@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "helusers.apps.HelusersConfig",
     "helusers.apps.HelusersAdminConfig",
+    "users",
     "hitas",
 ]
 
@@ -74,6 +75,7 @@ TEMPLATES = [
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
+AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/login/"
 
