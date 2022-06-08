@@ -1,0 +1,67 @@
+name: "Hitas CI"
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+
+    # Majority of the tests require database
+    services:
+      postgres:
+        image: postgres:13.7
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: "Checkout code"
+      uses: actions/checkout@v2
+
+    - name: "Set up Python 3.10"
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: "Install Poetry"
+      # The newer `install-poetry.py` is bugged: https://github.com/python-poetry/poetry/issues/3870
+      run: >
+        curl --silent --show-error -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+
+    - name: "Install test dependencies"
+      run: cd backend && ~/.poetry/bin/poetry install --no-root
+      env:
+        POETRY_VIRTUALENVS_CREATE: 0
+
+    - name: "Check code style"
+      run: >
+        cd backend
+        && black --check --diff .
+        && flake8 .
+        && isort --check-only --diff .
+
+    - name: "Run tests"
+      env:
+        SECRET_KEY: xxx
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/github_actions
+      run: cd backend && pytest -vvv --cov=. .
