@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  hitas-db:
+    image: postgres:13
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+        POSTGRES_USER: hitas
+        POSTGRES_PASSWORD: hitas
+        POSTGRES_DB: hitas
+
+  hitas:
+    container_name: hitas
+    build:
+      target: development
+      context: "."
+    volumes:
+        - .:/hitas
+    environment:
+        # Database location is controlled above by postgres config.
+        # Thus we override any value set in .env
+        - DATABASE_URL=postgres://hitas:hitas@hitas-db/hitas
+    env_file:
+        - .env
+    ports:
+      - "8000:8000"
+    restart: on-failure
+    depends_on:
+      - hitas-db
+
+volumes:
+    db_data:
+
