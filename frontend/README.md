@@ -47,6 +47,10 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 Checks for possibly conflicting rules between eslint and prettier
 
+#### `yarn run prettier-format`
+
+Checks (and when possible, fixes) prettier linting of the relevant files in the entire project
+
 ### Miscellaneous
 
 This project makes use of components from `hds-react` and `hds-core/hds-design-tokens` style abstractions.\
