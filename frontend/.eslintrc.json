@@ -1,47 +1,33 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true,
-    "amd": false
-  },
-  "globals": {
-    "angular": false,
-    "module": false,
-    "inject": false,
-    "document": false
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
+    "env": {
+        "browser": true,
+        "es2021": true
     },
-    "ecmaVersion": "latest",
-    "sourceType": "module"
-  },
-  "plugins": [
-    "react",
-    "@typescript-eslint",
-    "prettier"
-  ],
-  "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "printWidth": 80,
-        "trailingComma": "es5",
-        "semi": true,
-        "jsxSingleQuote": false,
-        "singleQuote": false,
-        "useTabs": false,
-        "eol-last": false
-      }
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "google",
+        "prettier"
+    ],
+    "rules": {
+        "no-console": 1,       // Means warning
+        "prettier/prettier": 2, // Means error
+        "quotes": 0,
+        "semicolons": 0,
+        "comma-dangle": 0,
+        "require-jsdoc":0
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "prettier"
     ]
-  }
 }

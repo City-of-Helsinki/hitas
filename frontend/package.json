@@ -23,13 +23,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "eslint-check": "eslint-config-prettier src/App.tsx"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "eslint-check": "eslint-config-prettier src/index.tsx",
+    "prettier-format": "prettier --config .prettierrc.json 'src/**/*.tsx' --write"
   },
   "browserslist": {
     "production": [
@@ -46,7 +41,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
-    "eslint": "^8.0.0",
+    "eslint": ">=5.16.0",
+    "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "7.0.1",
     "eslint-plugin-prettier": "^4.0.0",
