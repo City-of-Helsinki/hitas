@@ -1,4 +1,4 @@
-# Hitas backend for City of Helsinki 
+# Hitas backend for City of Helsinki
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ or
 
 4. Start the app `docker-compose up`
 
-5. Access Django admin from [localhost:8000/admin](http://localhost:8000/admin) 
+5. Access Django admin from [localhost:8000/admin](http://localhost:8000/admin)
 
 
 ### Running development environment without Docker
