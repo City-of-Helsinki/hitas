@@ -1,19 +1,19 @@
 [
   {
     "model": "users.user",
-    "pk": "8198b453-f557-40f7-a282-7548e5e28e03",
+    "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
     "fields": {
-      "password": "pbkdf2_sha256$260000$1v92r2n1vFpthLJA5muhde$qz68vRXwTf4hU7fFUZFOacfentNPSH8/Izwm08kRYPc=",
-      "last_login": "2022-06-17T12:07:54.103Z",
+      "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
+      "last_login": "2022-06-14T12:40:21.467Z",
       "is_superuser": true,
-      "username": "foo",
+      "username": "hitas",
       "first_name": "",
       "last_name": "",
-      "email": "foo@example.com",
+      "email": "hitas@example.com",
       "is_staff": true,
       "is_active": true,
       "date_joined": "2022-06-10T12:54:47.561Z",
-      "uuid": "82270950-e8bc-11ec-91f7-57e0ef3ccf79",
+      "uuid": "149689de-eca8-11ec-91f7-57e0ef3ccf79",
       "department_name": null,
       "groups": [],
       "user_permissions": [],
@@ -635,7 +635,7 @@
       "legacy_id": "581",
       "notes": "",
       "last_modified_datetime": "2022-06-20T10:00:50.506Z",
-      "last_modified_by": "8198b453-f557-40f7-a282-7548e5e28e03"
+      "last_modified_by": "09a0a600-a62d-44bd-b9ef-ab446eeccb28"
     }
   },
   {

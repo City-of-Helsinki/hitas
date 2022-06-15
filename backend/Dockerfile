@@ -1,69 +1,85 @@
-ARG VERSION=""
+FROM python:3.10-slim-bullseye as base
 
-# ==============================
-FROM python:3.10-slim-bullseye AS base
-# ==============================
-ENV PYTHONUNBUFFERED 1
+#
+# Set python defaults
+#
+ENV PYTHONUNBUFFERED 1 \
+    PYTHONFAULTHANDLER 1 \
+    PYTHONHASHSEED=random
 
-RUN mkdir /hitas-backend && \
-    groupadd -g 1000 appuser && \
-    useradd -u 1000 -g appuser -ms /bin/bash appuser
+#
+# Create user and directory for hitas
+#
+RUN mkdir /hitas && \
+    addgroup --gid 1000 hitas && \
+    adduser --disabled-login --ingroup hitas --no-create-home --home /nonexistent --gecos "hitas user" --shell /bin/false --uid 1000 hitas && \
+    chown hitas:hitas /hitas
 
-WORKDIR /hitas-backend
-
-COPY poetry.lock pyproject.toml /hitas-backend/
-
+#
+# Install common depedencies
+#
 RUN apt-get update && \
-    mkdir -p /usr/share/man/man1/ /usr/share/man/man3/ /usr/share/man/man7/ && \
     apt-get install -y --no-install-recommends \
-        libpq-dev \
-        build-essential \
-        postgresql-client \
+        libpq5 \
         gettext \
-        mime-support \
-        curl && \
-    curl -sSL --retry 5 https://install.python-poetry.org | python - && \
-    /root/.local/bin/poetry config virtualenvs.create false && \
-    /root/.local/bin/poetry install --no-dev --no-interaction && \
-    apt-get remove -y build-essential libpq-dev && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/cache/apt/archives && \
-    rm -rf /root/.cache/pypoetry && \
-    rm -rf /root/.cache/pip
+        mime-support
 
-COPY docker-entrypoint.sh /usr/local/bin
-ENTRYPOINT ["docker-entrypoint.sh"]
 
-# ==============================
-FROM base AS development
-# ==============================
+#
+# Build virtualenv
+#
+FROM base AS builder
 
-ENV DEBUG=1
-ENV APPLY_MIGRATIONS=1
-ENV COLLECT_STATIC=1
-ENV DEV_SERVER=1
+#
+# Install depedencies for building
+#
+RUN apt-get install -y --no-install-recommends \
+        libpq-dev \
+        build-essential
 
-RUN /root/.local/bin/poetry install
-COPY . /hitas-backend
-RUN chown -R appuser:appuser /hitas-backend
-USER appuser
-EXPOSE 8000
+#
+# Set defaults for pip and poetry
+#
+ENV POETRY_VERSION=1.1.13 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
 
-# ==============================
-FROM base AS production
-# ==============================
-ARG VERSION
+#
+# Poetry installation
+#
+RUN pip install "poetry==$POETRY_VERSION"
 
-ENV VERSION=${VERSION}
-ENV APPLY_MIGRATIONS=0
-ENV COLLECT_STATIC=1
 
-COPY . /hitas-backend
+#
+# Create virtualenv and install dependencies
+#
+USER hitas
+RUN python -m venv /hitas/venv
 
-# OpenShift runs container in arbitrary user which belongs to group `root` (0)
-RUN chgrp -R 0 /hitas-backend && \
-    chmod -R g=u /hitas-backend
-USER appuser:0
+RUN mkdir /hitas/build
+WORKDIR /hitas/build
+COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
+RUN poetry export | /hitas/venv/bin/pip install -r /dev/stdin
+
+#
+# Build the image
+#
+FROM base
+
+# Copy virtualenv
+COPY --from=builder --chown=hitas:hitas /hitas/venv /hitas/venv
+
+USER hitas
+RUN mkdir -p /hitas/backend
+WORKDIR /hitas/backend
+COPY --chown=hitas:hitas docker-entrypoint.sh ./
+ENTRYPOINT ["/hitas/backend/docker-entrypoint.sh"]
+
+COPY --chown=hitas:hitas manage.py uwsgi.ini ./
+COPY --chown=hitas:hitas hitas ./hitas
+COPY --chown=hitas:hitas config ./config
+COPY --chown=hitas:hitas templates ./templates
+COPY --chown=hitas:hitas users ./users
+COPY --chown=hitas:hitas initial.json ./
 
 EXPOSE 8000
