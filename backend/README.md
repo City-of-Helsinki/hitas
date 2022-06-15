@@ -16,11 +16,9 @@ or
 
 2. Ented the backend directory `cd hitas/backend`
 
-3. [Follow the instructions for environment variables](#environment-variables)
+4. Start the app by running `make`
 
-4. Start the app `docker-compose up`
-
-5. Access Django admin from [localhost:8000/admin](http://localhost:8000/admin)
+5. Access Django admin from [localhost:8080/admin](http://localhost:8080/admin). Default username `hitas`/`hitas`
 
 
 ### Running development environment without Docker
@@ -29,13 +27,12 @@ or
 * Install Python requirements: `poetry install`
 * Enable debug `echo 'DEBUG=True' >> .env` [And setup env variables](#environment-variables)
 * Run `python manage.py migrate`
-* Run `python manage.py runserver 0.0.0.0:8000`
+* Run `python manage.py runserver`
+* Access Django admin from [localhost:8000/admin](http://localhost:8080/admin). Default username `hitas`/`hitas`
 
 ### Testing
 
-* Running the tests in Docker: `docker-compose run --no-deps --rm --entrypoint='/bin/sh -c' hitas "pytest"`
-* Running the tests: `pytest`
-* Checking the project test coverage: `pytest --cov`
+* Running the tests: `make tests`
 
 ## Environment Variables
 
@@ -45,4 +42,5 @@ or
 ### Helpful commands
 
 * Opening a shell in the container: `docker-compose run --rm hitas bash`
-* Running code formatting and linting: `sh format.sh`
+* Running code formatting and linting: `make format`
+* Make a initial database dump: `make dump`
