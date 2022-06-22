@@ -2,8 +2,6 @@ version: "3.9"
 services:
   hitas-db:
     image: postgres:13
-    volumes:
-      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
@@ -29,7 +27,3 @@ services:
     restart: on-failure
     depends_on:
       - hitas-db
-
-volumes:
-    db_data:
-
