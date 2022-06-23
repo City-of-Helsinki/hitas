@@ -658,7 +658,7 @@
       "completion_date": "2021-07-07",
       "street_address": "Fakestreet 123",
       "postal_code": 1,
-      "building_identifier": "example-building-identifier"
+      "building_identifier": "100012345A"
     }
   }
 ]
