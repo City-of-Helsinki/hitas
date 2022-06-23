@@ -37,6 +37,22 @@ def validate_property_id(value: str) -> None:
         )
 
 
+def validate_building_id(value: str) -> None:
+    # Example valid value: '100012345A'
+    permanent_building_id_match = re.search(r"^1(\d{8})[A-Za-z0-9]$", value)
+    if permanent_building_id_match is not None:
+        # TODO: verify building id with the check digit
+        return
+
+    building_id_match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$", value)
+    if building_id_match is None:
+        raise ValidationError(
+            _("%(value)s is not an valid property id"),
+            params={"value": value},
+        )
+    # TODO: verify building id with the check digit
+
+
 class HousingCompanyState(Enum):
     NOT_READY = 0
     LESS_THAN_30_YEARS = 1
@@ -150,7 +166,12 @@ class Building(ExternalHitasModel):
     postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
 
     # 'rakennustunnus'
-    building_identifier = models.CharField(max_length=1024)
+    building_identifier = models.CharField(
+        blank=True,
+        max_length=25,
+        validators=[validate_building_id],
+        help_text=_("Format: 100012345A or 91-17-16-1 S 001"),
+    )
 
     class Meta:
         verbose_name = _("Building")
