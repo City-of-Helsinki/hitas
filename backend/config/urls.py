@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from hitas.views.housing_company import HousingCompanyListApiView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/v1/housing-companies", HousingCompanyListApiView.as_view(), name="list-housing-companies"),
 ]

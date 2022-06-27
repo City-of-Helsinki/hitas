@@ -125,6 +125,7 @@ class HousingCompany(ExternalHitasModel):
     class Meta:
         verbose_name = _("Housing company")
         verbose_name_plural = _("Housing companies")
+        ordering = ["id"]
 
         constraints = [
             models.CheckConstraint(name="acquisition_price_positive", check=models.Q(acquisition_price__gte=0)),
