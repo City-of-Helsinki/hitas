@@ -38,3 +38,8 @@
 * Opening a shell in the container: `docker-compose run --rm hitas bash`
 * Running code formatting and linting: `make format`
 * Make a initial database dump: `make dump`
+
+## API definitions
+
+* It's possible to take a look into `openapi.yaml`
+* After running `make` Swagger editor is running in [localhost:8090](localhost:8090)
