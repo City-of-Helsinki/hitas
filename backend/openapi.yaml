@@ -1,0 +1,369 @@
+openapi: 3.0.3
+info:
+  title: Hitas Helsinki APIs
+  version: 1.0.0
+  description: API definitions for Hitas Helsinki project.
+paths:
+  /api/v1/housing-companies:
+    get:
+      description: Fetch housing companies
+      operationId: list-housing-companies
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of housing companies
+          content:
+            application/json:
+              schema:
+                description: Single page of housing companies
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of housing companies
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HousingCompany'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    PagingLimitParameter:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 10
+        minimum: 1
+        maximum: 100
+      description: Specifies how many results are returned per page
+
+    PagingPageParameter:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 1
+        minimum: 1
+      description: Specifies the index of the returned page
+
+  schemas:
+    PageInfo:
+      description: Page metadata
+      type: object
+      properties:
+        size:
+          description: Size of the returned page
+          type: integer
+          format: int32
+          minimum: 0
+          example: 10
+        total_items:
+          description: Total items across all of the pages
+          type: integer
+          format: int32
+          minimum: 0
+          example: 100
+        current_page:
+          description: Current page number
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        total_pages:
+          description: Total number of pages
+          type: integer
+          format: int32
+          minimum: 0
+          example: 5
+        links:
+          description: Links to other pages
+          type: object
+          properties:
+            next:
+              description: Link to next page
+              type: string
+              nullable: true
+              example: 'http://example.com/api/v1/housing-companies?page=4'
+            previous:
+              description: Link to previous page
+              type: string
+              nullable: true
+              example: 'http://example.com/api/v1/housing-companies?page=2'
+      required:
+        - size
+        - total_items
+        - current_page
+        - total_pages
+        - links
+
+    HousingCompany:
+      description: Single housing company
+      type: object
+      required:
+        - address
+        - area
+        - date
+        - id
+        - name
+        - state
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        name:
+          description: Name of the housing company
+          type: string
+          example: Taloyhtiö Helmi
+          maxLength: 1024
+        state:
+          $ref: '#/components/schemas/HousingCompanyState'
+        address:
+          $ref: '#/components/schemas/Address'
+        area:
+          description: Hitas cost area information related to the housing company
+          type: object
+          readOnly: true
+          required:
+            - name
+            - cost_area
+          properties:
+            name:
+              description: Area name based on the postal code
+              type: string
+              example: Helsinki Keskusta - Etu-Töölö
+            cost_area:
+              description: Hitas cost area based on the postal code
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4
+              example: 1
+        date:
+          description: Year of first construction based on the housing company's earliest constructed building
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+
+    Address:
+      description: Address information
+      type: object
+      required:
+        - street
+        - postal_code
+        - city
+      properties:
+        street:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        postal_code:
+          description: Postal code
+          type: string
+          example: "00100"
+        city:
+          description: City based on the postal code
+          type: string
+          readOnly: true
+          example: Helsinki
+
+    HousingCompanyState:
+      description: |-
+        Housing company state
+
+        Can have the following values:
+        - not_ready
+        - less_than_30_years
+        - greater_than_30_years_not_free
+        - greater_than_30_years_free
+        - greater_than_30_years_plot_department_notification
+        - ready_no_statistics
+      type: string
+      example: greater_than_30_years_not_free
+      x-extensible-enum:
+        - not_ready
+        - less_than_30_years
+        - greater_than_30_years_not_free
+        - greater_than_30_years_free
+        - greater_than_30_years_plot_department_notification
+        - ready_no_statistics
+
+    # Errors
+
+    BadRequestError:
+      description: Bad request error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          example: 400
+          enum: [400]
+        reason:
+          description: Error phrase
+          type: string
+          example: "Bad Request"
+          enum: ["Bad Request"]
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Request could not be processed due to malformed request
+        error:
+          description: |-
+            Error reason
+
+            Can have the following values:
+            - bad_request
+          type: string
+          example: bad_request
+          x-extensible-enum:
+            - bad_request
+        fields:
+          description: Details about specific validation failures on specific fields
+          type: array
+          items:
+            description: Single field validation details
+            type: object
+            required:
+              - field
+              - message
+            properties:
+              field:
+                description: Name of the field
+                type: string
+                example: name
+              message:
+                description: Error message with details about the failure
+                type: string
+                example: Length exceeds maximum length of 50
+
+    NotFoundError:
+      description: Not found error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [404]
+          example: 404
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Not Found"]
+          example: Not Found
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Housing company not found
+        error:
+          description: |-
+            Error reason
+
+            Can have the following values:
+            - housing_company_not_found
+          type: string
+          example: housing_company_not_found
+          x-extensible-enum:
+            - housing_company_not_found
+
+    InternalServerError:
+      type: object
+      description: Internal server error
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [500]
+          example: 500
+        reason:
+          description: Error phrase
+          type: string
+          example: Internal Server Error
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Unexpected internal server error occurred
+        error:
+          description: Error reason
+          type: string
+          enum: [internal_server_error]
+          example: internal_server_error
+
+  responses:
+
+    BadRequest:
+      description: The request was malformed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+          example:
+            status: 400
+            reason: Bad Request
+            error: bad_request
+            details: Some fields failed validation
+            fields:
+              - field: name
+                message: Length exceeds maximum length of 50
+              - field: age
+                message: Age must be within range [0, 200]
+              - field: email
+                message: Email is required
+
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+          example:
+            status: 404
+            reason: Not Found
+            error: housing_company_not_found
+            message: Housing company not found
+
+    InternalServerError:
+      description: Unexpected internal server error occurred
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+          example:
+            status: 500
+            reason: Internal Server Error
+            error: internal_server_error
+            message: Unexpected internal server error occurred
+

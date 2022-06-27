@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "users",
     "hitas",
     "nested_inline",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
+
+REST_FRAMEWORK = {"EXCEPTION_HANDLER": "hitas.exceptions.exception_handler"}
 
 TEMPLATES = [
     {

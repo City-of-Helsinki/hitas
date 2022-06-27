@@ -11,6 +11,8 @@ format:
 	flake8 .
 
 tests:
+	# fast workaround for now: start database for API tests...
+	docker-compose up -d postgres
 	pytest --cov
 
 dump:
