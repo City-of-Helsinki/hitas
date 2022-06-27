@@ -150,6 +150,10 @@ class RealEstate(ExternalHitasModel):
     street_address = models.CharField(max_length=1024)
     postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
 
+    @property
+    def city(self):
+        return hitas_city(self.postal_code.value)
+
     class Meta:
         verbose_name = _("Real estate")
         verbose_name_plural = _("Real estates")
@@ -160,6 +164,7 @@ class RealEstate(ExternalHitasModel):
 
 # Rakennus
 class Building(ExternalHitasModel):
+    housing_company = models.ForeignKey(HousingCompany, on_delete=models.PROTECT)
     real_estate = models.ForeignKey(RealEstate, on_delete=models.PROTECT)
     completion_date = models.DateField(null=True)
 
@@ -173,6 +178,10 @@ class Building(ExternalHitasModel):
         validators=[validate_building_id],
         help_text=_("Format: 100012345A or 91-17-16-1 S 001"),
     )
+
+    @property
+    def city(self):
+        return hitas_city(self.postal_code.value)
 
     class Meta:
         verbose_name = _("Building")

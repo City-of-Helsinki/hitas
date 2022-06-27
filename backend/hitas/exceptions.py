@@ -15,6 +15,18 @@ class HitasException(Exception):
     pass
 
 
+class HousingCompanyNotFound(HitasException):
+    def __init__(self):
+        self.status_code = 404
+
+        self.data = {
+            "status": 404,
+            "reason": "Not Found",
+            "message": "Housing company not found",
+            "error": "housing_company_not_found",
+        }
+
+
 class InvalidPage(HitasException):
     def __init__(self):
         self.status_code = 400
