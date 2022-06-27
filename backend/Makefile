@@ -1,6 +1,6 @@
 .PHONY = build format tests dump
 
-build:
+build: tests
 	./manage.py collectstatic --clear --no-input --verbosity=0
 	docker-compose up --detach --build
 
