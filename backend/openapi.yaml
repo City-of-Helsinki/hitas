@@ -37,6 +37,30 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/housing-companies/{housing_company_id}:
+    get:
+      description: Fetch a single housing company by id
+      operationId: read-housing-company
+      parameters:
+      - name: housing_company_id
+        required: true
+        in: path
+        description: Housing company ID
+        schema:
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully fetched list of housing companies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
@@ -162,6 +186,115 @@ components:
           format: date
           nullable: true
           readOnly: true
+
+    HousingCompanyDetails:
+      description: Single housing company's details
+      type: object
+      required:
+        - address
+        - area
+        - date
+        - id
+        - name
+        - state
+        - business_id
+        - real_estates
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        name:
+          description: Name information about the housing company
+          type: object
+          required:
+            - official
+            - display
+          properties:
+            official:
+              description: Official name of the housing company. Better suited for official documents, etc.
+              type: string
+              maxLength: 1024
+              example: As Oy Taloyhtiö Helmi
+            display:
+              description: Simpler form of official name. Better suited for displaying housing company's name
+              type: string
+              maxLength: 1024
+              example: Taloyhtiö Helmi
+        business_id:
+          description: Official business ID
+          type: string
+          pattern: '^\d{7}-\d$'
+          example: 1234567-8
+        state:
+          $ref: '#/components/schemas/HousingCompanyState'
+        address:
+          $ref: '#/components/schemas/Address'
+        area:
+          description: Hitas cost area information related to the housing company
+          type: object
+          readOnly: true
+          required:
+            - name
+            - cost_area
+          properties:
+            name:
+              description: Area name based on the postal code
+              type: string
+              example: Helsinki Keskusta - Etu-Töölö
+            cost_area:
+              description: Hitas cost area based on the postal code
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4
+              example: 1
+        date:
+          description: Year of first construction based on the housing company's earliest constructed building
+          type: string
+          format: date
+          readOnly: true
+        real_estates:
+          description: List of real estates this housing company has
+          type: array
+          items:
+            description: Single real estate
+            type: object
+            required:
+              - property_identifier
+              - address
+              - buildings
+            properties:
+              property_identifier:
+                description: This real estate's official property identifier
+                type: string
+                pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
+              address:
+                $ref: '#/components/schemas/Address'
+              buildings:
+                description: List of buildings this real estate has
+                type: array
+                items:
+                  description: Single building
+                  type: object
+                  required:
+                    - address
+                    - completion_date
+                  properties:
+                    address:
+                      $ref: '#/components/schemas/Address'
+                    completion_date:
+                      description: Building's construction completion date
+                      type: string
+                      format: date
+                      nullable: true
+                    building_identifier:
+                      description: This building's official identifier
+                      type: string
+                      pattern: '^1\d{8}[A-Za-z0-9]$'
+                      nullable: true
+                      example: 100012345A
 
     Address:
       description: Address information
