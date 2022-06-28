@@ -1,5 +1,7 @@
 import openapi_core
 import yaml
+from crum import impersonate
+from django.contrib.auth import get_user_model
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
 from openapi_core.validation.response.validators import ResponseValidator
 from rest_framework.response import Response
@@ -20,19 +22,20 @@ def validate_openapi(response: Response) -> None:
 
 
 def create_test_housing_company(idx: int) -> HousingCompany:
-    return HousingCompany.objects.create(
-        display_name=f"test-housing-company-{idx}",
-        official_name=f"test-housing-company-{idx}-as-oy",
-        street_address=f"test-street-address-{idx}",
-        business_id="1234567-8",
-        acquisition_price=10.0,
-        primary_loan=10.0,
-        building_type_id=1,
-        developer_id=1,
-        financing_method_id=1,
-        postal_code_id=1,
-        property_manager_id=1,
-    )
+    with impersonate(get_user_model().objects.first()):
+        return HousingCompany.objects.create(
+            display_name=f"test-housing-company-{idx}",
+            official_name=f"test-housing-company-{idx}-as-oy",
+            street_address=f"test-street-address-{idx}",
+            business_id="1234567-8",
+            acquisition_price=10.0,
+            primary_loan=10.0,
+            building_type_id=1,
+            developer_id=1,
+            financing_method_id=1,
+            postal_code_id=1,
+            property_manager_id=1,
+        )
 
 
 def create_test_real_estate(hc: HousingCompany, idx: int) -> RealEstate:

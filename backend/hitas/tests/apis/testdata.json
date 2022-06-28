@@ -1,5 +1,26 @@
 [
   {
+    "model": "users.user",
+    "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
+    "fields": {
+      "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
+      "last_login": "2022-06-14T12:40:21.467Z",
+      "is_superuser": true,
+      "username": "hitas",
+      "first_name": "",
+      "last_name": "",
+      "email": "hitas@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2022-06-10T12:54:47.561Z",
+      "uuid": "149689de-eca8-11ec-91f7-57e0ef3ccf79",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
     "model": "hitas.buildingtype",
     "pk": 1,
     "fields": {
