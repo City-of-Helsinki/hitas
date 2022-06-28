@@ -1,10 +1,10 @@
 import re
 
+from crum import get_current_user
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django_currentuser.db.models import CurrentUserField
-from django_currentuser.middleware import get_current_authenticated_user
 from enumfields import Enum, EnumIntegerField
 
 from hitas.models._base import ExternalHitasModel
@@ -103,7 +103,7 @@ class HousingCompany(ExternalHitasModel):
     legacy_id = models.CharField(max_length=10, blank=True)
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)
-    last_modified_by = CurrentUserField(on_update=True)
+    last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
     @property
     def city(self):
@@ -119,7 +119,7 @@ class HousingCompany(ExternalHitasModel):
         return f"{hitas_city(pc.value)}-{hitas_cost_area(pc.value)}: {pc.description}"
 
     def save(self, *args, **kwargs):
-        self.last_modified_by = get_current_authenticated_user()
+        self.last_modified_by = get_current_user()
         super(HousingCompany, self).save(*args, **kwargs)
 
     class Meta:

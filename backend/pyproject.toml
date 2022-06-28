@@ -15,8 +15,8 @@ django-filter = "^21.1"
 Markdown = "^3.3.7"
 djangorestframework = "^3.13.1"
 django-nested-inline = "^0.4.5"
-django-currentuser = "^0.5.3"
 uWSGI = "^2.0.20"
+django-crum = "^0.7.9"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"

@@ -198,15 +198,15 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-currentuser"
-version = "0.5.3"
-description = "Conveniently store reference to request user on thread/db level."
+name = "django-crum"
+version = "0.7.9"
+description = "Django middleware to capture current request and user."
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-Django = {version = ">=1.11.17,<3.3", markers = "python_version >= \"2.7\""}
+django = ">=1.8"
 
 [[package]]
 name = "django-enumfields"
@@ -1032,7 +1032,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "4a253180a5c67c06744d2f730d021df9a3297b5b7b7f99a212dd7151724b9dd1"
+content-hash = "f70294da2fc7e1e953444576cf6bbeab018770fed45b618b1063fe68910e9cce"
 
 [metadata.files]
 appnope = [
@@ -1167,9 +1167,9 @@ django = [
     {file = "Django-3.2.13-py3-none-any.whl", hash = "sha256:b896ca61edc079eb6bbaa15cf6071eb69d6aac08cce5211583cfb41515644fdf"},
     {file = "Django-3.2.13.tar.gz", hash = "sha256:6d93497a0a9bf6ba0e0b1a29cccdc40efbfc76297255b1309b3a884a688ec4b6"},
 ]
-django-currentuser = [
-    {file = "django-currentuser-0.5.3.tar.gz", hash = "sha256:6dca73d6b3a358d421662d45020d1e64ae2b4492deef2eb2428f4e48441547a0"},
-    {file = "django_currentuser-0.5.3-py2.py3-none-any.whl", hash = "sha256:3d4424204da1efbe25d3afe7ae9044662e99904e117e3e788a97394d7269125e"},
+django-crum = [
+    {file = "django-crum-0.7.9.tar.gz", hash = "sha256:65e9bc0f070a663fafc4d9e357f45fd4e6f01838b20a9e2fb7670f5706754288"},
+    {file = "django_crum-0.7.9-py2.py3-none-any.whl", hash = "sha256:037cc8b822975bb1d41cd24269b59a512cc77448fadc3f34ab9a17b229b4b471"},
 ]
 django-enumfields = [
     {file = "django-enumfields-2.1.1.tar.gz", hash = "sha256:f64841732a9c343f5071220e0abcf5f51c9472c06e3c33d7c6a7ec27b6087561"},
