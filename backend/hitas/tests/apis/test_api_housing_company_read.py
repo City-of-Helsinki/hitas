@@ -12,6 +12,36 @@ from hitas.tests.apis.helpers import (
 )
 
 
+def assert_about_now(data, path) -> datetime.datetime:
+    value = _get_value(data, path, mandatory=True)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    diff = now - value
+    if -1 < diff.total_seconds() < 5:
+        return value
+    else:
+        raise Exception(f"Too big difference. Value: '{value}', now: '{now}', difference: {diff} seconds.")
+
+
+def _get_value(data, path, mandatory=True):
+    current_value = data
+    current_path = ""
+
+    for part in path.split("."):
+        current_path += part
+        if getattr(current_value, "get", None) is None:
+            raise Exception(f"Data not not dict for path '{current_path}'.")
+
+        current_value = current_value.get(part)
+        if current_value is None:
+            if mandatory:
+                raise Exception(f"Data not found for path '{path}'.")
+            else:
+                return None
+        current_path += "."
+
+    return current_value
+
+
 class ReadHousingCompanyTests(APITestCase):
     fixtures = ["hitas/tests/apis/testdata.json"]
     maxDiff = None
@@ -36,23 +66,56 @@ class ReadHousingCompanyTests(APITestCase):
         # Validate response
         validate_openapi(response)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        now = assert_about_now(response.data, "last_modified.datetime")
         self.assertDictEqual(
             dict(response.data),
             {
-                "id": hc1.uuid.hex,
-                "business_id": "1234567-8",
-                "name": {
-                    "display": "test-housing-company-1",
-                    "official": "test-housing-company-1-as-oy",
-                },
-                "state": "not_ready",
+                "acquisition_price": {"initial": 10.00, "realized": None},
                 "address": {
                     "street": "test-street-address-1",
                     "postal_code": "00100",
                     "city": "Helsinki",
                 },
                 "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
+                "building_type": {
+                    "code": "001",
+                    "value": "tuntematon",
+                    "description": None,
+                },
+                "business_id": "1234567-8",
                 "date": datetime.date(2021, 1, 1),
+                "developer": {
+                    "code": "000",
+                    "value": "Tuntematon",
+                    "description": None,
+                },
+                "financing_method": {
+                    "code": "000",
+                    "value": "tuntematon",
+                    "description": None,
+                },
+                "id": hc1.uuid.hex,
+                "last_modified": {
+                    "user": {
+                        "first_name": None,
+                        "last_name": None,
+                        "username": "hitas",
+                    },
+                    "datetime": now,
+                },
+                "legacy_id": None,
+                "name": {
+                    "display": "test-housing-company-1",
+                    "official": "test-housing-company-1-as-oy",
+                },
+                "notes": None,
+                "notification_date": None,
+                "primary_loan": 10.00,
+                "property_manager": {
+                    "address": {"city": "Helsinki", "postal_code": "00100", "street": "Fakestreet 123"},
+                    "email": "iskonen@example.com",
+                    "name": "Isännöitsijä Iskonen Oy",
+                },
                 "real_estates": [
                     # First real estate
                     {
@@ -98,6 +161,8 @@ class ReadHousingCompanyTests(APITestCase):
                         ],
                     },
                 ],
+                "state": "not_ready",
+                "sales_price_catalogue_confirmation_date": None,
             },
         )
 

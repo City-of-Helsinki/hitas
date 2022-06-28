@@ -255,6 +255,91 @@ components:
           type: string
           format: date
           readOnly: true
+        financing_method:
+          $ref: '#/components/schemas/Code'
+        building_type:
+          $ref: '#/components/schemas/Code'
+        developer:
+          $ref: '#/components/schemas/Code'
+        property_manager:
+          $ref: '#/components/schemas/PropertyManager'
+        acquisition_price:
+          description: Acquisition price information
+          type: object
+          required:
+            - initial
+            - realized
+          properties:
+            initial:
+              description: Initial acquisition price
+              type: number
+              format: float
+              example: 112000.00
+            realized:
+              description: Realized acquisition price
+              type: number
+              format: float
+              nullable: true
+              example: 112000.00
+        primary_loan:
+          description: Primary loan
+          type: number
+          format: float
+          nullable: true
+          example: 112000.00
+        sales_price_catalogue_confirmation_date:
+          description: Sales price catalogue confirmation date
+          type: string
+          format: date
+          nullable: true
+        notification_date:
+          description: Notification date
+          type: string
+          format: date
+          nullable: true
+        legacy_id:
+          description: Old legacy ID for this housing company
+          type: string
+          readOnly: true
+          nullable: true
+        notes:
+          description: Optional notes for this housing company
+          type: string
+          nullable: true
+        last_modified:
+          description: Last modified informatoin
+          type: object
+          readOnly: true
+          required:
+            - user
+            - datetime
+          properties:
+            user:
+              description: User who last modified this housing company
+              type: object
+              required:
+                - username
+                - first_name
+                - last_name
+              properties:
+                user:
+                  description: Username of this user
+                  type: string
+                  example: mameik01
+                first_name:
+                  description: First name of this user
+                  type: string
+                  nullable: true
+                  example: Matti
+                last_name:
+                  description: Last name of this user
+                  type: string
+                  nullable: true
+                  example: Meikäläinen
+            datetime:
+              description: When this housing company was last modified
+              type: string
+              format: date-time
         real_estates:
           description: List of real estates this housing company has
           type: array
@@ -317,6 +402,47 @@ components:
           type: string
           readOnly: true
           example: Helsinki
+
+    Code:
+      description: Hitas codebook entry
+      type: object
+      required:
+        - value
+        - description
+        - code
+      properties:
+        value:
+          description: Value for this code
+          type: string
+          example: luhtitalo
+        description:
+          description: Description of this code
+          type: string
+          nullable: true
+          example: This building type is for luhtitalo
+        code:
+          description: Code number
+          type: string
+          example: 001
+
+    PropertyManager:
+      description: Property manager information
+      type: object
+      required:
+        - name
+        - email
+        - address
+      properties:
+        name:
+          description: Name of this property manager
+          type: string
+          example: Ismo Isännöitsijät Oy
+        email:
+          description: Meail for this property manager
+          type: string
+          example: ismo@example.com
+        address:
+          $ref: '#/components/schemas/Address'
 
     HousingCompanyState:
       description: |-
