@@ -2,44 +2,14 @@ from collections import defaultdict
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import EmptyPage, PageNotAnInteger
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers, status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hitas.exceptions import HousingCompanyNotFound, InvalidPage
+from hitas.exceptions import HousingCompanyNotFound
 from hitas.models.housing_company import Building, HousingCompany
-
-
-class HitasPagination(PageNumberPagination):
-    def get_page_number(self, request, paginator):
-        """
-        Overwrite this function from PageNumberPagination so that
-        the errors are handled a bit differently.
-
-        `PageNumberPagination.paginate_queryset` will first call this and then eventually call `Paginator.page()` which
-        will validate the page number as well. if that raises an error then `PageNumberPagination` will raise `Http404`
-        which we don't want.
-        """
-
-        number = super(HitasPagination, self).get_page_number(request, paginator)
-
-        try:
-            paginator.validate_number(number)
-        except PageNotAnInteger:
-            raise InvalidPage()
-        except EmptyPage:
-            if int(number) < 1:
-                # If the given page number is an integer but not a positive one, then we throw the invalid page
-                # exception as well
-                raise InvalidPage()
-            else:
-                # if the given page is higher than maximum number of pages then let's just return the last page
-                number = paginator.num_pages
-
-        return number
+from hitas.views.paginator import get_default_paginator
 
 
 class HousingCompanyListSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
@@ -220,10 +190,7 @@ SELECT MIN(completion_date) FROM hitas_building AS b
             .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
         )
 
-        paginator = HitasPagination()
-        paginator.page_size = 10
-        paginator.page_size_query_param = "limit"
-        paginator.max_page_size = 100
+        paginator = get_default_paginator()
         result_page = paginator.paginate_queryset(housing_companies, request)
         serializer = HousingCompanyListSerializer(result_page, many=True)
 
