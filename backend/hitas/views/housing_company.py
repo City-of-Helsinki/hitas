@@ -1,4 +1,6 @@
+import datetime
 from collections import defaultdict
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,6 +11,7 @@ from rest_framework.views import APIView
 
 from hitas.exceptions import HousingCompanyNotFound
 from hitas.models.housing_company import Building, HousingCompany
+from hitas.views.helpers import Address, Code, address_obj, code_to_obj, to_float, value_or_null
 from hitas.views.paginator import get_default_paginator
 
 
@@ -20,23 +23,19 @@ class HousingCompanyListSerializer(EnumSupportSerializerMixin, serializers.Model
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
 
-    def get_id(self, obj):
+    def get_id(self, obj: HousingCompany) -> str:
         return obj.uuid.hex
 
-    def get_state(self, obj):
+    def get_state(self, obj: HousingCompany) -> str:
         return obj.state.name.lower()
 
-    def get_address(self, obj):
-        return {
-            "street": obj.street_address,
-            "postal_code": obj.postal_code.value,
-            "city": obj.city,
-        }
+    def get_address(self, obj: HousingCompany) -> Address:
+        return address_obj(obj)
 
-    def get_area(self, obj):
+    def get_area(self, obj: HousingCompany) -> Dict[str, Any]:
         return {"name": obj.postal_code.description, "cost_area": obj.area}
 
-    def get_date(self, obj):
+    def get_date(self, obj: HousingCompany) -> datetime.date:
         return obj.date
 
     class Meta:
@@ -52,33 +51,79 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
     real_estates = serializers.SerializerMethodField()
+    building_type = serializers.SerializerMethodField()
+    financing_method = serializers.SerializerMethodField()
+    developer = serializers.SerializerMethodField()
+    property_manager = serializers.SerializerMethodField()
+    acquisition_price = serializers.SerializerMethodField()
+    primary_loan = serializers.SerializerMethodField()
+    last_modified = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
+    legacy_id = serializers.SerializerMethodField()
 
-    def get_name(self, obj):
+    def get_id(self, obj: HousingCompany) -> str:
+        return obj.uuid.hex
+
+    def get_name(self, obj: HousingCompany) -> Dict[str, str]:
         return {
             "display": obj.display_name,
             "official": obj.official_name,
         }
 
-    def get_id(self, obj):
-        return obj.uuid.hex
+    def get_legacy_id(self, obj: HousingCompany) -> Optional[str]:
+        return value_or_null(obj.legacy_id)
 
-    def get_state(self, obj):
+    def get_notes(self, obj: HousingCompany) -> Optional[str]:
+        return value_or_null(obj.notes)
+
+    def get_state(self, obj: HousingCompany) -> str:
         return obj.state.name.lower()
 
-    def get_address(self, obj):
-        return {
-            "street": obj.street_address,
-            "postal_code": obj.postal_code.value,
-            "city": obj.city,
-        }
+    def get_address(self, obj: HousingCompany) -> Address:
+        return address_obj(obj)
 
-    def get_area(self, obj):
+    def get_area(self, obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.description, "cost_area": obj.area}
 
-    def get_date(self, obj):
+    def get_date(self, obj: HousingCompany) -> datetime.date:
         return obj.date
 
-    def get_real_estates(self, obj):
+    def get_building_type(self, obj: HousingCompany) -> Code:
+        return code_to_obj(obj.building_type)
+
+    def get_financing_method(self, obj: HousingCompany) -> Code:
+        return code_to_obj(obj.financing_method)
+
+    def get_developer(self, obj: HousingCompany) -> Code:
+        return code_to_obj(obj.developer)
+
+    def get_property_manager(self, obj) -> Dict[str, Any]:
+        return {
+            "name": obj.property_manager.name,
+            "email": obj.property_manager.email,
+            "address": address_obj(obj.property_manager),
+        }
+
+    def get_acquisition_price(self, obj: HousingCompany) -> Dict[str, float]:
+        return {
+            "initial": to_float(obj.acquisition_price),
+            "realized": to_float(obj.realized_acquisition_price),
+        }
+
+    def get_primary_loan(self, obj: HousingCompany) -> float:
+        return to_float(obj.primary_loan)
+
+    def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
+        return {
+            "user": {
+                "username": obj.last_modified_by.username,
+                "first_name": value_or_null(obj.last_modified_by.first_name),
+                "last_name": value_or_null(obj.last_modified_by.last_name),
+            },
+            "datetime": obj.last_modified_datetime,
+        }
+
+    def get_real_estates(self, obj: HousingCompany) -> List[Dict[str, Any]]:
         # Select all buildings for this housing company with one query instead
         # of having one query per property
         buildings_by_real_estate = defaultdict(list)
@@ -120,7 +165,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
                                     "postal_code": b.postal_code.value,
                                     "city": b.city,
                                 },
-                                "building_identifier": b.building_identifier if b.building_identifier != "" else None,
+                                "building_identifier": value_or_null(b.building_identifier),
                                 "completion_date": b.completion_date,
                             },
                             buildings_by_real_estate[re.id],
@@ -133,7 +178,27 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
 
     class Meta:
         model = HousingCompany
-        fields = ["id", "business_id", "name", "state", "address", "area", "date", "real_estates"]
+        fields = [
+            "id",
+            "business_id",
+            "name",
+            "state",
+            "address",
+            "area",
+            "date",
+            "real_estates",
+            "financing_method",
+            "building_type",
+            "developer",
+            "property_manager",
+            "acquisition_price",
+            "primary_loan",
+            "sales_price_catalogue_confirmation_date",
+            "notification_date",
+            "legacy_id",
+            "notes",
+            "last_modified",
+        ]
 
 
 class HousingCompanyDetailApiView(APIView):
@@ -154,16 +219,49 @@ class HousingCompanyDetailApiView(APIView):
     """
                     }
                 )
-                .select_related("postal_code")
+                .select_related(
+                    "postal_code",
+                    "financing_method",
+                    "developer",
+                    "building_type",
+                    "property_manager",
+                    "property_manager__postal_code",
+                    "last_modified_by",
+                )
                 .only(
                     "uuid",
                     "state",
                     "postal_code__value",
                     "postal_code__description",
+                    "financing_method__value",
+                    "financing_method__description",
+                    "financing_method__legacy_code_number",
+                    "developer__value",
+                    "developer__description",
+                    "developer__legacy_code_number",
+                    "building_type__value",
+                    "building_type__description",
+                    "building_type__legacy_code_number",
+                    "property_manager__name",
+                    "property_manager__email",
+                    "property_manager__street_address",
+                    "property_manager__postal_code__value",
+                    "property_manager__postal_code__description",
                     "display_name",
                     "street_address",
                     "business_id",
                     "official_name",
+                    "acquisition_price",
+                    "realized_acquisition_price",
+                    "primary_loan",
+                    "sales_price_catalogue_confirmation_date",
+                    "notification_date",
+                    "legacy_id",
+                    "notes",
+                    "last_modified_by__username",
+                    "last_modified_by__first_name",
+                    "last_modified_by__last_name",
+                    "last_modified_datetime",
                 )
                 .get(uuid=uuid)
             )
