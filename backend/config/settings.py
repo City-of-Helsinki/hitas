@@ -60,6 +60,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
+TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
+
 REST_FRAMEWORK = {"EXCEPTION_HANDLER": "hitas.exceptions.exception_handler"}
 
 TEMPLATES = [
