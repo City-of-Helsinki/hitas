@@ -11,8 +11,8 @@
 
 1. Clone this repository
 2. Enter the backend directory `cd hitas/backend`
-4. Start the app by running `make`
-5. Access Django admin from [localhost:8080/admin](http://localhost:8080/admin). Default username `hitas`/`hitas`
+3. Start the app by running `make`
+4. Access Django admin from [localhost:8080/admin](http://localhost:8080/admin). Default username `hitas`/`hitas`
 
 
 ### Running development environment without Docker
