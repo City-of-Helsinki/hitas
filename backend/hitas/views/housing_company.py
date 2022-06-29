@@ -10,8 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hitas.exceptions import HousingCompanyNotFound
-from hitas.models.housing_company import Building, HousingCompany, RealEstate
-from hitas.models.property_manager import PropertyManager
+from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
 from hitas.views.helpers import Address, Code, address_obj, code_to_obj, to_float, value_or_null
 from hitas.views.paginator import get_default_paginator
 

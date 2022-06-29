@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from hitas.models.property_manager import PropertyManager
+from hitas.models import PropertyManager
 
 
 @admin.register(PropertyManager)
