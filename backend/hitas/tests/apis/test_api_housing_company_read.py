@@ -61,7 +61,7 @@ class ReadHousingCompanyTests(APITestCase):
         create_test_building(re3, 4, "2000-01-01")
 
         # Make the request
-        response = self.client.get(reverse("read-housing-company", args=[hc1.uuid.hex]))
+        response = self.client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
 
         # Validate response
         validate_openapi(response)
@@ -177,7 +177,7 @@ class ReadHousingCompanyTests(APITestCase):
         create_test_housing_company(1)
 
         # Make the request
-        response = self.client.get(reverse("read-housing-company", args=[id]))
+        response = self.client.get(reverse("hitas:housing-company-detail", args=[id]))
 
         # Validate response
         validate_openapi(response)

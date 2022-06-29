@@ -5,9 +5,8 @@ from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
 from enumfields.drf.serializers import EnumSupportSerializerMixin
-from rest_framework import serializers, status
+from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
@@ -224,8 +223,49 @@ class PropertyManagerSerializer(serializers.ModelSerializer):
         ]
 
 
-class HousingCompanyDetailApiView(APIView):
-    def get(self, request, housing_company_id, *args, **kwargs):
+class HousingCompanyView(viewsets.ModelViewSet):
+    queryset = HousingCompany.objects.all()
+    serializer_class = HousingCompanyDetailSerializer
+    permission_classes = []
+    lookup_field = "housing_company_id"
+
+    def list(self, request):
+        housing_companies = (
+            HousingCompany.objects.extra(
+                select={
+                    "date": """
+SELECT MIN(completion_date) FROM hitas_building AS b
+    LEFT JOIN hitas_realestate AS re ON b.real_estate_id = re.id
+    WHERE re.housing_company_id = hitas_housingcompany.id
+"""
+                }
+            )
+            .select_related("postal_code")
+            .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
+        )
+
+        paginator = get_default_paginator()
+        result_page = paginator.paginate_queryset(housing_companies, request)
+        serializer = HousingCompanyListSerializer(result_page, many=True)
+
+        return Response(
+            {
+                "page": {
+                    "current_page": paginator.page.number,
+                    "size": len(result_page),
+                    "total_items": paginator.page.paginator.count,
+                    "total_pages": paginator.page.paginator.num_pages,
+                    "links": {
+                        "next": paginator.get_next_link(),
+                        "previous": paginator.get_previous_link(),
+                    },
+                },
+                "contents": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def retrieve(self, request, housing_company_id=None):
         try:
             uuid = UUID(hex=housing_company_id)
         except ValueError:
@@ -293,41 +333,3 @@ class HousingCompanyDetailApiView(APIView):
 
         serializer = HousingCompanyDetailSerializer(housing_company)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class HousingCompanyListApiView(APIView):
-    def get(self, request, *args, **kwargs):
-        housing_companies = (
-            HousingCompany.objects.extra(
-                select={
-                    "date": """
-SELECT MIN(completion_date) FROM hitas_building AS b
-    LEFT JOIN hitas_realestate AS re ON b.real_estate_id = re.id
-    WHERE re.housing_company_id = hitas_housingcompany.id
-"""
-                }
-            )
-            .select_related("postal_code")
-            .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
-        )
-
-        paginator = get_default_paginator()
-        result_page = paginator.paginate_queryset(housing_companies, request)
-        serializer = HousingCompanyListSerializer(result_page, many=True)
-
-        return Response(
-            {
-                "page": {
-                    "current_page": paginator.page.number,
-                    "size": len(result_page),
-                    "total_items": paginator.page.paginator.count,
-                    "total_pages": paginator.page.paginator.num_pages,
-                    "links": {
-                        "next": paginator.get_next_link(),
-                        "previous": paginator.get_previous_link(),
-                    },
-                },
-                "contents": serializer.data,
-            },
-            status=status.HTTP_200_OK,
-        )
