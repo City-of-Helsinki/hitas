@@ -140,7 +140,7 @@ class HousingCompany(ExternalHitasModel):
 
 # Kiinteistö
 class RealEstate(ExternalHitasModel):
-    housing_company = models.ForeignKey(HousingCompany, on_delete=models.PROTECT)
+    housing_company = models.ForeignKey(HousingCompany, on_delete=models.PROTECT, related_name="real_estates")
 
     # 'kiinteistötunnus'
     property_identifier = models.CharField(
@@ -164,7 +164,7 @@ class RealEstate(ExternalHitasModel):
 
 # Rakennus
 class Building(ExternalHitasModel):
-    real_estate = models.ForeignKey(RealEstate, on_delete=models.PROTECT)
+    real_estate = models.ForeignKey(RealEstate, on_delete=models.PROTECT, related_name="buildings")
     completion_date = models.DateField(null=True)
 
     street_address = models.CharField(max_length=1024)
