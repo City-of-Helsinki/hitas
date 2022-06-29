@@ -9,12 +9,14 @@ from rest_framework.response import Response
 
 from hitas.models import Building, HousingCompany, RealEstate
 
+with open("openapi.yaml", "r") as spec_file:
+    _openapi_spec = openapi_core.create_spec(yaml.safe_load(spec_file))
+
 
 def validate_openapi(response: Response) -> None:
-    with open("openapi.yaml", "r") as spec_file:
-        openapi = yaml.safe_load(spec_file)
+    global _openapi_spec
 
-    result = ResponseValidator(openapi_core.create_spec(openapi)).validate(
+    result = ResponseValidator(_openapi_spec).validate(
         _openapi_url_pattern_workaround(DjangoOpenAPIRequest(response.wsgi_request)),
         DjangoOpenAPIResponse(response),
     )
