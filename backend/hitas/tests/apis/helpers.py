@@ -49,7 +49,6 @@ def create_test_real_estate(hc: HousingCompany, idx: int) -> RealEstate:
 
 def create_test_building(re: RealEstate, idx: int, completion_date=None) -> Building:
     return Building.objects.create(
-        housing_company=re.housing_company,
         real_estate=re,
         postal_code_id=1,
         street_address=f"test-b-street-address-{idx}",

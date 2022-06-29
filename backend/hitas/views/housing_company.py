@@ -136,7 +136,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
                 "real_estate__id",
                 "completion_date",
             )
-            .filter(housing_company__id=obj.id)
+            .filter(real_estate__housing_company_id=obj.id)
         ):
             buildings_by_real_estate[b.real_estate_id].append(b)
 

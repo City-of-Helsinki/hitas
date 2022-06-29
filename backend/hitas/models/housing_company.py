@@ -164,7 +164,6 @@ class RealEstate(ExternalHitasModel):
 
 # Rakennus
 class Building(ExternalHitasModel):
-    housing_company = models.ForeignKey(HousingCompany, on_delete=models.PROTECT)
     real_estate = models.ForeignKey(RealEstate, on_delete=models.PROTECT)
     completion_date = models.DateField(null=True)
 
