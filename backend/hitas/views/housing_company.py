@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hitas.exceptions import HousingCompanyNotFound
-from hitas.models.housing_company import Building, HousingCompany
+from hitas.models.housing_company import Building, HousingCompany, RealEstate
+from hitas.models.property_manager import PropertyManager
 from hitas.views.helpers import Address, Code, address_obj, code_to_obj, to_float, value_or_null
 from hitas.views.paginator import get_default_paginator
 
@@ -98,11 +99,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
         return code_to_obj(obj.developer)
 
     def get_property_manager(self, obj) -> Dict[str, Any]:
-        return {
-            "name": obj.property_manager.name,
-            "email": obj.property_manager.email,
-            "address": address_obj(obj.property_manager),
-        }
+        return PropertyManagerSerializer(obj.property_manager).data
 
     def get_acquisition_price(self, obj: HousingCompany) -> Dict[str, float]:
         return {
@@ -148,33 +145,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
             "housing_company__id",
         )
 
-        return list(
-            map(
-                lambda re: {
-                    "address": {
-                        "street": re.street_address,
-                        "postal_code": re.postal_code.value,
-                        "city": re.city,
-                    },
-                    "property_identifier": re.property_identifier,
-                    "buildings": list(
-                        map(
-                            lambda b: {
-                                "address": {
-                                    "street": b.street_address,
-                                    "postal_code": b.postal_code.value,
-                                    "city": b.city,
-                                },
-                                "building_identifier": value_or_null(b.building_identifier),
-                                "completion_date": b.completion_date,
-                            },
-                            buildings_by_real_estate[re.id],
-                        )
-                    ),
-                },
-                query,
-            )
-        )
+        return RealEstateSerializer(query.all(), context={"buildings": buildings_by_real_estate}, many=True).data
 
     class Meta:
         model = HousingCompany
@@ -198,6 +169,59 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
             "legacy_id",
             "notes",
             "last_modified",
+        ]
+
+
+class RealEstateSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+    buildings = serializers.SerializerMethodField()
+
+    def get_address(self, obj: RealEstate) -> Address:
+        return address_obj(obj)
+
+    def get_buildings(self, obj: RealEstate) -> List[Building]:
+        return BuildingSerializer(self.context["buildings"][obj.id], many=True).data
+
+    class Meta:
+        model = RealEstate
+        fields = [
+            "address",
+            "property_identifier",
+            "buildings",
+        ]
+
+
+class BuildingSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+    building_identifier = serializers.SerializerMethodField()
+
+    def get_address(self, obj: Building) -> Address:
+        return address_obj(obj)
+
+    def get_building_identifier(self, obj: Building) -> Optional[str]:
+        return value_or_null(obj.building_identifier)
+
+    class Meta:
+        model = Building
+        fields = [
+            "address",
+            "building_identifier",
+            "completion_date",
+        ]
+
+
+class PropertyManagerSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+
+    def get_address(self, obj: Building) -> Address:
+        return address_obj(obj)
+
+    class Meta:
+        model = PropertyManager
+        fields = [
+            "address",
+            "name",
+            "email",
         ]
 
 
