@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import Address, address_obj, to_float, value_or_null
+from hitas.views.helpers import Address, address_obj, to_float, value_or_none
 from hitas.views.paginator import get_default_paginator
 
 
@@ -72,10 +72,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
         }
 
     def get_legacy_id(self, obj: HousingCompany) -> Optional[str]:
-        return value_or_null(obj.legacy_id)
+        return value_or_none(obj.legacy_id)
 
     def get_notes(self, obj: HousingCompany) -> Optional[str]:
-        return value_or_null(obj.notes)
+        return value_or_none(obj.notes)
 
     def get_state(self, obj: HousingCompany) -> str:
         return obj.state.name.lower()
@@ -114,8 +114,8 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
         return {
             "user": {
                 "username": obj.last_modified_by.username,
-                "first_name": value_or_null(obj.last_modified_by.first_name),
-                "last_name": value_or_null(obj.last_modified_by.last_name),
+                "first_name": value_or_none(obj.last_modified_by.first_name),
+                "last_name": value_or_none(obj.last_modified_by.last_name),
             },
             "datetime": obj.last_modified_datetime,
         }
@@ -199,7 +199,7 @@ class BuildingSerializer(serializers.ModelSerializer):
         return address_obj(obj)
 
     def get_building_identifier(self, obj: Building) -> Optional[str]:
-        return value_or_null(obj.building_identifier)
+        return value_or_none(obj.building_identifier)
 
     class Meta:
         model = Building

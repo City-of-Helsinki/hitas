@@ -1,7 +1,7 @@
 from typing import Any, Optional, TypedDict
 
 
-def value_or_null(s: str) -> Optional[str]:
+def value_or_none(s: str) -> Optional[str]:
     return s if s != "" else None
 
 
