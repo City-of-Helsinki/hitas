@@ -17,8 +17,7 @@ class ListHousingCompaniesTests(APITestCase):
     maxDiff = None
 
     def test_list_empty(self):
-        url = reverse("list-housing-companies")
-        response = self.client.get(url)
+        response = self.client.get(reverse("hitas:housing-company-list"))
 
         # Validate response
         validate_openapi(response)
@@ -56,7 +55,7 @@ class ListHousingCompaniesTests(APITestCase):
         create_test_building(re3, 4, "2000-01-01")
 
         # Make the request
-        response = self.client.get(reverse("list-housing-companies"))
+        response = self.client.get(reverse("hitas:housing-company-list"))
 
         # Validate response
         validate_openapi(response)
@@ -108,7 +107,7 @@ class ListHousingCompaniesTests(APITestCase):
             create_test_housing_company(i)
 
         # Make the request
-        response = self.client.get(reverse("list-housing-companies"))
+        response = self.client.get(reverse("hitas:housing-company-list"))
 
         # Validate response
         validate_openapi(response)
@@ -128,7 +127,7 @@ class ListHousingCompaniesTests(APITestCase):
         )
 
         # Make the second page request
-        response = self.client.get(reverse("list-housing-companies"), {"page": 2})
+        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 2})
 
         # Validate response
         validate_openapi(response)
@@ -148,7 +147,7 @@ class ListHousingCompaniesTests(APITestCase):
         )
 
         # Make the last page request
-        response = self.client.get(reverse("list-housing-companies"), {"page": 5})
+        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 5})
 
         # Validate response
         validate_openapi(response)
@@ -174,7 +173,7 @@ class ListHousingCompaniesTests(APITestCase):
         self._test_paging_invalid("")
 
     def _test_paging_invalid(self, invalid_value):
-        response = self.client.get(reverse("list-housing-companies"), {"page": invalid_value})
+        response = self.client.get(reverse("hitas:housing-company-list"), {"page": invalid_value})
 
         # Validate response
         validate_openapi(response)
@@ -196,7 +195,7 @@ class ListHousingCompaniesTests(APITestCase):
         )
 
     def test_paging_too_high(self):
-        response = self.client.get(reverse("list-housing-companies"), {"page": 2})
+        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 2})
 
         # Validate response
         validate_openapi(response)
