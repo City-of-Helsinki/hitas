@@ -7,7 +7,6 @@ from hitas.models.housing_company import validate_building_id, validate_business
 
 @pytest.mark.parametrize("code", ["000", "001", "100", "801", "999"])
 def test_validate_valid_code_number(code):
-    print(code)
     validate_code_number(code)
 
 
