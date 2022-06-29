@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Min
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers, status, viewsets
 from rest_framework.response import Response
@@ -231,16 +232,9 @@ class HousingCompanyView(viewsets.ModelViewSet):
 
     def list(self, request):
         housing_companies = (
-            HousingCompany.objects.extra(
-                select={
-                    "date": """
-SELECT MIN(completion_date) FROM hitas_building AS b
-    LEFT JOIN hitas_realestate AS re ON b.real_estate_id = re.id
-    WHERE re.housing_company_id = hitas_housingcompany.id
-"""
-                }
-            )
+            HousingCompany.objects
             .select_related("postal_code")
+            .annotate(date=Min("real_estates__buildings__completion_date"))
             .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
         )
 
