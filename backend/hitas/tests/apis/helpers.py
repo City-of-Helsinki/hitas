@@ -6,7 +6,7 @@ from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIRespo
 from openapi_core.validation.response.validators import ResponseValidator
 from rest_framework.response import Response
 
-from hitas.models.housing_company import Building, HousingCompany, RealEstate
+from hitas.models import Building, HousingCompany, RealEstate
 
 
 def validate_openapi(response: Response) -> None:

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from nested_inline.admin import NestedModelAdmin, NestedTabularInline
 
-from hitas.models.housing_company import Building, HousingCompany, RealEstate
+from hitas.models import Building, HousingCompany, RealEstate
 
 
 class BuildingAdmin(NestedTabularInline):

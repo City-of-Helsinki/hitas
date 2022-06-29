@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from hitas.models.codes import BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models import BuildingType, Developer, FinancingMethod, PostalCode
 
 
 @admin.register(BuildingType, FinancingMethod, PostalCode, Developer)
