@@ -654,7 +654,6 @@
     "pk": 1,
     "fields": {
       "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
-      "housing_company": 1,
       "real_estate": 1,
       "completion_date": "2021-07-07",
       "street_address": "Fakestreet 123",
