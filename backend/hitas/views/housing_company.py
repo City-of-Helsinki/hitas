@@ -11,7 +11,8 @@ from rest_framework.response import Response
 
 from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
-from hitas.views.helpers import Address, Code, address_obj, code_to_obj, to_float, value_or_null
+from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
+from hitas.views.helpers import Address, address_obj, to_float, value_or_null
 from hitas.views.paginator import get_default_paginator
 
 
@@ -88,14 +89,14 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     def get_date(self, obj: HousingCompany) -> datetime.date:
         return obj.date
 
-    def get_building_type(self, obj: HousingCompany) -> Code:
-        return code_to_obj(obj.building_type)
+    def get_building_type(self, obj: HousingCompany) -> Dict[str, Any]:
+        return BuildingTypeSerializer(obj.building_type).data
 
-    def get_financing_method(self, obj: HousingCompany) -> Code:
-        return code_to_obj(obj.financing_method)
+    def get_financing_method(self, obj: HousingCompany) -> Dict[str, Any]:
+        return FinancingMethodSerializer(obj.financing_method).data
 
-    def get_developer(self, obj: HousingCompany) -> Code:
-        return code_to_obj(obj.developer)
+    def get_developer(self, obj: HousingCompany) -> Dict[str, Any]:
+        return DeveloperSerializer(obj.developer).data
 
     def get_property_manager(self, obj) -> Dict[str, Any]:
         return PropertyManagerSerializer(obj.property_manager).data
@@ -232,8 +233,7 @@ class HousingCompanyView(viewsets.ModelViewSet):
 
     def list(self, request):
         housing_companies = (
-            HousingCompany.objects
-            .select_related("postal_code")
+            HousingCompany.objects.select_related("postal_code")
             .annotate(date=Min("real_estates__buildings__completion_date"))
             .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
         )
