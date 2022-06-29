@@ -130,7 +130,7 @@ class ReadHousingCompanyTests(APITestCase):
                                     "street": "test-b-street-address-1",
                                 },
                                 "building_identifier": None,
-                                "completion_date": datetime.date(2022, 1, 1),
+                                "completion_date": "2022-01-01",
                             },
                             # Second building
                             {
@@ -140,7 +140,7 @@ class ReadHousingCompanyTests(APITestCase):
                                     "street": "test-b-street-address-2",
                                 },
                                 "building_identifier": None,
-                                "completion_date": datetime.date(2021, 1, 1),
+                                "completion_date": "2021-01-01",
                             },
                         ],
                     },
@@ -156,7 +156,7 @@ class ReadHousingCompanyTests(APITestCase):
                                     "street": "test-b-street-address-3",
                                 },
                                 "building_identifier": None,
-                                "completion_date": datetime.date(2021, 5, 1),
+                                "completion_date": "2021-05-01",
                             }
                         ],
                     },
