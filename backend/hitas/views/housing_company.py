@@ -141,7 +141,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
             buildings_by_real_estate[b.real_estate_id].append(b)
 
         # Fetch real estates
-        query = obj.realestate_set.select_related("postal_code").only(
+        query = obj.real_estates.select_related("postal_code").only(
             "street_address",
             "postal_code__value",
             "property_identifier",
