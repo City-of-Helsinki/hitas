@@ -44,6 +44,21 @@ class HousingCompanyListSerializer(EnumSupportSerializerMixin, serializers.Model
         fields = ["id", "name", "state", "address", "area", "date"]
 
 
+class PropertyManagerSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField()
+
+    def get_address(self, obj: Building) -> Address:
+        return address_obj(obj)
+
+    class Meta:
+        model = PropertyManager
+        fields = [
+            "address",
+            "name",
+            "email",
+        ]
+
+
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
@@ -55,7 +70,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     building_type = serializers.SerializerMethodField()
     financing_method = serializers.SerializerMethodField()
     developer = serializers.SerializerMethodField()
-    property_manager = serializers.SerializerMethodField()
+    property_manager = PropertyManagerSerializer()
     acquisition_price = serializers.SerializerMethodField()
     last_modified = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
@@ -96,9 +111,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
 
     def get_developer(self, obj: HousingCompany) -> Dict[str, Any]:
         return DeveloperSerializer(obj.developer).data
-
-    def get_property_manager(self, obj) -> Dict[str, Any]:
-        return PropertyManagerSerializer(obj.property_manager).data
 
     def get_acquisition_price(self, obj: HousingCompany) -> Dict[str, float]:
         return {
@@ -203,21 +215,6 @@ class BuildingSerializer(serializers.ModelSerializer):
             "address",
             "building_identifier",
             "completion_date",
-        ]
-
-
-class PropertyManagerSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-
-    def get_address(self, obj: Building) -> Address:
-        return address_obj(obj)
-
-    class Meta:
-        model = PropertyManager
-        fields = [
-            "address",
-            "name",
-            "email",
         ]
 
 
