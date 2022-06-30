@@ -1,19 +1,34 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from hitas.exceptions import InvalidPage
 
 
-def get_default_paginator():
-    paginator = HitasPagination()
-    paginator.page_size = 10
-    paginator.page_size_query_param = "limit"
-    paginator.max_page_size = 100
-
-    return paginator
-
-
 class HitasPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "limit"
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "page": {
+                    "current_page": self.page.number,
+                    "size": len(data),
+                    "total_items": self.page.paginator.count,
+                    "total_pages": self.page.paginator.num_pages,
+                    "links": {
+                        "next": self.get_next_link(),
+                        "previous": self.get_previous_link(),
+                    },
+                },
+                "contents": data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
     def get_page_number(self, request, paginator):
         """
         Overwrite this function from PageNumberPagination so that
