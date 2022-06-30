@@ -236,6 +236,7 @@ class HousingCompanyView(viewsets.ModelViewSet):
             HousingCompany.objects.select_related("postal_code")
             .annotate(date=Min("real_estates__buildings__completion_date"))
             .only("uuid", "state", "postal_code__value", "postal_code__description", "display_name", "street_address")
+            .order_by("id")
         )
 
         paginator = get_default_paginator()
