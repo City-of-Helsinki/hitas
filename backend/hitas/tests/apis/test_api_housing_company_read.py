@@ -172,12 +172,12 @@ class ReadHousingCompanyTests(APITestCase):
     def test_not_found_invalid_id(self):
         self._test_not_found("foo")
 
-    def _test_not_found(self, id):
+    def _test_not_found(self, hc_id):
         # Create housing company
         create_test_housing_company(1)
 
         # Make the request
-        response = self.client.get(reverse("hitas:housing-company-detail", args=[id]))
+        response = self.client.get(reverse("hitas:housing-company-detail", args=[hc_id]))
 
         # Validate response
         validate_openapi(response)

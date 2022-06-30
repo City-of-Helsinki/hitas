@@ -72,7 +72,7 @@ def _init_cost_areas() -> None:
 _init_cost_areas()
 
 
-def hitas_cost_area(postal_code: str) -> str:
+def hitas_cost_area(postal_code: str) -> int:
     return _hitas_cost_areas[postal_code]
 
 
