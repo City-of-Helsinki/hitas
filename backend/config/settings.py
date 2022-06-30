@@ -62,7 +62,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
 
-REST_FRAMEWORK = {"EXCEPTION_HANDLER": "hitas.exceptions.exception_handler"}
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
+    "COERCE_DECIMAL_TO_STRING": False,
+}
 
 TEMPLATES = [
     {

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import Address, address_obj, to_float, value_or_none
+from hitas.views.helpers import Address, address_obj, value_or_none
 from hitas.views.paginator import get_default_paginator
 
 
@@ -57,7 +57,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     developer = serializers.SerializerMethodField()
     property_manager = serializers.SerializerMethodField()
     acquisition_price = serializers.SerializerMethodField()
-    primary_loan = serializers.SerializerMethodField()
     last_modified = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
     legacy_id = serializers.SerializerMethodField()
@@ -103,12 +102,9 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
 
     def get_acquisition_price(self, obj: HousingCompany) -> Dict[str, float]:
         return {
-            "initial": to_float(obj.acquisition_price),
-            "realized": to_float(obj.realized_acquisition_price),
+            "initial": obj.acquisition_price,
+            "realized": obj.realized_acquisition_price,
         }
-
-    def get_primary_loan(self, obj: HousingCompany) -> float:
-        return to_float(obj.primary_loan)
 
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
