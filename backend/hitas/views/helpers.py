@@ -17,10 +17,3 @@ def address_obj(obj: Any) -> Address:
         "postal_code": obj.postal_code.value,
         "city": obj.city,
     }
-
-
-def to_float(s: Optional[str]) -> Optional[float]:
-    if s is None:
-        return None
-
-    return float(s)
