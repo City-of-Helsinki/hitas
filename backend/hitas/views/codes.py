@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import serializers
 
 from hitas.models.codes import AbstractCode, BuildingType, Developer, FinancingMethod
@@ -8,10 +10,10 @@ class AbstractCodeSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
     code = serializers.SerializerMethodField()
 
-    def get_description(self, obj: AbstractCode) -> str:
+    def get_description(self, obj: AbstractCode) -> Optional[str]:
         return value_or_none(obj.description)
 
-    def get_code(self, obj: AbstractCode) -> str:
+    def get_code(self, obj: AbstractCode) -> Optional[str]:
         return obj.legacy_code_number
 
     class Meta:
