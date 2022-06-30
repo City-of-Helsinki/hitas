@@ -1,17 +1,19 @@
-.PHONY = build format tests dump
+.PHONY = all build format tests dump
 
-build: tests
+all: tests build
+
+build:
 	./manage.py collectstatic --clear --no-input --verbosity=0
 	docker-compose up --detach --build
+
+tests:
+	pytest --cov
 
 format:
 	autoflake --recursive --in-place --remove-all-unused-imports --ignore-init-module-imports .
 	isort .
 	black .
 	flake8 .
-
-tests:
-	pytest --cov
 
 dump:
 	./manage.py dumpdata users hitas > initial.json
