@@ -39,28 +39,6 @@ function App(children) {
                         href="/koodisto/"
                         label="Koodisto"
                     />
-                    <Navigation.Dropdown label="Dropdown">
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                    </Navigation.Dropdown>
                 </Navigation.Row>
             </Navigation>
 
