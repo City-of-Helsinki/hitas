@@ -19,7 +19,7 @@ def validate_business_id(value: str) -> None:
 
     if match is None:
         raise ValidationError(
-            _("%(value)s is not an valid business id"),
+            _("'%(value)s' is not a valid business id."),
             params={"value": value},
         )
 

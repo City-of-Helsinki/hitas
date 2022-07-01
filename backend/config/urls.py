@@ -11,3 +11,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include((router.urls, "hitas"))),
 ]
+
+handler404 = "hitas.error_handlers.handle_404"
+handler500 = "hitas.error_handlers.handle_500"
