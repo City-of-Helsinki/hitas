@@ -10,6 +10,7 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "hds-design-tokens": "^1.15.0",
     "hds-react": "^1.15.0",
     "path": "^0.12.7",
     "postcss-loader": "^7.0.0",
