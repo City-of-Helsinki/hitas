@@ -34,6 +34,29 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new housing company
+      operationId: create-housing-company
+      responses:
+        '201':
+          description: Successfully added a new housing company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -58,6 +81,8 @@ paths:
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '404':
           $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -553,6 +578,64 @@ components:
           x-extensible-enum:
             - housing_company_not_found
 
+    NotAcceptableError:
+      description: Not acceptable error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [406]
+          example: 406
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Not Acceptable"]
+          example: Not Acceptable
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Only 'application/json' Content-Type is supported.
+        error:
+          description: Error reason
+          type: string
+          enum: [not_acceptable]
+          example: not_acceptable
+
+    UnsupportedMediaTypeError:
+      description: Unsupported media type error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [415]
+          example: 415
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Unsupported Media Type"]
+          example: Unsupported Media Type
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Only 'application/json' Content-Type is supported.
+        error:
+          description: Error reason
+          type: string
+          enum: [unsupported_media_type]
+          example: unsupported_media_type
+
     InternalServerError:
       type: object
       description: Internal server error
@@ -613,6 +696,30 @@ components:
             reason: Not Found
             error: housing_company_not_found
             message: Housing company not found
+
+    UnsupportedMediaType:
+      description: Only 'application/json' content-type is supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            status: 415
+            reason: Unsupported Media Type
+            error: unsupported_media_type
+            message: Only 'application/json' Content-Type is supported.
+
+    NotAcceptable:
+      description: Only 'application/json' content-type is supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAcceptableError'
+          example:
+            status: 405
+            reason: Not Acceptable
+            error: not_acceptable
+            message: Only 'application/json' Content-Type is supported.
 
     InternalServerError:
       description: Unexpected internal server error occurred

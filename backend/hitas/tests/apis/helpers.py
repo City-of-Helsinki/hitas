@@ -13,11 +13,25 @@ with open("openapi.yaml", "r") as spec_file:
     _openapi_spec = openapi_core.create_spec(yaml.safe_load(spec_file))
 
 
+from django.core.handlers.wsgi import WSGIRequest
+
+
+class WSGIRequestWorkaround:
+    def __init__(self, r: WSGIRequest):
+        self.r = r
+
+    def __getattr__(self, item):
+        if item == "body":
+            return self.r.META["wsgi.input"].read()
+
+        return getattr(self.r, item)
+
+
 def validate_openapi(response: Response) -> None:
     global _openapi_spec
 
     result = ResponseValidator(_openapi_spec).validate(
-        _openapi_url_pattern_workaround(DjangoOpenAPIRequest(response.wsgi_request)),
+        _openapi_url_pattern_workaround(DjangoOpenAPIRequest(WSGIRequestWorkaround(response.wsgi_request))),
         DjangoOpenAPIResponse(response),
     )
 
