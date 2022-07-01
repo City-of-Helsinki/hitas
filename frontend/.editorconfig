@@ -6,20 +6,9 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 insert_final_newline = true
-max_line_length = 120
-tab_width = 4
+max_line_length = 72
 trim_trailing_whitespace = true
 
 [*.sass]
-indent_size = 4
-tab_width = 2
-
-[{*.ats,*.cts,*.mts,*.ts,*.tsx}]
-indent_size = 4
-max_line_length = 80
-tab_width = 2
-
-[{*.cjs,*.js, *.jsx}]
 indent_size = 2
-max_line_length = 80
 tab_width = 2

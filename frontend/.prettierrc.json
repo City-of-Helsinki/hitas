@@ -6,10 +6,12 @@
         }
     ],
     "trailingComma": "es5",
-    "semi": true,
     "singleQuote": false,
-    "arrowParens": "always",
-    "parser": "babel-ts",
-    "singleAttributePerLine": true
+    "bracketSpacing": true,
+    "parser": "typescript",
+    "singleAttributePerLine": true,
+    "importOrder": ["^components/(.*)$", "^[./]" ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
 }
 
