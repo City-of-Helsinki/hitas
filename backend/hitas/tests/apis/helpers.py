@@ -1,6 +1,7 @@
 import openapi_core
 import yaml
 from crum import impersonate
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
 from openapi_core.validation.request.datatypes import OpenAPIRequest
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 
 from hitas.models import Building, HousingCompany, RealEstate
 
-with open("openapi.yaml", "r") as spec_file:
+with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
     _openapi_spec = openapi_core.create_spec(yaml.safe_load(spec_file))
 
 
