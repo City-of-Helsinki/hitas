@@ -1,6 +1,6 @@
 .PHONY = all build format tests dump
 
-all: tests build
+all: format tests build
 
 build:
 	./manage.py collectstatic --clear --no-input --verbosity=0
