@@ -103,7 +103,7 @@ class HousingCompany(ExternalHitasModel):
     legacy_id = models.CharField(max_length=10, blank=True)
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)
-    last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
 
     @property
     def city(self):
@@ -119,7 +119,9 @@ class HousingCompany(ExternalHitasModel):
         return f"{hitas_city(pc.value)}-{hitas_cost_area(pc.value)}: {pc.description}"
 
     def save(self, *args, **kwargs):
-        self.last_modified_by = get_current_user()
+        current_user = get_current_user()
+        if current_user is not None:
+            self.last_modified_by = current_user
         super(HousingCompany, self).save(*args, **kwargs)
 
     class Meta:
