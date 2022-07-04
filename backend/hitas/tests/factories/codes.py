@@ -1,0 +1,101 @@
+from datetime import date
+
+import factory
+from factory import fuzzy
+from factory.django import DjangoModelFactory
+from faker import Faker
+
+from hitas.models import BuildingType, Developer, FinancingMethod, PostalCode
+
+fake = Faker(locale="fi_FI")
+
+
+class AbstractCodeFactory(DjangoModelFactory):
+    class Meta:
+        django_get_or_create = ("value",)
+        abstract = True
+
+    value = None
+    description = None
+    in_use = True
+    order = None
+    legacy_code_number = factory.Sequence(lambda n: f"{n:03}")
+    legacy_start_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    legacy_end_date = None
+
+
+class PostalCodeFactory(AbstractCodeFactory):
+    class Meta:
+        model = PostalCode
+
+        django_get_or_create = ("value",)
+
+    value = fake.bothify(fake.random_element(["00##0"]))  # Helsinki area postal code
+    description = fake.city()
+
+
+class BuildingTypeFactory(AbstractCodeFactory):
+    class Meta:
+        model = BuildingType
+        django_get_or_create = ("value",)
+
+    value = fuzzy.FuzzyChoice(
+        [
+            "tuntematon",
+            "kerrostalo",
+            "rivitalo",
+            "paritalo",
+            "pienkerrostalo",
+            "luhtitalo",
+            "omakotitalo",
+            "rivitalo/kerrostalo",
+            "kerrostalo/rivitalo",
+            "pientalo",
+            "erillistalo",
+            "rivitalo/erillistalo",
+        ]
+    )
+    description = fake.word()
+
+
+class FinancingMethodFactory(AbstractCodeFactory):
+    class Meta:
+        model = FinancingMethod
+        django_get_or_create = ("value",)
+
+    value = fuzzy.FuzzyChoice(
+        [
+            "tuntematon",
+            "vapaarahoitteinen, Hitas I",
+            "vapaarahoitteinen, Hitas II",
+            "HK valtion laina, Hitas I",
+            "HK valtion laina, Hitas II",
+            "RA valtion laina, Hitas I",
+            "RA valtion laina, Hitas I",
+            "HK valtion laina, Hitas I",
+            "HK valtion laina, Hitas II",
+            "RA valtion laina, Hitas I",
+            "RA valtion laina, Hitas II",
+            "Korkotuki, Hitas I",
+            "Korkotuki, Hitas II",
+            "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
+            "Pitkä korkotukilaina osaomistus Hitas I",
+            "Omaksi lunastettava vuokra-asunto, Hitas I",
+            "Uusi Hitas I (vapaarahoitteinen)",
+            "Uusi Hitas II (vapaarahoitteinen)",
+            "Uusi Hitas I (vanhat säännöt)",
+            "Uusi Hitas II (vanhat säännöt)",
+            "Vuokratalo Hitas II",
+            "Vuokratalo Hitas I",
+        ]
+    )
+    description = fake.word()
+
+
+class DeveloperFactory(AbstractCodeFactory):
+    class Meta:
+        model = Developer
+        django_get_or_create = ("value",)
+
+    value = factory.LazyAttribute(lambda self: f"As Oy {fake.last_name()}")
+    description = fake.word()
