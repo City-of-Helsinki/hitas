@@ -1,7 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.sass";
+import { BrowserRouter } from "react-router-dom";
+
 import App from "./App";
+
+import "./styles/index.sass";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
@@ -9,6 +12,8 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <App />
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
     </React.StrictMode>
 );
