@@ -1,9 +1,7 @@
-import React from "react";
-
+import { Outlet } from "react-router";
 import { Container, Footer, Navigation } from "hds-react";
 
 import "./styles/index.sass";
-import { Outlet } from "react-router";
 
 function App(children) {
     const formatStr = (str: string): string => {
