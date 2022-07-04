@@ -5,7 +5,7 @@ from hitas.models import BuildingType, Developer, FinancingMethod, PostalCode
 
 @admin.register(BuildingType, FinancingMethod, PostalCode, Developer)
 class CodeAdmin(admin.ModelAdmin):
-    list_display = (
+    list_display = [
         "value",
         "description",
         "in_use",
@@ -13,4 +13,11 @@ class CodeAdmin(admin.ModelAdmin):
         "legacy_code_number",
         "legacy_start_date",
         "legacy_end_date",
-    )
+    ]
+    fields = ["uuid"] + list_display
+    readonly_fields = [
+        "uuid",
+        "legacy_code_number",
+        "legacy_start_date",
+        "legacy_end_date",
+    ]

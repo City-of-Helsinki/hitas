@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import HitasModel
+from hitas.models._base import ExternalHitasModel
 
 
 def validate_code_number(value: str) -> None:
@@ -19,7 +19,7 @@ def validate_code_number(value: str) -> None:
         )
 
 
-class AbstractCode(HitasModel):
+class AbstractCode(ExternalHitasModel):
     value = models.CharField(max_length=1024)
     description = models.TextField(blank=True)
 

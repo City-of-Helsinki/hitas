@@ -1,13 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import HitasModel
+from hitas.models._base import ExternalHitasModel
 from hitas.models.areas import hitas_city
 from hitas.models.codes import PostalCode
 
 
 # Isännöitsijä
-class PropertyManager(HitasModel):
+class PropertyManager(ExternalHitasModel):
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     street_address = models.CharField(max_length=1024)
