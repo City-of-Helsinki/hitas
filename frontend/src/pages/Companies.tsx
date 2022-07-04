@@ -2,7 +2,7 @@ import React from "react";
 
 import { Button, NumberInput, SearchInput, Select } from "hds-react";
 
-const CompanyListing = () => {
+const Companies = () => {
     return (
         <div className="company-listing">
             <h1 className="main-heading">
@@ -92,4 +92,4 @@ const CompanyListing = () => {
     );
 };
 
-export default CompanyListing;
+export default Companies;

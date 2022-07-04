@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import App from "./App";
-import CompanyListing from "./pages/CompanyListing";
-import Apartmentslisting from "./pages/ApartmentsListing";
+import Companies from "./pages/Companies";
+import Apartments from "./pages/Apartments";
 import Reports from "./pages/Reports";
 import Documents from "./pages/Documents";
 import Codes from "./pages/Codes";
@@ -22,11 +22,11 @@ root.render(
             >
                 <Route
                     path="yhtiot"
-                    element={<CompanyListing />}
+                    element={<Companies />}
                 />
                 <Route
                     path="asunnot"
-                    element={<Apartmentslisting />}
+                    element={<Apartments />}
                 />
                 <Route
                     path="raportit"
@@ -42,7 +42,7 @@ root.render(
                 />
                 <Route
                     index
-                    element={<CompanyListing />}
+                    element={<Companies />}
                 />
                 <Route
                     path="*"
