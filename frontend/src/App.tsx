@@ -1,20 +1,20 @@
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import { Container, Footer, Navigation } from "hds-react";
 
 import "./styles/index.sass";
 
 function App(children) {
+    // Function for formatting the NavItem titles into label texts
     const formatStr = (str: string): string => {
         if (str === null) return "";
         const strArray =
-            str && str === "yhtiot"
+            str && str === "yhtiot" // make yhtiot (for url) into yhtiöt, for the label string
                 ? "yhtiöt".split("")
                 : str.split("");
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const firstLetter = strArray.shift().toUpperCase();
-        const capitalizedStr = firstLetter + strArray.join("");
-        return capitalizedStr;
+        return firstLetter + strArray.join("");
     };
     const NavItem = (item) => {
         return (
