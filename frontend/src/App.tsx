@@ -1,17 +1,32 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
 
 import { Container, Footer, Navigation } from "hds-react";
 
-import CompanyListing from "./pages/CompanyListing";
-import Apartmentslisting from "./pages/ApartmentsListing";
-import Reports from "./pages/Reports";
-import Documents from "./pages/Documents";
-import Codes from "./pages/Codes";
-
 import "./styles/index.sass";
+import { Outlet } from "react-router";
 
 function App(children) {
+    const formatStr = (str: string): string => {
+        if (str === null) return "";
+        const strArray =
+            str && str === "yhtiot"
+                ? "yhtiöt".split("")
+                : str.split("");
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const firstLetter = strArray.shift().toUpperCase();
+        const capitalizedStr = firstLetter + strArray.join("");
+        return capitalizedStr;
+    };
+    const NavItem = (item) => {
+        return (
+            <Navigation.Item
+                href={"/" + item.title}
+                label={formatStr(item.title)}
+                className={item.className}
+            />
+        );
+    };
     return (
         <div className="App">
             <Navigation
@@ -21,52 +36,16 @@ function App(children) {
                 skipToContentLabel=""
             >
                 <Navigation.Row ariaLabel="Main navigation">
-                    <Navigation.Item
-                        href="/yhtiot/"
-                        label="Yhtiöt"
-                    />
-                    <Navigation.Item
-                        href="/asunnot/"
-                        label="Asunnot"
-                    />
-                    <Navigation.Item
-                        href="/raportit/"
-                        label="Raportit"
-                    />
-                    <Navigation.Item
-                        href="/dokumentit/"
-                        label="Dokumentit"
-                    />
-                    <Navigation.Item
-                        href="/koodisto/"
-                        label="Koodisto"
-                    />
+                    <NavItem title="yhtiot" />
+                    <NavItem title="asunnot" />
+                    <NavItem title="raportit" />
+                    <NavItem title="dokumentit" />
+                    <NavItem title="koodisto" />
                 </Navigation.Row>
             </Navigation>
 
             <Container className="main-content">
-                <Routes>
-                    <Route
-                        path="yhtiot/"
-                        element={<CompanyListing />}
-                    />
-                    <Route
-                        path="asunnot/"
-                        element={<Apartmentslisting />}
-                    />
-                    <Route
-                        path="raportit/"
-                        element={<Reports />}
-                    />
-                    <Route
-                        path="dokumentit/"
-                        element={<Documents />}
-                    />
-                    <Route
-                        path="koodisto/"
-                        element={<Codes />}
-                    />
-                </Routes>
+                <Outlet />
             </Container>
 
             <Footer />

@@ -1,3 +1,5 @@
+@use 'hds-design-tokens' as *
+
 .App
   display: flex
   flex-flow: column nowrap
@@ -7,3 +9,33 @@
     width: 100%
     margin: 0 auto
     flex-grow: 2
+
+.listing
+  background: $color-engel
+  padding: $spacing-layout-s
+  display: grid
+  grid-template-columns: 65% 35%
+  > .search
+    margin-bottom: $spacing-layout-s
+
+.results
+  grid-row: 2
+  &-list
+    background: white
+    list-style: none
+    padding: 0
+    &__item
+      display: flex
+      justify-content: space-between
+      padding: $spacing-layout-s
+
+.list-headers
+  display: flex
+  justify-content: space-between
+
+.list-header
+  width: 25%
+
+.filters
+  grid-row: 2
+  padding-left: $spacing-layout-s
