@@ -40,6 +40,17 @@ root.render(
                     path="koodisto"
                     element={<Codes />}
                 />
+                <Route
+                    path="*"
+                    element={
+                        <main style={{ padding: "1rem" }}>
+                            <h1>
+                                Päädyit tyhjälle sivulle. Ole hyvä ja
+                                tarkista osoite!
+                            </h1>
+                        </main>
+                    }
+                />
             </Route>
         </Routes>
         <App />
