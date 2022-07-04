@@ -24,6 +24,7 @@
     "model": "hitas.buildingtype",
     "pk": 1,
     "fields": {
+      "uuid": "114211d1-db03-4389-ab6d-49683c8282e1",
       "value": "tuntematon",
       "description": "",
       "in_use": true,
@@ -37,6 +38,7 @@
     "model": "hitas.buildingtype",
     "pk": 2,
     "fields": {
+      "uuid": "f3a77a46-9fc3-4b45-ba6d-baeebacd8a33",
       "value": "kerrostalo",
       "description": "",
       "in_use": true,
@@ -50,6 +52,7 @@
     "model": "hitas.buildingtype",
     "pk": 3,
     "fields": {
+      "uuid": "84e5d67b-6090-4d16-bfc2-7a686e0ee515",
       "value": "rivitalo",
       "description": "",
       "in_use": true,
@@ -63,6 +66,7 @@
     "model": "hitas.buildingtype",
     "pk": 4,
     "fields": {
+      "uuid": "e7d21da9-f4c6-485a-ab93-17f2767dda57",
       "value": "paritalo",
       "description": "",
       "in_use": true,
@@ -76,6 +80,7 @@
     "model": "hitas.buildingtype",
     "pk": 5,
     "fields": {
+      "uuid": "d46238ac-9ec8-44ee-b1c3-0f1f43ed9e37",
       "value": "pienkerrostalo",
       "description": "",
       "in_use": true,
@@ -89,6 +94,7 @@
     "model": "hitas.buildingtype",
     "pk": 6,
     "fields": {
+      "uuid": "1e0e6d39-e885-48cb-9dfb-e444fbf9c481",
       "value": "luhtitalo",
       "description": "",
       "in_use": true,
@@ -102,6 +108,7 @@
     "model": "hitas.buildingtype",
     "pk": 7,
     "fields": {
+      "uuid": "976a10f2-fc95-4de7-a2c9-95db2938de94",
       "value": "omakotitalo",
       "description": "",
       "in_use": true,
@@ -115,6 +122,7 @@
     "model": "hitas.buildingtype",
     "pk": 8,
     "fields": {
+      "uuid": "742e10d3-f65e-470f-8dfb-0c9216a6eff7",
       "value": "rivitalo/kerrostalo",
       "description": "",
       "in_use": true,
@@ -128,6 +136,7 @@
     "model": "hitas.buildingtype",
     "pk": 9,
     "fields": {
+      "uuid": "62a1f517-9d19-42da-9a56-5ccabb54138b",
       "value": "kerrostalo/rivitalo",
       "description": "",
       "in_use": true,
@@ -141,6 +150,7 @@
     "model": "hitas.buildingtype",
     "pk": 10,
     "fields": {
+      "uuid": "8e1b3fd6-49eb-495b-a092-eac3b8a2dcc5",
       "value": "pientalo",
       "description": "",
       "in_use": true,
@@ -154,6 +164,7 @@
     "model": "hitas.buildingtype",
     "pk": 11,
     "fields": {
+      "uuid": "6bb1eff5-2da0-4a51-abe9-ee7dfe0fccfc",
       "value": "erillistalo",
       "description": "",
       "in_use": true,
@@ -167,6 +178,7 @@
     "model": "hitas.buildingtype",
     "pk": 12,
     "fields": {
+      "uuid": "a2d0ed67-f16d-4870-9293-f111785300b1",
       "value": "rivitalo/erillistalo",
       "description": "",
       "in_use": true,
@@ -180,6 +192,7 @@
     "model": "hitas.financingmethod",
     "pk": 1,
     "fields": {
+      "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
       "value": "tuntematon",
       "description": "",
       "in_use": true,
@@ -193,6 +206,7 @@
     "model": "hitas.financingmethod",
     "pk": 2,
     "fields": {
+      "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
       "value": "vapaarahoitteinen, Hitas I",
       "description": "",
       "in_use": true,
@@ -206,6 +220,7 @@
     "model": "hitas.financingmethod",
     "pk": 3,
     "fields": {
+      "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
       "value": "vapaarahoitteinen, Hitas II",
       "description": "",
       "in_use": true,
@@ -219,6 +234,7 @@
     "model": "hitas.financingmethod",
     "pk": 4,
     "fields": {
+      "uuid": "4a9446cf-54cd-4e94-9e26-a44a6fe29ec2",
       "value": "HK valtion laina, Hitas I",
       "description": "",
       "in_use": true,
@@ -232,6 +248,7 @@
     "model": "hitas.financingmethod",
     "pk": 5,
     "fields": {
+      "uuid": "6cbfaa4b-b81f-4ee2-9800-fcd3c109a0ac",
       "value": "HK valtion laina, Hitas II",
       "description": "",
       "in_use": true,
@@ -245,6 +262,7 @@
     "model": "hitas.financingmethod",
     "pk": 6,
     "fields": {
+      "uuid": "b1d6c359-fbf9-4b7a-a5d6-caf189835ead",
       "value": "RA valtion laina, Hitas I",
       "description": "",
       "in_use": true,
@@ -258,6 +276,7 @@
     "model": "hitas.financingmethod",
     "pk": 7,
     "fields": {
+      "uuid": "36ecc9af-f5ff-455a-b89f-60f2557a53aa",
       "value": "RA valtion laina, Hitas I",
       "description": "",
       "in_use": true,
@@ -271,6 +290,7 @@
     "model": "hitas.financingmethod",
     "pk": 8,
     "fields": {
+      "uuid": "4739ad1c-01d1-4a32-889b-b19f1f8c6a33",
       "value": "HK valtion laina, Hitas I",
       "description": "",
       "in_use": true,
@@ -284,6 +304,7 @@
     "model": "hitas.financingmethod",
     "pk": 9,
     "fields": {
+      "uuid": "1781fdb8-cff3-4c3b-9af0-1cc4ae3c3d36",
       "value": "HK valtion laina, Hitas II",
       "description": "",
       "in_use": true,
@@ -297,6 +318,7 @@
     "model": "hitas.financingmethod",
     "pk": 10,
     "fields": {
+      "uuid": "c05bab17-3153-4bc1-91b6-2354e582fcc8",
       "value": "RA valtion laina, Hitas I",
       "description": "",
       "in_use": true,
@@ -310,6 +332,7 @@
     "model": "hitas.financingmethod",
     "pk": 11,
     "fields": {
+      "uuid": "b60c3d06-f3a9-4cec-9c1e-0bd41de324ba",
       "value": "RA valtion laina, Hitas II",
       "description": "",
       "in_use": true,
@@ -323,6 +346,7 @@
     "model": "hitas.financingmethod",
     "pk": 12,
     "fields": {
+      "uuid": "64467849-4239-4a62-983e-5ac66a8153a4",
       "value": "Korkotuki, Hitas I",
       "description": "",
       "in_use": true,
@@ -336,6 +360,7 @@
     "model": "hitas.financingmethod",
     "pk": 13,
     "fields": {
+      "uuid": "485d8561-ad32-4d2b-a384-29f8a28c04a7",
       "value": "Korkotuki, Hitas II",
       "description": "",
       "in_use": true,
@@ -349,6 +374,7 @@
     "model": "hitas.financingmethod",
     "pk": 14,
     "fields": {
+      "uuid": "0b957ecb-1ead-4ad1-ae29-e6515fed3077",
       "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
       "description": "",
       "in_use": true,
@@ -362,6 +388,7 @@
     "model": "hitas.financingmethod",
     "pk": 15,
     "fields": {
+      "uuid": "4e3943a6-d097-439e-bd68-3ae8d9a072f6",
       "value": "Pitkä korkotukilaina osaomistus Hitas I",
       "description": "",
       "in_use": true,
@@ -375,6 +402,7 @@
     "model": "hitas.financingmethod",
     "pk": 16,
     "fields": {
+      "uuid": "6f6ab506-79a0-45f7-a752-65d1a1848dbb",
       "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
       "description": "",
       "in_use": true,
@@ -388,6 +416,7 @@
     "model": "hitas.financingmethod",
     "pk": 17,
     "fields": {
+      "uuid": "e062e181-24b9-48fb-a51a-bceec2a37d34",
       "value": "Uusi Hitas I (vapaarahoitteinen)",
       "description": "",
       "in_use": true,
@@ -401,6 +430,7 @@
     "model": "hitas.financingmethod",
     "pk": 18,
     "fields": {
+      "uuid": "793f4bad-0b63-41a7-a6df-1e3dc0337f07",
       "value": "Uusi Hitas II (vapaarahoitteinen)",
       "description": "",
       "in_use": true,
@@ -414,6 +444,7 @@
     "model": "hitas.financingmethod",
     "pk": 19,
     "fields": {
+      "uuid": "2913209c-9724-4f8e-82e5-f5a44e9bdfb4",
       "value": "Uusi Hitas I (vanhat säännöt)",
       "description": "",
       "in_use": true,
@@ -427,6 +458,7 @@
     "model": "hitas.financingmethod",
     "pk": 20,
     "fields": {
+      "uuid": "de4dfac0-ca52-46bf-bb8c-394d78a52db7",
       "value": "Uusi Hitas II (vanhat säännöt)",
       "description": "",
       "in_use": true,
@@ -440,6 +472,7 @@
     "model": "hitas.financingmethod",
     "pk": 21,
     "fields": {
+      "uuid": "a42bd1a4-ddee-4fca-aa36-461b61742f4c",
       "value": "Vuokratalo Hitas II",
       "description": "",
       "in_use": true,
@@ -453,6 +486,7 @@
     "model": "hitas.financingmethod",
     "pk": 22,
     "fields": {
+      "uuid": "3b36f759-4fa8-40f5-a477-574a936374bf",
       "value": "Vuokratalo Hitas I",
       "description": "",
       "in_use": true,
@@ -466,6 +500,7 @@
     "model": "hitas.postalcode",
     "pk": 1,
     "fields": {
+      "uuid": "75592d94-970c-4862-81d1-53ccd672ae3e",
       "value": "00100",
       "description": "Helsinki Keskusta - Etu-Töölö",
       "in_use": true,
@@ -479,6 +514,7 @@
     "model": "hitas.postalcode",
     "pk": 2,
     "fields": {
+      "uuid": "b8ada237-479c-410d-962c-306c22b186e0",
       "value": "00150",
       "description": "Eira - Hernesaari",
       "in_use": true,
@@ -492,6 +528,7 @@
     "model": "hitas.postalcode",
     "pk": 3,
     "fields": {
+      "uuid": "82d6115c-4058-45d1-a993-2d4225124929",
       "value": "00190",
       "description": "Suomenlinna",
       "in_use": true,
@@ -505,6 +542,7 @@
     "model": "hitas.postalcode",
     "pk": 4,
     "fields": {
+      "uuid": "679e2218-7db9-4358-b904-da6f350cd6a3",
       "value": "00230",
       "description": "Ilmala",
       "in_use": true,
@@ -518,6 +556,7 @@
     "model": "hitas.postalcode",
     "pk": 5,
     "fields": {
+      "uuid": "aced7b38-19be-4769-b1f6-804893cc2ff3",
       "value": "00420",
       "description": "Kannelmäki",
       "in_use": true,
@@ -531,6 +570,7 @@
     "model": "hitas.developer",
     "pk": 1,
     "fields": {
+      "uuid": "d8ac709e-9407-4dfa-8c77-6aecfd13dac2",
       "value": "Tuntematon",
       "description": "",
       "in_use": true,
@@ -544,6 +584,7 @@
     "model": "hitas.developer",
     "pk": 2,
     "fields": {
+      "uuid": "f405f7f2-0380-420e-8215-022dd2660af3",
       "value": "Rakennuskartio Oy",
       "description": "",
       "in_use": true,
@@ -557,6 +598,7 @@
     "model": "hitas.developer",
     "pk": 3,
     "fields": {
+      "uuid": "14675fc4-8322-46ec-821a-613f48be9e73",
       "value": "Att",
       "description": "",
       "in_use": true,
@@ -570,6 +612,7 @@
     "model": "hitas.developer",
     "pk": 4,
     "fields": {
+      "uuid": "0f89ba3a-853b-42ea-a6f7-99ccfc4282ed",
       "value": "VVO",
       "description": "",
       "in_use": true,
@@ -583,6 +626,7 @@
     "model": "hitas.developer",
     "pk": 5,
     "fields": {
+      "uuid": "06224336-de27-4d87-853a-fb950ba5ecc8",
       "value": "Helsingin Sato Oy",
       "description": "",
       "in_use": true,
@@ -596,6 +640,7 @@
     "model": "hitas.propertymanager",
     "pk": 1,
     "fields": {
+      "uuid": "431e81fc-4d95-412d-8a68-b299b4651531",
       "name": "Isännöitsijä Iskonen Oy",
       "email": "iskonen@example.com",
       "street_address": "Fakestreet 123",
@@ -606,6 +651,7 @@
     "model": "hitas.propertymanager",
     "pk": 2,
     "fields": {
+      "uuid": "2d9a7fac-81e5-426d-b3b3-3d6ad6ca9949",
       "name": "EA-isännöinti Oy",
       "email": "not-known@example.com",
       "street_address": "Värikuja 1 B 13",
