@@ -9,6 +9,8 @@ import Reports from "./pages/Reports";
 import Documents from "./pages/Documents";
 import Codes from "./pages/Codes";
 
+import "./styles/index.sass";
+
 function App(children) {
     return (
         <div className="App">
