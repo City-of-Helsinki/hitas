@@ -1,9 +1,9 @@
-import { Outlet } from "react-router-dom";
 import { Container, Footer, Navigation } from "hds-react";
+import { Outlet } from "react-router-dom";
 
 import "./styles/index.sass";
 
-function App(children) {
+function App() {
     // Function for formatting the NavItem titles into label texts
     const formatStr = (str: string): string => {
         if (str === null) return "";

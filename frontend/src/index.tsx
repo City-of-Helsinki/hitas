@@ -2,12 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import App from "./App";
-import Companies from "./pages/Companies";
 import Apartments from "./pages/Apartments";
-import Reports from "./pages/Reports";
-import Documents from "./pages/Documents";
 import Codes from "./pages/Codes";
+import Companies from "./pages/Companies";
+import Documents from "./pages/Documents";
+import Reports from "./pages/Reports";
+
+import App from "./App";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement

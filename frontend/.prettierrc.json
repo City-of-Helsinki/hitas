@@ -9,9 +9,6 @@
     "singleQuote": false,
     "bracketSpacing": true,
     "parser": "typescript",
-    "singleAttributePerLine": true,
-    "importOrder": ["^components/(.*)$", "^[./]" ],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
+    "singleAttributePerLine": true
 }
 
