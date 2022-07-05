@@ -44,7 +44,7 @@ const Companies = () => {
                 <div className="results">
                     <div>Rekisterin tulokset: 9037 yhtiötä</div>
                     <div className="list-headers">
-                        <div className="list-header name">Kohde</div>
+                        <div className="list-header name">Yhtiö</div>
                         <div className="list-header address">
                             Osoite
                         </div>
@@ -63,20 +63,41 @@ const Companies = () => {
                             address="Arabiankatu 5, 00540"
                             dateAdded="1.1.2015"
                         />
-                        <li className="results-list__item">
-                            <div className="name">Kesäunelma</div>
-                            <div className="address">
-                                Sompasaarenlaituri 20, 00540
-                            </div>
-                            <div className="date-added">1.1.2015</div>
-                        </li>
-                        <li className="results-list__item">
-                            <div className="name">Postipuisto</div>
-                            <div className="address">
-                                Kustinpolku 12, 00620
-                            </div>
-                            <div className="date-added">1.1.2015</div>
-                        </li>
+                        <CompanyListItem
+                            name="Kesäunelma"
+                            address="Sompasaarenlaituri 20, 00540"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Postipuisto"
+                            address="Kustinpolku 12, 00620"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Aapeli Aava"
+                            address="Peipposentie 7, 00720"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Arabian Unelma"
+                            address="Arabiankatu 5, 00540"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Kesäunelma"
+                            address="Sompasaarenlaituri 20, 00540"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Postipuisto"
+                            address="Kustinpolku 12, 00620"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Postipuisto"
+                            address="Kustinpolku 12, 00620"
+                            dateAdded="1.1.2015"
+                        />
                     </ul>
                 </div>
                 <div className="filters">
