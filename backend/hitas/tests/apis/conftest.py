@@ -1,9 +1,10 @@
 import os
 
 import pytest
+from django.utils.translation import activate
+from rest_framework.test import APIClient
 
 from hitas.tests.runner import HitasTestContainer
-from rest_framework.test import APIClient
 
 # Container is stopped with destructor so keep a global copy
 _htc = None
@@ -19,6 +20,11 @@ def django_db_modify_db_settings(
     global _htc
     _htc = HitasTestContainer()
     _htc.start()
+
+
+@pytest.fixture(autouse=True)
+def init_test() -> None:
+    activate("en")
 
 
 @pytest.fixture()
