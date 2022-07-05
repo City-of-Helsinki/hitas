@@ -8,7 +8,7 @@ from hitas.views.helpers import value_or_none
 
 class AbstractCodeSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
-    code = serializers.SerializerMethodField()
+    code = serializers.CharField(source="legacy_code_number")
 
     def get_description(self, obj: AbstractCode) -> Optional[str]:
         return value_or_none(obj.description)
@@ -19,6 +19,7 @@ class AbstractCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AbstractCode
         fields = ["value", "description", "code"]
+        read_only_fields = ["value"]
         abstract = True
 
 
