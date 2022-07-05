@@ -8,7 +8,7 @@ function App() {
     const formatStr = (str: string): string => {
         if (str === null) return "";
         const strArray =
-            str && str === "yhtiot" // make yhtiot (for url) into yhtiöt, for the label string
+            str && str === "companies" // make yhtiot (for url) into yhtiöt, for the label string
                 ? "yhtiöt".split("")
                 : str.split("");
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -34,7 +34,7 @@ function App() {
                 skipToContentLabel=""
             >
                 <Navigation.Row ariaLabel="Main navigation">
-                    <NavItem title="yhtiot" />
+                    <NavItem title="companies" />
                     <NavItem title="asunnot" />
                     <NavItem title="raportit" />
                     <NavItem title="dokumentit" />

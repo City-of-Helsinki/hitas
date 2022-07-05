@@ -12,7 +12,7 @@
   flex-grow: 2
 
 .listing
-  background: $color-engel
+  background: $color-engel-medium-light
   padding: $spacing-layout-s
   display: grid
   grid-template-columns: 65% 35%
@@ -26,11 +26,14 @@
     list-style: none
     padding: 0
     &__item
+      cursor: pointer
       display: flex
       justify-content: space-between
       padding: $spacing-layout-xs
       &:not(:last-child)
         border-bottom: 1px solid #ccc
+      &:hover
+        background-color: #ededed
   .name,.address,.date-added
     width: 32%
   .name,.address

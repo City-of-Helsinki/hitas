@@ -1,5 +1,6 @@
 import { Button, NumberInput, SearchInput, Select } from "hds-react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 type ListItemProps = {
     name: string;
@@ -53,11 +54,13 @@ const Companies = () => {
                         </div>
                     </div>
                     <ul className="results-list">
-                        <CompanyListItem
-                            name="Aapeli Aava"
-                            address="Peipposentie 7, 00720"
-                            dateAdded="1.1.2015"
-                        />
+                        <Link to="507130">
+                            <CompanyListItem
+                                name="Aapeli Aava"
+                                address="Peipposentie 7, 00720"
+                                dateAdded="1.1.2015"
+                            />
+                        </Link>
                         <CompanyListItem
                             name="Arabian Unelma"
                             address="Arabiankatu 5, 00540"
