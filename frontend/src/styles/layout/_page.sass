@@ -28,7 +28,9 @@
     &__item
       display: flex
       justify-content: space-between
-      padding: $spacing-layout-s
+      padding: $spacing-layout-xs
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
   .name,.address,.date-added
     width: 32%
   .name,.address
@@ -39,6 +41,7 @@
 .list-headers
   display: flex
   justify-content: space-between
+  padding: $spacing-layout-xs $spacing-layout-xs 0
 
 .list-header
   width: 25%
@@ -48,3 +51,6 @@
   padding-left: $spacing-layout-s
   > *
     margin-bottom: $spacing-layout-s
+
+footer
+  width: 100%
