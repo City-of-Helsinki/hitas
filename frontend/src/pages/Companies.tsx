@@ -1,6 +1,23 @@
+import { Button, NumberInput, SearchInput, Select } from "hds-react";
 import React from "react";
 
-import { Button, NumberInput, SearchInput, Select } from "hds-react";
+type ListItemProps = {
+    name: string;
+    address: string;
+    dateAdded: Date | string;
+};
+
+const CompanyListItem = (props: ListItemProps) => {
+    return (
+        <li className="results-list__item">
+            <div className="name">{props.name}</div>
+            <div className="address">{props.address}</div>
+            <div className="date-added">
+                {props.dateAdded as string}
+            </div>
+        </li>
+    );
+};
 
 const Companies = () => {
     return (
@@ -27,28 +44,25 @@ const Companies = () => {
                 <div className="results">
                     <div>Rekisterin tulokset: 9037 yhtiötä</div>
                     <div className="list-headers">
-                        <div className="list-header">Kohde</div>
-                        <div className="list-header">Osoite</div>
-                        <div className="list-header">
+                        <div className="list-header name">Kohde</div>
+                        <div className="list-header address">
+                            Osoite
+                        </div>
+                        <div className="list-header date-added">
                             Valmiustila, pvm
                         </div>
-                        <div className="list-header">Tila</div>
                     </div>
                     <ul className="results-list">
-                        <li className="results-list__item">
-                            <div className="name">Aapeli Aava</div>
-                            <div className="address">
-                                Peipposentie 7, 00720
-                            </div>
-                            <div className="date-added">1.1.2015</div>
-                        </li>
-                        <li className="results-list__item">
-                            <div className="name">Arabian Unelma</div>
-                            <div className="address">
-                                Arabiankatu 5, 00550
-                            </div>
-                            <div className="date-added">1.1.2015</div>
-                        </li>
+                        <CompanyListItem
+                            name="Aapeli Aava"
+                            address="Peipposentie 7, 00720"
+                            dateAdded="1.1.2015"
+                        />
+                        <CompanyListItem
+                            name="Arabian Unelma"
+                            address="Arabiankatu 5, 00540"
+                            dateAdded="1.1.2015"
+                        />
                         <li className="results-list__item">
                             <div className="name">Kesäunelma</div>
                             <div className="address">
