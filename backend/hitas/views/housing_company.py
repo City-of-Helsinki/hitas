@@ -1,23 +1,17 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from django.db.models import Min
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
 from hitas.exceptions import HousingCompanyNotFound
-from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager, RealEstate
+from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager
 from hitas.models.housing_company import HousingCompanyState
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import (
-    Address,
-    AddressSerializer,
-    HitasModelViewSet,
-    UUIDRelatedField,
-    ValueOrNullField,
-    address_obj,
-    value_or_none,
-)
+from hitas.views.helpers import AddressSerializer, HitasModelViewSet, UUIDRelatedField, ValueOrNullField, value_or_none
+from hitas.views.property_manager import PropertyManagerSerializer
+from hitas.views.real_estate import RealEstateSerializer
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):
@@ -41,142 +35,28 @@ class HousingCompanyStateField(serializers.Field):
             raise serializers.ValidationError(f"Unsupported state '{data}'.")
 
 
-class BuildingSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-    building_identifier = serializers.SerializerMethodField()
-
-    def get_address(self, obj: Building) -> Address:
-        return address_obj(obj)
-
-    def get_building_identifier(self, obj: Building) -> Optional[str]:
-        return value_or_none(obj.building_identifier)
-
-    class Meta:
-        model = Building
-        fields = [
-            "address",
-            "building_identifier",
-            "completion_date",
-        ]
-
-
-class RealEstateSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-    buildings = BuildingSerializer(many=True)
-
-    def get_address(self, obj: RealEstate) -> Address:
-        return address_obj(obj)
-
-    class Meta:
-        model = RealEstate
-        fields = [
-            "address",
-            "property_identifier",
-            "buildings",
-        ]
-
-
-class HousingCompanyListSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    name = serializers.CharField(source="display_name", max_length=1024)
-    state = serializers.SerializerMethodField()
-    address = serializers.SerializerMethodField()
-    area = serializers.SerializerMethodField()
-    date = serializers.DateField()
-
-    def get_id(self, obj: HousingCompany) -> str:
-        return obj.uuid.hex
-
-    def get_state(self, obj: HousingCompany) -> str:
-        return obj.state.name.lower()
-
-    def get_address(self, obj: HousingCompany) -> Address:
-        return address_obj(obj)
-
-    def get_area(self, obj: HousingCompany) -> Dict[str, Any]:
-        return {"name": obj.postal_code.description, "cost_area": obj.area}
-
-    def get_date(self, obj: HousingCompany) -> datetime.date:
-        return obj.date
-
-    class Meta:
-        model = HousingCompany
-        fields = ["id", "name", "state", "address", "area", "date"]
-
-
-class PropertyManagerSerializer(serializers.ModelSerializer):
-    address = serializers.SerializerMethodField()
-
-    def get_address(self, obj: Building) -> Address:
-        return address_obj(obj)
-
-    class Meta:
-        model = PropertyManager
-        fields = [
-            "address",
-            "name",
-            "email",
-        ]
-
-
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
-    state = serializers.SerializerMethodField()
-    address = serializers.SerializerMethodField()
+    name = HousingCompanyNameSerializer(source="*")
+    state = HousingCompanyStateField()
+    address = AddressSerializer(source="*")
     area = serializers.SerializerMethodField()
-    date = serializers.SerializerMethodField()
+    date = serializers.DateField(read_only=True)
     real_estates = serializers.SerializerMethodField()
-    building_type = serializers.SerializerMethodField()
-    financing_method = serializers.SerializerMethodField()
-    developer = serializers.SerializerMethodField()
+    financing_method = FinancingMethodSerializer()
+    building_type = BuildingTypeSerializer()
+    developer = DeveloperSerializer()
     property_manager = PropertyManagerSerializer()
-    acquisition_price = serializers.SerializerMethodField()
-    last_modified = serializers.SerializerMethodField()
-    notes = serializers.SerializerMethodField()
-    legacy_id = serializers.SerializerMethodField()
+    acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
+    notes = ValueOrNullField(required=False)
+    legacy_id = ValueOrNullField(read_only=True)
+    last_modified = serializers.SerializerMethodField(read_only=True)
 
     def get_id(self, obj: HousingCompany) -> str:
         return obj.uuid.hex
-
-    def get_name(self, obj: HousingCompany) -> Dict[str, str]:
-        return {
-            "display": obj.display_name,
-            "official": obj.official_name,
-        }
-
-    def get_legacy_id(self, obj: HousingCompany) -> Optional[str]:
-        return value_or_none(obj.legacy_id)
-
-    def get_notes(self, obj: HousingCompany) -> Optional[str]:
-        return value_or_none(obj.notes)
-
-    def get_state(self, obj: HousingCompany) -> str:
-        return obj.state.name.lower()
-
-    def get_address(self, obj: HousingCompany) -> Address:
-        return address_obj(obj)
 
     def get_area(self, obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.description, "cost_area": obj.area}
-
-    def get_date(self, obj: HousingCompany) -> datetime.date:
-        return obj.date
-
-    def get_building_type(self, obj: HousingCompany) -> Dict[str, Any]:
-        return BuildingTypeSerializer(obj.building_type).data
-
-    def get_financing_method(self, obj: HousingCompany) -> Dict[str, Any]:
-        return FinancingMethodSerializer(obj.financing_method).data
-
-    def get_developer(self, obj: HousingCompany) -> Dict[str, Any]:
-        return DeveloperSerializer(obj.developer).data
-
-    def get_acquisition_price(self, obj: HousingCompany) -> Dict[str, float]:
-        return {
-            "initial": obj.acquisition_price,
-            "realized": obj.realized_acquisition_price,
-        }
 
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
@@ -189,8 +69,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
         }
 
     def get_real_estates(self, obj: HousingCompany) -> List[Dict[str, Any]]:
-        # Select all buildings for this housing company with one query instead
-        # of having one query per property
+        """Select all buildings for this housing company with one query instead of having one query per property"""
         buildings_by_real_estate = defaultdict(list)
         for b in (
             Building.objects.select_related("postal_code")
@@ -233,27 +112,26 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
             "acquisition_price",
             "primary_loan",
             "sales_price_catalogue_confirmation_date",
-            "notification_date",
-            "legacy_id",
             "notes",
+            "legacy_id",
+            "notification_date",
             "last_modified",
         ]
 
 
-class HousingCompanyCreateSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    name = HousingCompanyNameSerializer(source="*")
-    state = HousingCompanyStateField()
-    address = AddressSerializer(source="*")
+class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
+    name = serializers.CharField(source="display_name", max_length=1024)
+
+    class Meta:
+        model = HousingCompany
+        fields = ["id", "name", "state", "address", "area", "date"]
+
+
+class HousingCompanyCreateSerializer(HousingCompanyDetailSerializer):
     building_type = UUIDRelatedField(queryset=BuildingType.objects.all())
     financing_method = UUIDRelatedField(queryset=FinancingMethod.objects.all())
     developer = UUIDRelatedField(queryset=Developer.objects.all())
     property_manager = UUIDRelatedField(queryset=PropertyManager.objects.all())
-    acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
-    notes = ValueOrNullField(required=False)
-
-    def get_id(self, obj: HousingCompany) -> str:
-        return obj.uuid.hex
 
     class Meta:
         model = HousingCompany
