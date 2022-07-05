@@ -3,8 +3,7 @@
 all: format tests build
 
 build:
-	./manage.py collectstatic --clear --no-input --verbosity=0
-	docker-compose up --detach --build
+	cd .. && docker-compose up --detach --build
 
 tests:
 	pytest --cov

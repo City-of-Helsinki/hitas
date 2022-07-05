@@ -62,7 +62,33 @@ COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
 RUN poetry export | /hitas/venv/bin/pip install -r /dev/stdin
 
 #
-# Build the image
+# Build image for django static content
+#
+FROM base AS django-collectstatic
+
+# Copy virtualenv
+COPY --from=builder --chown=hitas:hitas /hitas/venv /hitas/venv
+
+RUN mkdir -p /hitas/backend
+WORKDIR /hitas/backend
+
+COPY manage.py ./
+COPY hitas ./hitas
+COPY config ./config
+COPY users ./users
+
+RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py collectstatic --clear --no-input --verbosity=0
+
+#
+# Build nginx image
+#
+FROM nginx:1.23-alpine AS nginx
+
+ADD nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=django-collectstatic --chown=nginx:nginx /hitas/backend/var/static /media/static
+
+#
+# Build the backend image
 #
 FROM base
 

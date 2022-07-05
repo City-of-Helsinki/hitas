@@ -1,9 +1,16 @@
 version: "3.9"
 services:
-  hitas:
-    container_name: hitas
+  hitas-frontend:
     build:
-      context: .
+      context: frontend
+    ports:
+      - 8081:80
+    depends_on:
+      - hitas-backend
+
+  hitas-backend:
+    build:
+      context: backend
     environment:
       APPLY_MIGRATIONS: 1
       COLLECT_STATIC: 1
@@ -28,15 +35,14 @@ services:
       POSTGRES_PASSWORD: hitas
       POSTGRES_DB: hitas
 
-  nginx:
-    image: nginx:1.21
+  hitas-backend-nginx:
+    build:
+      context: backend
+      target: nginx
     ports:
-      - 8080:8080
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./var/static:/media/static
+      - 8080:80
     depends_on:
-      - hitas
+      - hitas-backend
 
   swagger-editor:
     image: swaggerapi/swagger-editor:v4.2.9
@@ -45,4 +51,4 @@ services:
     ports:
       - 8090:8080
     volumes:
-      - ./openapi.yaml:/swagger/openapi.yaml:ro
+      - ./backend/openapi.yaml:/swagger/openapi.yaml:ro
