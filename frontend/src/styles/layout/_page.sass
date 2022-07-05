@@ -1,4 +1,5 @@
 @use 'hds-design-tokens' as *
+@use '../utils/mixins' as mix
 
 .App
   display: flex
@@ -55,5 +56,22 @@
   > *
     margin-bottom: $spacing-layout-s
 
+.company-details
+  &__tab
+    padding: $spacing-layout-s
+    background: $color-black-5
+    @include mix.flexbox()
+    @include mix.flex-flow(row nowrap)
+    //&.basic-details, &.additional-details
+    .column
+      width: 50%
+    .detail-label
+      display: block
+      font-size: $fontsize-body-m
+      margin-bottom: $spacing-3-xs
+    .detail-value
+      font-size: $fontsize-body-l
+      font-weight: 600
+      margin-bottom: $spacing-layout-s
 footer
   width: 100%
