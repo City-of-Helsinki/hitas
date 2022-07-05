@@ -29,6 +29,12 @@
       display: flex
       justify-content: space-between
       padding: $spacing-layout-s
+  .name,.address,.date-added
+    width: 32%
+  .name,.address
+    margin-right: 2%
+  .date-added
+    text-align: right
 
 .list-headers
   display: flex
@@ -40,3 +46,5 @@
 .filters
   grid-row: 2
   padding-left: $spacing-layout-s
+  > *
+    margin-bottom: $spacing-layout-s
