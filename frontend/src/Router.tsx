@@ -6,6 +6,7 @@ import Reports from "./pages/Reports";
 import Documents from "./pages/Documents";
 import Codes from "./pages/Codes";
 import React from "react";
+import Company from "./pages/Company";
 
 export default function Router() {
     return (
@@ -14,10 +15,16 @@ export default function Router() {
                 path="/"
                 element={<App />}
             >
-                <Route
-                    path="yhtiot"
-                    element={<Companies />}
-                />
+                <Route path="companies">
+                    <Route
+                        index
+                        element={<Companies />}
+                    />
+                    <Route
+                        path=":companyId"
+                        element={<Company />}
+                    />
+                </Route>
                 <Route
                     path="asunnot"
                     element={<Apartments />}
