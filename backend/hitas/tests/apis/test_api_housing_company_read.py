@@ -83,7 +83,7 @@ class ReadHousingCompanyTests(APITestCase):
                     "description": None,
                 },
                 "business_id": "1234567-8",
-                "date": datetime.date(2021, 1, 1),
+                "date": "2021-01-01",
                 "developer": {
                     "code": "000",
                     "value": "Tuntematon",

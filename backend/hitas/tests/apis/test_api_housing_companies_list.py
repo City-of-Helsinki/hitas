@@ -1,5 +1,3 @@
-import datetime
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -74,7 +72,7 @@ class ListHousingCompaniesTests(APITestCase):
                             "city": "Helsinki",
                         },
                         "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
-                        "date": datetime.date(2021, 1, 1),
+                        "date": "2021-01-01",
                     },
                     {
                         "id": hc2.uuid.hex,
@@ -86,7 +84,7 @@ class ListHousingCompaniesTests(APITestCase):
                             "city": "Helsinki",
                         },
                         "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
-                        "date": datetime.date(2000, 1, 1),
+                        "date": "2000-01-01",
                     },
                 ],
                 "page": {
