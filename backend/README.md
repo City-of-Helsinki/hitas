@@ -27,6 +27,7 @@
 ## Testing
 
 * Running the tests: `make tests`
+* Running the tests without docker (local PostgreSQL required): `HITAS_TESTS_NO_DOCKER=1 make tests`
 
 ## Environment Variables
 
