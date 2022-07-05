@@ -60,7 +60,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return self.list_serializer_class
-        elif self.action == "create":
+        elif self.action in ["create", "update", "partial_update"]:
             return self.create_serializer_class
         return self.serializer_class
 
@@ -97,6 +97,11 @@ class PostalCodeField(SlugRelatedField):
 
     def to_representation(self, instance: PostalCode):
         return instance.value
+
+
+class HitasDecimalField(serializers.DecimalField):
+    def __init__(self, max_digits=15, decimal_places=2, min_value=0, **kwargs):
+        super().__init__(max_digits, decimal_places, min_value, **kwargs)
 
 
 class AddressSerializer(serializers.Serializer):

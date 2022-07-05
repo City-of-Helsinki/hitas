@@ -9,7 +9,14 @@ from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager
 from hitas.models.housing_company import HousingCompanyState
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import AddressSerializer, HitasModelViewSet, UUIDRelatedField, ValueOrNullField, value_or_none
+from hitas.views.helpers import (
+    AddressSerializer,
+    HitasDecimalField,
+    HitasModelViewSet,
+    UUIDRelatedField,
+    ValueOrNullField,
+    value_or_none,
+)
 from hitas.views.property_manager import PropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 
@@ -20,8 +27,8 @@ class HousingCompanyNameSerializer(serializers.Serializer):
 
 
 class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
-    initial = serializers.FloatField(source="acquisition_price", min_value=0)
-    realized = serializers.FloatField(source="realized_acquisition_price", min_value=0, required=False)
+    initial = HitasDecimalField(source="acquisition_price")
+    realized = HitasDecimalField(source="realized_acquisition_price", required=False, allow_null=True)
 
 
 class HousingCompanyStateField(serializers.Field):
