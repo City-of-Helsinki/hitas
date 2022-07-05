@@ -2,8 +2,10 @@ from typing import Any, Optional, TypedDict
 from uuid import UUID
 
 from django.http import Http404
-from rest_framework import viewsets
+from rest_framework import serializers, viewsets
+from rest_framework.relations import SlugRelatedField
 
+from hitas.models import PostalCode
 from hitas.views.paginator import HitasPagination
 
 
@@ -28,6 +30,7 @@ def address_obj(obj: Any) -> Address:
 class HitasModelViewSet(viewsets.ModelViewSet):
     serializer_class = None
     list_serializer_class = None
+    create_serializer_class = None
     not_found_exception_class = None
     permission_classes = []
     lookup_field = "uuid"
@@ -49,7 +52,6 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
         if lookup_url_kwarg == "uuid":
             self.kwargs[lookup_url_kwarg] = self._lookup_id_to_uuid(self.kwargs[lookup_url_kwarg])
-
         try:
             return super().get_object()
         except Http404:
@@ -58,6 +60,8 @@ class HitasModelViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return self.list_serializer_class
+        elif self.action == "create":
+            return self.create_serializer_class
         return self.serializer_class
 
     def _lookup_id_to_uuid(self, s: str) -> UUID:
@@ -65,3 +69,37 @@ class HitasModelViewSet(viewsets.ModelViewSet):
             return UUID(hex=s)
         except ValueError:
             raise self.not_found_exception_class()
+
+
+class ValueOrNullField(serializers.Field):
+    def to_representation(self, value):
+        return value_or_none(value)
+
+    def to_internal_value(self, data):
+        return data
+
+
+class UUIDRelatedField(SlugRelatedField):
+    def __init__(self, **kwargs):
+        super().__init__(slug_field="uuid", **kwargs)
+
+    def to_representation(self, obj):
+        return getattr(obj, self.slug_field).hex
+
+    def to_internal_value(self, data):
+        data = UUID(hex=data)
+        return super().to_internal_value(data)
+
+
+class PostalCodeField(SlugRelatedField):
+    def __init__(self, **kwargs):
+        super().__init__(slug_field="value", queryset=PostalCode.objects.all(), **kwargs)
+
+    def to_representation(self, instance: PostalCode):
+        return instance.value
+
+
+class AddressSerializer(serializers.Serializer):
+    street = serializers.CharField(source="street_address")
+    postal_code = PostalCodeField()
+    city = serializers.CharField(read_only=True)

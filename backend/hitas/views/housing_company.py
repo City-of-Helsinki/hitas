@@ -1,4 +1,3 @@
-import datetime
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
@@ -7,9 +6,39 @@ from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
 from hitas.exceptions import HousingCompanyNotFound
-from hitas.models import Building, HousingCompany, PropertyManager, RealEstate
+from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager, RealEstate
+from hitas.models.housing_company import HousingCompanyState
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import Address, HitasModelViewSet, address_obj, value_or_none
+from hitas.views.helpers import (
+    Address,
+    AddressSerializer,
+    HitasModelViewSet,
+    UUIDRelatedField,
+    ValueOrNullField,
+    address_obj,
+    value_or_none,
+)
+
+
+class HousingCompanyNameSerializer(serializers.Serializer):
+    display = serializers.CharField(source="display_name")
+    official = serializers.CharField(source="official_name")
+
+
+class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
+    initial = serializers.FloatField(source="acquisition_price", min_value=0)
+    realized = serializers.FloatField(source="realized_acquisition_price", min_value=0, required=False)
+
+
+class HousingCompanyStateField(serializers.Field):
+    def to_representation(self, value):
+        return value.name.lower()
+
+    def to_internal_value(self, data):
+        try:
+            return HousingCompanyState[data.upper()]
+        except KeyError:
+            raise serializers.ValidationError(f"Unsupported state '{data}'.")
 
 
 class BuildingSerializer(serializers.ModelSerializer):
@@ -53,7 +82,7 @@ class HousingCompanyListSerializer(EnumSupportSerializerMixin, serializers.Model
     state = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     area = serializers.SerializerMethodField()
-    date = serializers.SerializerMethodField()
+    date = serializers.DateField()
 
     def get_id(self, obj: HousingCompany) -> str:
         return obj.uuid.hex
@@ -211,9 +240,44 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
         ]
 
 
+class HousingCompanyCreateSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+    name = HousingCompanyNameSerializer(source="*")
+    state = HousingCompanyStateField()
+    address = AddressSerializer(source="*")
+    building_type = UUIDRelatedField(queryset=BuildingType.objects.all())
+    financing_method = UUIDRelatedField(queryset=FinancingMethod.objects.all())
+    developer = UUIDRelatedField(queryset=Developer.objects.all())
+    property_manager = UUIDRelatedField(queryset=PropertyManager.objects.all())
+    acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
+    notes = ValueOrNullField(required=False)
+
+    def get_id(self, obj: HousingCompany) -> str:
+        return obj.uuid.hex
+
+    class Meta:
+        model = HousingCompany
+        fields = [
+            "id",
+            "business_id",
+            "name",
+            "state",
+            "address",
+            "financing_method",
+            "building_type",
+            "developer",
+            "property_manager",
+            "acquisition_price",
+            "primary_loan",
+            "sales_price_catalogue_confirmation_date",
+            "notes",
+        ]
+
+
 class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
+    create_serializer_class = HousingCompanyCreateSerializer
     not_found_exception_class = HousingCompanyNotFound
 
     def get_list_queryset(self):
