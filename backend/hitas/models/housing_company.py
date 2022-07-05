@@ -120,9 +120,9 @@ class HousingCompany(ExternalHitasModel):
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()
-        if current_user is not None:
+        if current_user is not None and current_user.is_authenticated:
             self.last_modified_by = current_user
-        super(HousingCompany, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = _("Housing company")
