@@ -17,7 +17,6 @@ def value_or_none(s: str) -> Optional[str]:
 class HitasModelViewSet(viewsets.ModelViewSet):
     serializer_class = None
     list_serializer_class = None
-    create_serializer_class = None
     permission_classes = []
     lookup_field = "uuid"
     pagination_class = HitasPagination
@@ -50,8 +49,6 @@ class HitasModelViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return self.list_serializer_class
-        elif self.action in ["create", "update", "partial_update"]:
-            return self.create_serializer_class
         return self.serializer_class
 
     def _lookup_id_to_uuid(self, s: str) -> UUID:
