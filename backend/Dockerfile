@@ -62,9 +62,9 @@ COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
 RUN poetry export | /hitas/venv/bin/pip install -r /dev/stdin
 
 #
-# Build image for django static content
+# Build image for django static content and translations
 #
-FROM base AS django-collectstatic
+FROM base AS django-build-static
 
 # Copy virtualenv
 COPY --from=builder --chown=hitas:hitas /hitas/venv /hitas/venv
@@ -78,6 +78,7 @@ COPY config ./config
 COPY users ./users
 
 RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py collectstatic --clear --no-input --verbosity=0
+RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py compilemessages -l "fi"
 
 #
 # Build nginx image
@@ -85,7 +86,7 @@ RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py collectstatic --cle
 FROM nginx:1.23-alpine AS nginx
 
 ADD nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=django-collectstatic --chown=nginx:nginx /hitas/backend/var/static /media/static
+COPY --from=django-build-static --chown=nginx:nginx /hitas/backend/var/static /media/static
 
 #
 # Build the backend image
@@ -104,6 +105,7 @@ ENTRYPOINT ["/hitas/backend/docker-entrypoint.sh"]
 COPY --chown=hitas:hitas manage.py uwsgi.ini ./
 COPY --chown=hitas:hitas hitas ./hitas
 COPY --chown=hitas:hitas config ./config
+COPY --from=django-build-static --chown=hitas:hitas /hitas/backend/config/locale ./config/
 COPY --chown=hitas:hitas templates ./templates
 COPY --chown=hitas:hitas users ./users
 COPY --chown=hitas:hitas initial.json ./

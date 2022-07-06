@@ -28,10 +28,6 @@ if [[ "${LOAD_INITIAL_DATASET:-"0"}" = "1" ]]; then
     ./manage.py loaddata initial.json
 fi
 
-# Translate messages
-echo "Updating translations..."
-./manage.py compilemessages -l "fi"
-
 # Start server
 echo
 echo "Starting uwsgi-server..."
