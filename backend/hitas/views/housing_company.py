@@ -5,7 +5,6 @@ from django.db.models import Min
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.exceptions import HousingCompanyNotFound
 from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager
 from hitas.models.housing_company import HousingCompanyState
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
@@ -163,7 +162,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
     create_serializer_class = HousingCompanyCreateSerializer
-    not_found_exception_class = HousingCompanyNotFound
 
     def get_list_queryset(self):
         return (
