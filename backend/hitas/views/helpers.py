@@ -1,10 +1,11 @@
-from typing import Any, Optional, TypedDict
+from typing import Optional
 from uuid import UUID
 
 from django.http import Http404
 from rest_framework import serializers, viewsets
 from rest_framework.relations import SlugRelatedField
 
+from hitas.exceptions import HitasModelNotFound
 from hitas.models import PostalCode
 from hitas.views.paginator import HitasPagination
 
@@ -17,10 +18,13 @@ class HitasModelViewSet(viewsets.ModelViewSet):
     serializer_class = None
     list_serializer_class = None
     create_serializer_class = None
-    not_found_exception_class = None
     permission_classes = []
     lookup_field = "uuid"
     pagination_class = HitasPagination
+
+    def get_model_class(self):
+        # Simplest way of getting the viewset model without explicitly declaring it
+        return self.get_queryset().model
 
     def get_list_queryset(self):
         return super().get_queryset()
@@ -41,7 +45,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         try:
             return super().get_object()
         except Http404:
-            raise self.not_found_exception_class()
+            raise HitasModelNotFound(model=self.get_model_class())
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -54,7 +58,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         try:
             return UUID(hex=s)
         except ValueError:
-            raise self.not_found_exception_class()
+            raise HitasModelNotFound(model=self.get_model_class())
 
 
 class ValueOrNullField(serializers.Field):

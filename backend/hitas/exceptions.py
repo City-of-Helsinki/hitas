@@ -126,15 +126,20 @@ class BadRequestException(HitasException):
             self.data["fields"] = fields
 
 
-class HousingCompanyNotFound(HitasException):
-    def __init__(self):
+class HitasModelNotFound(HitasException):
+    def __init__(self, model=None):
+        if model is None:
+            verbose_name = "Object"
+        else:
+            verbose_name = model._meta.verbose_name
+
         super().__init__(
             status_code=404,
             data={
                 "status": 404,
                 "reason": "Not Found",
-                "message": "Housing company not found",
-                "error": "housing_company_not_found",
+                "message": f"{verbose_name} not found",
+                "error": f"{verbose_name.lower().replace(' ','_')}_not_found",
             },
         )
 
