@@ -22,8 +22,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libpq5 \
         gettext \
-        mime-support
-
+        mime-support \
+        libpcre3 libpcre3-dev
 
 #
 # Build virtualenv
