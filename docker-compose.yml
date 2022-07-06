@@ -20,6 +20,7 @@ services:
       DATABASE_URL: postgres://hitas:hitas@postgres/hitas
     ports:
       - 8888
+      - 8082:8080
     restart: on-failure
     depends_on:
       - postgres
