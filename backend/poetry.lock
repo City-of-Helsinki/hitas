@@ -241,6 +241,17 @@ python-versions = ">=3.6"
 Django = ">=2.2"
 
 [[package]]
+name = "django-health-check"
+version = "3.16.5"
+description = "Run checks on services like databases, queue servers, celery processes, etc."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+django = ">=2.2"
+
+[[package]]
 name = "django-helusers"
 version = "0.7.1"
 description = "Django app for the user infrastructure of the City of Helsinki"
@@ -1085,7 +1096,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "bb266d3425c73f3d5531e99ed68e91efbf1bb6f86eff87b449e61aeec51a74e8"
+content-hash = "0991b6a4b35979a9240fb085b8e8ee6f8a94bed3ae38677cd85e65bc9eadb1ed"
 
 [metadata.files]
 appnope = [
@@ -1235,6 +1246,10 @@ django-environ = [
 django-filter = [
     {file = "django-filter-21.1.tar.gz", hash = "sha256:632a251fa8f1aadb4b8cceff932bb52fe2f826dd7dfe7f3eac40e5c463d6836e"},
     {file = "django_filter-21.1-py3-none-any.whl", hash = "sha256:f4a6737a30104c98d2e2a5fb93043f36dd7978e0c7ddc92f5998e85433ea5063"},
+]
+django-health-check = [
+    {file = "django-health-check-3.16.5.tar.gz", hash = "sha256:1edfd49293ccebbce29f9da609c407f307aee240ab799ab4201031341ae78c0f"},
+    {file = "django_health_check-3.16.5-py2.py3-none-any.whl", hash = "sha256:8d66781a0ea82b1a8b44878187b38a27370e94f18287312e39be0593e72d8983"},
 ]
 django-helusers = [
     {file = "django-helusers-0.7.1.tar.gz", hash = "sha256:7c63ff403d3db5136fbc61dbb96db7858a74157c832953c1f9dd9032ffac7236"},

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "hitas",
     "nested_inline",
     "rest_framework",
+    "health_check",
+    "health_check.db",
 ]
 
 MIDDLEWARE = [
