@@ -13,20 +13,6 @@ def value_or_none(s: str) -> Optional[str]:
     return s if s != "" else None
 
 
-class Address(TypedDict):
-    street: str
-    postal_code: str
-    city: str
-
-
-def address_obj(obj: Any) -> Address:
-    return {
-        "street": obj.street_address,
-        "postal_code": obj.postal_code.value,
-        "city": obj.city,
-    }
-
-
 class HitasModelViewSet(viewsets.ModelViewSet):
     serializer_class = None
     list_serializer_class = None
