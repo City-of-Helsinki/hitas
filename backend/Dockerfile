@@ -110,4 +110,4 @@ COPY --chown=hitas:hitas templates ./templates
 COPY --chown=hitas:hitas users ./users
 COPY --chown=hitas:hitas initial.json ./
 
-EXPOSE 8000
+EXPOSE 8888 8080
