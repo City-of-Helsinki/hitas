@@ -8,16 +8,12 @@ from factory.django import DjangoModelFactory
 from faker import Faker
 
 from hitas.models import HousingCompany
-from hitas.models.housing_company import HousingCompanyState
+from hitas.models.housing_company import Building, HousingCompanyState, RealEstate
 
 fake = Faker(locale="fi_FI")
 
 
 class HousingCompanyFactory(DjangoModelFactory):
-    class Meta:
-        model = HousingCompany
-        django_get_or_create = ("official_name",)
-
     display_name = fake.last_name()
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = HousingCompanyState.NOT_READY
@@ -42,3 +38,28 @@ class HousingCompanyFactory(DjangoModelFactory):
     notes = fake.text()
     last_modified_datetime = fuzzy.FuzzyDate(date(2010, 1, 1))
     last_modified_by = factory.SubFactory("hitas.tests.factories.UserFactory")
+
+    class Meta:
+        model = HousingCompany
+        django_get_or_create = ("official_name",)
+
+
+class RealEstateFactory(DjangoModelFactory):
+    housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
+    property_identifier = fake.bothify(fake.random_element(["####-####-####-####"]))
+    street_address = fake.street_address()
+    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+
+    class Meta:
+        model = RealEstate
+
+
+class BuildingFactory(DjangoModelFactory):
+    class Meta:
+        model = Building
+
+    real_estate = factory.SubFactory("hitas.tests.factories.RealEstateFactory")
+    completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    building_identifier = fake.bothify(fake.random_element(["#########?"]))
+    street_address = fake.street_address()
+    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
