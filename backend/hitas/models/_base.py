@@ -20,7 +20,7 @@ class ExternalHitasModel(models.Model):
     Abstract model for Hitas entities with an externally visible ID in UUID format
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     class Meta:
         abstract = True
