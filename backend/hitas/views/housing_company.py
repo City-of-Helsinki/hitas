@@ -1,21 +1,14 @@
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from django.db.models import Min
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Building, BuildingType, Developer, FinancingMethod, HousingCompany, PropertyManager
+from hitas.models import Building, HousingCompany
 from hitas.models.housing_company import HousingCompanyState
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import (
-    AddressSerializer,
-    HitasDecimalField,
-    HitasModelViewSet,
-    UUIDRelatedField,
-    ValueOrNullField,
-    value_or_none,
-)
+from hitas.views.helpers import AddressSerializer, HitasDecimalField, HitasModelViewSet, ValueOrNullField, value_or_none
 from hitas.views.property_manager import PropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 
@@ -47,7 +40,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     state = HousingCompanyStateField()
     address = AddressSerializer(source="*")
     area = serializers.SerializerMethodField()
-    date = serializers.DateField(read_only=True)
+    date = serializers.SerializerMethodField()
     real_estates = serializers.SerializerMethodField()
     financing_method = FinancingMethodSerializer()
     building_type = BuildingTypeSerializer()
@@ -63,6 +56,13 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
 
     def get_area(self, obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.description, "cost_area": obj.area}
+
+    def get_date(self, obj: HousingCompany) -> Optional[str]:
+        """
+        SerializerMethodField is used instead of DateField due to
+        date being an annotated value because of that it's left out in e.g. create action responses
+        """
+        return getattr(obj, "date", None)
 
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
@@ -133,35 +133,9 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
         fields = ["id", "name", "state", "address", "area", "date"]
 
 
-class HousingCompanyCreateSerializer(HousingCompanyDetailSerializer):
-    building_type = UUIDRelatedField(queryset=BuildingType.objects.all())
-    financing_method = UUIDRelatedField(queryset=FinancingMethod.objects.all())
-    developer = UUIDRelatedField(queryset=Developer.objects.all())
-    property_manager = UUIDRelatedField(queryset=PropertyManager.objects.all())
-
-    class Meta:
-        model = HousingCompany
-        fields = [
-            "id",
-            "business_id",
-            "name",
-            "state",
-            "address",
-            "financing_method",
-            "building_type",
-            "developer",
-            "property_manager",
-            "acquisition_price",
-            "primary_loan",
-            "sales_price_catalogue_confirmation_date",
-            "notes",
-        ]
-
-
 class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
-    create_serializer_class = HousingCompanyCreateSerializer
 
     def get_list_queryset(self):
         return (

@@ -5,9 +5,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from hitas.models import HousingCompany
+from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
 from hitas.tests.factories import (
+    BuildingFactory,
     BuildingTypeFactory,
     DeveloperFactory,
     FinancingMethodFactory,
@@ -19,8 +20,7 @@ from hitas.tests.factories import (
 
 
 @pytest.mark.django_db
-def test__api__housing_company__create(api_client: APIClient):
-    api_client.force_authenticate(UserFactory.create())
+def test__api__housing_company__create__maximum_data(api_client: APIClient):
     developer = DeveloperFactory.create()
     financing_method = FinancingMethodFactory.create()
     property_manager = PropertyManagerFactory.create()
@@ -48,18 +48,24 @@ def test__api__housing_company__create(api_client: APIClient):
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
 
+    api_client.force_authenticate(UserFactory.create())
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
     # validate_openapi(response)  # TODO
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert response.json()["id"] == HousingCompany.objects.first().uuid.hex
-    assert response.json()["address"]["postal_code"] == postal_code.value
+
+    hc = HousingCompany.objects.first()
+    assert response.json()["id"] == hc.uuid.hex
+    assert response.json()["address"]["postal_code"] == PostalCode.objects.first().value
+
+    get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
+    assert response.json() == get_response.json()
 
 
 @pytest.mark.django_db
 def test__api__housing_company__update(api_client: APIClient):
-    api_client.force_authenticate(UserFactory.create())
     hc: HousingCompany = HousingCompanyFactory.create()
+    BuildingFactory.create(real_estate__housing_company=hc)
     postal_code = PostalCodeFactory.create(value="99999")
     financing_method = FinancingMethodFactory.create()
     property_manager = PropertyManagerFactory.create()
@@ -84,6 +90,8 @@ def test__api__housing_company__update(api_client: APIClient):
         "state": "less_than_30_years",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
+
+    api_client.force_authenticate(UserFactory.create())
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
     # validate_openapi(response)  # TODO
     assert response.status_code == status.HTTP_200_OK
@@ -98,3 +106,7 @@ def test__api__housing_company__update(api_client: APIClient):
     assert hc.acquisition_price == Decimal("10.01")
     assert hc.realized_acquisition_price is None
     assert hc.notes == ""
+    assert response.json()["date"]
+
+    get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
+    assert response.json() == get_response.json()
