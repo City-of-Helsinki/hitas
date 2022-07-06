@@ -29,5 +29,4 @@ def init_test() -> None:
 
 @pytest.fixture()
 def api_client():
-    api_client = APIClient()
-    return api_client
+    return APIClient()

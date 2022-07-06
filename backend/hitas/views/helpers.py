@@ -87,8 +87,7 @@ class UUIDRelatedField(SlugRelatedField):
         return getattr(obj, self.slug_field).hex
 
     def to_internal_value(self, data):
-        data = UUID(hex=data)
-        return super().to_internal_value(data)
+        return super().to_internal_value(data=UUID(hex=data))
 
 
 class PostalCodeField(SlugRelatedField):

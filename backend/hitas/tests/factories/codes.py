@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import datetime
 
 import factory
+import pytz
 from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
@@ -20,14 +21,13 @@ class AbstractCodeFactory(DjangoModelFactory):
     in_use = True
     order = None
     legacy_code_number = factory.Sequence(lambda n: f"{n:03}")
-    legacy_start_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    legacy_start_date = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=pytz.timezone("Europe/Helsinki")))
     legacy_end_date = None
 
 
 class PostalCodeFactory(AbstractCodeFactory):
     class Meta:
         model = PostalCode
-
         django_get_or_create = ("value",)
 
     value = fake.bothify(fake.random_element(["00##0"]))  # Helsinki area postal code
