@@ -8,7 +8,7 @@ from hitas.tests.apis.helpers import validate_openapi
 class ExceptionApiCases(APITestCase):
     maxDiff = None
 
-    def test_400_invalid_json(self):
+    def test__api__exception__400_bad_request__invalid_json(self):
         response = self.client.post(reverse("hitas:housing-company-list"), data="foo", content_type="application/json")
 
         validate_openapi(response)
@@ -23,7 +23,7 @@ class ExceptionApiCases(APITestCase):
             },
         )
 
-    def test_404(self):
+    def test__api__exception__404_not_found(self):
         response = self.client.get("/foo")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -37,7 +37,7 @@ class ExceptionApiCases(APITestCase):
             },
         )
 
-    def test_405(self):
+    def test__api__exception__405_method_not_allowed(self):
         response = self.client.generic("FOO", reverse("hitas:housing-company-list"))
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -51,7 +51,7 @@ class ExceptionApiCases(APITestCase):
             },
         )
 
-    def test_406(self):
+    def test__api__exception__406_not_acceptable(self):
         response = self.client.get(reverse("hitas:housing-company-list"), HTTP_ACCEPT="text/plain")
 
         validate_openapi(response)
@@ -66,7 +66,7 @@ class ExceptionApiCases(APITestCase):
             },
         )
 
-    def test_415(self):
+    def test__api__exception__415_unsupported_media_type(self):
         response = self.client.post(reverse("hitas:housing-company-list"), data="foo", content_type="text/plain")
 
         validate_openapi(response)

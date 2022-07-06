@@ -6,23 +6,23 @@ from hitas.models.housing_company import validate_building_id, validate_business
 
 
 @pytest.mark.parametrize("code", ["000", "001", "100", "801", "999"])
-def test_validate_valid_code_number(code):
+def test__validate__code_number__valid(code):
     validate_code_number(code)
 
 
 @pytest.mark.parametrize("code", ["", "1", "11", "0000", "foo", "a000", "000a"])
-def test_validate_invalid_code_number(code):
+def test__validate__code_number__invalid(code):
     with pytest.raises(ValidationError):
         validate_code_number(code)
 
 
 @pytest.mark.parametrize("business_id", ["1234567-1"])
-def test_validate_valid_business_id(business_id):
+def test__validate__business_id__valid(business_id):
     validate_business_id(business_id)
 
 
 @pytest.mark.parametrize("business_id", ["", "1", "12345678", "a1234567-8", "1234567-8a"])
-def test_validate_invalid_business_id(business_id):
+def test__validate__business_id__invalid(business_id):
     with pytest.raises(ValidationError):
         validate_business_id(business_id)
 
@@ -39,7 +39,7 @@ def test_validate_invalid_business_id(business_id):
         "1-11-111-1",
     ],
 )
-def test_validate_valid_property_id(property_id):
+def test__validate__property_id__valid(property_id):
     validate_property_id(property_id)
 
 
@@ -54,7 +54,7 @@ def test_validate_valid_property_id(property_id):
         "0-0-0-0a",
     ],
 )
-def test_validate_invalid_property_id(property_id):
+def test__validate__property_id__invalid(property_id):
     with pytest.raises(ValidationError):
         validate_property_id(property_id)
 
@@ -73,7 +73,7 @@ def test_validate_invalid_property_id(property_id):
         "100012345A",
     ],
 )
-def test_validate_valid_building_id(building_id):
+def test__validate__building_id__valid(building_id):
     validate_building_id(building_id)
 
 
@@ -91,6 +91,6 @@ def test_validate_valid_building_id(building_id):
         "200012345A",
     ],
 )
-def test_validate_invalid_building_id(building_id):
+def test__validate__building_id__invalid(building_id):
     with pytest.raises(ValidationError):
         validate_building_id(building_id)

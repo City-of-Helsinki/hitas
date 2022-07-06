@@ -14,7 +14,7 @@ class ListHousingCompaniesTests(APITestCase):
     fixtures = ["hitas/tests/apis/testdata.json"]
     maxDiff = None
 
-    def test_list_empty(self):
+    def test__api__housing_company__list__empty(self):
         response = self.client.get(reverse("hitas:housing-company-list"))
 
         # Validate response
@@ -38,7 +38,7 @@ class ListHousingCompaniesTests(APITestCase):
             },
         )
 
-    def test_list(self):
+    def test__api__housing_company__list(self):
         # Create first housing company
         hc1 = create_test_housing_company(1)
         re1 = create_test_real_estate(hc1, 1)
@@ -100,7 +100,7 @@ class ListHousingCompaniesTests(APITestCase):
             },
         )
 
-    def test_paging(self):
+    def test__api__housing_company__list__paging(self):
         for i in range(45):
             create_test_housing_company(i)
 
@@ -164,7 +164,7 @@ class ListHousingCompaniesTests(APITestCase):
             },
         )
 
-    def test_paging_invalid(self):
+    def test__api__housing_company__list__paging__invalid(self):
         self._test_paging_invalid("a")
         self._test_paging_invalid("#")
         self._test_paging_invalid(" ")
@@ -192,7 +192,7 @@ class ListHousingCompaniesTests(APITestCase):
             },
         )
 
-    def test_paging_too_high(self):
+    def test__api__housing_company__list__paging__too_high(self):
         response = self.client.get(reverse("hitas:housing-company-list"), {"page": 2})
 
         # Validate response
