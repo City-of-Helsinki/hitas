@@ -91,5 +91,27 @@
       font-size: $fontsize-body-l
       width: 100%
       height: 400px
+
+.company
+  .company-status
+    margin-bottom: 16px
+
+.upgrade-list
+  &__list
+    background-color: $color-engel-medium-light
+    padding: $spacing-layout-s
+    li
+      @include mix.flexbox()
+      > *
+        width: 25%
+    &-headers
+      font-weight: bold
+      padding: 0 $spacing-layout-s $spacing-s
+    &-item
+      background-color: white
+      padding: $spacing-layout-s
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
 footer
   width: 100%
