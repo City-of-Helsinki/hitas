@@ -46,7 +46,7 @@ class ReadHousingCompanyTests(APITestCase):
     fixtures = ["hitas/tests/apis/testdata.json"]
     maxDiff = None
 
-    def test_read(self):
+    def test__api__housing_company__read(self):
         # Create first housing company
         hc1 = create_test_housing_company(1)
         re1 = create_test_real_estate(hc1, 1)
@@ -166,10 +166,10 @@ class ReadHousingCompanyTests(APITestCase):
             },
         )
 
-    def test_not_found(self):
+    def test__api__housing_company__read__not_found(self):
         self._test_not_found("38432c233a914dfb9c2f54d9f5ad9063")
 
-    def test_not_found_invalid_id(self):
+    def test__api__housing_company__read__invalid_id(self):
         self._test_not_found("foo")
 
     def _test_not_found(self, hc_id):
