@@ -20,8 +20,9 @@ from hitas.tests.factories import (
 )
 
 
+@pytest.mark.parametrize("minimal_data", [False, True])
 @pytest.mark.django_db
-def test__api__housing_company__create__maximum_data(api_client: APIClient):
+def test__api__housing_company__create(api_client: APIClient, minimal_data):
     developer = DeveloperFactory.create()
     financing_method = FinancingMethodFactory.create()
     property_manager = PropertyManagerFactory.create()
@@ -48,6 +49,14 @@ def test__api__housing_company__create__maximum_data(api_client: APIClient):
         "state": "not_ready",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
+    if minimal_data:
+        data.update(
+            {
+                "acquisition_price": {"initial": 10.00, "realized": None},
+                "notes": "",
+                "sales_price_catalogue_confirmation_date": None,
+            }
+        )
 
     api_client.force_authenticate(UserFactory.create())
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
