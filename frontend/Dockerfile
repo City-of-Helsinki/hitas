@@ -15,7 +15,7 @@ ADD webpack.config.js ./
 
 RUN yarn build
 
-FROM nginx:1.23-alpine
+FROM nginxinc/nginx-unprivileged:1.23-alpine
 COPY --from=build /hitas/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
+EXPOSE 8080
