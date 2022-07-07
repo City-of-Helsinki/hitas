@@ -42,6 +42,12 @@ paths:
     post:
       description: Add a new housing company
       operationId: create-housing-company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HousingCompanyDetails'
       responses:
         '201':
           description: Successfully added a new housing company
@@ -281,13 +287,21 @@ components:
           format: date
           readOnly: true
         financing_method:
-          $ref: '#/components/schemas/Code'
+          allOf:
+            - $ref: '#/components/schemas/Code'
+            - $ref: '#/components/schemas/ReadOnlyCode'
         building_type:
-          $ref: '#/components/schemas/Code'
+          allOf:
+            - $ref: '#/components/schemas/Code'
+            - $ref: '#/components/schemas/ReadOnlyCode'
         developer:
-          $ref: '#/components/schemas/Code'
+          allOf:
+            - $ref: '#/components/schemas/Code'
+            - $ref: '#/components/schemas/ReadOnlyCode'
         property_manager:
-          $ref: '#/components/schemas/PropertyManager'
+          allOf:
+            - $ref: '#/components/schemas/PropertyManager'
+            - $ref: '#/components/schemas/ReadOnlyPropertyManager'
         acquisition_price:
           description: Acquisition price information
           type: object
@@ -368,6 +382,7 @@ components:
         real_estates:
           description: List of real estates this housing company has
           type: array
+          readOnly: true
           items:
             description: Single real estate
             type: object
@@ -428,14 +443,29 @@ components:
           readOnly: true
           example: Helsinki
 
+    ReadOnlyCode:
+      description: Read-only Hitas codebook entry
+      properties:
+        value:
+          readOnly: true
+        description:
+          readOnly: true
+        code:
+          readOnly: true
+
     Code:
       description: Hitas codebook entry
       type: object
       required:
+        - id
         - value
         - description
         - code
       properties:
+        id:
+          description: ID of this cod
+          type: string
+          example: 21d25cc973d8450f8f89937b9eba0a04
         value:
           description: Value for this code
           type: string
@@ -450,14 +480,29 @@ components:
           type: string
           example: 001
 
+    ReadOnlyPropertyManager:
+      description: Property manager information
+      properties:
+        name:
+          readOnly: true
+        email:
+          readOnly: true
+        address:
+          readOnly: true
+
     PropertyManager:
       description: Property manager information
       type: object
       required:
+        - id
         - name
         - email
         - address
       properties:
+        id:
+          description: ID of this property manager
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
         name:
           description: Name of this property manager
           type: string
