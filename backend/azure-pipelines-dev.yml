@@ -40,7 +40,7 @@ resources:
   pipelines:
   # Pipeline trigger
   - pipeline: City-of-Helsinki.build-hitastj-api
-    source: build-hitastj-api
+    source: City-of-Helsinki.build-hitastj-api
     # Run deploy-dev pipeline when any run of build pipeline completes
     trigger: true
 
