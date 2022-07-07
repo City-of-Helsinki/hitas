@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 
 from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
+from hitas.tests.apis.helpers import validate_openapi
 from hitas.tests.factories import (
     BuildingFactory,
     BuildingTypeFactory,
@@ -50,7 +51,7 @@ def test__api__housing_company__create__maximum_data(api_client: APIClient):
 
     api_client.force_authenticate(UserFactory.create())
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    # validate_openapi(response)  # TODO
+    validate_openapi(response)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -93,7 +94,7 @@ def test__api__housing_company__update(api_client: APIClient):
 
     api_client.force_authenticate(UserFactory.create())
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
-    # validate_openapi(response)  # TODO
+    validate_openapi(response)
     assert response.status_code == status.HTTP_200_OK
 
     hc.refresh_from_db()
