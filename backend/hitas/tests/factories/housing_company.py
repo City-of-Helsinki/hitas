@@ -41,7 +41,6 @@ class HousingCompanyFactory(DjangoModelFactory):
 
     class Meta:
         model = HousingCompany
-        django_get_or_create = ("official_name",)
 
 
 class RealEstateFactory(DjangoModelFactory):
@@ -60,6 +59,6 @@ class BuildingFactory(DjangoModelFactory):
 
     real_estate = factory.SubFactory("hitas.tests.factories.RealEstateFactory")
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    building_identifier = fake.bothify(fake.random_element(["#########?"]))
+    building_identifier = fake.bothify(fake.random_element(["1########?"]))
     street_address = fake.street_address()
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
