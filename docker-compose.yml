@@ -1,0 +1,54 @@
+version: "3.9"
+services:
+  hitas-frontend:
+    build:
+      context: frontend
+    ports:
+      - 8081:80
+    depends_on:
+      - hitas-backend
+
+  hitas-backend:
+    build:
+      context: backend
+    environment:
+      APPLY_MIGRATIONS: 1
+      COLLECT_STATIC: 1
+      LOAD_INITIAL_DATASET: 1
+      DEBUG: "True"
+      ALLOWED_HOSTS: "*"
+      SECRET_KEY: top-secret-development-key
+      DATABASE_URL: postgres://hitas:hitas@postgres/hitas
+    ports:
+      - 8888
+    restart: on-failure
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13
+    command: ["postgres", "-c", "log_statement=all"]
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: hitas
+      POSTGRES_PASSWORD: hitas
+      POSTGRES_DB: hitas
+
+  hitas-backend-nginx:
+    build:
+      context: backend
+      target: nginx
+    ports:
+      - 8080:80
+    depends_on:
+      - hitas-backend
+
+  swagger-editor:
+    image: swaggerapi/swagger-editor:v4.2.9
+    environment:
+       SWAGGER_FILE: /swagger/openapi.yaml
+    ports:
+      - 8090:8080
+    volumes:
+      - ./backend/openapi.yaml:/swagger/openapi.yaml:ro

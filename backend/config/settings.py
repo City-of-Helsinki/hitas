@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "helusers.apps.HelusersAdminConfig",
     "users",
     "hitas",
+    "nested_inline",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -52,10 +54,18 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "crum.CurrentRequestUserMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
+
+TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
+    "COERCE_DECIMAL_TO_STRING": False,
+}
 
 TEMPLATES = [
     {

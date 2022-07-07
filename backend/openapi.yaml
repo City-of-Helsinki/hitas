@@ -1,0 +1,735 @@
+openapi: 3.0.3
+info:
+  title: Hitas Helsinki APIs
+  version: 1.0.0
+  description: API definitions for Hitas Helsinki project.
+paths:
+  /api/v1/housing-companies:
+    get:
+      description: Fetch housing companies
+      operationId: list-housing-companies
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of housing companies
+          content:
+            application/json:
+              schema:
+                description: Single page of housing companies
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of housing companies
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HousingCompany'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new housing company
+      operationId: create-housing-company
+      responses:
+        '201':
+          description: Successfully added a new housing company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}:
+    get:
+      description: Fetch a single housing company by id
+      operationId: read-housing-company
+      parameters:
+      - name: housing_company_id
+        required: true
+        in: path
+        description: Housing company ID
+        schema:
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully fetched list of housing companies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    PagingLimitParameter:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 10
+        minimum: 1
+        maximum: 100
+      description: Specifies how many results are returned per page
+
+    PagingPageParameter:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 1
+        minimum: 1
+      description: Specifies the index of the returned page
+
+  schemas:
+    PageInfo:
+      description: Page metadata
+      type: object
+      properties:
+        size:
+          description: Size of the returned page
+          type: integer
+          format: int32
+          minimum: 0
+          example: 10
+        total_items:
+          description: Total items across all of the pages
+          type: integer
+          format: int32
+          minimum: 0
+          example: 100
+        current_page:
+          description: Current page number
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+        total_pages:
+          description: Total number of pages
+          type: integer
+          format: int32
+          minimum: 0
+          example: 5
+        links:
+          description: Links to other pages
+          type: object
+          properties:
+            next:
+              description: Link to next page
+              type: string
+              nullable: true
+              example: 'http://example.com/api/v1/housing-companies?page=4'
+            previous:
+              description: Link to previous page
+              type: string
+              nullable: true
+              example: 'http://example.com/api/v1/housing-companies?page=2'
+      required:
+        - size
+        - total_items
+        - current_page
+        - total_pages
+        - links
+
+    HousingCompany:
+      description: Single housing company
+      type: object
+      required:
+        - address
+        - area
+        - date
+        - id
+        - name
+        - state
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        name:
+          description: Name of the housing company
+          type: string
+          example: Taloyhtiö Helmi
+          maxLength: 1024
+        state:
+          $ref: '#/components/schemas/HousingCompanyState'
+        address:
+          $ref: '#/components/schemas/Address'
+        area:
+          description: Hitas cost area information related to the housing company
+          type: object
+          readOnly: true
+          required:
+            - name
+            - cost_area
+          properties:
+            name:
+              description: Area name based on the postal code
+              type: string
+              example: Helsinki Keskusta - Etu-Töölö
+            cost_area:
+              description: Hitas cost area based on the postal code
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4
+              example: 1
+        date:
+          description: Year of first construction based on the housing company's earliest constructed building
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+
+    HousingCompanyDetails:
+      description: Single housing company's details
+      type: object
+      required:
+        - address
+        - area
+        - date
+        - id
+        - name
+        - state
+        - business_id
+        - real_estates
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        name:
+          description: Name information about the housing company
+          type: object
+          required:
+            - official
+            - display
+          properties:
+            official:
+              description: Official name of the housing company. Better suited for official documents, etc.
+              type: string
+              maxLength: 1024
+              example: As Oy Taloyhtiö Helmi
+            display:
+              description: Simpler form of official name. Better suited for displaying housing company's name
+              type: string
+              maxLength: 1024
+              example: Taloyhtiö Helmi
+        business_id:
+          description: Official business ID
+          type: string
+          pattern: '^\d{7}-\d$'
+          example: 1234567-8
+        state:
+          $ref: '#/components/schemas/HousingCompanyState'
+        address:
+          $ref: '#/components/schemas/Address'
+        area:
+          description: Hitas cost area information related to the housing company
+          type: object
+          readOnly: true
+          required:
+            - name
+            - cost_area
+          properties:
+            name:
+              description: Area name based on the postal code
+              type: string
+              example: Helsinki Keskusta - Etu-Töölö
+            cost_area:
+              description: Hitas cost area based on the postal code
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4
+              example: 1
+        date:
+          description: Year of first construction based on the housing company's earliest constructed building
+          type: string
+          format: date
+          readOnly: true
+        financing_method:
+          $ref: '#/components/schemas/Code'
+        building_type:
+          $ref: '#/components/schemas/Code'
+        developer:
+          $ref: '#/components/schemas/Code'
+        property_manager:
+          $ref: '#/components/schemas/PropertyManager'
+        acquisition_price:
+          description: Acquisition price information
+          type: object
+          required:
+            - initial
+            - realized
+          properties:
+            initial:
+              description: Initial acquisition price
+              type: number
+              format: float
+              example: 112000.00
+            realized:
+              description: Realized acquisition price
+              type: number
+              format: float
+              nullable: true
+              example: 112000.00
+        primary_loan:
+          description: Primary loan
+          type: number
+          format: float
+          nullable: true
+          example: 112000.00
+        sales_price_catalogue_confirmation_date:
+          description: Sales price catalogue confirmation date
+          type: string
+          format: date
+          nullable: true
+        notification_date:
+          description: Notification date
+          type: string
+          format: date
+          nullable: true
+        legacy_id:
+          description: Old legacy ID for this housing company
+          type: string
+          readOnly: true
+          nullable: true
+        notes:
+          description: Optional notes for this housing company
+          type: string
+          nullable: true
+        last_modified:
+          description: Last modified informatoin
+          type: object
+          readOnly: true
+          required:
+            - user
+            - datetime
+          properties:
+            user:
+              description: User who last modified this housing company
+              type: object
+              required:
+                - username
+                - first_name
+                - last_name
+              properties:
+                user:
+                  description: Username of this user
+                  type: string
+                  example: mameik01
+                first_name:
+                  description: First name of this user
+                  type: string
+                  nullable: true
+                  example: Matti
+                last_name:
+                  description: Last name of this user
+                  type: string
+                  nullable: true
+                  example: Meikäläinen
+            datetime:
+              description: When this housing company was last modified
+              type: string
+              format: date-time
+        real_estates:
+          description: List of real estates this housing company has
+          type: array
+          items:
+            description: Single real estate
+            type: object
+            required:
+              - property_identifier
+              - address
+              - buildings
+            properties:
+              property_identifier:
+                description: This real estate's official property identifier
+                type: string
+                pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
+              address:
+                $ref: '#/components/schemas/Address'
+              buildings:
+                description: List of buildings this real estate has
+                type: array
+                items:
+                  description: Single building
+                  type: object
+                  required:
+                    - address
+                    - completion_date
+                  properties:
+                    address:
+                      $ref: '#/components/schemas/Address'
+                    completion_date:
+                      description: Building's construction completion date
+                      type: string
+                      format: date
+                      nullable: true
+                    building_identifier:
+                      description: This building's official identifier
+                      type: string
+                      pattern: '^1\d{8}[A-Za-z0-9]$'
+                      nullable: true
+                      example: 100012345A
+
+    Address:
+      description: Address information
+      type: object
+      required:
+        - street
+        - postal_code
+        - city
+      properties:
+        street:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        postal_code:
+          description: Postal code
+          type: string
+          example: "00100"
+        city:
+          description: City based on the postal code
+          type: string
+          readOnly: true
+          example: Helsinki
+
+    Code:
+      description: Hitas codebook entry
+      type: object
+      required:
+        - value
+        - description
+        - code
+      properties:
+        value:
+          description: Value for this code
+          type: string
+          example: luhtitalo
+        description:
+          description: Description of this code
+          type: string
+          nullable: true
+          example: This building type is for luhtitalo
+        code:
+          description: Code number
+          type: string
+          example: 001
+
+    PropertyManager:
+      description: Property manager information
+      type: object
+      required:
+        - name
+        - email
+        - address
+      properties:
+        name:
+          description: Name of this property manager
+          type: string
+          example: Ismo Isännöitsijät Oy
+        email:
+          description: Meail for this property manager
+          type: string
+          example: ismo@example.com
+        address:
+          $ref: '#/components/schemas/Address'
+
+    HousingCompanyState:
+      description: |-
+        Housing company state
+
+        Can have the following values:
+        - not_ready
+        - less_than_30_years
+        - greater_than_30_years_not_free
+        - greater_than_30_years_free
+        - greater_than_30_years_plot_department_notification
+        - ready_no_statistics
+      type: string
+      example: greater_than_30_years_not_free
+      x-extensible-enum:
+        - not_ready
+        - less_than_30_years
+        - greater_than_30_years_not_free
+        - greater_than_30_years_free
+        - greater_than_30_years_plot_department_notification
+        - ready_no_statistics
+
+    # Errors
+
+    BadRequestError:
+      description: Bad request error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          example: 400
+          enum: [400]
+        reason:
+          description: Error phrase
+          type: string
+          example: "Bad Request"
+          enum: ["Bad Request"]
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Request could not be processed due to malformed request
+        error:
+          description: |-
+            Error reason
+
+            Can have the following values:
+            - bad_request
+          type: string
+          example: bad_request
+          x-extensible-enum:
+            - bad_request
+        fields:
+          description: Details about specific validation failures on specific fields
+          type: array
+          items:
+            description: Single field validation details
+            type: object
+            required:
+              - field
+              - message
+            properties:
+              field:
+                description: Name of the field
+                type: string
+                example: name
+              message:
+                description: Error message with details about the failure
+                type: string
+                example: Length exceeds maximum length of 50
+
+    NotFoundError:
+      description: Not found error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [404]
+          example: 404
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Not Found"]
+          example: Not Found
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Housing company not found
+        error:
+          description: |-
+            Error reason
+
+            Can have the following values:
+            - housing_company_not_found
+          type: string
+          example: housing_company_not_found
+          x-extensible-enum:
+            - housing_company_not_found
+
+    NotAcceptableError:
+      description: Not acceptable error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [406]
+          example: 406
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Not Acceptable"]
+          example: Not Acceptable
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Only 'application/json' Content-Type is supported.
+        error:
+          description: Error reason
+          type: string
+          enum: [not_acceptable]
+          example: not_acceptable
+
+    UnsupportedMediaTypeError:
+      description: Unsupported media type error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [415]
+          example: 415
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Unsupported Media Type"]
+          example: Unsupported Media Type
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Only 'application/json' Content-Type is supported.
+        error:
+          description: Error reason
+          type: string
+          enum: [unsupported_media_type]
+          example: unsupported_media_type
+
+    InternalServerError:
+      type: object
+      description: Internal server error
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [500]
+          example: 500
+        reason:
+          description: Error phrase
+          type: string
+          example: Internal Server Error
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Unexpected internal server error occurred
+        error:
+          description: Error reason
+          type: string
+          enum: [internal_server_error]
+          example: internal_server_error
+
+  responses:
+
+    BadRequest:
+      description: The request was malformed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+          example:
+            status: 400
+            reason: Bad Request
+            error: bad_request
+            details: Some fields failed validation
+            fields:
+              - field: name
+                message: Length exceeds maximum length of 50
+              - field: age
+                message: Age must be within range [0, 200]
+              - field: email
+                message: Email is required
+
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+          example:
+            status: 404
+            reason: Not Found
+            error: housing_company_not_found
+            message: Housing company not found
+
+    UnsupportedMediaType:
+      description: Only 'application/json' content-type is supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            status: 415
+            reason: Unsupported Media Type
+            error: unsupported_media_type
+            message: Only 'application/json' Content-Type is supported.
+
+    NotAcceptable:
+      description: Only 'application/json' content-type is supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAcceptableError'
+          example:
+            status: 405
+            reason: Not Acceptable
+            error: not_acceptable
+            message: Only 'application/json' Content-Type is supported.
+
+    InternalServerError:
+      description: Unexpected internal server error occurred
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+          example:
+            status: 500
+            reason: Internal Server Error
+            error: internal_server_error
+            message: Unexpected internal server error occurred
+

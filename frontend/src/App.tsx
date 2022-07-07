@@ -1,73 +1,75 @@
 import React from "react";
+import { Route, Routes } from "react-router-dom";
 
-import { Navigation, Container } from "hds-react";
+import { Container, Footer, Navigation } from "hds-react";
 
-import "./App.sass";
+import CompanyListing from "./pages/CompanyListing";
+import Apartmentslisting from "./pages/ApartmentsListing";
+import Reports from "./pages/Reports";
+import Documents from "./pages/Documents";
+import Codes from "./pages/Codes";
 
-function App() {
+import "./styles/index.sass";
+
+function App(children) {
     return (
         <div className="App">
             <Navigation
-                title="Hitas"
+                title="Asuntopalvelut"
                 menuToggleAriaLabel=""
                 skipTo=""
                 skipToContentLabel=""
             >
                 <Navigation.Row ariaLabel="Main navigation">
                     <Navigation.Item
-                        href="#"
-                        label="Link"
-                        active
-                        onClick={(e) => e.preventDefault()}
+                        href="/yhtiot/"
+                        label="Yhtiöt"
                     />
                     <Navigation.Item
-                        href="#"
-                        label="Link"
-                        onClick={(e) => e.preventDefault()}
+                        href="/asunnot/"
+                        label="Asunnot"
                     />
                     <Navigation.Item
-                        href="#"
-                        label="Link"
-                        onClick={(e) => e.preventDefault()}
+                        href="/raportit/"
+                        label="Raportit"
                     />
                     <Navigation.Item
-                        href="#"
-                        label="Link"
-                        onClick={(e) => e.preventDefault()}
+                        href="/dokumentit/"
+                        label="Dokumentit"
                     />
-                    <Navigation.Dropdown label="Dropdown">
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                        <Navigation.Item
-                            href="#"
-                            label="Link"
-                            onClick={(e) => e.preventDefault()}
-                        />
-                    </Navigation.Dropdown>
+                    <Navigation.Item
+                        href="/koodisto/"
+                        label="Koodisto"
+                    />
                 </Navigation.Row>
             </Navigation>
-            <Container className={"App"}>
-                <h1>Hitas</h1>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad
-                    deserunt dolorem eaque esse facilis fugiat fugit illo modi
-                    molestias neque nobis perspiciatis possimus ratione,
-                    recusandae, repudiandae saepe sapiente.
-                </p>
+
+            <Container className="main-content">
+                <Routes>
+                    <Route
+                        path="yhtiot/"
+                        element={<CompanyListing />}
+                    />
+                    <Route
+                        path="asunnot/"
+                        element={<Apartmentslisting />}
+                    />
+                    <Route
+                        path="raportit/"
+                        element={<Reports />}
+                    />
+                    <Route
+                        path="dokumentit/"
+                        element={<Documents />}
+                    />
+                    <Route
+                        path="koodisto/"
+                        element={<Codes />}
+                    />
+                </Routes>
             </Container>
+
+            <Footer />
         </div>
     );
 }

@@ -39,7 +39,11 @@ resources:
     name: hitastj/hitastj-pipelines
   pipelines:
   # Pipeline trigger
+<<<<<<< HEAD
   - pipeline: City-of-Helsinki.build-hitastj-api
+=======
+  - pipeline: build
+>>>>>>> 48785dbb7ab9bd03dcb374994e64c5f600e69afc
     source: build-hitastj-api
     # Run deploy-dev pipeline when any run of build pipeline completes
     trigger: true
@@ -51,4 +55,8 @@ extends:
   template: azure-pipelines-deploy-hitastj-api-dev.yml@hitastj-pipelines
   # Image tag name for Fuse projects
   #parameters:
+<<<<<<< HEAD
     #imagetag: ${{ parameters.imagetag }}
+=======
+    #imagetag: ${{ parameters.imagetag }}
+>>>>>>> 48785dbb7ab9bd03dcb374994e64c5f600e69afc
