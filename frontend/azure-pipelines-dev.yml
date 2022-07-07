@@ -40,7 +40,7 @@ resources:
   pipelines:
   # Pipeline trigger
   - pipeline: City-of-Helsinki.build-hitastj-ui
-    source: build-hitastj-ui
+    source: City-of-Helsinki.build-hitastj-ui
     # Run deploy-dev pipeline when any run of build pipeline completes
     trigger: true
 
