@@ -7,8 +7,9 @@ from rest_framework import serializers
 
 from hitas.models import Building, HousingCompany
 from hitas.models.housing_company import HousingCompanyState
+from hitas.utils import safe_attrgetter
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import AddressSerializer, HitasDecimalField, HitasModelViewSet, ValueOrNullField, value_or_none
+from hitas.views.helpers import AddressSerializer, HitasDecimalField, HitasModelViewSet, ValueOrNullField
 from hitas.views.property_manager import PropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 
@@ -67,9 +68,9 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, serializers.Mod
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
             "user": {
-                "username": obj.last_modified_by.username,
-                "first_name": value_or_none(obj.last_modified_by.first_name),
-                "last_name": value_or_none(obj.last_modified_by.last_name),
+                "username": safe_attrgetter(obj, "last_modified_by.username", default=None),
+                "first_name": safe_attrgetter(obj, "last_modified_by.first_name", default=None),
+                "last_name": safe_attrgetter(obj, "last_modified_by.last_name", default=None),
             },
             "datetime": obj.last_modified_datetime,
         }
