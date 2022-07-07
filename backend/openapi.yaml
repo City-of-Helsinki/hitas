@@ -91,7 +91,40 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
+    put:
+      description: Modify an existing housing company
+      operationId: update-housing-company
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HousingCompanyDetails'
+      responses:
+        '200':
+          description: Successfully updated a housing company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     PagingLimitParameter:
@@ -285,6 +318,7 @@ components:
           description: Year of first construction based on the housing company's earliest constructed building
           type: string
           format: date
+          nullable: true
           readOnly: true
         financing_method:
           allOf:
@@ -336,6 +370,7 @@ components:
           type: string
           format: date
           nullable: true
+          readOnly: true
         legacy_id:
           description: Old legacy ID for this housing company
           type: string
@@ -463,7 +498,7 @@ components:
         - code
       properties:
         id:
-          description: ID of this cod
+          description: ID of this code
           type: string
           example: 21d25cc973d8450f8f89937b9eba0a04
         value:
