@@ -53,7 +53,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
 
     def _lookup_id_to_uuid(self, s: str) -> UUID:
         try:
-            return UUID(hex=s)
+            return UUID(hex=str(s))
         except ValueError:
             raise HitasModelNotFound(model=self.get_model_class())
 
@@ -73,8 +73,11 @@ class UUIDRelatedField(SlugRelatedField):
     def to_representation(self, obj):
         return getattr(obj, self.slug_field).hex
 
-    def to_internal_value(self, data):
-        return super().to_internal_value(data=UUID(hex=data))
+    def to_internal_value(self, data: str):
+        try:
+            return super().to_internal_value(data=UUID(hex=str(data)))
+        except ValueError:
+            raise HitasModelNotFound(model=self.get_queryset().model)
 
 
 class PostalCodeField(SlugRelatedField):
@@ -83,6 +86,12 @@ class PostalCodeField(SlugRelatedField):
 
     def to_representation(self, instance: PostalCode):
         return instance.value
+
+    def to_internal_value(self, data: str):
+        try:
+            return super().to_internal_value(data=data)
+        except ValueError:
+            raise HitasModelNotFound(model=PostalCode)
 
 
 class HitasDecimalField(serializers.DecimalField):
