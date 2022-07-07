@@ -4,12 +4,10 @@ from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models.codes import AbstractCode, BuildingType, Developer, FinancingMethod
-from hitas.views.helpers import ValueOrNullField
 
 
 class AbstractCodeSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
-    description = ValueOrNullField()
     code = serializers.CharField(source="legacy_code_number")
 
     def get_id(self, obj: AbstractCode) -> str:
