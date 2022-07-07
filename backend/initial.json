@@ -1,0 +1,664 @@
+[
+  {
+    "model": "users.user",
+    "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
+    "fields": {
+      "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
+      "last_login": "2022-06-14T12:40:21.467Z",
+      "is_superuser": true,
+      "username": "hitas",
+      "first_name": "",
+      "last_name": "",
+      "email": "hitas@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2022-06-10T12:54:47.561Z",
+      "uuid": "149689de-eca8-11ec-91f7-57e0ef3ccf79",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 1,
+    "fields": {
+      "value": "tuntematon",
+      "description": "",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "001",
+      "legacy_start_date": "2022-06-10T12:53:10.149Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 2,
+    "fields": {
+      "value": "kerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "002",
+      "legacy_start_date": "2022-06-10T12:53:10.150Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 3,
+    "fields": {
+      "value": "rivitalo",
+      "description": "",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "003",
+      "legacy_start_date": "2022-06-10T12:53:10.150Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 4,
+    "fields": {
+      "value": "paritalo",
+      "description": "",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "004",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 5,
+    "fields": {
+      "value": "pienkerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 5,
+      "legacy_code_number": "005",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 6,
+    "fields": {
+      "value": "luhtitalo",
+      "description": "",
+      "in_use": true,
+      "order": 6,
+      "legacy_code_number": "006",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 7,
+    "fields": {
+      "value": "omakotitalo",
+      "description": "",
+      "in_use": true,
+      "order": 7,
+      "legacy_code_number": "007",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 8,
+    "fields": {
+      "value": "rivitalo/kerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "008",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 9,
+    "fields": {
+      "value": "kerrostalo/rivitalo",
+      "description": "",
+      "in_use": true,
+      "order": 9,
+      "legacy_code_number": "009",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 10,
+    "fields": {
+      "value": "pientalo",
+      "description": "",
+      "in_use": true,
+      "order": 10,
+      "legacy_code_number": "010",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 11,
+    "fields": {
+      "value": "erillistalo",
+      "description": "",
+      "in_use": true,
+      "order": 11,
+      "legacy_code_number": "011",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.buildingtype",
+    "pk": 12,
+    "fields": {
+      "value": "rivitalo/erillistalo",
+      "description": "",
+      "in_use": true,
+      "order": 12,
+      "legacy_code_number": "012",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 1,
+    "fields": {
+      "value": "tuntematon",
+      "description": "",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2022-06-10T12:53:10.136Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 2,
+    "fields": {
+      "value": "vapaarahoitteinen, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "101",
+      "legacy_start_date": "2022-06-10T12:53:10.136Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 3,
+    "fields": {
+      "value": "vapaarahoitteinen, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "102",
+      "legacy_start_date": "2022-06-10T12:53:10.137Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 4,
+    "fields": {
+      "value": "HK valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "211",
+      "legacy_start_date": "2022-06-10T12:53:10.137Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 5,
+    "fields": {
+      "value": "HK valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 5,
+      "legacy_code_number": "212",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 6,
+    "fields": {
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 6,
+      "legacy_code_number": "221",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 7,
+    "fields": {
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 7,
+      "legacy_code_number": "222",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 8,
+    "fields": {
+      "value": "HK valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "311",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 9,
+    "fields": {
+      "value": "HK valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 9,
+      "legacy_code_number": "312",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 10,
+    "fields": {
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 10,
+      "legacy_code_number": "321",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 11,
+    "fields": {
+      "value": "RA valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 11,
+      "legacy_code_number": "322",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 12,
+    "fields": {
+      "value": "Korkotuki, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 12,
+      "legacy_code_number": "411",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 13,
+    "fields": {
+      "value": "Korkotuki, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 13,
+      "legacy_code_number": "412",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 14,
+    "fields": {
+      "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 14,
+      "legacy_code_number": "511",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 15,
+    "fields": {
+      "value": "Pitkä korkotukilaina osaomistus Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 15,
+      "legacy_code_number": "611",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 16,
+    "fields": {
+      "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 16,
+      "legacy_code_number": "711",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 17,
+    "fields": {
+      "value": "Uusi Hitas I (vapaarahoitteinen)",
+      "description": "",
+      "in_use": true,
+      "order": 17,
+      "legacy_code_number": "811",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 18,
+    "fields": {
+      "value": "Uusi Hitas II (vapaarahoitteinen)",
+      "description": "",
+      "in_use": true,
+      "order": 18,
+      "legacy_code_number": "812",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 19,
+    "fields": {
+      "value": "Uusi Hitas I (vanhat säännöt)",
+      "description": "",
+      "in_use": true,
+      "order": 19,
+      "legacy_code_number": "821",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 20,
+    "fields": {
+      "value": "Uusi Hitas II (vanhat säännöt)",
+      "description": "",
+      "in_use": true,
+      "order": 20,
+      "legacy_code_number": "822",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 21,
+    "fields": {
+      "value": "Vuokratalo Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 21,
+      "legacy_code_number": "911",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
+    "pk": 22,
+    "fields": {
+      "value": "Vuokratalo Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 22,
+      "legacy_code_number": "912",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.postalcode",
+    "pk": 1,
+    "fields": {
+      "value": "00100",
+      "description": "Helsinki Keskusta - Etu-Töölö",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "001",
+      "legacy_start_date": "2022-06-13T06:53:57Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.postalcode",
+    "pk": 2,
+    "fields": {
+      "value": "00150",
+      "description": "Eira - Hernesaari",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "002",
+      "legacy_start_date": "2022-06-13T06:53:57Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.postalcode",
+    "pk": 3,
+    "fields": {
+      "value": "00190",
+      "description": "Suomenlinna",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "003",
+      "legacy_start_date": "2022-06-13T06:53:57Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.postalcode",
+    "pk": 4,
+    "fields": {
+      "value": "00230",
+      "description": "Ilmala",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "004",
+      "legacy_start_date": "2022-06-13T06:53:57Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.postalcode",
+    "pk": 5,
+    "fields": {
+      "value": "00420",
+      "description": "Kannelmäki",
+      "in_use": true,
+      "order": 5,
+      "legacy_code_number": "008",
+      "legacy_start_date": "2022-06-13T10:49:15Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 1,
+    "fields": {
+      "value": "Tuntematon",
+      "description": "",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2022-06-13T10:38:55Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 2,
+    "fields": {
+      "value": "Rakennuskartio Oy",
+      "description": "",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "107",
+      "legacy_start_date": "2022-06-13T10:39:12Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 3,
+    "fields": {
+      "value": "Att",
+      "description": "",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "001",
+      "legacy_start_date": "2022-06-13T10:39:55Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 4,
+    "fields": {
+      "value": "VVO",
+      "description": "",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "002",
+      "legacy_start_date": "2022-06-13T10:40:03Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 5,
+    "fields": {
+      "value": "Helsingin Sato Oy",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "007",
+      "legacy_start_date": "2022-06-13T10:46:59Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.propertymanager",
+    "pk": 1,
+    "fields": {
+      "name": "Isännöitsijä Iskonen Oy",
+      "email": "iskonen@example.com",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1
+    }
+  },
+  {
+    "model": "hitas.propertymanager",
+    "pk": 2,
+    "fields": {
+      "name": "EA-isännöinti Oy",
+      "email": "not-known@example.com",
+      "street_address": "Värikuja 1 B 13",
+      "postal_code": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 1,
+    "fields": {
+      "uuid": "dccd2cbc-9826-4f28-b097-da8209441bbf",
+      "official_name": "Helsingin Rumpupolun palvelutalo",
+      "display_name": "Asunto Oy Helsingin Rumpupolun palvelutalo",
+      "state": 2,
+      "business_id": "1234567-8",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1,
+      "building_type": 2,
+      "financing_method": 2,
+      "property_manager": 2,
+      "developer": 5,
+      "acquisition_price": "123456.78",
+      "realized_acquisition_price": null,
+      "primary_loan": "100000.00",
+      "sales_price_catalogue_confirmation_date": null,
+      "notification_date": null,
+      "legacy_id": "581",
+      "notes": "",
+      "last_modified_datetime": "2022-06-20T10:00:50.506Z",
+      "last_modified_by": "09a0a600-a62d-44bd-b9ef-ab446eeccb28"
+    }
+  },
+  {
+    "model": "hitas.realestate",
+    "pk": 1,
+    "fields": {
+      "uuid": "a20254d4-b3ea-4f25-a509-f4f081d9e446",
+      "housing_company": 1,
+      "property_identifier": "091-020-0015-0003",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1
+    }
+  },
+  {
+    "model": "hitas.building",
+    "pk": 1,
+    "fields": {
+      "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
+      "real_estate": 1,
+      "completion_date": "2021-07-07",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1,
+      "building_identifier": "100012345A"
+    }
+  }
+]

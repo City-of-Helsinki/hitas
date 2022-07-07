@@ -4,6 +4,7 @@
         "es2021": true
     },
     "extends": [
+        "react-app",
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
@@ -13,8 +14,6 @@
     "rules": {
         "no-console": 1,       // Means warning
         "prettier/prettier": 2, // Means error
-        "quotes": 0,
-        "semicolons": 0,
         "comma-dangle": 0,
         "require-jsdoc":0
     },
