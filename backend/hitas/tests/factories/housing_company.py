@@ -29,7 +29,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     realized_acquisition_price = factory.LazyAttribute(
         lambda self: self.state == HousingCompanyState.NOT_READY
         and None
-        or self.acquisition_price * Decimal(random.uniform(0.5, 1.5))
+        or round(self.acquisition_price * Decimal(random.uniform(0.5, 1.5)), 2)
     )
     primary_loan = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))

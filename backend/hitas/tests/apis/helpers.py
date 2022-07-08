@@ -1,14 +1,10 @@
 import openapi_core
 import yaml
-from crum import impersonate
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
 from openapi_core.validation.request.datatypes import OpenAPIRequest
 from openapi_core.validation.response.validators import ResponseValidator
 from rest_framework.response import Response
-
-from hitas.models import Building, HousingCompany, RealEstate
 
 with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
     _openapi_spec = openapi_core.create_spec(yaml.safe_load(spec_file))
@@ -60,39 +56,4 @@ def _openapi_url_pattern_workaround(original: OpenAPIRequest):
         parameters=original.parameters,
         body=original.body,
         mimetype=original.mimetype,
-    )
-
-
-def create_test_housing_company(idx: int) -> HousingCompany:
-    with impersonate(get_user_model().objects.first()):
-        return HousingCompany.objects.create(
-            display_name=f"test-housing-company-{idx}",
-            official_name=f"test-housing-company-{idx}-as-oy",
-            street_address=f"test-street-address-{idx}",
-            business_id="1234567-8",
-            acquisition_price=10.0,
-            primary_loan=10.0,
-            building_type_id=1,
-            developer_id=1,
-            financing_method_id=1,
-            postal_code_id=1,
-            property_manager_id=1,
-        )
-
-
-def create_test_real_estate(hc: HousingCompany, idx: int) -> RealEstate:
-    return RealEstate.objects.create(
-        housing_company=hc,
-        postal_code_id=1,
-        property_identifier="091-020-0015-0003",
-        street_address=f"test-re-street-address-{idx}",
-    )
-
-
-def create_test_building(re: RealEstate, idx: int, completion_date=None) -> Building:
-    return Building.objects.create(
-        real_estate=re,
-        postal_code_id=1,
-        street_address=f"test-b-street-address-{idx}",
-        completion_date=completion_date,
     )

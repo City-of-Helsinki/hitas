@@ -1,193 +1,146 @@
-import datetime
+from datetime import date
 
+import pytest
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 
-from hitas.tests.apis.helpers import (
-    create_test_building,
-    create_test_housing_company,
-    create_test_real_estate,
-    validate_openapi,
-)
+from hitas import exceptions
+from hitas.models import Building, HousingCompany, RealEstate
+from hitas.tests.apis.helpers import validate_openapi
+from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory, UserFactory
 
 
-def assert_about_now(data, path) -> datetime.datetime:
-    value = _get_value(data, path, mandatory=True)
-    now = datetime.datetime.now(datetime.timezone.utc)
-    diff = now - value
-    if -1 < diff.total_seconds() < 5:
-        return value
-    else:
-        raise Exception(f"Too big difference. Value: '{value}', now: '{now}', difference: {diff} seconds.")
+@pytest.mark.django_db
+def test__api__housing_company__retrieve(api_client: APIClient):
+    hc1: HousingCompany = HousingCompanyFactory.create()
+    hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
+    hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2020, 1, 1))
+    hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2000, 1, 1))
+    hc1_re2: RealEstate = RealEstateFactory.create(housing_company=hc1)
+    hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2, completion_date=None)
 
+    # Second HousingCompany with a building
+    BuildingFactory.create()
 
-def _get_value(data, path, mandatory=True):
-    current_value = data
-    current_path = ""
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK
+    validate_openapi(response)
 
-    for part in path.split("."):
-        current_path += part
-        if getattr(current_value, "get", None) is None:
-            raise Exception(f"Data not not dict for path '{current_path}'.")
-
-        current_value = current_value.get(part)
-        if current_value is None:
-            if mandatory:
-                raise Exception(f"Data not found for path '{path}'.")
-            else:
-                return None
-        current_path += "."
-
-    return current_value
-
-
-class ReadHousingCompanyTests(APITestCase):
-    fixtures = ["hitas/tests/apis/testdata.json"]
-    maxDiff = None
-
-    def test__api__housing_company__read(self):
-        # Create first housing company
-        hc1 = create_test_housing_company(1)
-        re1 = create_test_real_estate(hc1, 1)
-        create_test_building(re1, 1, "2022-01-01")
-        create_test_building(re1, 2, "2021-01-01")
-        re2 = create_test_real_estate(hc1, 2)
-        create_test_building(re2, 3, "2021-05-01")
-
-        # Create second housing company
-        hc2 = create_test_housing_company(2)
-        re3 = create_test_real_estate(hc2, 3)
-        create_test_building(re3, 4, "2000-01-01")
-
-        # Make the request
-        response = self.client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
-
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        now = assert_about_now(response.data, "last_modified.datetime")
-        self.assertDictEqual(
-            dict(response.data),
+    assert response.json() == {
+        "id": hc1.uuid.hex,
+        "business_id": hc1.business_id,
+        "name": {"display": hc1.display_name, "official": hc1.official_name},
+        "state": hc1.state.name.lower(),
+        "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street": hc1.street_address},
+        "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
+        "date": "2000-01-01",
+        "real_estates": [
             {
-                "acquisition_price": {"initial": 10.00, "realized": None},
                 "address": {
-                    "street": "test-street-address-1",
-                    "postal_code": "00100",
                     "city": "Helsinki",
+                    "postal_code": hc1_re1.postal_code.value,
+                    "street": hc1_re1.street_address,
                 },
-                "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
-                "building_type": {
-                    "code": "001",
-                    "value": "tuntematon",
-                    "description": None,
-                },
-                "business_id": "1234567-8",
-                "date": "2021-01-01",
-                "developer": {
-                    "code": "000",
-                    "value": "Tuntematon",
-                    "description": None,
-                },
-                "financing_method": {
-                    "code": "000",
-                    "value": "tuntematon",
-                    "description": None,
-                },
-                "id": hc1.uuid.hex,
-                "last_modified": {
-                    "user": {
-                        "first_name": None,
-                        "last_name": None,
-                        "username": "hitas",
-                    },
-                    "datetime": now,
-                },
-                "legacy_id": None,
-                "name": {
-                    "display": "test-housing-company-1",
-                    "official": "test-housing-company-1-as-oy",
-                },
-                "notes": None,
-                "notification_date": None,
-                "primary_loan": 10.00,
-                "property_manager": {
-                    "address": {"city": "Helsinki", "postal_code": "00100", "street": "Fakestreet 123"},
-                    "email": "iskonen@example.com",
-                    "name": "Isännöitsijä Iskonen Oy",
-                },
-                "real_estates": [
-                    # First real estate
+                "property_identifier": hc1_re1.property_identifier,
+                "buildings": [
                     {
-                        "address": {"city": "Helsinki", "postal_code": "00100", "street": "test-re-street-address-1"},
-                        "property_identifier": "091-020-0015-0003",
-                        "buildings": [
-                            # First building
-                            {
-                                "address": {
-                                    "city": "Helsinki",
-                                    "postal_code": "00100",
-                                    "street": "test-b-street-address-1",
-                                },
-                                "building_identifier": None,
-                                "completion_date": "2022-01-01",
-                            },
-                            # Second building
-                            {
-                                "address": {
-                                    "city": "Helsinki",
-                                    "postal_code": "00100",
-                                    "street": "test-b-street-address-2",
-                                },
-                                "building_identifier": None,
-                                "completion_date": "2021-01-01",
-                            },
-                        ],
+                        "address": {
+                            "city": "Helsinki",
+                            "postal_code": hc1_re1_bu1.postal_code.value,
+                            "street": hc1_re1_bu1.street_address,
+                        },
+                        "building_identifier": hc1_re1_bu1.building_identifier,
+                        "completion_date": "2020-01-01",
                     },
-                    # Second real estate
                     {
-                        "address": {"city": "Helsinki", "postal_code": "00100", "street": "test-re-street-address-2"},
-                        "property_identifier": "091-020-0015-0003",
-                        "buildings": [
-                            {
-                                "address": {
-                                    "city": "Helsinki",
-                                    "postal_code": "00100",
-                                    "street": "test-b-street-address-3",
-                                },
-                                "building_identifier": None,
-                                "completion_date": "2021-05-01",
-                            }
-                        ],
+                        "address": {
+                            "city": "Helsinki",
+                            "postal_code": hc1_re1_bu2.postal_code.value,
+                            "street": hc1_re1_bu2.street_address,
+                        },
+                        "building_identifier": hc1_re1_bu2.building_identifier,
+                        "completion_date": "2000-01-01",
                     },
                 ],
-                "state": "not_ready",
-                "sales_price_catalogue_confirmation_date": None,
             },
-        )
-
-    def test__api__housing_company__read__not_found(self):
-        self._test_not_found("38432c233a914dfb9c2f54d9f5ad9063")
-
-    def test__api__housing_company__read__invalid_id(self):
-        self._test_not_found("foo")
-
-    def _test_not_found(self, hc_id):
-        # Create housing company
-        create_test_housing_company(1)
-
-        # Make the request
-        response = self.client.get(reverse("hitas:housing-company-detail", args=[hc_id]))
-
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertDictEqual(
-            dict(response.data),
             {
-                "error": "housing_company_not_found",
-                "message": "Housing company not found",
-                "reason": "Not Found",
-                "status": 404,
+                "address": {
+                    "city": "Helsinki",
+                    "postal_code": hc1_re2.postal_code.value,
+                    "street": hc1_re2.street_address,
+                },
+                "property_identifier": hc1_re2.property_identifier,
+                "buildings": [
+                    {
+                        "address": {
+                            "city": "Helsinki",
+                            "postal_code": hc1_re2_bu1.postal_code.value,
+                            "street": hc1_re2_bu1.street_address,
+                        },
+                        "building_identifier": hc1_re2_bu1.building_identifier,
+                        "completion_date": None,
+                    }
+                ],
             },
-        )
+        ],
+        "financing_method": {
+            "id": hc1.financing_method.uuid.hex,
+            "value": hc1.financing_method.value,
+            "description": hc1.financing_method.description,
+            "code": hc1.financing_method.legacy_code_number,
+        },
+        "building_type": {
+            "id": hc1.building_type.uuid.hex,
+            "value": hc1.building_type.value,
+            "description": hc1.building_type.description,
+            "code": hc1.building_type.legacy_code_number,
+        },
+        "developer": {
+            "id": hc1.developer.uuid.hex,
+            "value": hc1.developer.value,
+            "description": hc1.developer.description,
+            "code": hc1.developer.legacy_code_number,
+        },
+        "property_manager": {
+            "id": hc1.property_manager.uuid.hex,
+            "address": {
+                "city": "Helsinki",
+                "postal_code": hc1.property_manager.postal_code.value,
+                "street": hc1.property_manager.street_address,
+            },
+            "name": hc1.property_manager.name,
+            "email": hc1.property_manager.email,
+        },
+        "acquisition_price": {
+            "initial": float(hc1.acquisition_price),
+            "realized": float(hc1.realized_acquisition_price),
+        },
+        "primary_loan": float(hc1.primary_loan),
+        "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),
+        "notes": hc1.notes,
+        "legacy_id": hc1.legacy_id,
+        "notification_date": str(hc1.notification_date),
+        "last_modified": {
+            "datetime": hc1.last_modified_datetime.isoformat().replace("+00:00", "Z"),
+            "user": {
+                "username": hc1.last_modified_by.username,
+                "first_name": hc1.last_modified_by.first_name,
+                "last_name": hc1.last_modified_by.last_name,
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
+@pytest.mark.django_db
+def test__api__housing_company__read__fail(api_client: APIClient, invalid_id):
+    HousingCompanyFactory.create()
+
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[invalid_id]))
+    validate_openapi(response)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == exceptions.HitasModelNotFound(model=HousingCompany).data

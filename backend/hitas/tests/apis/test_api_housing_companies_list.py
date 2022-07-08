@@ -1,216 +1,161 @@
+from datetime import date
+
+import pytest
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 
-from hitas.tests.apis.helpers import (
-    create_test_building,
-    create_test_housing_company,
-    create_test_real_estate,
-    validate_openapi,
-)
+from hitas import exceptions
+from hitas.models import Building, HousingCompany
+from hitas.tests.apis.helpers import validate_openapi
+from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, UserFactory
 
 
-class ListHousingCompaniesTests(APITestCase):
-    fixtures = ["hitas/tests/apis/testdata.json"]
-    maxDiff = None
+@pytest.mark.django_db
+def test__api__housing_company__list__empty(api_client: APIClient):
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-list"))
+    validate_openapi(response)
 
-    def test__api__housing_company__list__empty(self):
-        response = self.client.get(reverse("hitas:housing-company-list"))
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["contents"] == []
+    assert response.json()["page"] == {
+        "size": 0,
+        "current_page": 1,
+        "total_items": 0,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
 
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertDictEqual(
-            dict(response.data),
-            {
-                "contents": [],
-                "page": {
-                    "size": 0,
-                    "current_page": 1,
-                    "total_items": 0,
-                    "total_pages": 1,
-                    "links": {
-                        "next": None,
-                        "previous": None,
-                    },
-                },
+@pytest.mark.django_db
+def test__api__housing_company__list(api_client: APIClient):
+    hc1: HousingCompany = HousingCompanyFactory.create()
+    hc2: HousingCompany = HousingCompanyFactory.create()
+    BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2020, 1, 1))
+    bu2: Building = BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2000, 1, 1))
+
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-list"))
+    validate_openapi(response)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["contents"] == [
+        {
+            "id": hc1.uuid.hex,
+            "name": hc1.display_name,
+            "state": hc1.state.name.lower(),
+            "address": {
+                "street": hc1.street_address,
+                "postal_code": hc1.postal_code.value,
+                "city": "Helsinki",
             },
-        )
-
-    def test__api__housing_company__list(self):
-        # Create first housing company
-        hc1 = create_test_housing_company(1)
-        re1 = create_test_real_estate(hc1, 1)
-        create_test_building(re1, 1, "2022-01-01")
-        create_test_building(re1, 2, "2021-01-01")
-        re2 = create_test_real_estate(hc1, 2)
-        create_test_building(re2, 3, "2021-05-01")
-
-        # Create second housing company
-        hc2 = create_test_housing_company(2)
-        re3 = create_test_real_estate(hc2, 3)
-        create_test_building(re3, 4, "2000-01-01")
-
-        # Make the request
-        response = self.client.get(reverse("hitas:housing-company-list"))
-
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            dict(response.data),
-            {
-                "contents": [
-                    {
-                        "id": hc1.uuid.hex,
-                        "name": "test-housing-company-1",
-                        "state": "not_ready",
-                        "address": {
-                            "street": "test-street-address-1",
-                            "postal_code": "00100",
-                            "city": "Helsinki",
-                        },
-                        "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
-                        "date": "2021-01-01",
-                    },
-                    {
-                        "id": hc2.uuid.hex,
-                        "name": "test-housing-company-2",
-                        "state": "not_ready",
-                        "address": {
-                            "street": "test-street-address-2",
-                            "postal_code": "00100",
-                            "city": "Helsinki",
-                        },
-                        "area": {"name": "Helsinki Keskusta - Etu-Töölö", "cost_area": 1},
-                        "date": "2000-01-01",
-                    },
-                ],
-                "page": {
-                    "size": 2,
-                    "current_page": 1,
-                    "total_items": 2,
-                    "total_pages": 1,
-                    "links": {
-                        "next": None,
-                        "previous": None,
-                    },
-                },
+            "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
+            "date": str(bu2.completion_date),
+        },
+        {
+            "id": hc2.uuid.hex,
+            "name": hc2.display_name,
+            "state": hc2.state.name.lower(),
+            "address": {
+                "street": hc2.street_address,
+                "postal_code": hc2.postal_code.value,
+                "city": "Helsinki",
             },
-        )
+            "area": {"name": hc2.postal_code.description, "cost_area": hc2.area},
+            "date": None,
+        },
+    ]
+    assert response.json()["page"] == {
+        "size": 2,
+        "current_page": 1,
+        "total_items": 2,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
 
-    def test__api__housing_company__list__paging(self):
-        for i in range(45):
-            create_test_housing_company(i)
 
-        # Make the request
-        response = self.client.get(reverse("hitas:housing-company-list"))
+@pytest.mark.django_db
+def test__api__housing_company__list__paging(api_client: APIClient):
+    HousingCompanyFactory.create_batch(size=45)
 
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            dict(response.data["page"]),
-            {
-                "size": 10,
-                "current_page": 1,
-                "total_items": 45,
-                "total_pages": 5,
-                "links": {
-                    "next": "http://testserver/api/v1/housing-companies?page=2",
-                    "previous": None,
-                },
-            },
-        )
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-list"))
+    validate_openapi(response)
 
-        # Make the second page request
-        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 2})
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["page"] == {
+        "size": 10,
+        "current_page": 1,
+        "total_items": 45,
+        "total_pages": 5,
+        "links": {
+            "next": "http://testserver/api/v1/housing-companies?page=2",
+            "previous": None,
+        },
+    }
 
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            dict(response.data["page"]),
-            {
-                "size": 10,
-                "current_page": 2,
-                "total_items": 45,
-                "total_pages": 5,
-                "links": {
-                    "next": "http://testserver/api/v1/housing-companies?page=3",
-                    "previous": "http://testserver/api/v1/housing-companies",
-                },
-            },
-        )
+    # Make the second page request
+    response = api_client.get(reverse("hitas:housing-company-list"), {"page": 2})
+    validate_openapi(response)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["page"] == {
+        "size": 10,
+        "current_page": 2,
+        "total_items": 45,
+        "total_pages": 5,
+        "links": {
+            "next": "http://testserver/api/v1/housing-companies?page=3",
+            "previous": "http://testserver/api/v1/housing-companies",
+        },
+    }
 
-        # Make the last page request
-        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 5})
+    # Make the last page request
+    response = api_client.get(reverse("hitas:housing-company-list"), {"page": 5})
+    validate_openapi(response)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["page"] == {
+        "size": 5,
+        "current_page": 5,
+        "total_items": 45,
+        "total_pages": 5,
+        "links": {
+            "next": None,
+            "previous": "http://testserver/api/v1/housing-companies?page=4",
+        },
+    }
 
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            dict(response.data["page"]),
-            {
-                "size": 5,
-                "current_page": 5,
-                "total_items": 45,
-                "total_pages": 5,
-                "links": {
-                    "next": None,
-                    "previous": "http://testserver/api/v1/housing-companies?page=4",
-                },
-            },
-        )
 
-    def test__api__housing_company__list__paging__invalid(self):
-        self._test_paging_invalid("a")
-        self._test_paging_invalid("#")
-        self._test_paging_invalid(" ")
-        self._test_paging_invalid("")
+@pytest.mark.parametrize("page_number", ["a", "#", " ", ""])
+@pytest.mark.django_db
+def test__api__housing_company__list__paging__invalid(api_client: APIClient, page_number):
+    response = api_client.get(reverse("hitas:housing-company-list"), {"page": page_number})
+    validate_openapi(response)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == exceptions.InvalidPage().data
 
-    def _test_paging_invalid(self, invalid_value):
-        response = self.client.get(reverse("hitas:housing-company-list"), {"page": invalid_value})
 
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertDictEqual(
-            dict(response.data),
-            {
-                "status": 400,
-                "error": "bad_request",
-                "message": "Bad request",
-                "reason": "Bad Request",
-                "fields": [
-                    {
-                        "field": "page_number",
-                        "message": "Page number must be a positive integer.",
-                    },
-                ],
-            },
-        )
+@pytest.mark.django_db
+def test__api__housing_company__list__paging__too_high(api_client: APIClient):
+    api_client.force_authenticate(UserFactory.create())
+    response = api_client.get(reverse("hitas:housing-company-list"), {"page": 2})
+    validate_openapi(response)
 
-    def test__api__housing_company__list__paging__too_high(self):
-        response = self.client.get(reverse("hitas:housing-company-list"), {"page": 2})
-
-        # Validate response
-        validate_openapi(response)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertDictEqual(
-            dict(response.data),
-            {
-                "contents": [],
-                "page": {
-                    "size": 0,
-                    "current_page": 1,
-                    "total_items": 0,
-                    "total_pages": 1,
-                    "links": {
-                        "next": None,
-                        "previous": None,
-                    },
-                },
-            },
-        )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["contents"] == []
+    assert response.json()["page"] == {
+        "size": 0,
+        "current_page": 1,
+        "total_items": 0,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
