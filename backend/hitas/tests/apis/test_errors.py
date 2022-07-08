@@ -2,16 +2,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hitas.tests.apis.helpers import validate_openapi
-
 
 class ExceptionApiCases(APITestCase):
     maxDiff = None
 
     def test__api__exception__400_bad_request__invalid_json(self):
         response = self.client.post(reverse("hitas:housing-company-list"), data="foo", content_type="application/json")
-
-        validate_openapi(response)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertDictEqual(
             response.json(),
@@ -53,8 +49,6 @@ class ExceptionApiCases(APITestCase):
 
     def test__api__exception__406_not_acceptable(self):
         response = self.client.get(reverse("hitas:housing-company-list"), HTTP_ACCEPT="text/plain")
-
-        validate_openapi(response)
         self.assertEqual(response.status_code, status.HTTP_406_NOT_ACCEPTABLE)
         self.assertDictEqual(
             response.json(),
@@ -68,8 +62,6 @@ class ExceptionApiCases(APITestCase):
 
     def test__api__exception__415_unsupported_media_type(self):
         response = self.client.post(reverse("hitas:housing-company-list"), data="foo", content_type="text/plain")
-
-        validate_openapi(response)
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         self.assertDictEqual(
             response.json(),

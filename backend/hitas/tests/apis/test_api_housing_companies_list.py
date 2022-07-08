@@ -7,16 +7,12 @@ from rest_framework.test import APIClient
 
 from hitas import exceptions
 from hitas.models import Building, HousingCompany
-from hitas.tests.apis.helpers import validate_openapi
-from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, UserFactory
+from hitas.tests.factories import BuildingFactory, HousingCompanyFactory
 
 
 @pytest.mark.django_db
 def test__api__housing_company__list__empty(api_client: APIClient):
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-list"))
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["contents"] == []
     assert response.json()["page"] == {
@@ -38,10 +34,7 @@ def test__api__housing_company__list(api_client: APIClient):
     BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2020, 1, 1))
     bu2: Building = BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2000, 1, 1))
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-list"))
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["contents"] == [
         {
@@ -85,10 +78,7 @@ def test__api__housing_company__list(api_client: APIClient):
 def test__api__housing_company__list__paging(api_client: APIClient):
     HousingCompanyFactory.create_batch(size=45)
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-list"))
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["page"] == {
         "size": 10,
@@ -103,7 +93,6 @@ def test__api__housing_company__list__paging(api_client: APIClient):
 
     # Make the second page request
     response = api_client.get(reverse("hitas:housing-company-list"), {"page": 2})
-    validate_openapi(response)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["page"] == {
         "size": 10,
@@ -118,7 +107,6 @@ def test__api__housing_company__list__paging(api_client: APIClient):
 
     # Make the last page request
     response = api_client.get(reverse("hitas:housing-company-list"), {"page": 5})
-    validate_openapi(response)
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["page"] == {
         "size": 5,
@@ -136,17 +124,13 @@ def test__api__housing_company__list__paging(api_client: APIClient):
 @pytest.mark.django_db
 def test__api__housing_company__list__paging__invalid(api_client: APIClient, page_number):
     response = api_client.get(reverse("hitas:housing-company-list"), {"page": page_number})
-    validate_openapi(response)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json() == exceptions.InvalidPage().data
 
 
 @pytest.mark.django_db
 def test__api__housing_company__list__paging__too_high(api_client: APIClient):
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-list"), {"page": 2})
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["contents"] == []
     assert response.json()["page"] == {
