@@ -25,6 +25,6 @@ class PropertyManagerSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         try:
-            return self.Meta.model.objects.get(uuid=UUID(hex=str(data)))
+            return self.Meta.model.objects.get(uuid=UUID(hex=str(data.get("id", None))))
         except (self.Meta.model.DoesNotExist, ValueError):
             raise HitasModelNotFound(model=self.Meta.model)

@@ -6,8 +6,10 @@ from hitas.exceptions import HitasModelNotFound
 from hitas.models.codes import AbstractCode, BuildingType, Developer, FinancingMethod
 
 
-class AbstractCodeSerializer(serializers.ModelSerializer):
+class AbstractCodeSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
+    value = serializers.CharField()
+    description = serializers.CharField()
     code = serializers.CharField(source="legacy_code_number")
 
     def get_id(self, obj: AbstractCode) -> str:
@@ -15,7 +17,7 @@ class AbstractCodeSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         try:
-            return self.Meta.model.objects.get(uuid=UUID(hex=str(data)))
+            return self.Meta.model.objects.get(uuid=UUID(hex=str(data.get("id", None))))
         except (self.Meta.model.DoesNotExist, ValueError):
             raise HitasModelNotFound(model=self.Meta.model)
 
