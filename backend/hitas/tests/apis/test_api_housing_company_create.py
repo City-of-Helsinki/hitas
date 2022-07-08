@@ -1,10 +1,12 @@
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from hitas import exceptions
 from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
 from hitas.tests.apis.helpers import validate_openapi
@@ -20,9 +22,7 @@ from hitas.tests.factories import (
 )
 
 
-@pytest.mark.parametrize("minimal_data", [False, True])
-@pytest.mark.django_db
-def test__api__housing_company__create(api_client: APIClient, minimal_data):
+def get_housing_company_create_data() -> dict[str, Any]:
     developer = DeveloperFactory.create()
     financing_method = FinancingMethodFactory.create()
     property_manager = PropertyManagerFactory.create()
@@ -49,6 +49,13 @@ def test__api__housing_company__create(api_client: APIClient, minimal_data):
         "state": "not_ready",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
+    return data
+
+
+@pytest.mark.parametrize("minimal_data", [False, True])
+@pytest.mark.django_db
+def test__api__housing_company__create(api_client: APIClient, minimal_data):
+    data = get_housing_company_create_data()
     if minimal_data:
         data.update(
             {
@@ -70,6 +77,31 @@ def test__api__housing_company__create(api_client: APIClient, minimal_data):
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.json() == get_response.json()
+
+
+@pytest.mark.parametrize(
+    "missing_field",
+    [
+        "business_id",
+        "name",
+        "state",
+        "address",
+        "financing_method",
+        "building_type",
+        "developer",
+        "property_manager",
+        "acquisition_price",
+        "primary_loan",
+    ],
+)
+@pytest.mark.django_db
+def test__api__housing_company__create__missing_required_field(api_client: APIClient, missing_field):
+    data = get_housing_company_create_data()
+    data.pop(missing_field)
+
+    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == exceptions.BadRequestException().data
 
 
 @pytest.mark.django_db
