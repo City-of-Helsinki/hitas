@@ -7,8 +7,7 @@ from rest_framework.test import APIClient
 
 from hitas import exceptions
 from hitas.models import Building, HousingCompany, RealEstate
-from hitas.tests.apis.helpers import validate_openapi
-from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory, UserFactory
+from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory
 
 
 @pytest.mark.django_db
@@ -23,11 +22,8 @@ def test__api__housing_company__retrieve(api_client: APIClient):
     # Second HousingCompany with a building
     BuildingFactory.create()
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK
-    validate_openapi(response)
-
     assert response.json() == {
         "id": hc1.uuid.hex,
         "business_id": hc1.business_id,
@@ -138,9 +134,6 @@ def test__api__housing_company__retrieve(api_client: APIClient):
 def test__api__housing_company__read__fail(api_client: APIClient, invalid_id):
     HousingCompanyFactory.create()
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.get(reverse("hitas:housing-company-detail", args=[invalid_id]))
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == exceptions.HitasModelNotFound(model=HousingCompany).data

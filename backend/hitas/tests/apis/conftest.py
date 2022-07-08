@@ -2,8 +2,9 @@ import os
 
 import pytest
 from django.utils.translation import activate
-from rest_framework.test import APIClient
 
+from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.factories import UserFactory
 from hitas.tests.runner import HitasTestContainer
 
 # Container is stopped with destructor so keep a global copy
@@ -29,4 +30,6 @@ def init_test() -> None:
 
 @pytest.fixture()
 def api_client():
-    return APIClient()
+    api_client = HitasAPIClient()
+    api_client.force_authenticate(UserFactory.create())
+    return api_client

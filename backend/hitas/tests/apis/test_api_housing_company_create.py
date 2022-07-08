@@ -9,7 +9,6 @@ from rest_framework.test import APIClient
 from hitas import exceptions
 from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
-from hitas.tests.apis.helpers import validate_openapi
 from hitas.tests.factories import (
     BuildingFactory,
     BuildingTypeFactory,
@@ -18,7 +17,6 @@ from hitas.tests.factories import (
     HousingCompanyFactory,
     PostalCodeFactory,
     PropertyManagerFactory,
-    UserFactory,
 )
 
 
@@ -65,10 +63,7 @@ def test__api__housing_company__create(api_client: APIClient, minimal_data):
             }
         )
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    validate_openapi(response)
-
     assert response.status_code == status.HTTP_201_CREATED
 
     hc = HousingCompany.objects.first()
@@ -133,9 +128,7 @@ def test__api__housing_company__update(api_client: APIClient):
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
 
-    api_client.force_authenticate(UserFactory.create())
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
-    validate_openapi(response)
     assert response.status_code == status.HTTP_200_OK
 
     hc.refresh_from_db()

@@ -5,6 +5,7 @@ from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIRespo
 from openapi_core.validation.request.datatypes import OpenAPIRequest
 from openapi_core.validation.response.validators import ResponseValidator
 from rest_framework.response import Response
+from rest_framework.test import APIClient
 
 with open(f"{settings.BASE_DIR}/openapi.yaml", "r") as spec_file:
     _openapi_spec = openapi_core.create_spec(yaml.safe_load(spec_file))
@@ -57,3 +58,10 @@ def _openapi_url_pattern_workaround(original: OpenAPIRequest):
         body=original.body,
         mimetype=original.mimetype,
     )
+
+
+class HitasAPIClient(APIClient):
+    def generic(self, method, path, data="", content_type="json", secure=False, **kwargs):
+        response = super().generic(method, path, data, content_type, secure=False, **kwargs)
+        validate_openapi(response)
+        return response
