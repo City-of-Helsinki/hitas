@@ -6,7 +6,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from hitas import exceptions
 from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
 from hitas.tests.factories import (
@@ -75,28 +74,42 @@ def test__api__housing_company__create(api_client: APIClient, minimal_data):
 
 
 @pytest.mark.parametrize(
-    "missing_field",
+    "invalid_data",
     [
-        "business_id",
-        "name",
-        "state",
-        "address",
-        "financing_method",
-        "building_type",
-        "developer",
-        "property_manager",
-        "acquisition_price",
-        "primary_loan",
+        {"business_id": None},
+        {"business_id": "#"},
+        {"business_id": "123"},
+        {"name": None},
+        {"name": 0},
+        {"state": None},
+        {"state": "failing-state"},
+        {"address": None},
+        {"address": 123},
+        {"financing_method": None},
+        {"building_type": None},
+        {"developer": None},
+        {"property_manager": None},
+        {"acquisition_price": None},
+        {"primary_loan": None},
+        {"primary_loan": "foo"},
     ],
 )
 @pytest.mark.django_db
-def test__api__housing_company__create__missing_required_field(api_client: APIClient, missing_field):
+def test__api__housing_company__create__invalid_data(api_client: APIClient, invalid_data):
     data = get_housing_company_create_data()
-    data.pop(missing_field)
+    data.update(invalid_data)
 
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert response.json() == exceptions.BadRequestException().data
+
+
+@pytest.mark.django_db
+def test__api__housing_company__create__invalid_foreign_key(api_client: APIClient):
+    data = get_housing_company_create_data()
+    data.update({"property_manager": {"id": "foo"}})
+
+    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.django_db
