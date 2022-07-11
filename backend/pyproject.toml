@@ -18,6 +18,7 @@ django-nested-inline = "^0.4.5"
 uWSGI = "^2.0.20"
 django-crum = "^0.7.9"
 django-health-check = "^3.16.5"
+drf-nested-routers = "^0.93.4"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
