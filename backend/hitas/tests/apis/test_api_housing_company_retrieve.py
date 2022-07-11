@@ -34,6 +34,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "date": "2000-01-01",
         "real_estates": [
             {
+                "id": hc1_re1.uuid.hex,
                 "address": {
                     "city": "Helsinki",
                     "postal_code": hc1_re1.postal_code.value,
@@ -42,6 +43,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 "property_identifier": hc1_re1.property_identifier,
                 "buildings": [
                     {
+                        "id": hc1_re1_bu1.uuid.hex,
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re1_bu1.postal_code.value,
@@ -51,6 +53,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                         "completion_date": "2020-01-01",
                     },
                     {
+                        "id": hc1_re1_bu2.uuid.hex,
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re1_bu2.postal_code.value,
@@ -62,6 +65,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 ],
             },
             {
+                "id": hc1_re2.uuid.hex,
                 "address": {
                     "city": "Helsinki",
                     "postal_code": hc1_re2.postal_code.value,
@@ -70,6 +74,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 "property_identifier": hc1_re2.property_identifier,
                 "buildings": [
                     {
+                        "id": hc1_re2_bu1.uuid.hex,
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re2_bu1.postal_code.value,

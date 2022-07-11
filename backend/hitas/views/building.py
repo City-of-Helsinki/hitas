@@ -1,16 +1,15 @@
-from rest_framework import serializers
-
 from hitas.models import Building
-from hitas.views.helpers import AddressSerializer, ValueOrNullField
+from hitas.views.helpers import AddressSerializer, HitasModelSerializer, ValueOrNullField
 
 
-class BuildingSerializer(serializers.ModelSerializer):
+class BuildingSerializer(HitasModelSerializer):
     address = AddressSerializer(source="*")
     building_identifier = ValueOrNullField(required=False)
 
     class Meta:
         model = Building
         fields = [
+            "id",
             "address",
             "building_identifier",
             "completion_date",
