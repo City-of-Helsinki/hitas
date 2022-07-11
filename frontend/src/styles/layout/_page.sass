@@ -26,26 +26,53 @@
     background: white
     list-style: none
     padding: 0
-    &__item
-      cursor: pointer
-      display: flex
-      justify-content: space-between
-      padding: $spacing-layout-xs
+    > a
+      display: block
       &:not(:last-child)
         border-bottom: 1px solid #ccc
+    &__item
+      cursor: pointer
+      @include mix.flexbox
+      justify-content: space-between
+      padding: $spacing-layout-xs
       &:hover
         background-color: #ededed
+      &--apartment
+        display: grid
+        grid-template-columns: 90px auto
+        grid-template-rows: auto auto
+        .number
+          grid-column: 1
+          font-size: $fontsize-heading-l
+          font-weight: 600
+          width: 90px
+        .details
+          font-size: $fontsize-body-l
+          grid-column: 2
+          @include mix.flex-grow(1)
+          @include mix.flexbox
+          @include mix.flex-wrap(wrap)
+        .owner
+          width: 100%
+          font-size: $fontsize-body-s
+          margin-bottom: 0.25rem
+        .rooms
+          width: 100px
   .name,.address,.date-added
     width: 32%
   .name,.address
     margin-right: 2%
   .date-added
     text-align: right
+  .area
+    width: 15%
 
 .list-headers
   display: flex
   justify-content: space-between
   padding: $spacing-layout-xs $spacing-layout-xs 0
+  .apartment
+    width: 32%
 
 .list-header
   width: 25%

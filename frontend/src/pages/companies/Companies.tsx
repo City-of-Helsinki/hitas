@@ -22,7 +22,7 @@ const CompanyListItem = (props: ListItemProps) => {
 
 const Companies = () => {
     return (
-        <div className="company-listing">
+        <div className="companies">
             <h1 className="main-heading">
                 <span>Kaikki kohteet</span>
                 <Button>Lisää uusi yhtiö</Button>
