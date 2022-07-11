@@ -1,0 +1,1 @@
+from hitas.views.housing_company import HousingCompanyViewSet
