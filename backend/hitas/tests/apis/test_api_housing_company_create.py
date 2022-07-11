@@ -4,10 +4,10 @@ from typing import Any
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from hitas.models import HousingCompany, PostalCode
 from hitas.models.housing_company import HousingCompanyState
+from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     BuildingFactory,
     BuildingTypeFactory,
@@ -51,7 +51,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
 
 @pytest.mark.parametrize("minimal_data", [False, True])
 @pytest.mark.django_db
-def test__api__housing_company__create(api_client: APIClient, minimal_data):
+def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data):
     data = get_housing_company_create_data()
     if minimal_data:
         data.update(
@@ -95,7 +95,7 @@ def test__api__housing_company__create(api_client: APIClient, minimal_data):
     ],
 )
 @pytest.mark.django_db
-def test__api__housing_company__create__invalid_data(api_client: APIClient, invalid_data):
+def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient, invalid_data):
     data = get_housing_company_create_data()
     data.update(invalid_data)
 
@@ -104,7 +104,7 @@ def test__api__housing_company__create__invalid_data(api_client: APIClient, inva
 
 
 @pytest.mark.django_db
-def test__api__housing_company__create__invalid_foreign_key(api_client: APIClient):
+def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPIClient):
     data = get_housing_company_create_data()
     data.update({"property_manager": {"id": "foo"}})
 
@@ -113,7 +113,7 @@ def test__api__housing_company__create__invalid_foreign_key(api_client: APIClien
 
 
 @pytest.mark.django_db
-def test__api__housing_company__update(api_client: APIClient):
+def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     BuildingFactory.create(real_estate__housing_company=hc)
     postal_code = PostalCodeFactory.create(value="99999")

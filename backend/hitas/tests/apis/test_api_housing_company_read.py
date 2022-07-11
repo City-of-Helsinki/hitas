@@ -3,15 +3,15 @@ from datetime import date
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from hitas import exceptions
 from hitas.models import Building, HousingCompany, RealEstate
+from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory
 
 
 @pytest.mark.django_db
-def test__api__housing_company__retrieve(api_client: APIClient):
+def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2020, 1, 1))
@@ -131,7 +131,7 @@ def test__api__housing_company__retrieve(api_client: APIClient):
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
 @pytest.mark.django_db
-def test__api__housing_company__read__fail(api_client: APIClient, invalid_id):
+def test__api__housing_company__read__fail(api_client: HitasAPIClient, invalid_id):
     HousingCompanyFactory.create()
 
     response = api_client.get(reverse("hitas:housing-company-detail", args=[invalid_id]))
