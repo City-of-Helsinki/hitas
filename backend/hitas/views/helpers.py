@@ -7,6 +7,7 @@ from rest_framework.relations import SlugRelatedField
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import PostalCode
+from hitas.models._base import ExternalHitasModel
 from hitas.views.paginator import HitasPagination
 
 
@@ -14,16 +15,20 @@ def value_or_none(s: str) -> Optional[str]:
     return s if s != "" else None
 
 
+class HitasModelSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, instance: ExternalHitasModel) -> str:
+        return instance.uuid.hex
+
+
 class HitasModelViewSet(viewsets.ModelViewSet):
     serializer_class = None
     list_serializer_class = None
+    model_class = None
     permission_classes = []
     lookup_field = "uuid"
     pagination_class = HitasPagination
-
-    def get_model_class(self):
-        # Simplest way of getting the viewset model without explicitly declaring it
-        return self.get_queryset().model
 
     def get_list_queryset(self):
         return super().get_queryset()
@@ -44,10 +49,10 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         try:
             return super().get_object()
         except Http404:
-            raise HitasModelNotFound(model=self.get_model_class())
+            raise HitasModelNotFound(model=self.model_class)
 
     def get_serializer_class(self):
-        if self.action == "list":
+        if self.action == "list" and self.list_serializer_class is not None:
             return self.list_serializer_class
         return self.serializer_class
 
@@ -55,7 +60,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         try:
             return UUID(hex=str(s))
         except ValueError:
-            raise HitasModelNotFound(model=self.get_model_class())
+            raise HitasModelNotFound(model=self.model_class)
 
 
 class ValueOrNullField(serializers.Field):
