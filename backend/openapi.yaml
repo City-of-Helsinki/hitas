@@ -8,6 +8,8 @@ paths:
     get:
       description: Fetch housing companies
       operationId: list-housing-companies
+      tags:
+        - Housing companies
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
@@ -42,6 +44,8 @@ paths:
     post:
       description: Add a new housing company
       operationId: create-housing-company
+      tags:
+        - Housing companies
       requestBody:
         required: true
         content:
@@ -57,12 +61,12 @@ paths:
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -70,17 +74,19 @@ paths:
     get:
       description: Fetch a single housing company by id
       operationId: read-housing-company
+      tags:
+        - Housing companies
       parameters:
-      - name: housing_company_id
-        required: true
-        in: path
-        description: Housing company ID
-        schema:
-          type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
         '200':
-          description: Successfully fetched list of housing companies
+          description: Successfully read a housing company details
           content:
             application/json:
               schema:
@@ -92,8 +98,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
-      description: Modify an existing housing company
+      description: Update a housing company
       operationId: update-housing-company
+      tags:
+        - Housing companies
       parameters:
         - name: housing_company_id
           required: true
@@ -117,14 +125,453 @@ paths:
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
         '415':
           $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a housing company
+      operationId: delete-housing-company
+      tags:
+        - Housing companies
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/real-estates:
+    get:
+      description: Fetch real estates for a housing company
+      operationId: list-housing-company-real-estates
+      tags:
+        - Real estates
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of real estates
+          content:
+            application/json:
+              schema:
+                description: Single page of real estates
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of real estates
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RealEstate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new real estate for a housing company
+      operationId: create-housing-company-real-estate
+      tags:
+        - Real estates
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RealEstate'
+      responses:
+        '201':
+          description: Successfully added a new real estate for a housing company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealEstate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}:
+    get:
+      description: Fetch a single housing company by id
+      operationId: read-housing-company-real-estate
+      tags:
+        - Real estates
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+      responses:
+        '200':
+          description: Successfully read a housing company's real estate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealEstate'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update a real estate for a housing company
+      operationId: update-housing-company-real-estate
+      tags:
+        - Real estates
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RealEstate'
+      responses:
+        '201':
+          description: Successfully updated an existing real estate for a housing company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealEstate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a real estate from a housing company
+      operationId: delete-housing-company-real-estate
+      tags:
+        - Real estates
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+      responses:
+        '204':
+          description: Real estate successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings:
+    get:
+      description: Fetch buildings for a housing company's real estate
+      operationId: list-housing-company-real-estates-buildings
+      tags:
+        - Buildings
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of buildings
+          content:
+            application/json:
+              schema:
+                description: Single page of buildings
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of buildings
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Building'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new building for a housing company's real estate
+      operationId: create-housing-company-real-estate-building
+      tags:
+        - Buildings
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Building'
+      responses:
+        '201':
+          description: Successfully added a new building for a housing company real estate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings/{building_id}:
+    get:
+      description: Fetch a single housing company by id
+      operationId: read-housing-company-real-estate-building
+      tags:
+        - Buildings
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+        - name: building_id
+          required: true
+          in: path
+          description: Building ID
+          schema:
+            type: string
+            example: dc1072975bab4ba69f64814f021c6785
+      responses:
+        '200':
+          description: Successfully read a building details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update a building for a housing company's real estate
+      operationId: update-housing-company-real-estate-building
+      tags:
+        - Buildings
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+        - name: building_id
+          required: true
+          in: path
+          description: Building ID
+          schema:
+            type: string
+            example: dc1072975bab4ba69f64814f021c6785
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Building'
+      responses:
+        '201':
+          description: Successfully updated an existing building for a housing company's real estate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Building'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a building from from a housing company's real estate
+      operationId: delete-housing-company-real-estate-building
+      tags:
+        - Buildings
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+        - name: building_id
+          required: true
+          in: path
+          description: Building ID
+          schema:
+            type: string
+            example: dc1072975bab4ba69f64814f021c6785
+      responses:
+        '204':
+          description: Building successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
@@ -420,42 +867,61 @@ components:
           type: array
           readOnly: true
           items:
-            description: Single real estate
-            type: object
-            required:
-              - property_identifier
-              - address
-              - buildings
-            properties:
-              property_identifier:
-                description: This real estate's official property identifier
-                type: string
-                pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
-              address:
-                $ref: '#/components/schemas/Address'
-              buildings:
-                description: List of buildings this real estate has
-                type: array
-                items:
-                  description: Single building
-                  type: object
-                  required:
-                    - address
-                    - completion_date
-                  properties:
-                    address:
-                      $ref: '#/components/schemas/Address'
-                    completion_date:
-                      description: Building's construction completion date
-                      type: string
-                      format: date
-                      nullable: true
-                    building_identifier:
-                      description: This building's official identifier
-                      type: string
-                      pattern: '^1\d{8}[A-Za-z0-9]$'
-                      nullable: true
-                      example: 100012345A
+            $ref: '#/components/schemas/RealEstate'
+
+    RealEstate:
+      description: Single real estate
+      type: object
+      required:
+        - id
+        - property_identifier
+        - address
+        - buildings
+      properties:
+        id:
+          description: ID of this building
+          type: string
+          readOnly: true
+          example: c86eaa399ce141d89d962d46bb81ab2b
+        property_identifier:
+          description: This real estate's official property identifier
+          type: string
+          pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
+        address:
+          $ref: '#/components/schemas/Address'
+        buildings:
+          description: List of buildings this real estate has
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Building'
+
+    Building:
+      description: Single building
+      type: object
+      required:
+        - id
+        - address
+        - completion_date
+      properties:
+        id:
+          description: ID of this building
+          type: string
+          readOnly: true
+          example: 9d0ac35b01eb44829bc84c25f7c1813a
+        address:
+          $ref: '#/components/schemas/Address'
+        completion_date:
+          description: Building's construction completion date
+          type: string
+          format: date
+          nullable: true
+        building_identifier:
+          description: This building's official identifier
+          type: string
+          pattern: '^1\d{8}[A-Za-z0-9]$'
+          nullable: true
+          example: 100012345A
 
     Address:
       description: Address information
@@ -654,10 +1120,14 @@ components:
 
             Can have the following values:
             - housing_company_not_found
+            - housing_company_property_not_found
+            - housing_company_building_not_found
           type: string
           example: housing_company_not_found
           x-extensible-enum:
             - housing_company_not_found
+            - housing_company_property_not_found
+            - housing_company_building_not_found
 
     NotAcceptableError:
       description: Not acceptable error
