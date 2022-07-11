@@ -43,13 +43,15 @@ def _openapi_url_pattern_workaround(original: OpenAPIRequest):
     # openapi-core does not understand the last $ when trying to look up the correct OpenAPI definition. let's remove it
     if full_url_pattern[-1:] == "$":
         full_url_pattern = full_url_pattern[:-1]
+
     # For detail view, DefaultRouter creates routes likes this:
     # - /api/v1/housing-companies/(?P<housing_company_id>[^/.]+)$
     # openapi-core tries to simplify the URL so it can look the correct OpenAPI definition but fails and ends up with:
     # - http://testserver/api/v1/housing-companies/{housing_company_id}/.]+)$
-    # Let's remove the /.]+) from the end of the url pattern if it's there ($ was removed in the previous step)
-    if full_url_pattern[-5:] == "/.]+)":
-        full_url_pattern = full_url_pattern[:-5]
+    # - http://testserver/api/v1/housing-companies/{housing_company_id}/.]+)/real-estates$
+    # Let's remove the /.]+) from the url pattern if it's there ($ was removed in the previous step)
+    if full_url_pattern.find("/.]+)"):
+        full_url_pattern = full_url_pattern.replace("/.]+)", "")
 
     return OpenAPIRequest(
         full_url_pattern=full_url_pattern,
