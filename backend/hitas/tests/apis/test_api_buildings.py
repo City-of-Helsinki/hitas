@@ -1,0 +1,251 @@
+import pytest
+from django.urls import reverse
+from rest_framework import status
+
+from hitas.models import Building, HousingCompany, RealEstate
+from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory
+
+# List tests
+
+
+@pytest.mark.django_db
+def test__api__building__list__empty(api_client: HitasAPIClient):
+    re: RealEstate = RealEstateFactory.create()
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": re.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["contents"] == []
+    assert response.json()["page"] == {
+        "size": 0,
+        "current_page": 1,
+        "total_items": 0,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
+
+
+@pytest.mark.django_db
+def test__api__building__list(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re1: RealEstate = RealEstateFactory.create(housing_company=hc)
+    re2: RealEstate = RealEstateFactory.create(housing_company=hc)
+    bu1: Building = BuildingFactory.create(real_estate=re1)
+    bu2: Building = BuildingFactory.create(real_estate=re1)
+    BuildingFactory.create(real_estate=re2)
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re1.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["contents"] == [
+        {
+            "id": bu1.uuid.hex,
+            "address": {
+                "city": "Helsinki",
+                "postal_code": bu1.postal_code.value,
+                "street": bu1.street_address,
+            },
+            "building_identifier": bu1.building_identifier,
+            "completion_date": str(bu1.completion_date),
+        },
+        {
+            "id": bu2.uuid.hex,
+            "address": {
+                "city": "Helsinki",
+                "postal_code": bu2.postal_code.value,
+                "street": bu2.street_address,
+            },
+            "building_identifier": bu2.building_identifier,
+            "completion_date": str(bu2.completion_date),
+        },
+    ]
+    assert response.json()["page"] == {
+        "size": 2,
+        "current_page": 1,
+        "total_items": 2,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
+
+
+@pytest.mark.django_db
+def test__api__building__list__invalid_real_estate(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    BuildingFactory.create(real_estate__housing_company=hc)
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": "bar"},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# Retrieve tests
+
+
+@pytest.mark.django_db
+def test__api__building__retrieve(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    bu1: Building = BuildingFactory.create(real_estate=re)
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu1.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": bu1.uuid.hex,
+        "address": {
+            "city": "Helsinki",
+            "postal_code": bu1.postal_code.value,
+            "street": bu1.street_address,
+        },
+        "building_identifier": bu1.building_identifier,
+        "completion_date": str(bu1.completion_date),
+    }
+
+
+# Create tests
+
+
+@pytest.mark.django_db
+def test__api__building__create(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    data = {
+        "address": {
+            "postal_code": re.postal_code.value,
+            "street": "test-street-address-1",
+        },
+        "building_identifier": "100012345A",
+    }
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex},
+    )
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+
+    bu = Building.objects.first()
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu.uuid.hex},
+    )
+    get_response = api_client.get(url)
+    assert response.json() == get_response.json()
+
+
+@pytest.mark.django_db
+def test__api__building__create__invalid_building_identifier(api_client: HitasAPIClient):
+    re: RealEstate = RealEstateFactory.create()
+    data = {
+        "address": {
+            "postal_code": re.postal_code.value,
+            "street": "test-street-address-1",
+        },
+        "building_identifier": "foo",
+    }
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": re.uuid.hex},
+    )
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+def test__api__building__create__invalid_real_estate(api_client: HitasAPIClient):
+    re: RealEstate = RealEstateFactory.create()
+    data = {
+        "address": {
+            "postal_code": re.postal_code.value,
+            "street": "test-street-address-1",
+        },
+        "building_identifier": "100012345A",
+    }
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": "foo"},
+    )
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# Update tests
+
+
+@pytest.mark.django_db
+def test__api__building__update(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    bu: Building = BuildingFactory.create(real_estate=re)
+
+    data = {
+        "address": {
+            "postal_code": re.postal_code.value,
+            "street": "test-street-address-1",
+        },
+        "completion_date": "1999-01-01",
+        "building_identifier": "100012345A",
+    }
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu.uuid.hex},
+    )
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": bu.uuid.hex,
+        "address": {
+            "city": "Helsinki",
+            "postal_code": data["address"]["postal_code"],
+            "street": data["address"]["street"],
+        },
+        "building_identifier": data["building_identifier"],
+        "completion_date": data["completion_date"],
+    }
+
+    get_response = api_client.get(url)
+    assert response.json() == get_response.json()
+
+
+# Delete tests
+
+
+@pytest.mark.django_db
+def test__api__building__delete(api_client: HitasAPIClient):
+    bu: Building = BuildingFactory.create()
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={
+            "housing_company_uuid": bu.real_estate.housing_company.uuid.hex,
+            "real_estate_uuid": bu.real_estate.uuid.hex,
+            "uuid": bu.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
