@@ -50,7 +50,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                             "street": hc1_re1_bu1.street_address,
                         },
                         "building_identifier": hc1_re1_bu1.building_identifier,
-                        "completion_date": "2020-01-01",
+                        "completion_date": str(hc1_re1_bu1.completion_date),
                     },
                     {
                         "id": hc1_re1_bu2.uuid.hex,
@@ -60,7 +60,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                             "street": hc1_re1_bu2.street_address,
                         },
                         "building_identifier": hc1_re1_bu2.building_identifier,
-                        "completion_date": "2000-01-01",
+                        "completion_date": str(hc1_re1_bu2.completion_date),
                     },
                 ],
             },

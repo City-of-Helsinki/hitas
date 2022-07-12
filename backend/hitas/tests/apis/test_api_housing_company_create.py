@@ -29,8 +29,8 @@ def get_housing_company_create_data() -> dict[str, Any]:
     data = {
         "acquisition_price": {"initial": 10.00, "realized": 10.00},
         "address": {
-            "street": "test-street-address-1",
             "postal_code": postal_code.value,
+            "street": "test-street-address-1",
         },
         "building_type": {"id": building_type.uuid.hex},
         "business_id": "1234567-8",
