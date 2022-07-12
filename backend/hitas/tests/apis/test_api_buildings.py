@@ -108,7 +108,7 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu1.uuid.hex},
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         "id": bu1.uuid.hex,
         "address": {
@@ -124,8 +124,9 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
 # Create tests
 
 
+@pytest.mark.parametrize("building_identifier", ["100012345A", "1-1234-321-56 A 111"])
 @pytest.mark.django_db
-def test__api__building__create(api_client: HitasAPIClient):
+def test__api__building__create(api_client: HitasAPIClient, building_identifier):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     data = {
@@ -133,7 +134,6 @@ def test__api__building__create(api_client: HitasAPIClient):
             "postal_code": re.postal_code.value,
             "street": "test-street-address-1",
         },
-        "building_identifier": "100012345A",
     }
 
     url = reverse(
@@ -141,7 +141,7 @@ def test__api__building__create(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex},
     )
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     bu = Building.objects.first()
     url = reverse(
@@ -153,14 +153,43 @@ def test__api__building__create(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__building__create__invalid_building_identifier(api_client: HitasAPIClient):
+def test__api__building__create__no_building_identifier(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create()
     data = {
         "address": {
             "postal_code": re.postal_code.value,
             "street": "test-street-address-1",
         },
-        "building_identifier": "foo",
+    }
+
+    url = reverse(
+        "hitas:building-list",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex},
+    )
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+
+    bu = Building.objects.first()
+    assert bu.building_identifier is None
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu.uuid.hex},
+    )
+    get_response = api_client.get(url)
+    assert response.json() == get_response.json()
+
+
+@pytest.mark.parametrize("building_identifier", ["foo", None])
+@pytest.mark.django_db
+def test__api__building__create__invalid_building_identifier(api_client: HitasAPIClient, building_identifier):
+    re: RealEstate = RealEstateFactory.create()
+    data = {
+        "address": {
+            "postal_code": re.postal_code.value,
+            "street": "test-street-address-1",
+        },
+        "building_identifier": building_identifier,
     }
 
     url = reverse(
@@ -213,7 +242,7 @@ def test__api__building__update(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu.uuid.hex},
     )
     response = api_client.put(url, data=data, format="json")
-    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         "id": bu.uuid.hex,
         "address": {

@@ -919,7 +919,7 @@ components:
         building_identifier:
           description: This building's official identifier
           type: string
-          pattern: '^1\d{8}[A-Za-z0-9]$'
+          pattern: '^1\d{8}[A-Za-z0-9]$|^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$'
           nullable: true
           example: 100012345A
 
