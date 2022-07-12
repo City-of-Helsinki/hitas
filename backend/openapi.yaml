@@ -300,7 +300,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RealEstate'
       responses:
-        '201':
+        '200':
           description: Successfully updated an existing real estate for a housing company
           content:
             application/json:
@@ -518,7 +518,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Building'
       responses:
-        '201':
+        '200':
           description: Successfully updated an existing building for a housing company's real estate
           content:
             application/json:
