@@ -39,4 +39,4 @@ class RealEstateViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         uuid = self._lookup_id_to_uuid(self.kwargs["housing_company_uuid"])
-        return RealEstate.objects.filter(housing_company__uuid=uuid)
+        return RealEstate.objects.filter(housing_company__uuid=uuid).select_related("postal_code")
