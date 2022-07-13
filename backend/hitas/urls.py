@@ -6,6 +6,7 @@ from hitas import views
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r"housing-companies", views.HousingCompanyViewSet, basename="housing-company")
+router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 
 # Nested routers
 # /api/v1/housing-companies/{housing_company_id}/real-estates

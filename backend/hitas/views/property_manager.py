@@ -1,18 +1,12 @@
 from uuid import UUID
 
-from rest_framework import serializers
-
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import PropertyManager
-from hitas.views.helpers import AddressSerializer
+from hitas.views.helpers import AddressSerializer, HitasModelSerializer, HitasModelViewSet
 
 
-class PropertyManagerSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
+class PropertyManagerSerializer(HitasModelSerializer):
     address = AddressSerializer(source="*")
-
-    def get_id(self, obj: PropertyManager) -> str:
-        return obj.uuid.hex
 
     class Meta:
         model = PropertyManager
@@ -24,7 +18,18 @@ class PropertyManagerSerializer(serializers.ModelSerializer):
         ]
 
     def to_internal_value(self, data):
-        try:
-            return self.Meta.model.objects.get(uuid=UUID(hex=str(data.get("id", None))))
-        except (self.Meta.model.DoesNotExist, ValueError):
-            raise HitasModelNotFound(model=self.Meta.model)
+        """If referenced in another serializer by id, return an object"""
+        if data.get("id", None) is not None:
+            try:
+                return self.Meta.model.objects.get(uuid=UUID(hex=str(data.get("id", None))))
+            except (self.Meta.model.DoesNotExist, ValueError):
+                raise HitasModelNotFound(model=self.Meta.model)
+        return super().to_internal_value(data)
+
+
+class PropertyManagerViewSet(HitasModelViewSet):
+    serializer_class = PropertyManagerSerializer
+    model_class = PropertyManager
+
+    def get_queryset(self):
+        return PropertyManager.objects.select_related("postal_code")

@@ -10,7 +10,6 @@ fake = Faker(locale="fi_FI")
 class PropertyManagerFactory(DjangoModelFactory):
     class Meta:
         model = PropertyManager
-        django_get_or_create = ("name",)
 
     name = fake.name()
     email = fake.email()
