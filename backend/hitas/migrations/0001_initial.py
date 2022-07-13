@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Building type',
                 'verbose_name_plural': 'Building types',
-                'ordering': ['order'],
+                'ordering': ['order', 'id'],
                 'abstract': False,
             },
         ),
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Developer',
                 'verbose_name_plural': 'Developers',
-                'ordering': ['order'],
+                'ordering': ['order', 'id'],
                 'abstract': False,
             },
         ),
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Financing methods',
                 'verbose_name_plural': 'Financing methods',
-                'ordering': ['order'],
+                'ordering': ['order', 'id'],
                 'abstract': False,
             },
         ),
@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Postal code',
                 'verbose_name_plural': 'Postal codes',
-                'ordering': ['order'],
+                'ordering': ['order', 'id'],
                 'abstract': False,
             },
         ),
@@ -141,6 +141,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Real estate',
                 'verbose_name_plural': 'Real estates',
+                'ordering': ['id'],
             },
         ),
         migrations.CreateModel(
@@ -156,6 +157,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Property manager',
                 'verbose_name_plural': 'Property managers',
+                'ordering': ['id'],
             },
         ),
         migrations.AddField(
@@ -182,6 +184,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Building',
                 'verbose_name_plural': 'Buildings',
+                'ordering': ['id'],
             },
         ),
         migrations.AddConstraint(

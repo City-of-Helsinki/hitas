@@ -162,6 +162,7 @@ class RealEstate(ExternalHitasModel):
     class Meta:
         verbose_name = _("Real estate")
         verbose_name_plural = _("Real estates")
+        ordering = ["id"]
 
     def __str__(self):
         return self.property_identifier
@@ -191,6 +192,7 @@ class Building(ExternalHitasModel):
     class Meta:
         verbose_name = _("Building")
         verbose_name_plural = _("Buildings")
+        ordering = ["id"]
 
     def __str__(self):
         return self.building_identifier

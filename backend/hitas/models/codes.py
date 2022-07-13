@@ -33,7 +33,7 @@ class AbstractCode(ExternalHitasModel):
 
     class Meta:
         abstract = True
-        ordering = ["order"]
+        ordering = ["order", "id"]
 
     def __str__(self):
         return self.value
