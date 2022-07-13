@@ -443,3 +443,28 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.json() == get_response.json()
 
+
+# Delete tests
+
+
+@pytest.mark.django_db
+def test__api__property_manager__delete(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+
+    url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+@pytest.mark.django_db
+def test__api__property_manager__delete__invalid(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    RealEstateFactory.create(housing_company=hc)
+
+    url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
+    with pytest.raises(ProtectedError):  # TODO: Return better error message from the API?
+        response = api_client.delete(url)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
