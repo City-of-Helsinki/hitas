@@ -59,7 +59,7 @@ RUN python -m venv /hitas/venv
 RUN mkdir /hitas/build
 WORKDIR /hitas/build
 COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
-RUN poetry export | /hitas/venv/bin/pip install -r /dev/stdin
+RUN poetry export --without-hashes | /hitas/venv/bin/pip install -r /dev/stdin
 
 #
 # Build image for django static content and translations
