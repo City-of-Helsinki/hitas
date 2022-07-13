@@ -20,6 +20,7 @@ class PropertyManager(ExternalHitasModel):
     class Meta:
         verbose_name = _("Property manager")
         verbose_name_plural = _("Property managers")
+        ordering = ["id"]
 
     def __str__(self):
         return self.name
