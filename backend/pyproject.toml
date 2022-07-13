@@ -37,6 +37,7 @@ testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
 DJANGO_SETTINGS_MODULE = "config.settings"
 norecursedirs = "node_modules"
 addopts = "--nomigrations"
+filterwarnings = ["ignore::DeprecationWarning:openapi_core*"]
 
 [tool.black]
 extend-exclude = "migrations"
