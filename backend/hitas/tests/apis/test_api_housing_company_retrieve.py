@@ -23,7 +23,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     BuildingFactory.create()
 
     response = api_client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": hc1.uuid.hex,
         "business_id": hc1.business_id,
@@ -140,5 +140,5 @@ def test__api__housing_company__read__fail(api_client: HitasAPIClient, invalid_i
     HousingCompanyFactory.create()
 
     response = api_client.get(reverse("hitas:housing-company-detail", args=[invalid_id]))
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
     assert response.json() == exceptions.HitasModelNotFound(model=HousingCompany).data
