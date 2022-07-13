@@ -2,8 +2,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.areas import hitas_city
 from hitas.models.codes import PostalCode
+from hitas.models.utils import hitas_city
 
 
 # Isännöitsijä
