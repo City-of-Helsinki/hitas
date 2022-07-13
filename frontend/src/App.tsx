@@ -11,7 +11,6 @@ function App() {
             str && str === "companies" // make yhtiot (for url) into yhtiöt, for the label string
                 ? "yhtiöt".split("")
                 : str.split("");
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const firstLetter = strArray.shift().toUpperCase();
         return firstLetter + strArray.join("");
