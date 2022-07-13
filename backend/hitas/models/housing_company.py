@@ -1,59 +1,19 @@
-import re
-
 from crum import get_current_user
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumIntegerField
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.areas import hitas_city, hitas_cost_area
 from hitas.models.codes import BuildingType, Developer, FinancingMethod, PostalCode
 from hitas.models.property_manager import PropertyManager
-
-
-def validate_business_id(value: str) -> None:
-    # Example valid value: '1234567-8'
-    match = re.search(r"^(\d{7})-(\d)$", value)
-
-    if match is None:
-        raise ValidationError(
-            _("'%(value)s' is not a valid business id."),
-            params={"value": value},
-        )
-
-    # TODO: verify business id with the check digit
-
-
-def validate_property_id(value: str) -> None:
-    # Example valid value: '1-1234-321-56'
-    match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$", value)
-
-    if match is None:
-        raise ValidationError(
-            _("%(value)s is not an valid property id"),
-            params={"value": value},
-        )
-
-
-def validate_building_id(value: str) -> None:
-    if value is None:
-        return
-
-    # Example valid value: '100012345A'
-    permanent_building_id_match = re.search(r"^1(\d{8})[A-Za-z0-9]$", value)
-    if permanent_building_id_match is not None:
-        # TODO: verify building id with the check digit
-        return
-
-    building_id_match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$", value)
-    if building_id_match is None:
-        raise ValidationError(
-            _("%(value)s is not an valid building id"),
-            params={"value": value},
-        )
-    # TODO: verify building id with the check digit
+from hitas.models.utils import (
+    hitas_city,
+    hitas_cost_area,
+    validate_building_id,
+    validate_business_id,
+    validate_property_id,
+)
 
 
 class HousingCompanyState(Enum):

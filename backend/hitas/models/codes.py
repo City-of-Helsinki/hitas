@@ -1,22 +1,9 @@
-import re
-
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-
-
-def validate_code_number(value: str) -> None:
-    # Example valid value: '012'
-    match = re.search(r"^\d{3}$", value)
-
-    if match is None:
-        raise ValidationError(
-            _("%(value)s is not an valid code number"),
-            params={"value": value},
-        )
+from hitas.models.utils import validate_code_number
 
 
 class AbstractCode(ExternalHitasModel):

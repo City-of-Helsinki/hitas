@@ -1,5 +1,9 @@
+import re
 from collections import defaultdict
 from typing import List
+
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 _hitas_cost_areas = defaultdict(lambda: 4)
 _hitas_cities = defaultdict(lambda: "Helsinki")
@@ -78,3 +82,57 @@ def hitas_cost_area(postal_code: str) -> int:
 
 def hitas_city(postal_code: str) -> str:
     return _hitas_cities[postal_code]
+
+
+def validate_code_number(value: str) -> None:
+    # Example valid value: '012'
+    match = re.search(r"^\d{3}$", value)
+
+    if match is None:
+        raise ValidationError(
+            _("%(value)s is not an valid code number"),
+            params={"value": value},
+        )
+
+
+def validate_property_id(value: str) -> None:
+    # Example valid value: '1-1234-321-56'
+    match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$", value)
+
+    if match is None:
+        raise ValidationError(
+            _("%(value)s is not an valid property id"),
+            params={"value": value},
+        )
+
+
+def validate_business_id(value: str) -> None:
+    # Example valid value: '1234567-8'
+    match = re.search(r"^(\d{7})-(\d)$", value)
+
+    if match is None:
+        raise ValidationError(
+            _("'%(value)s' is not a valid business id."),
+            params={"value": value},
+        )
+
+    # TODO: verify business id with the check digit
+
+
+def validate_building_id(value: str) -> None:
+    if value is None:
+        return
+
+    # Example valid value: '100012345A'
+    permanent_building_id_match = re.search(r"^1(\d{8})[A-Za-z0-9]$", value)
+    if permanent_building_id_match is not None:
+        # TODO: verify building id with the check digit
+        return
+
+    building_id_match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$", value)
+    if building_id_match is None:
+        raise ValidationError(
+            _("%(value)s is not an valid building id"),
+            params={"value": value},
+        )
+    # TODO: verify building id with the check digit
