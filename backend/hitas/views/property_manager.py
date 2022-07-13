@@ -2,7 +2,7 @@ from uuid import UUID
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import PropertyManager
-from hitas.views.helpers import AddressSerializer, HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import AddressSerializer, HitasModelSerializer, HitasModelViewSet
 
 
 class PropertyManagerSerializer(HitasModelSerializer):

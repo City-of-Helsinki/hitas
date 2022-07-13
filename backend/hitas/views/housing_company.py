@@ -9,15 +9,15 @@ from hitas.models import Building, HousingCompany
 from hitas.models.housing_company import HousingCompanyState
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.helpers import (
+from hitas.views.property_manager import PropertyManagerSerializer
+from hitas.views.real_estate import RealEstateSerializer
+from hitas.views.utils import (
     AddressSerializer,
     HitasDecimalField,
     HitasModelSerializer,
     HitasModelViewSet,
     ValueOrNullField,
 )
-from hitas.views.property_manager import PropertyManagerSerializer
-from hitas.views.real_estate import RealEstateSerializer
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):
