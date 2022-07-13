@@ -17,7 +17,7 @@ def test__api__real_estate__list__empty(api_client: HitasAPIClient):
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": hc.uuid.hex})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == []
     assert response.json()["page"] == {
         "size": 0,
@@ -42,7 +42,7 @@ def test__api__real_estate__list(api_client: HitasAPIClient):
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": hc.uuid.hex})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
             "id": re1.uuid.hex,
@@ -104,7 +104,7 @@ def test__api__real_estate__list__invalid_housing_company(api_client: HitasAPICl
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": "foo"})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Retrieve tests
@@ -125,7 +125,7 @@ def test__api__real_estate__retrieve(api_client: HitasAPIClient):
 
     url = reverse("hitas:real-estate-detail", kwargs={"housing_company_uuid": hc1.uuid.hex, "uuid": hc1_re1.uuid.hex})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": hc1_re1.uuid.hex,
         "address": {
@@ -167,7 +167,7 @@ def test__api__real_estate__retrieve__invalid_real_estate(api_client: HitasAPICl
         "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": "foo"}
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Create tests
@@ -186,7 +186,7 @@ def test__api__real_estate__create(api_client: HitasAPIClient):
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": hc.uuid.hex})
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     re = RealEstate.objects.first()
     url = reverse("hitas:real-estate-detail", kwargs={"housing_company_uuid": hc.uuid.hex, "uuid": re.uuid.hex})
@@ -207,7 +207,7 @@ def test__api__real_estate__create__invalid_property_identifier(api_client: Hita
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": hc.uuid.hex})
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 
 # Update tests
@@ -227,7 +227,7 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
 
     url = reverse("hitas:real-estate-detail", kwargs={"housing_company_uuid": hc.uuid.hex, "uuid": re.uuid.hex})
     response = api_client.put(url, data=data, format="json")
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": re.uuid.hex,
         "address": {
@@ -254,7 +254,7 @@ def test__api__real_estate__delete(api_client: HitasAPIClient):
         "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": re.uuid.hex}
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

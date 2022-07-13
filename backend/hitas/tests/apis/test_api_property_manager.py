@@ -13,7 +13,7 @@ from hitas.tests.factories import PostalCodeFactory, PropertyManagerFactory
 def test__api__property_manager__list__empty(api_client: HitasAPIClient):
     url = reverse("hitas:property-manager-list")
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == []
     assert response.json()["page"] == {
         "size": 0,
@@ -34,7 +34,7 @@ def test__api__property_manager__list(api_client: HitasAPIClient):
 
     url = reverse("hitas:property-manager-list")
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
             "id": pm1.uuid.hex,
@@ -78,7 +78,7 @@ def test__api__property_manager__retrieve(api_client: HitasAPIClient):
 
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": pm.uuid.hex})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": pm.uuid.hex,
         "address": {
@@ -97,7 +97,7 @@ def test__api__property_manager__retrieve__invalid_id(api_client: HitasAPIClient
 
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": "foo"})
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Create tests
@@ -118,7 +118,7 @@ def test__api__property_manager__create(api_client: HitasAPIClient):
 
     url = reverse("hitas:property-manager-list")
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": PropertyManager.objects.first().uuid.hex})
     get_response = api_client.get(url)
@@ -170,7 +170,7 @@ def test__api__property_manager__update(api_client: HitasAPIClient):
 
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": pm.uuid.hex})
     response = api_client.put(url, data=data, format="json")
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": pm.uuid.hex,
         "address": {
@@ -195,7 +195,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
 
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": pm.uuid.hex})
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

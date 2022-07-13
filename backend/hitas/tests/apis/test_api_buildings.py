@@ -18,7 +18,7 @@ def test__api__building__list__empty(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": re.uuid.hex},
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == []
     assert response.json()["page"] == {
         "size": 0,
@@ -46,7 +46,7 @@ def test__api__building__list(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re1.uuid.hex},
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
             "id": bu1.uuid.hex,
@@ -91,7 +91,7 @@ def test__api__building__list__invalid_real_estate(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": "bar"},
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Retrieve tests
@@ -108,7 +108,7 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu1.uuid.hex},
     )
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": bu1.uuid.hex,
         "address": {
@@ -197,7 +197,7 @@ def test__api__building__create__invalid_building_identifier(api_client: HitasAP
         kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": re.uuid.hex},
     )
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 
 @pytest.mark.django_db
@@ -216,7 +216,7 @@ def test__api__building__create__invalid_real_estate(api_client: HitasAPIClient)
         kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": "foo"},
     )
     response = api_client.post(url, data=data, format="json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Update tests
@@ -242,7 +242,7 @@ def test__api__building__update(api_client: HitasAPIClient):
         kwargs={"housing_company_uuid": hc.uuid.hex, "real_estate_uuid": re.uuid.hex, "uuid": bu.uuid.hex},
     )
     response = api_client.put(url, data=data, format="json")
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": bu.uuid.hex,
         "address": {
@@ -274,7 +274,7 @@ def test__api__building__delete(api_client: HitasAPIClient):
         },
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
     response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

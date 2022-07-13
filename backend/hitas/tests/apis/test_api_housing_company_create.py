@@ -63,7 +63,7 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data)
         )
 
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     hc = HousingCompany.objects.first()
     assert response.json()["id"] == hc.uuid.hex
@@ -100,7 +100,7 @@ def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient,
     data.update(invalid_data)
 
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 
 @pytest.mark.django_db
@@ -109,7 +109,7 @@ def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPI
     data.update({"property_manager": {"id": "foo"}})
 
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 @pytest.mark.django_db
@@ -142,7 +142,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     }
 
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_200_OK, response.json()
 
     hc.refresh_from_db()
     assert hc.postal_code == postal_code
