@@ -22,7 +22,8 @@ class HousingCompanyState(Enum):
     GREATER_THAN_30_YEARS_NOT_FREE = 2
     GREATER_THAN_30_YEARS_FREE = 3
     GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = 4
-    READY_NO_STATISTICS = 5
+    HALF_HITAS = 5
+    READY_NO_STATISTICS = 6
 
     class Labels:
         NOT_READY = _("Not Ready")
@@ -30,6 +31,7 @@ class HousingCompanyState(Enum):
         GREATER_THAN_30_YEARS_NOT_FREE = _("Greater than 30 years, not free")
         GREATER_THAN_30_YEARS_FREE = _("Greater than 30 years, free")
         GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = _("Greater than 30 years, plot department notification")
+        HALF_HITAS = _("Half hitas")  # Puolihtas
         READY_NO_STATISTICS = _("Ready, no statistics")
 
 
