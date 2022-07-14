@@ -4,7 +4,7 @@ from django.http import Http404
 from rest_framework import viewsets
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.views.utils import HitasPagination
+from hitas.views.utils import HitasFilterSet, HitasPagination
 
 
 class HitasModelViewSet(viewsets.ModelViewSet):
@@ -46,3 +46,15 @@ class HitasModelViewSet(viewsets.ModelViewSet):
             return UUID(hex=str(s))
         except ValueError:
             raise HitasModelNotFound(model=self.model_class)
+
+    def get_filterset_class(self):
+        """Automagically generate a Filter Set class for subclassing ViewSets"""
+
+        class HitasModelFilterSet(HitasFilterSet):
+            class Meta:
+                model = self.model_class
+                fields = "__all__"
+
+        HitasModelFilterSet.__name__ = f"{self.model_class}FilterSet"
+
+        return HitasModelFilterSet
