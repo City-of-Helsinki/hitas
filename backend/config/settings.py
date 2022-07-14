@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "hitas",
     "nested_inline",
     "rest_framework",
+    "django_filters",
     "health_check",
     "health_check.db",
 ]
@@ -67,6 +68,7 @@ TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
     "COERCE_DECIMAL_TO_STRING": False,
+    "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
 }
 
 TEMPLATES = [
