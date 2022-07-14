@@ -55,7 +55,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
         {
             "id": hc1.uuid.hex,
             "name": hc1.display_name,
-            "state": hc1.state.name.lower(),
+            "state": hc1.state.value,
             "address": {
                 "street": hc1.street_address,
                 "postal_code": hc1.postal_code.value,
@@ -67,7 +67,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
         {
             "id": hc2.uuid.hex,
             "name": hc2.display_name,
-            "state": hc2.state.name.lower(),
+            "state": hc2.state.value,
             "address": {
                 "street": hc2.street_address,
                 "postal_code": hc2.postal_code.value,
@@ -181,7 +181,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "id": hc1.uuid.hex,
         "business_id": hc1.business_id,
         "name": {"display": hc1.display_name, "official": hc1.official_name},
-        "state": hc1.state.name.lower(),
+        "state": hc1.state.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street": hc1.street_address},
         "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
         "date": "2000-01-01",
@@ -421,7 +421,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "notes": "",
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
-        "state": "less_than_30_years",
+        "state": HousingCompanyState.LESS_THAN_30_YEARS.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
     }
 
@@ -448,7 +448,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__property_manager__delete(api_client: HitasAPIClient):
+def test__api__housing_company__delete(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
 
     url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
@@ -460,7 +460,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__property_manager__delete__invalid(api_client: HitasAPIClient):
+def test__api__housing_company__delete__invalid(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     RealEstateFactory.create(housing_company=hc)
 

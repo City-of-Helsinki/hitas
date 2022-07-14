@@ -2,7 +2,7 @@ from crum import get_current_user
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from enumfields import Enum, EnumIntegerField
+from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel
 from hitas.models.codes import BuildingType, Developer, FinancingMethod, PostalCode
@@ -17,13 +17,13 @@ from hitas.models.utils import (
 
 
 class HousingCompanyState(Enum):
-    NOT_READY = 0
-    LESS_THAN_30_YEARS = 1
-    GREATER_THAN_30_YEARS_NOT_FREE = 2
-    GREATER_THAN_30_YEARS_FREE = 3
-    GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = 4
-    HALF_HITAS = 5
-    READY_NO_STATISTICS = 6
+    NOT_READY = "not_ready"
+    LESS_THAN_30_YEARS = "lt_30_years"
+    GREATER_THAN_30_YEARS_NOT_FREE = "gt_30_years_not_free"
+    GREATER_THAN_30_YEARS_FREE = "gt_30_years_free"
+    GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = "gt_30_years_plot_department_notification"
+    HALF_HITAS = "half_hitas"
+    READY_NO_STATISTICS = "ready_no_statistics"
 
     class Labels:
         NOT_READY = _("Not Ready")
@@ -42,7 +42,7 @@ class HousingCompany(ExternalHitasModel):
     # More human-friendly housing company name
     display_name = models.CharField(max_length=1024)
 
-    state = EnumIntegerField(HousingCompanyState, default=HousingCompanyState.NOT_READY)
+    state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
     # Business ID / 'y-tunnus'
     business_id = models.CharField(max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"))
 
