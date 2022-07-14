@@ -30,15 +30,18 @@ class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
     realized = HitasDecimalField(source="realized_acquisition_price", required=False, allow_null=True)
 
 
-class HousingCompanyStateField(serializers.Field):
-    def to_representation(self, value):
-        return value.name.lower()
+class HousingCompanyStateField(serializers.ChoiceField):
+    def __init__(self, **kwargs):
+        super().__init__(choices=HousingCompanyState.choices(), **kwargs)
 
-    def to_internal_value(self, data):
+    def to_representation(self, enum: HousingCompanyState):
+        return enum.value
+
+    def to_internal_value(self, data: str):
         try:
-            return HousingCompanyState[data.upper()]
-        except KeyError:
-            raise serializers.ValidationError(f"Unsupported state '{data}'.")
+            return HousingCompanyState(data)
+        except ValueError:
+            raise serializers.ValidationError(f"Unsupported Housing Company state '{data}'.")
 
 
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
