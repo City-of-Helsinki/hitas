@@ -43,6 +43,7 @@ class FinancingMethod(AbstractCode):
         verbose_name_plural = _("Financing methods")
 
 
+# Postinumero
 class PostalCode(AbstractCode):
     class Meta(AbstractCode.Meta):
         verbose_name = _("Postal code")
