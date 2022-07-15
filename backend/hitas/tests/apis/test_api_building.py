@@ -297,7 +297,7 @@ def test__api__building__delete(api_client: HitasAPIClient):
         # FIXME {"completion_date__year": "1800"},
         # FIXME {"completion_date__lte": "1801-01-01"},
         # FIXME {"completion_date_min": "1899-01-01", "completion_date_max": "1901-01-01"},
-        # FIXME {"postal_code": "99999"},
+        {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db
