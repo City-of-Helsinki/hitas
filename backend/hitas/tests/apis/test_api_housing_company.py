@@ -304,9 +304,9 @@ def test__api__housing_company__read__fail(api_client: HitasAPIClient, invalid_i
 def get_housing_company_create_data() -> dict[str, Any]:
     developer = DeveloperFactory.create()
     financing_method = FinancingMethodFactory.create()
-    property_manager = PropertyManagerFactory.create()
     building_type = BuildingTypeFactory.create()
     postal_code = PostalCodeFactory.create()
+    property_manager = PropertyManagerFactory.create(postal_code=postal_code)
 
     data = {
         "acquisition_price": {"initial": 10.00, "realized": 10.00},
