@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 from django.urls import reverse
+from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas.models import Building, HousingCompany, RealEstate
@@ -258,3 +259,32 @@ def test__api__real_estate__delete(api_client: HitasAPIClient):
 
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+# Filter tests
+
+
+@pytest.mark.parametrize(
+    "selected_filter",
+    [
+        {"property_identifier": "1-1234-321-56"},
+        {"property_identifier": "1-1234-"},
+        {"property_identifier": "321-56"},
+        {"street_address": "test_street"},
+        # FIXME {"postal_code": "99999"},
+    ],
+)
+@pytest.mark.django_db
+def test__api__real_estate__filter(api_client: HitasAPIClient, selected_filter):
+    re: RealEstate = RealEstateFactory.create(property_identifier="1-1234-321-56")
+    RealEstateFactory.create(street_address="test_street", housing_company=re.housing_company)
+    RealEstateFactory.create(postal_code__value="99999", housing_company=re.housing_company)
+
+    url = (
+        reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": re.housing_company.uuid.hex})
+        + "?"
+        + urlencode(selected_filter)
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1, response.json()

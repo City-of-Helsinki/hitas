@@ -1,5 +1,8 @@
+from datetime import date
+
 import pytest
 from django.urls import reverse
+from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas.models import Building, HousingCompany, RealEstate
@@ -278,3 +281,44 @@ def test__api__building__delete(api_client: HitasAPIClient):
 
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+# Filter tests
+
+
+@pytest.mark.parametrize(
+    "selected_filter",
+    [
+        {"building_identifier": "100012345"},
+        {"building_identifier": "1000"},
+        {"building_identifier": "12345"},
+        {"street_address": "test_street"},
+        {"completion_date": "1800-01-01"},
+        # FIXME {"completion_date__year": "1800"},
+        # FIXME {"completion_date__lte": "1801-01-01"},
+        # FIXME {"completion_date_min": "1899-01-01", "completion_date_max": "1901-01-01"},
+        # FIXME {"postal_code": "99999"},
+    ],
+)
+@pytest.mark.django_db
+def test__api__building__filter(api_client: HitasAPIClient, selected_filter):
+    bu: Building = BuildingFactory.create(completion_date=date(1800, 1, 1))
+    BuildingFactory.create(completion_date=date(1900, 1, 1), real_estate=bu.real_estate)
+    BuildingFactory.create(building_identifier="100012345A", real_estate=bu.real_estate)
+    BuildingFactory.create(street_address="test_street", real_estate=bu.real_estate)
+    BuildingFactory.create(postal_code__value="99999", real_estate=bu.real_estate)
+
+    url = (
+        reverse(
+            "hitas:building-list",
+            kwargs={
+                "housing_company_uuid": bu.real_estate.housing_company.uuid.hex,
+                "real_estate_uuid": bu.real_estate.uuid.hex,
+            },
+        )
+        + "?"
+        + urlencode(selected_filter)
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1, response.json()

@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas.models import PostalCode, PropertyManager
@@ -199,3 +200,32 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
 
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+# Filter tests
+
+
+@pytest.mark.parametrize(
+    "selected_filter",
+    [
+        {"name": "TestName"},
+        {"name": "TestN"},
+        {"name": "testname"},
+        {"name": "stNa"},
+        {"email": "test@hitas.com"},
+        {"email": "hitas.com"},
+        {"street_address": "test_street"},
+        # FIXME {"postal_code": "99999"},
+    ],
+)
+@pytest.mark.django_db
+def test__api__property_manager__filter(api_client: HitasAPIClient, selected_filter):
+    PropertyManagerFactory.create(name="TestName")
+    PropertyManagerFactory.create(email="test@hitas.com")
+    PropertyManagerFactory.create(street_address="test_street")
+    PropertyManagerFactory.create(postal_code__value="99999")
+
+    url = reverse("hitas:property-manager-list") + "?" + urlencode(selected_filter)
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1, response.json()
