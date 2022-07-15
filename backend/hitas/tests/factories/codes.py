@@ -17,7 +17,7 @@ class AbstractCodeFactory(DjangoModelFactory):
         abstract = True
 
     value = None
-    description = None
+    description = fake.sentence()
     in_use = True
     order = None
     legacy_code_number = factory.Sequence(lambda n: f"{n:03}")
@@ -30,7 +30,8 @@ class PostalCodeFactory(AbstractCodeFactory):
         model = PostalCode
         django_get_or_create = ("value",)
 
-    value = fake.bothify(fake.random_element(["00##0"]))  # Helsinki area postal code
+    # # Helsinki area postal code e.g. 00100
+    value = factory.Sequence(lambda n: fake.bothify(fake.random_element([f"0{n%100:02}#0"])))
     description = fake.city()
 
 
@@ -55,7 +56,6 @@ class BuildingTypeFactory(AbstractCodeFactory):
             "rivitalo/erillistalo",
         ]
     )
-    description = fake.word()
 
 
 class FinancingMethodFactory(AbstractCodeFactory):
@@ -89,7 +89,6 @@ class FinancingMethodFactory(AbstractCodeFactory):
             "Vuokratalo Hitas I",
         ]
     )
-    description = fake.word()
 
 
 class DeveloperFactory(AbstractCodeFactory):
@@ -98,4 +97,3 @@ class DeveloperFactory(AbstractCodeFactory):
         django_get_or_create = ("value",)
 
     value = factory.LazyAttribute(lambda self: f"As Oy {fake.last_name()}")
-    description = fake.word()
