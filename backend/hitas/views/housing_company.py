@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 from django.db.models import Min
+from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
@@ -14,10 +15,25 @@ from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
     AddressSerializer,
     HitasDecimalField,
+    HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
     ValueOrNullField,
 )
+
+
+class HousingCompanyFilterSet(HitasFilterSet):
+    postal_code = filters.CharFilter(field_name="postal_code__value")
+    property_manager = filters.CharFilter(field_name="property_manager__name", lookup_expr="icontains")
+    building_type = filters.CharFilter(field_name="building_type__value", lookup_expr="icontains")
+    financing_method = filters.CharFilter(field_name="financing_method__value", lookup_expr="icontains")
+    developer = filters.CharFilter(field_name="developer__value", lookup_expr="icontains")
+    property_identifier = filters.CharFilter(field_name="real_estates__property_identifier", lookup_expr="icontains")
+    state = filters.ChoiceFilter(choices=HousingCompanyState.choices())
+
+    class Meta:
+        model = HousingCompany
+        fields = "__all__"
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):
@@ -146,3 +162,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
             "property_manager__postal_code",
             "last_modified_by",
         ).annotate(date=Min("real_estates__buildings__completion_date"))
+
+    def get_filterset_class(self):
+        return HousingCompanyFilterSet
