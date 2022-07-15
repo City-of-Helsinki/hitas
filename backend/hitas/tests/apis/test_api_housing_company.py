@@ -480,20 +480,21 @@ def test__api__housing_company__delete__invalid(api_client: HitasAPIClient):
         {"display_name": "TestDisplayName"},
         {"official_name": "TestOfficialName OY"},
         {"display_name": "Test", "official_name": "Test"},
-        # FIXME {"state": HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION.value},
+        {"state": HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION.value},
         {"business_id": "1234567-8"},
         {"street_address": "test_street"},
-        # FIXME {"property_manager": "TestPropertyManager"},
-        # FIXME {"building_type": "TestBuildingType"},
-        # FIXME {"financing_method": "TestFinancingMethod"},
-        # FIXME {"developer": "TestDeveloper"},
+        {"property_manager": "TestPropertyManager"},
+        {"building_type": "TestBuildingType"},
+        {"financing_method": "TestFinancingMethod"},
+        {"developer": "TestDeveloper"},
         {"postal_code": "99999"},
-        # FIXME {"property_identifier": "1-1234-321-56"},
+        {"property_identifier": "1-1234-321-56"},
+        {"property_identifier": "1111"},
     ],
 )
 @pytest.mark.django_db
 def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filter):
-    HousingCompanyFactory.create(display_name="TestDisplayName")
+    hc: HousingCompany = HousingCompanyFactory.create(display_name="TestDisplayName")
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
     HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
     HousingCompanyFactory.create(business_id="1234567-8")
@@ -503,7 +504,8 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     HousingCompanyFactory.create(financing_method__value="TestFinancingMethod")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
     HousingCompanyFactory.create(postal_code__value="99999")
-    RealEstateFactory.create(property_identifier="1-1234-321-56")
+    RealEstateFactory.create(property_identifier="1-1234-321-56", housing_company=hc)
+    RealEstateFactory.create(property_identifier="1111-1111-1111-1111", housing_company=hc)
 
     url = reverse("hitas:housing-company-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)
