@@ -271,7 +271,7 @@ def test__api__real_estate__delete(api_client: HitasAPIClient):
         {"property_identifier": "1-1234-"},
         {"property_identifier": "321-56"},
         {"street_address": "test_street"},
-        # FIXME {"postal_code": "99999"},
+        {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db

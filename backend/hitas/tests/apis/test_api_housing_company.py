@@ -487,7 +487,7 @@ def test__api__housing_company__delete__invalid(api_client: HitasAPIClient):
         # FIXME {"building_type": "TestBuildingType"},
         # FIXME {"financing_method": "TestFinancingMethod"},
         # FIXME {"developer": "TestDeveloper"},
-        # FIXME {"postal_code": "99999"},
+        {"postal_code": "99999"},
         # FIXME {"property_identifier": "1-1234-321-56"},
     ],
 )

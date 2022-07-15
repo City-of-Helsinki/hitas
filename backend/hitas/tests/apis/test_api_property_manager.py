@@ -215,7 +215,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
         {"email": "test@hitas.com"},
         {"email": "hitas.com"},
         {"street_address": "test_street"},
-        # FIXME {"postal_code": "99999"},
+        {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db
