@@ -725,6 +725,622 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+
+  /api/v1/developers:
+    get:
+      description: Fetch developers
+      operationId: list-developers
+      tags:
+        - Developers
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of developers
+          content:
+            application/json:
+              schema:
+                description: Single page of developers
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of developers
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new developer
+      operationId: create-developer
+      tags:
+        - Developers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '201':
+          description: Successfully added a new developer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/developers/{developer_id}:
+    get:
+      description: Fetch a single developer by id
+      operationId: read-developer
+      tags:
+        - Developers
+      parameters:
+        - name: developer_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a developer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a developer
+      operationId: update-developer
+      tags:
+        - Developers
+      parameters:
+        - name: developer_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: Successfully updated a developer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a developer
+      operationId: delete-developer
+      tags:
+        - Developers
+      parameters:
+        - name: developer_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/postal-codes:
+    get:
+      description: Fetch postal codes
+      operationId: list-postal-codes
+      tags:
+        - Postal codes
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of postal codes
+          content:
+            application/json:
+              schema:
+                description: Single page of postal codes
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of postal codes
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new postal code
+      operationId: create-postal-code
+      tags:
+        - Postal codes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '201':
+          description: Successfully added a new postal code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/postal-codes/{postal_code_id}:
+    get:
+      description: Fetch a single postal code by id
+      operationId: read-postal-code
+      tags:
+        - Postal codes
+      parameters:
+        - name: postal_code_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a postal code details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a postal code
+      operationId: update-postal-code
+      tags:
+        - Postal codes
+      parameters:
+        - name: postal_code_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: Successfully updated a postal code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a postal code
+      operationId: delete-postal-code
+      tags:
+        - Postal codes
+      parameters:
+        - name: postal_code_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/building-types:
+    get:
+      description: Fetch building types
+      operationId: list-building-types
+      tags:
+        - Building types
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of building types
+          content:
+            application/json:
+              schema:
+                description: Single page of building types
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of building types
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new building type
+      operationId: create-building-type
+      tags:
+        - Building types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '201':
+          description: Successfully added a new building type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/building-types/{building_type_id}:
+    get:
+      description: Fetch a single building type by id
+      operationId: read-building-type
+      tags:
+        - Building types
+      parameters:
+        - name: building_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a building type details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a building type
+      operationId: update-building-type
+      tags:
+        - Building types
+      parameters:
+        - name: building_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: Successfully updated a building type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a building type
+      operationId: delete-building-type
+      tags:
+        - Building types
+      parameters:
+        - name: building_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/financing-methods:
+    get:
+      description: Fetch financing methods
+      operationId: list-financing-methods
+      tags:
+        - Financing methods
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of financing methods
+          content:
+            application/json:
+              schema:
+                description: Single page of financing methods
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of financing methods
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new financing method
+      operationId: create-financing-method
+      tags:
+        - Financing methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '201':
+          description: Successfully added a new financing method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/financing-methods/{financing_method_id}:
+    get:
+      description: Fetch a single financing method by id
+      operationId: read-financing-method
+      tags:
+        - Financing methods
+      parameters:
+        - name: financing_method_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a financing method details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a financing method
+      operationId: update-financing-method
+      tags:
+        - Financing methods
+      parameters:
+        - name: financing_method_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: Successfully updated a financing method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a financing method
+      operationId: delete-financing-method
+      tags:
+        - Financing methods
+      parameters:
+        - name: financing_method_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
