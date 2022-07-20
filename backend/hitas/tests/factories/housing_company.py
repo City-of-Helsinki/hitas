@@ -7,8 +7,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from hitas.models import HousingCompany
-from hitas.models.housing_company import Building, HousingCompanyState, RealEstate
+from hitas.models import Building, HousingCompany, HousingCompanyState, RealEstate
 
 fake = Faker(locale="fi_FI")
 

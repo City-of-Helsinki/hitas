@@ -5,15 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.codes import BuildingType, Developer, FinancingMethod, PostalCode
-from hitas.models.property_manager import PropertyManager
-from hitas.models.utils import (
-    hitas_city,
-    hitas_cost_area,
-    validate_building_id,
-    validate_business_id,
-    validate_property_id,
-)
+from hitas.models.utils import hitas_city, hitas_cost_area, validate_business_id
 
 
 class HousingCompanyState(Enum):
@@ -47,12 +39,12 @@ class HousingCompany(ExternalHitasModel):
     business_id = models.CharField(max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"))
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
+    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT)
 
-    building_type = models.ForeignKey(BuildingType, on_delete=models.PROTECT)
-    financing_method = models.ForeignKey(FinancingMethod, on_delete=models.PROTECT)
-    property_manager = models.ForeignKey(PropertyManager, on_delete=models.PROTECT)
-    developer = models.ForeignKey(Developer, on_delete=models.PROTECT)
+    building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT)
+    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT)
+    property_manager = models.ForeignKey("PropertyManager", on_delete=models.PROTECT)
+    developer = models.ForeignKey("Developer", on_delete=models.PROTECT)
 
     # 'hankinta-arvo'
     acquisition_price = models.DecimalField(max_digits=15, decimal_places=2)
@@ -103,58 +95,3 @@ class HousingCompany(ExternalHitasModel):
 
     def __str__(self):
         return self.display_name
-
-
-# Kiinteistö
-class RealEstate(ExternalHitasModel):
-    housing_company = models.ForeignKey(HousingCompany, on_delete=models.PROTECT, related_name="real_estates")
-
-    # 'kiinteistötunnus'
-    property_identifier = models.CharField(
-        max_length=19, validators=[validate_property_id], help_text=_("Format: 1234-1234-1234-1234")
-    )
-
-    street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
-
-    @property
-    def city(self):
-        return hitas_city(self.postal_code.value)
-
-    class Meta:
-        verbose_name = _("Real estate")
-        verbose_name_plural = _("Real estates")
-        ordering = ["id"]
-
-    def __str__(self):
-        return self.property_identifier
-
-
-# Rakennus
-class Building(ExternalHitasModel):
-    real_estate = models.ForeignKey(RealEstate, on_delete=models.PROTECT, related_name="buildings")
-    completion_date = models.DateField(null=True)
-
-    street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
-
-    # 'rakennustunnus'
-    building_identifier = models.CharField(
-        blank=True,
-        null=True,
-        max_length=25,
-        validators=[validate_building_id],
-        help_text=_("Format: 100012345A or 91-17-16-1 S 001"),
-    )
-
-    @property
-    def city(self):
-        return hitas_city(self.postal_code.value)
-
-    class Meta:
-        verbose_name = _("Building")
-        verbose_name_plural = _("Buildings")
-        ordering = ["id"]
-
-    def __str__(self):
-        return self.building_identifier

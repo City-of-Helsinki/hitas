@@ -9,8 +9,7 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Building, HousingCompany, PostalCode, RealEstate
-from hitas.models.housing_company import HousingCompanyState
+from hitas.models import Building, HousingCompany, HousingCompanyState, PostalCode, RealEstate
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     BuildingFactory,
