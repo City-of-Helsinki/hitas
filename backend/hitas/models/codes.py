@@ -13,7 +13,7 @@ class AbstractCode(ExternalHitasModel):
     in_use = models.BooleanField(default=True)
     order = models.PositiveSmallIntegerField(null=True, blank=True)
     legacy_code_number = models.CharField(
-        max_length=3, unique=True, validators=[validate_code_number], help_text=_("Format: 000")
+        null=True, max_length=3, validators=[validate_code_number], help_text=_("Format: 000")
     )
     legacy_start_date = models.DateTimeField(default=timezone.now)
     legacy_end_date = models.DateTimeField(null=True, blank=True)
@@ -55,3 +55,10 @@ class Developer(AbstractCode):
     class Meta(AbstractCode.Meta):
         verbose_name = _("Developer")
         verbose_name_plural = _("Developers")
+
+
+# Huoneistotyyppi
+class ApartmentType(AbstractCode):
+    class Meta(AbstractCode.Meta):
+        verbose_name = _("Apartment type")
+        verbose_name_plural = _("Apartment types")

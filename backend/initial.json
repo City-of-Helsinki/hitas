@@ -21,6 +21,18 @@
     }
   },
   {
+    "model": "hitas.building",
+    "pk": 1,
+    "fields": {
+      "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
+      "real_estate": 1,
+      "completion_date": "2021-07-07",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1,
+      "building_identifier": "100012345A"
+    }
+  },
+  {
     "model": "hitas.buildingtype",
     "pk": 1,
     "fields": {
@@ -637,25 +649,143 @@
     }
   },
   {
-    "model": "hitas.propertymanager",
+    "model": "hitas.apartmenttype",
     "pk": 1,
     "fields": {
-      "uuid": "431e81fc-4d95-412d-8a68-b299b4651531",
-      "name": "Isännöitsijä Iskonen Oy",
-      "email": "iskonen@example.com",
-      "street_address": "Fakestreet 123",
-      "postal_code": 1
+      "uuid": "8a4ff2db-3673-4f10-9515-8dc3c4955574",
+      "value": "1h",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.178Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.propertymanager",
+    "model": "hitas.apartmenttype",
     "pk": 2,
     "fields": {
-      "uuid": "2d9a7fac-81e5-426d-b3b3-3d6ad6ca9949",
-      "name": "EA-isännöinti Oy",
-      "email": "not-known@example.com",
-      "street_address": "Värikuja 1 B 13",
-      "postal_code": 1
+      "uuid": "fbf1bd95-32dc-4776-8b45-761a4c3717d1",
+      "value": "2h",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.185Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 3,
+    "fields": {
+      "uuid": "3a35f866-b33e-4f21-a9f0-502a03164171",
+      "value": "Alkovi+tupak+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.186Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 4,
+    "fields": {
+      "uuid": "7402438d-54f6-4721-b3fb-60cdd4e9de5c",
+      "value": "2h+kk+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.190Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 5,
+    "fields": {
+      "uuid": "0c42aa39-1200-430a-a165-6de64016b117",
+      "value": "2h+k+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.191Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 6,
+    "fields": {
+      "uuid": "0812e1b6-2312-4d53-a566-7c55615db7ad",
+      "value": "3h+kk+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.192Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 7,
+    "fields": {
+      "uuid": "249664b0-03ca-4be9-8314-802c04677b31",
+      "value": "2h+kk+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.193Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 8,
+    "fields": {
+      "uuid": "1793330a-c383-4f74-80b9-0bedc8f5f8d5",
+      "value": "2mh+tupak+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.193Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 9,
+    "fields": {
+      "uuid": "97361dc9-adcf-4f40-a804-7689cf21a223",
+      "value": "Alkovi+tupak+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.194Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.apartmenttype",
+    "pk": 10,
+    "fields": {
+      "uuid": "7f9c029b-3945-4509-91af-c998a768b868",
+      "value": "2mh+tupak+s",
+      "description": "",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "",
+      "legacy_start_date": "2022-07-20T17:03:24.195Z",
+      "legacy_end_date": null
     }
   },
   {
@@ -685,6 +815,28 @@
     }
   },
   {
+    "model": "hitas.propertymanager",
+    "pk": 1,
+    "fields": {
+      "uuid": "431e81fc-4d95-412d-8a68-b299b4651531",
+      "name": "Isännöitsijä Iskonen Oy",
+      "email": "iskonen@example.com",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1
+    }
+  },
+  {
+    "model": "hitas.propertymanager",
+    "pk": 2,
+    "fields": {
+      "uuid": "2d9a7fac-81e5-426d-b3b3-3d6ad6ca9949",
+      "name": "EA-isännöinti Oy",
+      "email": "not-known@example.com",
+      "street_address": "Värikuja 1 B 13",
+      "postal_code": 1
+    }
+  },
+  {
     "model": "hitas.realestate",
     "pk": 1,
     "fields": {
@@ -693,18 +845,6 @@
       "property_identifier": "091-020-0015-0003",
       "street_address": "Fakestreet 123",
       "postal_code": 1
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 1,
-    "fields": {
-      "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
-      "real_estate": 1,
-      "completion_date": "2021-07-07",
-      "street_address": "Fakestreet 123",
-      "postal_code": 1,
-      "building_identifier": "100012345A"
     }
   }
 ]
