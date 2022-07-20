@@ -1341,6 +1341,159 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/apartment-types:
+    get:
+      description: Fetch apartment types
+      operationId: list-apartment-types
+      tags:
+        - Building types
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of apartment types
+          content:
+            application/json:
+              schema:
+                description: Single page of apartment types
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of apartment types
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new apartment type
+      operationId: create-apartment-type
+      tags:
+        - Building types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '201':
+          description: Successfully added a new apartment type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/apartment-types/{apartment_type_id}:
+    get:
+      description: Fetch a single apartment type by id
+      operationId: read-apartment-type
+      tags:
+        - Building types
+      parameters:
+        - name: apartment_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a apartment type details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a apartment type
+      operationId: update-apartment-type
+      tags:
+        - Building types
+      parameters:
+        - name: apartment_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Code'
+      responses:
+        '200':
+          description: Successfully updated a apartment type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Code'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a apartment type
+      operationId: delete-apartment-type
+      tags:
+        - Building types
+      parameters:
+        - name: apartment_type_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Housing company successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
