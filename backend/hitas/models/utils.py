@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-from typing import List
+from typing import List, Optional
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -84,7 +84,10 @@ def hitas_city(postal_code: str) -> str:
     return _hitas_cities[postal_code]
 
 
-def validate_code_number(value: str) -> None:
+def validate_code_number(value: Optional[str]) -> None:
+    if value is None:
+        return
+
     # Example valid value: '012'
     match = re.search(r"^\d{3}$", value)
 
@@ -119,7 +122,7 @@ def validate_business_id(value: str) -> None:
     # TODO: verify business id with the check digit
 
 
-def validate_building_id(value: str) -> None:
+def validate_building_id(value: Optional[str]) -> None:
     if value is None:
         return
 
