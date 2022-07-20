@@ -1,7 +1,7 @@
 from django_filters.rest_framework import filters
 from rest_framework import serializers
 
-from hitas.models.codes import AbstractCode, BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
 from hitas.models.utils import validate_code_number
 from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
@@ -42,6 +42,11 @@ class DeveloperSerializer(AbstractCodeSerializer):
         model = Developer
 
 
+class ApartmentTypeSerializer(AbstractCodeSerializer):
+    class Meta(AbstractCodeSerializer.Meta):
+        model = ApartmentType
+
+
 class AbstractCodeViewSet(HitasModelViewSet):
     def get_queryset(self):
         return self.model_class.objects.all()
@@ -77,3 +82,8 @@ class FinancingMethodViewSet(AbstractCodeViewSet):
 class DeveloperViewSet(AbstractCodeViewSet):
     serializer_class = DeveloperSerializer
     model_class = Developer
+
+
+class ApartmentTypeViewSet(AbstractCodeViewSet):
+    serializer_class = ApartmentTypeSerializer
+    model_class = ApartmentType
