@@ -6,8 +6,7 @@ from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Building, HousingCompany
-from hitas.models.housing_company import HousingCompanyState
+from hitas.models import Building, HousingCompany, HousingCompanyState
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
 from hitas.views.property_manager import PropertyManagerSerializer
