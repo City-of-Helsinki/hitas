@@ -7,6 +7,7 @@ from hitas.tests import factories
 @pytest.mark.parametrize(
     "factory_class",
     [
+        factories.ApartmentTypeFactory,
         factories.BuildingFactory,
         factories.BuildingTypeFactory,
         factories.DeveloperFactory,

@@ -3,17 +3,18 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.tests import factories
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import BuildingTypeFactory, DeveloperFactory, FinancingMethodFactory, PostalCodeFactory
 
 _code_parameters = (
     "url_basename,model,factory",
     [
-        ("postal-code", PostalCode, PostalCodeFactory),
-        ("financing-method", FinancingMethod, FinancingMethodFactory),
-        ("building-type", BuildingType, BuildingTypeFactory),
-        ("developer", Developer, DeveloperFactory),
+        ("postal-code", PostalCode, factories.PostalCodeFactory),
+        ("financing-method", FinancingMethod, factories.FinancingMethodFactory),
+        ("building-type", BuildingType, factories.BuildingTypeFactory),
+        ("developer", Developer, factories.DeveloperFactory),
+        ("apartment-type", ApartmentType, factories.ApartmentTypeFactory),
     ],
 )
 

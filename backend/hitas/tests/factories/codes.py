@@ -6,7 +6,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from hitas.models import BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
 
 fake = Faker(locale="fi_FI")
 
@@ -97,3 +97,25 @@ class DeveloperFactory(AbstractCodeFactory):
         django_get_or_create = ("value",)
 
     value = factory.LazyAttribute(lambda self: f"As Oy {fake.last_name()}")
+
+
+class ApartmentTypeFactory(AbstractCodeFactory):
+    class Meta:
+        model = ApartmentType
+        django_get_or_create = ("value",)
+
+    value = fuzzy.FuzzyChoice(
+        [
+            "tuntematon",
+            "1h",
+            "2h",
+            "Alkovi+tupak+s",
+            "2h+kk+s",
+            "2h+k+s",
+            "3h+kk+s",
+            "2h+kk+s",
+            "2mh+tupak+s",
+            "Alkovi+tupak+s",
+            "2mh+tupak+s",
+        ]
+    )
