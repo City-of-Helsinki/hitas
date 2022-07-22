@@ -840,6 +840,31 @@
     }
   },
   {
+    "model": "hitas.owner",
+    "pk": 1,
+    "fields": {
+      "uuid": "93898f7f-30bd-4be9-9838-b0ee7543af04",
+      "apartment": 1,
+      "person": 1,
+      "ownership_percentage": "100.00",
+      "ownership_start_date": "2022-01-01",
+      "ownership_end_date": null
+    }
+  },
+  {
+    "model": "hitas.person",
+    "pk": 1,
+    "fields": {
+      "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
+      "first_name": "Matti",
+      "last_name": "Meikäläinen",
+      "social_security_number": "010199-123A",
+      "email": "matti@hitas.fi",
+      "street_address": "Matinkatu 22",
+      "postal_code": 3
+    }
+  },
+  {
     "model": "hitas.propertymanager",
     "pk": 1,
     "fields": {
