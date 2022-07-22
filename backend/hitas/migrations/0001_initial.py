@@ -211,6 +211,41 @@ class Migration(migrations.Migration):
                 'ordering': ['id'],
             },
         ),
+        migrations.CreateModel(
+            name='Person',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
+                ('first_name', models.CharField(max_length=128)),
+                ('last_name', models.CharField(max_length=128)),
+                ('social_security_number', models.CharField(blank=True, max_length=128, null=True)),
+                ('email', models.EmailField(blank=True, max_length=254, null=True)),
+                ('street_address', models.CharField(max_length=128)),
+                ('postal_code', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='hitas.postalcode')),
+            ],
+            options={
+                'verbose_name': 'Person',
+                'verbose_name_plural': 'Persons',
+                'ordering': ['id'],
+            },
+        ),
+        migrations.CreateModel(
+            name='Owner',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, unique=True)),
+                ('ownership_percentage', hitas.models._base.HitasModelDecimalField(decimal_places=2, max_digits=15, validators=[django.core.validators.MinValueValidator(Decimal('0')), django.core.validators.MaxValueValidator(Decimal('100'))])),
+                ('ownership_start_date', models.DateField(blank=True, null=True)),
+                ('ownership_end_date', models.DateField(blank=True, null=True)),
+                ('apartment', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='hitas.apartment')),
+                ('person', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='hitas.person')),
+            ],
+            options={
+                'verbose_name': 'Owner',
+                'verbose_name_plural': 'Owners',
+                'ordering': ['id'],
+            },
+        ),
         migrations.AddField(
             model_name='housingcompany',
             name='postal_code',
