@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 from hitas.models.utils import hitas_city, hitas_cost_area, validate_business_id
 
 
@@ -47,11 +47,11 @@ class HousingCompany(ExternalHitasModel):
     developer = models.ForeignKey("Developer", on_delete=models.PROTECT)
 
     # 'hankinta-arvo'
-    acquisition_price = models.DecimalField(max_digits=15, decimal_places=2)
+    acquisition_price = HitasModelDecimalField()
     # 'toteutunut hankinta-arvo'
-    realized_acquisition_price = models.DecimalField(null=True, blank=True, max_digits=15, decimal_places=2)
+    realized_acquisition_price = HitasModelDecimalField(null=True, blank=True)
     # 'ensisijaislaina'
-    primary_loan = models.DecimalField(max_digits=15, decimal_places=2)
+    primary_loan = HitasModelDecimalField()
     # 'Myyntihintaluettelon vahvistamispäivä'
     sales_price_catalogue_confirmation_date = models.DateField(null=True, blank=True)
     # 'ilmoituspäivä'

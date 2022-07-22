@@ -21,6 +21,31 @@
     }
   },
   {
+    "model": "hitas.apartment",
+    "pk": 1,
+    "fields": {
+      "uuid": "a0ed3e6b-b844-4fd5-9db9-2c3c53b193d8",
+      "building": 1,
+      "state": "reserved",
+      "apartment_type": 2,
+      "surface_area": "60.00",
+      "share_number_start": 1,
+      "share_number_end": 49,
+      "street_address": "Matinkatu 22",
+      "postal_code": 2,
+      "apartment_number": 1,
+      "floor": 1,
+      "stair": "A",
+      "debt_free_purchase_price": "11000.00",
+      "purchase_price": "22000.00",
+      "acquisition_price": "33000.00",
+      "primary_loan_amount": "44000.00",
+      "loans_during_construction": "55000.00",
+      "interest_during_construction": "66000.00",
+      "notes": ""
+    }
+  },
+  {
     "model": "hitas.building",
     "pk": 1,
     "fields": {
