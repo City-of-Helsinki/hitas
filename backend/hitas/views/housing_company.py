@@ -79,11 +79,15 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return {"name": obj.postal_code.description, "cost_area": obj.area}
 
     def get_date(self, obj: HousingCompany) -> Optional[str]:
-        """
-        SerializerMethodField is used instead of DateField due to
-        date being an annotated value because of that it's left out in e.g. create action responses
-        """
-        return getattr(obj, "date", None)
+        """SerializerMethodField is used instead of DateField due to date being an annotated value"""
+        date = getattr(obj, "date", None)
+        if date is None:
+            date = (
+                HousingCompany.objects.annotate(date=Min("real_estates__buildings__completion_date"))
+                .get(pk=obj.pk)
+                .date
+            )
+        return date
 
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
