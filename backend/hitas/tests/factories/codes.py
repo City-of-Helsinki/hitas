@@ -31,7 +31,7 @@ class PostalCodeFactory(AbstractCodeFactory):
         django_get_or_create = ("value",)
 
     # # Helsinki area postal code e.g. 00100
-    value = factory.Sequence(lambda n: fake.bothify(fake.random_element([f"0{n%100:02}#0"])))
+    value = factory.Sequence(lambda n: fake.bothify(f"0{n%100:02}#0"))
     description = fake.city()
 
 
