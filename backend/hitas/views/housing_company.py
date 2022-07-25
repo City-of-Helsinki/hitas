@@ -14,12 +14,12 @@ from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
     AddressSerializer,
     HitasDecimalField,
+    HitasEnumField,
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
     ValueOrNullField,
 )
-from hitas.views.utils.fields import HitasEnumField
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
