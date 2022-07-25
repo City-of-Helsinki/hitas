@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from enumfields import Enum
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -46,3 +47,19 @@ class PostalCodeField(SlugRelatedField):
             return super().to_internal_value(data=data)
         except ValueError:
             raise HitasModelNotFound(model=PostalCode)
+
+
+class HitasEnumField(serializers.ChoiceField):
+    def __init__(self, enum=None, **kwargs):
+        assert enum is not None, "Enum class not given given."
+        self.enum_class = enum
+        super().__init__(choices=self.enum_class.choices(), **kwargs)
+
+    def to_representation(self, enum: Enum):
+        return enum.value
+
+    def to_internal_value(self, data: str):
+        try:
+            return self.enum_class(data)
+        except ValueError:
+            raise serializers.ValidationError(f"Unsupported {self.enum_class.__name__} '{data}'.")

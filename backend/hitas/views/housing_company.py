@@ -19,6 +19,7 @@ from hitas.views.utils import (
     HitasModelViewSet,
     ValueOrNullField,
 )
+from hitas.views.utils.fields import HitasEnumField
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
@@ -45,23 +46,9 @@ class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
     realized = HitasDecimalField(source="realized_acquisition_price", required=False, allow_null=True)
 
 
-class HousingCompanyStateField(serializers.ChoiceField):
-    def __init__(self, **kwargs):
-        super().__init__(choices=HousingCompanyState.choices(), **kwargs)
-
-    def to_representation(self, enum: HousingCompanyState):
-        return enum.value
-
-    def to_internal_value(self, data: str):
-        try:
-            return HousingCompanyState(data)
-        except ValueError:
-            raise serializers.ValidationError(f"Unsupported Housing Company state '{data}'.")
-
-
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
-    state = HousingCompanyStateField()
+    state = HitasEnumField(enum=HousingCompanyState)
     address = AddressSerializer(source="*")
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
