@@ -11,7 +11,7 @@ class Building(ExternalHitasModel):
     completion_date = models.DateField(null=True)
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT)
+    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="buildings")
 
     # 'rakennustunnus'
     building_identifier = models.CharField(

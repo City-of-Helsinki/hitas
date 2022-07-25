@@ -39,12 +39,12 @@ class HousingCompany(ExternalHitasModel):
     business_id = models.CharField(max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"))
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT)
+    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="housing_companies")
 
-    building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT)
-    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT)
-    property_manager = models.ForeignKey("PropertyManager", on_delete=models.PROTECT)
-    developer = models.ForeignKey("Developer", on_delete=models.PROTECT)
+    building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
+    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
+    property_manager = models.ForeignKey("PropertyManager", on_delete=models.PROTECT, related_name="housing_companies")
+    developer = models.ForeignKey("Developer", on_delete=models.PROTECT, related_name="housing_companies")
 
     # 'hankinta-arvo'
     acquisition_price = HitasModelDecimalField()
@@ -60,7 +60,9 @@ class HousingCompany(ExternalHitasModel):
     legacy_id = models.CharField(max_length=10, null=True, blank=True)
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)
-    last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, related_name="housing_companies"
+    )
 
     @property
     def city(self):

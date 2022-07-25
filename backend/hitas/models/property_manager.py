@@ -11,7 +11,7 @@ class PropertyManager(ExternalHitasModel):
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT)
+    postal_code = models.ForeignKey(PostalCode, on_delete=models.PROTECT, related_name="property_managers")
 
     @property
     def city(self):

@@ -12,7 +12,7 @@ class Person(ExternalHitasModel):
 
     email = models.EmailField(blank=True, null=True)
     street_address = models.CharField(max_length=128)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT)
+    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="persons")
 
     class Meta:
         verbose_name = _("Person")

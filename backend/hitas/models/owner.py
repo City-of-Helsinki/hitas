@@ -8,8 +8,8 @@ from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 
 
 class Owner(ExternalHitasModel):
-    apartment = models.ForeignKey("Apartment", on_delete=models.PROTECT)
-    person = models.ForeignKey("Person", on_delete=models.PROTECT)
+    apartment = models.ForeignKey("Apartment", on_delete=models.PROTECT, related_name="owners")
+    person = models.ForeignKey("Person", on_delete=models.PROTECT, related_name="owners")
 
     ownership_percentage = HitasModelDecimalField(
         validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))]
