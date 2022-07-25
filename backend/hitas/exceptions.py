@@ -179,7 +179,7 @@ def _convert_field_errors(field_name: str, errors: List[Dict[str, Any]]):
     for error in errors:
         if error["code"] in ["required", "null", "blank"]:
             retval.append({"field": field_name, "message": "This field is mandatory and cannot be blank."})
-        elif error["code"] in ["invalid", "invalid_choice"]:
+        elif error["code"] in ["invalid", "invalid_choice", "min_value"]:
             retval.append({"field": field_name, "message": error["message"]})
         else:
             raise Exception(f"Unhandled error code '{error['code']}'.")
