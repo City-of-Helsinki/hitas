@@ -11,10 +11,30 @@ from hitas.views.owner import OwnerSerializer
 from hitas.views.utils import (
     AddressSerializer,
     HitasDecimalField,
+    HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
+    HitasUUIDFilter,
 )
 from hitas.views.utils.fields import HitasEnumField, UUIDRelatedField
+
+
+class ApartmentFilterSet(HitasFilterSet):
+    housing_company = HitasUUIDFilter(field_name="building__real_estate__housing_company__uuid")
+    housing_company_name = filters.CharFilter(
+        field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
+    )
+    property_identifier = filters.CharFilter(
+        field_name="building__real_estate__property_identifier", lookup_expr="icontains"
+    )
+    postal_code = filters.CharFilter(field_name="postal_code__value")
+    state = filters.ChoiceFilter(choices=ApartmentState.choices())
+    apartment_type = filters.CharFilter(field_name="apartment_type__value")
+    building = HitasUUIDFilter(field_name="building__uuid")
+
+    class Meta:
+        model = Apartment
+        fields = "__all__"
 
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
@@ -97,3 +117,6 @@ class ApartmentViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         return Apartment.objects.select_related("postal_code")
+
+    def get_filterset_class(self):
+        return ApartmentFilterSet
