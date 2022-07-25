@@ -1,9 +1,9 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
+from hitas.models.utils import validate_share_numbers
 
 
 class ApartmentState(Enum):
@@ -60,19 +60,7 @@ class Apartment(ExternalHitasModel):
         return f"{self.share_number_start} - {self.share_number_end}"
 
     def validate_share_numbers(self) -> None:
-        # TODO Validate overlap in share numbers across other HousingCompany shares
-        if self.share_number_start is None and self.share_number_end is None:
-            return
-        if self.share_number_start is None or self.share_number_end is None:
-            raise ValidationError(
-                _("You must enter both: %(start)s and %(end)s or neither."),
-                params={"start": "share_number_start", "end": "share_number_end"},
-            )
-        if self.share_number_start > self.share_number_end:
-            raise ValidationError(
-                _("%(start)s must not be greater than %(end)s"),
-                params={"start": "share_number_start", "end": "share_number_end"},
-            )
+        validate_share_numbers(start=self.share_number_start, end=self.share_number_end)
 
     class Meta:
         verbose_name = _("Apartment")
