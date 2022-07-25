@@ -11,12 +11,13 @@ from hitas.views.owner import OwnerSerializer
 from hitas.views.utils import (
     AddressSerializer,
     HitasDecimalField,
+    HitasEnumField,
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
     HitasUUIDFilter,
+    UUIDRelatedField,
 )
-from hitas.views.utils.fields import HitasEnumField, UUIDRelatedField
 
 
 class ApartmentFilterSet(HitasFilterSet):
