@@ -14,7 +14,6 @@ class PersonSerializer(HitasModelSerializer):
             "social_security_number",
             "email",
             "address",
-            "postal_code",
         ]
 
 
