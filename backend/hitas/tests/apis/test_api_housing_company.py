@@ -9,7 +9,17 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Building, HousingCompany, HousingCompanyState, PostalCode, RealEstate
+from hitas.models import (
+    Building,
+    BuildingType,
+    Developer,
+    FinancingMethod,
+    HousingCompany,
+    HousingCompanyState,
+    PostalCode,
+    PropertyManager,
+    RealEstate,
+)
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     BuildingFactory,
@@ -301,11 +311,11 @@ def test__api__housing_company__read__fail(api_client: HitasAPIClient, invalid_i
 
 
 def get_housing_company_create_data() -> dict[str, Any]:
-    developer = DeveloperFactory.create()
-    financing_method = FinancingMethodFactory.create()
-    building_type = BuildingTypeFactory.create()
-    postal_code = PostalCodeFactory.create()
-    property_manager = PropertyManagerFactory.create(postal_code=postal_code)
+    developer: Developer = DeveloperFactory.create()
+    financing_method: FinancingMethod = FinancingMethodFactory.create()
+    building_type: BuildingType = BuildingTypeFactory.create()
+    postal_code: PostalCode = PostalCodeFactory.create()
+    property_manager: PropertyManager = PropertyManagerFactory.create(postal_code=postal_code)
 
     data = {
         "acquisition_price": {"initial": 10.00, "realized": 10.00},
@@ -400,9 +410,9 @@ def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPI
 def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     BuildingFactory.create(real_estate__housing_company=hc)
-    postal_code = PostalCodeFactory.create(value="99999")
-    financing_method = FinancingMethodFactory.create()
-    property_manager = PropertyManagerFactory.create()
+    postal_code: PostalCode = PostalCodeFactory.create(value="99999")
+    financing_method: FinancingMethod = FinancingMethodFactory.create()
+    property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {
         "acquisition_price": {"initial": 10.01, "realized": None},
