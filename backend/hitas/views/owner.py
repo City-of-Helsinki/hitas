@@ -1,12 +1,21 @@
+from rest_framework import serializers
+
 from hitas.models import Owner
+from hitas.views.person import PersonSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
 class OwnerSerializer(HitasModelSerializer):
+    apartment_id = serializers.SerializerMethodField()
+    person = PersonSerializer()
+
+    def get_apartment_id(self, instance: Owner) -> str:
+        return instance.apartment.uuid.hex
+
     class Meta:
         model = Owner
         fields = [
-            "apartment",
+            "apartment_id",
             "person",
             "ownership_percentage",
             "ownership_start_date",
