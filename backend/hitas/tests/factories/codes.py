@@ -20,7 +20,7 @@ class AbstractCodeFactory(DjangoModelFactory):
     description = fake.sentence()
     in_use = True
     order = None
-    legacy_code_number = factory.Sequence(lambda n: f"{n:03}")
+    legacy_code_number = factory.Sequence(lambda n: f"{n%1000:03}")
     legacy_start_date = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=pytz.timezone("Europe/Helsinki")))
     legacy_end_date = None
 
