@@ -32,6 +32,11 @@ class ApartmentFilterSet(HitasFilterSet):
     state = filters.ChoiceFilter(choices=ApartmentState.choices())
     apartment_type = filters.CharFilter(field_name="apartment_type__value")
     building = HitasUUIDFilter(field_name="building__uuid")
+    owner_first_name = filters.CharFilter(field_name="owners__person__first_name", lookup_expr="icontains")
+    owner_last_name = filters.CharFilter(field_name="owners__person__last_name", lookup_expr="icontains")
+    owner_social_security_number = filters.CharFilter(
+        field_name="owners__person__social_security_number", lookup_expr="icontains"
+    )
 
     class Meta:
         model = Apartment
