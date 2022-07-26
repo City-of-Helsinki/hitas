@@ -214,7 +214,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
         {"name": "stNa"},
         {"email": "test@hitas.com"},
         {"email": "hitas.com"},
-        {"street_address": "test_street"},
+        {"street_address": "test-street"},
         {"postal_code": "99999"},
     ],
 )
@@ -222,7 +222,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
 def test__api__property_manager__filter(api_client: HitasAPIClient, selected_filter):
     PropertyManagerFactory.create(name="TestName")
     PropertyManagerFactory.create(email="test@hitas.com")
-    PropertyManagerFactory.create(street_address="test_street")
+    PropertyManagerFactory.create(street_address="test-street")
     PropertyManagerFactory.create(postal_code__value="99999")
 
     url = reverse("hitas:property-manager-list") + "?" + urlencode(selected_filter)

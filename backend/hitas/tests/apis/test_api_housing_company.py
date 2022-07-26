@@ -342,7 +342,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
 
 @pytest.mark.parametrize("minimal_data", [False, True])
 @pytest.mark.django_db
-def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data):
+def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data: bool):
     data = get_housing_company_create_data()
     if minimal_data:
         data.update(
@@ -491,7 +491,7 @@ def test__api__housing_company__delete__invalid(api_client: HitasAPIClient):
         {"display_name": "Test", "official_name": "Test"},
         {"state": HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION.value},
         {"business_id": "1234567-8"},
-        {"street_address": "test_street"},
+        {"street_address": "test-street"},
         {"property_manager": "TestPropertyManager"},
         {"building_type": "TestBuildingType"},
         {"financing_method": "TestFinancingMethod"},
@@ -507,7 +507,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
     HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
     HousingCompanyFactory.create(business_id="1234567-8")
-    HousingCompanyFactory.create(street_address="test_street")
+    HousingCompanyFactory.create(street_address="test-street")
     HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
     HousingCompanyFactory.create(building_type__value="TestBuildingType")
     HousingCompanyFactory.create(financing_method__value="TestFinancingMethod")

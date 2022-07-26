@@ -292,7 +292,7 @@ def test__api__building__delete(api_client: HitasAPIClient):
         {"building_identifier": "100012345"},
         {"building_identifier": "1000"},
         {"building_identifier": "12345"},
-        {"street_address": "test_street"},
+        {"street_address": "test-street"},
         {"completion_date": "1800-01-01"},
         # FIXME {"completion_date__year": "1800"},
         # FIXME {"completion_date__lte": "1801-01-01"},
@@ -305,7 +305,7 @@ def test__api__building__filter(api_client: HitasAPIClient, selected_filter):
     bu: Building = BuildingFactory.create(completion_date=date(1800, 1, 1))
     BuildingFactory.create(completion_date=date(1900, 1, 1), real_estate=bu.real_estate)
     BuildingFactory.create(building_identifier="100012345A", real_estate=bu.real_estate)
-    BuildingFactory.create(street_address="test_street", real_estate=bu.real_estate)
+    BuildingFactory.create(street_address="test-street", real_estate=bu.real_estate)
     BuildingFactory.create(postal_code__value="99999", real_estate=bu.real_estate)
 
     url = (
