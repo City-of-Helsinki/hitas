@@ -205,7 +205,7 @@ def get_apartment_create_data() -> dict[str, Any]:
 
 @pytest.mark.parametrize("minimal_data", [False, True])
 @pytest.mark.django_db
-def test__api__apartment__create(api_client: HitasAPIClient, minimal_data):
+def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool):
     data = get_apartment_create_data()
     if minimal_data:
         data.update(
@@ -369,7 +369,7 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
         {"property_identifier": "1-1234-321-56"},
         {"state": ApartmentState.SOLD.value},
         {"apartment_type": "1h+sauna+takkahuone+uima-allas"},
-        {"street_address": "test_street"},
+        {"street_address": "test-street"},
         {"apartment_number": 69},
         {"floor": 22},
         {"stair": "Ö"},
@@ -391,7 +391,7 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     )
     ApartmentFactory.create(state=ApartmentState.FREE, building__real_estate__property_identifier="1-1234-321-56")
     ApartmentFactory.create(state=ApartmentState.FREE, apartment_type__value="1h+sauna+takkahuone+uima-allas")
-    ApartmentFactory.create(state=ApartmentState.FREE, street_address="test_street")
+    ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
     ApartmentFactory.create(state=ApartmentState.FREE, apartment_number=69)
     ApartmentFactory.create(state=ApartmentState.FREE, floor=22)
     ApartmentFactory.create(state=ApartmentState.FREE, stair="Ö")
