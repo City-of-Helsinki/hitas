@@ -374,6 +374,9 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
         {"floor": 22},
         {"stair": "Ö"},
         {"building": "4a5c66cdcd554784a9047bd45c2362ba"},
+        {"owner_first_name": "Megatron"},
+        {"owner_last_name": "Opetimus Prime"},
+        {"owner_social_security_number": "010199-123A"},
     ],
 )
 @pytest.mark.django_db
@@ -393,6 +396,9 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     ApartmentFactory.create(state=ApartmentState.FREE, floor=22)
     ApartmentFactory.create(state=ApartmentState.FREE, stair="Ö")
     ApartmentFactory.create(state=ApartmentState.FREE, building__uuid=UUID("4a5c66cd-cd55-4784-a904-7bd45c2362ba"))
+    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__first_name="Megatron")
+    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__last_name="Opetimus Prime")
+    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__social_security_number="010199-123A")
 
     url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)
