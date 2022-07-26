@@ -8,7 +8,6 @@ from hitas.views.codes import (
     PostalCodeViewSet,
 )
 from hitas.views.housing_company import HousingCompanyViewSet
-from hitas.views.owner import OwnerViewSet
 from hitas.views.person import PersonViewSet
 from hitas.views.property_manager import PropertyManagerViewSet
 from hitas.views.real_estate import RealEstateViewSet

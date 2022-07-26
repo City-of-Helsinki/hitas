@@ -23,4 +23,3 @@ class OwnerAdmin(admin.ModelAdmin):
         "ownership_start_date",
         "ownership_end_date",
     ]
-    readonly_fields = ("uuid",)

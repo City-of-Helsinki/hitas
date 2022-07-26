@@ -2341,7 +2341,6 @@
     "model": "hitas.owner",
     "pk": 1,
     "fields": {
-      "uuid": "93898f7f-30bd-4be9-9838-b0ee7543af04",
       "apartment": 1,
       "person": 1,
       "ownership_percentage": "100.00",
