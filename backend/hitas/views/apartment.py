@@ -60,7 +60,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     building = UUIDRelatedField(queryset=Building.objects.all())
     real_estate = serializers.SerializerMethodField()
     housing_company = HousingCompanyListSerializer(source="building.real_estate.housing_company", read_only=True)
-    owners = OwnerSerializer(many=True, read_only=True)
+    owners = OwnerSerializer(many=True, read_only=False)
 
     def get_real_estate(self, instance: Apartment) -> str:
         return instance.building.real_estate.uuid.hex
