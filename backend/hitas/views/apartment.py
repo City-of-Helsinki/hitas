@@ -1,8 +1,13 @@
+from collections import OrderedDict
+from typing import Any, Union
+
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Apartment, Building
+from hitas.models import Apartment, Building, Owner
 from hitas.models.apartment import ApartmentState
 from hitas.models.utils import validate_share_numbers
 from hitas.views.codes import ApartmentTypeSerializer
@@ -65,9 +70,66 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def get_real_estate(self, instance: Apartment) -> str:
         return instance.building.real_estate.uuid.hex
 
-    def validate(self, data):
-        validate_share_numbers(start=data["share_number_start"], end=data["share_number_end"])
+    def validate_owners(self, owners: OrderedDict):
+        if owners == []:
+            return owners
+
+        for owner in owners:
+            op = owner["ownership_percentage"]
+            if not 0 < op <= 100:
+                raise ValidationError(
+                    {
+                        "ownership_percentage": _(
+                            "Ownership percentage greater than 0 and less than or equal to 100. (Given value was {})"
+                        ).format(op)
+                    },
+                )
+
+        if (sum_op := sum(o["ownership_percentage"] for o in owners)) != 100:
+            raise ValidationError(
+                {
+                    "ownership_percentage": _(
+                        "Ownership percentage of all owners combined must be equal to 100. (Given sum was {})"
+                    ).format(sum_op)
+                }
+            )
+
+        return owners
+
+    def validate(self, data: Union[OrderedDict, Apartment]):
+        if type(data) == OrderedDict:
+            validate_share_numbers(start=data["share_number_start"], end=data["share_number_end"])
+        else:
+            validate_share_numbers(start=data.share_number_start, end=data.share_number_end)
         return data
+
+    def create(self, validated_data: dict[str, Any]):
+        owners = validated_data.pop("owners")
+        instance: Apartment = super().create(validated_data)
+        for owner_data in owners:
+            Owner.objects.create(apartment=instance, **owner_data)
+        return instance
+
+    def update(self, instance: Apartment, validated_data: dict[str, Any]):
+        owners = validated_data.pop("owners")
+        instance: Apartment = super().update(instance, validated_data)
+
+        if not owners:
+            instance.owners.all().delete()
+
+        owner_objs = []
+        for owner_data in owners:
+            person = owner_data.pop("person")
+            owner_obj, _ = Owner.objects.update_or_create(apartment=instance, person=person, defaults={**owner_data})
+            owner_objs.append(owner_obj)
+
+        # Using `instance.owners.set(owner_objs)` does not work here
+        # due to the `Owner.apartment` field isn't nullable, so the set method fails silently
+        for owner in instance.owners.all():
+            if owner not in owner_objs:
+                owner.delete()
+
+        return instance
 
     class Meta:
         model = Apartment
