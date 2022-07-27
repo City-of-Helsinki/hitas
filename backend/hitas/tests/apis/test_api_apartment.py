@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Owner, PostalCode
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Owner, Person, PostalCode
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -17,8 +17,10 @@ from hitas.tests.factories import (
     ApartmentTypeFactory,
     BuildingFactory,
     OwnerFactory,
+    PersonFactory,
     PostalCodeFactory,
 )
+from hitas.views.apartment import ApartmentDetailSerializer
 
 # List tests
 
@@ -63,7 +65,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "date": str(ap1.building.completion_date),
             "owners": [
                 {
-                    "apartment_id": ap1.uuid.hex,
                     "person": {
                         "id": o1.person.uuid.hex,
                         "first_name": o1.person.first_name,
@@ -77,7 +78,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "ownership_end_date": None,
                 },
                 {
-                    "apartment_id": ap1.uuid.hex,
                     "person": {
                         "id": o2.person.uuid.hex,
                         "first_name": o2.person.first_name,
@@ -123,6 +123,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     hc: HousingCompany = ap.building.real_estate.housing_company
+    owner: Owner = OwnerFactory.create(apartment=ap)
 
     response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -159,7 +160,21 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "area": {"name": hc.postal_code.description, "cost_area": hc.area},
             "date": str(ap.building.completion_date),
         },
-        "owners": [],
+        "owners": [
+            {
+                "person": {
+                    "id": owner.person.uuid.hex,
+                    "first_name": owner.person.first_name,
+                    "last_name": owner.person.last_name,
+                    "social_security_number": owner.person.social_security_number,
+                    "email": owner.person.email,
+                    "address": {"street": owner.person.street_address, "postal_code": owner.person.postal_code.value},
+                },
+                "ownership_percentage": float(owner.ownership_percentage),
+                "ownership_start_date": str(owner.ownership_start_date),
+                "ownership_end_date": None,
+            },
+        ],
         "notes": ap.notes,
     }
 
@@ -180,6 +195,8 @@ def test__api__apartment__read__fail(api_client: HitasAPIClient, invalid_id):
 def get_apartment_create_data() -> dict[str, Any]:
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
     building: Building = BuildingFactory.create()
+    person1: Person = PersonFactory.create()
+    person2: Person = PersonFactory.create()
 
     data = {
         "state": ApartmentState.SOLD.value,
@@ -199,6 +216,20 @@ def get_apartment_create_data() -> dict[str, Any]:
         "interest_during_construction": 12345,
         "building": building.uuid.hex,
         "notes": "Lorem ipsum",
+        "owners": [
+            {
+                "person": {"id": person1.uuid.hex},
+                "ownership_percentage": 50,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+            {
+                "person": {"id": person2.uuid.hex},
+                "ownership_percentage": 50,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+        ],
     }
     return data
 
@@ -219,6 +250,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 "loans_during_construction": None,
                 "interest_during_construction": None,
                 "notes": "",
+                "owners": [],
             }
         )
 
@@ -227,6 +259,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 
     ap = Apartment.objects.first()
     assert response.json()["id"] == ap.uuid.hex
+    assert len(response.json()["owners"]) == 0 if minimal_data else 2
 
     get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.json() == get_response.json()
@@ -262,15 +295,98 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         {"interest_during_construction": -1},
         {"building": None},
         {"notes": None},  # None is not allowed, but blank is fine
+        {"owners": None},
+        {
+            "owners": [
+                {
+                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                    "ownership_percentage": 100,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+                {
+                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                    "ownership_percentage": 50,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+            ]
+        },
+        {
+            "owners": [
+                {
+                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                    "ownership_percentage": 10,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+                {
+                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                    "ownership_percentage": 10,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+            ]
+        },
+        {
+            "owners": [
+                {
+                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                    "ownership_percentage": 100,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+                {
+                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                    "ownership_percentage": 0,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+            ]
+        },
+        {
+            "owners": [
+                {
+                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                    "ownership_percentage": 200,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+                {
+                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                    "ownership_percentage": -100,
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+            ]
+        },
+        {
+            "owners": [
+                {
+                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                    "ownership_percentage": "foo",
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+                {
+                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                    "ownership_percentage": "baz",
+                    "ownership_start_date": "2020-01-01",
+                    "ownership_end_date": None,
+                },
+            ]
+        },
     ],
 )
 @pytest.mark.django_db
 def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data):
+    PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    PersonFactory.create(uuid=UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
+
     data = get_apartment_create_data()
     data.update(invalid_data)
 
     response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
-    print(response.json())
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 
@@ -278,11 +394,12 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
 
 
 @pytest.mark.django_db
-def test__api__apartment__update(api_client: HitasAPIClient):
+def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
     building: Building = BuildingFactory.create()
     postal_code: PostalCode = PostalCodeFactory.create(value="99999")
+    OwnerFactory.create(apartment=ap)
 
     data = {
         "state": ApartmentState.SOLD.value,
@@ -302,11 +419,11 @@ def test__api__apartment__update(api_client: HitasAPIClient):
         "interest_during_construction": 22222,
         "building": building.uuid.hex,
         "notes": "Test Notes",
+        "owners": [],
     }
 
     response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
     assert response.status_code == status.HTTP_200_OK, response.json()
-    print(response.json())
 
     ap.refresh_from_db()
     assert ap.state.value == data["state"]
@@ -327,6 +444,75 @@ def test__api__apartment__update(api_client: HitasAPIClient):
     assert ap.interest_during_construction == data["interest_during_construction"]
     assert ap.building == building
     assert ap.notes == data["notes"]
+    assert ap.owners.all().count() == 0
+
+    get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
+    assert response.json() == get_response.json()
+
+
+@pytest.mark.parametrize(
+    "owner_data",
+    [
+        [
+            {
+                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "ownership_percentage": 100,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            }
+        ],
+        [
+            {
+                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "ownership_percentage": 50,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+            {
+                "person": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
+                "ownership_percentage": 50,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+        ],
+        [
+            {
+                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "ownership_percentage": 33.33,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+            {
+                "person": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
+                "ownership_percentage": 33.33,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+            {
+                "person": {"id": "2b44c90e8e0448a3b75399e66a220a1d"},
+                "ownership_percentage": 33.34,
+                "ownership_start_date": "2020-01-01",
+                "ownership_end_date": None,
+            },
+        ],
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner_data: list):
+    ap: Apartment = ApartmentFactory.create()
+    OwnerFactory.create(apartment=ap)
+    PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    PersonFactory.create(uuid=UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
+    PersonFactory.create(uuid=UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
+
+    data = ApartmentDetailSerializer(ap).data
+    data["owners"] = owner_data
+
+    response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    ap.refresh_from_db()
+    assert ap.owners.all().count() == len(owner_data)
 
     get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.json() == get_response.json()

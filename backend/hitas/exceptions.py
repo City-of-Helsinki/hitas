@@ -177,10 +177,21 @@ def _convert_field_errors(field_name: str, errors: List[Dict[str, Any]]):
     retval = []
 
     for error in errors:
+        # Skip empty values, which may happen in certain cases when using nested serializers
+        if not error:
+            continue
+
+        formatted_field_name = field_name
+        # Handle nested serializer field errors where error message be in a nested dict
+        if "code" not in error:
+            nested_field_name = next(iter(error))
+            formatted_field_name = f"{field_name}.{nested_field_name}"
+            error = error[nested_field_name][0]
+
         if error["code"] in ["required", "null", "blank"]:
-            retval.append({"field": field_name, "message": "This field is mandatory and cannot be blank."})
-        elif error["code"] in ["invalid", "invalid_choice", "min_value"]:
-            retval.append({"field": field_name, "message": error["message"]})
+            retval.append({"field": formatted_field_name, "message": "This field is mandatory and cannot be blank."})
+        elif error["code"] in ["invalid", "invalid_choice", "min_value", "max_value"]:
+            retval.append({"field": formatted_field_name, "message": error["message"]})
         else:
             raise Exception(f"Unhandled error code '{error['code']}'.")
 
