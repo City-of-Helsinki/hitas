@@ -572,6 +572,315 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+
+  /api/v1/apartments:
+    get:
+      description: Fetch apartments
+      operationId: list-apartments
+      tags:
+        - Apartments
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of apartments
+          content:
+            application/json:
+              schema:
+                description: Single page of apartments
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of apartments
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Apartment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new apartment
+      operationId: create-apartment
+      tags:
+        - Apartments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Apartment'
+      responses:
+        '201':
+          description: Successfully added a new apartment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/apartments/{apartment_id}:
+    get:
+      description: Fetch a single apartment by id
+      operationId: read-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a apartment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a apartment
+      operationId: update-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApartmentDetails'
+      responses:
+        '200':
+          description: Successfully updated a apartment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a apartment
+      operationId: delete-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Apartment successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/persons:
+    get:
+      description: Fetch persons
+      operationId: list-persons
+      tags:
+        - Persons
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of persons
+          content:
+            application/json:
+              schema:
+                description: Single page of persons
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of persons
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Person'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new person
+      operationId: create-person
+      tags:
+        - Persons
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '201':
+          description: Successfully added a new person
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/persons/{person_id}:
+    get:
+      description: Fetch a single person by id
+      operationId: read-person
+      tags:
+        - Persons
+      parameters:
+        - name: person_id
+          required: true
+          in: path
+          description: Person ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read a person details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update a person
+      operationId: update-person
+      tags:
+        - Persons
+      parameters:
+        - name: person_id
+          required: true
+          in: path
+          description: Person ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '200':
+          description: Successfully updated a person
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a person
+      operationId: delete-person
+      tags:
+        - Persons
+      parameters:
+        - name: person_id
+          required: true
+          in: path
+          description: Person ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '204':
+          description: Person successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/property-managers:
     get:
       description: Fetch property managers
@@ -725,6 +1034,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+
+  # Codes
 
   /api/v1/developers:
     get:
@@ -1341,12 +1652,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+
   /api/v1/apartment-types:
     get:
       description: Fetch apartment types
       operationId: list-apartment-types
       tags:
-        - Building types
+        - Apartment types
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
@@ -1382,7 +1694,7 @@ paths:
       description: Add a new apartment type
       operationId: create-apartment-type
       tags:
-        - Building types
+        - Apartment types
       requestBody:
         required: true
         content:
@@ -1412,7 +1724,7 @@ paths:
       description: Fetch a single apartment type by id
       operationId: read-apartment-type
       tags:
-        - Building types
+        - Apartment types
       parameters:
         - name: apartment_type_id
           required: true
@@ -1438,7 +1750,7 @@ paths:
       description: Update a apartment type
       operationId: update-apartment-type
       tags:
-        - Building types
+        - Apartment types
       parameters:
         - name: apartment_type_id
           required: true
@@ -1475,7 +1787,7 @@ paths:
       description: Remove a apartment type
       operationId: delete-apartment-type
       tags:
-        - Building types
+        - Apartment types
       parameters:
         - name: apartment_type_id
           required: true
@@ -1845,6 +2157,203 @@ components:
           nullable: true
           example: 100012345A
 
+    Apartment:
+      description: Single apartment
+      type: object
+      required:
+        - id
+        - state
+        - apartment_type
+        - surface_area
+        - address
+        - apartment_number
+        - date
+        - housing_company
+        - owners
+      properties:
+        id:
+          description: Apartment ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        state:
+          $ref: '#/components/schemas/ApartmentState'
+        apartment_type:
+          type: string
+          readOnly: true
+        surface_area:
+          description: Surface area of the apartment measured in square meters
+          type: number
+        address:
+          $ref: '#/components/schemas/Address'
+        apartment_number:
+          type: number
+        date:
+          description: Date that the apartment's building was completed on
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        housing_company:
+          description: Name of the housing company this apartment belongs in
+          type: string
+          readOnly: true
+        owners:
+          description: List of apartment's owners
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Owner'
+
+    ApartmentDetails:
+      description: Single apartment details
+      type: object
+      required:
+        - id
+        - state
+        - apartment_type
+        - surface_area
+        - address
+        - apartment_number
+        - date
+        - housing_company
+        - owners
+      properties:
+        id:
+          description: Apartment ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        state:
+          $ref: '#/components/schemas/ApartmentState'
+        apartment_type:
+          allOf:
+            - $ref: '#/components/schemas/Code'
+            - $ref: '#/components/schemas/ReadOnlyCode'
+        surface_area:
+          description: Surface area of the apartment measured in square meters
+          type: number
+        share_number_start:
+          type: integer
+          nullable: true
+        share_number_end:
+          type: integer
+          nullable: true
+        address:
+          $ref: '#/components/schemas/Address'
+        apartment_number:
+          type: number
+        floor:
+          type: integer
+        stair:
+          type: string
+        date:
+          description: Date that the apartment's building was completed on
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        debt_free_purchase_price:
+          type: number
+          nullable: true
+        purchase_price:
+          type: number
+          nullable: true
+        acquisition_price:
+          type: number
+          nullable: true
+        primary_loan_amount:
+          type: number
+          nullable: true
+        loans_during_construction:
+          type: number
+          nullable: true
+        interest_during_construction:
+          type: number
+          nullable: true
+        building:
+          description: ID of the building this apartment belongs to
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        real_estate:
+          description: ID of the real estate this apartment belongs to
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        housing_company:
+          $ref: '#/components/schemas/HousingCompany'
+        owners:
+          description: List of apartment's owners
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Owner'
+        notes:
+          type: string
+          nullable: true
+
+    Owner:
+      description: Owner information
+      type: object
+      required:
+        - person
+        - ownership_percentage
+        - ownership_start_date
+        - ownership_end_date
+      properties:
+        person:
+          $ref: '#/components/schemas/Person'
+        ownership_percentage:
+          description: Percentage that the person owns of the apartment
+          type: number
+        ownership_start_date:
+          description: Date owner took ownership of the apartment
+          type: string
+          format: date
+          nullable: true
+        ownership_end_date:
+          description: Date owner released ownership of the apartment
+          type: string
+          format: date
+          nullable: true
+
+    Person:
+      description: Owner information
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - social_security_number
+        - email
+        - address
+      properties:
+        id:
+          description: ID of this person
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
+        first_name:
+          description: First name(s) of this person
+          type: string
+          example: Martti
+        last_name:
+          description: Last name of this person
+          type: string
+          example: Virtanen
+        social_security_number:
+          description: Social security number of this person
+          type: string
+          example: 260969-420B
+          nullable: true
+        email:
+          description: Email for this person
+          type: string
+          example: martti.virtanen@example.com
+          nullable: true
+        address:
+          $ref: '#/components/schemas/Address'
+
     Address:
       description: Address information
       type: object
@@ -1932,7 +2441,7 @@ components:
           type: string
           example: Ismo Isännöitsijät Oy
         email:
-          description: Meail for this property manager
+          description: Email for this property manager
           type: string
           example: ismo@example.com
         address:
@@ -1944,20 +2453,37 @@ components:
 
         Can have the following values:
         - not_ready
-        - less_than_30_years
-        - greater_than_30_years_not_free
-        - greater_than_30_years_free
-        - greater_than_30_years_plot_department_notification
+        - lt_30_years
+        - gt_30_years_not_free
+        - gt_30_years_free
+        - gt_30_years_plot_department_notification
+        - half_hitas
         - ready_no_statistics
       type: string
-      example: greater_than_30_years_not_free
+      example: gt_30_years_not_free
       x-extensible-enum:
         - not_ready
-        - less_than_30_years
-        - greater_than_30_years_not_free
-        - greater_than_30_years_free
-        - greater_than_30_years_plot_department_notification
+        - lt_30_years
+        - gt_30_years_not_free
+        - gt_30_years_free
+        - gt_30_years_plot_department_notification
+        - half_hitas
         - ready_no_statistics
+
+    ApartmentState:
+      description: |-
+        Apartment state
+
+        Can have the following values:
+        - free
+        - reserved
+        - sold
+      type: string
+      example: sold
+      x-extensible-enum:
+        - free
+        - reserved
+        - sold
 
     # Errors
 
@@ -2205,4 +2731,3 @@ components:
             reason: Internal Server Error
             error: internal_server_error
             message: Unexpected internal server error occurred
-
