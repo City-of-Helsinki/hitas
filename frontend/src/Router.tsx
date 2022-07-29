@@ -17,7 +17,7 @@ export default function Router() {
                 path="/"
                 element={<App />}
             >
-                <Route path="companies">
+                <Route path="housing-companies">
                     <Route
                         index
                         element={<Companies />}
@@ -27,7 +27,7 @@ export default function Router() {
                         element={<Company />}
                     />
                 </Route>
-                <Route path="asunnot">
+                <Route path="apartments">
                     <Route
                         index
                         element={<Apartments />}
@@ -38,15 +38,15 @@ export default function Router() {
                     />
                 </Route>
                 <Route
-                    path="raportit"
+                    path="reports"
                     element={<Reports />}
                 />
                 <Route
-                    path="dokumentit"
+                    path="documents"
                     element={<Documents />}
                 />
                 <Route
-                    path="koodisto"
+                    path="codes"
                     element={<Codes />}
                 />
                 <Route

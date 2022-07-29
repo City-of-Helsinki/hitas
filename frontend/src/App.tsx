@@ -4,22 +4,11 @@ import { Outlet } from "react-router-dom";
 import "./styles/index.sass";
 
 function App() {
-    // Function for formatting the NavItem titles into label texts
-    const formatStr = (str: string): string => {
-        if (str === null) return "";
-        const strArray =
-            str && str === "companies" // make yhtiot (for url) into yhtiöt, for the label string
-                ? "yhtiöt".split("")
-                : str.split("");
-        // @ts-ignore
-        const firstLetter = strArray.shift().toUpperCase();
-        return firstLetter + strArray.join("");
-    };
     const NavItem = (item) => {
         return (
             <Navigation.Item
-                href={"/" + item.title}
-                label={formatStr(item.title)}
+                href={"/" + item.path}
+                label={item.label}
                 className={item.className}
             />
         );
@@ -33,11 +22,26 @@ function App() {
                 skipToContentLabel=""
             >
                 <Navigation.Row ariaLabel="Main navigation">
-                    <NavItem title="companies" />
-                    <NavItem title="asunnot" />
-                    <NavItem title="raportit" />
-                    <NavItem title="dokumentit" />
-                    <NavItem title="koodisto" />
+                    <NavItem
+                        label="Yhtiöt"
+                        path="companies"
+                    />
+                    <NavItem
+                        label="Asunnot"
+                        path="apartments"
+                    />
+                    <NavItem
+                        label="Raportit"
+                        path="reports"
+                    />
+                    <NavItem
+                        label="Dokumentit"
+                        path="documents"
+                    />
+                    <NavItem
+                        label="Koodisto"
+                        path="codes"
+                    />
                 </Navigation.Row>
             </Navigation>
 
