@@ -1,8 +1,10 @@
 import React from "react";
 
+import {Provider} from "react-redux";
 import {Navigate, Route, Routes} from "react-router-dom";
 
 import App from "./app/App";
+import {store} from "./app/store";
 import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
@@ -14,7 +16,11 @@ export default function Router() {
         <Routes>
             <Route
                 path="/"
-                element={<App />}
+                element={
+                    <Provider store={store}>
+                        <App />
+                    </Provider>
+                }
             >
                 <Route path="housing-companies">
                     <Route
