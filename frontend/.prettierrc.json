@@ -6,9 +6,17 @@
         }
     ],
     "trailingComma": "es5",
+    "printWidth": 120,
     "singleQuote": false,
-    "bracketSpacing": true,
+    "bracketSpacing": false,
     "parser": "typescript",
-    "singleAttributePerLine": true
+    "singleAttributePerLine": true,
+    "importOrder": [
+        "^react$",
+        "<THIRD_PARTY_MODULES>",
+        "^[./]"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
 }
 

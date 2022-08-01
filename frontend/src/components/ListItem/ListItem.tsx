@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 
-export type ListitemProps = {}
+export type ListitemProps = {};
 
 export default function Listitem({}: ListitemProps) {
-    return (<div className="ListItem"/>);
+    return <div className="ListItem" />;
 }

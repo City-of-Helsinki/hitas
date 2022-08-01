@@ -15,7 +15,10 @@
         "no-console": 1,       // Means warning
         "prettier/prettier": 2, // Means error
         "comma-dangle": 0,
-        "require-jsdoc":0
+        "require-jsdoc": 0,
+        "max-len": [0, 120, 2],
+        "object-curly-spacing": 0,
+        "@typescript-eslint/object-curly-spacing": ["error"]
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
