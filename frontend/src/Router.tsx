@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 
 import App from "./App";
 import Codes from "./pages/Codes";
@@ -50,7 +50,7 @@ export default function Router() {
                 />
                 <Route
                     index
-                    element={<HousingCompanyListPage />}
+                    element={<Navigate to="/housing-companies" />}
                 />
                 <Route
                     path="*"
