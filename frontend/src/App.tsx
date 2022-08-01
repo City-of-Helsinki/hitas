@@ -20,6 +20,7 @@ function App() {
                 menuToggleAriaLabel=""
                 skipTo=""
                 skipToContentLabel=""
+                titleUrl="/"
             >
                 <Navigation.Row ariaLabel="Main navigation">
                     <NavItem
