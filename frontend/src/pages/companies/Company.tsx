@@ -1,4 +1,4 @@
-import { StatusLabel, Tabs } from "hds-react";
+import {StatusLabel, Tabs} from "hds-react";
 
 const Company = () => {
     const theme = {
@@ -54,9 +54,7 @@ const Company = () => {
                                     />
                                 </div>
                                 <div className="column">
-                                    <label className="detail-label">
-                                        Huomioitavaa
-                                    </label>
+                                    <label className="detail-label">Huomioitavaa</label>
                                     <textarea></textarea>
                                 </div>
                             </div>
@@ -90,16 +88,12 @@ const Company = () => {
                             </div>
                         </Tabs.TabPanel>
                         <Tabs.TabPanel>
-                            <div className="company-details__tab documents">
-                                Dokumentit
-                            </div>
+                            <div className="company-details__tab documents">Dokumentit</div>
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
                 <div className="upgrade-list__wrapper">
-                    <h2 className="upgrade-list__heading">
-                        Yhtiökohtaiset parannukset
-                    </h2>
+                    <h2 className="upgrade-list__heading">Yhtiökohtaiset parannukset</h2>
                     <ul className="upgrade-list__list">
                         <li className="upgrade-list__list-headers">
                             <div>Nimi</div>
@@ -123,10 +117,7 @@ const Company = () => {
                 </div>
                 <div>
                     <h2>Asunnot</h2>
-                    <p>
-                        Coming up - the listing will be added once the
-                        component for an apartments listing is done
-                    </p>
+                    <p>Coming up - the listing will be added once the component for an apartments listing is done</p>
                 </div>
             </div>
         </div>

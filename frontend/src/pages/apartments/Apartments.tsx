@@ -1,11 +1,7 @@
-import {
-    NumberInput,
-    SearchInput,
-    Select,
-    StatusLabel,
-} from "hds-react";
-import { Link } from "react-router-dom";
 import React from "react";
+
+import {NumberInput, SearchInput, Select, StatusLabel} from "hds-react";
+import {Link} from "react-router-dom";
 
 const ApartmentListItem = (apartment) => (
     <Link to={apartment.id}>
@@ -37,24 +33,15 @@ export default function Apartments() {
                     clearButtonAriaLabel="Clear search field"
                     onSubmit={(submittedValue) =>
                         // eslint-disable-next-line no-console
-                        console.log(
-                            "Submitted search-value:",
-                            submittedValue
-                        )
+                        console.log("Submitted search-value:", submittedValue)
                     }
                 />
                 <div className="results">
                     <div>Rekisterin tulokset: 9037 yhtiötä</div>
                     <div className="list-headers">
-                        <div className="list-header apartment">
-                            Asunto
-                        </div>
-                        <div className="list-header area">
-                            Pinta-ala
-                        </div>
-                        <div className="list-header address">
-                            Osoite
-                        </div>
+                        <div className="list-header apartment">Asunto</div>
+                        <div className="list-header area">Pinta-ala</div>
+                        <div className="list-header address">Osoite</div>
                         <div className="list-header status">Tila</div>
                     </div>
                     <ul className="results-list">
@@ -123,11 +110,11 @@ export default function Apartments() {
                 <div className="filters">
                     <Select
                         label="Yhtiön nimi"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <Select
                         label="Osoite"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <NumberInput
                         label="Postinumero"
@@ -135,11 +122,11 @@ export default function Apartments() {
                     />
                     <Select
                         label="Rakennuttaja"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <Select
                         label="Isännöitsijä"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                 </div>
             </div>

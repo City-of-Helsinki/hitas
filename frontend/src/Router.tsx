@@ -1,14 +1,15 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+
+import {Route, Routes} from "react-router-dom";
 
 import App from "./App";
-import Companies from "./pages/companies/Companies";
-import Apartments from "./pages/apartments/Apartments";
-import Reports from "./pages/Reports";
-import Documents from "./pages/Documents";
 import Codes from "./pages/Codes";
-import Company from "./pages/companies/Company";
+import Documents from "./pages/Documents";
+import Reports from "./pages/Reports";
 import Apartment from "./pages/apartments/Apartment";
+import Apartments from "./pages/apartments/Apartments";
+import Companies from "./pages/companies/Companies";
+import Company from "./pages/companies/Company";
 
 export default function Router() {
     return (
@@ -56,11 +57,8 @@ export default function Router() {
                 <Route
                     path="*"
                     element={
-                        <main style={{ padding: "1rem" }}>
-                            <h1>
-                                Päädyit tyhjälle sivulle. Ole hyvä ja
-                                tarkista osoite!
-                            </h1>
+                        <main style={{padding: "1rem"}}>
+                            <h1>Päädyit tyhjälle sivulle. Ole hyvä ja tarkista osoite!</h1>
                         </main>
                     }
                 />

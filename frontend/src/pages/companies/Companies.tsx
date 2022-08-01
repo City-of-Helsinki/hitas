@@ -1,6 +1,7 @@
-import { Button, NumberInput, SearchInput, Select } from "hds-react";
 import React from "react";
-import { Link } from "react-router-dom";
+
+import {Button, NumberInput, SearchInput, Select} from "hds-react";
+import {Link} from "react-router-dom";
 
 type ListItemProps = {
     name: string;
@@ -13,9 +14,7 @@ const CompanyListItem = (props: ListItemProps) => {
         <li className="results-list__item">
             <div className="name">{props.name}</div>
             <div className="address">{props.address}</div>
-            <div className="date-added">
-                {props.dateAdded as string}
-            </div>
+            <div className="date-added">{props.dateAdded as string}</div>
         </li>
     );
 };
@@ -36,22 +35,15 @@ const Companies = () => {
                     clearButtonAriaLabel="Clear search field"
                     onSubmit={(submittedValue) =>
                         // eslint-disable-next-line no-console
-                        console.log(
-                            "Submitted search-value:",
-                            submittedValue
-                        )
+                        console.log("Submitted search-value:", submittedValue)
                     }
                 />
                 <div className="results">
                     <div>Rekisterin tulokset: 9037 yhtiötä</div>
                     <div className="list-headers">
                         <div className="list-header name">Yhtiö</div>
-                        <div className="list-header address">
-                            Osoite
-                        </div>
-                        <div className="list-header date-added">
-                            Valmiustila, pvm
-                        </div>
+                        <div className="list-header address">Osoite</div>
+                        <div className="list-header date-added">Valmiustila, pvm</div>
                     </div>
                     <ul className="results-list">
                         <Link to="507130">
@@ -106,11 +98,11 @@ const Companies = () => {
                 <div className="filters">
                     <Select
                         label="Yhtiön nimi"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <Select
                         label="Osoite"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <NumberInput
                         label="Postinumero"
@@ -118,11 +110,11 @@ const Companies = () => {
                     />
                     <Select
                         label="Rakennuttaja"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                     <Select
                         label="Isännöitsijä"
-                        options={[{ label: "Foo" }, { label: "Bar" }]}
+                        options={[{label: "Foo"}, {label: "Bar"}]}
                     />
                 </div>
             </div>
