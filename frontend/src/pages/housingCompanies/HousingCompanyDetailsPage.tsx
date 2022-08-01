@@ -1,6 +1,6 @@
 import {StatusLabel, Tabs} from "hds-react";
 
-const Company = () => {
+const HousingCompanyDetailsPage = () => {
     const theme = {
         "--tab-color": "var(--color-black-90)",
         "--tab-active-border-color": "var(--color-black-90)",
@@ -124,4 +124,4 @@ const Company = () => {
     );
 };
 
-export default Company;
+export default HousingCompanyDetailsPage;

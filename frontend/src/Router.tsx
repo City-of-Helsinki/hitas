@@ -6,10 +6,8 @@ import App from "./App";
 import Codes from "./pages/Codes";
 import Documents from "./pages/Documents";
 import Reports from "./pages/Reports";
-import Apartment from "./pages/apartments/Apartment";
-import Apartments from "./pages/apartments/Apartments";
-import Companies from "./pages/companies/Companies";
-import Company from "./pages/companies/Company";
+import {ApartmentDetailsPage, ApartmentListPage} from "./pages/apartments";
+import {HousingCompanyDetailsPage, HousingCompanyListPage} from "./pages/housingCompanies";
 
 export default function Router() {
     return (
@@ -21,21 +19,21 @@ export default function Router() {
                 <Route path="housing-companies">
                     <Route
                         index
-                        element={<Companies />}
+                        element={<HousingCompanyListPage />}
                     />
                     <Route
-                        path=":companyId"
-                        element={<Company />}
+                        path=":housingCompanyId"
+                        element={<HousingCompanyDetailsPage />}
                     />
                 </Route>
                 <Route path="apartments">
                     <Route
                         index
-                        element={<Apartments />}
+                        element={<ApartmentListPage />}
                     />
                     <Route
                         path=":apartmentId"
-                        element={<Apartment />}
+                        element={<ApartmentDetailsPage />}
                     />
                 </Route>
                 <Route
@@ -52,7 +50,7 @@ export default function Router() {
                 />
                 <Route
                     index
-                    element={<Companies />}
+                    element={<HousingCompanyListPage />}
                 />
                 <Route
                     path="*"
