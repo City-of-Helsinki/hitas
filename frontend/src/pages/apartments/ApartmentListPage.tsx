@@ -20,7 +20,7 @@ const ApartmentListItem = (apartment) => (
     </Link>
 );
 
-export default function Apartments() {
+export default function ApartmentListPage() {
     return (
         <div className="apartments">
             <h1 className="main-heading">Kaikki kohteet</h1>

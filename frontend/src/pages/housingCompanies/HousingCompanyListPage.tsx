@@ -19,7 +19,7 @@ const CompanyListItem = (props: ListItemProps) => {
     );
 };
 
-const Companies = () => {
+const HousingCompanyListPage = () => {
     return (
         <div className="companies">
             <h1 className="main-heading">
@@ -122,4 +122,4 @@ const Companies = () => {
     );
 };
 
-export default Companies;
+export default HousingCompanyListPage;
