@@ -1,16 +1,11 @@
 import {StatusLabel, Tabs} from "hds-react";
+import {DetailField} from "../../common/components";
 
 const HousingCompanyDetailsPage = () => {
     const theme = {
         "--tab-color": "var(--color-black-90)",
         "--tab-active-border-color": "var(--color-black-90)",
     };
-    const Detail = (detail) => (
-        <>
-            <label className="detail-label">{detail.label}</label>
-            <div className="detail-value">{detail.value}</div>
-        </>
-    );
     return (
         <div className="company">
             <h1 className="main-heading">Aapeli Aava</h1>
