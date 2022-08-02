@@ -2,12 +2,12 @@ import React from "react";
 
 import {Navigate, Route, Routes} from "react-router-dom";
 
-import App from "./App";
-import Codes from "./pages/Codes";
-import Documents from "./pages/Documents";
-import Reports from "./pages/Reports";
-import {ApartmentDetailsPage, ApartmentListPage} from "./pages/apartments";
-import {HousingCompanyDetailsPage, HousingCompanyListPage} from "./pages/housingCompanies";
+import App from "./app/App";
+import Codes from "./features/Codes";
+import Documents from "./features/Documents";
+import Reports from "./features/Reports";
+import {ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
+import {HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
 
 export default function Router() {
     return (

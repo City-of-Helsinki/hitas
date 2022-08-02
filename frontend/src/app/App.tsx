@@ -1,7 +1,7 @@
 import {Container, Footer, Navigation} from "hds-react";
 import {Outlet} from "react-router-dom";
 
-import "./styles/index.sass";
+import "../styles/index.sass";
 
 function App() {
     const NavItem = (item) => {
@@ -25,7 +25,7 @@ function App() {
                 <Navigation.Row ariaLabel="Main navigation">
                     <NavItem
                         label="Yhtiöt"
-                        path="companies"
+                        path="housing-companies"
                     />
                     <NavItem
                         label="Asunnot"
