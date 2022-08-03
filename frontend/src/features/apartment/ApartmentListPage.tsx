@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery} from "../../app/services";
 import {IAddress, IApartment, IOwner} from "../../common/models";
+import {formatAddress} from "../../common/utils";
 
 interface IApartmentListItem {
     id: string;
@@ -43,9 +44,7 @@ const ApartmentListItem = ({
                     <div className="owner">Omistaja: {ownersString}</div>
                     <div className="rooms">{apartmentType}</div>
                     <div className="area">{surfaceArea} m²</div>
-                    <div className="address">
-                        {address.street}, {address.postal_code}
-                    </div>
+                    <div className="address">{formatAddress(address)}</div>
                     <div className="state">
                         <StatusLabel>{state}</StatusLabel>
                     </div>

@@ -3,6 +3,7 @@ import {useParams} from "react-router";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField} from "../../common/components";
+import {formatAddress} from "../../common/utils";
 
 const HousingCompanyDetailsPage = () => {
     const params = useParams();
@@ -47,7 +48,7 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Virallinen osoite"
-                                            value={`${data.address.street}, ${data.address.postal_code}, ${data.address.city}`}
+                                            value={formatAddress(data.address)}
                                         />
                                         <DetailField
                                             label="Alue"
