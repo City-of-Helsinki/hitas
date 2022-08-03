@@ -65,7 +65,10 @@ const HousingCompanyDetailsPage = () => {
                                     </div>
                                     <div className="column">
                                         <label className="detail-field-label">Huomioitavaa</label>
-                                        <textarea>{data.notes}</textarea>
+                                        <textarea
+                                            readOnly
+                                            value={data.notes as string}
+                                        ></textarea>
                                     </div>
                                 </div>
                             </Tabs.TabPanel>

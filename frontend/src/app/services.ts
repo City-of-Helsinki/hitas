@@ -1,6 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
-import {IApartment, IHousingCompany, IHousingCompanyDetails, PageInfo} from "../common/models";
+import {IApartment, IApartmentDetails, IHousingCompany, IHousingCompanyDetails, PageInfo} from "../common/models";
 
 interface IHousingCompaniesListResponse {
     page: PageInfo;
@@ -23,6 +23,9 @@ export const hitasApi = createApi({
         }),
         // Apartments
         getApartments: builder.query<IApartmentsListResponse, string>({query: () => "apartments"}),
+        getApartmentDetail: builder.query<IApartmentDetails, string>({
+            query: (id) => `apartments/${id}`,
+        }),
     }),
 });
 
@@ -30,4 +33,5 @@ export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyDetailQuery,
     useGetApartmentsQuery,
+    useGetApartmentDetailQuery,
 } = hitasApi;
