@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
@@ -25,7 +26,7 @@ class Apartment(ExternalHitasModel):
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")
     surface_area = HitasModelDecimalField(help_text=_("Measured in m^2"))
 
-    share_number_start = models.PositiveIntegerField(null=True)
+    share_number_start = models.PositiveIntegerField(null=True, validators=[MinValueValidator(1)])
     share_number_end = models.PositiveIntegerField(null=True)
 
     street_address = models.CharField(max_length=128)

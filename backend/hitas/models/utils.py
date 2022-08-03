@@ -143,9 +143,9 @@ def validate_building_id(value: Optional[str]) -> None:
 
 def validate_share_numbers(start: Optional[int], end: Optional[int]) -> None:
     # TODO Validate overlap in share numbers across other HousingCompany shares
-    if start is None and end is None:
+    if not start and not end:
         return
-    if start is None or end is None:
+    if not start or not end:
         raise ValidationError(
             _("You must enter both: %(start)s and %(end)s or neither."),
             params={"start": "share_number_start", "end": "share_number_end"},
