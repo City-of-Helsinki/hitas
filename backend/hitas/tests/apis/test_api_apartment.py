@@ -61,6 +61,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "surface_area": float(ap1.surface_area),
             "address": {"street": ap1.street_address, "postal_code": ap1.postal_code.value, "city": "Helsinki"},
             "apartment_number": ap1.apartment_number,
+            "stair": ap1.stair,
             "housing_company": hc1.display_name,
             "date": str(ap1.building.completion_date),
             "owners": [
@@ -107,6 +108,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "surface_area": float(ap2.surface_area),
             "address": {"street": ap2.street_address, "postal_code": ap2.postal_code.value, "city": "Helsinki"},
             "apartment_number": ap2.apartment_number,
+            "stair": ap2.stair,
             "housing_company": hc2.display_name,
             "date": str(ap2.building.completion_date),
             "owners": [],

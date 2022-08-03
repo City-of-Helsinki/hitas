@@ -98,6 +98,7 @@ export interface IApartment {
     surface_area: number;
     address: IAddress;
     apartment_number: number;
+    stair: string;
     date: string | null;
     housing_company: string;
     owners: Array<IOwner>;
