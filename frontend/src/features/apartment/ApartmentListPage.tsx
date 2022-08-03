@@ -3,24 +3,125 @@ import React from "react";
 import {NumberInput, SearchInput, Select, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
-const ApartmentListItem = (apartment) => (
-    <Link to={apartment.id}>
-        <li className="results-list__item results-list__item--apartment">
-            <div className="number">{apartment.number}</div>
-            <div className="details">
-                <div className="owner">{`Omistaja: ${apartment.owner}, (${apartment.ownerId})`}</div>
-                <div className="rooms">{apartment.rooms}</div>
-                <div className="area">{apartment.area} m²</div>
-                <div className="address">{apartment.address}</div>
-                <div className="state">
-                    <StatusLabel>{apartment.state}</StatusLabel>
+import {useGetApartmentsQuery} from "../../app/services";
+import {IAddress, IApartment, IOwner} from "../../common/models";
+
+interface IApartmentListItem {
+    id: string;
+    apartmentNumber: number;
+    stair: string;
+    owners: IOwner[];
+    apartmentType: string;
+    surfaceArea: number;
+    address: IAddress;
+    state: string;
+}
+
+const ApartmentListItem = ({
+    id,
+    apartmentNumber,
+    stair,
+    owners,
+    apartmentType,
+    surfaceArea,
+    address,
+    state,
+}: IApartmentListItem) => {
+    // Combine owners into a single formatted string
+    const ownersString = owners
+        .map((o) => `${o.person.last_name}, ${o.person.first_name} (${o.person.social_security_number})`)
+        .join(", ");
+
+    return (
+        <Link to={id}>
+            <li className="results-list__item results-list__item--apartment">
+                <div className="number">
+                    {stair}
+                    {apartmentNumber}
                 </div>
-            </div>
-        </li>
-    </Link>
-);
+                <div className="details">
+                    <div className="owner">Omistaja: {ownersString}</div>
+                    <div className="rooms">{apartmentType}</div>
+                    <div className="area">{surfaceArea} m²</div>
+                    <div className="address">
+                        {address.street}, {address.postal_code}
+                    </div>
+                    <div className="state">
+                        <StatusLabel>{state}</StatusLabel>
+                    </div>
+                </div>
+            </li>
+        </Link>
+    );
+};
+
+const ApartmentResultsList = ({items, page}) => {
+    if (items.length) {
+        return (
+            <>
+                <div>Rekisterin tulokset: {page.total_items} yhtiötä</div>
+                <div className="list-headers">
+                    <div className="list-header apartment">Asunto</div>
+                    <div className="list-header area">Pinta-ala</div>
+                    <div className="list-header address">Osoite</div>
+                    <div className="list-header status">Tila</div>
+                </div>
+                <ul className="results-list">
+                    {items.map((item: IApartment) => (
+                        <ApartmentListItem
+                            key={item.id}
+                            id={item.id}
+                            apartmentNumber={item.apartment_number}
+                            stair={item.stair}
+                            owners={item.owners}
+                            apartmentType={item.apartment_type}
+                            surfaceArea={item.surface_area}
+                            address={item.address}
+                            state={item.state}
+                        />
+                    ))}
+                </ul>
+            </>
+        );
+    } else {
+        return (
+            <ul className="results-list">
+                <p>Ei tuloksia</p>
+            </ul>
+        );
+    }
+};
+
+const ApartmentFilters = () => {
+    return (
+        <div className="filters">
+            <Select
+                label="Yhtiön nimi"
+                options={[{label: "Foo"}, {label: "Bar"}]}
+            />
+            <Select
+                label="Osoite"
+                options={[{label: "Foo"}, {label: "Bar"}]}
+            />
+            <NumberInput
+                label="Postinumero"
+                id="postinumeroFiltteri"
+            />
+            <Select
+                label="Rakennuttaja"
+                options={[{label: "Foo"}, {label: "Bar"}]}
+            />
+            <Select
+                label="Isännöitsijä"
+                options={[{label: "Foo"}, {label: "Bar"}]}
+            />
+        </div>
+    );
+};
 
 export default function ApartmentListPage() {
+    const {data, error, isLoading} = useGetApartmentsQuery("");
+
     return (
         <div className="apartments">
             <h1 className="main-heading">Kaikki kohteet</h1>
@@ -36,99 +137,21 @@ export default function ApartmentListPage() {
                         console.log("Submitted search-value:", submittedValue)
                     }
                 />
+
                 <div className="results">
-                    <div>Rekisterin tulokset: 9037 yhtiötä</div>
-                    <div className="list-headers">
-                        <div className="list-header apartment">Asunto</div>
-                        <div className="list-header area">Pinta-ala</div>
-                        <div className="list-header address">Osoite</div>
-                        <div className="list-header status">Tila</div>
-                    </div>
-                    <ul className="results-list">
-                        <ApartmentListItem
-                            id="abc001"
-                            owner="Virtanen, Antti"
-                            ownerId="200788-192A"
-                            number="A70"
-                            rooms="4h,kt,s"
-                            area="85.0"
-                            address="Peipposentie 3"
-                            state="Varattu"
+                    {error ? (
+                        <>Oh no, there was an error</>
+                    ) : isLoading ? (
+                        <>Loading...</>
+                    ) : data ? (
+                        <ApartmentResultsList
+                            items={data.contents}
+                            page={data.page}
                         />
-                        <ApartmentListItem
-                            id="abc002"
-                            owner="Virtanen, Mirjami"
-                            ownerId="190277-181D"
-                            number="C2"
-                            rooms="1h, kt, s"
-                            area="45.0"
-                            address="Arabiankatu 5"
-                            state="Myyty"
-                        />
-                        <ApartmentListItem
-                            id="abc002"
-                            owner="Virtanen, Mirjami"
-                            ownerId="190277-181D"
-                            number="C2"
-                            rooms="1h, kt, s"
-                            area="45.0"
-                            address="Arabiankatu 5"
-                            state="Myyty"
-                        />
-                        <ApartmentListItem
-                            id="abc002"
-                            owner="Virtanen, Mirjami"
-                            ownerId="190277-181D"
-                            number="C2"
-                            rooms="1h, kt, s"
-                            area="45.0"
-                            address="Arabiankatu 5"
-                            state="Myyty"
-                        />
-                        <ApartmentListItem
-                            id="abc002"
-                            owner="Virtanen, Mirjami"
-                            ownerId="190277-181D"
-                            number="C2"
-                            rooms="1h, kt, s"
-                            area="45.0"
-                            address="Arabiankatu 5"
-                            state="Myyty"
-                        />
-                        <ApartmentListItem
-                            id="abc002"
-                            owner="Virtanen, Mirjami"
-                            ownerId="190277-181D"
-                            number="C2"
-                            rooms="1h, kt, s"
-                            area="45.0"
-                            address="Arabiankatu 5"
-                            state="Myyty"
-                        />
-                    </ul>
+                    ) : null}
                 </div>
-                <div className="filters">
-                    <Select
-                        label="Yhtiön nimi"
-                        options={[{label: "Foo"}, {label: "Bar"}]}
-                    />
-                    <Select
-                        label="Osoite"
-                        options={[{label: "Foo"}, {label: "Bar"}]}
-                    />
-                    <NumberInput
-                        label="Postinumero"
-                        id="postinumeroFiltteri"
-                    />
-                    <Select
-                        label="Rakennuttaja"
-                        options={[{label: "Foo"}, {label: "Bar"}]}
-                    />
-                    <Select
-                        label="Isännöitsijä"
-                        options={[{label: "Foo"}, {label: "Bar"}]}
-                    />
-                </div>
+
+                <ApartmentFilters />
             </div>
         </div>
     );
