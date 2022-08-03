@@ -172,6 +172,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "surface_area",
             "address",
             "apartment_number",
+            "stair",
             "date",
             "housing_company",
             "owners",

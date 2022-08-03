@@ -2188,6 +2188,8 @@ components:
           $ref: '#/components/schemas/Address'
         apartment_number:
           type: number
+        stair:
+          type: string
         date:
           description: Date that the apartment's building was completed on
           type: string
