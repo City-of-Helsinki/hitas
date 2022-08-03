@@ -5,15 +5,14 @@ import {Link} from "react-router-dom";
 
 import {useGetHousingCompaniesQuery} from "../../app/services";
 import {IHousingCompany} from "../../common/models";
+import {formatAddress} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}) => {
     return (
         <Link to={id}>
             <li className="results-list__item">
                 <div className="name">{name}</div>
-                <div className="address">
-                    {address.street}, {address.postal_code}
-                </div>
+                <div className="address">{formatAddress(address)}</div>
                 <div className="date">{date}</div>
             </li>
         </Link>
