@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {Button, NumberInput, SearchInput, Select} from "hds-react";
+import {Button, SearchInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetHousingCompaniesQuery} from "../../app/services";
+import {FilterCombobox, FilterPostalCodeInput, FilterTextInput} from "../../common/components";
 import {IHousingCompany} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -51,35 +52,48 @@ const HousingCompanyResultsList = ({items, page}) => {
     }
 };
 
-const HousingCompanyFilters = () => {
+const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
     return (
         <div className="filters">
-            <Select
+            <FilterTextInput
                 label="Yhtiön nimi"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="display_name"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterTextInput
                 label="Osoite"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="street_address"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <NumberInput
+            <FilterPostalCodeInput
                 label="Postinumero"
-                id="postinumeroFiltteri"
+                filterFieldName="postal_code"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterCombobox
                 label="Rakennuttaja"
                 options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="developer"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterCombobox
                 label="Isännöitsijä"
                 options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="property_manager"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
         </div>
     );
 };
 
 const HousingCompanyListPage = () => {
-    const {data, error, isLoading} = useGetHousingCompaniesQuery("");
+    const [filterParams, setFilterParams] = useState({});
+    const {data, error, isLoading} = useGetHousingCompaniesQuery(filterParams);
 
     return (
         <div className="companies">
@@ -111,7 +125,10 @@ const HousingCompanyListPage = () => {
                         />
                     ) : null}
                 </div>
-                <HousingCompanyFilters />
+                <HousingCompanyFilters
+                    filterParams={filterParams}
+                    setFilterParams={setFilterParams}
+                />
             </div>
         </div>
     );

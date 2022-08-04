@@ -17,12 +17,22 @@ export const hitasApi = createApi({
     baseQuery: fetchBaseQuery({baseUrl: "http://localhost:8000/api/v1/"}),
     endpoints: (builder) => ({
         // HousingCompany
-        getHousingCompanies: builder.query<IHousingCompaniesListResponse, string>({query: () => "housing-companies"}),
+        getHousingCompanies: builder.query<IHousingCompaniesListResponse, object>({
+            query: (params: object) => ({
+                url: "housing-companies",
+                params: params,
+            }),
+        }),
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
         }),
         // Apartments
-        getApartments: builder.query<IApartmentsListResponse, string>({query: () => "apartments"}),
+        getApartments: builder.query<IApartmentsListResponse, object>({
+            query: (params: object) => ({
+                url: "apartments",
+                params: params,
+            }),
+        }),
         getApartmentDetail: builder.query<IApartmentDetails, string>({
             query: (id) => `apartments/${id}`,
         }),
