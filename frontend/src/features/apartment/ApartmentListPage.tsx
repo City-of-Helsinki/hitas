@@ -55,11 +55,28 @@ const ApartmentListItem = ({
     );
 };
 
-const ApartmentResultsList = ({items, page}) => {
-    if (items.length) {
+export const ApartmentResultsList = ({filterParams}) => {
+    const {data, error, isLoading} = useGetApartmentsQuery(filterParams);
+    if (error) {
         return (
-            <>
-                <div>Rekisterin tulokset: {page.total_items} yhtiötä</div>
+            <div className="results">
+                <ul className="results-list">
+                    <p>Error</p>
+                </ul>
+            </div>
+        );
+    } else if (isLoading) {
+        return (
+            <div className="results">
+                <ul className="results-list">
+                    <p>Loading</p>
+                </ul>
+            </div>
+        );
+    } else if (data && data.contents.length) {
+        return (
+            <div className="results">
+                <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
                 <div className="list-headers">
                     <div className="list-header apartment">Asunto</div>
                     <div className="list-header area">Pinta-ala</div>
@@ -67,7 +84,7 @@ const ApartmentResultsList = ({items, page}) => {
                     <div className="list-header status">Tila</div>
                 </div>
                 <ul className="results-list">
-                    {items.map((item: IApartment) => (
+                    {data.contents.map((item: IApartment) => (
                         <ApartmentListItem
                             key={item.id}
                             id={item.id}
@@ -81,13 +98,15 @@ const ApartmentResultsList = ({items, page}) => {
                         />
                     ))}
                 </ul>
-            </>
+            </div>
         );
     } else {
         return (
-            <ul className="results-list">
-                <p>Ei tuloksia</p>
-            </ul>
+            <div className="results">
+                <ul className="results-list">
+                    <p>Ei tuloksia</p>
+                </ul>
+            </div>
         );
     }
 };
@@ -133,7 +152,6 @@ const ApartmentFilters = ({filterParams, setFilterParams}) => {
 
 export default function ApartmentListPage() {
     const [filterParams, setFilterParams] = useState({});
-    const {data, error, isLoading} = useGetApartmentsQuery(filterParams);
 
     return (
         <div className="apartments">
@@ -151,18 +169,7 @@ export default function ApartmentListPage() {
                     }
                 />
 
-                <div className="results">
-                    {error ? (
-                        <>Oh no, there was an error</>
-                    ) : isLoading ? (
-                        <>Loading...</>
-                    ) : data ? (
-                        <ApartmentResultsList
-                            items={data.contents}
-                            page={data.page}
-                        />
-                    ) : null}
-                </div>
+                <ApartmentResultsList filterParams={filterParams} />
 
                 <ApartmentFilters
                     filterParams={filterParams}

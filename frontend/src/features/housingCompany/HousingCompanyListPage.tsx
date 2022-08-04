@@ -20,18 +20,35 @@ const HousingCompanyListItem = ({id, name, address, date}) => {
     );
 };
 
-const HousingCompanyResultsList = ({items, page}) => {
-    if (items.length) {
+const HousingCompanyResultsList = ({filterParams}) => {
+    const {data, error, isLoading} = useGetHousingCompaniesQuery(filterParams);
+    if (error) {
         return (
-            <>
-                <div>Rekisterin tulokset: {page.total_items} yhtiötä</div>
+            <div className="results">
+                <ul className="results-list">
+                    <p>Error</p>
+                </ul>
+            </div>
+        );
+    } else if (isLoading) {
+        return (
+            <div className="results">
+                <ul className="results-list">
+                    <p>Loading</p>
+                </ul>
+            </div>
+        );
+    } else if (data && data.contents.length) {
+        return (
+            <div className="results">
+                <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
                 <div className="list-headers">
                     <div className="list-header name">Yhtiö</div>
                     <div className="list-header address">Osoite</div>
                     <div className="list-header date">Valmiustila, pvm</div>
                 </div>
                 <ul className="results-list">
-                    {items.map((item: IHousingCompany) => (
+                    {data.contents.map((item: IHousingCompany) => (
                         <HousingCompanyListItem
                             key={item.id}
                             id={item.id}
@@ -41,13 +58,15 @@ const HousingCompanyResultsList = ({items, page}) => {
                         />
                     ))}
                 </ul>
-            </>
+            </div>
         );
     } else {
         return (
-            <ul className="results-list">
-                <p>Ei tuloksia</p>
-            </ul>
+            <div className="results">
+                <ul className="results-list">
+                    <p>Ei tuloksia</p>
+                </ul>
+            </div>
         );
     }
 };
@@ -93,7 +112,6 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
 
 const HousingCompanyListPage = () => {
     const [filterParams, setFilterParams] = useState({});
-    const {data, error, isLoading} = useGetHousingCompaniesQuery(filterParams);
 
     return (
         <div className="companies">
@@ -113,18 +131,7 @@ const HousingCompanyListPage = () => {
                         console.log("Submitted search-value:", submittedValue)
                     }
                 />
-                <div className="results">
-                    {error ? (
-                        <>Oh no, there was an error</>
-                    ) : isLoading ? (
-                        <>Loading...</>
-                    ) : data ? (
-                        <HousingCompanyResultsList
-                            items={data.contents}
-                            page={data.page}
-                        />
-                    ) : null}
-                </div>
+                <HousingCompanyResultsList filterParams={filterParams} />
                 <HousingCompanyFilters
                     filterParams={filterParams}
                     setFilterParams={setFilterParams}
