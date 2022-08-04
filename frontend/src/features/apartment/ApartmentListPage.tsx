@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {NumberInput, SearchInput, Select, StatusLabel} from "hds-react";
+import {SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery} from "../../app/services";
+import {FilterCombobox, FilterPostalCodeInput, FilterTextInput} from "../../common/components";
 import {IAddress, IApartment, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -91,35 +92,48 @@ const ApartmentResultsList = ({items, page}) => {
     }
 };
 
-const ApartmentFilters = () => {
+const ApartmentFilters = ({filterParams, setFilterParams}) => {
     return (
         <div className="filters">
-            <Select
+            <FilterTextInput
                 label="Yhtiön nimi"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="housing_company_name"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterTextInput
                 label="Osoite"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="street_address"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <NumberInput
+            <FilterPostalCodeInput
                 label="Postinumero"
-                id="postinumeroFiltteri"
+                filterFieldName="postal_code"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterCombobox
                 label="Rakennuttaja"
                 options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="developer"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
-            <Select
+            <FilterCombobox
                 label="Isännöitsijä"
                 options={[{label: "Foo"}, {label: "Bar"}]}
+                filterFieldName="property_manager"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
             />
         </div>
     );
 };
 
 export default function ApartmentListPage() {
-    const {data, error, isLoading} = useGetApartmentsQuery("");
+    const [filterParams, setFilterParams] = useState({});
+    const {data, error, isLoading} = useGetApartmentsQuery(filterParams);
 
     return (
         <div className="apartments">
@@ -150,7 +164,10 @@ export default function ApartmentListPage() {
                     ) : null}
                 </div>
 
-                <ApartmentFilters />
+                <ApartmentFilters
+                    filterParams={filterParams}
+                    setFilterParams={setFilterParams}
+                />
             </div>
         </div>
     );
