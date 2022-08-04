@@ -35,7 +35,7 @@ const ApartmentListItem = ({
         .join(", ");
 
     return (
-        <Link to={id}>
+        <Link to={`/apartments/${id}`}>
             <li className="results-list__item results-list__item--apartment">
                 <div className="number">
                     {stair}

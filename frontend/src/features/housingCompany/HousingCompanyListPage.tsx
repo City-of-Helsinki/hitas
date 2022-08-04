@@ -10,7 +10,7 @@ import {formatAddress} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}) => {
     return (
-        <Link to={id}>
+        <Link to={`/housing-companies/${id}`}>
             <li className="results-list__item">
                 <div className="name">{name}</div>
                 <div className="address">{formatAddress(address)}</div>

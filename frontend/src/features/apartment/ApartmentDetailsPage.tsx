@@ -2,6 +2,7 @@ import React from "react";
 
 import {StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
+import {Link} from "react-router-dom";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
 import {DetailField} from "../../common/components";
@@ -22,7 +23,9 @@ const ApartmentDetailsPage = () => {
         return (
             <div className="apartment">
                 <h1>
-                    {data.housing_company.name} {formatAddress(data.address)}
+                    <Link to={`/housing-companies/${data.housing_company.id}`}>
+                        {data.housing_company.name} {formatAddress(data.address)}
+                    </Link>
                 </h1>
                 <h2>
                     {data.stair}
