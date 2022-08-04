@@ -4,6 +4,7 @@ import {useParams} from "react-router";
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField} from "../../common/components";
 import {formatAddress} from "../../common/utils";
+import {ApartmentResultsList} from "../apartment/ApartmentListPage";
 
 const HousingCompanyDetailsPage = () => {
     const params = useParams();
@@ -130,9 +131,12 @@ const HousingCompanyDetailsPage = () => {
                     </div>
                     <div>
                         <h2>Asunnot</h2>
-                        <p>
-                            Coming up - the listing will be added once the component for an apartments listing is done
-                        </p>
+                        <div className="listing">
+                            <div className="results">
+                                <ApartmentResultsList filterParams={{housing_company: params.housingCompanyId}} />
+                            </div>
+                        </div>
+                        <div className="results"></div>
                     </div>
                 </div>
             </div>
