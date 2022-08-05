@@ -31,6 +31,20 @@ export const hitasApi = createApi({
         getApartmentDetail: builder.query<IApartmentDetails, string>({
             query: (id) => `apartments/${id}`,
         }),
+        // Property Manager
+        getPropertyManagers: builder.query<IApartmentListResponse, object>({
+            query: (params: object) => ({
+                url: "property-managers",
+                params: params,
+            }),
+        }),
+        // Codes
+        getDevelopers: builder.query<IApartmentListResponse, object>({
+            query: (params: object) => ({
+                url: "developers",
+                params: params,
+            }),
+        }),
     }),
 });
 
@@ -39,4 +53,6 @@ export const {
     useGetHousingCompanyDetailQuery,
     useGetApartmentsQuery,
     useGetApartmentDetailQuery,
+    useGetPropertyManagersQuery,
+    useGetDevelopersQuery,
 } = hitasApi;

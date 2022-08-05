@@ -3,8 +3,9 @@ import React, {useState} from "react";
 import {SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {useGetApartmentsQuery} from "../../app/services";
-import {FilterCombobox, FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import {useGetApartmentsQuery, useGetDevelopersQuery, useGetPropertyManagersQuery} from "../../app/services";
+import {FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import RelatedModelFilterCombobox from "../../common/components/RelatedModelFilterCombobox";
 import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -122,16 +123,18 @@ const ApartmentFilters = ({filterParams, setFilterParams}) => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterCombobox
+            <RelatedModelFilterCombobox
                 label="Rakennuttaja"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                queryFunction={useGetDevelopersQuery}
+                labelField="value"
                 filterFieldName="developer"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterCombobox
+            <RelatedModelFilterCombobox
                 label="Isännöitsijä"
-                options={[{label: "Foo"}, {label: "Bar"}]}
+                queryFunction={useGetPropertyManagersQuery}
+                labelField="name"
                 filterFieldName="property_manager"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
