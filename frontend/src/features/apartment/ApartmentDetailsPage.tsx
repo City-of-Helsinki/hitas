@@ -5,23 +5,17 @@ import {useParams} from "react-router";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
-import {DetailField} from "../../common/components";
-import {IOwner} from "../../common/models";
+import {DetailField, QueryStateHandler} from "../../common/components";
+import {IApartmentDetails, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 const ApartmentDetailsPage = () => {
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery(params.apartmentId as string);
 
-    if (isLoading || error || !data) {
+    const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}) => {
         return (
-            <div className="apartment">
-                <h1 className="main-heading">Loading...</h1>
-            </div>
-        );
-    } else {
-        return (
-            <div className="apartment">
+            <>
                 <h1>
                     <Link to={`/housing-companies/${data.housing_company.id}`}>
                         {data.housing_company.name} {formatAddress(data.address)}
@@ -138,9 +132,20 @@ const ApartmentDetailsPage = () => {
                         </ul>
                     </div>
                 </div>
-            </div>
+            </>
         );
-    }
+    };
+    return (
+        <div className="apartment">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedApartmentDetails data={data as IApartmentDetails} />
+            </QueryStateHandler>
+        </div>
+    );
 };
 
 export default ApartmentDetailsPage;

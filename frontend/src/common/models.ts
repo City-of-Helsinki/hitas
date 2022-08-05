@@ -166,3 +166,14 @@ export interface PageInfoLinks {
     next?: string | null;
     previous?: string | null;
 }
+
+// List response interfaces
+
+export interface IHousingCompanyListResponse {
+    page: PageInfo;
+    contents: IHousingCompany[];
+}
+export interface IApartmentListResponse {
+    page: PageInfo;
+    contents: IApartment[];
+}
