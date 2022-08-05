@@ -566,6 +566,8 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
     [
         {"housing_company": "38432c233a914dfb9c2f54d9f5ad9063"},
         {"housing_company_name": "TestDisplayName"},
+        {"property_manager": "TestPropertyManager"},
+        {"developer": "TestDeveloper"},
         {"property_identifier": "1-1234-321-56"},
         {"state": ApartmentState.SOLD.value},
         {"apartment_type": "1h+sauna+takkahuone+uima-allas"},
@@ -588,6 +590,12 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     )
     ApartmentFactory.create(
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
+    )
+    ApartmentFactory.create(
+        state=ApartmentState.FREE, building__real_estate__housing_company__property_manager__name="TestPropertyManager"
+    )
+    ApartmentFactory.create(
+        state=ApartmentState.FREE, building__real_estate__housing_company__developer__value="TestDeveloper"
     )
     ApartmentFactory.create(state=ApartmentState.FREE, building__real_estate__property_identifier="1-1234-321-56")
     ApartmentFactory.create(state=ApartmentState.FREE, apartment_type__value="1h+sauna+takkahuone+uima-allas")

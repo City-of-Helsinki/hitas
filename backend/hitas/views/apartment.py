@@ -30,6 +30,12 @@ class ApartmentFilterSet(HitasFilterSet):
     housing_company_name = filters.CharFilter(
         field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
     )
+    property_manager = filters.CharFilter(
+        field_name="building__real_estate__housing_company__property_manager__name", lookup_expr="icontains"
+    )
+    developer = filters.CharFilter(
+        field_name="building__real_estate__housing_company__developer__value", lookup_expr="icontains"
+    )
     property_identifier = filters.CharFilter(
         field_name="building__real_estate__property_identifier", lookup_expr="icontains"
     )
