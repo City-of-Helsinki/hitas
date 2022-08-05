@@ -4,8 +4,8 @@ import {Button, SearchInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetHousingCompaniesQuery} from "../../app/services";
-import {FilterCombobox, FilterPostalCodeInput, FilterTextInput} from "../../common/components";
-import {IHousingCompany} from "../../common/models";
+import {FilterCombobox, FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}) => {
@@ -22,25 +22,10 @@ const HousingCompanyListItem = ({id, name, address, date}) => {
 
 const HousingCompanyResultsList = ({filterParams}) => {
     const {data, error, isLoading} = useGetHousingCompaniesQuery(filterParams);
-    if (error) {
+
+    const LoadedHousingCompanyResultsList = ({data}: {data: IHousingCompanyListResponse}) => {
         return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Error</p>
-                </ul>
-            </div>
-        );
-    } else if (isLoading) {
-        return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Loading</p>
-                </ul>
-            </div>
-        );
-    } else if (data && data.contents.length) {
-        return (
-            <div className="results">
+            <>
                 <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
                 <div className="list-headers">
                     <div className="list-header name">Yhtiö</div>
@@ -58,17 +43,21 @@ const HousingCompanyResultsList = ({filterParams}) => {
                         />
                     ))}
                 </ul>
-            </div>
+            </>
         );
-    } else {
-        return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Ei tuloksia</p>
-                </ul>
-            </div>
-        );
-    }
+    };
+
+    return (
+        <div className="results">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedHousingCompanyResultsList data={data as IHousingCompanyListResponse} />
+            </QueryStateHandler>
+        </div>
+    );
 };
 
 const HousingCompanyFilters = ({filterParams, setFilterParams}) => {

@@ -1,23 +1,18 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
-import {IApartment, IApartmentDetails, IHousingCompany, IHousingCompanyDetails, PageInfo} from "../common/models";
-
-interface IHousingCompaniesListResponse {
-    page: PageInfo;
-    contents: IHousingCompany[];
-}
-
-interface IApartmentsListResponse {
-    page: PageInfo;
-    contents: IApartment[];
-}
+import {
+    IApartmentDetails,
+    IApartmentListResponse,
+    IHousingCompanyDetails,
+    IHousingCompanyListResponse,
+} from "../common/models";
 
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
     baseQuery: fetchBaseQuery({baseUrl: "http://localhost:8000/api/v1/"}),
     endpoints: (builder) => ({
         // HousingCompany
-        getHousingCompanies: builder.query<IHousingCompaniesListResponse, object>({
+        getHousingCompanies: builder.query<IHousingCompanyListResponse, object>({
             query: (params: object) => ({
                 url: "housing-companies",
                 params: params,
@@ -27,7 +22,7 @@ export const hitasApi = createApi({
             query: (id) => `housing-companies/${id}`,
         }),
         // Apartments
-        getApartments: builder.query<IApartmentsListResponse, object>({
+        getApartments: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
                 url: "apartments",
                 params: params,

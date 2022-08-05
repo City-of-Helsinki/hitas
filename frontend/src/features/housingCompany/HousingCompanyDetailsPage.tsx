@@ -1,8 +1,11 @@
+import React from "react";
+
 import {StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {DetailField} from "../../common/components";
+import {DetailField, QueryStateHandler} from "../../common/components";
+import {IHousingCompanyDetails} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 import {ApartmentResultsList} from "../apartment/ApartmentListPage";
 
@@ -10,20 +13,13 @@ const HousingCompanyDetailsPage = () => {
     const params = useParams();
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
 
-    const theme = {
-        "--tab-color": "var(--color-black-90)",
-        "--tab-active-border-color": "var(--color-black-90)",
-    };
-
-    if (isLoading || error || !data) {
+    const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
+        const theme = {
+            "--tab-color": "var(--color-black-90)",
+            "--tab-active-border-color": "var(--color-black-90)",
+        };
         return (
-            <div className="company">
-                <h1 className="main-heading">Loading...</h1>
-            </div>
-        );
-    } else {
-        return (
-            <div className="company">
+            <>
                 <h1 className="main-heading">{data.name.display}</h1>
                 <div className="company-status">
                     <StatusLabel>Vapautunut 1.6.2022 ({data.state})</StatusLabel>
@@ -139,9 +135,21 @@ const HousingCompanyDetailsPage = () => {
                         <div className="results"></div>
                     </div>
                 </div>
-            </div>
+            </>
         );
-    }
+    };
+
+    return (
+        <div className="company">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedHousingCompanyDetails data={data as IHousingCompanyDetails} />
+            </QueryStateHandler>
+        </div>
+    );
 };
 
 export default HousingCompanyDetailsPage;

@@ -4,8 +4,8 @@ import {SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery} from "../../app/services";
-import {FilterCombobox, FilterPostalCodeInput, FilterTextInput} from "../../common/components";
-import {IAddress, IApartment, IOwner} from "../../common/models";
+import {FilterCombobox, FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 interface IApartmentListItem {
@@ -57,25 +57,10 @@ const ApartmentListItem = ({
 
 export const ApartmentResultsList = ({filterParams}) => {
     const {data, error, isLoading} = useGetApartmentsQuery(filterParams);
-    if (error) {
+
+    const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
         return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Error</p>
-                </ul>
-            </div>
-        );
-    } else if (isLoading) {
-        return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Loading</p>
-                </ul>
-            </div>
-        );
-    } else if (data && data.contents.length) {
-        return (
-            <div className="results">
+            <>
                 <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
                 <div className="list-headers">
                     <div className="list-header apartment">Asunto</div>
@@ -98,17 +83,22 @@ export const ApartmentResultsList = ({filterParams}) => {
                         />
                     ))}
                 </ul>
-            </div>
+            </>
         );
-    } else {
-        return (
-            <div className="results">
-                <ul className="results-list">
-                    <p>Ei tuloksia</p>
-                </ul>
-            </div>
-        );
-    }
+    };
+
+    return (
+        <div className="results">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedApartmentResultsList data={data as IApartmentListResponse} />
+            </QueryStateHandler>
+            <></>
+        </div>
+    );
 };
 
 const ApartmentFilters = ({filterParams, setFilterParams}) => {
@@ -163,10 +153,9 @@ export default function ApartmentListPage() {
                     placeholder="Rajaa hakusanalla"
                     searchButtonAriaLabel="Search"
                     clearButtonAriaLabel="Clear search field"
-                    onSubmit={(submittedValue) =>
-                        // eslint-disable-next-line no-console
-                        console.log("Submitted search-value:", submittedValue)
-                    }
+                    onSubmit={(
+                        submittedValue // eslint-disable-next-line no-console
+                    ) => console.log("Submitted search-value:", submittedValue)}
                 />
 
                 <ApartmentResultsList filterParams={filterParams} />
