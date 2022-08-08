@@ -5,6 +5,8 @@ services:
       context: frontend
     ports:
       - 8081:8080
+    volumes:
+      -  ./frontend/docker-env-config.js:/usr/share/nginx/html/env-config.js
     depends_on:
       - hitas-backend
 
