@@ -7,9 +7,22 @@ import {
     IHousingCompanyListResponse,
 } from "../common/models";
 
+declare global {
+    interface Window {
+        __env: Record<string, string> | undefined;
+    }
+}
+
+export class Config {
+    static api_url =
+        window.__env !== undefined
+            ? window.__env.API_URL
+            : process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1";
+}
+
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
-    baseQuery: fetchBaseQuery({baseUrl: "http://localhost:8000/api/v1/"}),
+    baseQuery: fetchBaseQuery({baseUrl: Config.api_url}),
     endpoints: (builder) => ({
         // HousingCompany
         getHousingCompanies: builder.query<IHousingCompanyListResponse, object>({
