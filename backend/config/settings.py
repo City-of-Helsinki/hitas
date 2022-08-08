@@ -18,6 +18,7 @@ env = environ.Env(
     VAR_ROOT=(str, var_root),
     STATIC_URL=(str, "/static/"),
     MEDIA_URL=(str, "/media/"),
+    CORS_ALLOWED_ORIGINS=(list, []),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -30,6 +31,7 @@ STATIC_ROOT = var_root("static")
 MEDIA_ROOT = var_root("media")
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 
 # Application definition
 INSTALLED_APPS = [
@@ -130,6 +132,3 @@ TIME_ZONE = "Europe/Helsinki"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-if DEBUG:
-    CORS_ORIGIN_ALLOW_ALL = True
