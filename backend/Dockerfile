@@ -54,7 +54,7 @@ RUN pip install "poetry==$POETRY_VERSION"
 # Create virtualenv and install dependencies
 #
 USER hitas
-RUN python -m venv /hitas/venv
+RUN python -m venv /hitas/venv && /hitas/venv/bin/pip install wheel
 
 RUN mkdir /hitas/build
 WORKDIR /hitas/build
