@@ -3,7 +3,7 @@
 all: format tests build
 
 build:
-	cd .. && docker-compose up --detach --build
+	docker-compose up --detach --build
 
 tests:
 	pytest --cov
