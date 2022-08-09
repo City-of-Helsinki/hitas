@@ -1,11 +1,10 @@
 import React, {useState} from "react";
 
-import {SearchInput, StatusLabel} from "hds-react";
+import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {useGetApartmentsQuery, useGetDevelopersQuery, useGetPropertyManagersQuery} from "../../app/services";
+import {useGetApartmentsQuery} from "../../app/services";
 import {FilterPostalCodeInput, FilterTextInput, ListPageNumbers, QueryStateHandler} from "../../common/components";
-import RelatedModelFilterCombobox from "../../common/components/RelatedModelFilterCombobox";
 import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -112,12 +111,6 @@ const ApartmentFilters = ({filterParams, setFilterParams}) => {
     return (
         <div className="filters">
             <FilterTextInput
-                label="Yhtiön nimi"
-                filterFieldName="housing_company_name"
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-            />
-            <FilterTextInput
                 label="Osoite"
                 filterFieldName="street_address"
                 filterParams={filterParams}
@@ -129,21 +122,33 @@ const ApartmentFilters = ({filterParams, setFilterParams}) => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <RelatedModelFilterCombobox
-                label="Rakennuttaja"
-                queryFunction={useGetDevelopersQuery}
-                labelField="value"
-                filterFieldName="developer"
+            <FilterTextInput
+                label="Yhtiön nimi"
+                filterFieldName="housing_company_name"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <RelatedModelFilterCombobox
-                label="Isännöitsijä"
-                queryFunction={useGetPropertyManagersQuery}
-                labelField="name"
-                filterFieldName="property_manager"
+            <FilterTextInput
+                label="Omistajan nimi"
+                filterFieldName="owner_name"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
+            />
+            <FilterTextInput
+                label="Henkilötunnus"
+                filterFieldName="owner_social_security_number"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <TextInput
+                id="filter__ostajaehdokas"
+                label={"Ostajaehdokas"}
+                disabled
+            />
+            <Checkbox
+                id="sales_condition"
+                label="Löytyy myyntiehto"
+                disabled={true}
             />
         </div>
     );
