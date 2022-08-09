@@ -4,7 +4,7 @@ import {Button, SearchInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import {FilterPostalCodeInput, FilterTextInput, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import RelatedModelFilterCombobox from "../../common/components/RelatedModelFilterCombobox";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress} from "../../common/utils";
@@ -22,7 +22,8 @@ const HousingCompanyListItem = ({id, name, address, date}) => {
 };
 
 const HousingCompanyResultsList = ({filterParams}) => {
-    const {data, error, isLoading} = useGetHousingCompaniesQuery(filterParams);
+    const [currentPage, setCurrentPage] = useState(1);
+    const {data, error, isLoading} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
 
     const LoadedHousingCompanyResultsList = ({data}: {data: IHousingCompanyListResponse}) => {
         return (
@@ -56,6 +57,11 @@ const HousingCompanyResultsList = ({filterParams}) => {
                 isLoading={isLoading}
             >
                 <LoadedHousingCompanyResultsList data={data as IHousingCompanyListResponse} />
+                <ListPageNumbers
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageInfo={data?.page}
+                />
             </QueryStateHandler>
         </div>
     );

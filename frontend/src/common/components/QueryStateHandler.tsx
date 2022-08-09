@@ -15,7 +15,7 @@ interface IQueryLoading {
         | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     isLoading: boolean;
-    children: JSX.Element;
+    children: JSX.Element | JSX.Element[];
 }
 
 export default function QueryStateHandler({data, error, isLoading, children}: IQueryLoading): JSX.Element {

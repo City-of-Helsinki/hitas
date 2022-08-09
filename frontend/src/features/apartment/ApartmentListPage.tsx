@@ -4,7 +4,7 @@ import {SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetDevelopersQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {FilterPostalCodeInput, FilterTextInput, QueryStateHandler} from "../../common/components";
+import {FilterPostalCodeInput, FilterTextInput, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import RelatedModelFilterCombobox from "../../common/components/RelatedModelFilterCombobox";
 import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
@@ -57,7 +57,8 @@ const ApartmentListItem = ({
 };
 
 export const ApartmentResultsList = ({filterParams}) => {
-    const {data, error, isLoading} = useGetApartmentsQuery(filterParams);
+    const [currentPage, setCurrentPage] = useState(1);
+    const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
 
     const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
         return (
@@ -96,6 +97,11 @@ export const ApartmentResultsList = ({filterParams}) => {
                 isLoading={isLoading}
             >
                 <LoadedApartmentResultsList data={data as IApartmentListResponse} />
+                <ListPageNumbers
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageInfo={data?.page}
+                />
             </QueryStateHandler>
             <></>
         </div>

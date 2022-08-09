@@ -173,10 +173,7 @@ export interface IHousingCompanyListResponse {
     page: PageInfo;
     contents: IHousingCompany[];
 }
-export interface IHousingCompanyListResponse {
-    page: PageInfo;
-    contents: IHousingCompany[];
-}
+
 export interface IApartmentListResponse {
     page: PageInfo;
     contents: IApartment[];
