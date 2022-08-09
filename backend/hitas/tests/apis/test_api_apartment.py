@@ -588,8 +588,8 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
         {"floor": 22},
         {"stair": "Ö"},
         {"building": "4a5c66cdcd554784a9047bd45c2362ba"},
-        {"owner_first_name": "Megatron"},
-        {"owner_last_name": "Opetimus Prime"},
+        {"owner_name": "Megatron"},
+        {"owner_name": "Opetimus Prime"},
         {"owner_social_security_number": "010199-123A"},
     ],
 )

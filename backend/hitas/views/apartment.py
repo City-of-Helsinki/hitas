@@ -2,6 +2,7 @@ from collections import OrderedDict
 from typing import Any, Union
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
@@ -43,11 +44,15 @@ class ApartmentFilterSet(HitasFilterSet):
     state = filters.ChoiceFilter(choices=ApartmentState.choices())
     apartment_type = filters.CharFilter(field_name="apartment_type__value")
     building = HitasUUIDFilter(field_name="building__uuid")
-    owner_first_name = filters.CharFilter(field_name="owners__person__first_name", lookup_expr="icontains")
-    owner_last_name = filters.CharFilter(field_name="owners__person__last_name", lookup_expr="icontains")
+    owner_name = filters.CharFilter(method="owner_name_filter")
     owner_social_security_number = filters.CharFilter(
         field_name="owners__person__social_security_number", lookup_expr="icontains"
     )
+
+    def owner_name_filter(self, queryset, name, value):
+        return queryset.filter(
+            Q(owners__person__first_name__icontains=value) | Q(owners__person__last_name__icontains=value)
+        )
 
     class Meta:
         model = Apartment
