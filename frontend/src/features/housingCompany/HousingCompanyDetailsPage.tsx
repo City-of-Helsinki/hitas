@@ -57,7 +57,15 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
+                                            value={`${data.acquisition_price.initial} €`} // TODO: Format number
+                                        />
+                                        <DetailField
+                                            label="Toteutunut hankinta-arvo"
                                             value={`${data.acquisition_price.realized} €`} // TODO: Format number
+                                        />
+                                        <DetailField
+                                            label="Ensisijaislaina"
+                                            value={`${data.primary_loan} €`} // TODO: Format number
                                         />
                                     </div>
                                     <div className="column">
@@ -85,6 +93,14 @@ const HousingCompanyDetailsPage = () => {
                                             value="2 045 m²"
                                         />
                                         <DetailField
+                                            label="Myyntihintaluettelon vahvistamispäivä"
+                                            value={data.sales_price_catalogue_confirmation_date}
+                                        />
+                                        <DetailField
+                                            label="Ilmoituspäivä"
+                                            value={data.notification_date}
+                                        />
+                                        <DetailField
                                             label="Rakennuttaja"
                                             value={data.developer.value}
                                         />
@@ -93,6 +109,14 @@ const HousingCompanyDetailsPage = () => {
                                         <DetailField
                                             label="Isännöitsijä"
                                             value={`${data.property_manager.name} (${data.property_manager.email})`}
+                                        />
+                                        <DetailField
+                                            label="Rahoitusmuoto"
+                                            value={data.financing_method.value}
+                                        />
+                                        <DetailField
+                                            label="Talotyyppi"
+                                            value={data.building_type.value}
                                         />
                                     </div>
                                 </div>
