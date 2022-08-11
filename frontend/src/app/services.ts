@@ -5,6 +5,7 @@ import {
     IApartmentListResponse,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
+    IHousingCompanyWritable,
 } from "../common/models";
 
 declare global {
@@ -33,6 +34,16 @@ export const hitasApi = createApi({
         }),
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
+        }),
+        createHousingCompany: builder.mutation<IHousingCompanyDetails, IHousingCompanyWritable>({
+            query: (data) => ({
+                url: "housing-companies",
+                method: "POST",
+                body: data,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }),
         }),
         // Apartments
         getApartments: builder.query<IApartmentListResponse, object>({
@@ -64,6 +75,7 @@ export const hitasApi = createApi({
 export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyDetailQuery,
+    useCreateHousingCompanyMutation,
     useGetApartmentsQuery,
     useGetApartmentDetailQuery,
     useGetPropertyManagersQuery,
