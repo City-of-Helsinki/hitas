@@ -97,9 +97,9 @@ const ApartmentDetailsPage = () => {
                                     <div className="column">
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
+                                            value={(data.notes as string) || ""}
                                             readOnly
-                                            value={data.notes as string}
-                                        ></textarea>
+                                        />
                                     </div>
                                 </div>
                             </Tabs.TabPanel>
