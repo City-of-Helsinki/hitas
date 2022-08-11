@@ -2,16 +2,25 @@
 
 set -euo pipefail
 
-VERSION=${VERSION:-""}
+VERSION=${VERSION:-"<unknown>"}
 
+echo
 echo "Version: ${VERSION}"
+echo
 
 . /hitas/venv/bin/activate
+
+if [[ "${RESET_MIGRATIONS:-"0"}" = "1" ]]; then
+    echo "Resetting migrations..."
+    ./manage.py migrate hitas zero
+    echo
+fi
 
 # Apply or validate database migrations
 if [[ "${APPLY_MIGRATIONS:-"0"}" = "1" ]]; then
     echo "Applying database migrations..."
     ./manage.py migrate --noinput
+    echo
 else
     echo "Checking that migrations are applied..."
     error_code=0
@@ -25,6 +34,7 @@ fi
 
 # Apply initial dataset
 if [[ "${LOAD_INITIAL_DATASET:-"0"}" = "1" ]]; then
+    echo "Loading initial dataset..."
     ./manage.py loaddata initial.json
 fi
 
