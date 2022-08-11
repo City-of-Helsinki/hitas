@@ -57,15 +57,15 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={`${data.acquisition_price?.realized} €`} // TODO: Format number
+                                            value={`${data.acquisition_price.realized} €`} // TODO: Format number
                                         />
                                     </div>
                                     <div className="column">
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
                                             readOnly
-                                            value={data.notes as string}
-                                        ></textarea>
+                                            value={(data.notes as string) || ""}
+                                        />
                                     </div>
                                 </div>
                             </Tabs.TabPanel>
@@ -86,13 +86,13 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Rakennuttaja"
-                                            value={data.developer?.value}
+                                            value={data.developer.value}
                                         />
                                     </div>
                                     <div className="column">
                                         <DetailField
                                             label="Isännöitsijä"
-                                            value={`${data.property_manager?.name} (${data.property_manager?.email})`}
+                                            value={`${data.property_manager.name} (${data.property_manager.email})`}
                                         />
                                     </div>
                                 </div>

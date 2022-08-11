@@ -28,17 +28,24 @@ export interface IHousingCompanyDetails {
     address: IAddress;
     area: IHousingCompanyArea;
     date: string | null;
-    financing_method?: ICode;
-    building_type?: ICode;
-    developer?: ICode;
-    property_manager?: IPropertyManager;
-    acquisition_price?: IHousingCompanyDetailsAcquisitionPrice;
-    primary_loan?: number | null;
-    sales_price_catalogue_confirmation_date?: string | null;
-    notification_date?: string | null;
-    legacy_id?: string | null;
-    notes?: string | null;
-    last_modified?: IHousingCompanyDetailsLastModified;
+    financing_method: ICode;
+    building_type: ICode;
+    developer: ICode;
+    property_manager: IPropertyManager;
+    acquisition_price: IHousingCompanyDetailsAcquisitionPrice;
+    primary_loan: number | null;
+    sales_price_catalogue_confirmation_date: string | null;
+    notification_date: string | null;
+    legacy_id: string | null;
+    notes: string | null;
+    last_modified: {
+        user: {
+            user: string | null;
+            first_name: string | null;
+            last_name: string | null;
+        };
+        datetime: Date;
+    };
     real_estates: Array<IRealEstate>;
 }
 
@@ -61,17 +68,6 @@ export interface IHousingCompanyDetailsName {
     display: string;
 }
 
-export interface IHousingCompanyDetailsLastModifiedUser {
-    user?: string | null;
-    first_name: string | null;
-    last_name: string | null;
-}
-
-export interface IHousingCompanyDetailsLastModified {
-    user: IHousingCompanyDetailsLastModifiedUser;
-    datetime: Date;
-}
-
 export interface IHousingCompanyDetailsAcquisitionPrice {
     initial: number;
     realized: number | null;
@@ -88,7 +84,7 @@ export interface IBuilding {
     readonly id: string;
     address: IAddress;
     completion_date: string | null;
-    building_identifier?: string | null;
+    building_identifier: string | null;
 }
 
 export interface IApartment {
@@ -109,24 +105,24 @@ export interface IApartmentDetails {
     state: ApartmentState;
     apartment_type: ICode;
     surface_area: number;
-    share_number_start?: number | null;
-    share_number_end?: number | null;
+    share_number_start: number | null;
+    share_number_end: number | null;
     address: IAddress;
     apartment_number: number;
-    floor?: number;
-    stair?: string;
+    floor: number;
+    stair: string;
     date: string | null;
-    debt_free_purchase_price?: number | null;
-    purchase_price?: number | null;
-    acquisition_price?: number | null;
-    primary_loan_amount?: number | null;
-    loans_during_construction?: number | null;
-    interest_during_construction?: number | null;
-    building?: string;
-    real_estate?: string;
+    debt_free_purchase_price: number | null;
+    purchase_price: number | null;
+    acquisition_price: number | null;
+    primary_loan_amount: number | null;
+    loans_during_construction: number | null;
+    interest_during_construction: number | null;
+    building: string;
+    real_estate: string;
     housing_company: IHousingCompany;
     owners: Array<IOwner>;
-    notes?: string | null;
+    notes: string | null;
 }
 
 export type ApartmentState = "free" | "reserved" | "sold";
@@ -159,12 +155,10 @@ export interface PageInfo {
     total_items: number;
     current_page: number;
     total_pages: number;
-    links: PageInfoLinks;
-}
-
-export interface PageInfoLinks {
-    next?: string | null;
-    previous?: string | null;
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
 }
 
 // List response interfaces
