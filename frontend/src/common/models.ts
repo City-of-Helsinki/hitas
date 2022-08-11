@@ -1,7 +1,7 @@
 export interface IAddress {
     street_address: string;
     postal_code: string;
-    city: string;
+    city?: string; // Always returned when reading, but not required when writing
 }
 
 export interface ICode {
@@ -47,6 +47,22 @@ export interface IHousingCompanyDetails {
         datetime: Date;
     };
     real_estates: Array<IRealEstate>;
+}
+
+export interface IHousingCompanyWritable {
+    readonly id?: string;
+    name: IHousingCompanyDetailsName;
+    business_id: string;
+    state: IHousingCompanyState;
+    address: IAddress;
+    financing_method: {id: string};
+    building_type: {id: string};
+    developer: {id: string};
+    property_manager: {id: string};
+    acquisition_price: IHousingCompanyDetailsAcquisitionPrice;
+    primary_loan: number | null;
+    sales_price_catalogue_confirmation_date: string | null;
+    notes: string | null;
 }
 
 export interface IHousingCompanyArea {
