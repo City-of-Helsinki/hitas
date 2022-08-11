@@ -9,7 +9,7 @@ import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
 import {ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
-import {HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
+import {HousingCompanyCreatePage, HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
 
 export default function Router() {
     return (
@@ -26,6 +26,10 @@ export default function Router() {
                     <Route
                         index
                         element={<HousingCompanyListPage />}
+                    />
+                    <Route
+                        path="create"
+                        element={<HousingCompanyCreatePage />}
                     />
                     <Route
                         path=":housingCompanyId"

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, SearchInput} from "hds-react";
+import {Button, IconPlus, SearchInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
@@ -115,7 +115,9 @@ const HousingCompanyListPage = () => {
         <div className="companies">
             <h1 className="main-heading">
                 <span>Kaikki kohteet</span>
-                <Button>Lisää uusi yhtiö</Button>
+                <Link to="create">
+                    <Button iconLeft={<IconPlus />}>Lisää uusi yhtiö</Button>
+                </Link>
             </h1>
             <div className="listing">
                 <SearchInput
