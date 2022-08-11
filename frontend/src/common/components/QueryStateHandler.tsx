@@ -2,6 +2,7 @@ import React from "react";
 
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
+import {LoadingSpinner} from "hds-react";
 
 import {PageInfo} from "../models";
 
@@ -24,7 +25,7 @@ export default function QueryStateHandler({data, error, isLoading, children}: IQ
     return error ? (
         <p>Virhe</p>
     ) : isLoading ? (
-        <p>Ladataan</p>
+        <LoadingSpinner />
     ) : data && (!("contents" in data) || data.contents.length) ? (
         <>{children}</>
     ) : (
