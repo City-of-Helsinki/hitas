@@ -70,14 +70,17 @@ export interface IHousingCompanyArea {
     cost_area: number;
 }
 
-export type IHousingCompanyState =
-    | "not_ready"
-    | "lt_30_years"
-    | "gt_30_years_not_free"
-    | "gt_30_years_free"
-    | "gt_30_years_plot_department_notification"
-    | "half_hitas"
-    | "ready_no_statistics";
+export const HousingCompanyStates = [
+    "not_ready",
+    "lt_30_years",
+    "gt_30_years_not_free",
+    "gt_30_years_free",
+    "gt_30_years_plot_department_notification",
+    "half_hitas",
+    "ready_no_statistics",
+] as const;
+
+export type IHousingCompanyState = typeof HousingCompanyStates[number];
 
 export interface IHousingCompanyDetailsName {
     official: string;

@@ -1,10 +1,12 @@
 import React from "react";
 
-import {Button, Fieldset, IconSaveDisketteFill, NumberInput, TextArea, TextInput} from "hds-react";
+import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useCreateHousingCompanyMutation} from "../../app/services";
-import {IHousingCompanyState, IHousingCompanyWritable} from "../../common/models";
+import {FormInputField} from "../../common/components";
+import {HousingCompanyStates, IHousingCompanyWritable} from "../../common/models";
+import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = () => {
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>({
@@ -27,8 +29,7 @@ const HousingCompanyCreatePage = () => {
         state: "not_ready",
         sales_price_catalogue_confirmation_date: "2022-01-01",
     });
-    const [createHousingCompany, response] = useCreateHousingCompanyMutation();
-    console.log(response);
+    const [createHousingCompany] = useCreateHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
         createHousingCompany(formData);
@@ -47,83 +48,62 @@ const HousingCompanyCreatePage = () => {
                     gridGap: "1em",
                 }}
             >
-                <TextInput
+                <FormInputField
                     label="Yhtiön hakunimi"
-                    id="name.display"
-                    value={formData.name.display}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.name.display = e.target.value;
-                        })
-                    }
+                    fieldPath="name.display"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
+                <FormInputField
                     label="Yhtiön virallinen nimi"
-                    id="name.official"
-                    value={formData.name.official}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.name.official = e.target.value;
-                        })
-                    }
+                    fieldPath="name.official"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
+                <FormInputField
                     label="Virallinen osoite"
-                    id="address.street"
-                    value={formData.address.street}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.address.street = e.target.value;
-                        })
-                    }
+                    fieldPath="address.street"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
+                <FormInputField
+                    inputType={"postalCode"}
                     label="Postinumero"
-                    id="address.postal_code"
-                    value={formData.address.postal_code}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.address.postal_code = e.target.value;
-                        })
-                    }
+                    fieldPath="address.postal_code"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
-                    label="state"
-                    id="state"
-                    value={formData.state}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.state = e.target.value as IHousingCompanyState;
-                        })
-                    }
+                <FormInputField
+                    inputType={"select"}
+                    label="Tila"
+                    fieldPath="state"
+                    options={(() =>
+                        HousingCompanyStates.map((state) => {
+                            return {label: state};
+                        }))()}
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <NumberInput
+                <FormInputField
+                    inputType="money"
                     label="Hankinta-arvo"
-                    id="acquisition_price.initial"
-                    value={formData.acquisition_price.initial}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.acquisition_price.initial = Number(Number(e.target.value).toFixed(2));
-                        })
-                    }
-                    unit="€"
+                    fieldPath="acquisition_price.initial"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <NumberInput
-                    label="Hankinta-arvo"
-                    id="acquisition_price.realized"
-                    value={formData.acquisition_price.realized || ""}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.acquisition_price.realized = Number(Number(e.target.value).toFixed(2));
-                        })
-                    }
-                    unit="€"
+                <FormInputField
+                    inputType="money"
+                    label="Toteutunut hankinta-arvo"
+                    fieldPath="acquisition_price.realized"
+                    required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
             </Fieldset>
             <Fieldset
@@ -134,92 +114,62 @@ const HousingCompanyCreatePage = () => {
                     gridGap: "1em",
                 }}
             >
-                <TextInput
-                    label="business_id"
-                    id="business_id"
-                    value={formData.business_id}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.business_id = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    label="Y-Tunnus"
+                    fieldPath="business_id"
+                    validator={validateBusinessId}
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
-                    label="sales_price_catalogue_confirmation_date"
-                    id="sales_price_catalogue_confirmation_date"
-                    value={formData.sales_price_catalogue_confirmation_date || ""}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.sales_price_catalogue_confirmation_date = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    inputType="date"
+                    label="Myyntihintaluettelon vahvistamispäivä"
+                    fieldPath="sales_price_catalogue_confirmation_date"
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <NumberInput
-                    label="primary_loan"
-                    id="primary_loan"
-                    value={formData.primary_loan || ""}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.primary_loan = Number(Number(e.target.value).toFixed(2));
-                        })
-                    }
-                    unit="€"
-                />
-
-                <TextInput
-                    label="financing_method"
-                    id="financing_method"
-                    value={formData.financing_method.id}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.financing_method.id = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    inputType="money"
+                    label="Ensisijainen laina"
+                    fieldPath="primary_loan"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
-                    label="building_type"
-                    id="building_type"
-                    value={formData.building_type.id}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.building_type.id = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    label="Rahoitusmuoto"
+                    fieldPath="financing_method.id"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
-                    label="developer"
-                    id="developer"
-                    value={formData.developer.id}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.developer.id = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    label="Talotyyppi"
+                    fieldPath="building_type.id"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextInput
-                    label="property_manager"
-                    id="property_manager"
-                    value={formData.property_manager.id}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.property_manager.id = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    label="Rakennuttaja"
+                    fieldPath="developer.id"
                     required
+                    formData={formData}
+                    setFormData={setFormData}
                 />
-                <TextArea
-                    label="notes"
-                    id="notes"
-                    value={formData.notes || ""}
-                    onChange={(e) =>
-                        setFormData((draft) => {
-                            draft.notes = e.target.value;
-                        })
-                    }
+                <FormInputField
+                    label="Isännöitsijä"
+                    fieldPath="property_manager.id"
+                    required
+                    formData={formData}
+                    setFormData={setFormData}
+                />
+                <FormInputField
+                    label="Huomioitavaa"
+                    fieldPath="notes"
+                    formData={formData}
+                    setFormData={setFormData}
                 />
             </Fieldset>
             <Button
