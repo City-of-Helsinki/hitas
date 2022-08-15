@@ -19,19 +19,20 @@ env = environ.Env(
     STATIC_URL=(str, "/static/"),
     MEDIA_URL=(str, "/media/"),
     CORS_ALLOWED_ORIGINS=(list, []),
+    UWSGI_WARMUP=(bool, True),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
-
 var_root = env.path("VAR_ROOT")
 STATIC_ROOT = var_root("static")
 MEDIA_ROOT = var_root("media")
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+UWSGI_WARMUP = env("UWSGI_WARMUP")
 
 # Application definition
 INSTALLED_APPS = [
