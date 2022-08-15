@@ -103,9 +103,9 @@ def test__api__person__retrieve__invalid_id(api_client: HitasAPIClient):
 def get_person_create_data() -> dict[str, Any]:
     pc: PostalCode = PostalCodeFactory.create(value="00100")
 
-    data = {
-        "first_name": "Matti Matias",
-        "last_name": "Meikäläinen",
+    return {
+        "first_name": "fake-first-name",
+        "last_name": "fake-last-name",
         "social_security_number": "010199-123A",
         "email": "test@hitas.com",
         "address": {
@@ -113,7 +113,6 @@ def get_person_create_data() -> dict[str, Any]:
             "street": "test-street-address-1",
         },
     }
-    return data
 
 
 @pytest.mark.parametrize("minimal_data", [False, True])
@@ -214,9 +213,9 @@ def test__api__person__delete(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "selected_filter",
     [
-        {"first_name": "Matti"},
-        {"first_name": "Matias"},
-        {"last_name": "Meikäläinen"},
+        {"first_name": "fake-first"},
+        {"first_name": "first-name"},
+        {"last_name": "fake-last"},
         {"social_security_number": "010199-123A"},
         {"email": "hitas"},
         {"street_address": "test-street"},
