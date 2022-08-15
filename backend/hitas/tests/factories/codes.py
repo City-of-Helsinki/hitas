@@ -8,7 +8,7 @@ from faker import Faker
 
 from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
 
-fake = Faker(locale="fi_FI")
+faker = Faker(locale="fi_FI")
 
 
 class AbstractCodeFactory(DjangoModelFactory):
@@ -17,7 +17,7 @@ class AbstractCodeFactory(DjangoModelFactory):
         abstract = True
 
     value = None
-    description = fake.sentence()
+    description = factory.Faker("sentence")
     in_use = True
     order = None
     legacy_code_number = factory.Sequence(lambda n: f"{n%1000:03}")
@@ -31,8 +31,8 @@ class PostalCodeFactory(AbstractCodeFactory):
         django_get_or_create = ("value",)
 
     # # Helsinki area postal code e.g. 00100
-    value = factory.Sequence(lambda n: fake.bothify(f"0{n%100:02}#0"))
-    description = fake.city()
+    value = factory.Sequence(lambda n: faker.bothify(f"0{n%100:02}#0"))
+    description = factory.Faker("city")
 
 
 class BuildingTypeFactory(AbstractCodeFactory):
@@ -96,7 +96,7 @@ class DeveloperFactory(AbstractCodeFactory):
         model = Developer
         django_get_or_create = ("value",)
 
-    value = factory.LazyAttribute(lambda self: f"As Oy {fake.last_name()}")
+    value = factory.LazyAttribute(lambda _: f"As Oy {faker.last_name()}")
 
 
 class ApartmentTypeFactory(AbstractCodeFactory):

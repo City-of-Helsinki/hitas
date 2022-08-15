@@ -1,10 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
-from faker import Faker
 
 from users.models import User
-
-fake = Faker(locale="fi_FI")
 
 
 class UserFactory(DjangoModelFactory):
