@@ -5,23 +5,20 @@ from decimal import Decimal
 import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
-from faker import Faker
 
 from hitas.models import Apartment, Building, HousingCompany, HousingCompanyState, RealEstate
 from hitas.models.apartment import ApartmentState
-
-fake = Faker(locale="fi_FI")
 
 
 class HousingCompanyFactory(DjangoModelFactory):
     class Meta:
         model = HousingCompany
 
-    display_name = fake.last_name()
+    display_name = factory.Faker("last_name")
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = HousingCompanyState.NOT_READY
-    business_id = fake.company_business_id()
-    street_address = fake.street_address()
+    business_id = factory.Faker("company_business_id")
+    street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
     building_type = factory.SubFactory("hitas.tests.factories.BuildingTypeFactory")
     financing_method = factory.SubFactory("hitas.tests.factories.FinancingMethodFactory")
@@ -38,7 +35,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     legacy_id = factory.Sequence(lambda n: f"{n:03}")
-    notes = fake.text()
+    notes = factory.Faker("text")
     last_modified_datetime = fuzzy.FuzzyDate(date(2010, 1, 1))
     last_modified_by = factory.SubFactory("hitas.tests.factories.UserFactory")
 
@@ -48,8 +45,8 @@ class RealEstateFactory(DjangoModelFactory):
         model = RealEstate
 
     housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
-    property_identifier = fake.bothify("####-####-####-####")
-    street_address = fake.street_address()
+    property_identifier = factory.Faker("bothify", text="####-####-####-####")
+    street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
 
 
@@ -59,8 +56,8 @@ class BuildingFactory(DjangoModelFactory):
 
     real_estate = factory.SubFactory("hitas.tests.factories.RealEstateFactory")
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    building_identifier = fake.bothify("1########?")
-    street_address = fake.street_address()
+    building_identifier = factory.Faker("bothify", text="1########?")
+    street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
 
 
@@ -74,15 +71,15 @@ class ApartmentFactory(DjangoModelFactory):
     surface_area = fuzzy.FuzzyDecimal(10, 99, precision=2)
     share_number_start = factory.Sequence(lambda n: n * 50)
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
-    street_address = fake.street_address()
+    street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = fuzzy.FuzzyInteger(1, 9)
-    stair = fake.bothify("?")  # Random letter
+    stair = factory.Faker("bothify", text="?")  # Random letter
     debt_free_purchase_price = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     purchase_price = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     acquisition_price = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     primary_loan_amount = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     loans_during_construction = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     interest_during_construction = fuzzy.FuzzyDecimal(10000, 20000, precision=2)
-    notes = fake.text()
+    notes = factory.Faker("text")

@@ -14,11 +14,11 @@ class PersonFactory(DjangoModelFactory):
     class Meta:
         model = Person
 
-    first_name = fake.first_name()
-    last_name = fake.last_name()
-    social_security_number = fake.ssn()
-    email = fake.email()
-    street_address = fake.street_address()
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    social_security_number = factory.Faker("ssn")
+    email = factory.Faker("email")
+    street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
 
 
