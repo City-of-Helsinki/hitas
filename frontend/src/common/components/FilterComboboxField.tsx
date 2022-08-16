@@ -10,7 +10,7 @@ interface IFilterCombobox {
     setFilterParams: (object) => void;
 }
 
-export default function FilterCombobox({
+export default function FilterComboboxField({
     label,
     options,
     filterFieldName,

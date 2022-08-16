@@ -11,7 +11,7 @@ interface IRelatedModelFilterCombobox {
     setFilterParams: (object) => void;
 }
 
-export default function RelatedModelFilterCombobox({
+export default function FilterRelatedModelComboboxField({
     label,
     queryFunction,
     labelField,
