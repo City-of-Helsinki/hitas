@@ -9,7 +9,7 @@ import FilterRelatedModelComboboxField from "../../common/components/FilterRelat
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
-const HousingCompanyListItem = ({id, name, address, date}) => {
+const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {
     return (
         <Link to={`/housing-companies/${id}`}>
             <li className="results-list__item">
@@ -21,7 +21,7 @@ const HousingCompanyListItem = ({id, name, address, date}) => {
     );
 };
 
-const HousingCompanyResultsList = ({filterParams}) => {
+const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
     const {data, error, isLoading} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
 
@@ -67,7 +67,7 @@ const HousingCompanyResultsList = ({filterParams}) => {
     );
 };
 
-const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
+const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => {
     return (
         <div className="filters">
             <FilterTextInputField
@@ -108,7 +108,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
     );
 };
 
-const HousingCompanyListPage = () => {
+const HousingCompanyListPage = (): JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (

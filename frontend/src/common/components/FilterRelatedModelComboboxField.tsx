@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 
 import {Combobox} from "hds-react";
 
-interface IRelatedModelFilterCombobox {
+interface FilterRelatedModelComboboxFieldProps {
     label: string;
     queryFunction;
     labelField: string;
@@ -18,9 +18,9 @@ export default function FilterRelatedModelComboboxField({
     filterFieldName,
     filterParams,
     setFilterParams,
-}: IRelatedModelFilterCombobox) {
     const LOADING_OPTION = {label: "Loading..."};
     const [options, setOptions] = useState([LOADING_OPTION]);
+}: FilterRelatedModelComboboxFieldProps): JSX.Element {
     const [skip, setSkip] = useState(true);
 
     const {data} = queryFunction({}, {skip: skip});

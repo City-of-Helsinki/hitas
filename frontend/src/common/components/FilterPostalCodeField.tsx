@@ -2,7 +2,7 @@ import React, {useState} from "react";
 
 import {TextInput} from "hds-react";
 
-interface IFilterPostalCodeInput {
+interface FilterPostalCodeFieldProps {
     label: string;
     filterFieldName: string;
     filterParams: {string: string | number};
@@ -14,7 +14,7 @@ export default function FilterPostalCodeField({
     filterFieldName,
     filterParams,
     setFilterParams,
-}: IFilterPostalCodeInput) {
+}: FilterPostalCodeFieldProps): JSX.Element {
     const [inputValue, setInputValue] = useState("");
     const [isInvalid, setIsInvalid] = useState(false);
 

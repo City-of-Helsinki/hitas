@@ -4,13 +4,13 @@ import {Button} from "hds-react";
 
 import {PageInfo} from "../models";
 
-interface IListPageNumbers {
+interface ListPageNumbersProps {
     pageInfo: PageInfo | undefined;
     currentPage: number;
     setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function ListPageNumbers({currentPage, setCurrentPage, pageInfo}: IListPageNumbers): JSX.Element {
+export default function ListPageNumbers({currentPage, setCurrentPage, pageInfo}: ListPageNumbersProps): JSX.Element {
     if (pageInfo === undefined) return <></>;
 
     const pageButtonData: {pageNumber: number; buttonText: string | number}[] = [];

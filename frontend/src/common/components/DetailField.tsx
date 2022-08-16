@@ -1,9 +1,9 @@
-interface IDetailField {
+interface DetailFieldProps {
     label: string;
     value: string | number | null | undefined;
 }
 
-export default function DetailField({label, value}: IDetailField) {
+export default function DetailField({label, value}: DetailFieldProps): JSX.Element {
     return (
         <>
             <label className="detail-field-label">{label}</label>

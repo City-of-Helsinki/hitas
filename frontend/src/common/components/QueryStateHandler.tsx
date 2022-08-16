@@ -6,7 +6,7 @@ import {LoadingSpinner} from "hds-react";
 
 import {PageInfo} from "../models";
 
-interface IQueryLoading {
+interface QueryLoadingProps {
     data:
         | {
               page: PageInfo;
@@ -19,7 +19,7 @@ interface IQueryLoading {
     children: JSX.Element | JSX.Element[];
 }
 
-export default function QueryStateHandler({data, error, isLoading, children}: IQueryLoading): JSX.Element {
+export default function QueryStateHandler({data, error, isLoading, children}: QueryLoadingProps): JSX.Element {
     // When loading or an error has occurred, show an appropriate message, otherwise return children
 
     return error ? (

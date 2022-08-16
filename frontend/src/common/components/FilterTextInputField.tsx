@@ -2,7 +2,7 @@ import React, {useState} from "react";
 
 import {TextInput} from "hds-react";
 
-interface IFilterTextInput {
+interface FilterTextInputFieldProps {
     label: string;
     filterFieldName: string;
     filterParams: {string: string | number};
@@ -14,7 +14,7 @@ export default function FilterTextInputField({
     filterFieldName,
     filterParams,
     setFilterParams,
-}: IFilterTextInput) {
+}: FilterTextInputFieldProps): JSX.Element {
     const MIN_LENGTH = 3;
     const [isInvalid, setIsInvalid] = useState(false);
 

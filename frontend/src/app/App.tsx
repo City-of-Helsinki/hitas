@@ -3,7 +3,7 @@ import {Outlet} from "react-router-dom";
 
 import "../styles/index.sass";
 
-function App() {
+const App = (): JSX.Element => {
     const NavItem = (item) => {
         return (
             <Navigation.Item
@@ -53,6 +53,6 @@ function App() {
             <Footer />
         </div>
     );
-}
+};
 
 export default App;
