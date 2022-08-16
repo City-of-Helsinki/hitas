@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "health_check",
-    "health_check.db",
     "corsheaders",
 ]
 
