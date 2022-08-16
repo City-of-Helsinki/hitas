@@ -8,7 +8,7 @@ import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryState
 import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
-interface IApartmentListItem {
+interface ApartmentListItemProps {
     id: string;
     apartmentNumber: number;
     stair: string;
@@ -28,7 +28,7 @@ const ApartmentListItem = ({
     surfaceArea,
     address,
     state,
-}: IApartmentListItem) => {
+}: ApartmentListItemProps): JSX.Element => {
     // Combine owners into a single formatted string
     const ownersString = owners
         .map((o) => `${o.person.last_name}, ${o.person.first_name} (${o.person.social_security_number})`)
@@ -55,7 +55,7 @@ const ApartmentListItem = ({
     );
 };
 
-export const ApartmentResultsList = ({filterParams}) => {
+export const ApartmentResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
     const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
 
@@ -107,7 +107,7 @@ export const ApartmentResultsList = ({filterParams}) => {
     );
 };
 
-const ApartmentFilters = ({filterParams, setFilterParams}) => {
+const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
     return (
         <div className="filters">
             <FilterTextInputField
@@ -154,7 +154,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}) => {
     );
 };
 
-export default function ApartmentListPage() {
+const ApartmentListPage = (): JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (
@@ -181,4 +181,6 @@ export default function ApartmentListPage() {
             </div>
         </div>
     );
-}
+};
+
+export default ApartmentListPage;

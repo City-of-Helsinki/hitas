@@ -9,7 +9,7 @@ import {DetailField, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails, IOwner} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
-const ApartmentDetailsPage = () => {
+const ApartmentDetailsPage = (): JSX.Element => {
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery(params.apartmentId as string);
 

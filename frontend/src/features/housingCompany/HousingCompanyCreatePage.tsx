@@ -8,7 +8,7 @@ import {FormInputField} from "../../common/components";
 import {HousingCompanyStates, IHousingCompanyWritable} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
-const HousingCompanyCreatePage = () => {
+const HousingCompanyCreatePage = (): JSX.Element => {
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>({
         acquisition_price: {initial: 10.0, realized: 10.0},
         address: {

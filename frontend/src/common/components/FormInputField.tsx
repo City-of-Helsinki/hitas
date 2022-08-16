@@ -5,7 +5,7 @@ import {Combobox, DateInput, NumberInput, Select, TextArea, TextInput} from "hds
 
 import {dotted} from "../utils";
 
-interface IFormInputField {
+interface FormInputFieldProps {
     inputType?: "text" | "textArea" | "postalCode" | "money" | "select" | "combobox" | "date";
     label: string;
     fieldPath: string | string[];
@@ -25,7 +25,7 @@ export default function FormInputField({
     validator,
     formData,
     setFormData,
-}: IFormInputField) {
+}: FormInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
 
     const setFieldValue = (value) => {
