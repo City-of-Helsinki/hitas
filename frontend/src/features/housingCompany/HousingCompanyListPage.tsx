@@ -4,8 +4,8 @@ import {Button, IconPlus, SearchInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {FilterPostalCodeInput, FilterTextInput, ListPageNumbers, QueryStateHandler} from "../../common/components";
-import RelatedModelFilterCombobox from "../../common/components/RelatedModelFilterCombobox";
+import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -70,25 +70,25 @@ const HousingCompanyResultsList = ({filterParams}) => {
 const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
     return (
         <div className="filters">
-            <FilterTextInput
+            <FilterTextInputField
                 label="Yhtiön nimi"
                 filterFieldName="display_name"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterTextInput
+            <FilterTextInputField
                 label="Osoite"
                 filterFieldName="street_address"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterPostalCodeInput
+            <FilterPostalCodeField
                 label="Postinumero"
                 filterFieldName="postal_code"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <RelatedModelFilterCombobox
+            <FilterRelatedModelComboboxField
                 label="Rakennuttaja"
                 queryFunction={useGetDevelopersQuery}
                 labelField="value"
@@ -96,7 +96,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}) => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <RelatedModelFilterCombobox
+            <FilterRelatedModelComboboxField
                 label="Isännöitsijä"
                 queryFunction={useGetPropertyManagersQuery}
                 labelField="name"

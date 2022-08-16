@@ -9,7 +9,7 @@ interface IFilterPostalCodeInput {
     setFilterParams: (object) => void;
 }
 
-export default function FilterPostalCodeInput({
+export default function FilterPostalCodeField({
     label,
     filterFieldName,
     filterParams,

@@ -9,7 +9,12 @@ interface IFilterTextInput {
     setFilterParams: (object) => void;
 }
 
-export default function FilterTextInput({label, filterFieldName, filterParams, setFilterParams}: IFilterTextInput) {
+export default function FilterTextInputField({
+    label,
+    filterFieldName,
+    filterParams,
+    setFilterParams,
+}: IFilterTextInput) {
     const MIN_LENGTH = 3;
     const [isInvalid, setIsInvalid] = useState(false);
 
