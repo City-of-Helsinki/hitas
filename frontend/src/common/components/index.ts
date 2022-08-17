@@ -2,9 +2,9 @@ import DetailField from "./DetailField";
 import FilterComboboxField from "./FilterComboboxField";
 import FilterPostalCodeField from "./FilterPostalCodeField";
 import FilterTextInputField from "./FilterTextInputField";
-import FormInputField from "./FormInputField";
 import ListPageNumbers from "./ListPageNumbers";
 import QueryStateHandler from "./QueryStateHandler";
+import FormInputField from "./formInputField/FormInputField";
 
 export {
     DetailField,
