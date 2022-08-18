@@ -1,18 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from hitas.models.utils import validate_building_id, validate_business_id, validate_code_number, validate_property_id
-
-
-@pytest.mark.parametrize("code", [None, "000", "001", "100", "801", "999"])
-def test__validate__code_number__valid(code):
-    validate_code_number(code)
-
-
-@pytest.mark.parametrize("code", ["", "1", "11", "0000", "foo", "a000", "000a"])
-def test__validate__code_number__invalid(code):
-    with pytest.raises(ValidationError):
-        validate_code_number(code)
+from hitas.models.utils import validate_building_id, validate_business_id, validate_property_id
 
 
 @pytest.mark.parametrize("business_id", ["1234567-1"])

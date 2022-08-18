@@ -2,7 +2,6 @@ from django_filters.rest_framework import filters
 from rest_framework import serializers
 
 from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
-from hitas.models.utils import validate_code_number
 from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
@@ -10,10 +9,6 @@ class AbstractCodeSerializer(HitasModelSerializer):
     value = serializers.CharField()
     description = serializers.CharField()
     code = serializers.CharField(source="legacy_code_number")
-
-    def validate_code(self, value):
-        validate_code_number(value)
-        return value
 
     class Meta:
         model = AbstractCode

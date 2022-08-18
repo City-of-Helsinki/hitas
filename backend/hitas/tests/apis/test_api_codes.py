@@ -128,9 +128,8 @@ def test__api__code__create(api_client: HitasAPIClient, url_basename, model, fac
 @pytest.mark.parametrize(
     "invalid_data",
     [
-        {"code": "foo"},
-        {"code": "12"},
-        {"code": "1234"},
+        {"code": None},
+        {"description": None},
     ],
 )
 @pytest.mark.django_db

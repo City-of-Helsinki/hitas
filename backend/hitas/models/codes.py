@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.utils import validate_code_number
 
 
 class AbstractCode(ExternalHitasModel):
@@ -12,9 +11,7 @@ class AbstractCode(ExternalHitasModel):
 
     in_use = models.BooleanField(default=True)
     order = models.PositiveSmallIntegerField(null=True, blank=True)
-    legacy_code_number = models.CharField(
-        null=True, max_length=3, validators=[validate_code_number], help_text=_("Format: 000")
-    )
+    legacy_code_number = models.CharField(null=True, max_length=12)
     legacy_start_date = models.DateTimeField(default=timezone.now)
     legacy_end_date = models.DateTimeField(null=True, blank=True)
 
