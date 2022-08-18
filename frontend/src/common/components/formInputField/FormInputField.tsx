@@ -5,6 +5,7 @@ import FormDateInputField from "./FormDateInputField";
 import FormDropdownInputField from "./FormDropdownInputField";
 import FormMoneyInputField from "./FormMoneyInputField";
 import FormPostalCodeInputField from "./FormPostalCodeInputField";
+import FormRelatedModelInputField from "./FormRelatedModelInputField";
 import FormTextInputField from "./FormTextInputField";
 
 export interface CommonFormInputFieldProps {
@@ -110,6 +111,19 @@ export default function FormInputField({
             <FormDateInputField
                 {...commonProps}
                 setIsInvalid={setIsInvalid}
+                {...rest}
+            />
+        );
+    } else if (inputType === "relatedModel") {
+        if (!("getRelatedModelLabel" in rest) || rest.getRelatedModelLabel === undefined)
+            throw new Error("`relatedModelLabel` is required.");
+        if (!("queryFunction" in rest) || rest.queryFunction === undefined)
+            throw new Error("`queryFunction` is required.");
+
+        return (
+            <FormRelatedModelInputField
+                {...commonProps}
+                fieldPath={fieldPath}
                 {...rest}
             />
         );

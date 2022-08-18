@@ -3,9 +3,15 @@ import React from "react";
 import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
 import {useImmer} from "use-immer";
 
-import {useCreateHousingCompanyMutation} from "../../app/services";
+import {
+    useCreateHousingCompanyMutation,
+    useGetBuildingTypesQuery,
+    useGetDevelopersQuery,
+    useGetFinancingMethodsQuery,
+    useGetPropertyManagersQuery,
+} from "../../app/services";
 import {FormInputField} from "../../common/components";
-import {HousingCompanyStates, IHousingCompanyWritable} from "../../common/models";
+import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPropertyManager} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = (): JSX.Element => {
@@ -101,7 +107,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     inputType="money"
                     label="Toteutunut hankinta-arvo"
                     fieldPath="acquisition_price.realized"
-                    required
                     formData={formData}
                     setFormData={setFormData}
                 />
@@ -138,29 +143,45 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     setFormData={setFormData}
                 />
                 <FormInputField
+                    inputType="relatedModel"
                     label="Rahoitusmuoto"
                     fieldPath="financing_method.id"
+                    queryFunction={useGetFinancingMethodsQuery}
+                    relatedModelSearchField="value"
+                    getRelatedModelLabel={(obj: ICode) => obj.value}
                     required
                     formData={formData}
                     setFormData={setFormData}
                 />
                 <FormInputField
+                    inputType="relatedModel"
                     label="Talotyyppi"
                     fieldPath="building_type.id"
+                    queryFunction={useGetBuildingTypesQuery}
+                    relatedModelSearchField="value"
+                    getRelatedModelLabel={(obj: ICode) => obj.value}
                     required
                     formData={formData}
                     setFormData={setFormData}
                 />
                 <FormInputField
+                    inputType="relatedModel"
                     label="Rakennuttaja"
                     fieldPath="developer.id"
+                    queryFunction={useGetDevelopersQuery}
+                    relatedModelSearchField="value"
+                    getRelatedModelLabel={(obj: ICode) => obj.value}
                     required
                     formData={formData}
                     setFormData={setFormData}
                 />
                 <FormInputField
+                    inputType="relatedModel"
                     label="Isännöitsijä"
                     fieldPath="property_manager.id"
+                    queryFunction={useGetPropertyManagersQuery}
+                    relatedModelSearchField="name"
+                    getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
                     required
                     formData={formData}
                     setFormData={setFormData}
