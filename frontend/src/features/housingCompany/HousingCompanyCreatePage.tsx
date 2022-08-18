@@ -16,24 +16,24 @@ import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = (): JSX.Element => {
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>({
-        acquisition_price: {initial: 10.0, realized: 10.0},
+        acquisition_price: {initial: null, realized: null},
         address: {
-            postal_code: "00100",
-            street: "test-street-address-1",
+            postal_code: "",
+            street_address: "",
         },
-        building_type: {id: "f3a77a469fc34b45ba6dbaeebacd8a33"},
-        business_id: "1234567-8",
-        developer: {id: "06224336de274d87853afb950ba5ecc8"},
-        financing_method: {id: "0a76cff05ecf4ebab050204c3477d1c9"},
+        building_type: {id: ""},
+        business_id: "",
+        developer: {id: ""},
+        financing_method: {id: ""},
         name: {
-            display: "test-housing-company-1",
-            official: "test-housing-company-1-as-oy",
+            display: "",
+            official: "",
         },
-        notes: "This is a note.",
-        primary_loan: 10.0,
-        property_manager: {id: "2d9a7fac81e5426db3b33d6ad6ca9949"},
+        notes: "",
+        primary_loan: null,
+        property_manager: {id: ""},
         state: "not_ready",
-        sales_price_catalogue_confirmation_date: "2022-01-01",
+        sales_price_catalogue_confirmation_date: "",
     });
     const [createHousingCompany] = useCreateHousingCompanyMutation();
 
@@ -70,7 +70,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 />
                 <FormInputField
                     label="Virallinen osoite"
-                    fieldPath="address.street"
+                    fieldPath="address.street_address"
                     required
                     formData={formData}
                     setFormData={setFormData}
