@@ -2360,11 +2360,11 @@ components:
       description: Address information
       type: object
       required:
-        - street
+        - street_address
         - postal_code
         - city
       properties:
-        street:
+        street_address:
           description: Street address
           type: string
           example: Hannunkatu 24

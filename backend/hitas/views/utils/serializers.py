@@ -27,6 +27,6 @@ class HitasModelSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.Serializer):
-    street = serializers.CharField(source="street_address")
+    street_address = serializers.CharField()
     postal_code = PostalCodeField()
     city = serializers.CharField(read_only=True)

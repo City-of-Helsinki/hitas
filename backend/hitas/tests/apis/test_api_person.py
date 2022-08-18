@@ -44,7 +44,11 @@ def test__api__person__list(api_client: HitasAPIClient):
             "first_name": person1.first_name,
             "last_name": person1.last_name,
             "social_security_number": person1.social_security_number,
-            "address": {"postal_code": person1.postal_code.value, "street": person1.street_address, "city": "Helsinki"},
+            "address": {
+                "street_address": person1.street_address,
+                "postal_code": person1.postal_code.value,
+                "city": "Helsinki",
+            },
             "email": person1.email,
         },
         {
@@ -52,7 +56,11 @@ def test__api__person__list(api_client: HitasAPIClient):
             "first_name": person2.first_name,
             "last_name": person2.last_name,
             "social_security_number": person2.social_security_number,
-            "address": {"postal_code": person2.postal_code.value, "street": person2.street_address, "city": "Helsinki"},
+            "address": {
+                "street_address": person2.street_address,
+                "postal_code": person2.postal_code.value,
+                "city": "Helsinki",
+            },
             "email": person2.email,
         },
     ]
@@ -83,7 +91,11 @@ def test__api__person__retrieve(api_client: HitasAPIClient):
         "first_name": person.first_name,
         "last_name": person.last_name,
         "social_security_number": person.social_security_number,
-        "address": {"postal_code": person.postal_code.value, "street": person.street_address, "city": "Helsinki"},
+        "address": {
+            "street_address": person.street_address,
+            "postal_code": person.postal_code.value,
+            "city": "Helsinki",
+        },
         "email": person.email,
     }
 
@@ -109,8 +121,8 @@ def get_person_create_data() -> dict[str, Any]:
         "social_security_number": "010199-123A",
         "email": "test@hitas.com",
         "address": {
+            "street_address": "test-street-address-1",
             "postal_code": pc.value,
-            "street": "test-street-address-1",
         },
     }
 
@@ -139,7 +151,7 @@ def test__api__person__create(api_client: HitasAPIClient, minimal_data: bool):
 @pytest.mark.parametrize(
     "invalid_data",
     [
-        {"address": {"postal_code": "00100", "street": ""}},
+        {"address": {"postal_code": "00100", "street_address": ""}},
         {"first_name": ""},
         {"last_name": ""},
         {"email": "foo"},
@@ -167,8 +179,8 @@ def test__api__person__update(api_client: HitasAPIClient):
         "social_security_number": "010199-123A",
         "email": "test@hitas.com",
         "address": {
+            "street_address": "test-street-address-1",
             "postal_code": person.postal_code.value,
-            "street": "test-street-address-1",
         },
     }
 
@@ -178,8 +190,8 @@ def test__api__person__update(api_client: HitasAPIClient):
     assert response.json() == {
         "id": person.uuid.hex,
         "address": {
+            "street_address": data["address"]["street_address"],
             "postal_code": data["address"]["postal_code"],
-            "street": data["address"]["street"],
             "city": "Helsinki",
         },
         "first_name": data["first_name"],
@@ -229,7 +241,7 @@ def test__api__person__filter(api_client: HitasAPIClient, selected_filter):
     PersonFactory.create(last_name=data["last_name"])
     PersonFactory.create(social_security_number=data["social_security_number"])
     PersonFactory.create(email=data["email"])
-    PersonFactory.create(street_address=data["address"]["street"])
+    PersonFactory.create(street_address=data["address"]["street_address"])
     PersonFactory.create(postal_code__value="99999")
 
     url = reverse("hitas:person-list") + "?" + urlencode(selected_filter)
