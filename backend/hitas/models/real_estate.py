@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.utils import hitas_city, validate_property_id
+from hitas.models.utils import validate_property_id
 
 
 # Kiinteistö
@@ -15,11 +15,11 @@ class RealEstate(ExternalHitasModel):
     )
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="real_estates")
+    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="real_estates")
 
     @property
     def city(self):
-        return hitas_city(self.postal_code.value)
+        return self.postal_code.city
 
     class Meta:
         verbose_name = _("Real estate")

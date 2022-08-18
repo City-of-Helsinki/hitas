@@ -16,7 +16,7 @@ from hitas.tests import factories
         factories.HousingCompanyFactory,
         factories.OwnerFactory,
         factories.PersonFactory,
-        factories.PostalCodeFactory,
+        factories.HitasPostalCodeFactory,
         factories.PropertyManagerFactory,
         factories.RealEstateFactory,
         factories.UserFactory,

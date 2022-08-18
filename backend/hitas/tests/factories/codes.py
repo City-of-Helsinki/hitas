@@ -6,7 +6,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod
 
 faker = Faker(locale="fi_FI")
 
@@ -23,16 +23,6 @@ class AbstractCodeFactory(DjangoModelFactory):
     legacy_code_number = factory.Sequence(lambda n: f"{n%1000:03}")
     legacy_start_date = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=pytz.timezone("Europe/Helsinki")))
     legacy_end_date = None
-
-
-class PostalCodeFactory(AbstractCodeFactory):
-    class Meta:
-        model = PostalCode
-        django_get_or_create = ("value",)
-
-    # # Helsinki area postal code e.g. 00100
-    value = factory.Sequence(lambda n: faker.bothify(f"0{n%100:02}#0"))
-    description = factory.Faker("city")
 
 
 class BuildingTypeFactory(AbstractCodeFactory):

@@ -14,9 +14,9 @@ from hitas.models import (
     BuildingType,
     Developer,
     FinancingMethod,
+    HitasPostalCode,
     HousingCompany,
     HousingCompanyState,
-    PostalCode,
     PropertyManager,
     RealEstate,
 )
@@ -26,8 +26,8 @@ from hitas.tests.factories import (
     BuildingTypeFactory,
     DeveloperFactory,
     FinancingMethodFactory,
+    HitasPostalCodeFactory,
     HousingCompanyFactory,
-    PostalCodeFactory,
     PropertyManagerFactory,
     RealEstateFactory,
 )
@@ -71,7 +71,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
                 "postal_code": hc1.postal_code.value,
                 "city": "Helsinki",
             },
-            "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
+            "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
             "date": str(bu2.completion_date),
         },
         {
@@ -83,7 +83,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
                 "postal_code": hc2.postal_code.value,
                 "city": "Helsinki",
             },
-            "area": {"name": hc2.postal_code.description, "cost_area": hc2.area},
+            "area": {"name": hc2.postal_code.city, "cost_area": hc2.postal_code.cost_area},
             "date": None,
         },
     ]
@@ -193,7 +193,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "name": {"display": hc1.display_name, "official": hc1.official_name},
         "state": hc1.state.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
-        "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
+        "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": "2000-01-01",
         "real_estates": [
             {
@@ -270,9 +270,9 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "property_manager": {
             "id": hc1.property_manager.uuid.hex,
             "address": {
-                "city": "Helsinki",
-                "postal_code": hc1.property_manager.postal_code.value,
                 "street_address": hc1.property_manager.street_address,
+                "postal_code": hc1.property_manager.postal_code,
+                "city": hc1.property_manager.city,
             },
             "name": hc1.property_manager.name,
             "email": hc1.property_manager.email,
@@ -314,8 +314,8 @@ def get_housing_company_create_data() -> dict[str, Any]:
     developer: Developer = DeveloperFactory.create()
     financing_method: FinancingMethod = FinancingMethodFactory.create()
     building_type: BuildingType = BuildingTypeFactory.create()
-    postal_code: PostalCode = PostalCodeFactory.create()
-    property_manager: PropertyManager = PropertyManagerFactory.create(postal_code=postal_code)
+    postal_code: HitasPostalCode = HitasPostalCodeFactory.create()
+    property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {
         "acquisition_price": {"initial": 10.00, "realized": 10.00},
@@ -358,7 +358,7 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
 
     hc = HousingCompany.objects.first()
     assert response.json()["id"] == hc.uuid.hex
-    assert response.json()["address"]["postal_code"] == PostalCode.objects.first().value
+    assert response.json()["address"]["postal_code"] == HitasPostalCode.objects.first().value
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.json() == get_response.json()
@@ -410,7 +410,7 @@ def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPI
 def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     BuildingFactory.create(real_estate__housing_company=hc)
-    postal_code: PostalCode = PostalCodeFactory.create(value="99999")
+    postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
     financing_method: FinancingMethod = FinancingMethodFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()
 

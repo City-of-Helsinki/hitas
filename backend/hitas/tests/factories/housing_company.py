@@ -19,7 +19,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     state = HousingCompanyState.NOT_READY
     business_id = factory.Faker("company_business_id")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
     building_type = factory.SubFactory("hitas.tests.factories.BuildingTypeFactory")
     financing_method = factory.SubFactory("hitas.tests.factories.FinancingMethodFactory")
     property_manager = factory.SubFactory("hitas.tests.factories.PropertyManagerFactory")
@@ -47,7 +47,7 @@ class RealEstateFactory(DjangoModelFactory):
     housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
     property_identifier = factory.Faker("bothify", text="####-####-####-####")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
 
 
 class BuildingFactory(DjangoModelFactory):
@@ -58,7 +58,7 @@ class BuildingFactory(DjangoModelFactory):
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     building_identifier = factory.Faker("bothify", text="1########?")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
 
 
 class ApartmentFactory(DjangoModelFactory):
@@ -72,7 +72,7 @@ class ApartmentFactory(DjangoModelFactory):
     share_number_start = factory.Sequence(lambda n: n * 50)
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = fuzzy.FuzzyInteger(1, 9)
     stair = factory.Faker("bothify", text="?")  # Random letter

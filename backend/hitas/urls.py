@@ -11,7 +11,7 @@ router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
 router.register(r"persons", views.PersonViewSet, basename="person")
 
 # Codes
-router.register(r"postal-codes", views.PostalCodeViewSet, basename="postal-code")
+router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"financing-methods", views.FinancingMethodViewSet, basename="financing-method")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
 router.register(r"developers", views.DeveloperViewSet, basename="developer")

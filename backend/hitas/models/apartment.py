@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
-from hitas.models.utils import hitas_city, validate_share_numbers
+from hitas.models.utils import validate_share_numbers
 
 
 class ApartmentState(Enum):
@@ -30,7 +30,7 @@ class Apartment(ExternalHitasModel):
     share_number_end = models.PositiveIntegerField(null=True)
 
     street_address = models.CharField(max_length=128)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="apartments")
+    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="apartments")
     # 'Huoneistonumero'
     apartment_number = models.PositiveSmallIntegerField()
     floor = models.PositiveSmallIntegerField(default=1)
@@ -54,7 +54,7 @@ class Apartment(ExternalHitasModel):
 
     @property
     def city(self):
-        return hitas_city(self.postal_code.value)
+        return self.postal_code.city
 
     @property
     def shares_count(self) -> int:

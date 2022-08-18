@@ -10,6 +10,7 @@ class PropertyManagerAdmin(admin.ModelAdmin):
         "email",
         "street_address",
         "postal_code",
+        "city",
     ]
     fields = ["uuid"] + list_display
     readonly_fields = ("uuid",)

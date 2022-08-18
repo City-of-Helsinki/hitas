@@ -3,11 +3,11 @@ from uuid import UUID
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import HousingCompany, RealEstate
 from hitas.views.building import BuildingSerializer
-from hitas.views.utils import AddressSerializer, HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasAddressSerializer, HitasModelSerializer, HitasModelViewSet
 
 
 class RealEstateSerializer(HitasModelSerializer):
-    address = AddressSerializer(source="*")
+    address = HitasAddressSerializer(source="*")
     buildings = BuildingSerializer(many=True, read_only=True)
 
     @property

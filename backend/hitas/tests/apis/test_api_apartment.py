@@ -9,16 +9,16 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Owner, Person, PostalCode
+from hitas.models import Apartment, ApartmentType, Building, HitasPostalCode, HousingCompany, Owner, Person
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
     ApartmentTypeFactory,
     BuildingFactory,
+    HitasPostalCodeFactory,
     OwnerFactory,
     PersonFactory,
-    PostalCodeFactory,
 )
 from hitas.views.apartment import ApartmentDetailSerializer
 
@@ -59,7 +59,11 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "state": ap1.state.value,
             "apartment_type": ap1.apartment_type.value,
             "surface_area": float(ap1.surface_area),
-            "address": {"street_address": ap1.street_address, "postal_code": ap1.postal_code.value, "city": "Helsinki"},
+            "address": {
+                "street_address": ap1.street_address,
+                "postal_code": ap1.postal_code.value,
+                "city": ap1.postal_code.city,
+            },
             "apartment_number": ap1.apartment_number,
             "stair": ap1.stair,
             "housing_company": hc1.display_name,
@@ -74,8 +78,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "email": o1.person.email,
                         "address": {
                             "street_address": o1.person.street_address,
-                            "postal_code": o1.person.postal_code.value,
-                            "city": "Helsinki",
+                            "postal_code": o1.person.postal_code,
+                            "city": o1.person.city,
                         },
                     },
                     "ownership_percentage": float(o1.ownership_percentage),
@@ -91,8 +95,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "email": o2.person.email,
                         "address": {
                             "street_address": o2.person.street_address,
-                            "postal_code": o2.person.postal_code.value,
-                            "city": "Helsinki",
+                            "postal_code": o2.person.postal_code,
+                            "city": o2.person.city,
                         },
                     },
                     "ownership_percentage": float(o2.ownership_percentage),
@@ -149,7 +153,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "surface_area": float(ap.surface_area),
         "share_number_start": ap.share_number_start,
         "share_number_end": ap.share_number_end,
-        "address": {"street_address": ap.street_address, "postal_code": ap.postal_code.value, "city": "Helsinki"},
+        "address": {
+            "street_address": ap.street_address,
+            "postal_code": ap.postal_code.value,
+            "city": ap.postal_code.city,
+        },
         "apartment_number": ap.apartment_number,
         "floor": ap.floor,
         "stair": ap.stair,
@@ -166,8 +174,12 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "id": hc.uuid.hex,
             "name": hc.display_name,
             "state": hc.state.value,
-            "address": {"street_address": hc.street_address, "postal_code": hc.postal_code.value, "city": "Helsinki"},
-            "area": {"name": hc.postal_code.description, "cost_area": hc.area},
+            "address": {
+                "street_address": hc.street_address,
+                "postal_code": hc.postal_code.value,
+                "city": hc.postal_code.city,
+            },
+            "area": {"name": hc.postal_code.city, "cost_area": hc.postal_code.cost_area},
             "date": str(ap.building.completion_date),
         },
         "owners": [
@@ -180,8 +192,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "email": owner.person.email,
                     "address": {
                         "street_address": owner.person.street_address,
-                        "postal_code": owner.person.postal_code.value,
-                        "city": "Helsinki",
+                        "postal_code": owner.person.postal_code,
+                        "city": owner.person.city,
                     },
                 },
                 "ownership_percentage": float(owner.ownership_percentage),
@@ -412,7 +424,7 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
     building: Building = BuildingFactory.create()
-    postal_code: PostalCode = PostalCodeFactory.create(value="99999")
+    postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
     OwnerFactory.create(apartment=ap)
 
     data = {

@@ -1528,563 +1528,403 @@
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 1,
     "fields": {
       "uuid": "75592d94-970c-4862-81d1-53ccd672ae3e",
       "value": "00100",
-      "description": "Helsinki Keskusta - Etu-Töölö",
-      "in_use": true,
-      "order": 1,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2022-06-13T06:53:57Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 2,
     "fields": {
       "uuid": "b8ada237-479c-410d-962c-306c22b186e0",
       "value": "00150",
-      "description": "Eira - Hernesaari",
-      "in_use": true,
-      "order": 2,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2022-06-13T06:53:57Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 3,
     "fields": {
       "uuid": "82d6115c-4058-45d1-a993-2d4225124929",
       "value": "00190",
-      "description": "Suomenlinna",
-      "in_use": true,
-      "order": 3,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2022-06-13T06:53:57Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 4,
     "fields": {
       "uuid": "679e2218-7db9-4358-b904-da6f350cd6a3",
       "value": "00230",
-      "description": "Ilmala",
-      "in_use": true,
-      "order": 4,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2022-06-13T06:53:57Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 5,
     "fields": {
       "uuid": "aced7b38-19be-4769-b1f6-804893cc2ff3",
       "value": "00420",
-      "description": "Kannelmäki",
-      "in_use": true,
-      "order": 5,
-      "legacy_code_number": "008",
-      "legacy_start_date": "2022-06-13T10:49:15Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 6,
     "fields": {
       "uuid": "ee7a9635-56b2-4518-af25-36bf311df6a4",
       "value": "00530",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2015-05-15T02:10:35.120Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 7,
     "fields": {
       "uuid": "a9854cee-618a-4f4d-8e6b-20798990597e",
       "value": "00620",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "006",
-      "legacy_start_date": "2016-10-10T18:59:19.598Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 8,
     "fields": {
       "uuid": "9d58382c-65a4-4f51-b609-46fe13f27f44",
       "value": "00710",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "007",
-      "legacy_start_date": "2019-04-22T13:04:42.982Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 9,
     "fields": {
       "uuid": "24bc0687-6c91-43f2-8097-68987c6b7899",
       "value": "00890",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "008",
-      "legacy_start_date": "2022-06-24T11:04:46.642Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 10,
     "fields": {
       "uuid": "3c63efb8-6f87-416c-856f-83622f4090a6",
       "value": "00940",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "009",
-      "legacy_start_date": "2011-09-08T00:02:25.826Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 11,
     "fields": {
       "uuid": "70870539-58f9-49f9-9517-6128d342fec9",
       "value": "01020",
-      "description": "Paimio",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "010",
-      "legacy_start_date": "2017-08-14T16:48:28.982Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 12,
     "fields": {
       "uuid": "fe5cbba3-3da2-4980-9cf1-3758acd1cbaa",
       "value": "00020",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2011-11-26T05:07:32.649Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 13,
     "fields": {
       "uuid": "c6737eb2-be39-403a-8c29-dcb601da13c7",
       "value": "00950",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2011-07-13T16:23:35.211Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 14,
     "fields": {
       "uuid": "27b92601-98e1-458b-89ad-cb64ad5fe86b",
       "value": "00220",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2014-08-08T14:57:32.332Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 15,
     "fields": {
       "uuid": "a41a3dda-84d8-492a-b6a9-1a3eb2e58605",
       "value": "00470",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2019-06-10T01:38:49.528Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 16,
     "fields": {
       "uuid": "4b72a40b-286b-4ce5-8574-1d5684187cca",
       "value": "00990",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2010-01-22T14:14:38.888Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 17,
     "fields": {
       "uuid": "a484f296-f975-4cb2-8f37-977d3d9073c8",
       "value": "00340",
-      "description": "Maalahti",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2011-04-25T04:29:14.949Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 18,
     "fields": {
       "uuid": "2dbd3780-ce9d-44bd-a8a5-f12f70951bde",
       "value": "00660",
-      "description": "Lappeenranta",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2015-12-17T06:55:17.495Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 19,
     "fields": {
       "uuid": "827c0813-df89-46cf-a87a-abfd1bb003e2",
       "value": "00520",
-      "description": "Lappeenranta",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2019-02-21T02:16:21.712Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 20,
     "fields": {
       "uuid": "4da06ac7-f1ea-440f-addc-0f53830eaab5",
       "value": "00850",
-      "description": "Lappeenranta",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2015-04-10T17:47:42.090Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 21,
     "fields": {
       "uuid": "482f649e-ad74-4053-9feb-9d4c6cd6897d",
       "value": "00290",
-      "description": "Lappeenranta",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2010-10-12T12:27:29.213Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 22,
     "fields": {
       "uuid": "60586cf9-56a6-4586-b8d9-f95cb88769db",
       "value": "00240",
-      "description": "Lappeenranta",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2016-07-23T02:48:06.912Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 23,
     "fields": {
       "uuid": "2106516d-0e34-4f93-a72e-32610ce3093a",
       "value": "00450",
-      "description": "Pori",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2010-03-13T09:31:11.794Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 24,
     "fields": {
       "uuid": "c3f81039-ce1d-4d6d-80a8-538774a92973",
       "value": "00460",
-      "description": "Pori",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2011-10-12T04:15:00.329Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 25,
     "fields": {
       "uuid": "825fd6d3-bdfa-44a7-929d-692f82d95312",
       "value": "00640",
-      "description": "Pori",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2022-06-19T21:26:24.038Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 26,
     "fields": {
       "uuid": "daa8104c-5241-4f66-91c9-5f3cbc761a34",
       "value": "00610",
-      "description": "Pori",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2018-09-13T06:26:21.359Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 27,
     "fields": {
       "uuid": "1a8cc501-c900-4aa6-a760-066946aef409",
       "value": "00350",
-      "description": "Pori",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2022-05-09T15:36:29.661Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 28,
     "fields": {
       "uuid": "9a3c4e2f-a741-4469-8f35-3a649caa2355",
       "value": "00170",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2014-09-14T19:44:09.180Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 29,
     "fields": {
       "uuid": "7785845b-9dd3-4603-b79a-1006095e42b0",
       "value": "00270",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2011-04-28T05:37:27.343Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 30,
     "fields": {
       "uuid": "2214c454-6564-44ae-ac75-f5f1ee5eaed4",
       "value": "00480",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2022-04-18T07:27:05.122Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 31,
     "fields": {
       "uuid": "190ab006-1334-478e-be39-489fc4f6441a",
       "value": "00820",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2021-05-04T20:11:36.138Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 32,
     "fields": {
       "uuid": "8fee4ea0-4bcf-4191-a1f0-67b620e7eb41",
       "value": "00320",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2017-05-21T11:20:14.863Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 33,
     "fields": {
       "uuid": "dc2548a8-ade6-4cde-872e-aa93240cadf9",
       "value": "00900",
-      "description": "Parkano",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2021-07-17T13:36:18.800Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 34,
     "fields": {
       "uuid": "bfe36a1d-f032-4ce3-927f-2c8c1c3fb5eb",
       "value": "00490",
-      "description": "Lumparland",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2015-03-13T11:15:56.741Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 35,
     "fields": {
       "uuid": "f94e8cd6-b814-4288-adce-817f0653486e",
       "value": "00540",
-      "description": "Lumparland",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2015-04-18T07:57:58.380Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 36,
     "fields": {
       "uuid": "91771d5b-d867-4f21-b78d-efe71f7a7ee6",
       "value": "00260",
-      "description": "Lumparland",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2015-11-06T01:28:59.995Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 37,
     "fields": {
       "uuid": "666616a2-308e-4155-988d-ccf7234fb02c",
       "value": "00690",
-      "description": "Lumparland",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2012-05-28T22:34:44.938Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 38,
     "fields": {
       "uuid": "55f06525-545c-4b28-84a4-5430dece01e7",
       "value": "00750",
-      "description": "Ii",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2018-07-06T17:31:32.720Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 39,
     "fields": {
       "uuid": "82a34c14-4f7d-41e5-b81a-8ad6e98340ed",
       "value": "00930",
-      "description": "Ii",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2022-04-06T03:23:55.547Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {
-    "model": "hitas.postalcode",
+    "model": "hitas.hitaspostalcode",
     "pk": 40,
     "fields": {
       "uuid": "c8328f3b-24cd-4710-9d6a-eb5a93e5e168",
       "value": "00880",
-      "description": "Ii",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2019-04-12T22:25:26.901Z",
-      "legacy_end_date": null
+      "city": "Helsinki",
+      "cost_area": 1
     }
   },
   {

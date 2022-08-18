@@ -1905,7 +1905,7 @@ components:
         state:
           $ref: '#/components/schemas/HousingCompanyState'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -1975,7 +1975,7 @@ components:
         state:
           $ref: '#/components/schemas/HousingCompanyState'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -2122,7 +2122,7 @@ components:
           type: string
           pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         buildings:
           description: List of buildings this real estate has
           type: array
@@ -2144,7 +2144,7 @@ components:
           readOnly: true
           example: 9d0ac35b01eb44829bc84c25f7c1813a
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         completion_date:
           description: Building's construction completion date
           type: string
@@ -2185,7 +2185,7 @@ components:
           description: Surface area of the apartment measured in square meters
           type: number
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         apartment_number:
           type: number
         stair:
@@ -2242,7 +2242,7 @@ components:
           type: integer
           nullable: true
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/HitasAddress'
         apartment_number:
           type: number
         floor:
@@ -2367,9 +2367,30 @@ components:
         street_address:
           description: Street address
           type: string
-          example: Hannunkatu 24
+          example: Torikatu 16 B 4
         postal_code:
           description: Postal code
+          type: string
+          example: "90100"
+        city:
+          description: City
+          type: string
+          example: Oulu
+
+    HitasAddress:
+      description: Hitas address information
+      type: object
+      required:
+        - street_address
+        - postal_code
+        - city
+      properties:
+        street_address:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        postal_code:
+          description: Hitas postal code
           type: string
           example: "00100"
         city:
