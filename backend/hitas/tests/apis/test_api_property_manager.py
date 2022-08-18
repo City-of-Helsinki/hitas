@@ -42,7 +42,7 @@ def test__api__property_manager__list(api_client: HitasAPIClient):
             "address": {
                 "city": "Helsinki",
                 "postal_code": pm1.postal_code.value,
-                "street": pm1.street_address,
+                "street_address": pm1.street_address,
             },
             "name": pm1.name,
             "email": pm1.email,
@@ -52,7 +52,7 @@ def test__api__property_manager__list(api_client: HitasAPIClient):
             "address": {
                 "city": "Helsinki",
                 "postal_code": pm2.postal_code.value,
-                "street": pm2.street_address,
+                "street_address": pm2.street_address,
             },
             "name": pm2.name,
             "email": pm2.email,
@@ -85,7 +85,7 @@ def test__api__property_manager__retrieve(api_client: HitasAPIClient):
         "address": {
             "city": "Helsinki",
             "postal_code": pm.postal_code.value,
-            "street": pm.street_address,
+            "street_address": pm.street_address,
         },
         "name": pm.name,
         "email": pm.email,
@@ -111,7 +111,7 @@ def test__api__property_manager__create(api_client: HitasAPIClient):
     data = {
         "address": {
             "postal_code": pc.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "name": "Charlie Day",
         "email": "charlie@paddys.com",
@@ -129,7 +129,7 @@ def test__api__property_manager__create(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "invalid_data",
     [
-        {"address": {"postal_code": "00100", "street": ""}},
+        {"address": {"postal_code": "00100", "street_address": ""}},
         {"name": ""},
         {"email": ""},
         {"email": 123},
@@ -142,7 +142,7 @@ def test__api__property_manager__create__invalid_data(api_client: HitasAPIClient
     data = {
         "address": {
             "postal_code": pc.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "name": "Frank Reynolds",
         "email": "frank@paddys.com",
@@ -163,7 +163,7 @@ def test__api__property_manager__update(api_client: HitasAPIClient):
     data = {
         "address": {
             "postal_code": pm.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "name": "Ronald McDonald",
         "email": "mac@paddys.com",
@@ -177,7 +177,7 @@ def test__api__property_manager__update(api_client: HitasAPIClient):
         "address": {
             "city": "Helsinki",
             "postal_code": data["address"]["postal_code"],
-            "street": data["address"]["street"],
+            "street_address": data["address"]["street_address"],
         },
         "name": data["name"],
         "email": data["email"],

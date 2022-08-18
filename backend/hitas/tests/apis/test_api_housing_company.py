@@ -67,7 +67,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "name": hc1.display_name,
             "state": hc1.state.value,
             "address": {
-                "street": hc1.street_address,
+                "street_address": hc1.street_address,
                 "postal_code": hc1.postal_code.value,
                 "city": "Helsinki",
             },
@@ -79,7 +79,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "name": hc2.display_name,
             "state": hc2.state.value,
             "address": {
-                "street": hc2.street_address,
+                "street_address": hc2.street_address,
                 "postal_code": hc2.postal_code.value,
                 "city": "Helsinki",
             },
@@ -192,7 +192,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "business_id": hc1.business_id,
         "name": {"display": hc1.display_name, "official": hc1.official_name},
         "state": hc1.state.value,
-        "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street": hc1.street_address},
+        "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.description, "cost_area": hc1.area},
         "date": "2000-01-01",
         "real_estates": [
@@ -201,7 +201,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 "address": {
                     "city": "Helsinki",
                     "postal_code": hc1_re1.postal_code.value,
-                    "street": hc1_re1.street_address,
+                    "street_address": hc1_re1.street_address,
                 },
                 "property_identifier": hc1_re1.property_identifier,
                 "buildings": [
@@ -210,7 +210,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re1_bu1.postal_code.value,
-                            "street": hc1_re1_bu1.street_address,
+                            "street_address": hc1_re1_bu1.street_address,
                         },
                         "building_identifier": hc1_re1_bu1.building_identifier,
                         "completion_date": str(hc1_re1_bu1.completion_date),
@@ -220,7 +220,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re1_bu2.postal_code.value,
-                            "street": hc1_re1_bu2.street_address,
+                            "street_address": hc1_re1_bu2.street_address,
                         },
                         "building_identifier": hc1_re1_bu2.building_identifier,
                         "completion_date": str(hc1_re1_bu2.completion_date),
@@ -232,7 +232,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 "address": {
                     "city": "Helsinki",
                     "postal_code": hc1_re2.postal_code.value,
-                    "street": hc1_re2.street_address,
+                    "street_address": hc1_re2.street_address,
                 },
                 "property_identifier": hc1_re2.property_identifier,
                 "buildings": [
@@ -241,7 +241,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                         "address": {
                             "city": "Helsinki",
                             "postal_code": hc1_re2_bu1.postal_code.value,
-                            "street": hc1_re2_bu1.street_address,
+                            "street_address": hc1_re2_bu1.street_address,
                         },
                         "building_identifier": hc1_re2_bu1.building_identifier,
                         "completion_date": None,
@@ -272,7 +272,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
             "address": {
                 "city": "Helsinki",
                 "postal_code": hc1.property_manager.postal_code.value,
-                "street": hc1.property_manager.street_address,
+                "street_address": hc1.property_manager.street_address,
             },
             "name": hc1.property_manager.name,
             "email": hc1.property_manager.email,
@@ -321,7 +321,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "acquisition_price": {"initial": 10.00, "realized": 10.00},
         "address": {
             "postal_code": postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "building_type": {"id": building_type.uuid.hex},
         "business_id": "1234567-8",
@@ -417,7 +417,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     data = {
         "acquisition_price": {"initial": 10.01, "realized": None},
         "address": {
-            "street": "changed-street-address",
+            "street_address": "changed-street-address",
             "postal_code": postal_code.value,
         },
         "building_type": {"id": hc.building_type.uuid.hex},

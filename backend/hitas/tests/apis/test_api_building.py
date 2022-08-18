@@ -56,7 +56,7 @@ def test__api__building__list(api_client: HitasAPIClient):
             "address": {
                 "city": "Helsinki",
                 "postal_code": bu1.postal_code.value,
-                "street": bu1.street_address,
+                "street_address": bu1.street_address,
             },
             "building_identifier": bu1.building_identifier,
             "completion_date": str(bu1.completion_date),
@@ -66,7 +66,7 @@ def test__api__building__list(api_client: HitasAPIClient):
             "address": {
                 "city": "Helsinki",
                 "postal_code": bu2.postal_code.value,
-                "street": bu2.street_address,
+                "street_address": bu2.street_address,
             },
             "building_identifier": bu2.building_identifier,
             "completion_date": str(bu2.completion_date),
@@ -117,7 +117,7 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
         "address": {
             "city": "Helsinki",
             "postal_code": bu1.postal_code.value,
-            "street": bu1.street_address,
+            "street_address": bu1.street_address,
         },
         "building_identifier": bu1.building_identifier,
         "completion_date": str(bu1.completion_date),
@@ -135,7 +135,7 @@ def test__api__building__create(api_client: HitasAPIClient, building_identifier)
     data = {
         "address": {
             "postal_code": re.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
     }
 
@@ -162,7 +162,7 @@ def test__api__building__create__no_building_identifier(api_client: HitasAPIClie
     data = {
         "address": {
             "postal_code": re.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
     }
 
@@ -190,7 +190,7 @@ def test__api__building__create__invalid_building_identifier(api_client: HitasAP
     data = {
         "address": {
             "postal_code": re.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "building_identifier": building_identifier,
     }
@@ -209,7 +209,7 @@ def test__api__building__create__invalid_real_estate(api_client: HitasAPIClient)
     data = {
         "address": {
             "postal_code": re.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "building_identifier": "100012345A",
     }
@@ -234,7 +234,7 @@ def test__api__building__update(api_client: HitasAPIClient):
     data = {
         "address": {
             "postal_code": re.postal_code.value,
-            "street": "test-street-address-1",
+            "street_address": "test-street-address-1",
         },
         "completion_date": "1999-01-01",
         "building_identifier": "100012345A",
@@ -251,7 +251,7 @@ def test__api__building__update(api_client: HitasAPIClient):
         "address": {
             "city": "Helsinki",
             "postal_code": data["address"]["postal_code"],
-            "street": data["address"]["street"],
+            "street_address": data["address"]["street_address"],
         },
         "building_identifier": data["building_identifier"],
         "completion_date": data["completion_date"],

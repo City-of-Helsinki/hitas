@@ -59,7 +59,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "state": ap1.state.value,
             "apartment_type": ap1.apartment_type.value,
             "surface_area": float(ap1.surface_area),
-            "address": {"street": ap1.street_address, "postal_code": ap1.postal_code.value, "city": "Helsinki"},
+            "address": {"street_address": ap1.street_address, "postal_code": ap1.postal_code.value, "city": "Helsinki"},
             "apartment_number": ap1.apartment_number,
             "stair": ap1.stair,
             "housing_company": hc1.display_name,
@@ -73,7 +73,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "social_security_number": o1.person.social_security_number,
                         "email": o1.person.email,
                         "address": {
-                            "street": o1.person.street_address,
+                            "street_address": o1.person.street_address,
                             "postal_code": o1.person.postal_code.value,
                             "city": "Helsinki",
                         },
@@ -90,7 +90,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "social_security_number": o2.person.social_security_number,
                         "email": o2.person.email,
                         "address": {
-                            "street": o2.person.street_address,
+                            "street_address": o2.person.street_address,
                             "postal_code": o2.person.postal_code.value,
                             "city": "Helsinki",
                         },
@@ -106,7 +106,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "state": ap2.state.value,
             "apartment_type": ap2.apartment_type.value,
             "surface_area": float(ap2.surface_area),
-            "address": {"street": ap2.street_address, "postal_code": ap2.postal_code.value, "city": "Helsinki"},
+            "address": {"street_address": ap2.street_address, "postal_code": ap2.postal_code.value, "city": "Helsinki"},
             "apartment_number": ap2.apartment_number,
             "stair": ap2.stair,
             "housing_company": hc2.display_name,
@@ -149,7 +149,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "surface_area": float(ap.surface_area),
         "share_number_start": ap.share_number_start,
         "share_number_end": ap.share_number_end,
-        "address": {"street": ap.street_address, "postal_code": ap.postal_code.value, "city": "Helsinki"},
+        "address": {"street_address": ap.street_address, "postal_code": ap.postal_code.value, "city": "Helsinki"},
         "apartment_number": ap.apartment_number,
         "floor": ap.floor,
         "stair": ap.stair,
@@ -166,7 +166,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "id": hc.uuid.hex,
             "name": hc.display_name,
             "state": hc.state.value,
-            "address": {"street": hc.street_address, "postal_code": hc.postal_code.value, "city": "Helsinki"},
+            "address": {"street_address": hc.street_address, "postal_code": hc.postal_code.value, "city": "Helsinki"},
             "area": {"name": hc.postal_code.description, "cost_area": hc.area},
             "date": str(ap.building.completion_date),
         },
@@ -179,7 +179,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "social_security_number": owner.person.social_security_number,
                     "email": owner.person.email,
                     "address": {
-                        "street": owner.person.street_address,
+                        "street_address": owner.person.street_address,
                         "postal_code": owner.person.postal_code.value,
                         "city": "Helsinki",
                     },
@@ -218,7 +218,7 @@ def get_apartment_create_data() -> dict[str, Any]:
         "surface_area": 69,
         "share_number_start": 50,
         "share_number_end": 100,
-        "address": {"street": "TestStreet 3", "postal_code": building.postal_code.value},
+        "address": {"street_address": "TestStreet 3", "postal_code": building.postal_code.value},
         "apartment_number": 58,
         "floor": 1,
         "stair": "A",
@@ -421,7 +421,7 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
         "surface_area": 100,
         "share_number_start": 101,
         "share_number_end": 200,
-        "address": {"street": "TestStreet 3", "postal_code": postal_code.value, "city": "Helsinki"},
+        "address": {"street_address": "TestStreet 3", "postal_code": postal_code.value, "city": "Helsinki"},
         "apartment_number": 9,
         "floor": 5,
         "stair": "X",
@@ -445,7 +445,7 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     assert ap.surface_area == data["surface_area"]
     assert ap.share_number_start == data["share_number_start"]
     assert ap.share_number_end == data["share_number_end"]
-    assert ap.street_address == data["address"]["street"]
+    assert ap.street_address == data["address"]["street_address"]
     assert ap.postal_code == postal_code
     assert ap.apartment_number == data["apartment_number"]
     assert ap.floor == data["floor"]
