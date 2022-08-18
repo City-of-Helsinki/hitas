@@ -84,20 +84,6 @@ def hitas_city(postal_code: str) -> str:
     return _hitas_cities[postal_code]
 
 
-def validate_code_number(value: Optional[str]) -> None:
-    if value is None:
-        return
-
-    # Example valid value: '012'
-    match = re.search(r"^\d{3}$", value)
-
-    if match is None:
-        raise ValidationError(
-            _("%(value)s is not an valid code number"),
-            params={"value": value},
-        )
-
-
 def validate_property_id(value: str) -> None:
     # Example valid value: '1-1234-321-56'
     match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$", value)
