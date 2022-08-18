@@ -22,6 +22,7 @@ function dotted(obj: object, path: string | string[], value?: number | string | 
 }
 
 function formatAddress(address: IAddress): string {
+    // e.g. '1234567-8'
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 

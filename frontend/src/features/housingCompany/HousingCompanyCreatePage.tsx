@@ -123,6 +123,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     label="Y-Tunnus"
                     fieldPath="business_id"
                     validator={validateBusinessId}
+                    tooltipText={"Esimerkki arvo: '1234567-8'"}
                     required
                     formData={formData}
                     setFormData={setFormData}

@@ -22,6 +22,7 @@ type FormInputFieldProps = {
     fieldPath: string;
     validator?: (value) => boolean;
     required?: boolean;
+    tooltipText?: string;
     formData: object;
     setFormData: (draft) => void;
 } & (
