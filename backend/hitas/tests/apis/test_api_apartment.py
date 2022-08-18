@@ -572,7 +572,7 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
         {"state": ApartmentState.SOLD.value},
         {"apartment_type": "1h+sauna+takkahuone+uima-allas"},
         {"street_address": "test-street"},
-        {"apartment_number": 69},
+        {"apartment_number": 169},
         {"floor": 22},
         {"stair": "Ö"},
         {"building": "4a5c66cdcd554784a9047bd45c2362ba"},
@@ -600,7 +600,7 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     ApartmentFactory.create(state=ApartmentState.FREE, building__real_estate__property_identifier="1-1234-321-56")
     ApartmentFactory.create(state=ApartmentState.FREE, apartment_type__value="1h+sauna+takkahuone+uima-allas")
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    ApartmentFactory.create(state=ApartmentState.FREE, apartment_number=69)
+    ApartmentFactory.create(state=ApartmentState.FREE, apartment_number=169)
     ApartmentFactory.create(state=ApartmentState.FREE, floor=22)
     ApartmentFactory.create(state=ApartmentState.FREE, stair="Ö")
     ApartmentFactory.create(state=ApartmentState.FREE, building__uuid=UUID("4a5c66cd-cd55-4784-a904-7bd45c2362ba"))
