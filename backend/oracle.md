@@ -101,5 +101,6 @@ Log files are available in `oracle-data/admin/xe/dpdump/IMPORT-<datestamp>.LOG`
 
 1. Select `Oracle Connections` from left menu
 2. Select the dataase you created (`Oracle` )
-3. Expand `Other Users` 
+3. Expand `Other Users`
 4. Expand `HIDAS`
+5. Before running queries run the command `ALTER SESSION SET CURRENT_SCHEMA = HIDAS;`
