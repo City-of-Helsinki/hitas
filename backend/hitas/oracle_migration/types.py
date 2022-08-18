@@ -1,10 +1,11 @@
 import sqlalchemy.types as types
 
-from hitas.management.commands.migrate.globals import faker, should_anonymize
+from hitas.oracle_migration.globals import faker, should_anonymize
 
 
 class HitasAnonymizedSSN(types.TypeDecorator):
     impl = types.String
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         return value
@@ -18,6 +19,7 @@ class HitasAnonymizedSSN(types.TypeDecorator):
 
 class HitasAnonymizedName(types.TypeDecorator):
     impl = types.String
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         return value
@@ -35,6 +37,7 @@ class HitasBoolean(types.TypeDecorator):
     """
 
     impl = types.String
+    cache_ok = True
 
     def process_bind_param(self, value, dialect):
         return "K" if value else "E"
