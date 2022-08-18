@@ -12,7 +12,7 @@ from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, Finan
 from hitas.views.property_manager import PropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
-    AddressSerializer,
+    HitasAddressSerializer,
     HitasDecimalField,
     HitasEnumField,
     HitasFilterSet,
@@ -49,7 +49,7 @@ class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
-    address = AddressSerializer(source="*")
+    address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
     real_estates = serializers.SerializerMethodField()
@@ -63,7 +63,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     last_modified = serializers.SerializerMethodField(read_only=True)
 
     def get_area(self, obj: HousingCompany) -> Dict[str, any]:
-        return {"name": obj.postal_code.description, "cost_area": obj.area}
+        return {"name": obj.postal_code.city, "cost_area": obj.postal_code.cost_area}
 
     def get_date(self, obj: HousingCompany) -> Optional[str]:
         """SerializerMethodField is used instead of DateField due to date being an annotated value"""
@@ -149,7 +149,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
             "developer",
             "building_type",
             "property_manager",
-            "property_manager__postal_code",
             "last_modified_by",
         ).annotate(date=Min("real_estates__buildings__completion_date"))
 

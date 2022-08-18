@@ -19,7 +19,8 @@ class PersonFactory(DjangoModelFactory):
     social_security_number = factory.Faker("ssn")
     email = factory.Faker("email")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.PostalCodeFactory")
+    postal_code = factory.Faker("postcode")
+    city = factory.Faker("city")
 
 
 class OwnerFactory(DjangoModelFactory):

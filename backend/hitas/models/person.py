@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.utils import hitas_city
 
 
 class Person(ExternalHitasModel):
@@ -13,11 +12,8 @@ class Person(ExternalHitasModel):
 
     email = models.EmailField(blank=True, null=True)
     street_address = models.CharField(max_length=128)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="persons")
-
-    @property
-    def city(self):
-        return hitas_city(self.postal_code.value)
+    postal_code = models.CharField(max_length=5)
+    city = models.CharField(max_length=1024)
 
     class Meta:
         verbose_name = _("Person")
@@ -25,4 +21,4 @@ class Person(ExternalHitasModel):
         ordering = ["id"]
 
     def __str__(self):
-        return f"{self.last_name}, {self.first_name} ({self.social_security_number})"
+        return f"{self.last_name}, {self.first_name}"

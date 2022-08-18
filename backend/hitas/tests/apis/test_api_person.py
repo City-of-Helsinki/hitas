@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import Person, PostalCode
+from hitas.models import Person
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import PersonFactory, PostalCodeFactory
+from hitas.tests.factories import PersonFactory
 
 # List tests
 
@@ -46,8 +46,8 @@ def test__api__person__list(api_client: HitasAPIClient):
             "social_security_number": person1.social_security_number,
             "address": {
                 "street_address": person1.street_address,
-                "postal_code": person1.postal_code.value,
-                "city": "Helsinki",
+                "postal_code": person1.postal_code,
+                "city": person1.city,
             },
             "email": person1.email,
         },
@@ -58,8 +58,8 @@ def test__api__person__list(api_client: HitasAPIClient):
             "social_security_number": person2.social_security_number,
             "address": {
                 "street_address": person2.street_address,
-                "postal_code": person2.postal_code.value,
-                "city": "Helsinki",
+                "postal_code": person2.postal_code,
+                "city": person2.city,
             },
             "email": person2.email,
         },
@@ -93,8 +93,8 @@ def test__api__person__retrieve(api_client: HitasAPIClient):
         "social_security_number": person.social_security_number,
         "address": {
             "street_address": person.street_address,
-            "postal_code": person.postal_code.value,
-            "city": "Helsinki",
+            "postal_code": person.postal_code,
+            "city": person.city,
         },
         "email": person.email,
     }
@@ -113,8 +113,6 @@ def test__api__person__retrieve__invalid_id(api_client: HitasAPIClient):
 
 
 def get_person_create_data() -> dict[str, Any]:
-    pc: PostalCode = PostalCodeFactory.create(value="00100")
-
     return {
         "first_name": "fake-first-name",
         "last_name": "fake-last-name",
@@ -122,7 +120,8 @@ def get_person_create_data() -> dict[str, Any]:
         "email": "test@hitas.com",
         "address": {
             "street_address": "test-street-address-1",
-            "postal_code": pc.value,
+            "postal_code": "99999",
+            "city": "fake-city",
         },
     }
 
@@ -180,7 +179,8 @@ def test__api__person__update(api_client: HitasAPIClient):
         "email": "test@hitas.com",
         "address": {
             "street_address": "test-street-address-1",
-            "postal_code": person.postal_code.value,
+            "postal_code": person.postal_code,
+            "city": person.city,
         },
     }
 
@@ -192,7 +192,7 @@ def test__api__person__update(api_client: HitasAPIClient):
         "address": {
             "street_address": data["address"]["street_address"],
             "postal_code": data["address"]["postal_code"],
-            "city": "Helsinki",
+            "city": data["address"]["city"],
         },
         "first_name": data["first_name"],
         "last_name": data["last_name"],
@@ -242,7 +242,7 @@ def test__api__person__filter(api_client: HitasAPIClient, selected_filter):
     PersonFactory.create(social_security_number=data["social_security_number"])
     PersonFactory.create(email=data["email"])
     PersonFactory.create(street_address=data["address"]["street_address"])
-    PersonFactory.create(postal_code__value="99999")
+    PersonFactory.create(postal_code="99999")
 
     url = reverse("hitas:person-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)

@@ -3,9 +3,9 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import PostalCode, PropertyManager
+from hitas.models import PropertyManager
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import PostalCodeFactory, PropertyManagerFactory
+from hitas.tests.factories import PropertyManagerFactory
 
 # List tests
 
@@ -40,9 +40,9 @@ def test__api__property_manager__list(api_client: HitasAPIClient):
         {
             "id": pm1.uuid.hex,
             "address": {
-                "city": "Helsinki",
-                "postal_code": pm1.postal_code.value,
                 "street_address": pm1.street_address,
+                "postal_code": pm1.postal_code,
+                "city": pm1.city,
             },
             "name": pm1.name,
             "email": pm1.email,
@@ -50,9 +50,9 @@ def test__api__property_manager__list(api_client: HitasAPIClient):
         {
             "id": pm2.uuid.hex,
             "address": {
-                "city": "Helsinki",
-                "postal_code": pm2.postal_code.value,
                 "street_address": pm2.street_address,
+                "postal_code": pm2.postal_code,
+                "city": pm2.city,
             },
             "name": pm2.name,
             "email": pm2.email,
@@ -83,9 +83,9 @@ def test__api__property_manager__retrieve(api_client: HitasAPIClient):
     assert response.json() == {
         "id": pm.uuid.hex,
         "address": {
-            "city": "Helsinki",
-            "postal_code": pm.postal_code.value,
             "street_address": pm.street_address,
+            "postal_code": pm.postal_code,
+            "city": pm.city,
         },
         "name": pm.name,
         "email": pm.email,
@@ -106,12 +106,11 @@ def test__api__property_manager__retrieve__invalid_id(api_client: HitasAPIClient
 
 @pytest.mark.django_db
 def test__api__property_manager__create(api_client: HitasAPIClient):
-    pc: PostalCode = PostalCodeFactory.create()
-
     data = {
         "address": {
-            "postal_code": pc.value,
             "street_address": "test-street-address-1",
+            "postal_code": "01234",
+            "city": "Oulu",
         },
         "name": "Charlie Day",
         "email": "charlie@paddys.com",
@@ -129,7 +128,7 @@ def test__api__property_manager__create(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "invalid_data",
     [
-        {"address": {"postal_code": "00100", "street_address": ""}},
+        {"address": {"street_address": "", "postal_code": "00100", "city": "Helsinki"}},
         {"name": ""},
         {"email": ""},
         {"email": 123},
@@ -138,11 +137,11 @@ def test__api__property_manager__create(api_client: HitasAPIClient):
 )
 @pytest.mark.django_db
 def test__api__property_manager__create__invalid_data(api_client: HitasAPIClient, invalid_data):
-    pc: PostalCode = PostalCodeFactory.create(value="00100")
     data = {
         "address": {
-            "postal_code": pc.value,
             "street_address": "test-street-address-1",
+            "postal_code": "00100",
+            "city": "Oulu",
         },
         "name": "Frank Reynolds",
         "email": "frank@paddys.com",
@@ -162,8 +161,9 @@ def test__api__property_manager__update(api_client: HitasAPIClient):
     pm: PropertyManager = PropertyManagerFactory.create()
     data = {
         "address": {
-            "postal_code": pm.postal_code.value,
             "street_address": "test-street-address-1",
+            "postal_code": pm.postal_code,
+            "city": "Oulu",
         },
         "name": "Ronald McDonald",
         "email": "mac@paddys.com",
@@ -175,9 +175,9 @@ def test__api__property_manager__update(api_client: HitasAPIClient):
     assert response.json() == {
         "id": pm.uuid.hex,
         "address": {
-            "city": "Helsinki",
-            "postal_code": data["address"]["postal_code"],
             "street_address": data["address"]["street_address"],
+            "postal_code": data["address"]["postal_code"],
+            "city": "Oulu",
         },
         "name": data["name"],
         "email": data["email"],
@@ -216,6 +216,7 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
         {"email": "hitas.com"},
         {"street_address": "test-street"},
         {"postal_code": "99999"},
+        {"city": "test-city"},
     ],
 )
 @pytest.mark.django_db
@@ -223,7 +224,8 @@ def test__api__property_manager__filter(api_client: HitasAPIClient, selected_fil
     PropertyManagerFactory.create(name="TestName")
     PropertyManagerFactory.create(email="test@hitas.com")
     PropertyManagerFactory.create(street_address="test-street")
-    PropertyManagerFactory.create(postal_code__value="99999")
+    PropertyManagerFactory.create(postal_code="99999")
+    PropertyManagerFactory.create(city="test-city")
 
     url = reverse("hitas:property-manager-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)

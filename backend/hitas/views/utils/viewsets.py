@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.db import models
 from django.http import Http404
 from django_filters.rest_framework import filters
 from rest_framework import viewsets
@@ -52,7 +53,11 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         """Automagically generate a Filter Set class for subclassing ViewSets"""
 
         class HitasModelFilterSet(HitasFilterSet):
-            if hasattr(self.model_class, "postal_code"):
+
+            if (
+                hasattr(self.model_class, "postal_code")
+                and self.model_class.postal_code.field.__class__ == models.ForeignKey
+            ):
                 postal_code = filters.CharFilter(field_name="postal_code__value")
 
             class Meta:

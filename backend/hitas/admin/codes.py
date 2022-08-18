@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod
 
 
-@admin.register(BuildingType, FinancingMethod, PostalCode, Developer, ApartmentType)
+@admin.register(BuildingType, FinancingMethod, Developer, ApartmentType)
 class CodeAdmin(admin.ModelAdmin):
     list_display = [
         "value",

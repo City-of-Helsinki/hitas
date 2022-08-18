@@ -14,7 +14,7 @@ from hitas.views.codes import ApartmentTypeSerializer
 from hitas.views.housing_company import HousingCompanyListSerializer
 from hitas.views.owner import OwnerSerializer
 from hitas.views.utils import (
-    AddressSerializer,
+    HitasAddressSerializer,
     HitasDecimalField,
     HitasEnumField,
     HitasFilterSet,
@@ -57,7 +57,7 @@ class ApartmentFilterSet(HitasFilterSet):
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
-    address = AddressSerializer(source="*")
+    address = HitasAddressSerializer(source="*")
     date = serializers.DateField(source="building.completion_date", read_only=True)
     surface_area = HitasDecimalField()
 

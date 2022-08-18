@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
-from hitas.models.utils import hitas_city, hitas_cost_area, validate_business_id
+from hitas.models.utils import validate_business_id
 
 
 class HousingCompanyState(Enum):
@@ -39,7 +39,7 @@ class HousingCompany(ExternalHitasModel):
     business_id = models.CharField(max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"))
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("PostalCode", on_delete=models.PROTECT, related_name="housing_companies")
+    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="housing_companies")
 
     building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
     financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
@@ -66,16 +66,15 @@ class HousingCompany(ExternalHitasModel):
 
     @property
     def city(self):
-        return hitas_city(self.postal_code.value)
+        return self.postal_code.city
 
     @property
     def area(self):
-        return hitas_cost_area(self.postal_code.value)
+        return self.postal_code.cost_area
 
     @property
     def area_display(self):
-        pc = self.postal_code
-        return f"{hitas_city(pc.value)}-{hitas_cost_area(pc.value)}: {pc.description}"
+        return f"{self.city}-{self.area}: {self.postal_code.value}"
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()

@@ -22,4 +22,4 @@ class PersonViewSet(HitasModelViewSet):
     model_class = Person
 
     def get_queryset(self):
-        return Person.objects.select_related("postal_code")
+        return Person.objects.all()

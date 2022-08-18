@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.models import PostalCode
+from hitas.models import HitasPostalCode
 
 
 class ValueOrNullField(serializers.Field):
@@ -35,18 +35,18 @@ class UUIDRelatedField(SlugRelatedField):
             raise HitasModelNotFound(model=self.get_queryset().model)
 
 
-class PostalCodeField(SlugRelatedField):
+class HitasPostalCodeField(SlugRelatedField):
     def __init__(self, **kwargs):
-        super().__init__(slug_field="value", queryset=PostalCode.objects.all(), **kwargs)
+        super().__init__(slug_field="value", queryset=HitasPostalCode.objects.all(), **kwargs)
 
-    def to_representation(self, instance: PostalCode):
+    def to_representation(self, instance: HitasPostalCode):
         return instance.value
 
     def to_internal_value(self, data: str):
         try:
             return super().to_internal_value(data=data)
         except ValueError:
-            raise HitasModelNotFound(model=PostalCode)
+            raise HitasModelNotFound(model=HitasPostalCode)
 
 
 class HitasEnumField(serializers.ChoiceField):

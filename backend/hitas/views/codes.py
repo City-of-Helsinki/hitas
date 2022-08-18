@@ -1,7 +1,7 @@
 from django_filters.rest_framework import filters
 from rest_framework import serializers
 
-from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod, PostalCode
+from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
 from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
@@ -15,11 +15,6 @@ class AbstractCodeSerializer(HitasModelSerializer):
         fields = ["id", "value", "description", "code"]
         read_only_fields = ["value"]
         abstract = True
-
-
-class PostalCodeSerializer(AbstractCodeSerializer):
-    class Meta(AbstractCodeSerializer.Meta):
-        model = PostalCode
 
 
 class BuildingTypeSerializer(AbstractCodeSerializer):
@@ -57,11 +52,6 @@ class AbstractCodeViewSet(HitasModelViewSet):
         CodeFilterSet.__name__ = f"{self.model_class}FilterSet"
 
         return CodeFilterSet
-
-
-class PostalCodeViewSet(AbstractCodeViewSet):
-    serializer_class = PostalCodeSerializer
-    model_class = PostalCode
 
 
 class BuildingTypeViewSet(AbstractCodeViewSet):

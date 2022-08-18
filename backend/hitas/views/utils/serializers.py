@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models._base import ExternalHitasModel
-from hitas.views.utils import PostalCodeField
+from hitas.views.utils import HitasPostalCodeField
 
 
 class HitasModelSerializer(serializers.ModelSerializer):
@@ -26,7 +26,13 @@ class HitasModelSerializer(serializers.ModelSerializer):
         model = None
 
 
+class HitasAddressSerializer(serializers.Serializer):
+    street_address = serializers.CharField()
+    postal_code = HitasPostalCodeField()
+    city = serializers.CharField(read_only=True)
+
+
 class AddressSerializer(serializers.Serializer):
     street_address = serializers.CharField()
-    postal_code = PostalCodeField()
-    city = serializers.CharField(read_only=True)
+    postal_code = serializers.CharField()
+    city = serializers.CharField()
