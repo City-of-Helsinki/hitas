@@ -191,3 +191,8 @@ export interface IApartmentListResponse {
     page: PageInfo;
     contents: IApartment[];
 }
+
+export interface ICodeResponse {
+    page: PageInfo;
+    contents: ICode[];
+}

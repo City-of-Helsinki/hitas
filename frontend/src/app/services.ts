@@ -3,6 +3,7 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
     IApartmentDetails,
     IApartmentListResponse,
+    ICodeResponse,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
@@ -63,9 +64,21 @@ export const hitasApi = createApi({
             }),
         }),
         // Codes
-        getDevelopers: builder.query<IApartmentListResponse, object>({
+        getDevelopers: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
                 url: "developers",
+                params: params,
+            }),
+        }),
+        getBuildingTypes: builder.query<ICodeResponse, object>({
+            query: (params: object) => ({
+                url: "building-types",
+                params: params,
+            }),
+        }),
+        getFinancingMethods: builder.query<ICodeResponse, object>({
+            query: (params: object) => ({
+                url: "financing-methods",
                 params: params,
             }),
         }),
@@ -80,4 +93,6 @@ export const {
     useGetApartmentDetailQuery,
     useGetPropertyManagersQuery,
     useGetDevelopersQuery,
+    useGetBuildingTypesQuery,
+    useGetFinancingMethodsQuery,
 } = hitasApi;
