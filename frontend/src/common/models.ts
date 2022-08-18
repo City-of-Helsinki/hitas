@@ -32,7 +32,10 @@ export interface IHousingCompanyDetails {
     building_type: ICode;
     developer: ICode;
     property_manager: IPropertyManager;
-    acquisition_price: IHousingCompanyDetailsAcquisitionPrice;
+    acquisition_price: {
+        initial: number;
+        realized: number | null;
+    };
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notification_date: string | null;
@@ -59,7 +62,10 @@ export interface IHousingCompanyWritable {
     building_type: {id: string};
     developer: {id: string};
     property_manager: {id: string};
-    acquisition_price: IHousingCompanyDetailsAcquisitionPrice;
+    acquisition_price: {
+        initial: number | null;
+        realized: number | null;
+    };
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notes: string | null;
@@ -85,11 +91,6 @@ export type IHousingCompanyState = typeof HousingCompanyStates[number];
 export interface IHousingCompanyDetailsName {
     official: string;
     display: string;
-}
-
-export interface IHousingCompanyDetailsAcquisitionPrice {
-    initial: number;
-    realized: number | null;
 }
 
 export interface IRealEstate {
