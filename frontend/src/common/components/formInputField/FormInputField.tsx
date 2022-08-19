@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {dotted} from "../../utils";
 import FormDateInputField from "./FormDateInputField";
@@ -25,6 +25,7 @@ type FormInputFieldProps = {
     tooltipText?: string;
     formData: object;
     setFormData: (draft) => void;
+    error;
 } & (
     | {
           inputType?: "text" | "textArea" | "postalCode" | "money" | "date";
@@ -35,7 +36,6 @@ type FormInputFieldProps = {
       }
     | {
           inputType: "relatedModel";
-          options?: never;
           queryFunction;
           relatedModelSearchField: string;
           getRelatedModelLabel: (unknown) => string;
@@ -50,9 +50,11 @@ export default function FormInputField({
     validator,
     formData,
     setFormData,
+    error,
     ...rest
 }: FormInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const setFieldValue = (value) => {
         if (validator !== undefined) setIsInvalid(!validator(value));
@@ -63,6 +65,16 @@ export default function FormInputField({
         });
     };
 
+    useEffect(() => {
+        const errorFields = error?.data?.fields;
+        if (errorFields !== undefined) {
+            setErrorMessage(errorFields[errorFields.findIndex((e) => e.field === fieldPath)]?.message || "");
+            if (errorMessage) {
+                setIsInvalid(true);
+            }
+        }
+    }, [error]);
+
     const commonProps = {
         id: `input-${fieldPath}`,
         key: `input-${fieldPath}`,
@@ -71,6 +83,7 @@ export default function FormInputField({
         required: required,
         invalid: isInvalid,
         setFieldValue: setFieldValue,
+        errorText: errorMessage,
     };
 
     if (inputType === "text" || inputType === "textArea") {
