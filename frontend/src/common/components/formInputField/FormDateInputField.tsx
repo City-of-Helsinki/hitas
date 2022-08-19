@@ -13,6 +13,7 @@ export default function FormDateInputField({
     value,
     setFieldValue,
     setIsInvalid,
+    required,
     ...rest
 }: FormDateInputFieldProps): JSX.Element {
     // Display the date in 'HDS date format' to the user, but internally keep the date stored in a format which
@@ -36,7 +37,11 @@ export default function FormDateInputField({
         // Do not format the date if the year is obviously incomplete
         if (valueAsDate.getFullYear().toString().length < 4) {
             setFieldValue(newValue);
-            setIsInvalid(true);
+            if (newValue || required) {
+                setIsInvalid(true);
+            } else if (!newValue) {
+                setIsInvalid(false);
+            }
             return;
         }
 
@@ -56,6 +61,7 @@ export default function FormDateInputField({
             onChange={handleOnChange}
             language={"fi"}
             disableConfirmation={true}
+            required={required}
             {...rest}
         />
     );

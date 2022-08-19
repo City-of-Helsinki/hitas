@@ -35,11 +35,13 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         state: "not_ready",
         sales_price_catalogue_confirmation_date: "",
     });
-    const [createHousingCompany] = useCreateHousingCompanyMutation();
+    const [createHousingCompany, {error}] = useCreateHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
         createHousingCompany(formData);
     };
+
+    console.log(formData.sales_price_catalogue_confirmation_date);
 
     return (
         <div className="company-details">
@@ -60,6 +62,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     label="Yhtiön virallinen nimi"
@@ -67,6 +70,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     label="Virallinen osoite"
@@ -74,6 +78,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType={"postalCode"}
@@ -82,6 +87,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType={"select"}
@@ -94,6 +100,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="money"
@@ -102,6 +109,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="money"
@@ -109,6 +117,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     fieldPath="acquisition_price.realized"
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
             </Fieldset>
             <Fieldset
@@ -127,6 +136,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="date"
@@ -134,6 +144,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     fieldPath="sales_price_catalogue_confirmation_date"
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="money"
@@ -142,6 +153,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="relatedModel"
@@ -153,6 +165,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="relatedModel"
@@ -164,6 +177,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="relatedModel"
@@ -175,6 +189,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
                     inputType="relatedModel"
@@ -186,12 +201,15 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     required
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
                 <FormInputField
+                    inputType="textArea"
                     label="Huomioitavaa"
                     fieldPath="notes"
                     formData={formData}
                     setFormData={setFormData}
+                    error={error}
                 />
             </Fieldset>
             <Button
