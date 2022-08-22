@@ -98,41 +98,51 @@
 
 .filters
   grid-row: 2
-  padding-left: $spacing-layout-s
+  padding: 2.5rem 0 0 $spacing-layout-s
+
   > *
     margin-bottom: $spacing-layout-s
 
 .company-details
   > *
     margin-bottom: 75px
+
   .tab-area
     background: $color-black-5
     padding-bottom: 0.1px
+
   .tab-list
     background-color: white
+
   &__tab
     background: white
     margin: $spacing-layout-s
     padding: $spacing-layout-s
     @include mix.flexbox()
     @include mix.flex-flow(row nowrap)
+
     .column
       width: 50%
       border-left: 1px solid #ccc
       padding-left: $spacing-layout-xs
+
       &:not(:first-child)
         margin-left: $spacing-layout-s
+
     .detail-field-label
       display: block
       font-size: $fontsize-body-m
       margin-bottom: $spacing-3-xs
       letter-spacing: 1px
       color: $color-black-50
+
     .detail-field-value
       font-size: $fontsize-body-xl
       font-weight: 600
+
       &:not(:last-child)
         margin-bottom: $spacing-layout-s
+
     textarea
       font-size: $fontsize-body-l
       width: 100%
@@ -146,16 +156,21 @@
   &__list
     background-color: $color-engel-medium-light
     padding: $spacing-layout-s
+
     li
       @include mix.flexbox()
+
       > *
         width: 25%
+
     &-headers
       font-weight: bold
       padding: 0 $spacing-layout-s $spacing-s
+
     &-item
       background-color: white
       padding: $spacing-layout-s
+
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
