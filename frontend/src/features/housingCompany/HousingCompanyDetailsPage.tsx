@@ -14,10 +14,6 @@ const HousingCompanyDetailsPage = () => {
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
 
     const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
-        const theme = {
-            "--tab-color": "var(--color-black-90)",
-            "--tab-active-border-color": "var(--color-black-90)",
-        };
         return (
             <>
                 <h1 className="main-heading">{data.name.display}</h1>
@@ -26,7 +22,7 @@ const HousingCompanyDetailsPage = () => {
                 </div>
                 <div className="company-details">
                     <div className="tab-area">
-                        <Tabs theme={theme}>
+                        <Tabs>
                             <Tabs.TabList className="tab-list">
                                 <Tabs.Tab>Perustiedot</Tabs.Tab>
                                 <Tabs.Tab>Lisätiedot</Tabs.Tab>
@@ -149,12 +145,10 @@ const HousingCompanyDetailsPage = () => {
                             </li>
                         </ul>
                     </div>
-                    <div>
+                    <div className="apartment-list__wrapper">
                         <h2>Asunnot</h2>
                         <div className="listing">
-                            <div className="results">
-                                <ApartmentResultsList filterParams={{housing_company: params.housingCompanyId}} />
-                            </div>
+                            <ApartmentResultsList filterParams={{housing_company: params.housingCompanyId}} />
                         </div>
                         <div className="results"></div>
                     </div>
