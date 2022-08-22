@@ -28,7 +28,9 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
     const LoadedHousingCompanyResultsList = ({data}: {data: IHousingCompanyListResponse}) => {
         return (
             <>
-                <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
+                <div className="list-amount">
+                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "yhtiötä" : "yhtiö"}
+                </div>
                 <div className="list-headers">
                     <div className="list-header name">Yhtiö</div>
                     <div className="list-header address">Osoite</div>

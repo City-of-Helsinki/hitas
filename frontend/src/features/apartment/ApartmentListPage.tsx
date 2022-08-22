@@ -62,7 +62,9 @@ export const ApartmentResultsList = ({filterParams}): JSX.Element => {
     const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
         return (
             <>
-                <div>Rekisterin tulokset: {data.page.total_items} yhtiötä</div>
+                <div className="list-amount">
+                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "yhtiötä" : "yhtiö"}
+                </div>
                 <div className="list-headers">
                     <div className="list-header apartment">Asunto</div>
                     <div className="list-header area">Pinta-ala</div>
