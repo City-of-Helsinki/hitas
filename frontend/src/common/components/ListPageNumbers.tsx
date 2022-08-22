@@ -22,14 +22,19 @@ export default function ListPageNumbers({currentPage, setCurrentPage, pageInfo}:
     }
     pageButtonData.unshift({pageNumber: Math.max(1, currentPage - 1), buttonText: "<"});
     pageButtonData.push({pageNumber: Math.min(totalPages, currentPage + 1), buttonText: ">"});
-
+    if (totalPages === 1) return <></>;
     return (
         <div style={{display: "flex", justifyContent: "space-between"}}>
             {pageButtonData.map(({pageNumber, buttonText}) => (
                 <Button
                     key={`pageButton__${buttonText}`}
                     onClick={() => setCurrentPage(pageNumber)}
-                    style={{backgroundColor: currentPage.toString() === buttonText.toString() ? "black" : "blue"}}
+                    style={{
+                        backgroundColor: "transparent",
+                        color: "var(--text-color)",
+                        border: "0",
+                        fontWeight: "bold",
+                    }}
                 >
                     {buttonText}
                 </Button>
