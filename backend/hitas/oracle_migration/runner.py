@@ -141,7 +141,7 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
         new.primary_loan = hc["primary_loan"]
         new.sales_price_catalogue_confirmation_date = date_to_datetime(hc["sales_price_catalogue_confirmation_date"])
         new.notification_date = date_to_datetime(hc["notification_date"])
-        new.legacy_id = hc["id"]
+        new.legacy_id = hc[companies.c.id]
         new.notes = combine_notes(hc)
         new.last_modified_datetime = date_to_datetime(hc["last_modified"])
         new.building_type = converted_data.building_types[hc["building_type_code"]]
