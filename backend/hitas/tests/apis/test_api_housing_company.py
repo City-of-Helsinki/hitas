@@ -69,7 +69,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "address": {
                 "street_address": hc1.street_address,
                 "postal_code": hc1.postal_code.value,
-                "city": "Helsinki",
+                "city": hc1.postal_code.city,
             },
             "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
             "date": str(bu2.completion_date),
@@ -81,7 +81,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "address": {
                 "street_address": hc2.street_address,
                 "postal_code": hc2.postal_code.value,
-                "city": "Helsinki",
+                "city": hc2.postal_code.city,
             },
             "area": {"name": hc2.postal_code.city, "cost_area": hc2.postal_code.cost_area},
             "date": None,
@@ -299,12 +299,17 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
 @pytest.mark.django_db
-def test__api__housing_company__read__fail(api_client: HitasAPIClient, invalid_id):
+def test__api__housing_company__read__not_found(api_client: HitasAPIClient, invalid_id):
     HousingCompanyFactory.create()
 
     response = api_client.get(reverse("hitas:housing-company-detail", args=[invalid_id]))
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
-    assert response.json() == exceptions.HitasModelNotFound(model=HousingCompany).data
+    assert response.json() == {
+        "error": "housing_company_not_found",
+        "message": "Housing company not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
 
 
 # Create tests
@@ -356,8 +361,7 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
     assert response.status_code == status.HTTP_201_CREATED, response.json()
 
-    hc = HousingCompany.objects.first()
-    assert response.json()["id"] == hc.uuid.hex
+    hc = HousingCompany.objects.get(uuid=response.json()["id"])
     assert response.json()["address"]["postal_code"] == HitasPostalCode.objects.first().value
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
@@ -470,7 +474,7 @@ def test__api__housing_company__delete(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__housing_company__delete__invalid(api_client: HitasAPIClient):
+def test__api__housing_company__delete__with_real_estate(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     RealEstateFactory.create(housing_company=hc)
 
