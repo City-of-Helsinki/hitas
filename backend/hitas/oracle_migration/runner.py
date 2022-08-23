@@ -336,7 +336,7 @@ def create_codes(codes: List[LegacyRow], fn: Callable[[], T], modify_fn: Callabl
         new = fn()
 
         new.value = code["value"]
-        new.description = code["description"]
+        new.description = code["description"] or ""
         new.in_use = code["in_use"]
         new.order = code["order"]
         new.legacy_code_number = code["code_id"]
