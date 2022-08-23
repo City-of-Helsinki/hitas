@@ -1,12 +1,12 @@
-from collections import defaultdict
-from typing import Any, Dict, List, Optional
+import datetime
+from typing import Any, Dict, Optional
 
-from django.db.models import Min
+from django.db.models import Min, Prefetch
 from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Building, HousingCompany, HousingCompanyState
+from hitas.models import Building, HousingCompany, HousingCompanyState, RealEstate
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
 from hitas.views.property_manager import PropertyManagerSerializer
@@ -50,7 +50,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
-    real_estates = serializers.SerializerMethodField()
+    real_estates = RealEstateSerializer(many=True, read_only=True)
     financing_method = FinancingMethodSerializer()
     building_type = BuildingTypeSerializer()
     developer = DeveloperSerializer()
@@ -63,16 +63,9 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     def get_area(self, obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.city, "cost_area": obj.postal_code.cost_area}
 
-    def get_date(self, obj: HousingCompany) -> Optional[str]:
+    def get_date(self, obj: HousingCompany) -> Optional[datetime.date]:
         """SerializerMethodField is used instead of DateField due to date being an annotated value"""
-        date = getattr(obj, "date", None)
-        if date is None:
-            date = (
-                HousingCompany.objects.annotate(date=Min("real_estates__buildings__completion_date"))
-                .get(pk=obj.pk)
-                .date
-            )
-        return date
+        return getattr(obj, "date", None)
 
     def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
         return {
@@ -83,17 +76,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             },
             "datetime": obj.last_modified_datetime,
         }
-
-    def get_real_estates(self, obj: HousingCompany) -> List[Dict[str, Any]]:
-        """Select all buildings for this housing company with one query instead of having one query per property"""
-        buildings_by_real_estate = defaultdict(list)
-        building_qs = Building.objects.select_related("postal_code").filter(real_estate__housing_company_id=obj.id)
-        for b in building_qs:
-            buildings_by_real_estate[b.real_estate_id].append(b)
-
-        # Fetch real estates
-        real_estate_qs = obj.real_estates.select_related("postal_code")
-        return RealEstateSerializer(real_estate_qs, context={"buildings": buildings_by_real_estate}, many=True).data
 
     class Meta:
         model = HousingCompany
@@ -122,6 +104,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
 
 class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
     name = serializers.CharField(source="display_name", max_length=1024)
+    date = serializers.DateField()
 
     class Meta:
         model = HousingCompany
@@ -136,19 +119,81 @@ class HousingCompanyViewSet(HitasModelViewSet):
     def get_list_queryset(self):
         return (
             HousingCompany.objects.select_related("postal_code")
+            .only(
+                "uuid",
+                "display_name",
+                "state",
+                "street_address",
+                "postal_code__value",
+                "postal_code__city",
+                "postal_code__cost_area",
+            )
             .annotate(date=Min("real_estates__buildings__completion_date"))
             .order_by("id")
         )
 
     def get_detail_queryset(self):
-        return HousingCompany.objects.select_related(
-            "postal_code",
-            "financing_method",
-            "developer",
-            "building_type",
-            "property_manager",
-            "last_modified_by",
-        ).annotate(date=Min("real_estates__buildings__completion_date"))
+        return (
+            HousingCompany.objects.prefetch_related(
+                Prefetch(
+                    "real_estates",
+                    queryset=RealEstate.objects.prefetch_related(
+                        Prefetch("buildings", queryset=Building.objects.select_related("postal_code"))
+                    ).select_related("postal_code"),
+                )
+            )
+            .select_related(
+                "postal_code",
+                "financing_method",
+                "developer",
+                "building_type",
+                "property_manager",
+                "last_modified_by",
+            )
+            .only(
+                "uuid",
+                "business_id",
+                "display_name",
+                "official_name",
+                "state",
+                "street_address",
+                "acquisition_price",
+                "realized_acquisition_price",
+                "primary_loan",
+                "sales_price_catalogue_confirmation_date",
+                "notes",
+                "legacy_id",
+                "notification_date",
+                "last_modified_datetime",
+                "financing_method__uuid",
+                "financing_method__value",
+                "financing_method__description",
+                "financing_method__legacy_code_number",
+                "developer__uuid",
+                "developer__value",
+                "developer__description",
+                "developer__legacy_code_number",
+                "building_type__uuid",
+                "building_type__value",
+                "building_type__description",
+                "building_type__legacy_code_number",
+                "property_manager__uuid",
+                "property_manager__name",
+                "property_manager__email",
+                "property_manager__street_address",
+                "property_manager__postal_code",
+                "property_manager__city",
+                "last_modified_by__id",
+                "last_modified_by__username",
+                "last_modified_by__first_name",
+                "last_modified_by__last_name",
+                "postal_code__uuid",
+                "postal_code__value",
+                "postal_code__city",
+                "postal_code__cost_area",
+            )
+            .annotate(date=Min("real_estates__buildings__completion_date"))
+        )
 
     def get_filterset_class(self):
         return HousingCompanyFilterSet
