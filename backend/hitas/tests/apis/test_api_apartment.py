@@ -66,7 +66,10 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             },
             "apartment_number": ap1.apartment_number,
             "stair": ap1.stair,
-            "housing_company": hc1.display_name,
+            "housing_company": {
+                "id": hc1.uuid.hex,
+                "name": hc1.display_name,
+            },
             "date": str(ap1.building.completion_date),
             "owners": [
                 {
@@ -113,7 +116,10 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "address": {"street_address": ap2.street_address, "postal_code": ap2.postal_code.value, "city": "Helsinki"},
             "apartment_number": ap2.apartment_number,
             "stair": ap2.stair,
-            "housing_company": hc2.display_name,
+            "housing_company": {
+                "id": hc2.uuid.hex,
+                "name": hc2.display_name,
+            },
             "date": str(ap2.building.completion_date),
             "owners": [],
         },
@@ -173,14 +179,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "housing_company": {
             "id": hc.uuid.hex,
             "name": hc.display_name,
-            "state": hc.state.value,
-            "address": {
-                "street_address": hc.street_address,
-                "postal_code": hc.postal_code.value,
-                "city": hc.postal_code.city,
-            },
-            "area": {"name": hc.postal_code.city, "cost_area": hc.postal_code.cost_area},
-            "date": str(ap.building.completion_date),
         },
         "owners": [
             {
