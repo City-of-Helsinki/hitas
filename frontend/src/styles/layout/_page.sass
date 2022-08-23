@@ -19,7 +19,7 @@
   grid-template-columns: 65% 35%
 
   > .search
-    margin-bottom: $spacing-layout-s
+    margin-bottom: $spacing-s
 
 .results
   grid-row: 2
@@ -28,12 +28,10 @@
     background: white
     list-style: none
     padding: 0
+    margin: 0
 
     > a
       display: block
-
-      &:not(:last-child)
-        border-bottom: 1px solid #ccc
 
     &__item
       cursor: pointer
@@ -41,64 +39,107 @@
       justify-content: space-between
       padding: $spacing-layout-xs
 
-      &:hover
-        background-color: #ededed
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
+      .name, .address, .date, .number, .details > div
+        @include mix.flexbox
+        flex-flow: column nowrap
+        justify-content: center
+
+
+      .name, .address, .date
+        width: 32%
+
+      .name, .address
+        margin-right: 2%
+
+      .date
+        text-align: right
+
+      .area
+        width: 15%
+
+      .state
+        width: 15%
+
+        &:hover
+          background-color: #ededed
 
       &--apartment
-        display: grid
+        position: relative
+        display: flex
         grid-template-columns: 90px auto
         grid-template-rows: auto auto
 
         .number
-          grid-column: 1
           font-size: $fontsize-heading-l
           font-weight: 600
           width: 90px
+          line-height: 1.25
 
         .details
           font-size: $fontsize-body-l
-          grid-column: 2
           @include mix.flex-grow(1)
           @include mix.flexbox
           @include mix.flex-wrap(wrap)
 
         .owner
+          font-size: $fontsize-body-m
+          display: inline-block
+          line-height: 1
           width: 100%
-          font-size: $fontsize-body-s
           margin-bottom: 0.25rem
 
         .rooms
-          width: 100px
+          width: 19%
 
-  .name, .address, .date
-    width: 32%
+        .area
+          width: 10%
 
-  .name, .address
-    margin-right: 2%
+        .address
+          width: 40%
 
-  .date
-    text-align: right
+        .state
+          width: 15%
 
-  .area
-    width: 15%
+          span
+            transform: translateY(-1rem)
 
-.list-amount
-  padding-left: $spacing-layout-xs
+.list
 
-.list-headers
-  display: flex
-  justify-content: space-between
-  padding: $spacing-layout-xs $spacing-layout-xs 0
+  &-amount
+    padding: 0 0 0 $spacing-layout-xs
+    margin: 0 0 $spacing-layout-l
 
-  .apartment
-    width: 32%
+  &-headers
+    padding: 0 $spacing-layout-xs $spacing-xs
 
-.list-header
-  width: 25%
+  &-header
+    display: inline-block
+    width: 25%
+
+    &.name
+      width: 33%
+
+    &.area
+      width: 10%
+
+    &.apartment
+      width: 25%
+
+    &.address
+      width: 50%
+
+    &.date
+      width: 17%
+
+    &.state
+      width: 15%
 
 .filters
   grid-row: 2
-  padding: 2.5rem 0 0 $spacing-layout-s
+  padding: 5.5rem 0 0 $spacing-layout-s
 
   > *
     margin-bottom: $spacing-layout-s
@@ -164,7 +205,6 @@
         width: 25%
 
     &-headers
-      font-weight: bold
       padding: 0 $spacing-layout-s $spacing-s
 
     &-item

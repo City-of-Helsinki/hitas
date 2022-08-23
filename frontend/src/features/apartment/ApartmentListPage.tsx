@@ -69,7 +69,7 @@ export const ApartmentResultsList = ({filterParams}): JSX.Element => {
                     <div className="list-header apartment">Asunto</div>
                     <div className="list-header area">Pinta-ala</div>
                     <div className="list-header address">Osoite</div>
-                    <div className="list-header status">Tila</div>
+                    <div className="list-header state">Tila</div>
                 </div>
                 <ul className="results-list">
                     {data.contents.map((item: IApartment) => (
