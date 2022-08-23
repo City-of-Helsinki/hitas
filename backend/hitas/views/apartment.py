@@ -8,11 +8,10 @@ from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Apartment, Building, Owner
+from hitas.models import Apartment, Building, HousingCompany, Owner
 from hitas.models.apartment import ApartmentState
 from hitas.models.utils import validate_share_numbers
 from hitas.views.codes import ApartmentTypeSerializer
-from hitas.views.housing_company import HousingCompanyListSerializer
 from hitas.views.owner import OwnerSerializer
 from hitas.views.utils import (
     HitasAddressSerializer,
@@ -59,6 +58,14 @@ class ApartmentFilterSet(HitasFilterSet):
         fields = "__all__"
 
 
+class HousingCompanySerializer(EnumSupportSerializerMixin, HitasModelSerializer):
+    name = serializers.CharField(source="display_name")
+
+    class Meta:
+        model = HousingCompany
+        fields = ["id", "name"]
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
@@ -75,7 +82,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     building = UUIDRelatedField(queryset=Building.objects.all())
     real_estate = serializers.SerializerMethodField()
-    housing_company = HousingCompanyListSerializer(source="building.real_estate.housing_company", read_only=True)
+    housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
     owners = OwnerSerializer(many=True, read_only=False)
 
     def get_real_estate(self, instance: Apartment) -> str:
@@ -172,7 +179,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
 class ApartmentListSerializer(ApartmentDetailSerializer):
     apartment_type = serializers.CharField(source="apartment_type.value")
-    housing_company = serializers.CharField(source="building.real_estate.housing_company.display_name")
+    housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
 
     class Meta:
         model = Apartment

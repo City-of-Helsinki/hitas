@@ -2157,6 +2157,24 @@ components:
           nullable: true
           example: 100012345A
 
+    MinimalHousingCompany:
+      description: Housing company identifier
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
+        name:
+          description: Name of the housing company
+          type: string
+          example: Taloyhtiö Helmi
+          maxLength: 1024
+
     Apartment:
       description: Single apartment
       type: object
@@ -2197,9 +2215,7 @@ components:
           nullable: true
           readOnly: true
         housing_company:
-          description: Name of the housing company this apartment belongs in
-          type: string
-          readOnly: true
+          $ref: '#/components/schemas/MinimalHousingCompany'
         owners:
           description: List of apartment's owners
           type: array
@@ -2284,7 +2300,7 @@ components:
           example: a3181b8fa60b47df8ccba0d554a913bb
           readOnly: true
         housing_company:
-          $ref: '#/components/schemas/HousingCompany'
+          $ref: '#/components/schemas/MinimalHousingCompany'
         owners:
           description: List of apartment's owners
           type: array
