@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
@@ -8,6 +9,11 @@ urlpatterns = [
     path("api/v1/", include("hitas.urls")),
     path("healthz", HealthCheckView.as_view(), name="health_check"),
 ]
+
+if settings.DEBUG_TOOLBAR:
+    urlpatterns += [
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]
 
 handler404 = "hitas.error_handlers.handle_404"
 handler500 = "hitas.error_handlers.handle_500"

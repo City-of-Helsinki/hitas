@@ -34,6 +34,7 @@ pytest-django = "^4.5.2"
 ipython = "^8.4.0"
 openapi-core = "^0.14.2"
 testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
+django-debug-toolbar = "^3.6.0"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"

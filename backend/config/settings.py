@@ -64,6 +64,24 @@ MIDDLEWARE = [
     "crum.CurrentRequestUserMiddleware",
 ]
 
+DEBUG_TOOLBAR = False
+if DEBUG:
+    try:
+        import debug_toolbar  # noqa
+
+        DEBUG_TOOLBAR = True
+    except ImportError:
+        pass
+
+    if DEBUG_TOOLBAR:
+        INSTALLED_APPS.append("debug_toolbar")
+        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+        import socket
+
+        hostname, aliases, ips = socket.gethostbyname_ex(socket.gethostname())
+        INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 
