@@ -7,7 +7,7 @@ from hitas.models._base import ExternalHitasModel
 
 # Postinumero
 class HitasPostalCode(ExternalHitasModel):
-    value = models.CharField(max_length=5)
+    value = models.CharField(max_length=5, unique=True)
     city = models.CharField(max_length=1024, default="Helsinki")
     cost_area = models.PositiveIntegerField(validators=[MaxValueValidator(4), MinValueValidator(1)])
 
