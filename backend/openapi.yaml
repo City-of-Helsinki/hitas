@@ -13,6 +13,41 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
+        - name: display_name
+          description: Search housing companies with display name containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: helmi
+        - name: street_address
+          description: Search housing companies with street address containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: Hannunkatu
+        - name: postal_code
+          description: Search housing companies located in given postal code
+          required: false
+          in: query
+          schema:
+            type: string
+            example: "00100"
+        - name: developer
+          description: Search housing companies with developer name containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: Rakennuttaja
+        - name: property_manager
+          description: Search housing companies with property manager name matching to the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: isännöinti
       responses:
         '200':
           description: Successfully fetched list of housing companies
