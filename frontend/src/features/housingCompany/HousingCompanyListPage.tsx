@@ -118,7 +118,12 @@ const HousingCompanyListPage = (): JSX.Element => {
             <h1 className="main-heading">
                 <span>Kaikki kohteet</span>
                 <Link to="create">
-                    <Button iconLeft={<IconPlus />}>Lisää uusi yhtiö</Button>
+                    <Button
+                        theme="black"
+                        iconLeft={<IconPlus />}
+                    >
+                        Lisää uusi yhtiö
+                    </Button>
                 </Link>
             </h1>
             <div className="listing">
