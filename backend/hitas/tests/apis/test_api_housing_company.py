@@ -368,6 +368,30 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
     assert response.json() == get_response.json()
 
 
+@pytest.mark.django_db
+def test__api__housing_company__create__empty(api_client: HitasAPIClient):
+    response = api_client.post(reverse("hitas:housing-company-list"), data={}, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {"field": "business_id", "message": "This field is mandatory and cannot be blank."},
+            {"field": "name", "message": "This field is mandatory and cannot be blank."},
+            {"field": "state", "message": "This field is mandatory and cannot be blank."},
+            {"field": "address", "message": "This field is mandatory and cannot be blank."},
+            {"field": "financing_method", "message": "This field is mandatory and cannot be blank."},
+            {"field": "building_type", "message": "This field is mandatory and cannot be blank."},
+            {"field": "developer", "message": "This field is mandatory and cannot be blank."},
+            {"field": "property_manager", "message": "This field is mandatory and cannot be blank."},
+            {"field": "acquisition_price", "message": "This field is mandatory and cannot be blank."},
+            {"field": "primary_loan", "message": "This field is mandatory and cannot be blank."},
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 @pytest.mark.parametrize(
     "invalid_data",
     [
