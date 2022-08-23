@@ -15,7 +15,7 @@ class HitasModelSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
         """If referenced in another serializer by id, return an object"""
-        if not self.instance and data.get("id", None) is not None:
+        if not self.instance and type(data) == dict and data.get("id", None) is not None:
             try:
                 return self.Meta.model.objects.get(uuid=UUID(hex=str(data.get("id", None))))
             except (self.Meta.model.DoesNotExist, ValueError):
