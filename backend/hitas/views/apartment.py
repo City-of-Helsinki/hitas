@@ -202,8 +202,63 @@ class ApartmentViewSet(HitasModelViewSet):
     list_serializer_class = ApartmentListSerializer
     model_class = Apartment
 
-    def get_queryset(self):
-        return Apartment.objects.select_related("postal_code")
+    def get_detail_queryset(self):
+        return self.get_list_queryset().only(
+            "uuid",
+            "state",
+            "surface_area",
+            "street_address",
+            "apartment_number",
+            "floor",
+            "stair",
+            "share_number_start",
+            "share_number_end",
+            "debt_free_purchase_price",
+            "purchase_price",
+            "acquisition_price",
+            "primary_loan_amount",
+            "loans_during_construction",
+            "interest_during_construction",
+            "notes",
+            "building__uuid",
+            "building__completion_date",
+            "building__real_estate__housing_company__uuid",
+            "building__real_estate__housing_company__display_name",
+            "building__real_estate__uuid",
+            "apartment_type__uuid",
+            "apartment_type__value",
+            "apartment_type__legacy_code_number",
+            "apartment_type__description",
+            "postal_code__value",
+            "postal_code__city",
+        )
+
+    def get_list_queryset(self):
+        return (
+            Apartment.objects.prefetch_related("owners", "owners__person")
+            .select_related(
+                "postal_code",
+                "building",
+                "building__real_estate",
+                "apartment_type",
+                "building__real_estate__housing_company",
+            )
+            .only(
+                "uuid",
+                "state",
+                "surface_area",
+                "street_address",
+                "apartment_number",
+                "floor",
+                "stair",
+                "building__completion_date",
+                "building__real_estate__housing_company__uuid",
+                "building__real_estate__housing_company__display_name",
+                "apartment_type__value",
+                "postal_code__value",
+                "postal_code__city",
+            )
+        )
 
     def get_filterset_class(self):
         return ApartmentFilterSet
