@@ -23,17 +23,15 @@ from hitas.views.utils import (
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
+    display_name = filters.CharFilter(lookup_expr="icontains")
+    street_address = filters.CharFilter(lookup_expr="icontains")
     postal_code = filters.CharFilter(field_name="postal_code__value")
     property_manager = filters.CharFilter(field_name="property_manager__name", lookup_expr="icontains")
-    building_type = filters.CharFilter(field_name="building_type__value", lookup_expr="icontains")
-    financing_method = filters.CharFilter(field_name="financing_method__value", lookup_expr="icontains")
     developer = filters.CharFilter(field_name="developer__value", lookup_expr="icontains")
-    property_identifier = filters.CharFilter(field_name="real_estates__property_identifier", lookup_expr="icontains")
-    state = filters.ChoiceFilter(choices=HousingCompanyState.choices())
 
     class Meta:
         model = HousingCompany
-        fields = "__all__"
+        fields = ["display_name", "street_address", "postal_code", "property_manager", "developer"]
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):

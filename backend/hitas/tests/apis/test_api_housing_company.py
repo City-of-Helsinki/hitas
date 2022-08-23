@@ -515,18 +515,10 @@ def test__api__housing_company__delete__with_real_estate(api_client: HitasAPICli
     "selected_filter",
     [
         {"display_name": "TestDisplayName"},
-        {"official_name": "TestOfficialName OY"},
-        {"display_name": "Test", "official_name": "Test"},
-        {"state": HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION.value},
-        {"business_id": "1234567-8"},
         {"street_address": "test-street"},
         {"property_manager": "TestPropertyManager"},
-        {"building_type": "TestBuildingType"},
-        {"financing_method": "TestFinancingMethod"},
         {"developer": "TestDeveloper"},
         {"postal_code": "99999"},
-        {"property_identifier": "1-1234-321-56"},
-        {"property_identifier": "1111"},
     ],
 )
 @pytest.mark.django_db
@@ -534,11 +526,8 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     hc: HousingCompany = HousingCompanyFactory.create(display_name="TestDisplayName")
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
     HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
-    HousingCompanyFactory.create(business_id="1234567-8")
     HousingCompanyFactory.create(street_address="test-street")
     HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
-    HousingCompanyFactory.create(building_type__value="TestBuildingType")
-    HousingCompanyFactory.create(financing_method__value="TestFinancingMethod")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
     HousingCompanyFactory.create(postal_code__value="99999")
     RealEstateFactory.create(property_identifier="1-1234-321-56", housing_company=hc)
@@ -548,45 +537,3 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 1, response.json()
-
-
-@pytest.mark.parametrize(
-    "selected_filter",
-    [
-        {"area": 1},
-        {"area": 2},
-        {"area": 3},
-        {"area": 4},
-    ],
-)
-@pytest.mark.django_db
-def test__api__housing_company__area_filter(api_client: HitasAPIClient, selected_filter):
-    return  # FIXME
-
-    HousingCompanyFactory.create(postal_code__value="00100")  # Area 1
-    HousingCompanyFactory.create(postal_code__value="00200")  # Area 2
-    HousingCompanyFactory.create(postal_code__value="00240")  # Area 3
-    HousingCompanyFactory.create(postal_code__value="99999")  # Not in areas 1-3 => Area 4
-
-    url = reverse("hitas:housing-company-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 1, response.json()
-
-
-@pytest.mark.parametrize(
-    "selected_filter",
-    [
-        {"state": 1},
-        {"state": "123"},
-        {"state": "foo"},
-    ],
-)
-@pytest.mark.django_db
-def test__api__housing_company__filter_invalid_state(api_client: HitasAPIClient, selected_filter):
-    for state in list(HousingCompanyState):
-        HousingCompanyFactory.create(state=state)
-
-    url = reverse("hitas:housing-company-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
