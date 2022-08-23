@@ -93,6 +93,10 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
 }
 
+# Disable browseable API renderer if DEBUG is not set
+if not DEBUG:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",)
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
