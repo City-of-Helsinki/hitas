@@ -67,6 +67,7 @@
           background-color: #ededed
 
       &--apartment
+        padding-left: 0
         position: relative
         display: flex
         grid-template-columns: 90px auto
@@ -75,34 +76,38 @@
         .number
           font-size: $fontsize-heading-l
           font-weight: 600
-          width: 90px
+          width: calc(1.5rem + 90px)
           line-height: 1.25
+          align-items: center
 
         .details
+          width: calc(100% - 1.5rem - 90px)
           font-size: $fontsize-body-l
           @include mix.flex-grow(1)
           @include mix.flexbox
           @include mix.flex-wrap(wrap)
 
         .owner
+          position: relative
+          z-index: 10
           font-size: $fontsize-body-m
-          display: inline-block
           line-height: 1
           width: 100%
           margin-bottom: 0.25rem
 
         .rooms
-          width: 19%
+          width: 25%
 
         .area
-          width: 10%
+          width: 15%
 
         .address
-          width: 53%
+          width: 42%
 
         .details .state
           display: block
-          width: 10%
+          width: 15%
+          text-align: right
 
           span
             transform: translateY(-1rem)
@@ -124,19 +129,22 @@
       width: 33%
 
     &.area
-      width: 10%
+      width: 13%
 
     &.apartment
-      width: 25%
+      width: 35%
 
     &.address
       width: 50%
 
     &.date
       width: 17%
+      text-align: right
 
     &.state
-      width: 15%
+      width: 12%
+      text-align: right
+
 
 .filters
   grid-row: 2
