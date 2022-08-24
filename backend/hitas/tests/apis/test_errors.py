@@ -60,8 +60,38 @@ class ExceptionApiCases(APITestCase):
             },
         )
 
-    def test__api__exception__415_unsupported_media_type(self):
+    def test__api__exception__415_unsupported_media_type__plain_text(self):
         response = self.client.post(reverse("hitas:housing-company-list"), data="foo", content_type="text/plain")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertDictEqual(
+            response.json(),
+            {
+                "error": "unsupported_media_type",
+                "message": "Unsupported media type",
+                "reason": "Unsupported Media Type",
+                "status": 415,
+            },
+        )
+
+    def test__api__exception__415_unsupported_media_type__form_data(self):
+        response = self.client.post(
+            reverse("hitas:housing-company-list"), data="foo", content_type="multipart/form-data"
+        )
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertDictEqual(
+            response.json(),
+            {
+                "error": "unsupported_media_type",
+                "message": "Unsupported media type",
+                "reason": "Unsupported Media Type",
+                "status": 415,
+            },
+        )
+
+    def test__api__exception__415_unsupported_media_type__form_urlencoded(self):
+        response = self.client.post(
+            reverse("hitas:housing-company-list"), data={"foo": "bar"}, content_type="application/x-www-form-urlencoded"
+        )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         self.assertDictEqual(
             response.json(),

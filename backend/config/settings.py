@@ -91,6 +91,7 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
+    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
 }
 
 # Disable browseable API renderer if DEBUG is not set
