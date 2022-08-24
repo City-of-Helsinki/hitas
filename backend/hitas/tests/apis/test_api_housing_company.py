@@ -413,12 +413,20 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "financing_method", "message": "Invalid data. Expected a dictionary, but got str."},
         ),
         (
+            {"financing_method": {}},
+            {"field": "financing_method.id", "message": "This field is mandatory and cannot be blank."},
+        ),
+        (
             {"building_type": None},
             {"field": "building_type", "message": "This field is mandatory and cannot be blank."},
         ),
         (
             {"building_type": 123},
             {"field": "building_type", "message": "Invalid data. Expected a dictionary, but got int."},
+        ),
+        (
+            {"building_type": {}},
+            {"field": "building_type.id", "message": "This field is mandatory and cannot be blank."},
         ),
         ({"developer": None}, {"field": "developer", "message": "This field is mandatory and cannot be blank."}),
         ({"developer": 123}, {"field": "developer", "message": "Invalid data. Expected a dictionary, but got int."}),
@@ -429,6 +437,10 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         (
             {"property_manager": 123},
             {"field": "property_manager", "message": "Invalid data. Expected a dictionary, but got int."},
+        ),
+        (
+            {"property_manager": {}},
+            {"field": "property_manager.id", "message": "This field is mandatory and cannot be blank."},
         ),
         (
             {"acquisition_price": None},

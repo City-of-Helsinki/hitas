@@ -8,8 +8,12 @@ from rest_framework import serializers
 
 from hitas.models import Building, HousingCompany, HousingCompanyState, RealEstate
 from hitas.utils import safe_attrgetter
-from hitas.views.codes import BuildingTypeSerializer, DeveloperSerializer, FinancingMethodSerializer
-from hitas.views.property_manager import PropertyManagerSerializer
+from hitas.views.codes import (
+    ReadOnlyBuildingTypeSerializer,
+    ReadOnlyDeveloperSerializer,
+    ReadOnlyFinancingMethodSerializer,
+)
+from hitas.views.property_manager import ReadOnlyPropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
     HitasAddressSerializer,
@@ -51,10 +55,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
     real_estates = RealEstateSerializer(many=True, read_only=True)
-    financing_method = FinancingMethodSerializer()
-    building_type = BuildingTypeSerializer()
-    developer = DeveloperSerializer()
-    property_manager = PropertyManagerSerializer()
+    financing_method = ReadOnlyFinancingMethodSerializer()
+    building_type = ReadOnlyBuildingTypeSerializer()
+    developer = ReadOnlyDeveloperSerializer()
+    property_manager = ReadOnlyPropertyManagerSerializer()
     acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
     notes = ValueOrNullField(required=False)
     legacy_id = ValueOrNullField(read_only=True)

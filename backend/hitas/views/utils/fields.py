@@ -21,6 +21,14 @@ class HitasDecimalField(serializers.DecimalField):
         super().__init__(max_digits=max_digits, decimal_places=decimal_places, min_value=min_value, **kwargs)
 
 
+class UUIDField(serializers.Field):
+    def to_representation(self, obj):
+        return obj.hex
+
+    def to_internal_value(self, data: str):
+        return super().to_internal_value(data=UUID(hex=str(data)))
+
+
 class UUIDRelatedField(SlugRelatedField):
     def __init__(self, **kwargs):
         super().__init__(slug_field="uuid", **kwargs)
