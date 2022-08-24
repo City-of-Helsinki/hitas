@@ -20,7 +20,7 @@ class BuildingSerializer(HitasModelSerializer):
         validated_data = super().validated_data
         try:
             real_estate_uuid = UUID(hex=self.context["view"].kwargs.get("real_estate_uuid"))
-            real_estate_id = RealEstate.objects.get(uuid=real_estate_uuid).id
+            real_estate_id = RealEstate.objects.only("id").get(uuid=real_estate_uuid).id
         except (RealEstate.DoesNotExist, ValueError):
             raise HitasModelNotFound(model=RealEstate)
 
