@@ -65,6 +65,10 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                     </div>
                                     <div className="column">
+                                        <DetailField
+                                            label="Isännöitsijä"
+                                            value={`${data.property_manager.name} (${data.property_manager.email})`}
+                                        />
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
                                             readOnly
@@ -102,10 +106,6 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                     </div>
                                     <div className="column">
-                                        <DetailField
-                                            label="Isännöitsijä"
-                                            value={`${data.property_manager.name} (${data.property_manager.email})`}
-                                        />
                                         <DetailField
                                             label="Rahoitusmuoto"
                                             value={data.financing_method.value}
