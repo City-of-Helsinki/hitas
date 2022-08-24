@@ -393,37 +393,65 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
 
 
 @pytest.mark.parametrize(
-    "invalid_data",
+    "invalid_data,field",
     [
-        {"business_id": None},
-        {"business_id": "#"},
-        {"business_id": "123"},
-        {"name": None},
-        {"name": 0},
-        {"state": None},
-        {"state": "failing-state"},
-        {"address": None},
-        {"address": 123},
-        {"financing_method": None},
-        {"financing_method": "foo"},
-        {"building_type": None},
-        {"building_type": "foo"},
-        {"developer": None},
-        {"developer": "foo"},
-        {"property_manager": None},
-        {"property_manager": "foo"},
-        {"acquisition_price": None},
-        {"primary_loan": None},
-        {"primary_loan": "foo"},
+        ({"business_id": None}, {"field": "business_id", "message": "This field is mandatory and cannot be blank."}),
+        ({"business_id": "#"}, {"field": "business_id", "message": "'#' is not a valid business id."}),
+        ({"business_id": "123"}, {"field": "business_id", "message": "'123' is not a valid business id."}),
+        ({"name": None}, {"field": "name", "message": "This field is mandatory and cannot be blank."}),
+        ({"name": 0}, {"field": "name", "message": "Invalid data. Expected a dictionary, but got int."}),
+        ({"state": None}, {"field": "state", "message": "This field is mandatory and cannot be blank."}),
+        ({"state": "invalid_state"}, {"field": "state", "message": "Unsupported HousingCompanyState 'invalid_state'."}),
+        ({"address": None}, {"field": "address", "message": "This field is mandatory and cannot be blank."}),
+        ({"address": 123}, {"field": "address", "message": "Invalid data. Expected a dictionary, but got int."}),
+        (
+            {"financing_method": None},
+            {"field": "financing_method", "message": "This field is mandatory and cannot be blank."},
+        ),
+        (
+            {"financing_method": "foo"},
+            {"field": "financing_method", "message": "Invalid data. Expected a dictionary, but got str."},
+        ),
+        (
+            {"building_type": None},
+            {"field": "building_type", "message": "This field is mandatory and cannot be blank."},
+        ),
+        (
+            {"building_type": 123},
+            {"field": "building_type", "message": "Invalid data. Expected a dictionary, but got int."},
+        ),
+        ({"developer": None}, {"field": "developer", "message": "This field is mandatory and cannot be blank."}),
+        ({"developer": 123}, {"field": "developer", "message": "Invalid data. Expected a dictionary, but got int."}),
+        (
+            {"property_manager": None},
+            {"field": "property_manager", "message": "This field is mandatory and cannot be blank."},
+        ),
+        (
+            {"property_manager": 123},
+            {"field": "property_manager", "message": "Invalid data. Expected a dictionary, but got int."},
+        ),
+        (
+            {"acquisition_price": None},
+            {"field": "acquisition_price", "message": "This field is mandatory and cannot be blank."},
+        ),
+        ({"primary_loan": None}, {"field": "primary_loan", "message": "This field is mandatory and cannot be blank."}),
+        ({"primary_loan": "foo"}, {"field": "primary_loan", "message": "A valid number is required."}),
     ],
 )
 @pytest.mark.django_db
-def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient, invalid_data):
+def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient, invalid_data, field):
     data = get_housing_company_create_data()
     data.update(invalid_data)
 
     response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [field],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 @pytest.mark.django_db
