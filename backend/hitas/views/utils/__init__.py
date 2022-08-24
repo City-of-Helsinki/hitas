@@ -2,6 +2,7 @@ from hitas.views.utils.fields import (
     HitasDecimalField,
     HitasEnumField,
     HitasPostalCodeField,
+    UUIDField,
     UUIDRelatedField,
     ValueOrNullField,
 )

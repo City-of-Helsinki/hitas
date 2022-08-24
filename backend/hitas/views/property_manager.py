@@ -1,5 +1,5 @@
 from hitas.models import PropertyManager
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
 class PropertyManagerAddressSerializer(HitasModelSerializer):
@@ -19,6 +19,14 @@ class PropertyManagerSerializer(HitasModelSerializer):
             "email",
             "address",
         ]
+
+
+class ReadOnlyPropertyManagerSerializer(PropertyManagerSerializer):
+    id = UUIDField(source="uuid")
+    address = PropertyManagerAddressSerializer(source="*", read_only=True)
+
+    class Meta(PropertyManagerSerializer.Meta):
+        read_only_fields = ["name", "email", "address"]
 
 
 class PropertyManagerViewSet(HitasModelViewSet):
