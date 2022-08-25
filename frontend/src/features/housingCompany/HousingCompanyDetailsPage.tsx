@@ -158,7 +158,7 @@ const HousingCompanyDetailsPage = () => {
     };
 
     return (
-        <div className="company">
+        <div className="view--company-details">
             <QueryStateHandler
                 data={data}
                 error={error}

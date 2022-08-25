@@ -160,7 +160,7 @@ const ApartmentListPage = (): JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (
-        <div className="apartments">
+        <div className="view--apartments-listing">
             <h1 className="main-heading">Kaikki kohteet</h1>
             <div className="listing">
                 <SearchInput
