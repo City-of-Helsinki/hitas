@@ -290,120 +290,208 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 
 
 @pytest.mark.parametrize(
-    "invalid_data",
+    "invalid_data,fields",
     [
-        {"state": None},
-        {"state": "foo"},
-        {"apartment_type": None},
-        {"surface_area": None},
-        {"surface_area": "foo"},
-        {"surface_area": -1},
-        {"share_number_start": "foo"},
-        {"share_number_end": "foo"},
-        {"share_number_start": 100, "share_number_end": None},
-        {"share_number_start": None, "share_number_end": 100},
-        {"share_number_start": 100, "share_number_end": 50},
-        {"address": None},
-        {"apartment_number": None},
-        {"apartment_number": "foo"},
-        {"apartment_number": -1},
-        {"floor": None},
-        {"floor": "foo"},
-        {"floor": -1},
-        {"stair": None},
-        {"debt_free_purchase_price": -1},
-        {"purchase_price": -1},
-        {"acquisition_price": -1},
-        {"primary_loan_amount": -1},
-        {"loans_during_construction": -1},
-        {"interest_during_construction": -1},
-        {"building": None},
-        {"notes": None},  # None is not allowed, but blank is fine
-        {"owners": None},
-        {
-            "owners": [
+        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
+        ({"state": "invalid_state"}, [{"field": "state", "message": "Unsupported ApartmentState 'invalid_state'."}]),
+        (
+            {"apartment_type": None},
+            [{"field": "apartment_type", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        (
+            {"surface_area": None},
+            [{"field": "surface_area", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        ({"surface_area": "foo"}, [{"field": "surface_area", "message": "A valid number is required."}]),
+        (
+            {"surface_area": -1},
+            [{"field": "surface_area", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        ({"share_number_start": "foo"}, [{"field": "share_number_start", "message": "A valid integer is required."}]),
+        (
+            {"share_number_start": 100, "share_number_end": None},
+            [
                 {
-                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                    "ownership_percentage": 100,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
+                    "field": "non_field_errors",
+                    "message": "You must enter both: share_number_start and share_number_end or neither.",
+                }
+            ],
+        ),
+        (
+            {"share_number_start": None, "share_number_end": 100},
+            [
                 {
-                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                    "ownership_percentage": 50,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-            ]
-        },
-        {
-            "owners": [
+                    "field": "non_field_errors",
+                    "message": "You must enter both: share_number_start and share_number_end or neither.",
+                }
+            ],
+        ),
+        (
+            {"share_number_start": 100, "share_number_end": 50},
+            [{"field": "non_field_errors", "message": "share_number_start must not be greater than share_number_end"}],
+        ),
+        ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be blank."}]),
+        (
+            {"apartment_number": None},
+            [{"field": "apartment_number", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        ({"apartment_number": "foo"}, [{"field": "apartment_number", "message": "A valid integer is required."}]),
+        (
+            {"apartment_number": -1},
+            [{"field": "apartment_number", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        ({"floor": None}, [{"field": "floor", "message": "This field is mandatory and cannot be blank."}]),
+        ({"floor": "foo"}, [{"field": "floor", "message": "A valid integer is required."}]),
+        ({"floor": 10.1}, [{"field": "floor", "message": "A valid integer is required."}]),
+        ({"floor": -1}, [{"field": "floor", "message": "Ensure this value is greater than or equal to 0."}]),
+        ({"stair": None}, [{"field": "stair", "message": "This field is mandatory and cannot be blank."}]),
+        (
+            {"debt_free_purchase_price": -1},
+            [{"field": "debt_free_purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {"purchase_price": -1},
+            [{"field": "purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {"acquisition_price": -1},
+            [{"field": "acquisition_price", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {"primary_loan_amount": -1},
+            [{"field": "primary_loan_amount", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {"loans_during_construction": -1},
+            [{"field": "loans_during_construction", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {"interest_during_construction": -1},
+            [{"field": "interest_during_construction", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
+        ({"notes": None}, [{"field": "notes", "message": "This field is mandatory and cannot be blank."}]),
+        ({"owners": None}, [{"field": "owners", "message": "This field is mandatory and cannot be blank."}]),
+        (
+            {
+                "owners": [
+                    {
+                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "ownership_percentage": 100,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                    {
+                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "ownership_percentage": 50,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                ]
+            },
+            [
                 {
-                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                    "ownership_percentage": 10,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
+                    "field": "owners.ownership_percentage",
+                    "message": "Ownership percentage of all owners combined must"
+                    " be equal to 100. (Given sum was 150.00)",
+                }
+            ],
+        ),
+        (
+            {
+                "owners": [
+                    {
+                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "ownership_percentage": 10,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                    {
+                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "ownership_percentage": 10,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                ]
+            },
+            [
                 {
-                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                    "ownership_percentage": 10,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-            ]
-        },
-        {
-            "owners": [
+                    "field": "owners.ownership_percentage",
+                    "message": "Ownership percentage of all owners combined must"
+                    " be equal to 100. (Given sum was 20.00)",
+                }
+            ],
+        ),
+        (
+            {
+                "owners": [
+                    {
+                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "ownership_percentage": 100,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                    {
+                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "ownership_percentage": 0,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                ]
+            },
+            [
                 {
-                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                    "ownership_percentage": 100,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-                {
-                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                    "ownership_percentage": 0,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-            ]
-        },
-        {
-            "owners": [
-                {
-                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                    "ownership_percentage": 200,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-                {
-                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                    "ownership_percentage": -100,
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-            ]
-        },
-        {
-            "owners": [
-                {
-                    "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                    "ownership_percentage": "foo",
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-                {
-                    "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                    "ownership_percentage": "baz",
-                    "ownership_start_date": "2020-01-01",
-                    "ownership_end_date": None,
-                },
-            ]
-        },
+                    "field": "owners.ownership_percentage",
+                    "message": "Ownership percentage greater than 0 and less than"
+                    " or equal to 100. (Given value was 0.00)",
+                }
+            ],
+        ),
+        (
+            {
+                "owners": [
+                    {
+                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "ownership_percentage": 200,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                    {
+                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "ownership_percentage": -100,
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                ]
+            },
+            [{"field": "owners.ownership_percentage", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
+        (
+            {
+                "owners": [
+                    {
+                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "ownership_percentage": "foo",
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                    {
+                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "ownership_percentage": "baz",
+                        "ownership_start_date": "2020-01-01",
+                        "ownership_end_date": None,
+                    },
+                ]
+            },
+            [
+                {"field": "owners.ownership_percentage", "message": "A valid number is required."},
+                {"field": "owners.ownership_percentage", "message": "A valid number is required."},
+            ],
+        ),
     ],
 )
 @pytest.mark.django_db
-def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data):
+def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
     PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
     PersonFactory.create(uuid=UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
 
@@ -412,6 +500,13 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
 
     response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 # Update tests
