@@ -93,7 +93,7 @@ real_estates = Table(
         key="company_id",
         nullable=False,
     ),
-    Column("C_KIINTTUN", String(14), nullable=False),
+    Column("C_KIINTTUN", String(14), key="property_identifier", nullable=False),
     Column("C_KUNTA", String(3), nullable=False),
     Column("C_KOSAKOODI", String(16), nullable=False),  # Always 'KAUPOSA'
     Column("C_KAUPOSA", String(3), nullable=False),
@@ -120,30 +120,30 @@ apartments = Table(
     Column("C_SOTU1", HitasAnonymizedSSN(11)),
     Column("C_OMNIMI2", HitasAnonymizedName(50), index=True),
     Column("C_SOTU2", HitasAnonymizedSSN(11)),
-    Column("C_KATUOS", String(50), nullable=False),
-    Column("C_PORRAS", String(3), nullable=False),
-    Column("N_HUONRO", Integer, nullable=False),
+    Column("C_KATUOS", String(50), key="street_address", nullable=False),
+    Column("C_PORRAS", String(3), key="stair", nullable=False),
+    Column("N_HUONRO", Integer, key="apartment_number", nullable=False),
     Column("C_OSOITE", String(70), nullable=False, index=True),
     Column("C_POSKOODI", String(16), nullable=False),  # Always 'POSTINROT'
     Column("C_POSTINRO", String(12), key="postal_code_code", nullable=False),
     Column("C_PTP", String(30), nullable=False),  # Always 'HELSINKI'
-    Column("C_KERROS", String(3)),
+    Column("C_KERROS", String(3), key="floor"),
     Column("N_HUONELKM", Integer, nullable=False),
     Column("C_HUONKOODI", String(16), nullable=False),  # Always 'HUONETYYPPI'
-    Column("C_HUONTYYP", String(12), nullable=False),
-    Column("N_HPALA", Float, nullable=False),
-    Column("N_OSAKELKM1", Integer, nullable=False),
-    Column("N_OSAKELKM2", Integer, nullable=False),
+    Column("C_HUONTYYP", String(12), key="apartment_type_code", nullable=False),
+    Column("N_HPALA", Float, key="surface_area", nullable=False),
+    Column("N_OSAKELKM1", Integer, key="share_number_start", nullable=False),
+    Column("N_OSAKELKM2", Integer, key="share_number_end", nullable=False),
     Column("N_OSAKEYHT", Integer, nullable=False),
-    Column("D_VALMPVM", Date),
-    Column("N_LUOVHINTA", Integer, nullable=False),
-    Column("N_KAUPHINTA", Integer, nullable=False),
-    Column("N_ENSIJLAINA", Integer, nullable=False),
-    Column("N_HANKARVO", Integer, nullable=False),
-    Column("N_RAKKORKO", Integer, nullable=False),
+    Column("D_VALMPVM", Date, key="completion_date"),
+    Column("N_LUOVHINTA", Integer, key="debt_free_purchase_price", nullable=False),
+    Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
+    Column("N_ENSIJLAINA", Integer, key="primary_loan_amount", nullable=False),
+    Column("N_HANKARVO", Integer, key="acquisition_price", nullable=False),
+    Column("N_RAKKORKO", Integer, key="interest_during_construction", nullable=False),
     Column("D_KAUPPVM1", Date),
     Column("D_KAUPPVM2", Date),
-    Column("N_RAKLAINA", Integer, nullable=False),
+    Column("N_RAKLAINA", Integer, key="loans_during_construction", nullable=False),
     Column("N_RALUOVHINTA", Integer, nullable=False),
     Column("C_LISATIET", HitasBoolean, nullable=False),
     Column("C_LISATVIITE", String(10), key="additional_info_key", nullable=False),  # Always 'HITHUONE'
@@ -160,6 +160,19 @@ apartments = Table(
     Column("KG_VTUNNUS", Integer, nullable=False),
     Column("D_VARAPVM", Date),  # Always null
     ForeignKeyConstraint(["additional_info_key", "id"], ["HITLISAT.type", "HITLISAT.object_id"]),
+)
+
+apartment_owners = Table(
+    "HITHUONEOMISTAJUUS",
+    metadata_obj,
+    Column("KG_HOTUNNUS", Integer, key="id", primary_key=True),
+    Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False),
+    Column("C_OMNIMI", String(50), key="name"),
+    Column("C_SOTU", String(11), key="social_security_number"),
+    Column("C_OMNIMIUPPER", String(50)),
+    Column("N_PROSENTTIOSUUS", Float, key="percentage"),
+    Column("C_MUUTTAJA", String(10), nullable=False),
+    Column("D_MUUTETTU", Date, nullable=False),
 )
 
 codebooks = Table(
