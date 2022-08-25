@@ -116,7 +116,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     def validate(self, data: Union[OrderedDict, Apartment]):
         if type(data) == OrderedDict:
-            validate_share_numbers(start=data["share_number_start"], end=data["share_number_end"])
+            validate_share_numbers(start=data.get("share_number_start"), end=data.get("share_number_end"))
         else:
             validate_share_numbers(start=data.share_number_start, end=data.share_number_end)
         return data

@@ -265,18 +265,18 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
     if minimal_data:
         data.update(
             {
-                "share_number_start": None,
-                "share_number_end": None,
-                "debt_free_purchase_price": None,
-                "purchase_price": None,
-                "acquisition_price": None,
-                "primary_loan_amount": None,
-                "loans_during_construction": None,
-                "interest_during_construction": None,
                 "notes": "",
                 "owners": [],
             }
         )
+        del data["share_number_start"]
+        del data["share_number_end"]
+        del data["debt_free_purchase_price"]
+        del data["purchase_price"]
+        del data["acquisition_price"]
+        del data["primary_loan_amount"]
+        del data["loans_during_construction"]
+        del data["interest_during_construction"]
 
     response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
     assert response.status_code == status.HTTP_201_CREATED, response.json()
