@@ -40,6 +40,14 @@ export default function FormRelatedModelInputField({
         }
     };
 
+    const dialogTheme = {
+        "--accent-line-color": "var(--color-black-80)",
+    };
+
+    const tableTheme = {
+        "--header-background-color": "var(--color-black-80)",
+    };
+
     const cols = [
         {key: "id", headerName: "Not rendered"},
         {
@@ -67,6 +75,7 @@ export default function FormRelatedModelInputField({
                 isOpen={isModalVisible}
                 close={() => setIsModalVisible(false)}
                 boxShadow={true}
+                theme={dialogTheme}
             >
                 <Dialog.Header
                     id={`modal-title-${fieldPath}`}
@@ -97,6 +106,7 @@ export default function FormRelatedModelInputField({
                                 selectedRows={[]}
                                 setSelectedRows={handleSetSelectedRows}
                                 zebra
+                                theme={tableTheme}
                             />
                             <span>
                                 Näytetään {data?.page.size}/{data?.page.total_items} tulosta
@@ -108,12 +118,14 @@ export default function FormRelatedModelInputField({
                     <Button
                         onClick={closeModal}
                         disabled
+                        theme={"black"}
                     >
                         Lisää uusi
                     </Button>
                     <Button
                         onClick={closeModal}
                         variant="secondary"
+                        theme={"black"}
                     >
                         Sulje
                     </Button>

@@ -16,7 +16,10 @@ import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = (): JSX.Element => {
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>({
-        acquisition_price: {initial: null, realized: null},
+        acquisition_price: {
+            initial: null,
+            realized: null,
+        },
         address: {
             postal_code: "",
             street_address: "",
@@ -142,6 +145,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     inputType="date"
                     label="Myyntihintaluettelon vahvistamispäivä"
                     fieldPath="sales_price_catalogue_confirmation_date"
+                    required
                     formData={formData}
                     setFormData={setFormData}
                     error={error}
@@ -215,6 +219,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             <Button
                 iconLeft={<IconSaveDisketteFill />}
                 onClick={handleSaveButtonClicked}
+                theme={"black"}
             >
                 Tallenna
             </Button>
