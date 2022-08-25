@@ -1,10 +1,11 @@
 import datetime
 import logging
-from dataclasses import dataclass
-from typing import Callable, Dict, List, TypeVar
+from dataclasses import dataclass, field
+from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 import pytz
 from django.contrib.auth import get_user_model
+from django.db import models
 from sqlalchemy import create_engine
 from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
@@ -13,6 +14,7 @@ from sqlalchemy.sql import select
 from hitas.models import (
     AbstractCode,
     Apartment,
+    ApartmentState,
     ApartmentType,
     Building,
     BuildingType,
@@ -30,10 +32,13 @@ from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
+    apartment_owners,
+    apartments,
     codebooks,
     codes,
     companies,
     property_managers,
+    real_estates,
     users,
 )
 
@@ -41,13 +46,36 @@ TZ = pytz.timezone("Europe/Helsinki")
 
 
 @dataclass
+class CreatedBuilding:
+    value: Building = None
+    apartments: List[Apartment] = field(default_factory=list)
+
+
+@dataclass
+class CreatedRealEstate:
+    value: RealEstate = None
+    buildings: List[CreatedBuilding] = field(default_factory=list)
+
+
+@dataclass
+class CreatedHousingCompany:
+    value: HousingCompany = None
+    real_estates: List[CreatedRealEstate] = field(default_factory=list)
+
+
+@dataclass
 class ConvertedData:
-    users: Dict[str, get_user_model()] = None
-    building_types: Dict[str, BuildingType] = None
-    postal_codes: Dict[str, HitasPostalCode] = None
-    developers: Dict[str, Developer] = None
-    financing_methods: Dict[str, FinancingMethod] = None
-    property_managers: Dict[str, PropertyManager] = None
+    created_housing_companies_by_oracle_id: Dict[int, CreatedHousingCompany] = None
+    apartments_by_oracle_id: Dict[int, Apartment] = None
+
+    users_by_username: Dict[str, get_user_model()] = None
+    property_managers_by_oracle_id: Dict[int, PropertyManager] = None
+
+    building_types_by_code_number: Dict[str, BuildingType] = None
+    developers_by_code_number: Dict[str, Developer] = None
+    financing_methods_by_code_number: Dict[str, FinancingMethod] = None
+    postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
+    apartment_types_by_code_numer: Dict[str, ApartmentType] = None
 
 
 def run(
@@ -94,28 +122,54 @@ def run(
             codebooks_by_id = read_codebooks(connection)
 
             # Users
-            converted_data.users = create_users(connection)
+            converted_data.users_by_username = create_users(connection)
 
             # Codebooks
-            converted_data.building_types = create_codes(
+            converted_data.building_types_by_code_number = create_codes(
                 codebooks_by_id["TALOTYYPPI"], BuildingType, modify_fn=format_building_type
             )
-            converted_data.developers = create_codes(codebooks_by_id["RAKENTAJA"], Developer)
-            converted_data.financing_methods = create_codes(
+            converted_data.developers_by_code_number = create_codes(codebooks_by_id["RAKENTAJA"], Developer)
+            converted_data.financing_methods_by_code_number = create_codes(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
+            converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Postal codes
-            converted_data.postal_codes = create_unsaved_postal_codes(codebooks_by_id["POSTINROT"])
+            converted_data.postal_codes_by_postal_code = create_unsaved_postal_codes(codebooks_by_id["POSTINROT"])
 
             # Property managers
-            converted_data.property_managers = create_property_managers(connection)
+            converted_data.property_managers_by_oracle_id = create_property_managers(connection)
 
             # Housing companies
-            converted_data.housing_companies = create_housing_companies(connection, converted_data)
+            converted_data.created_housing_companies_by_oracle_id = create_housing_companies(connection, converted_data)
+
+            # Real estates (and buildings) and apartments
+            converted_data.apartments_by_oracle_id = {}
+            for chc in converted_data.created_housing_companies_by_oracle_id.values():
+                chc.real_estates = create_real_estates_and_buildings(chc.value, connection)
+                created_building = chc.real_estates[0].buildings[0]
+
+                # Create apartments
+                created_apartments = create_apartments(created_building.value, connection, converted_data)
+                created_building.apartments = created_apartments.values()
+                converted_data.apartments_by_oracle_id.update(created_apartments)
+
+            total_real_estates = sum(
+                map(lambda hc: len(hc.real_estates), converted_data.created_housing_companies_by_oracle_id.values())
+            )
+
+            print(f"Loaded {total_real_estates} real estates.")
+            print()
+            print(f"Loaded {total_real_estates} buildings.")
+            print()
+            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.")
+            print()
+
+            # Apartment owners
+            create_owners(connection, converted_data)
 
 
-def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> HousingCompany:
+def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
     housing_companies_by_id = {}
 
     for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
@@ -133,24 +187,153 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
         new.legacy_id = hc[companies.c.id]
         new.notes = combine_notes(hc)
         new.last_modified_datetime = date_to_datetime(hc["last_modified"])
-        new.building_type = converted_data.building_types[hc["building_type_code"]]
-        new.developer = converted_data.developers[hc["developer_code"]]
-        new.postal_code = converted_data.postal_codes[hc["postal_code_code"]]
-        new.financing_method = converted_data.financing_methods[hc["financing_method_code"]]
-        new.property_manager = converted_data.property_managers[hc["property_manager_id"]]
-        new.last_modified_by = converted_data.users.get(hc["last_modified_by"])
+        new.building_type = converted_data.building_types_by_code_number[hc["building_type_code"]]
+        new.developer = converted_data.developers_by_code_number[hc["developer_code"]]
+        new.postal_code = converted_data.postal_codes_by_postal_code[hc["postal_code_code"]]
+        new.financing_method = converted_data.financing_methods_by_code_number[hc["financing_method_code"]]
+        new.property_manager = converted_data.property_managers_by_oracle_id[hc["property_manager_id"]]
+        new.last_modified_by = converted_data.users_by_username.get(hc["last_modified_by"])
 
         # Only save postal codes linked to housing companies
         if new.postal_code._state.adding:
             new.postal_code.save()
 
         new.save()
-        housing_companies_by_id[new.legacy_id] = new
+        housing_companies_by_id[new.legacy_id] = CreatedHousingCompany(value=new)
 
     print(f"Loaded {len(housing_companies_by_id)} housing companies.")
     print()
 
     return housing_companies_by_id
+
+
+def create_real_estates_and_buildings(
+    housing_company: HousingCompany,
+    connection: Connection,
+) -> List[CreatedRealEstate]:
+    created_real_estates = []
+
+    for real_estate in connection.execute(
+        select(real_estates).where(real_estates.c.company_id == housing_company.legacy_id)
+    ).fetchall():
+        new = RealEstate()
+        new.housing_company = housing_company
+        new.property_identifier = real_estate["property_identifier"]
+        new.street_address = housing_company.street_address
+        new.postal_code = housing_company.postal_code
+
+        new.save()
+
+        b = Building()
+        b.real_estate = new
+        b.street_address = new.street_address
+        b.postal_code = new.postal_code
+        b.building_identifier = ""
+
+        b.save()
+
+        created_real_estates.append(CreatedRealEstate(value=new, buildings=[CreatedBuilding(value=b)]))
+
+    return created_real_estates
+
+
+def create_apartments(
+    building: Building, connection: Connection, converted_data: ConvertedData
+) -> Dict[int, Apartment]:
+    apartments_by_id = {}
+
+    bulk_apartments = []
+
+    for apartment in connection.execute(
+        select(apartments, additional_infos)
+        .join(additional_infos, isouter=True)
+        .where(apartments.c.company_id == building.real_estate.housing_company.legacy_id)
+    ).fetchall():
+        new = Apartment()
+        new.building = building
+        new.state = ApartmentState.SOLD
+        new.apartment_type = converted_data.apartment_types_by_code_numer[apartment["apartment_type_code"]]
+        new.surface_area = apartment["surface_area"]
+        new.share_number_start = apartment["share_number_start"]
+        new.share_number_end = apartment["share_number_end"]
+        new.street_address = apartment["street_address"]
+        new.postal_code = building.postal_code
+        new.postal_code = converted_data.postal_codes_by_postal_code[apartment["postal_code_code"]]
+        new.apartment_number = apartment["apartment_number"]
+        new.floor = apartment["floor"]
+        new.stair = apartment["stair"]
+        new.debt_free_purchase_price = apartment["debt_free_purchase_price"]
+        new.purchase_price = apartment["purchase_price"]
+        new.acquisition_price = apartment["acquisition_price"]
+        new.primary_loan_amount = apartment["primary_loan_amount"]
+        new.loans_during_construction = apartment["loans_during_construction"]
+        new.interest_during_construction = apartment["interest_during_construction"]
+        new.completion_date = apartment["completion_date"]
+        new.notes = combine_notes(apartment)
+
+        # Only save postal codes linked to housing companies
+        if new.postal_code._state.adding:
+            new.postal_code.save()
+
+        bulk_apartments.append(new)
+
+        if len(bulk_apartments) == 1000:
+            Apartment.objects.bulk_create(bulk_apartments)
+            bulk_apartments = []
+
+        apartments_by_id[apartment[apartments.c.id]] = new
+
+    if len(bulk_apartments):
+        Apartment.objects.bulk_create(bulk_apartments)
+
+    return apartments_by_id
+
+
+def split_owner_name(name) -> Tuple[str, str]:
+    if name:
+        splitted_name = name.split(", ", maxsplit=1)
+        if len(splitted_name) == 2:
+            return splitted_name
+        else:
+            return "", name
+
+    return "", ""
+
+
+def create_owners(connection: Connection, converted_data: ConvertedData) -> None:
+    count = 0
+    bulk_persons = []
+    bulk_owners = []
+
+    for owner in connection.execute(select(apartment_owners).where(apartment_owners.c.apartment_id != 0)).fetchall():
+        new_person = Person()
+        new_person.first_name, new_person.last_name = split_owner_name(owner["name"])
+        new_person.social_security_number = owner["social_security_number"]
+        bulk_persons.append(new_person)
+
+        new = Owner()
+        new.apartment = converted_data.apartments_by_oracle_id[owner["apartment_id"]]
+        new.person = new_person
+        new.ownership_percentage = owner["percentage"]
+        new.ownership_start_date = None
+        new.ownership_end_date = None
+
+        bulk_owners.append(new)
+        count += 1
+
+        if len(bulk_persons) == 1000:
+            Person.objects.bulk_create(bulk_persons)
+            Owner.objects.bulk_create(bulk_owners)
+
+            bulk_persons = []
+            bulk_owners = []
+
+    if len(bulk_persons):
+        Person.objects.bulk_create(bulk_persons)
+        Owner.objects.bulk_create(bulk_owners)
+
+    print(f"Loaded {count} owners.")
+    print()
 
 
 def create_property_managers(connection: Connection) -> Dict[str, PropertyManager]:
@@ -168,7 +351,7 @@ def create_property_managers(connection: Connection) -> Dict[str, PropertyManage
         new.city = pm["city"].capitalize()
         new.save()
 
-        property_managers_by_id[pm.id] = new
+        property_managers_by_id[pm[property_managers.c.id]] = new
 
     print(f"Loaded {len(property_managers_by_id)} property managers.")
     print()
@@ -269,33 +452,7 @@ def housing_company_state_from(code: str) -> HousingCompanyState:
             return HousingCompanyState.HALF_HITAS
 
 
-def printc(column: str, value: str) -> None:
-    print(f"{column: <40} - {value}")
-
-
-def print_codebook(codebooks: Dict[str, Dict[str, LegacyRow]], code_type: str) -> None:
-    for code in codebooks[code_type].values():
-        for column in codes.c:
-            printc(str(column), code[column])
-        print()
-
-
-def printm(model, instance):
-    for f in model._meta.get_fields():
-        if f.is_relation:
-            from django.core.exceptions import ObjectDoesNotExist
-
-            try:
-                printc(f.name, getattr(instance, f.name))
-            except ObjectDoesNotExist:
-                printc(f.name, None)
-        else:
-            printc(f.name, f.value_from_object(instance))
-
-    print()
-
-
-def date_to_datetime(d: datetime.date) -> datetime.datetime:
+def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
     if d is None:
         return None
 
@@ -342,7 +499,7 @@ def create_codes(codes: List[LegacyRow], fn: Callable[[], T], modify_fn: Callabl
     return retval
 
 
-def turn_off_auto_now(model, field_name):
+def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
     model._meta.get_field(field_name).auto_now = False
 
 
