@@ -36,7 +36,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         primary_loan: null,
         property_manager: {id: ""},
         state: "not_ready",
-        sales_price_catalogue_confirmation_date: "",
+        sales_price_catalogue_confirmation_date: null,
     });
     const [createHousingCompany, {error}] = useCreateHousingCompanyMutation();
 
@@ -145,7 +145,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     inputType="date"
                     label="Myyntihintaluettelon vahvistamispäivä"
                     fieldPath="sales_price_catalogue_confirmation_date"
-                    required
                     formData={formData}
                     setFormData={setFormData}
                     error={error}
