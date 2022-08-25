@@ -617,6 +617,41 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
+        - name: housing_company_name
+          description: Search apartments that belong to housing companies with display name containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: helmi
+        - name: street_address
+          description: Search apartments with street address containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: Hannunkatu
+        - name: postal_code
+          description: Search apartments located in given postal code
+          required: false
+          in: query
+          schema:
+            type: string
+            example: "00100"
+        - name: owner_name
+          description: Search apartments whose owner first name or last name contains the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: matti
+        - name: owner_social_security_number
+          description: Search apartments whose social security number matches the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            example: 131052-308T
       responses:
         '200':
           description: Successfully fetched list of apartments
