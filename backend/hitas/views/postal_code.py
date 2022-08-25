@@ -7,10 +7,11 @@ from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 class HitasPostalCodeSerializer(HitasModelSerializer):
     value = serializers.CharField()
     city = serializers.CharField()
-    cost_area = serializers.IntegerField()
+    cost_area = serializers.IntegerField(min_value=1, max_value=4)
 
     class Meta:
         model = HitasPostalCode
+        fields = ["id", "value", "city", "cost_area"]
 
 
 class HitasPostalCodeViewSet(HitasModelViewSet):
