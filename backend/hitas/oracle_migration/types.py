@@ -14,7 +14,7 @@ class HitasAnonymizedSSN(types.TypeDecorator):
         if value is None:
             return None
 
-        return value if not should_anonymize() else faker.ssn()
+        return value if not should_anonymize() else faker().ssn()
 
 
 class HitasAnonymizedName(types.TypeDecorator):
@@ -28,7 +28,7 @@ class HitasAnonymizedName(types.TypeDecorator):
         if value is None:
             return None
 
-        return value if not should_anonymize() else faker.name()
+        return value if not should_anonymize() else faker().name()
 
 
 class HitasBoolean(types.TypeDecorator):
