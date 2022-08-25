@@ -44,7 +44,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     console.log(formData.sales_price_catalogue_confirmation_date);
 
     return (
-        <div className="company-details">
+        <div className="view--create-company">
             <h1 className="main-heading">
                 <span>Uusi asunto-yhtiö</span>
             </h1>

@@ -114,7 +114,7 @@ const HousingCompanyListPage = (): JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (
-        <div className="companies">
+        <div className="view--companies-listing">
             <h1 className="main-heading">
                 <span>Kaikki kohteet</span>
                 <Link to="create">

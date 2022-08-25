@@ -136,7 +136,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
         );
     };
     return (
-        <div className="apartment">
+        <div className="view--apartment-details">
             <QueryStateHandler
                 data={data}
                 error={error}
