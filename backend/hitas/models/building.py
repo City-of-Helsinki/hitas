@@ -32,4 +32,4 @@ class Building(ExternalHitasModel):
         ordering = ["id"]
 
     def __str__(self):
-        return self.building_identifier
+        return self.street_address
