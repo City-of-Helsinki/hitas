@@ -16,7 +16,7 @@
   background: $color-engel-medium-light
   padding: $spacing-layout-s
   display: grid
-  grid-template-columns: 65% 35%
+  grid-template-columns: 70% 30%
 
   > .search
     margin-bottom: $spacing-s
@@ -33,6 +33,9 @@
     > a
       display: block
 
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
     &__item
       cursor: pointer
       @include mix.flexbox
@@ -42,7 +45,7 @@
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
-      .name, .address, .date, .number, .details > div
+      .name, .address, .date, .number, .state, .details > div
         @include mix.flexbox
         flex-flow: column nowrap
         justify-content: center
@@ -63,22 +66,21 @@
       .state
         width: 15%
 
-        &:hover
-          background-color: #ededed
-
       &--apartment
-        padding-left: 0
-        position: relative
         display: flex
+        height: 100px
+        //padding-left: 0
         grid-template-columns: 90px auto
         grid-template-rows: auto auto
 
         .number
           font-size: $fontsize-heading-l
-          font-weight: 600
-          width: calc(1.5rem + 90px)
+          letter-spacing: -1px
+          text-transform: uppercase
+          width: calc(90px)
           line-height: 1.25
-          align-items: center
+        //text-align: right
+        //align-items: center
 
         .details
           width: calc(100% - 1.5rem - 90px)
@@ -87,13 +89,32 @@
           @include mix.flexbox
           @include mix.flex-wrap(wrap)
 
-        .owner
-          position: relative
-          z-index: 10
-          font-size: $fontsize-body-m
-          line-height: 1
-          width: 100%
-          margin-bottom: 0.25rem
+          .owner
+            display: inline-block
+            position: relative
+            z-index: 10
+            font-size: $fontsize-body-m
+            line-height: 1
+            width: 85%
+            margin: 0 15% 0.25rem 0
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+            scrollbar-width: thin
+            scrollbar-color: $color-black-30 $color-black-10
+
+        &:hover .details .owner
+          overflow-x: auto
+          text-overflow: clip
+
+          &::-webkit-scrollbar
+            height: 2px
+
+            &-track
+              background: $color-black-10
+
+            &-thumb
+              background: $color-black-30
 
         .rooms
           width: 25%
@@ -102,15 +123,13 @@
           width: 15%
 
         .address
-          width: 42%
+          width: 45%
 
-        .details .state
-          display: block
-          width: 15%
+        .state
+          display: flex
+          align-items: flex-end
+          width: 12%
           text-align: right
-
-          span
-            transform: translateY(-1rem)
 
 .list
 
@@ -119,27 +138,29 @@
     margin: 0 0 $spacing-layout-l
 
   &-headers
-    padding: 0 $spacing-layout-xs $spacing-xs
+    margin: 0 $spacing-layout-xs $spacing-xs
 
   &-header
     display: inline-block
-    width: 25%
 
     &.name
-      width: 33%
-
-    &.area
-      width: 13%
-
-    &.apartment
-      width: 35%
+      width: 34%
 
     &.address
-      width: 50%
+      width: 49%
+
+      .apartments &
+        width: 40%
 
     &.date
       width: 17%
       text-align: right
+
+    &.area
+      width: 14%
+
+    &.apartment
+      width: 31%
 
     &.state
       width: 12%
@@ -198,7 +219,7 @@
       width: 100%
       height: 400px
 
-.company
+.company-page
   .company-status
     margin-bottom: 16px
 

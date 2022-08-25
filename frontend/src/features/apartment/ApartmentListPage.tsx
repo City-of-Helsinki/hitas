@@ -31,7 +31,7 @@ const ApartmentListItem = ({
 }: ApartmentListItemProps): JSX.Element => {
     // Combine owners into a single formatted string
     const ownersString = owners
-        .map((o) => `${o.person.last_name}, ${o.person.first_name} (${o.person.social_security_number})`)
+        .map((o) => `${o.person.last_name} ${o.person.first_name} (${o.person.social_security_number})`)
         .join(", ");
 
     return (
@@ -42,13 +42,13 @@ const ApartmentListItem = ({
                     {apartmentNumber}
                 </div>
                 <div className="details">
-                    <div className="owner">Omistaja: {ownersString}</div>
+                    <div className="owner">{`Omistaja: ${ownersString}`}</div>
                     <div className="rooms">{apartmentType}</div>
                     <div className="area">{surfaceArea} m²</div>
                     <div className="address">{formatAddress(address)}</div>
-                    <div className="state">
-                        <StatusLabel>{state}</StatusLabel>
-                    </div>
+                </div>
+                <div className="state">
+                    <StatusLabel>{state}</StatusLabel>
                 </div>
             </li>
         </Link>
