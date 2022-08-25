@@ -669,46 +669,21 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "selected_filter",
     [
-        {"housing_company": "38432c233a914dfb9c2f54d9f5ad9063"},
-        {"housing_company_name": "TestDisplayName"},
-        {"property_manager": "TestPropertyManager"},
-        {"developer": "TestDeveloper"},
-        {"property_identifier": "1-1234-321-56"},
-        {"state": ApartmentState.SOLD.value},
-        {"apartment_type": "1h+sauna+takkahuone+uima-allas"},
-        {"street_address": "test-street"},
-        {"apartment_number": 169},
-        {"floor": 22},
-        {"stair": "Ö"},
-        {"building": "4a5c66cdcd554784a9047bd45c2362ba"},
-        {"owner_name": "Megatron"},
-        {"owner_name": "Opetimus Prime"},
+        {"housing_company_name": "testdisplay"},
+        {"street_address": "test-str"},
+        {"postal_code": "99999"},
+        {"owner_name": "megatr"},
+        {"owner_name": "etimus pri"},
         {"owner_social_security_number": "010199-123A"},
     ],
 )
 @pytest.mark.django_db
 def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
-    ApartmentFactory.create(state=ApartmentState.SOLD)
-    ApartmentFactory.create(
-        state=ApartmentState.FREE,
-        building__real_estate__housing_company__uuid=UUID("38432c23-3a91-4dfb-9c2f-54d9f5ad9063"),
-    )
     ApartmentFactory.create(
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
-    ApartmentFactory.create(
-        state=ApartmentState.FREE, building__real_estate__housing_company__property_manager__name="TestPropertyManager"
-    )
-    ApartmentFactory.create(
-        state=ApartmentState.FREE, building__real_estate__housing_company__developer__value="TestDeveloper"
-    )
-    ApartmentFactory.create(state=ApartmentState.FREE, building__real_estate__property_identifier="1-1234-321-56")
-    ApartmentFactory.create(state=ApartmentState.FREE, apartment_type__value="1h+sauna+takkahuone+uima-allas")
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    ApartmentFactory.create(state=ApartmentState.FREE, apartment_number=169)
-    ApartmentFactory.create(state=ApartmentState.FREE, floor=22)
-    ApartmentFactory.create(state=ApartmentState.FREE, stair="Ö")
-    ApartmentFactory.create(state=ApartmentState.FREE, building__uuid=UUID("4a5c66cd-cd55-4784-a904-7bd45c2362ba"))
+    ApartmentFactory.create(state=ApartmentState.FREE, postal_code__value="99999")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__first_name="Megatron")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__last_name="Opetimus Prime")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__social_security_number="010199-123A")
@@ -717,45 +692,3 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 1, response.json()
-
-
-@pytest.mark.parametrize(
-    "selected_filter",
-    [
-        {"area": 1},
-        {"area": 2},
-        {"area": 3},
-        {"area": 4},
-    ],
-)
-@pytest.mark.django_db
-def test__api__apartment__area_filter(api_client: HitasAPIClient, selected_filter):
-    return  # FIXME
-
-    ApartmentFactory.create(postal_code__value="00100")  # Area 1
-    ApartmentFactory.create(postal_code__value="00200")  # Area 2
-    ApartmentFactory.create(postal_code__value="00240")  # Area 3
-    ApartmentFactory.create(postal_code__value="99999")  # Not in areas 1-3 => Area 4
-
-    url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 1, response.json()
-
-
-@pytest.mark.parametrize(
-    "selected_filter",
-    [
-        {"state": 1},
-        {"state": "123"},
-        {"state": "foo"},
-    ],
-)
-@pytest.mark.django_db
-def test__api__apartment__filter_invalid(api_client: HitasAPIClient, selected_filter):
-    for state in list(ApartmentState):
-        ApartmentFactory.create(state=state)
-
-    url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
