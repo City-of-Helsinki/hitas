@@ -74,7 +74,7 @@ class ApartmentFactory(DjangoModelFactory):
     street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
     apartment_number = fuzzy.FuzzyInteger(1, 99)
-    floor = fuzzy.FuzzyInteger(1, 9)
+    floor = factory.Faker("numerify", text="%")
     stair = factory.Faker("bothify", text="?")  # Random letter
     debt_free_purchase_price = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
     purchase_price = fuzzy.FuzzyDecimal(100000, 200000, precision=2)
