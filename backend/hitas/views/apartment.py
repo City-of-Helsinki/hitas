@@ -20,29 +20,16 @@ from hitas.views.utils import (
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
-    HitasUUIDFilter,
     UUIDRelatedField,
 )
 
 
 class ApartmentFilterSet(HitasFilterSet):
-    housing_company = HitasUUIDFilter(field_name="building__real_estate__housing_company__uuid")
     housing_company_name = filters.CharFilter(
         field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
     )
-    property_manager = filters.CharFilter(
-        field_name="building__real_estate__housing_company__property_manager__name", lookup_expr="icontains"
-    )
-    developer = filters.CharFilter(
-        field_name="building__real_estate__housing_company__developer__value", lookup_expr="icontains"
-    )
-    property_identifier = filters.CharFilter(
-        field_name="building__real_estate__property_identifier", lookup_expr="icontains"
-    )
+    street_address = filters.CharFilter(lookup_expr="icontains")
     postal_code = filters.CharFilter(field_name="postal_code__value")
-    state = filters.ChoiceFilter(choices=ApartmentState.choices())
-    apartment_type = filters.CharFilter(field_name="apartment_type__value")
-    building = HitasUUIDFilter(field_name="building__uuid")
     owner_name = filters.CharFilter(method="owner_name_filter")
     owner_social_security_number = filters.CharFilter(
         field_name="owners__person__social_security_number", lookup_expr="icontains"
@@ -55,7 +42,7 @@ class ApartmentFilterSet(HitasFilterSet):
 
     class Meta:
         model = Apartment
-        fields = "__all__"
+        fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_social_security_number"]
 
 
 class HousingCompanySerializer(EnumSupportSerializerMixin, HitasModelSerializer):
