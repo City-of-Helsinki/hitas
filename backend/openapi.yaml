@@ -2339,7 +2339,11 @@ components:
         apartment_number:
           type: number
         floor:
-          type: integer
+          description: Apartment floor number
+          type: string
+          maxLength: 50
+          nullable: true
+          example: "5"
         stair:
           type: string
         date:

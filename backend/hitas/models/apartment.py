@@ -33,7 +33,7 @@ class Apartment(ExternalHitasModel):
     postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="apartments")
     # 'Huoneistonumero'
     apartment_number = models.PositiveSmallIntegerField()
-    floor = models.PositiveSmallIntegerField(default=1)
+    floor = models.CharField(max_length=50, blank=True, null=True)
     # 'Porras'
     stair = models.CharField(max_length=16)
 
