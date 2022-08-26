@@ -20,11 +20,13 @@ from hitas.views.utils import (
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
+    HitasUUIDFilter,
     UUIDRelatedField,
 )
 
 
 class ApartmentFilterSet(HitasFilterSet):
+    housing_company = HitasUUIDFilter(field_name="building__real_estate__housing_company__uuid")
     housing_company_name = filters.CharFilter(
         field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
     )
