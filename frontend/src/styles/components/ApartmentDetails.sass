@@ -101,7 +101,7 @@
     flex-flow: column nowrap
 
     .row
-      display: flex
+      @include utils.flexbox()
       flex-flow: row nowrap
 
       .detail-field-
@@ -113,7 +113,7 @@
           margin-right: $spacing-layout-m
 
     .columns
-      display: flex
+      @include utils.flexbox()
       flex-flow: row
 
   [class^="Tabs-module_tablistBar"]
