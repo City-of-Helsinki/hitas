@@ -14,6 +14,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--truncate", action="store_true", help="Truncate hitas tables before starting the migration."
         )
+        parser.add_argument("--truncate-only", action="store_true", help="Truncate hitas tables and quits.")
         parser.add_argument("--oracle-host", default="localhost", help="Oracle database host (default: 'localhost').")
         parser.add_argument("--oracle-port", type=int, default=1521, help="Oracle database port (default: 1521).")
         parser.add_argument("--oracle-user", default="system", help="Oracle database user (default: 'system').")
@@ -38,4 +39,5 @@ class Command(BaseCommand):
             options["debug"],
             options["anonymize"],
             options["truncate"],
+            options["truncate_only"],
         )
