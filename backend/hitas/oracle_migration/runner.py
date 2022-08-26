@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, TypeVar
 
 import pytz
 from django.contrib.auth import get_user_model
-from sqlalchemy import and_, create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.sql import select
@@ -33,7 +33,6 @@ from hitas.oracle_migration.oracle_schema import (
     codebooks,
     codes,
     companies,
-    company_addresses,
     property_managers,
     users,
 )
@@ -119,24 +118,7 @@ def run(
 def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> HousingCompany:
     housing_companies_by_id = {}
 
-    a = additional_infos.alias("AI_COMPANY")
-    b = additional_infos.alias("AI_PROPERTY_MANAGER")
-
-    for hc in connection.execute(
-        select(companies, company_addresses, property_managers, a, b)
-        .join(company_addresses, isouter=True)
-        .join(property_managers, isouter=True)
-        .join(
-            a,
-            and_(companies.c.additional_info_key == a.c.type, companies.c.id == a.c.object_id),
-            isouter=True,
-        )
-        .join(
-            b,
-            and_(property_managers.c.additional_info_key == b.c.type, property_managers.c.id == b.c.object_id),
-            isouter=True,
-        )
-    ).fetchall():
+    for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
         new = HousingCompany()
         new.official_name = hc["official_name"]
         new.display_name = hc["display_name"]
