@@ -8,7 +8,7 @@
     flex-flow: row
     height: 75px
     padding: $spacing-layout-s
-    background: var(--color-engel-dark)
+    background: var(--color-engel)
     font-size: $fontsize-heading-s
     border: 0
 
@@ -103,18 +103,29 @@
     .row
       @include utils.flexbox()
       flex-flow: row nowrap
+      border-bottom: 1px solid #CCC
+      margin-bottom: 1rem
 
       .detail-field-
         &label
+          padding-top: 0.25rem
           margin-right: 0.5rem
 
         &value
           font-size: $fontsize-heading-m
           margin-right: $spacing-layout-m
+          flex-grow: 1
+          margin-bottom: 1rem
 
     .columns
       @include utils.flexbox()
       flex-flow: row
+
+      .column
+        border: 0
+
+        &:first-child
+          padding-left: 0
 
   [class^="Tabs-module_tablistBar"]
     background: white
