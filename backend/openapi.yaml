@@ -617,6 +617,13 @@ paths:
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
+        - name: housing_company
+          description: Search apartments that belong to housing company with given id
+          required: false
+          in: query
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
         - name: housing_company_name
           description: Search apartments that belong to housing companies with display name containing the given search string (case-insensitive)
           required: false

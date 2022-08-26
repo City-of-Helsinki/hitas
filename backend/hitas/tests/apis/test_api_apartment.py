@@ -669,6 +669,7 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "selected_filter",
     [
+        {"housing_company": "38432c233a914dfb9c2f54d9f5ad9063"},
         {"housing_company_name": "testdisplay"},
         {"street_address": "test-str"},
         {"postal_code": "99999"},
@@ -679,6 +680,11 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
 )
 @pytest.mark.django_db
 def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
+    ApartmentFactory.create(
+        state=ApartmentState.FREE,
+        building__real_estate__housing_company__uuid=UUID("38432c23-3a91-4dfb-9c2f-54d9f5ad9063"),
+    )
+
     ApartmentFactory.create(
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
