@@ -763,6 +763,7 @@
       "building": 1,
       "state": "reserved",
       "apartment_type": 100,
+      "completion_date": "2014-06-02",
       "surface_area": "60.00",
       "share_number_start": 1,
       "share_number_end": 49,
@@ -788,6 +789,7 @@
       "building": 2,
       "state": "free",
       "apartment_type": 128,
+      "completion_date": "2014-06-02",
       "surface_area": "43.67",
       "share_number_start": 50,
       "share_number_end": 100,
@@ -812,6 +814,7 @@
       "uuid": "231c4898-3918-4cad-9c6b-63d99fa1de62",
       "building": 3,
       "state": "free",
+      "completion_date": "2014-06-02",
       "apartment_type": 129,
       "surface_area": "13.40",
       "share_number_start": 1,
@@ -838,6 +841,7 @@
       "building": 4,
       "state": "sold",
       "apartment_type": 129,
+      "completion_date": "2014-06-02",
       "surface_area": "97.35",
       "share_number_start": 1,
       "share_number_end": 50,
@@ -863,6 +867,7 @@
       "building": 5,
       "state": "sold",
       "apartment_type": 130,
+      "completion_date": "2014-06-02",
       "surface_area": "11.72",
       "share_number_start": 1,
       "share_number_end": 500,
@@ -888,6 +893,7 @@
       "building": 6,
       "state": "sold",
       "apartment_type": 129,
+      "completion_date": "2014-06-02",
       "surface_area": "16.01",
       "share_number_start": 1,
       "share_number_end": 50,
@@ -913,6 +919,7 @@
       "building": 7,
       "state": "sold",
       "apartment_type": 129,
+      "completion_date": "2014-06-02",
       "surface_area": "14.36",
       "share_number_start": 1001,
       "share_number_end": 1500,
@@ -938,6 +945,7 @@
       "building": 8,
       "state": "sold",
       "apartment_type": 129,
+      "completion_date": "2014-06-02",
       "surface_area": "40.91",
       "share_number_start": 30,
       "share_number_end": 50,
@@ -961,7 +969,6 @@
     "fields": {
       "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
       "real_estate": 1,
-      "completion_date": "2021-07-07",
       "street_address": "Fakestreet 123",
       "postal_code": 1,
       "building_identifier": "100012345A"
@@ -973,7 +980,6 @@
     "fields": {
       "uuid": "be48cc00-3f0c-4419-a584-0c363feb0249",
       "real_estate": 2,
-      "completion_date": "2011-07-17",
       "street_address": "Berganpolku 048",
       "postal_code": 9,
       "building_identifier": "195041644r"
@@ -985,7 +991,6 @@
     "fields": {
       "uuid": "0f3561d9-f389-4f0a-a64a-38d4f2e90358",
       "real_estate": 3,
-      "completion_date": "2014-02-27",
       "street_address": "Porebulevardi 00",
       "postal_code": 15,
       "building_identifier": "180078596y"
@@ -997,7 +1002,6 @@
     "fields": {
       "uuid": "e35d0081-29cf-4208-bd10-d7608fe852c6",
       "real_estate": 4,
-      "completion_date": "2017-06-23",
       "street_address": "Aidasmäentie 1",
       "postal_code": 20,
       "building_identifier": "181193052R"
@@ -1009,7 +1013,6 @@
     "fields": {
       "uuid": "22c9f4ce-2953-4d24-97fc-c58ec69d1a37",
       "real_estate": 5,
-      "completion_date": "2014-09-12",
       "street_address": "Berganpolku 7",
       "postal_code": 26,
       "building_identifier": "169214244O"
@@ -1021,7 +1024,6 @@
     "fields": {
       "uuid": "dcd112ff-9e3d-4852-b359-a0f336acb6ae",
       "real_estate": 6,
-      "completion_date": "2011-08-18",
       "street_address": "Urheilukuja 0",
       "postal_code": 31,
       "building_identifier": "163576403P"
@@ -1033,7 +1035,6 @@
     "fields": {
       "uuid": "12ebf093-a10d-43c1-8075-df552bd6595d",
       "real_estate": 7,
-      "completion_date": "2011-11-24",
       "street_address": "Winqvistinkuja 0",
       "postal_code": 35,
       "building_identifier": "150076293A"
@@ -1045,7 +1046,6 @@
     "fields": {
       "uuid": "4c7f8a59-3e90-4500-8eeb-482dc35e5f16",
       "real_estate": 8,
-      "completion_date": "2014-06-02",
       "street_address": "Kimalaispolku 382",
       "postal_code": 39,
       "building_identifier": "106343642p"

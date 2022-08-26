@@ -2003,7 +2003,7 @@ components:
               maximum: 4
               example: 1
         date:
-          description: Year of first construction based on the housing company's earliest constructed building
+          description: Year of first construction based on the housing company's earliest constructed apartment
           type: string
           format: date
           nullable: true
@@ -2213,7 +2213,6 @@ components:
       required:
         - id
         - address
-        - completion_date
       properties:
         id:
           description: ID of this building
@@ -2222,11 +2221,6 @@ components:
           example: 9d0ac35b01eb44829bc84c25f7c1813a
         address:
           $ref: '#/components/schemas/HitasAddress'
-        completion_date:
-          description: Building's construction completion date
-          type: string
-          format: date
-          nullable: true
         building_identifier:
           description: This building's official identifier
           type: string
@@ -2262,7 +2256,7 @@ components:
         - surface_area
         - address
         - apartment_number
-        - date
+        - completion_date
         - housing_company
         - owners
       properties:
@@ -2285,12 +2279,11 @@ components:
           type: number
         stair:
           type: string
-        date:
-          description: Date that the apartment's building was completed on
+        completion_date:
+          description: Date that the apartment was completed on
           type: string
           format: date
           nullable: true
-          readOnly: true
         housing_company:
           $ref: '#/components/schemas/MinimalHousingCompany'
         owners:
@@ -2310,7 +2303,7 @@ components:
         - surface_area
         - address
         - apartment_number
-        - date
+        - completion_date
         - housing_company
         - owners
       properties:
@@ -2346,12 +2339,11 @@ components:
           example: "5"
         stair:
           type: string
-        date:
+        completion_date:
           description: Date that the apartment's building was completed on
           type: string
           format: date
           nullable: true
-          readOnly: true
         debt_free_purchase_price:
           type: number
           nullable: true

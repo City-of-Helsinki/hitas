@@ -29,6 +29,8 @@ class Apartment(ExternalHitasModel):
     share_number_start = models.PositiveIntegerField(null=True, validators=[MinValueValidator(1)])
     share_number_end = models.PositiveIntegerField(null=True)
 
+    completion_date = models.DateField(null=True)
+
     street_address = models.CharField(max_length=128)
     postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="apartments")
     # 'Huoneistonumero'

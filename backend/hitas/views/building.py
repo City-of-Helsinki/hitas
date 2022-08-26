@@ -33,7 +33,6 @@ class BuildingSerializer(HitasModelSerializer):
             "id",
             "address",
             "building_identifier",
-            "completion_date",
         ]
 
 

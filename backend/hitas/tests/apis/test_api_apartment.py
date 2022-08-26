@@ -70,7 +70,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "id": hc1.uuid.hex,
                 "name": hc1.display_name,
             },
-            "date": str(ap1.building.completion_date),
+            "completion_date": str(ap1.completion_date),
             "owners": [
                 {
                     "person": {
@@ -120,7 +120,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "id": hc2.uuid.hex,
                 "name": hc2.display_name,
             },
-            "date": str(ap2.building.completion_date),
+            "completion_date": str(ap2.completion_date),
             "owners": [],
         },
     ]
@@ -167,7 +167,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "apartment_number": ap.apartment_number,
         "floor": ap.floor,
         "stair": ap.stair,
-        "date": str(ap.building.completion_date),
+        "completion_date": str(ap.completion_date),
         "debt_free_purchase_price": float(ap.debt_free_purchase_price),
         "purchase_price": float(ap.purchase_price),
         "acquisition_price": float(ap.acquisition_price),
@@ -232,6 +232,7 @@ def get_apartment_create_data() -> dict[str, Any]:
         "apartment_number": 58,
         "floor": "1",
         "stair": "A",
+        "completion_date": "2022-08-26",
         "debt_free_purchase_price": 12345,
         "purchase_price": 12345.6,
         "acquisition_price": Decimal("12345"),

@@ -132,7 +132,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "postal_code__city",
                 "postal_code__cost_area",
             )
-            .annotate(date=Min("real_estates__buildings__completion_date"))
+            .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
             .order_by("id")
         )
 
@@ -196,7 +196,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "postal_code__city",
                 "postal_code__cost_area",
             )
-            .annotate(date=Min("real_estates__buildings__completion_date"))
+            .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
         )
 
     def get_filterset_class(self):
