@@ -84,6 +84,9 @@ def run(
 
     with engine.connect() as connection:
         with connection.begin():
+            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.")
+            print()
+
             # Codebooks by id
             codebooks_by_id = read_codebooks(connection)
 
