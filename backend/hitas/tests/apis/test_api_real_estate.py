@@ -1,5 +1,3 @@
-from datetime import date
-
 import pytest
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -62,7 +60,6 @@ def test__api__real_estate__list(api_client: HitasAPIClient):
                         "street_address": bu1.street_address,
                     },
                     "building_identifier": bu1.building_identifier,
-                    "completion_date": str(bu1.completion_date),
                 },
                 {
                     "id": bu2.uuid.hex,
@@ -72,7 +69,6 @@ def test__api__real_estate__list(api_client: HitasAPIClient):
                         "street_address": bu2.street_address,
                     },
                     "building_identifier": bu2.building_identifier,
-                    "completion_date": str(bu2.completion_date),
                 },
             ],
         },
@@ -115,11 +111,11 @@ def test__api__real_estate__list__invalid_housing_company(api_client: HitasAPICl
 def test__api__real_estate__retrieve(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
-    hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2020, 1, 1))
-    hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2000, 1, 1))
+    hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
+    hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1)
 
     # Second RealEstate in the same HousingCompany
-    BuildingFactory.create(real_estate__housing_company=hc1, completion_date=None)
+    BuildingFactory.create(real_estate__housing_company=hc1)
 
     # Second HousingCompany with a building
     BuildingFactory.create()
@@ -144,7 +140,6 @@ def test__api__real_estate__retrieve(api_client: HitasAPIClient):
                     "street_address": hc1_re1_bu1.street_address,
                 },
                 "building_identifier": hc1_re1_bu1.building_identifier,
-                "completion_date": str(hc1_re1_bu1.completion_date),
             },
             {
                 "id": hc1_re1_bu2.uuid.hex,
@@ -154,7 +149,6 @@ def test__api__real_estate__retrieve(api_client: HitasAPIClient):
                     "street_address": hc1_re1_bu2.street_address,
                 },
                 "building_identifier": hc1_re1_bu2.building_identifier,
-                "completion_date": str(hc1_re1_bu2.completion_date),
             },
         ],
     }

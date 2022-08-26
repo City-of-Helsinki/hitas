@@ -59,7 +59,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
     address = HitasAddressSerializer(source="*")
-    date = serializers.DateField(source="building.completion_date", read_only=True)
+    completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
 
     debt_free_purchase_price = HitasDecimalField(required=False, allow_null=True)
@@ -151,13 +151,13 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "apartment_number",
             "floor",
             "stair",
-            "date",
             "debt_free_purchase_price",
             "purchase_price",
             "acquisition_price",
             "primary_loan_amount",
             "loans_during_construction",
             "interest_during_construction",
+            "completion_date",
             "building",
             "real_estate",
             "housing_company",
@@ -180,7 +180,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "address",
             "apartment_number",
             "stair",
-            "date",
+            "completion_date",
             "housing_company",
             "owners",
         ]
@@ -209,8 +209,8 @@ class ApartmentViewSet(HitasModelViewSet):
             "loans_during_construction",
             "interest_during_construction",
             "notes",
+            "completion_date",
             "building__uuid",
-            "building__completion_date",
             "building__real_estate__housing_company__uuid",
             "building__real_estate__housing_company__display_name",
             "building__real_estate__uuid",
@@ -240,7 +240,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "apartment_number",
                 "floor",
                 "stair",
-                "building__completion_date",
+                "completion_date",
                 "building__real_estate__housing_company__uuid",
                 "building__real_estate__housing_company__display_name",
                 "apartment_type__value",

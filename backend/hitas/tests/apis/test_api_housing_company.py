@@ -10,6 +10,7 @@ from rest_framework import status
 
 from hitas import exceptions
 from hitas.models import (
+    Apartment,
     Building,
     BuildingType,
     Developer,
@@ -22,6 +23,7 @@ from hitas.models import (
 )
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
+    ApartmentFactory,
     BuildingFactory,
     BuildingTypeFactory,
     DeveloperFactory,
@@ -56,8 +58,10 @@ def test__api__housing_company__list__empty(api_client: HitasAPIClient):
 def test__api__housing_company__list(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc2: HousingCompany = HousingCompanyFactory.create()
-    BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2020, 1, 1))
-    bu2: Building = BuildingFactory.create(real_estate__housing_company=hc1, completion_date=date(2000, 1, 1))
+    ApartmentFactory.create(building__real_estate__housing_company=hc1, completion_date=date(2020, 1, 1))
+    ap2: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company=hc1, completion_date=date(2000, 1, 1)
+    )
 
     response = api_client.get(reverse("hitas:housing-company-list"))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -72,7 +76,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
                 "city": hc1.postal_code.city,
             },
             "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-            "date": str(bu2.completion_date),
+            "date": str(ap2.completion_date),
         },
         {
             "id": hc2.uuid.hex,
@@ -177,10 +181,13 @@ def test__api__housing_company__list__paging__too_high(api_client: HitasAPIClien
 def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
-    hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2020, 1, 1))
-    hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1, completion_date=date(2000, 1, 1))
+    hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
+    ApartmentFactory.create(building=hc1_re1_bu1, completion_date=date(2022, 1, 1))
+    hc1_re1_bu1_ap2: Apartment = ApartmentFactory.create(building=hc1_re1_bu1, completion_date=date(2020, 1, 1))
+    hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1)
+    ApartmentFactory.create(building=hc1_re1_bu2, completion_date=date(2021, 1, 1))
     hc1_re2: RealEstate = RealEstateFactory.create(housing_company=hc1)
-    hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2, completion_date=None)
+    hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2)
 
     # Second HousingCompany with a building
     BuildingFactory.create()
@@ -194,7 +201,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "state": hc1.state.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-        "date": "2000-01-01",
+        "date": str(hc1_re1_bu1_ap2.completion_date),
         "real_estates": [
             {
                 "id": hc1_re1.uuid.hex,
@@ -213,7 +220,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                             "street_address": hc1_re1_bu1.street_address,
                         },
                         "building_identifier": hc1_re1_bu1.building_identifier,
-                        "completion_date": str(hc1_re1_bu1.completion_date),
                     },
                     {
                         "id": hc1_re1_bu2.uuid.hex,
@@ -223,7 +229,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                             "street_address": hc1_re1_bu2.street_address,
                         },
                         "building_identifier": hc1_re1_bu2.building_identifier,
-                        "completion_date": str(hc1_re1_bu2.completion_date),
                     },
                 ],
             },
@@ -244,7 +249,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                             "street_address": hc1_re2_bu1.street_address,
                         },
                         "building_identifier": hc1_re2_bu1.building_identifier,
-                        "completion_date": None,
                     }
                 ],
             },
@@ -481,7 +485,7 @@ def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPI
 @pytest.mark.django_db
 def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
-    BuildingFactory.create(real_estate__housing_company=hc)
+    ApartmentFactory.create(building__real_estate__housing_company=hc)
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
     financing_method: FinancingMethod = FinancingMethodFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()

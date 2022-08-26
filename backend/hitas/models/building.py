@@ -8,7 +8,6 @@ from hitas.models.utils import validate_building_id
 # Rakennus
 class Building(ExternalHitasModel):
     real_estate = models.ForeignKey("RealEstate", on_delete=models.PROTECT, related_name="buildings")
-    completion_date = models.DateField(null=True)
 
     street_address = models.CharField(max_length=1024)
     postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="buildings")

@@ -1,5 +1,3 @@
-from datetime import date
-
 import pytest
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -59,7 +57,6 @@ def test__api__building__list(api_client: HitasAPIClient):
                 "street_address": bu1.street_address,
             },
             "building_identifier": bu1.building_identifier,
-            "completion_date": str(bu1.completion_date),
         },
         {
             "id": bu2.uuid.hex,
@@ -69,7 +66,6 @@ def test__api__building__list(api_client: HitasAPIClient):
                 "street_address": bu2.street_address,
             },
             "building_identifier": bu2.building_identifier,
-            "completion_date": str(bu2.completion_date),
         },
     ]
     assert response.json()["page"] == {
@@ -120,7 +116,6 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
             "street_address": bu1.street_address,
         },
         "building_identifier": bu1.building_identifier,
-        "completion_date": str(bu1.completion_date),
     }
 
 
@@ -236,7 +231,6 @@ def test__api__building__update(api_client: HitasAPIClient):
             "postal_code": re.postal_code.value,
             "street_address": "test-street-address-1",
         },
-        "completion_date": "1999-01-01",
         "building_identifier": "100012345A",
     }
 
@@ -254,7 +248,6 @@ def test__api__building__update(api_client: HitasAPIClient):
             "street_address": data["address"]["street_address"],
         },
         "building_identifier": data["building_identifier"],
-        "completion_date": data["completion_date"],
     }
 
     get_response = api_client.get(url)
@@ -293,17 +286,12 @@ def test__api__building__delete(api_client: HitasAPIClient):
         {"building_identifier": "1000"},
         {"building_identifier": "12345"},
         {"street_address": "test-street"},
-        {"completion_date": "1800-01-01"},
-        # FIXME {"completion_date__year": "1800"},
-        # FIXME {"completion_date__lte": "1801-01-01"},
-        # FIXME {"completion_date_min": "1899-01-01", "completion_date_max": "1901-01-01"},
         {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db
 def test__api__building__filter(api_client: HitasAPIClient, selected_filter):
-    bu: Building = BuildingFactory.create(completion_date=date(1800, 1, 1))
-    BuildingFactory.create(completion_date=date(1900, 1, 1), real_estate=bu.real_estate)
+    bu: Building = BuildingFactory.create()
     BuildingFactory.create(building_identifier="100012345A", real_estate=bu.real_estate)
     BuildingFactory.create(street_address="test-street", real_estate=bu.real_estate)
     BuildingFactory.create(postal_code__value="99999", real_estate=bu.real_estate)
