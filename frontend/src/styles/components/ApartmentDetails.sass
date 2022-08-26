@@ -1,0 +1,120 @@
+@use 'hds-design-tokens' as *
+@use '../utils' as utils
+
+.view--apartment-details
+  margin-top: -60px
+
+  .main-heading
+    flex-flow: row
+    height: 75px
+    padding: $spacing-layout-s
+    background: var(--color-engel-dark)
+    font-size: $fontsize-heading-s
+    border: 0
+
+    a
+      display: inherit
+      align-items: center
+
+    span
+      display: inline-block
+      margin-right: $spacing-layout-s
+
+    .address
+      font-weight: 400
+
+    [class^="StatusLabel"]
+      background-color: var(--color-engel-light)
+
+  .apartment-stats
+    display: flex
+    align-items: center
+    margin-top: 0
+    font-weight: 400
+    padding-bottom: 1rem
+    border-bottom: 1px #CCC solid
+
+    span
+
+      &:not(:last-child):after
+        display: inline-flex
+        width: $spacing-layout-m
+        content: "|"
+        justify-content: center
+
+    &--number
+      padding: $spacing-xs $spacing-s
+      border: 2px solid var(--color-black-80)
+      font-size: $fontsize-heading-l
+      font-weight: 700
+      line-height: 1
+      margin: 0 $spacing-l
+
+      &:after
+        display: none !important
+
+  .apartment-action-cards
+    @include utils.flexbox()
+    gap: 4%
+
+    [class^="Card-module_card"]
+      @include utils.flexbox()
+      flex-flow: column
+      background: $color-engel
+      width: 48%
+
+      p
+        margin: 0.5rem 0
+
+      .price
+        font-size: $fontsize-heading-l
+        font-weight: 900
+        line-height: 1
+        margin-bottom: 2rem
+
+      label
+        font-weight: 700
+        margin-bottom: 0.5rem
+
+        &:last-of-type
+          margin-top: $spacing-s
+
+      .sales-condition
+        @include utils.flexbox()
+
+        .icon-container
+          padding-top: 20px
+          width: 50px
+
+        .link
+          font-weight: 700
+
+        a
+          text-decoration: underline
+
+  .tab-area
+    background: $color-black-5
+    margin: $spacing-l 0
+
+  .company-details__tab
+    background: $color-black-5
+    flex-flow: column nowrap
+
+    .row
+      display: flex
+      flex-flow: row nowrap
+
+      .detail-field-
+        &label
+          margin-right: 0.5rem
+
+        &value
+          font-size: $fontsize-heading-m
+          margin-right: $spacing-layout-m
+
+    .columns
+      display: flex
+      flex-flow: row
+
+  [class^="Tabs-module_tablistBar"]
+    background: white
