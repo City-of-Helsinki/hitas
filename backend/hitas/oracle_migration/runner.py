@@ -232,6 +232,8 @@ def create_users(
             first_name=first_name,
             last_name=last_name,
             is_active=user["is_active"],
+            is_superuser=True,
+            is_staff=True,
         )
 
         users_by_id[user["username"]] = created_user
