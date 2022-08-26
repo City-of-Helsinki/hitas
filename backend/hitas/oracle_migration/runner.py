@@ -59,6 +59,7 @@ def run(
     debug: bool,
     anonymize: bool,
     truncate: bool,
+    truncate_only: bool,
 ) -> None:
 
     if debug:
@@ -68,8 +69,11 @@ def run(
     if anonymize:
         anonymize_data()
 
-    if truncate:
+    if truncate or truncate_only:
         do_truncate()
+
+    if truncate_only:
+        return
 
     init_cost_areas()
 
