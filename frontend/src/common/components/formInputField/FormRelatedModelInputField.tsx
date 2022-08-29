@@ -95,7 +95,6 @@ export default function FormRelatedModelInputField({
                     {isLoading ? (
                         <LoadingSpinner />
                     ) : (
-                        // TODO: Remove 'Select all' and 'Clear selected' buttons
                         <>
                             <Table
                                 cols={cols}
@@ -115,13 +114,15 @@ export default function FormRelatedModelInputField({
                     )}
                 </Dialog.Content>
                 <Dialog.ActionButtons>
-                    <Button
-                        onClick={closeModal}
-                        disabled
-                        theme={"black"}
-                    >
-                        Lisää uusi
-                    </Button>
+                    {/* ## Adding to the related data is handled by the Django dashboard for now. This feature is to be shown here later
+                     <Button
+                     onClick={closeModal}
+                     disabled
+                     theme={"black"}
+                     >
+                     Lisää uusi
+                     </Button>
+                     */}
                     <Button
                         onClick={closeModal}
                         variant="secondary"
