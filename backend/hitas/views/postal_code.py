@@ -19,4 +19,4 @@ class HitasPostalCodeViewSet(HitasModelViewSet):
     model_class = HitasPostalCode
 
     def get_queryset(self):
-        return HitasPostalCode.objects.all()
+        return HitasPostalCode.objects.all().order_by("value")

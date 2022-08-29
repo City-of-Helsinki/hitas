@@ -50,4 +50,4 @@ class BuildingViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         uuid = self._lookup_id_to_uuid(self.kwargs["real_estate_uuid"])
-        return Building.objects.filter(real_estate__uuid=uuid).select_related("real_estate")
+        return Building.objects.filter(real_estate__uuid=uuid).select_related("real_estate").order_by("id")
