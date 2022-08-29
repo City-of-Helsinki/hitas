@@ -66,7 +66,7 @@ class ApartmentFactory(DjangoModelFactory):
     state = fuzzy.FuzzyChoice(state[0] for state in ApartmentState.choices())
     apartment_type = factory.SubFactory("hitas.tests.factories.ApartmentTypeFactory")
     surface_area = fuzzy.FuzzyDecimal(10, 99, precision=2)
-    share_number_start = factory.Sequence(lambda n: n * 50)
+    share_number_start = factory.Sequence(lambda n: n * 50 + 1)
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
     street_address = factory.Faker("street_address")
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))

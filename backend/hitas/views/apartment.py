@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework.fields import SkipField, empty
 
 from hitas.models import Apartment, Building, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
@@ -60,12 +61,42 @@ class ApartmentHitasAddressSerializer(serializers.Serializer):
     city = serializers.CharField(source="building.real_estate.housing_company.city", read_only=True)
 
 
+class SharesSerializer(serializers.Serializer):
+    start = serializers.IntegerField(source="share_number_start", min_value=1)
+    end = serializers.IntegerField(source="share_number_end", min_value=1)
+    total = serializers.SerializerMethodField()
+
+    def get_total(self, instance: Apartment) -> int:
+        return instance.shares_count
+
+    def run_validation(self, data=empty):
+        value = super().run_validation(data)
+
+        if value is None:
+            raise SkipField
+
+        return value
+
+    def to_representation(self, instance):
+        if instance.share_number_start is None:
+            return None
+
+        return super().to_representation(instance)
+
+    def validate_empty_values(self, data):
+        if data is None:
+            return True, None
+        else:
+            return super().validate_empty_values(data)
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
+    shares = SharesSerializer(source="*", required=False, allow_null=True)
 
     debt_free_purchase_price = HitasDecimalField(required=False, allow_null=True)
     purchase_price = HitasDecimalField(required=False, allow_null=True)
@@ -150,8 +181,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "state",
             "apartment_type",
             "surface_area",
-            "share_number_start",
-            "share_number_end",
+            "shares",
             "address",
             "apartment_number",
             "floor",

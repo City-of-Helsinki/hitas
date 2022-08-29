@@ -26,8 +26,8 @@ class Apartment(ExternalHitasModel):
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")
     surface_area = HitasModelDecimalField(help_text=_("Measured in m^2"))
 
-    share_number_start = models.PositiveIntegerField(null=True, validators=[MinValueValidator(1)])
-    share_number_end = models.PositiveIntegerField(null=True)
+    share_number_start = models.IntegerField(null=True, validators=[MinValueValidator(1)])
+    share_number_end = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
     completion_date = models.DateField(null=True)
 
@@ -63,6 +63,9 @@ class Apartment(ExternalHitasModel):
 
     @property
     def shares_count(self) -> int:
+        if not self.share_number_start:
+            return 0
+
         return self.share_number_end - self.share_number_start + 1
 
     def validate_share_numbers(self) -> None:

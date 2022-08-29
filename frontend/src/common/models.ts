@@ -125,8 +125,11 @@ export interface IApartmentDetails {
     state: ApartmentState;
     apartment_type: ICode;
     surface_area: number;
-    share_number_start: number | null;
-    share_number_end: number | null;
+    shares: {
+        start: number;
+        end: number;
+        readonly total: number;
+    };
     address: IAddress;
     apartment_number: number;
     floor: number;

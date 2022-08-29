@@ -151,8 +151,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "code": ap.apartment_type.legacy_code_number,
         },
         "surface_area": float(ap.surface_area),
-        "share_number_start": ap.share_number_start,
-        "share_number_end": ap.share_number_end,
+        "shares": {
+            "start": ap.share_number_start,
+            "end": ap.share_number_end,
+            "total": ap.share_number_end - ap.share_number_start + 1,
+        },
         "address": {
             "street_address": ap.street_address,
             "postal_code": hc.postal_code.value,
@@ -215,8 +218,10 @@ def get_apartment_create_data() -> dict[str, Any]:
         "state": ApartmentState.SOLD.value,
         "apartment_type": {"id": apartment_type.uuid.hex},
         "surface_area": 69,
-        "share_number_start": 50,
-        "share_number_end": 100,
+        "shares": {
+            "start": 20,
+            "end": 100,
+        },
         "address": {
             "street_address": "TestStreet 3",
             "postal_code": building.real_estate.housing_company.postal_code.value,
@@ -262,8 +267,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 "ownerships": [],
             }
         )
-        del data["share_number_start"]
-        del data["share_number_end"]
+        del data["shares"]
         del data["debt_free_purchase_price"]
         del data["purchase_price"]
         del data["acquisition_price"]
@@ -300,28 +304,38 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             {"surface_area": -1},
             [{"field": "surface_area", "message": "Ensure this value is greater than or equal to 0."}],
         ),
-        ({"share_number_start": "foo"}, [{"field": "share_number_start", "message": "A valid integer is required."}]),
         (
-            {"share_number_start": 100, "share_number_end": None},
+            {"shares": {"start": "foo"}},
             [
-                {
-                    "field": "non_field_errors",
-                    "message": "You must enter both: share_number_start and share_number_end or neither.",
-                }
+                {"field": "shares.start", "message": "A valid integer is required."},
+                {"field": "shares.end", "message": "This field is mandatory and cannot be blank."},
             ],
         ),
         (
-            {"share_number_start": None, "share_number_end": 100},
+            {"shares": {"end": "foo"}},
             [
-                {
-                    "field": "non_field_errors",
-                    "message": "You must enter both: share_number_start and share_number_end or neither.",
-                }
+                {"field": "shares.start", "message": "This field is mandatory and cannot be blank."},
+                {"field": "shares.end", "message": "A valid integer is required."},
             ],
         ),
         (
-            {"share_number_start": 100, "share_number_end": 50},
+            {"shares": {"start": 100}},
+            [{"field": "shares.end", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        (
+            {"shares": {"start": None, "end": 100}},
+            [{"field": "shares.start", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        (
+            {"shares": {"start": 100, "end": 50}},
             [{"field": "non_field_errors", "message": "share_number_start must not be greater than share_number_end"}],
+        ),
+        (
+            {"shares": {"start": 0, "end": 0}},
+            [
+                {"field": "shares.start", "message": "Ensure this value is greater than or equal to 1."},
+                {"field": "shares.end", "message": "Ensure this value is greater than or equal to 1."},
+            ],
         ),
         ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be blank."}]),
         (
@@ -512,8 +526,10 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
         "state": ApartmentState.SOLD.value,
         "apartment_type": {"id": apartment_type.uuid.hex},
         "surface_area": 100,
-        "share_number_start": 101,
-        "share_number_end": 200,
+        "shares": {
+            "start": 101,
+            "end": 200,
+        },
         "address": {
             "street_address": "TestStreet 3",
             "postal_code": building.real_estate.housing_company.postal_code.value,
@@ -540,8 +556,8 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     assert ap.state.value == data["state"]
     assert ap.apartment_type == apartment_type
     assert ap.surface_area == data["surface_area"]
-    assert ap.share_number_start == data["share_number_start"]
-    assert ap.share_number_end == data["share_number_end"]
+    assert ap.share_number_start == data["shares"]["start"]
+    assert ap.share_number_end == data["shares"]["end"]
     assert ap.street_address == data["address"]["street_address"]
     assert ap.building.real_estate.housing_company.postal_code.value == data["address"]["postal_code"]
     assert ap.building.real_estate.housing_company.city == data["address"]["city"]
