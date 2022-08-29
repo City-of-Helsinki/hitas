@@ -1,13 +1,21 @@
 from uuid import UUID
 
+from rest_framework import serializers
+
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Building, RealEstate
 from hitas.models.utils import validate_building_id
-from hitas.views.utils import HitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, ValueOrNullField
+from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
+
+
+class BuildingHitasAddressSerializer(serializers.Serializer):
+    street_address = serializers.CharField()
+    postal_code = serializers.CharField(source="real_estate.housing_company.postal_code.value", read_only=True)
+    city = serializers.CharField(source="real_estate.housing_company.city", read_only=True)
 
 
 class BuildingSerializer(HitasModelSerializer):
-    address = HitasAddressSerializer(source="*")
+    address = BuildingHitasAddressSerializer(source="*")
     building_identifier = ValueOrNullField(required=False)
 
     def validate_building_identifier(self, value):
@@ -42,4 +50,4 @@ class BuildingViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         uuid = self._lookup_id_to_uuid(self.kwargs["real_estate_uuid"])
-        return Building.objects.filter(real_estate__uuid=uuid).select_related("postal_code")
+        return Building.objects.filter(real_estate__uuid=uuid).select_related("real_estate")

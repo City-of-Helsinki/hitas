@@ -9,14 +9,14 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Apartment, ApartmentType, Building, HitasPostalCode, HousingCompany, Owner, Person
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Owner, Person
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
     ApartmentTypeFactory,
     BuildingFactory,
-    HitasPostalCodeFactory,
+    HousingCompanyFactory,
     OwnerFactory,
     PersonFactory,
 )
@@ -61,8 +61,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "surface_area": float(ap1.surface_area),
             "address": {
                 "street_address": ap1.street_address,
-                "postal_code": ap1.postal_code.value,
-                "city": ap1.postal_code.city,
+                "postal_code": hc1.postal_code.value,
+                "city": hc1.postal_code.city,
             },
             "apartment_number": ap1.apartment_number,
             "stair": ap1.stair,
@@ -113,7 +113,11 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "state": ap2.state.value,
             "apartment_type": ap2.apartment_type.value,
             "surface_area": float(ap2.surface_area),
-            "address": {"street_address": ap2.street_address, "postal_code": ap2.postal_code.value, "city": "Helsinki"},
+            "address": {
+                "street_address": ap2.street_address,
+                "postal_code": hc2.postal_code.value,
+                "city": hc2.postal_code.city,
+            },
             "apartment_number": ap2.apartment_number,
             "stair": ap2.stair,
             "housing_company": {
@@ -161,8 +165,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "share_number_end": ap.share_number_end,
         "address": {
             "street_address": ap.street_address,
-            "postal_code": ap.postal_code.value,
-            "city": ap.postal_code.city,
+            "postal_code": hc.postal_code.value,
+            "city": hc.postal_code.city,
         },
         "apartment_number": ap.apartment_number,
         "floor": ap.floor,
@@ -228,7 +232,10 @@ def get_apartment_create_data() -> dict[str, Any]:
         "surface_area": 69,
         "share_number_start": 50,
         "share_number_end": 100,
-        "address": {"street_address": "TestStreet 3", "postal_code": building.postal_code.value},
+        "address": {
+            "street_address": "TestStreet 3",
+            "postal_code": building.real_estate.housing_company.postal_code.value,
+        },
         "apartment_number": 58,
         "floor": "1",
         "stair": "A",
@@ -514,7 +521,6 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
     building: Building = BuildingFactory.create()
-    postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
     OwnerFactory.create(apartment=ap)
 
     data = {
@@ -523,7 +529,11 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
         "surface_area": 100,
         "share_number_start": 101,
         "share_number_end": 200,
-        "address": {"street_address": "TestStreet 3", "postal_code": postal_code.value, "city": "Helsinki"},
+        "address": {
+            "street_address": "TestStreet 3",
+            "postal_code": building.real_estate.housing_company.postal_code.value,
+            "city": "Helsinki",
+        },
         "apartment_number": 9,
         "floor": "5",
         "stair": "X",
@@ -548,7 +558,8 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     assert ap.share_number_start == data["share_number_start"]
     assert ap.share_number_end == data["share_number_end"]
     assert ap.street_address == data["address"]["street_address"]
-    assert ap.postal_code == postal_code
+    assert ap.building.real_estate.housing_company.postal_code.value == data["address"]["postal_code"]
+    assert ap.building.real_estate.housing_company.city == data["address"]["city"]
     assert ap.apartment_number == data["apartment_number"]
     assert ap.floor == data["floor"]
     assert ap.stair == data["stair"]
@@ -686,10 +697,11 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    ApartmentFactory.create(state=ApartmentState.FREE, postal_code__value="99999")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__first_name="Megatron")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__last_name="Opetimus Prime")
     OwnerFactory.create(apartment__state=ApartmentState.FREE, person__social_security_number="010199-123A")
+    hc = HousingCompanyFactory.create(postal_code__value="99999")
+    ApartmentFactory.create(building__real_estate__housing_company=hc)
 
     url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)

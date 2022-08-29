@@ -768,7 +768,6 @@
       "share_number_start": 1,
       "share_number_end": 49,
       "street_address": "Matinkatu 22",
-      "postal_code": 2,
       "apartment_number": 1,
       "floor": 1,
       "stair": "A",
@@ -794,7 +793,6 @@
       "share_number_start": 50,
       "share_number_end": 100,
       "street_address": "Bengalinkuja 4",
-      "postal_code": 10,
       "apartment_number": 68,
       "floor": 4,
       "stair": "z",
@@ -820,7 +818,6 @@
       "share_number_start": 1,
       "share_number_end": 50,
       "street_address": "Iltatähdenkatu 7",
-      "postal_code": 16,
       "apartment_number": 2,
       "floor": 5,
       "stair": "W",
@@ -846,7 +843,6 @@
       "share_number_start": 1,
       "share_number_end": 50,
       "street_address": "Lautamiehenbulevardi 04",
-      "postal_code": 21,
       "apartment_number": 95,
       "floor": 2,
       "stair": "Q",
@@ -872,7 +868,6 @@
       "share_number_start": 1,
       "share_number_end": 500,
       "street_address": "Ylipalonpolku 7",
-      "postal_code": 20,
       "apartment_number": 39,
       "floor": 6,
       "stair": "q",
@@ -898,7 +893,6 @@
       "share_number_start": 1,
       "share_number_end": 50,
       "street_address": "Iltatähdenbulevardi 909",
-      "postal_code": 32,
       "apartment_number": 87,
       "floor": 9,
       "stair": "o",
@@ -924,7 +918,6 @@
       "share_number_start": 1001,
       "share_number_end": 1500,
       "street_address": "Fabianinbulevardi 565",
-      "postal_code": 36,
       "apartment_number": 88,
       "floor": 9,
       "stair": "A",
@@ -950,7 +943,6 @@
       "share_number_start": 30,
       "share_number_end": 50,
       "street_address": "Yrjöntie 703",
-      "postal_code": 40,
       "apartment_number": 53,
       "floor": 8,
       "stair": "P",
@@ -970,7 +962,6 @@
       "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
       "real_estate": 1,
       "street_address": "Fakestreet 123",
-      "postal_code": 1,
       "building_identifier": "100012345A"
     }
   },
@@ -981,7 +972,6 @@
       "uuid": "be48cc00-3f0c-4419-a584-0c363feb0249",
       "real_estate": 2,
       "street_address": "Berganpolku 048",
-      "postal_code": 9,
       "building_identifier": "195041644r"
     }
   },
@@ -992,7 +982,6 @@
       "uuid": "0f3561d9-f389-4f0a-a64a-38d4f2e90358",
       "real_estate": 3,
       "street_address": "Porebulevardi 00",
-      "postal_code": 15,
       "building_identifier": "180078596y"
     }
   },
@@ -1003,7 +992,6 @@
       "uuid": "e35d0081-29cf-4208-bd10-d7608fe852c6",
       "real_estate": 4,
       "street_address": "Aidasmäentie 1",
-      "postal_code": 20,
       "building_identifier": "181193052R"
     }
   },
@@ -1014,7 +1002,6 @@
       "uuid": "22c9f4ce-2953-4d24-97fc-c58ec69d1a37",
       "real_estate": 5,
       "street_address": "Berganpolku 7",
-      "postal_code": 26,
       "building_identifier": "169214244O"
     }
   },
@@ -1025,7 +1012,6 @@
       "uuid": "dcd112ff-9e3d-4852-b359-a0f336acb6ae",
       "real_estate": 6,
       "street_address": "Urheilukuja 0",
-      "postal_code": 31,
       "building_identifier": "163576403P"
     }
   },
@@ -1036,7 +1022,6 @@
       "uuid": "12ebf093-a10d-43c1-8075-df552bd6595d",
       "real_estate": 7,
       "street_address": "Winqvistinkuja 0",
-      "postal_code": 35,
       "building_identifier": "150076293A"
     }
   },
@@ -1047,7 +1032,6 @@
       "uuid": "4c7f8a59-3e90-4500-8eeb-482dc35e5f16",
       "real_estate": 8,
       "street_address": "Kimalaispolku 382",
-      "postal_code": 39,
       "building_identifier": "106343642p"
     }
   },
@@ -4084,8 +4068,7 @@
       "uuid": "a20254d4-b3ea-4f25-a509-f4f081d9e446",
       "housing_company": 1,
       "property_identifier": "091-020-0015-0003",
-      "street_address": "Fakestreet 123",
-      "postal_code": 1
+      "street_address": "Fakestreet 123"
     }
   },
   {
@@ -4095,8 +4078,7 @@
       "uuid": "5a62b822-5ee2-40ce-aa6e-49644f77ec45",
       "housing_company": 2,
       "property_identifier": "6535-9995-1426-4929",
-      "street_address": "Betleheminkuja 300",
-      "postal_code": 8
+      "street_address": "Betleheminkuja 300"
     }
   },
   {
@@ -4106,8 +4088,7 @@
       "uuid": "6a21e0f1-9ad5-49f8-8f0a-94a096a5eac4",
       "housing_company": 3,
       "property_identifier": "4510-9520-6441-3392",
-      "street_address": "Malminkartanonbulevardi 575",
-      "postal_code": 14
+      "street_address": "Malminkartanonbulevardi 575"
     }
   },
   {
@@ -4117,8 +4098,7 @@
       "uuid": "4a8e7cf0-3a7e-45cb-a4fe-a3285799dafa",
       "housing_company": 4,
       "property_identifier": "2059-2641-8704-8619",
-      "street_address": "Uurtajanpolku 782",
-      "postal_code": 19
+      "street_address": "Uurtajanpolku 782"
     }
   },
   {
@@ -4128,8 +4108,7 @@
       "uuid": "91d5c926-f0fc-4ed0-91d8-160ae87b11bb",
       "housing_company": 5,
       "property_identifier": "3032-1618-8490-9881",
-      "street_address": "Willebrandinbulevardi 4",
-      "postal_code": 25
+      "street_address": "Willebrandinbulevardi 4"
     }
   },
   {
@@ -4139,8 +4118,7 @@
       "uuid": "367aeceb-6c52-49b9-8f87-d24b3e738927",
       "housing_company": 6,
       "property_identifier": "4669-9138-2027-5229",
-      "street_address": "Niitynperänkuja 74",
-      "postal_code": 30
+      "street_address": "Niitynperänkuja 74"
     }
   },
   {
@@ -4150,8 +4128,7 @@
       "uuid": "e487b17e-13e0-49dc-8c4c-034b7a875ebb",
       "housing_company": 7,
       "property_identifier": "6911-0472-5072-1192",
-      "street_address": "Orisaarenbulevardi 48",
-      "postal_code": 34
+      "street_address": "Orisaarenbulevardi 48"
     }
   },
   {
@@ -4161,8 +4138,7 @@
       "uuid": "5ff86872-53a3-48f9-8dfb-656171ce3315",
       "housing_company": 8,
       "property_identifier": "8440-9485-1889-1839",
-      "street_address": "Fabianinbulevardi 461",
-      "postal_code": 17
+      "street_address": "Fabianinbulevardi 461"
     }
   }
 ]

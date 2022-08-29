@@ -10,7 +10,6 @@ class Building(ExternalHitasModel):
     real_estate = models.ForeignKey("RealEstate", on_delete=models.PROTECT, related_name="buildings")
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="buildings")
 
     # 'rakennustunnus'
     building_identifier = models.CharField(
@@ -22,8 +21,12 @@ class Building(ExternalHitasModel):
     )
 
     @property
+    def postal_code(self):
+        return self.real_estate.postal_code
+
+    @property
     def city(self):
-        return self.postal_code.city
+        return self.postal_code().city
 
     class Meta:
         verbose_name = _("Building")

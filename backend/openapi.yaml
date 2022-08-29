@@ -1982,7 +1982,7 @@ components:
         state:
           $ref: '#/components/schemas/HousingCompanyState'
         address:
-          $ref: '#/components/schemas/HitasAddress'
+          $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -2052,7 +2052,7 @@ components:
         state:
           $ref: '#/components/schemas/HousingCompanyState'
         address:
-          $ref: '#/components/schemas/HitasAddress'
+          $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -2489,6 +2489,28 @@ components:
           maximum: 4
           example: Helsinki
 
+    HitasHousingCompanyAddress:
+      description: Hitas address information for a housing company (includes postal code)
+      type: object
+      required:
+        - street_address
+        - postal_code
+        - city
+      properties:
+        street_address:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        postal_code:
+          description: Hitas postal code
+          type: string
+          example: "00100"
+        city:
+          description: City based on the postal code
+          type: string
+          readOnly: true
+          example: Helsinki
+
     HitasAddress:
       description: Hitas address information
       type: object
@@ -2504,6 +2526,7 @@ components:
         postal_code:
           description: Hitas postal code
           type: string
+          readOnly: true
           example: "00100"
         city:
           description: City based on the postal code

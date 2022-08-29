@@ -15,7 +15,10 @@ class RealEstate(ExternalHitasModel):
     )
 
     street_address = models.CharField(max_length=1024)
-    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="real_estates")
+
+    @property
+    def postal_code(self):
+        return self.housing_company.postal_code
 
     @property
     def city(self):

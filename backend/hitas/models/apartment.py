@@ -32,7 +32,6 @@ class Apartment(ExternalHitasModel):
     completion_date = models.DateField(null=True)
 
     street_address = models.CharField(max_length=128)
-    postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="apartments")
     # 'Huoneistonumero'
     apartment_number = models.PositiveSmallIntegerField()
     floor = models.CharField(max_length=50, blank=True, null=True)
@@ -55,8 +54,12 @@ class Apartment(ExternalHitasModel):
     notes = models.TextField(blank=True)
 
     @property
+    def postal_code(self):
+        return self.building.postal_code
+
+    @property
     def city(self):
-        return self.postal_code.city
+        return self.postal_code().city
 
     @property
     def shares_count(self) -> int:

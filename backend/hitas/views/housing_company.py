@@ -6,7 +6,7 @@ from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Building, HousingCompany, HousingCompanyState, RealEstate
+from hitas.models import HousingCompany, HousingCompanyState, RealEstate
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
@@ -141,9 +141,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
             HousingCompany.objects.prefetch_related(
                 Prefetch(
                     "real_estates",
-                    queryset=RealEstate.objects.prefetch_related(
-                        Prefetch("buildings", queryset=Building.objects.select_related("postal_code"))
-                    ).select_related("postal_code"),
+                    queryset=RealEstate.objects.prefetch_related("buildings"),
                 )
             )
             .select_related(
