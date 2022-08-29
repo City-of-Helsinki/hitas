@@ -63,7 +63,7 @@ export const ApartmentResultsList = ({filterParams}): JSX.Element => {
         return (
             <>
                 <div className="list-amount">
-                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "yhtiötä" : "yhtiö"}
+                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
                 </div>
                 <div className="list-headers">
                     <div className="list-header apartment">Asunto</div>
