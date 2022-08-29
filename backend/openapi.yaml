@@ -2305,6 +2305,7 @@ components:
         - apartment_number
         - completion_date
         - housing_company
+        - shares
         - ownerships
       properties:
         id:
@@ -2321,12 +2322,31 @@ components:
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
-        share_number_start:
-          type: integer
+        shares:
+          description: Share information
+          type: object
           nullable: true
-        share_number_end:
-          type: integer
-          nullable: true
+          required:
+            - start
+            - end
+            - total
+          properties:
+            start:
+              description: First share number
+              type: integer
+              minimum: 0
+              example: 100
+            end:
+              description: Last share number
+              type: integer
+              minimum: 0
+              example: 150
+            total:
+              description: Total number of shares
+              type: integer
+              minimum: 0
+              readOnly: true
+              example: 50
         address:
           $ref: '#/components/schemas/HitasAddress'
         apartment_number:

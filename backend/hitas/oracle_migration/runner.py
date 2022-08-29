@@ -252,8 +252,6 @@ def create_apartments(
         new.state = ApartmentState.SOLD
         new.apartment_type = converted_data.apartment_types_by_code_numer[apartment["apartment_type_code"]]
         new.surface_area = apartment["surface_area"]
-        new.share_number_start = apartment["share_number_start"]
-        new.share_number_end = apartment["share_number_end"]
         new.street_address = apartment["street_address"]
         new.apartment_number = apartment["apartment_number"]
         new.floor = apartment["floor"]
@@ -266,6 +264,10 @@ def create_apartments(
         new.interest_during_construction = apartment["interest_during_construction"]
         new.completion_date = apartment["completion_date"]
         new.notes = combine_notes(apartment)
+
+        if apartment["share_number_start"] != 0:
+            new.share_number_start = apartment["share_number_start"]
+            new.share_number_end = apartment["share_number_end"]
 
         bulk_apartments.append(new)
 
