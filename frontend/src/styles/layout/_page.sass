@@ -19,7 +19,13 @@
   grid-template-columns: 70% 30%
 
   > .search
+    position: relative
     margin-bottom: $spacing-s
+
+    [class^="Icon-module"]
+      position: absolute
+      top: 1rem
+      right: 1rem
 
 .results
   grid-row: 2

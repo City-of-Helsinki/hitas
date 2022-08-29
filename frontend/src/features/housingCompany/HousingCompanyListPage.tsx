@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, IconPlus, SearchInput} from "hds-react";
+import {Button, IconPlus, IconSearch} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
@@ -73,12 +73,6 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
     return (
         <div className="filters">
             <FilterTextInputField
-                label="Yhtiön nimi"
-                filterFieldName="display_name"
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-            />
-            <FilterTextInputField
                 label="Osoite"
                 filterFieldName="street_address"
                 filterParams={filterParams}
@@ -111,7 +105,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
 };
 
 const HousingCompanyListPage = (): JSX.Element => {
-    const [filterParams, setFilterParams] = useState({});
+    const [filterParams, setFilterParams] = useState({string: ""});
 
     return (
         <div className="view--companies-listing">
@@ -127,17 +121,15 @@ const HousingCompanyListPage = (): JSX.Element => {
                 </Link>
             </h1>
             <div className="listing">
-                <SearchInput
-                    className="search"
-                    label=""
-                    placeholder="Rajaa hakusanalla"
-                    searchButtonAriaLabel="Search"
-                    clearButtonAriaLabel="Clear search field"
-                    onSubmit={(submittedValue) =>
-                        // eslint-disable-next-line no-console
-                        console.log("Submitted search-value:", submittedValue)
-                    }
-                />
+                <div className="search">
+                    <FilterTextInputField
+                        label=""
+                        filterFieldName="display_name"
+                        filterParams={filterParams}
+                        setFilterParams={setFilterParams}
+                    />
+                    <IconSearch />
+                </div>
                 <HousingCompanyResultsList filterParams={filterParams} />
                 <HousingCompanyFilters
                     filterParams={filterParams}

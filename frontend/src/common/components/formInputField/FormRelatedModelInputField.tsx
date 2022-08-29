@@ -114,7 +114,7 @@ export default function FormRelatedModelInputField({
                     )}
                 </Dialog.Content>
                 <Dialog.ActionButtons>
-                    {/* ## Adding to the related data is handled by the Django dashboard for now. This feature is to be shown here later
+                    {/* TODO: Adding to the related data is handled by the Django dashboard for now. This feature is to be shown here later
                      <Button
                      onClick={closeModal}
                      disabled
