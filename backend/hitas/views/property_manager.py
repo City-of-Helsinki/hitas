@@ -34,4 +34,4 @@ class PropertyManagerViewSet(HitasModelViewSet):
     model_class = PropertyManager
 
     def get_queryset(self):
-        return PropertyManager.objects.all()
+        return PropertyManager.objects.all().order_by("id")

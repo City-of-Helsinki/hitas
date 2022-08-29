@@ -51,4 +51,5 @@ class RealEstateViewSet(HitasModelViewSet):
             RealEstate.objects.filter(housing_company__uuid=uuid)
             .select_related("housing_company__postal_code")
             .prefetch_related("buildings")
+            .order_by("id")
         )

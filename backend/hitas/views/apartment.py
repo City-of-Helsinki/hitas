@@ -252,6 +252,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
             )
+            .order_by("id")
         )
 
     def get_filterset_class(self):

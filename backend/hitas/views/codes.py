@@ -66,7 +66,7 @@ class ApartmentTypeSerializer(AbstractCodeSerializer):
 
 class AbstractCodeViewSet(HitasModelViewSet):
     def get_queryset(self):
-        return self.model_class.objects.all()
+        return self.model_class.objects.all().order_by("id")
 
     def get_filterset_class(self):
         class CodeFilterSet(HitasFilterSet):

@@ -141,7 +141,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
             HousingCompany.objects.prefetch_related(
                 Prefetch(
                     "real_estates",
-                    queryset=RealEstate.objects.prefetch_related("buildings"),
+                    queryset=RealEstate.objects.prefetch_related("buildings").order_by("id"),
                 )
             )
             .select_related(
