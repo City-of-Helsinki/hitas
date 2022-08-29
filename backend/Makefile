@@ -1,9 +1,12 @@
-.PHONY = all build format tests dump
+.PHONY = all docker-build docker-build-backend-only tests format dump
 
-all: format tests build
+all: format tests docker-build
 
-build:
+docker-build:
 	docker-compose up --detach --build
+
+docker-build-backend-only:
+	docker-compose up --detach --build hitas-backend
 
 tests:
 	pytest --cov
