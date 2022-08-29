@@ -56,6 +56,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
 
             if (
                 hasattr(self.model_class, "postal_code")
+                and hasattr(self.model_class.postal_code, "field")
                 and self.model_class.postal_code.field.__class__ == models.ForeignKey
             ):
                 postal_code = filters.CharFilter(field_name="postal_code__value")

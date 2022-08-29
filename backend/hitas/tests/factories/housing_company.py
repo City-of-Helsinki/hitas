@@ -47,7 +47,6 @@ class RealEstateFactory(DjangoModelFactory):
     housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
     property_identifier = factory.Faker("bothify", text="####-####-####-####")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
 
 
 class BuildingFactory(DjangoModelFactory):
@@ -57,7 +56,6 @@ class BuildingFactory(DjangoModelFactory):
     real_estate = factory.SubFactory("hitas.tests.factories.RealEstateFactory")
     building_identifier = factory.Faker("bothify", text="1########?")
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
 
 
 class ApartmentFactory(DjangoModelFactory):
@@ -71,7 +69,6 @@ class ApartmentFactory(DjangoModelFactory):
     share_number_start = factory.Sequence(lambda n: n * 50)
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
     street_address = factory.Faker("street_address")
-    postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = factory.Faker("numerify", text="%")

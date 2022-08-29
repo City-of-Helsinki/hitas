@@ -53,7 +53,7 @@ def test__api__building__list(api_client: HitasAPIClient):
             "id": bu1.uuid.hex,
             "address": {
                 "city": "Helsinki",
-                "postal_code": bu1.postal_code.value,
+                "postal_code": bu1.real_estate.housing_company.postal_code.value,
                 "street_address": bu1.street_address,
             },
             "building_identifier": bu1.building_identifier,
@@ -62,7 +62,7 @@ def test__api__building__list(api_client: HitasAPIClient):
             "id": bu2.uuid.hex,
             "address": {
                 "city": "Helsinki",
-                "postal_code": bu2.postal_code.value,
+                "postal_code": bu2.real_estate.housing_company.postal_code.value,
                 "street_address": bu2.street_address,
             },
             "building_identifier": bu2.building_identifier,
@@ -112,7 +112,7 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
         "id": bu1.uuid.hex,
         "address": {
             "city": "Helsinki",
-            "postal_code": bu1.postal_code.value,
+            "postal_code": bu1.real_estate.housing_company.postal_code.value,
             "street_address": bu1.street_address,
         },
         "building_identifier": bu1.building_identifier,
@@ -127,9 +127,9 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
 def test__api__building__create(api_client: HitasAPIClient, building_identifier):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
+
     data = {
         "address": {
-            "postal_code": re.postal_code.value,
             "street_address": "test-street-address-1",
         },
     }
@@ -156,7 +156,7 @@ def test__api__building__create__no_building_identifier(api_client: HitasAPIClie
     re: RealEstate = RealEstateFactory.create()
     data = {
         "address": {
-            "postal_code": re.postal_code.value,
+            "postal_code": re.housing_company.postal_code.value,
             "street_address": "test-street-address-1",
         },
     }
@@ -286,7 +286,6 @@ def test__api__building__delete(api_client: HitasAPIClient):
         {"building_identifier": "1000"},
         {"building_identifier": "12345"},
         {"street_address": "test-street"},
-        {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db
@@ -294,7 +293,6 @@ def test__api__building__filter(api_client: HitasAPIClient, selected_filter):
     bu: Building = BuildingFactory.create()
     BuildingFactory.create(building_identifier="100012345A", real_estate=bu.real_estate)
     BuildingFactory.create(street_address="test-street", real_estate=bu.real_estate)
-    BuildingFactory.create(postal_code__value="99999", real_estate=bu.real_estate)
 
     url = (
         reverse(

@@ -265,14 +265,12 @@ def test__api__real_estate__delete(api_client: HitasAPIClient):
         {"property_identifier": "1-1234-"},
         {"property_identifier": "321-56"},
         {"street_address": "test-street"},
-        {"postal_code": "99999"},
     ],
 )
 @pytest.mark.django_db
 def test__api__real_estate__filter(api_client: HitasAPIClient, selected_filter):
     re: RealEstate = RealEstateFactory.create(property_identifier="1-1234-321-56")
     RealEstateFactory.create(street_address="test-street", housing_company=re.housing_company)
-    RealEstateFactory.create(postal_code__value="99999", housing_company=re.housing_company)
 
     url = (
         reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": re.housing_company.uuid.hex})

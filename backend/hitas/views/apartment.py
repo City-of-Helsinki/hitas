@@ -14,7 +14,6 @@ from hitas.models.utils import validate_share_numbers
 from hitas.views.codes import ApartmentTypeSerializer
 from hitas.views.owner import OwnerSerializer
 from hitas.views.utils import (
-    HitasAddressSerializer,
     HitasDecimalField,
     HitasEnumField,
     HitasFilterSet,
@@ -31,7 +30,7 @@ class ApartmentFilterSet(HitasFilterSet):
         field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
     )
     street_address = filters.CharFilter(lookup_expr="icontains")
-    postal_code = filters.CharFilter(field_name="postal_code__value")
+    postal_code = filters.CharFilter(field_name="building__real_estate__housing_company__postal_code__value")
     owner_name = filters.CharFilter(method="owner_name_filter")
     owner_social_security_number = filters.CharFilter(
         field_name="owners__person__social_security_number", lookup_expr="icontains"
@@ -55,10 +54,16 @@ class HousingCompanySerializer(EnumSupportSerializerMixin, HitasModelSerializer)
         fields = ["id", "name"]
 
 
+class ApartmentHitasAddressSerializer(serializers.Serializer):
+    street_address = serializers.CharField()
+    postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
+    city = serializers.CharField(source="building.real_estate.housing_company.city", read_only=True)
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
-    address = HitasAddressSerializer(source="*")
+    address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
 
@@ -218,19 +223,19 @@ class ApartmentViewSet(HitasModelViewSet):
             "apartment_type__value",
             "apartment_type__legacy_code_number",
             "apartment_type__description",
-            "postal_code__value",
-            "postal_code__city",
+            "building__real_estate__housing_company__postal_code__value",
+            "building__real_estate__housing_company__postal_code__city",
         )
 
     def get_list_queryset(self):
         return (
             Apartment.objects.prefetch_related("owners", "owners__person")
             .select_related(
-                "postal_code",
                 "building",
                 "building__real_estate",
                 "apartment_type",
                 "building__real_estate__housing_company",
+                "building__real_estate__housing_company__postal_code",
             )
             .only(
                 "uuid",
@@ -244,8 +249,8 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__uuid",
                 "building__real_estate__housing_company__display_name",
                 "apartment_type__value",
-                "postal_code__value",
-                "postal_code__city",
+                "building__real_estate__housing_company__postal_code__value",
+                "building__real_estate__housing_company__postal_code__city",
             )
         )
 

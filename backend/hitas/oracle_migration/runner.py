@@ -220,14 +220,12 @@ def create_real_estates_and_buildings(
         new.housing_company = housing_company
         new.property_identifier = real_estate["property_identifier"]
         new.street_address = housing_company.street_address
-        new.postal_code = housing_company.postal_code
 
         new.save()
 
         b = Building()
         b.real_estate = new
         b.street_address = new.street_address
-        b.postal_code = new.postal_code
         b.building_identifier = ""
 
         b.save()
@@ -257,8 +255,6 @@ def create_apartments(
         new.share_number_start = apartment["share_number_start"]
         new.share_number_end = apartment["share_number_end"]
         new.street_address = apartment["street_address"]
-        new.postal_code = building.postal_code
-        new.postal_code = converted_data.postal_codes_by_postal_code[apartment["postal_code_code"]]
         new.apartment_number = apartment["apartment_number"]
         new.floor = apartment["floor"]
         new.stair = apartment["stair"]
@@ -270,10 +266,6 @@ def create_apartments(
         new.interest_during_construction = apartment["interest_during_construction"]
         new.completion_date = apartment["completion_date"]
         new.notes = combine_notes(apartment)
-
-        # Only save postal codes linked to housing companies
-        if new.postal_code._state.adding:
-            new.postal_code.save()
 
         bulk_apartments.append(new)
 

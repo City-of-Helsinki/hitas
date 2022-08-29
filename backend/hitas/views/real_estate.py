@@ -1,15 +1,21 @@
 from uuid import UUID
 
-from django.db.models import Prefetch
+from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.models import Building, HousingCompany, RealEstate
+from hitas.models import HousingCompany, RealEstate
 from hitas.views.building import BuildingSerializer
-from hitas.views.utils import HitasAddressSerializer, HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
+
+
+class RealEstateHitasAddressSerializer(serializers.Serializer):
+    street_address = serializers.CharField()
+    postal_code = serializers.CharField(source="housing_company.postal_code.value", read_only=True)
+    city = serializers.CharField(source="housing_company.city", read_only=True)
 
 
 class RealEstateSerializer(HitasModelSerializer):
-    address = HitasAddressSerializer(source="*")
+    address = RealEstateHitasAddressSerializer(source="*")
     buildings = BuildingSerializer(many=True, read_only=True)
 
     @property
@@ -43,6 +49,6 @@ class RealEstateViewSet(HitasModelViewSet):
         uuid = self._lookup_id_to_uuid(self.kwargs["housing_company_uuid"])
         return (
             RealEstate.objects.filter(housing_company__uuid=uuid)
-            .select_related("postal_code")
-            .prefetch_related(Prefetch("buildings", Building.objects.select_related("postal_code")))
+            .select_related("housing_company__postal_code")
+            .prefetch_related("buildings")
         )
