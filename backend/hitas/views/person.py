@@ -1,10 +1,8 @@
 from hitas.models import Person
-from hitas.views.utils import AddressSerializer, HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
 class PersonSerializer(HitasModelSerializer):
-    address = AddressSerializer(source="*")
-
     class Meta:
         model = Person
         fields = [
@@ -13,7 +11,6 @@ class PersonSerializer(HitasModelSerializer):
             "last_name",
             "social_security_number",
             "email",
-            "address",
         ]
 
 

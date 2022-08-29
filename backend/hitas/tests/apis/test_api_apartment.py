@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas import exceptions
-from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Owner, Person
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Ownership, Person
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -17,7 +17,7 @@ from hitas.tests.factories import (
     ApartmentTypeFactory,
     BuildingFactory,
     HousingCompanyFactory,
-    OwnerFactory,
+    OwnershipFactory,
     PersonFactory,
 )
 from hitas.views.apartment import ApartmentDetailSerializer
@@ -48,8 +48,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     ap2: Apartment = ApartmentFactory.create()
     hc1: HousingCompany = ap1.building.real_estate.housing_company
     hc2: HousingCompany = ap2.building.real_estate.housing_company
-    o1: Owner = OwnerFactory.create(apartment=ap1, ownership_percentage=50)
-    o2: Owner = OwnerFactory.create(apartment=ap1, ownership_percentage=50)
+    o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
+    o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
     response = api_client.get(reverse("hitas:apartment-list"))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -71,40 +71,30 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "name": hc1.display_name,
             },
             "completion_date": str(ap1.completion_date),
-            "owners": [
+            "ownerships": [
                 {
-                    "person": {
-                        "id": o1.person.uuid.hex,
-                        "first_name": o1.person.first_name,
-                        "last_name": o1.person.last_name,
-                        "social_security_number": o1.person.social_security_number,
-                        "email": o1.person.email,
-                        "address": {
-                            "street_address": o1.person.street_address,
-                            "postal_code": o1.person.postal_code,
-                            "city": o1.person.city,
-                        },
+                    "owner": {
+                        "id": o1.owner.uuid.hex,
+                        "first_name": o1.owner.first_name,
+                        "last_name": o1.owner.last_name,
+                        "social_security_number": o1.owner.social_security_number,
+                        "email": o1.owner.email,
                     },
-                    "ownership_percentage": float(o1.ownership_percentage),
-                    "ownership_start_date": str(o1.ownership_start_date),
-                    "ownership_end_date": None,
+                    "percentage": float(o1.percentage),
+                    "start_date": str(o1.start_date) if o1.start_date else None,
+                    "end_date": None,
                 },
                 {
-                    "person": {
-                        "id": o2.person.uuid.hex,
-                        "first_name": o2.person.first_name,
-                        "last_name": o2.person.last_name,
-                        "social_security_number": o2.person.social_security_number,
-                        "email": o2.person.email,
-                        "address": {
-                            "street_address": o2.person.street_address,
-                            "postal_code": o2.person.postal_code,
-                            "city": o2.person.city,
-                        },
+                    "owner": {
+                        "id": o2.owner.uuid.hex,
+                        "first_name": o2.owner.first_name,
+                        "last_name": o2.owner.last_name,
+                        "social_security_number": o2.owner.social_security_number,
+                        "email": o2.owner.email,
                     },
-                    "ownership_percentage": float(o2.ownership_percentage),
-                    "ownership_start_date": str(o2.ownership_start_date),
-                    "ownership_end_date": None,
+                    "percentage": float(o2.percentage),
+                    "start_date": str(o2.start_date) if o2.start_date else None,
+                    "end_date": None,
                 },
             ],
         },
@@ -125,7 +115,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "name": hc2.display_name,
             },
             "completion_date": str(ap2.completion_date),
-            "owners": [],
+            "ownerships": [],
         },
     ]
     assert response.json()["page"] == {
@@ -147,7 +137,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     hc: HousingCompany = ap.building.real_estate.housing_company
-    owner: Owner = OwnerFactory.create(apartment=ap)
+    owner: Ownership = OwnershipFactory.create(apartment=ap)
 
     response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -184,23 +174,18 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "id": hc.uuid.hex,
             "name": hc.display_name,
         },
-        "owners": [
+        "ownerships": [
             {
-                "person": {
-                    "id": owner.person.uuid.hex,
-                    "first_name": owner.person.first_name,
-                    "last_name": owner.person.last_name,
-                    "social_security_number": owner.person.social_security_number,
-                    "email": owner.person.email,
-                    "address": {
-                        "street_address": owner.person.street_address,
-                        "postal_code": owner.person.postal_code,
-                        "city": owner.person.city,
-                    },
+                "owner": {
+                    "id": owner.owner.uuid.hex,
+                    "first_name": owner.owner.first_name,
+                    "last_name": owner.owner.last_name,
+                    "social_security_number": owner.owner.social_security_number,
+                    "email": owner.owner.email,
                 },
-                "ownership_percentage": float(owner.ownership_percentage),
-                "ownership_start_date": str(owner.ownership_start_date),
-                "ownership_end_date": None,
+                "percentage": float(owner.percentage),
+                "start_date": str(owner.start_date) if owner.start_date else None,
+                "end_date": None,
             },
         ],
         "notes": ap.notes,
@@ -248,18 +233,18 @@ def get_apartment_create_data() -> dict[str, Any]:
         "interest_during_construction": 12345,
         "building": building.uuid.hex,
         "notes": "Lorem ipsum",
-        "owners": [
+        "ownerships": [
             {
-                "person": {"id": person1.uuid.hex},
-                "ownership_percentage": 50,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": person1.uuid.hex},
+                "percentage": 50,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
             {
-                "person": {"id": person2.uuid.hex},
-                "ownership_percentage": 50,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": person2.uuid.hex},
+                "percentage": 50,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
         ],
     }
@@ -274,7 +259,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         data.update(
             {
                 "notes": "",
-                "owners": [],
+                "ownerships": [],
             }
         )
         del data["share_number_start"]
@@ -291,7 +276,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 
     ap = Apartment.objects.first()
     assert response.json()["id"] == ap.uuid.hex
-    assert len(response.json()["owners"]) == 0 if minimal_data else 2
+    assert len(response.json()["ownerships"]) == 0 if minimal_data else 2
 
     get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.json() == get_response.json()
@@ -375,77 +360,77 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
         ({"notes": None}, [{"field": "notes", "message": "This field is mandatory and cannot be blank."}]),
-        ({"owners": None}, [{"field": "owners", "message": "This field is mandatory and cannot be blank."}]),
+        ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be blank."}]),
         (
             {
-                "owners": [
+                "ownerships": [
                     {
-                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "ownership_percentage": 100,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "percentage": 100,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                     {
-                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "ownership_percentage": 50,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "percentage": 50,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                 ]
             },
             [
                 {
-                    "field": "owners.ownership_percentage",
-                    "message": "Ownership percentage of all owners combined must"
+                    "field": "ownerships.percentage",
+                    "message": "Ownership percentage of all ownerships combined must"
                     " be equal to 100. (Given sum was 150.00)",
                 }
             ],
         ),
         (
             {
-                "owners": [
+                "ownerships": [
                     {
-                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "ownership_percentage": 10,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "percentage": 10,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                     {
-                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "ownership_percentage": 10,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "percentage": 10,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                 ]
             },
             [
                 {
-                    "field": "owners.ownership_percentage",
-                    "message": "Ownership percentage of all owners combined must"
+                    "field": "ownerships.percentage",
+                    "message": "Ownership percentage of all ownerships combined must"
                     " be equal to 100. (Given sum was 20.00)",
                 }
             ],
         ),
         (
             {
-                "owners": [
+                "ownerships": [
                     {
-                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "ownership_percentage": 100,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "percentage": 100,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                     {
-                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "ownership_percentage": 0,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "percentage": 0,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                 ]
             },
             [
                 {
-                    "field": "owners.ownership_percentage",
+                    "field": "ownerships.percentage",
                     "message": "Ownership percentage greater than 0 and less than"
                     " or equal to 100. (Given value was 0.00)",
                 }
@@ -453,43 +438,43 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         (
             {
-                "owners": [
+                "ownerships": [
                     {
-                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "ownership_percentage": 200,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "percentage": 200,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                     {
-                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "ownership_percentage": -100,
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "percentage": -100,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                 ]
             },
-            [{"field": "owners.ownership_percentage", "message": "Ensure this value is greater than or equal to 0."}],
+            [{"field": "ownerships.percentage", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
             {
-                "owners": [
+                "ownerships": [
                     {
-                        "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "ownership_percentage": "foo",
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                        "percentage": "foo",
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                     {
-                        "person": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "ownership_percentage": "baz",
-                        "ownership_start_date": "2020-01-01",
-                        "ownership_end_date": None,
+                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
+                        "percentage": "baz",
+                        "start_date": "2020-01-01",
+                        "end_date": None,
                     },
                 ]
             },
             [
-                {"field": "owners.ownership_percentage", "message": "A valid number is required."},
-                {"field": "owners.ownership_percentage", "message": "A valid number is required."},
+                {"field": "ownerships.percentage", "message": "A valid number is required."},
+                {"field": "ownerships.percentage", "message": "A valid number is required."},
             ],
         ),
     ],
@@ -517,11 +502,11 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
 
 
 @pytest.mark.django_db
-def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
+def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
     building: Building = BuildingFactory.create()
-    OwnerFactory.create(apartment=ap)
+    OwnershipFactory.create(apartment=ap)
 
     data = {
         "state": ApartmentState.SOLD.value,
@@ -545,7 +530,7 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
         "interest_during_construction": 22222,
         "building": building.uuid.hex,
         "notes": "Test Notes",
-        "owners": [],
+        "ownerships": [],
     }
 
     response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
@@ -571,7 +556,7 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     assert ap.interest_during_construction == data["interest_during_construction"]
     assert ap.building == building
     assert ap.notes == data["notes"]
-    assert ap.owners.all().count() == 0
+    assert ap.ownerships.all().count() == 0
 
     get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.json() == get_response.json()
@@ -582,44 +567,44 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
     [
         [
             {
-                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "ownership_percentage": 100,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "percentage": 100,
+                "start_date": "2020-01-01",
+                "end_date": None,
             }
         ],
         [
             {
-                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "ownership_percentage": 50,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "percentage": 50,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
             {
-                "person": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
-                "ownership_percentage": 50,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
+                "percentage": 50,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
         ],
         [
             {
-                "person": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "ownership_percentage": 33.33,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
+                "percentage": 33.33,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
             {
-                "person": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
-                "ownership_percentage": 33.33,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
+                "percentage": 33.33,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
             {
-                "person": {"id": "2b44c90e8e0448a3b75399e66a220a1d"},
-                "ownership_percentage": 33.34,
-                "ownership_start_date": "2020-01-01",
-                "ownership_end_date": None,
+                "owner": {"id": "2b44c90e8e0448a3b75399e66a220a1d"},
+                "percentage": 33.34,
+                "start_date": "2020-01-01",
+                "end_date": None,
             },
         ],
     ],
@@ -627,19 +612,19 @@ def test__api__apartment__update__clear_owners(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner_data: list):
     ap: Apartment = ApartmentFactory.create()
-    OwnerFactory.create(apartment=ap)
+    OwnershipFactory.create(apartment=ap)
     PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
     PersonFactory.create(uuid=UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
     PersonFactory.create(uuid=UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
 
     data = ApartmentDetailSerializer(ap).data
-    data["owners"] = owner_data
+    data["ownerships"] = owner_data
 
     response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
     assert response.status_code == status.HTTP_200_OK, response.json()
 
     ap.refresh_from_db()
-    assert ap.owners.all().count() == len(owner_data)
+    assert ap.ownerships.all().count() == len(owner_data)
 
     get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
     assert response.json() == get_response.json()
@@ -663,7 +648,7 @@ def test__api__apartment__delete(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
-    OwnerFactory.create(apartment=ap)
+    OwnershipFactory.create(apartment=ap)
 
     url = reverse("hitas:apartment-detail", kwargs={"uuid": ap.uuid.hex})
     with pytest.raises(ProtectedError):  # TODO: Return better error message from the API?
@@ -697,9 +682,9 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__first_name="Megatron")
-    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__last_name="Opetimus Prime")
-    OwnerFactory.create(apartment__state=ApartmentState.FREE, person__social_security_number="010199-123A")
+    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__first_name="Megatron")
+    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__last_name="Opetimus Prime")
+    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__social_security_number="010199-123A")
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 

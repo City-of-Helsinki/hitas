@@ -12,7 +12,7 @@ from hitas.tests.factories.housing_company import (
     HousingCompanyFactory,
     RealEstateFactory,
 )
-from hitas.tests.factories.person import OwnerFactory, PersonFactory
+from hitas.tests.factories.person import OwnershipFactory, PersonFactory
 from hitas.tests.factories.postal_code import HitasPostalCodeFactory
 from hitas.tests.factories.property_manager import PropertyManagerFactory
 from hitas.tests.factories.user import UserFactory

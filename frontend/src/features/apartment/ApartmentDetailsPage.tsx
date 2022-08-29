@@ -6,7 +6,7 @@ import {Link} from "react-router-dom";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
 import {DetailField, QueryStateHandler} from "../../common/components";
-import {IApartmentDetails, IOwner} from "../../common/models";
+import {IApartmentDetails, IOwnership} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 const SalesCondition = ({
@@ -120,11 +120,11 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                     <div className="columns">
                                         <div className="column">
                                             <label className="detail-field-label">Omistajat</label>
-                                            {data.owners.map((owner: IOwner) => (
+                                            {data.ownerships.map((ownership: IOwnership) => (
                                                 <DetailField
-                                                    key={owner.person.id}
-                                                    label={`${owner.person.first_name} ${owner.person.last_name} ${owner.person.social_security_number}`}
-                                                    value={`Omistusosuus: ${owner.ownership_percentage}%`}
+                                                    key={ownership.owner.id}
+                                                    label={`${ownership.owner.first_name} ${ownership.owner.last_name} ${ownership.owner.social_security_number}`}
+                                                    value={`Omistusosuus: ${ownership.percentage}%`}
                                                 />
                                             ))}
                                             <DetailField

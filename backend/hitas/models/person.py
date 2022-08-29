@@ -5,15 +5,10 @@ from hitas.models._base import ExternalHitasModel
 
 
 class Person(ExternalHitasModel):
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
-    # 'Henkilötunnus'
-    social_security_number = models.CharField(max_length=128, blank=True, null=True)
-
+    first_name = models.CharField(max_length=256)
+    last_name = models.CharField(max_length=256)
+    social_security_number = models.CharField(max_length=11, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    street_address = models.CharField(max_length=128)
-    postal_code = models.CharField(max_length=5)
-    city = models.CharField(max_length=1024)
 
     class Meta:
         verbose_name = _("Person")

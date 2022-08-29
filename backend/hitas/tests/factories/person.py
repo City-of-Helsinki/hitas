@@ -1,11 +1,8 @@
-from datetime import date
-
 import factory
-from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from hitas.models import Owner, Person
+from hitas.models import Ownership, Person
 
 fake = Faker(locale="fi_FI")
 
@@ -18,17 +15,14 @@ class PersonFactory(DjangoModelFactory):
     last_name = factory.Faker("last_name")
     social_security_number = factory.Faker("ssn")
     email = factory.Faker("email")
-    street_address = factory.Faker("street_address")
-    postal_code = factory.Faker("postcode")
-    city = factory.Faker("city")
 
 
-class OwnerFactory(DjangoModelFactory):
+class OwnershipFactory(DjangoModelFactory):
     class Meta:
-        model = Owner
+        model = Ownership
 
     apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
-    person = factory.SubFactory("hitas.tests.factories.PersonFactory")
-    ownership_percentage = 100
-    ownership_start_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    ownership_end_date = None
+    owner = factory.SubFactory("hitas.tests.factories.PersonFactory")
+    percentage = 100
+    start_date = None
+    end_date = None
