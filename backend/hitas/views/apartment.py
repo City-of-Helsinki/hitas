@@ -8,11 +8,11 @@ from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 
-from hitas.models import Apartment, Building, HousingCompany, Owner
+from hitas.models import Apartment, Building, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
 from hitas.models.utils import validate_share_numbers
 from hitas.views.codes import ApartmentTypeSerializer
-from hitas.views.owner import OwnerSerializer
+from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasDecimalField,
     HitasEnumField,
@@ -33,12 +33,12 @@ class ApartmentFilterSet(HitasFilterSet):
     postal_code = filters.CharFilter(field_name="building__real_estate__housing_company__postal_code__value")
     owner_name = filters.CharFilter(method="owner_name_filter")
     owner_social_security_number = filters.CharFilter(
-        field_name="owners__person__social_security_number", lookup_expr="icontains"
+        field_name="ownerships__owner__social_security_number", lookup_expr="icontains"
     )
 
     def owner_name_filter(self, queryset, name, value):
         return queryset.filter(
-            Q(owners__person__first_name__icontains=value) | Q(owners__person__last_name__icontains=value)
+            Q(ownerships__owner__first_name__icontains=value) | Q(ownerships__owner__last_name__icontains=value)
         )
 
     class Meta:
@@ -77,36 +77,36 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     building = UUIDRelatedField(queryset=Building.objects.all())
     real_estate = serializers.SerializerMethodField()
     housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
-    owners = OwnerSerializer(many=True, read_only=False)
+    ownerships = OwnershipSerializer(many=True, read_only=False)
 
     def get_real_estate(self, instance: Apartment) -> str:
         return instance.building.real_estate.uuid.hex
 
-    def validate_owners(self, owners: OrderedDict):
-        if owners == []:
-            return owners
+    def validate_ownerships(self, ownerships: OrderedDict):
+        if not ownerships:
+            return ownerships
 
-        for owner in owners:
-            op = owner["ownership_percentage"]
+        for owner in ownerships:
+            op = owner["percentage"]
             if not 0 < op <= 100:
                 raise ValidationError(
                     {
-                        "ownership_percentage": _(
+                        "percentage": _(
                             "Ownership percentage greater than 0 and less than or equal to 100. (Given value was {})"
                         ).format(op)
                     },
                 )
 
-        if (sum_op := sum(o["ownership_percentage"] for o in owners)) != 100:
+        if (sum_op := sum(o["percentage"] for o in ownerships)) != 100:
             raise ValidationError(
                 {
-                    "ownership_percentage": _(
-                        "Ownership percentage of all owners combined must be equal to 100. (Given sum was {})"
+                    "percentage": _(
+                        "Ownership percentage of all ownerships combined must be equal to 100. (Given sum was {})"
                     ).format(sum_op)
                 }
             )
 
-        return owners
+        return ownerships
 
     def validate(self, data: Union[OrderedDict, Apartment]):
         if type(data) == OrderedDict:
@@ -116,30 +116,30 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return data
 
     def create(self, validated_data: dict[str, Any]):
-        owners = validated_data.pop("owners")
+        ownerships = validated_data.pop("ownerships")
         instance: Apartment = super().create(validated_data)
-        for owner_data in owners:
-            Owner.objects.create(apartment=instance, **owner_data)
+        for owner_data in ownerships:
+            Ownership.objects.create(apartment=instance, **owner_data)
         return instance
 
     def update(self, instance: Apartment, validated_data: dict[str, Any]):
-        owners = validated_data.pop("owners")
+        ownerships = validated_data.pop("ownerships")
         instance: Apartment = super().update(instance, validated_data)
 
-        if not owners:
-            instance.owners.all().delete()
+        if not ownerships:
+            instance.ownerships.all().delete()
 
-        owner_objs = []
-        for owner_data in owners:
-            person = owner_data.pop("person")
-            owner_obj, _ = Owner.objects.update_or_create(apartment=instance, person=person, defaults={**owner_data})
-            owner_objs.append(owner_obj)
+        ownership_objs = []
+        for owner_data in ownerships:
+            owner = owner_data.pop("owner")
+            owner_obj, _ = Ownership.objects.update_or_create(apartment=instance, owner=owner, defaults={**owner_data})
+            ownership_objs.append(owner_obj)
 
-        # Using `instance.owners.set(owner_objs)` does not work here
-        # due to the `Owner.apartment` field isn't nullable, so the set method fails silently
-        for owner in instance.owners.all():
-            if owner not in owner_objs:
-                owner.delete()
+        # Using `instance.ownerships.set(ownership_objs)` does not work here
+        # due to the `Ownership.apartment` field isn't nullable, so the set method fails silently
+        for ownership in instance.ownerships.all():
+            if ownership not in ownership_objs:
+                ownership.delete()
 
         return instance
 
@@ -166,7 +166,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "building",
             "real_estate",
             "housing_company",
-            "owners",
+            "ownerships",
             "notes",
         ]
 
@@ -187,7 +187,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "stair",
             "completion_date",
             "housing_company",
-            "owners",
+            "ownerships",
         ]
 
 
@@ -229,7 +229,7 @@ class ApartmentViewSet(HitasModelViewSet):
 
     def get_list_queryset(self):
         return (
-            Apartment.objects.prefetch_related("owners", "owners__person")
+            Apartment.objects.prefetch_related("ownerships", "ownerships__owner")
             .select_related(
                 "building",
                 "building__real_estate",

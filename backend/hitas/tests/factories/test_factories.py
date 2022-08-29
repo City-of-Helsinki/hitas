@@ -14,7 +14,7 @@ from hitas.tests import factories
         factories.DeveloperFactory,
         factories.FinancingMethodFactory,
         factories.HousingCompanyFactory,
-        factories.OwnerFactory,
+        factories.OwnershipFactory,
         factories.PersonFactory,
         factories.HitasPostalCodeFactory,
         factories.PropertyManagerFactory,

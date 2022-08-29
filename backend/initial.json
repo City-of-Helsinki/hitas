@@ -3758,102 +3758,102 @@
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 1,
     "fields": {
       "apartment": 1,
-      "person": 1,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2022-01-01",
-      "ownership_end_date": null
+      "owner": 1,
+      "percentage": "100.00",
+      "start_date": "2022-01-01",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 2,
     "fields": {
       "apartment": 2,
-      "person": 2,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2010-12-03",
-      "ownership_end_date": null
+      "owner": 2,
+      "percentage": "100.00",
+      "start_date": "2010-12-03",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 3,
     "fields": {
       "apartment": 3,
-      "person": 3,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2021-08-27",
-      "ownership_end_date": null
+      "owner": 3,
+      "percentage": "100.00",
+      "start_date": "2021-08-27",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 4,
     "fields": {
       "apartment": 4,
-      "person": 4,
-      "ownership_percentage": "50.00",
-      "ownership_start_date": "2021-07-31",
-      "ownership_end_date": null
+      "owner": 4,
+      "percentage": "50.00",
+      "start_date": "2021-07-31",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 5,
     "fields": {
       "apartment": 5,
-      "person": 5,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2018-09-08",
-      "ownership_end_date": null
+      "owner": 5,
+      "percentage": "100.00",
+      "start_date": "2018-09-08",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 6,
     "fields": {
       "apartment": 6,
-      "person": 6,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2010-05-24",
-      "ownership_end_date": null
+      "owner": 6,
+      "percentage": "100.00",
+      "start_date": "2010-05-24",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 7,
     "fields": {
       "apartment": 7,
-      "person": 7,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2018-11-12",
-      "ownership_end_date": null
+      "owner": 7,
+      "percentage": "100.00",
+      "start_date": "2018-11-12",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 8,
     "fields": {
       "apartment": 8,
-      "person": 8,
-      "ownership_percentage": "100.00",
-      "ownership_start_date": "2016-08-13",
-      "ownership_end_date": null
+      "owner": 8,
+      "percentage": "100.00",
+      "start_date": "2016-08-13",
+      "end_date": null
     }
   },
   {
-    "model": "hitas.owner",
+    "model": "hitas.ownership",
     "pk": 9,
     "fields": {
       "apartment": 4,
-      "person": 9,
-      "ownership_percentage": "50.00",
-      "ownership_start_date": "2021-07-31",
-      "ownership_end_date": null
+      "owner": 9,
+      "percentage": "50.00",
+      "start_date": "2021-07-31",
+      "end_date": null
     }
   },
   {
@@ -3864,9 +3864,7 @@
       "first_name": "Matti",
       "last_name": "Meikäläinen",
       "social_security_number": "010199-123A",
-      "email": "matti@hitas.fi",
-      "street_address": "Matinkatu 22",
-      "postal_code": 3
+      "email": "matti@hitas.fi"
     }
   },
   {
@@ -3877,9 +3875,7 @@
       "first_name": "Kerttu",
       "last_name": "Kuusisto",
       "social_security_number": "050462-494C",
-      "email": "juhanisaari@example.com",
-      "street_address": "Nordenskiöldinkuja 022",
-      "postal_code": 11
+      "email": "juhanisaari@example.com"
     }
   },
   {
@@ -3890,9 +3886,7 @@
       "first_name": "Juhani",
       "last_name": "Kujala",
       "social_security_number": "300505A522H",
-      "email": "kaarinalehto@example.com",
-      "street_address": "Ilveskuja 148",
-      "postal_code": 17
+      "email": "kaarinalehto@example.com"
     }
   },
   {
@@ -3903,9 +3897,7 @@
       "first_name": "Kerttu",
       "last_name": "Asikainen",
       "social_security_number": "151124-088K",
-      "email": "mattigustafsson@example.org",
-      "street_address": "Jätkäsaarenkatu 216",
-      "postal_code": 22
+      "email": "mattigustafsson@example.org"
     }
   },
   {
@@ -3916,9 +3908,7 @@
       "first_name": "Jaakko",
       "last_name": "Virtanen",
       "social_security_number": "230919-757D",
-      "email": "emiliaseppanen@example.net",
-      "street_address": "Pyörökivenkatu 52",
-      "postal_code": 27
+      "email": "emiliaseppanen@example.net"
     }
   },
   {
@@ -3929,9 +3919,7 @@
       "first_name": "Marjaana",
       "last_name": "Myllymäki",
       "social_security_number": "160339-233A",
-      "email": "artturiihimaki@example.org",
-      "street_address": "Malminkartanontie 901",
-      "postal_code": 33
+      "email": "artturiihimaki@example.org"
     }
   },
   {
@@ -3942,9 +3930,7 @@
       "first_name": "Seppo",
       "last_name": "Lahtinen",
       "social_security_number": "211283-058H",
-      "email": "ensio55@example.org",
-      "street_address": "Tuomarinkyläntie 1",
-      "postal_code": 37
+      "email": "ensio55@example.org"
     }
   },
   {
@@ -3955,9 +3941,7 @@
       "first_name": "Riitta",
       "last_name": "Ojanen",
       "social_security_number": "160288-587K",
-      "email": "onurmi@example.org",
-      "street_address": "Capellan puistokuja 422",
-      "postal_code": 8
+      "email": "onurmi@example.org"
     }
   },
   {
@@ -3968,9 +3952,7 @@
       "first_name": "Katariina",
       "last_name": "Virna",
       "social_security_number": "111269-222X",
-      "email": null,
-      "street_address": "Joukahaisenkatu 3",
-      "postal_code": 31
+      "email": null
     }
   },
   {

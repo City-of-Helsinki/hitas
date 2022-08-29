@@ -23,7 +23,7 @@ from hitas.models import (
     HitasPostalCode,
     HousingCompany,
     HousingCompanyState,
-    Owner,
+    Ownership,
     Person,
     PropertyManager,
     RealEstate,
@@ -32,7 +32,7 @@ from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
-    apartment_owners,
+    apartment_ownerships,
     apartments,
     codebooks,
     codes,
@@ -166,7 +166,7 @@ def run(
             print()
 
             # Apartment owners
-            create_owners(connection, converted_data)
+            create_ownerships(connection, converted_data)
 
 
 def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
@@ -281,7 +281,7 @@ def create_apartments(
     return apartments_by_id
 
 
-def split_owner_name(name) -> Tuple[str, str]:
+def split_person_name(name) -> Tuple[str, str]:
     if name:
         splitted_name = name.split(", ", maxsplit=1)
         if len(splitted_name) == 2:
@@ -292,37 +292,41 @@ def split_owner_name(name) -> Tuple[str, str]:
     return "", ""
 
 
-def create_owners(connection: Connection, converted_data: ConvertedData) -> None:
+def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
     count = 0
     bulk_persons = []
-    bulk_owners = []
+    bulk_ownerships = []
 
-    for owner in connection.execute(select(apartment_owners).where(apartment_owners.c.apartment_id != 0)).fetchall():
+    for ownership in connection.execute(
+        select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
+    ).fetchall():
         new_person = Person()
-        new_person.first_name, new_person.last_name = split_owner_name(owner["name"])
-        new_person.social_security_number = owner["social_security_number"]
+        new_person.first_name, new_person.last_name = split_person_name(ownership["name"])
+        new_person.social_security_number = ownership["social_security_number"]
+        new_person.legacy_social_security_number = True
+        new_person.clean()
         bulk_persons.append(new_person)
 
-        new = Owner()
-        new.apartment = converted_data.apartments_by_oracle_id[owner["apartment_id"]]
-        new.person = new_person
-        new.ownership_percentage = owner["percentage"]
-        new.ownership_start_date = None
-        new.ownership_end_date = None
+        new = Ownership()
+        new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
+        new.owner = new_person
+        new.percentage = ownership["percentage"]
+        new.start_date = None
+        new.end_date = None
 
-        bulk_owners.append(new)
+        bulk_ownerships.append(new)
         count += 1
 
         if len(bulk_persons) == 1000:
             Person.objects.bulk_create(bulk_persons)
-            Owner.objects.bulk_create(bulk_owners)
+            Ownership.objects.bulk_create(bulk_ownerships)
 
             bulk_persons = []
-            bulk_owners = []
+            bulk_ownerships = []
 
     if len(bulk_persons):
         Person.objects.bulk_create(bulk_persons)
-        Owner.objects.bulk_create(bulk_owners)
+        Ownership.objects.bulk_create(bulk_ownerships)
 
     print(f"Loaded {count} owners.")
     print()
@@ -496,7 +500,7 @@ def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
 
 
 def do_truncate():
-    Owner.objects.all().delete()
+    Ownership.objects.all().delete()
     Apartment.objects.all().delete()
     ApartmentType.objects.all().delete()
     Building.objects.all().delete()

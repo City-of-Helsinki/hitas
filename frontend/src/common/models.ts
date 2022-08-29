@@ -117,7 +117,7 @@ export interface IApartment {
     stair: string;
     date: string | null;
     housing_company: string;
-    owners: Array<IOwner>;
+    ownerships: Array<IOwnership>;
 }
 
 export interface IApartmentDetails {
@@ -141,7 +141,7 @@ export interface IApartmentDetails {
     building: string;
     real_estate: string;
     housing_company: IHousingCompany;
-    owners: Array<IOwner>;
+    ownerships: Array<IOwnership>;
     notes: string | null;
 }
 
@@ -163,11 +163,11 @@ export interface IPerson {
     address: IAddress;
 }
 
-export interface IOwner {
-    person: IPerson;
-    ownership_percentage: number;
-    ownership_start_date: string | null;
-    ownership_end_date: string | null;
+export interface IOwnership {
+    owner: IPerson;
+    percentage: number;
+    start_date: string | null;
+    end_date: string | null;
 }
 
 export interface PageInfo {

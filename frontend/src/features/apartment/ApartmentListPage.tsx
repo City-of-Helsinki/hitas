@@ -5,14 +5,14 @@ import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery} from "../../app/services";
 import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
-import {IAddress, IApartment, IApartmentListResponse, IOwner} from "../../common/models";
+import {IAddress, IApartment, IApartmentListResponse, IOwnership} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 interface ApartmentListItemProps {
     id: string;
     apartmentNumber: number;
     stair: string;
-    owners: IOwner[];
+    ownerships: IOwnership[];
     apartmentType: string;
     surfaceArea: number;
     address: IAddress;
@@ -23,15 +23,15 @@ const ApartmentListItem = ({
     id,
     apartmentNumber,
     stair,
-    owners,
+    ownerships,
     apartmentType,
     surfaceArea,
     address,
     state,
 }: ApartmentListItemProps): JSX.Element => {
-    // Combine owners into a single formatted string
-    const ownersString = owners
-        .map((o) => `${o.person.last_name} ${o.person.first_name} (${o.person.social_security_number})`)
+    // Combine ownerships into a single formatted string
+    const ownershipsString = ownerships
+        .map((o) => `${o.owner.last_name} ${o.owner.first_name} (${o.owner.social_security_number})`)
         .join(", ");
 
     return (
@@ -42,7 +42,7 @@ const ApartmentListItem = ({
                     {apartmentNumber}
                 </div>
                 <div className="details">
-                    <div className="owner">{`Omistaja: ${ownersString}`}</div>
+                    <div className="ownership">{`Omistaja: ${ownershipsString}`}</div>
                     <div className="rooms">{apartmentType}</div>
                     <div className="area">{surfaceArea} m²</div>
                     <div className="address">{formatAddress(address)}</div>
@@ -78,7 +78,7 @@ export const ApartmentResultsList = ({filterParams}): JSX.Element => {
                             id={item.id}
                             apartmentNumber={item.apartment_number}
                             stair={item.stair}
-                            owners={item.owners}
+                            ownerships={item.ownerships}
                             apartmentType={item.apartment_type}
                             surfaceArea={item.surface_area}
                             address={item.address}

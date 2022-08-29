@@ -2258,7 +2258,7 @@ components:
         - apartment_number
         - completion_date
         - housing_company
-        - owners
+        - ownerships
       properties:
         id:
           description: Apartment ID
@@ -2286,12 +2286,12 @@ components:
           nullable: true
         housing_company:
           $ref: '#/components/schemas/MinimalHousingCompany'
-        owners:
-          description: List of apartment's owners
+        ownerships:
+          description: List of apartment's ownerships
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/Owner'
+            $ref: '#/components/schemas/Ownership'
 
     ApartmentDetails:
       description: Single apartment details
@@ -2305,7 +2305,7 @@ components:
         - apartment_number
         - completion_date
         - housing_company
-        - owners
+        - ownerships
       properties:
         id:
           description: Apartment ID
@@ -2374,43 +2374,45 @@ components:
           readOnly: true
         housing_company:
           $ref: '#/components/schemas/MinimalHousingCompany'
-        owners:
-          description: List of apartment's owners
+        ownerships:
+          description: List of apartment's ownerships
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/Owner'
+            $ref: '#/components/schemas/Ownership'
         notes:
           type: string
           nullable: true
 
-    Owner:
-      description: Owner information
+    Ownership:
+      description: Ownership information
       type: object
       required:
-        - person
-        - ownership_percentage
-        - ownership_start_date
-        - ownership_end_date
+        - owner
+        - percentage
+        - start_date
+        - end_date
       properties:
-        person:
+        owner:
           $ref: '#/components/schemas/Person'
-        ownership_percentage:
+        percentage:
           description: Percentage that the person owns of the apartment
           type: number
-        ownership_start_date:
+          minimum: 0
+          maximum: 100
+        start_date:
           description: Date owner took ownership of the apartment
           type: string
           format: date
           nullable: true
-        ownership_end_date:
+        end_date:
           description: Date owner released ownership of the apartment
           type: string
           format: date
           nullable: true
 
     Person:
-      description: Owner information
+      description: Person information
       type: object
       required:
         - id
@@ -2418,7 +2420,6 @@ components:
         - last_name
         - social_security_number
         - email
-        - address
       properties:
         id:
           description: ID of this person
@@ -2442,8 +2443,6 @@ components:
           type: string
           example: martti.virtanen@example.com
           nullable: true
-        address:
-          $ref: '#/components/schemas/Address'
 
     Address:
       description: Address information

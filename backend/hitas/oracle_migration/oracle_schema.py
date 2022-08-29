@@ -162,7 +162,7 @@ apartments = Table(
     ForeignKeyConstraint(["additional_info_key", "id"], ["HITLISAT.type", "HITLISAT.object_id"]),
 )
 
-apartment_owners = Table(
+apartment_ownerships = Table(
     "HITHUONEOMISTAJUUS",
     metadata_obj,
     Column("KG_HOTUNNUS", Integer, key="id", primary_key=True),
