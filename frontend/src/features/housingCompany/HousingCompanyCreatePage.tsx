@@ -8,10 +8,11 @@ import {
     useGetBuildingTypesQuery,
     useGetDevelopersQuery,
     useGetFinancingMethodsQuery,
+    useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
 } from "../../app/services";
 import {FormInputField} from "../../common/components";
-import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPropertyManager} from "../../common/models";
+import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IPropertyManager} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = (): JSX.Element => {
@@ -84,9 +85,12 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     error={error}
                 />
                 <FormInputField
-                    inputType={"postalCode"}
+                    inputType="relatedModel"
                     label="Postinumero"
                     fieldPath="address.postal_code"
+                    queryFunction={useGetPostalCodesQuery}
+                    relatedModelSearchField="value"
+                    getRelatedModelLabel={(obj: IPostalCode) => obj.value}
                     required
                     formData={formData}
                     setFormData={setFormData}

@@ -7,6 +7,7 @@ import {
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
+    IPostalCodeResponse,
 } from "../common/models";
 
 declare global {
@@ -44,6 +45,13 @@ export const hitasApi = createApi({
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
                 },
+            }),
+        }),
+        // Postal codes
+        getPostalCodes: builder.query<IPostalCodeResponse, object>({
+            query: (params: object) => ({
+                url: "postal-codes",
+                params: params,
             }),
         }),
         // Apartments
@@ -91,6 +99,7 @@ export const {
     useCreateHousingCompanyMutation,
     useGetApartmentsQuery,
     useGetApartmentDetailQuery,
+    useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,
