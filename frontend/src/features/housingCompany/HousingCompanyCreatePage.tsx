@@ -45,8 +45,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         createHousingCompany(formData);
     };
 
-    console.log(formData.sales_price_catalogue_confirmation_date);
-
     return (
         <div className="view--create-company">
             <h1 className="main-heading">
