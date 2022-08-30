@@ -58,5 +58,8 @@
     "eslint-plugin-react": "^7.30.0",
     "prettier": "^2.6.2",
     "react-scripts": "^5.0.1"
+  },
+  "resolutions": {
+    "@svgr/webpack": "^6.3.1"
   }
 }
