@@ -225,6 +225,12 @@ export interface PageInfo {
     };
 }
 
+export interface IPostalCode {
+    value: string;
+    city: string | null;
+    cost_area: string;
+}
+
 // List response interfaces
 
 export interface IHousingCompanyListResponse {
@@ -240,4 +246,9 @@ export interface IApartmentListResponse {
 export interface ICodeResponse {
     page: PageInfo;
     contents: ICode[];
+}
+
+export interface IPostalCodeResponse {
+    page: PageInfo;
+    contents: IPostalCode[];
 }
