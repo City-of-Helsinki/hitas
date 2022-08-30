@@ -73,7 +73,7 @@ export default function FormInputField({
                 setIsInvalid(true);
             }
         }
-    }, [error]);
+    }, [error, errorMessage, setErrorMessage, fieldPath]);
 
     const commonProps = {
         id: `input-${fieldPath}`,
