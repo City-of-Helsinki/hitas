@@ -2293,6 +2293,75 @@ components:
           items:
             $ref: '#/components/schemas/Ownership'
 
+    ApartmentPrices:
+      description: Single apartment price information
+      type: object
+      properties:
+        debt_free_purchase_price:
+          description: TBD
+          type: number
+          minimum: 0
+          nullable: true
+          example: 51222
+        primary_loan_amount:
+          description: TBD
+          type: number
+          minimum: 0
+          nullable: true
+          example: 4208
+        acquisition_price:
+          description: TBD
+          type: number
+          minimum: 0
+          nullable: true
+          example: 55430
+        purchase_price:
+          description: TBD
+          type: number
+          minimum: 0
+          nullable: true
+          example: 51222
+        first_purchase_date:
+          description: TBD
+          type: string
+          format: date
+          nullable: true
+          example: 1985-12-10
+        second_purchase_date:
+          description: TBD
+          type: string
+          format: date
+          nullable: true
+          example: 1989-11-17
+        construction:
+          description: Single apartment construction price information
+          type: object
+          properties:
+            loans:
+              description: Loans during construction
+              type: number
+              minimum: 0
+              nullable: true
+              example: 9805
+            interest:
+              description: Interest during construction
+              type: number
+              minimum: 0
+              nullable: true
+              example: 3618
+            debt_free_purchase_price:
+              description: TBD
+              type: number
+              minimum: 0
+              nullable: true
+              example: 18281
+            additional_work:
+              description: TBD
+              type: number
+              minimum: 0
+              nullable: true
+              example: 8610
+
     ApartmentDetails:
       description: Single apartment details
       type: object
@@ -2364,24 +2433,8 @@ components:
           type: string
           format: date
           nullable: true
-        debt_free_purchase_price:
-          type: number
-          nullable: true
-        purchase_price:
-          type: number
-          nullable: true
-        acquisition_price:
-          type: number
-          nullable: true
-        primary_loan_amount:
-          type: number
-          nullable: true
-        loans_during_construction:
-          type: number
-          nullable: true
-        interest_during_construction:
-          type: number
-          nullable: true
+        prices:
+          $ref: '#/components/schemas/ApartmentPrices'
         building:
           description: ID of the building this apartment belongs to
           type: string

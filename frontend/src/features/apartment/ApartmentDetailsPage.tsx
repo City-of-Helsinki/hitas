@@ -106,11 +106,11 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                     <div className="row">
                                         <DetailField
                                             label="Kauppakirjahinta"
-                                            value={`${data.purchase_price} €`}
+                                            value={`${data.prices.purchase_price} €`}
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={`${data.acquisition_price} €`}
+                                            value={`${data.prices.acquisition_price} €`}
                                         />
                                         <DetailField
                                             label="Valmistumispäivä"
@@ -150,19 +150,19 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                             }
                                             <DetailField
                                                 label="Luovutushinta"
-                                                value={`${data.debt_free_purchase_price} €`}
+                                                value={`${data.prices.debt_free_purchase_price} €`}
                                             />
                                             <DetailField
                                                 label="Ensisijaislaina"
-                                                value={`${data.primary_loan_amount} €`}
+                                                value={`${data.prices.primary_loan_amount} €`}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset lainat"
-                                                value={`${data.loans_during_construction} €`}
+                                                value={`${data.prices.construction.loans} €`}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset korot"
-                                                value={`${data.interest_during_construction} €`}
+                                                value={`${data.prices.construction.interest} €`}
                                             />
                                         </div>
                                     </div>

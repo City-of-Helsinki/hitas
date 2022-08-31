@@ -141,10 +141,10 @@ apartments = Table(
     Column("N_ENSIJLAINA", Integer, key="primary_loan_amount", nullable=False),
     Column("N_HANKARVO", Integer, key="acquisition_price", nullable=False),
     Column("N_RAKKORKO", Integer, key="interest_during_construction", nullable=False),
-    Column("D_KAUPPVM1", Date),
-    Column("D_KAUPPVM2", Date),
+    Column("D_KAUPPVM1", Date, key="first_purchase_date"),
+    Column("D_KAUPPVM2", Date, key="second_purchase_date"),
     Column("N_RAKLAINA", Integer, key="loans_during_construction", nullable=False),
-    Column("N_RALUOVHINTA", Integer, nullable=False),
+    Column("N_RALUOVHINTA", Integer, key="debt_free_purchase_price_during_construction", nullable=False),
     Column("C_LISATIET", HitasBoolean, nullable=False),
     Column("C_LISATVIITE", String(10), key="additional_info_key", nullable=False),  # Always 'HITHUONE'
     Column("C_MUUTTAJA", String(10), nullable=False),
@@ -155,7 +155,7 @@ apartments = Table(
     Column("N_KIINTLISA", Integer),
     Column("C_PARANNHUOM", HitasBoolean),
     Column("N_PPALA", Float, nullable=False),
-    Column("N_RAKAIKLISATYOT", Integer, nullable=False),
+    Column("N_RAKAIKLISATYOT", Integer, key="additional_work_during_construction", nullable=False),
     Column("C_MYYTAVA", HitasBoolean, nullable=False),
     Column("KG_VTUNNUS", Integer, nullable=False),
     Column("D_VARAPVM", Date),  # Always null

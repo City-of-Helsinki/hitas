@@ -90,6 +90,33 @@ class SharesSerializer(serializers.Serializer):
             return super().validate_empty_values(data)
 
 
+class ConstructionPrices(serializers.Serializer):
+    loans = serializers.IntegerField(source="loans_during_construction", required=False, allow_null=True, min_value=0)
+    additional_work = serializers.IntegerField(
+        source="additional_work_during_construction",
+        required=False,
+        allow_null=True,
+        min_value=0,
+    )
+    interest = serializers.IntegerField(
+        source="interest_during_construction", required=False, allow_null=True, min_value=0
+    )
+    debt_free_purchase_price = serializers.IntegerField(
+        source="debt_free_purchase_price_during_construction", required=False, allow_null=True, min_value=0
+    )
+
+
+class PricesSerializer(serializers.Serializer):
+    debt_free_purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    primary_loan_amount = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    acquisition_price = serializers.IntegerField(read_only=True)
+    purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    first_purchase_date = serializers.DateField(required=False, allow_null=True)
+    second_purchase_date = serializers.DateField(required=False, allow_null=True)
+
+    construction = ConstructionPrices(source="*", required=False, allow_null=True)
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     apartment_type = ApartmentTypeSerializer()
@@ -97,13 +124,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
     shares = SharesSerializer(source="*", required=False, allow_null=True)
-
-    debt_free_purchase_price = HitasDecimalField(required=False, allow_null=True)
-    purchase_price = HitasDecimalField(required=False, allow_null=True)
-    acquisition_price = HitasDecimalField(required=False, allow_null=True)
-    primary_loan_amount = HitasDecimalField(required=False, allow_null=True)
-    loans_during_construction = HitasDecimalField(required=False, allow_null=True)
-    interest_during_construction = HitasDecimalField(required=False, allow_null=True)
+    prices = PricesSerializer(source="*", required=False, allow_null=True)
 
     building = UUIDRelatedField(queryset=Building.objects.all())
     real_estate = serializers.SerializerMethodField()
@@ -181,17 +202,12 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "state",
             "apartment_type",
             "surface_area",
-            "shares",
-            "address",
             "apartment_number",
             "floor",
             "stair",
-            "debt_free_purchase_price",
-            "purchase_price",
-            "acquisition_price",
-            "primary_loan_amount",
-            "loans_during_construction",
-            "interest_during_construction",
+            "shares",
+            "address",
+            "prices",
             "completion_date",
             "building",
             "real_estate",
@@ -238,11 +254,14 @@ class ApartmentViewSet(HitasModelViewSet):
             "share_number_start",
             "share_number_end",
             "debt_free_purchase_price",
-            "purchase_price",
-            "acquisition_price",
             "primary_loan_amount",
+            "purchase_price",
+            "first_purchase_date",
+            "second_purchase_date",
+            "additional_work_during_construction",
             "loans_during_construction",
             "interest_during_construction",
+            "debt_free_purchase_price_during_construction",
             "notes",
             "completion_date",
             "building__uuid",

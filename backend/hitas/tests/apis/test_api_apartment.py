@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -165,12 +164,20 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "floor": ap.floor,
         "stair": ap.stair,
         "completion_date": str(ap.completion_date),
-        "debt_free_purchase_price": float(ap.debt_free_purchase_price),
-        "purchase_price": float(ap.purchase_price),
-        "acquisition_price": float(ap.acquisition_price),
-        "primary_loan_amount": float(ap.primary_loan_amount),
-        "loans_during_construction": float(ap.loans_during_construction),
-        "interest_during_construction": float(ap.interest_during_construction),
+        "prices": {
+            "debt_free_purchase_price": ap.debt_free_purchase_price,
+            "primary_loan_amount": ap.primary_loan_amount,
+            "acquisition_price": ap.debt_free_purchase_price + ap.primary_loan_amount,
+            "purchase_price": ap.purchase_price,
+            "first_purchase_date": ap.first_purchase_date,
+            "second_purchase_date": ap.second_purchase_date,
+            "construction": {
+                "loans": ap.loans_during_construction,
+                "interest": ap.interest_during_construction,
+                "debt_free_purchase_price": ap.debt_free_purchase_price_during_construction,
+                "additional_work": ap.additional_work_during_construction,
+            },
+        },
         "building": ap.building.uuid.hex,
         "real_estate": ap.building.real_estate.uuid.hex,
         "housing_company": {
@@ -230,12 +237,19 @@ def get_apartment_create_data() -> dict[str, Any]:
         "floor": "1",
         "stair": "A",
         "completion_date": "2022-08-26",
-        "debt_free_purchase_price": 12345,
-        "purchase_price": 12345.6,
-        "acquisition_price": Decimal("12345"),
-        "primary_loan_amount": 12345,
-        "loans_during_construction": 12345,
-        "interest_during_construction": 12345,
+        "prices": {
+            "debt_free_purchase_price": 12345,
+            "purchase_price": 23456,
+            "primary_loan_amount": 34567,
+            "first_purchase_date": "2000-01-01",
+            "second_purchase_date": "2020-05-05",
+            "construction": {
+                "loans": 123,
+                "interest": 234,
+                "debt_free_purchase_price": 345,
+                "additional_work": 456,
+            },
+        },
         "building": building.uuid.hex,
         "notes": "Lorem ipsum",
         "ownerships": [
@@ -268,12 +282,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             }
         )
         del data["shares"]
-        del data["debt_free_purchase_price"]
-        del data["purchase_price"]
-        del data["acquisition_price"]
-        del data["primary_loan_amount"]
-        del data["loans_during_construction"]
-        del data["interest_during_construction"]
+        del data["prices"]
 
     response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
     assert response.status_code == status.HTTP_201_CREATED, response.json()
@@ -349,28 +358,47 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         ({"stair": None}, [{"field": "stair", "message": "This field is mandatory and cannot be blank."}]),
         (
-            {"debt_free_purchase_price": -1},
-            [{"field": "debt_free_purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"debt_free_purchase_price": -1}},
+            [
+                {
+                    "field": "prices.debt_free_purchase_price",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
         ),
         (
-            {"purchase_price": -1},
-            [{"field": "purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"purchase_price": -1}},
+            [{"field": "prices.purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
-            {"acquisition_price": -1},
-            [{"field": "acquisition_price", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"primary_loan_amount": -1}},
+            [{"field": "prices.primary_loan_amount", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
-            {"primary_loan_amount": -1},
-            [{"field": "primary_loan_amount", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"construction": {"loans": -1}}},
+            [{"field": "prices.construction.loans", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
-            {"loans_during_construction": -1},
-            [{"field": "loans_during_construction", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"construction": {"interest": -1}}},
+            [{"field": "prices.construction.interest", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
-            {"interest_during_construction": -1},
-            [{"field": "interest_during_construction", "message": "Ensure this value is greater than or equal to 0."}],
+            {"prices": {"construction": {"debt_free_purchase_price": -1}}},
+            [
+                {
+                    "field": "prices.construction.debt_free_purchase_price",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
+        ),
+        (
+            {"prices": {"construction": {"additional_work": -1}}},
+            [
+                {
+                    "field": "prices.construction.additional_work",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
         ),
         ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
         ({"notes": None}, [{"field": "notes", "message": "This field is mandatory and cannot be blank."}]),
@@ -538,12 +566,19 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
         "apartment_number": 9,
         "floor": "5",
         "stair": "X",
-        "debt_free_purchase_price": 22222,
-        "purchase_price": 22222,
-        "acquisition_price": 22222,
-        "primary_loan_amount": 22222,
-        "loans_during_construction": 22222,
-        "interest_during_construction": 22222,
+        "prices": {
+            "debt_free_purchase_price": 11111,
+            "purchase_price": 22222,
+            "primary_loan_amount": 33333,
+            "first_purchase_date": "1999-01-01",
+            "second_purchase_date": "2010-08-01",
+            "construction": {
+                "loans": 44444,
+                "interest": 55555,
+                "debt_free_purchase_price": 66666,
+                "additional_work": 77777,
+            },
+        },
         "building": building.uuid.hex,
         "notes": "Test Notes",
         "ownerships": [],
@@ -564,12 +599,15 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     assert ap.apartment_number == data["apartment_number"]
     assert ap.floor == data["floor"]
     assert ap.stair == data["stair"]
-    assert ap.debt_free_purchase_price == data["debt_free_purchase_price"]
-    assert ap.purchase_price == data["purchase_price"]
-    assert ap.acquisition_price == data["acquisition_price"]
-    assert ap.primary_loan_amount == data["primary_loan_amount"]
-    assert ap.loans_during_construction == data["loans_during_construction"]
-    assert ap.interest_during_construction == data["interest_during_construction"]
+    assert ap.debt_free_purchase_price == data["prices"]["debt_free_purchase_price"]
+    assert ap.purchase_price == data["prices"]["purchase_price"]
+    assert ap.primary_loan_amount == data["prices"]["primary_loan_amount"]
+    assert str(ap.first_purchase_date) == data["prices"]["first_purchase_date"]
+    assert str(ap.second_purchase_date) == data["prices"]["second_purchase_date"]
+    assert ap.loans_during_construction == data["prices"]["construction"]["loans"]
+    assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
+    assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
+    assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
     assert ap.building == building
     assert ap.notes == data["notes"]
     assert ap.ownerships.all().count() == 0

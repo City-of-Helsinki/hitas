@@ -256,12 +256,15 @@ def create_apartments(
         new.apartment_number = apartment["apartment_number"]
         new.floor = apartment["floor"]
         new.stair = apartment["stair"]
+        new.first_purchase_date = apartment["first_purchase_date"]
+        new.second_purchase_date = apartment["second_purchase_date"]
         new.debt_free_purchase_price = apartment["debt_free_purchase_price"]
         new.purchase_price = apartment["purchase_price"]
-        new.acquisition_price = apartment["acquisition_price"]
+        new.additional_work_during_construction = apartment["additional_work_during_construction"]
         new.primary_loan_amount = apartment["primary_loan_amount"]
         new.loans_during_construction = apartment["loans_during_construction"]
         new.interest_during_construction = apartment["interest_during_construction"]
+        new.debt_free_purchase_price_during_construction = apartment["debt_free_purchase_price_during_construction"]
         new.completion_date = apartment["completion_date"]
         new.notes = combine_notes(apartment)
 
