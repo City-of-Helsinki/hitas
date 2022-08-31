@@ -159,7 +159,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                                 value={`${data.primary_loan_amount} €`}
                                             />
                                             <DetailField
-                                                label="Rakennusaikaiset loans"
+                                                label="Rakennusaikaiset lainat"
                                                 value={`${data.loans_during_construction} €`}
                                             />
                                             <DetailField
