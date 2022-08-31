@@ -133,7 +133,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                             />
                                             <label className="detail-field-label">Huomioitavaa</label>
                                             <textarea
-                                                value={(data.notes as string) || ""}
+                                                value={data.notes}
                                                 readOnly
                                             />
                                         </div>

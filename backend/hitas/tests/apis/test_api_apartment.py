@@ -401,7 +401,6 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             ],
         ),
         ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
-        ({"notes": None}, [{"field": "notes", "message": "This field is mandatory and cannot be blank."}]),
         ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be blank."}]),
         (
             {

@@ -57,7 +57,7 @@ class Apartment(ExternalHitasModel):
     # 'Luovutushinta (RA)'
     debt_free_purchase_price_during_construction = models.PositiveIntegerField(default=0)
 
-    notes = models.TextField(blank=True)
+    notes = models.TextField(blank=True, null=True)
 
     # 'Hankinta-arvo'
     @property
