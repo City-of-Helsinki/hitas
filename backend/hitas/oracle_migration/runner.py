@@ -268,7 +268,7 @@ def create_apartments(
         new.completion_date = apartment["completion_date"]
         new.notes = combine_notes(apartment)
 
-        if apartment["share_number_start"] != 0:
+        if apartment["share_number_start"] != 0 and apartment["share_number_end"] != 0:
             new.share_number_start = apartment["share_number_start"]
             new.share_number_end = apartment["share_number_end"]
 

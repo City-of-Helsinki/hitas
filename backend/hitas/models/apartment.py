@@ -87,5 +87,24 @@ class Apartment(ExternalHitasModel):
         verbose_name_plural = _("Apartments")
         ordering = ["id"]
 
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_share_number_start_gte_1",
+                check=models.Q(share_number_start__gte=1),
+            ),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_share_number_end_gte_1",
+                check=models.Q(share_number_end__gte=1),
+            ),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_share_number_start_lte_share_number_end",
+                check=models.Q(share_number_end__gte=models.F("share_number_start")),
+            ),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_surface_area_gte_0",
+                check=models.Q(surface_area__gte=0),
+            ),
+        ]
+
     def __str__(self):
         return f"{self.street_address} {self.apartment_number}"
