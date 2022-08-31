@@ -2482,11 +2482,11 @@ components:
           type: string
           example: Helsinki
         cost_area:
-          description: City
+          description: Hitas cost area
           type: integer
           minimum: 1
           maximum: 4
-          example: Helsinki
+          example: 2
 
     HitasHousingCompanyAddress:
       description: Hitas address information for a housing company (includes postal code)
