@@ -2454,8 +2454,10 @@ components:
           items:
             $ref: '#/components/schemas/Ownership'
         notes:
+          description: Apartment notes
           type: string
           nullable: true
+          example: Random notes about the apartment...
 
     Ownership:
       description: Ownership information

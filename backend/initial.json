@@ -776,7 +776,7 @@
       "primary_loan_amount": 44000,
       "loans_during_construction": 55000,
       "interest_during_construction": 66000,
-      "notes": ""
+      "notes": null
     }
   },
   {

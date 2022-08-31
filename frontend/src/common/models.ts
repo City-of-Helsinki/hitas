@@ -159,7 +159,7 @@ export interface IApartmentDetails {
     real_estate: string;
     housing_company: IHousingCompany;
     ownerships: Array<IOwnership>;
-    notes: string | null;
+    notes: string;
 }
 
 export type ApartmentState = "free" | "reserved" | "sold";
