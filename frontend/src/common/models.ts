@@ -227,8 +227,8 @@ export interface PageInfo {
 
 export interface IPostalCode {
     value: string;
-    city: string | null;
-    cost_area: string;
+    city: string;
+    cost_area: number;
 }
 
 // List response interfaces
