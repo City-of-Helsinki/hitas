@@ -115,7 +115,7 @@ export interface IApartment {
     address: IAddress;
     apartment_number: number;
     stair: string;
-    date: string | null;
+    completion_date: string | null;
     housing_company: string;
     ownerships: Array<IOwnership>;
 }
@@ -131,7 +131,7 @@ export interface IApartmentDetails {
     apartment_number: number;
     floor: number;
     stair: string;
-    date: string | null;
+    completion_date: string | null;
     debt_free_purchase_price: number | null;
     purchase_price: number | null;
     acquisition_price: number | null;

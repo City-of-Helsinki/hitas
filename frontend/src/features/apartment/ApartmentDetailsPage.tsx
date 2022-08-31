@@ -114,7 +114,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                         />
                                         <DetailField
                                             label="Valmistumispäivä"
-                                            value={data.date}
+                                            value={data.completion_date}
                                         />
                                     </div>
                                     <div className="columns">
