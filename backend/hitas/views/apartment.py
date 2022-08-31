@@ -46,7 +46,7 @@ class ApartmentFilterSet(HitasFilterSet):
         fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_social_security_number"]
 
 
-class HousingCompanySerializer(EnumSupportSerializerMixin, HitasModelSerializer):
+class HousingCompanySerializer(HitasModelSerializer):
     name = serializers.CharField(source="display_name")
 
     class Meta:
