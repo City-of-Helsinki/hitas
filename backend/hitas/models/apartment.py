@@ -39,19 +39,30 @@ class Apartment(ExternalHitasModel):
     stair = models.CharField(max_length=16)
 
     # 'Luovutushinta'
-    debt_free_purchase_price = HitasModelDecimalField(blank=True, null=True)
+    debt_free_purchase_price = models.PositiveIntegerField(default=0)
+    # 'Ensisijaislaina'
+    primary_loan_amount = models.PositiveIntegerField(default=0)
     # 'Kauppakirjahinta'
     purchase_price = HitasModelDecimalField(blank=True, null=True)
-    # 'Hankinta-arvo'
-    acquisition_price = HitasModelDecimalField(blank=True, null=True)
-    # 'Ensisijaislaina'
-    primary_loan_amount = HitasModelDecimalField(blank=True, null=True)
-    # 'Rakennusaikaiset loans'
-    loans_during_construction = HitasModelDecimalField(blank=True, null=True)
+    # '1. kauppakirjapvm'
+    first_purchase_date = models.DateField(null=True, blank=True)
+    # '2. kauppakirjapvm'
+    second_purchase_date = models.DateField(null=True, blank=True)
+    # 'Rakennusaikaiset lisätyöt'
+    additional_work_during_construction = models.PositiveIntegerField(default=0)
+    # 'Rakennusaikaiset lainat'
+    loans_during_construction = models.PositiveIntegerField(default=0)
     # 'Rakennusaikaiset korot'
-    interest_during_construction = HitasModelDecimalField(blank=True, null=True)
+    interest_during_construction = models.PositiveIntegerField(default=0)
+    # 'Luovutushinta (RA)'
+    debt_free_purchase_price_during_construction = models.PositiveIntegerField(default=0)
 
     notes = models.TextField(blank=True)
+
+    # 'Hankinta-arvo'
+    @property
+    def acquisition_price(self):
+        return self.debt_free_purchase_price + self.primary_loan_amount
 
     @property
     def postal_code(self):

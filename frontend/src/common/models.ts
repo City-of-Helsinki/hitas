@@ -120,6 +120,25 @@ export interface IApartment {
     ownerships: Array<IOwnership>;
 }
 
+export interface IApartmentConstructionPrices {
+    loans: number;
+    additional_work: number;
+    interest: number;
+    debt_free_purchase_price: number;
+}
+
+export interface IApartmentPrices {
+    debt_free_purchase_price: number;
+    primary_loan_amount: number;
+    acquisition_price: number;
+    purchase_price: number;
+
+    first_purchase_date: string | null;
+    second_purchase_date: string | null;
+
+    construction: IApartmentConstructionPrices;
+}
+
 export interface IApartmentDetails {
     readonly id: string;
     state: ApartmentState;
@@ -135,12 +154,7 @@ export interface IApartmentDetails {
     floor: number;
     stair: string;
     completion_date: string | null;
-    debt_free_purchase_price: number | null;
-    purchase_price: number | null;
-    acquisition_price: number | null;
-    primary_loan_amount: number | null;
-    loans_during_construction: number | null;
-    interest_during_construction: number | null;
+    prices: IApartmentPrices;
     building: string;
     real_estate: string;
     housing_company: IHousingCompany;
