@@ -56,15 +56,16 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         {
             "id": ap1.uuid.hex,
             "state": ap1.state.value,
-            "apartment_type": ap1.apartment_type.value,
+            "type": ap1.apartment_type.value,
             "surface_area": float(ap1.surface_area),
             "address": {
                 "street_address": ap1.street_address,
                 "postal_code": hc1.postal_code.value,
                 "city": hc1.postal_code.city,
+                "apartment_number": ap1.apartment_number,
+                "stair": ap1.stair,
+                "floor": ap1.floor,
             },
-            "apartment_number": ap1.apartment_number,
-            "stair": ap1.stair,
             "housing_company": {
                 "id": hc1.uuid.hex,
                 "name": hc1.display_name,
@@ -100,15 +101,16 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         {
             "id": ap2.uuid.hex,
             "state": ap2.state.value,
-            "apartment_type": ap2.apartment_type.value,
+            "type": ap2.apartment_type.value,
             "surface_area": float(ap2.surface_area),
             "address": {
                 "street_address": ap2.street_address,
                 "postal_code": hc2.postal_code.value,
                 "city": hc2.postal_code.city,
+                "apartment_number": ap2.apartment_number,
+                "stair": ap2.stair,
+                "floor": ap2.floor,
             },
-            "apartment_number": ap2.apartment_number,
-            "stair": ap2.stair,
             "housing_company": {
                 "id": hc2.uuid.hex,
                 "name": hc2.display_name,
@@ -143,7 +145,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     assert response.json() == {
         "id": ap.uuid.hex,
         "state": ap.state.value,
-        "apartment_type": {
+        "type": {
             "id": ap.apartment_type.uuid.hex,
             "value": ap.apartment_type.value,
             "description": ap.apartment_type.description,
@@ -159,10 +161,10 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "street_address": ap.street_address,
             "postal_code": hc.postal_code.value,
             "city": hc.postal_code.city,
+            "apartment_number": ap.apartment_number,
+            "floor": ap.floor,
+            "stair": ap.stair,
         },
-        "apartment_number": ap.apartment_number,
-        "floor": ap.floor,
-        "stair": ap.stair,
         "completion_date": str(ap.completion_date),
         "prices": {
             "debt_free_purchase_price": ap.debt_free_purchase_price,
@@ -223,7 +225,7 @@ def get_apartment_create_data() -> dict[str, Any]:
 
     data = {
         "state": ApartmentState.SOLD.value,
-        "apartment_type": {"id": apartment_type.uuid.hex},
+        "type": {"id": apartment_type.uuid.hex},
         "surface_area": 69,
         "shares": {
             "start": 20,
@@ -232,10 +234,10 @@ def get_apartment_create_data() -> dict[str, Any]:
         "address": {
             "street_address": "TestStreet 3",
             "postal_code": building.real_estate.housing_company.postal_code.value,
+            "apartment_number": 58,
+            "floor": "1",
+            "stair": "A",
         },
-        "apartment_number": 58,
-        "floor": "1",
-        "stair": "A",
         "completion_date": "2022-08-26",
         "prices": {
             "debt_free_purchase_price": 12345,
@@ -301,8 +303,8 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
         ({"state": "invalid_state"}, [{"field": "state", "message": "Unsupported ApartmentState 'invalid_state'."}]),
         (
-            {"apartment_type": None},
-            [{"field": "apartment_type", "message": "This field is mandatory and cannot be blank."}],
+            {"type": None},
+            [{"field": "type", "message": "This field is mandatory and cannot be blank."}],
         ),
         (
             {"surface_area": None},
@@ -348,15 +350,39 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be blank."}]),
         (
-            {"apartment_number": None},
-            [{"field": "apartment_number", "message": "This field is mandatory and cannot be blank."}],
+            {
+                "address": {
+                    "street_address": None,
+                    "apartment_number": None,
+                    "stair": None,
+                }
+            },
+            [
+                {"field": "address.street_address", "message": "This field is mandatory and cannot be blank."},
+                {"field": "address.apartment_number", "message": "This field is mandatory and cannot be blank."},
+                {"field": "address.stair", "message": "This field is mandatory and cannot be blank."},
+            ],
         ),
-        ({"apartment_number": "foo"}, [{"field": "apartment_number", "message": "A valid integer is required."}]),
         (
-            {"apartment_number": -1},
-            [{"field": "apartment_number", "message": "Ensure this value is greater than or equal to 0."}],
+            {
+                "address": {
+                    "street_address": "test",
+                    "apartment_number": "foo",
+                    "stair": "1",
+                }
+            },
+            [{"field": "address.apartment_number", "message": "A valid integer is required."}],
         ),
-        ({"stair": None}, [{"field": "stair", "message": "This field is mandatory and cannot be blank."}]),
+        (
+            {
+                "address": {
+                    "street_address": "test",
+                    "apartment_number": -1,
+                    "stair": "1",
+                }
+            },
+            [{"field": "address.apartment_number", "message": "Ensure this value is greater than or equal to 0."}],
+        ),
         (
             {"prices": {"debt_free_purchase_price": -1}},
             [
@@ -551,7 +577,7 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
 
     data = {
         "state": ApartmentState.SOLD.value,
-        "apartment_type": {"id": apartment_type.uuid.hex},
+        "type": {"id": apartment_type.uuid.hex},
         "surface_area": 100,
         "shares": {
             "start": 101,
@@ -561,10 +587,10 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
             "street_address": "TestStreet 3",
             "postal_code": building.real_estate.housing_company.postal_code.value,
             "city": "Helsinki",
+            "apartment_number": 9,
+            "floor": "5",
+            "stair": "X",
         },
-        "apartment_number": 9,
-        "floor": "5",
-        "stair": "X",
         "prices": {
             "debt_free_purchase_price": 11111,
             "purchase_price": 22222,
@@ -595,9 +621,9 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     assert ap.street_address == data["address"]["street_address"]
     assert ap.building.real_estate.housing_company.postal_code.value == data["address"]["postal_code"]
     assert ap.building.real_estate.housing_company.city == data["address"]["city"]
-    assert ap.apartment_number == data["apartment_number"]
-    assert ap.floor == data["floor"]
-    assert ap.stair == data["stair"]
+    assert ap.apartment_number == data["address"]["apartment_number"]
+    assert ap.floor == data["address"]["floor"]
+    assert ap.stair == data["address"]["stair"]
     assert ap.debt_free_purchase_price == data["prices"]["debt_free_purchase_price"]
     assert ap.purchase_price == data["prices"]["purchase_price"]
     assert ap.primary_loan_amount == data["prices"]["primary_loan_amount"]
