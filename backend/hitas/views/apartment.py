@@ -59,6 +59,9 @@ class ApartmentHitasAddressSerializer(serializers.Serializer):
     street_address = serializers.CharField()
     postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
     city = serializers.CharField(source="building.real_estate.housing_company.city", read_only=True)
+    apartment_number = serializers.IntegerField(min_value=0)
+    floor = serializers.CharField(max_length=50, required=False, allow_null=True)
+    stair = serializers.CharField(max_length=16)
 
 
 class SharesSerializer(serializers.Serializer):
@@ -119,7 +122,7 @@ class PricesSerializer(serializers.Serializer):
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
-    apartment_type = ApartmentTypeSerializer()
+    type = ApartmentTypeSerializer(source="apartment_type")
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
@@ -200,11 +203,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         fields = [
             "id",
             "state",
-            "apartment_type",
+            "type",
             "surface_area",
-            "apartment_number",
-            "floor",
-            "stair",
             "shares",
             "address",
             "prices",
@@ -218,7 +218,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
 
 class ApartmentListSerializer(ApartmentDetailSerializer):
-    apartment_type = serializers.CharField(source="apartment_type.value")
+    type = serializers.CharField(source="apartment_type.value")
     housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
 
     class Meta:
@@ -226,11 +226,9 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
         fields = [
             "id",
             "state",
-            "apartment_type",
+            "type",
             "surface_area",
             "address",
-            "apartment_number",
-            "stair",
             "completion_date",
             "housing_company",
             "ownerships",

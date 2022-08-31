@@ -2252,10 +2252,9 @@ components:
       required:
         - id
         - state
-        - apartment_type
+        - type
         - surface_area
         - address
-        - apartment_number
         - completion_date
         - housing_company
         - ownerships
@@ -2267,7 +2266,7 @@ components:
           readOnly: true
         state:
           $ref: '#/components/schemas/ApartmentState'
-        apartment_type:
+        type:
           type: string
           readOnly: true
         surface_area:
@@ -2275,10 +2274,6 @@ components:
           type: number
         address:
           $ref: '#/components/schemas/HitasAddress'
-        apartment_number:
-          type: number
-        stair:
-          type: string
         completion_date:
           description: Date that the apartment was completed on
           type: string
@@ -2368,10 +2363,9 @@ components:
       required:
         - id
         - state
-        - apartment_type
+        - type
         - surface_area
         - address
-        - apartment_number
         - completion_date
         - housing_company
         - shares
@@ -2384,7 +2378,7 @@ components:
           readOnly: true
         state:
           $ref: '#/components/schemas/ApartmentState'
-        apartment_type:
+        type:
           allOf:
             - $ref: '#/components/schemas/Code'
             - $ref: '#/components/schemas/ReadOnlyCode'
@@ -2417,17 +2411,7 @@ components:
               readOnly: true
               example: 50
         address:
-          $ref: '#/components/schemas/HitasAddress'
-        apartment_number:
-          type: number
-        floor:
-          description: Apartment floor number
-          type: string
-          maxLength: 50
-          nullable: true
-          example: "5"
-        stair:
-          type: string
+          $ref: '#/components/schemas/ApartmentAddress'
         completion_date:
           description: Date that the apartment's building was completed on
           type: string
@@ -2584,6 +2568,48 @@ components:
           type: string
           readOnly: true
           example: Helsinki
+
+    ApartmentAddress:
+      description: Apartment address information
+      type: object
+      required:
+        - street_address
+        - postal_code
+        - city
+        - apartment_number
+        - floor
+        - stair
+      properties:
+        street_address:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        postal_code:
+          description: Hitas postal code
+          type: string
+          readOnly: true
+          example: "00100"
+        city:
+          description: City based on the postal code
+          type: string
+          readOnly: true
+          example: Helsinki
+        apartment_number:
+          description: Apartment number
+          type: number
+          minimum: 0
+          example: 14
+        floor:
+          description: Apartment floor
+          type: string
+          maxLength: 50
+          nullable: true
+          example: "5"
+        stair:
+          description: Apartment stair
+          type: string
+          maxLength: 16
+          example: A
 
     HitasAddress:
       description: Hitas address information

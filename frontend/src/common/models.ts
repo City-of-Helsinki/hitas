@@ -107,6 +107,15 @@ export interface IBuilding {
     building_identifier: string | null;
 }
 
+export interface IApartmentAddress {
+    street_address: string;
+    postal_code: string;
+    readonly city?: string; // Always returned when reading, but not required when writing
+    apartment_number: number;
+    floor: string | null;
+    stair: string;
+}
+
 export interface IApartment {
     readonly id: string;
     state: ApartmentState;
@@ -142,17 +151,14 @@ export interface IApartmentPrices {
 export interface IApartmentDetails {
     readonly id: string;
     state: ApartmentState;
-    apartment_type: ICode;
+    type: ICode;
     surface_area: number;
     shares: {
         start: number;
         end: number;
         readonly total: number;
     };
-    address: IAddress;
-    apartment_number: number;
-    floor: number;
-    stair: string;
+    address: IApartmentAddress;
     completion_date: string | null;
     prices: IApartmentPrices;
     building: string;

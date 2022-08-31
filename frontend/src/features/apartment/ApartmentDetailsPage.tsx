@@ -64,12 +64,12 @@ const ApartmentDetailsPage = (): JSX.Element => {
                 </h1>
                 <h2 className={"apartment-stats"}>
                     <span className="apartment-stats--number">
-                        {data.stair}
-                        {data.apartment_number}
+                        {data.address.stair}
+                        {data.address.apartment_number}
                     </span>
-                    <span>{data.apartment_type.value}</span>
+                    <span>{data.type.value}</span>
                     <span>{data.surface_area}m²</span>
-                    <span>{data.floor}.krs</span>
+                    <span>{data.address.floor}.krs</span>
                 </h2>
                 <div className="apartment-action-cards">
                     <Card>
