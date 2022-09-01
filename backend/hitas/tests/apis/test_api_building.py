@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -119,6 +121,71 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.django_db
+def test__api__building__retrieve__invalid_housing_company_id(api_client: HitasAPIClient):
+    hc1: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc1)
+    bu1: Building = BuildingFactory.create(real_estate=re)
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": uuid.uuid4().hex, "real_estate_uuid": re.uuid.hex, "uuid": bu1.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "housing_company_not_found",
+        "message": "Housing company not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
+def test__api__building__retrieve__invalid_real_estate_id(api_client: HitasAPIClient):
+    hc1: HousingCompany = HousingCompanyFactory.create()
+    hc2: HousingCompany = HousingCompanyFactory.create()
+    re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
+    re2: RealEstate = RealEstateFactory.create(housing_company=hc2)
+    bu1: Building = BuildingFactory.create(real_estate=re1)
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc1.uuid.hex, "real_estate_uuid": re2.uuid.hex, "uuid": bu1.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "real_estate_not_found",
+        "message": "Real estate not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
+def test__api__building__retrieve__invalid_building_id(api_client: HitasAPIClient):
+    hc1: HousingCompany = HousingCompanyFactory.create()
+    hc2: HousingCompany = HousingCompanyFactory.create()
+    re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
+    re2: RealEstate = RealEstateFactory.create(housing_company=hc2)
+    Building = BuildingFactory.create(real_estate=re1)
+    bu2: Building = BuildingFactory.create(real_estate=re2)
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={"housing_company_uuid": hc1.uuid.hex, "real_estate_uuid": re1.uuid.hex, "uuid": bu2.uuid.hex},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "building_not_found",
+        "message": "Building not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
 # Create tests
 
 
@@ -153,7 +220,7 @@ def test__api__building__create(api_client: HitasAPIClient, building_identifier)
 @pytest.mark.django_db
 def test__api__building__create__no_building_identifier(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
-    re: RealEstate = RealEstateFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
     data = {
         "address": {
             "postal_code": re.housing_company.postal_code.value,
