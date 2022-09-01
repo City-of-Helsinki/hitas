@@ -52,4 +52,15 @@ class BuildingViewSet(HitasModelViewSet):
         hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
         re_id = self._lookup_model_id_by_uuid(RealEstate, "real_estate_uuid", housing_company_id=hc_id)
 
-        return Building.objects.filter(real_estate__id=re_id).select_related("real_estate").order_by("id")
+        return (
+            Building.objects.filter(real_estate__id=re_id)
+            .select_related("real_estate__housing_company__postal_code")
+            .only(
+                "uuid",
+                "street_address",
+                "building_identifier",
+                "real_estate__housing_company__postal_code__value",
+                "real_estate__housing_company__postal_code__city",
+            )
+            .order_by("id")
+        )
