@@ -9,6 +9,7 @@ import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
 import {ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
+import ApartmentCreatePage from "./features/apartment/ApartmentCreatePage";
 import {HousingCompanyCreatePage, HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
 
 export default function Router() {
@@ -44,6 +45,10 @@ export default function Router() {
                     <Route
                         index
                         element={<ApartmentListPage />}
+                    />
+                    <Route
+                        path="create"
+                        element={<ApartmentCreatePage />}
                     />
                     <Route
                         path=":apartmentId"

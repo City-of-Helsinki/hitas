@@ -1,7 +1,8 @@
 import React from "react";
 
-import {StatusLabel, Tabs} from "hds-react";
+import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
+import {Link} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, QueryStateHandler} from "../../common/components";
@@ -130,7 +131,7 @@ const HousingCompanyDetailsPage = () => {
                             </Tabs.TabPanel>
                         </Tabs>
                     </div>
-                    <div className="upgrade-list__wrapper">
+                    <div className="list-wrapper list-wrapper--upgrades">
                         <h2 className="upgrade-list__heading">Yhtiökohtaiset parannukset</h2>
                         <ul className="upgrade-list__list">
                             <li className="upgrade-list__list-headers">
@@ -153,8 +154,19 @@ const HousingCompanyDetailsPage = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="apartment-list__wrapper">
-                        <h2>Asunnot</h2>
+                    <div className="list-wrapper list-wrapper--apartments">
+                        <h2>
+                            <span>Asunnot</span>
+                            <Link to={`/apartments/create/`}>
+                                <Button
+                                    theme="black"
+                                    size="small"
+                                    iconLeft={<IconPlus />}
+                                >
+                                    Lisää asunto
+                                </Button>
+                            </Link>
+                        </h2>
                         <div className="listing">
                             <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                         </div>
