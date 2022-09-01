@@ -57,6 +57,17 @@ export interface IHousingCompanyDetails {
     };
 }
 
+export interface IApartmentWritable {
+    readonly id?: string;
+    state: "sold" | "reserved" | "free";
+    surface_area: number | null;
+    address: {street_address: string};
+    apartment_number: number | null;
+    stair: string | null;
+    completion_date?: Date;
+    housing_company: {name: string};
+}
+
 export interface IHousingCompanyWritable {
     readonly id?: string;
     name: IHousingCompanyDetailsName;

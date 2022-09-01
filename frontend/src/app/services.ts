@@ -4,6 +4,7 @@ import {
     IApartmentDetails,
     IApartmentListResponse,
     IApartmentQuery,
+    IApartmentWritable,
     ICodeResponse,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
@@ -86,6 +87,16 @@ export const hitasApi = createApi({
                 params: params,
             }),
         }),
+        createApartment: builder.mutation<IApartmentDetails, IApartmentWritable>({
+            query: (data) => ({
+                url: "apartments",
+                method: "POST",
+                body: data,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }),
+        }),
         // Property Manager
         getPropertyManagers: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
@@ -123,6 +134,7 @@ export const {
     useGetPostalCodesQuery,
     useGetApartmentsQuery,
     useGetApartmentDetailQuery,
+    useCreateApartmentMutation,
     useGetPropertyManagersQuery,
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,

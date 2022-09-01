@@ -12,12 +12,24 @@ body
   border-bottom: 1px solid #ccc
   margin: 0 0 32px
 
-  button
-    font-size: $fontsize-body-l
-    margin: $spacing-s 0
-
   .company &
     margin-bottom: 16px
+
+h1, h2, h3
+  button
+    font-size: $fontsize-body-l
+
+.list-wrapper
+  h2
+    width: 100%
+    display: flex
+    justify-content: space-between
+
+    button
+      margin-top: -7px
+
+.main-heading button
+  margin: $spacing-s 0
 
 .results-list .name
   font-weight: 700
