@@ -3,7 +3,7 @@ from uuid import UUID
 from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.models import Building, RealEstate
+from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
 
@@ -49,5 +49,7 @@ class BuildingViewSet(HitasModelViewSet):
     model_class = Building
 
     def get_queryset(self):
-        uuid = self._lookup_id_to_uuid(self.kwargs["real_estate_uuid"])
-        return Building.objects.filter(real_estate__uuid=uuid).select_related("real_estate").order_by("id")
+        hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
+        re_id = self._lookup_model_id_by_uuid(RealEstate, "real_estate_uuid", housing_company_id=hc_id)
+
+        return Building.objects.filter(real_estate__id=re_id).select_related("real_estate").order_by("id")

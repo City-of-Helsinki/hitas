@@ -43,11 +43,19 @@ class HitasModelViewSet(viewsets.ModelViewSet):
             return self.list_serializer_class
         return self.serializer_class
 
-    def _lookup_id_to_uuid(self, s: str) -> UUID:
+    def _lookup_id_to_uuid(self, s: str, model_class=None) -> UUID:
         try:
             return UUID(hex=str(s))
         except ValueError:
-            raise HitasModelNotFound(model=self.model_class)
+            raise HitasModelNotFound(model=model_class if model_class else self.model_class)
+
+    def _lookup_model_id_by_uuid(self, model_class, arg_name, **kwargs):
+        uuid = self._lookup_id_to_uuid(self.kwargs[arg_name], model_class)
+
+        try:
+            return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
+        except model_class.DoesNotExist:
+            raise HitasModelNotFound(model=model_class)
 
     def get_filterset_class(self):
         """Automagically generate a Filter Set class for subclassing ViewSets"""
