@@ -31,6 +31,16 @@ class HitasAnonymizedName(types.TypeDecorator):
         return value if not should_anonymize() else faker().name()
 
 
+class HitasAnonymizedNameCommaSeparated(HitasAnonymizedName):
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+
+        return (
+            value if not should_anonymize() else f"{faker().last_name()}, {faker().first_name()} {faker().first_name()}"
+        )
+
+
 class HitasBoolean(types.TypeDecorator):
     """
     This is either 'K' (true) or 'E' (false) in the database

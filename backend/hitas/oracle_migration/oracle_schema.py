@@ -1,6 +1,11 @@
 from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, Integer, MetaData, String, Table
 
-from hitas.oracle_migration.types import HitasAnonymizedName, HitasAnonymizedSSN, HitasBoolean
+from hitas.oracle_migration.types import (
+    HitasAnonymizedName,
+    HitasAnonymizedNameCommaSeparated,
+    HitasAnonymizedSSN,
+    HitasBoolean,
+)
 
 metadata_obj = MetaData(schema="HIDAS")
 companies = Table(
@@ -167,8 +172,8 @@ apartment_ownerships = Table(
     metadata_obj,
     Column("KG_HOTUNNUS", Integer, key="id", primary_key=True),
     Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False),
-    Column("C_OMNIMI", String(50), key="name"),
-    Column("C_SOTU", String(11), key="social_security_number"),
+    Column("C_OMNIMI", HitasAnonymizedNameCommaSeparated(50), key="name"),
+    Column("C_SOTU", HitasAnonymizedSSN(11), key="social_security_number"),
     Column("C_OMNIMIUPPER", String(50)),
     Column("N_PROSENTTIOSUUS", Float, key="percentage"),
     Column("C_MUUTTAJA", String(10), nullable=False),
