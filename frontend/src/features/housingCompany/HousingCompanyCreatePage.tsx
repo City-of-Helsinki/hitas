@@ -85,6 +85,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <FormInputField
                     inputType="relatedModel"
                     label="Postinumero"
+                    field="value"
                     fieldPath="address.postal_code"
                     queryFunction={useGetPostalCodesQuery}
                     relatedModelSearchField="value"
@@ -120,6 +121,14 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     inputType="money"
                     label="Toteutunut hankinta-arvo"
                     fieldPath="acquisition_price.realized"
+                    formData={formData}
+                    setFormData={setFormData}
+                    error={error}
+                />
+                <FormInputField
+                    inputType="textArea"
+                    label="Huomioitavaa"
+                    fieldPath="notes"
                     formData={formData}
                     setFormData={setFormData}
                     error={error}
@@ -163,6 +172,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <FormInputField
                     inputType="relatedModel"
                     label="Rahoitusmuoto"
+                    field="id"
                     fieldPath="financing_method.id"
                     queryFunction={useGetFinancingMethodsQuery}
                     relatedModelSearchField="value"
@@ -175,6 +185,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <FormInputField
                     inputType="relatedModel"
                     label="Talotyyppi"
+                    field="id"
                     fieldPath="building_type.id"
                     queryFunction={useGetBuildingTypesQuery}
                     relatedModelSearchField="value"
@@ -187,6 +198,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <FormInputField
                     inputType="relatedModel"
                     label="Rakennuttaja"
+                    field="id"
                     fieldPath="developer.id"
                     queryFunction={useGetDevelopersQuery}
                     relatedModelSearchField="value"
@@ -199,19 +211,12 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <FormInputField
                     inputType="relatedModel"
                     label="Isännöitsijä"
+                    field="id"
                     fieldPath="property_manager.id"
                     queryFunction={useGetPropertyManagersQuery}
                     relatedModelSearchField="name"
                     getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
                     required
-                    formData={formData}
-                    setFormData={setFormData}
-                    error={error}
-                />
-                <FormInputField
-                    inputType="textArea"
-                    label="Huomioitavaa"
-                    fieldPath="notes"
                     formData={formData}
                     setFormData={setFormData}
                     error={error}
