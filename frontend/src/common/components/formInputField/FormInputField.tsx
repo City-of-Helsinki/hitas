@@ -4,6 +4,7 @@ import {dotted} from "../../utils";
 import FormDateInputField from "./FormDateInputField";
 import FormDropdownInputField from "./FormDropdownInputField";
 import FormMoneyInputField from "./FormMoneyInputField";
+import FormNumberInputField from "./FormNumberInputField";
 import FormPostalCodeInputField from "./FormPostalCodeInputField";
 import FormRelatedModelInputField from "./FormRelatedModelInputField";
 import FormTextInputField from "./FormTextInputField";
@@ -29,7 +30,7 @@ type FormInputFieldProps = {
     error;
 } & (
     | {
-          inputType?: "text" | "textArea" | "postalCode" | "money" | "date";
+          inputType?: "text" | "textArea" | "postalCode" | "money" | "number" | "date";
       }
     | {
           inputType: "select" | "combobox";
@@ -96,7 +97,16 @@ export default function FormInputField({
                 {...rest}
             />
         );
-    } else if (inputType === "postalCode") {
+    }
+    if (inputType === "number") {
+        return (
+            <FormNumberInputField
+                {...commonProps}
+                {...rest}
+            />
+        );
+    }
+    if (inputType === "postalCode") {
         return (
             <FormPostalCodeInputField
                 {...commonProps}
@@ -104,14 +114,16 @@ export default function FormInputField({
                 {...rest}
             />
         );
-    } else if (inputType === "money") {
+    }
+    if (inputType === "money") {
         return (
             <FormMoneyInputField
                 {...commonProps}
                 {...rest}
             />
         );
-    } else if (inputType === "combobox" || inputType === "select") {
+    }
+    if (inputType === "combobox" || inputType === "select") {
         if (!("options" in rest) || rest.options === undefined || !rest.options.length)
             throw new Error("`options` argument is required when `inputType` is `select` or `combobox`.");
 
@@ -122,7 +134,8 @@ export default function FormInputField({
                 {...rest}
             />
         );
-    } else if (inputType === "date") {
+    }
+    if (inputType === "date") {
         return (
             <FormDateInputField
                 {...commonProps}
@@ -130,7 +143,8 @@ export default function FormInputField({
                 {...rest}
             />
         );
-    } else if (inputType === "relatedModel") {
+    }
+    if (inputType === "relatedModel") {
         if (!("getRelatedModelLabel" in rest) || rest.getRelatedModelLabel === undefined)
             throw new Error("`relatedModelLabel` is required.");
         if (!("queryFunction" in rest) || rest.queryFunction === undefined)
