@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {useGetApartmentsQuery} from "../../app/services";
+import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {IAddress, IApartment, IApartmentListResponse, IOwnership} from "../../common/models";
 import {formatAddress} from "../../common/utils";
@@ -17,6 +17,7 @@ interface ApartmentListItemProps {
     surfaceArea: number;
     address: IAddress;
     state: string;
+    hcId: string;
 }
 
 const ApartmentListItem = ({
@@ -28,6 +29,7 @@ const ApartmentListItem = ({
     surfaceArea,
     address,
     state,
+    hcId,
 }: ApartmentListItemProps): JSX.Element => {
     // Combine ownerships into a single formatted string
     const ownershipsString = ownerships
@@ -35,7 +37,7 @@ const ApartmentListItem = ({
         .join(", ");
 
     return (
-        <Link to={`/apartments/${id}`}>
+        <Link to={`/housing-companies/${hcId}/apartments/${id}`}>
             <li className="results-list__item results-list__item--apartment">
                 <div className="number">
                     {stair}
@@ -55,41 +57,7 @@ const ApartmentListItem = ({
     );
 };
 
-export const ApartmentResultsList = ({filterParams}): JSX.Element => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
-
-    const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
-        return (
-            <>
-                <div className="list-amount">
-                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
-                </div>
-                <div className="list-headers">
-                    <div className="list-header apartment">Asunto</div>
-                    <div className="list-header area">Pinta-ala</div>
-                    <div className="list-header address">Osoite</div>
-                    <div className="list-header state">Tila</div>
-                </div>
-                <ul className="results-list">
-                    {data.contents.map((item: IApartment) => (
-                        <ApartmentListItem
-                            key={item.id}
-                            id={item.id}
-                            apartmentNumber={item.apartment_number}
-                            stair={item.stair}
-                            ownerships={item.ownerships}
-                            apartmentType={item.apartment_type}
-                            surfaceArea={item.surface_area}
-                            address={item.address}
-                            state={item.state}
-                        />
-                    ))}
-                </ul>
-            </>
-        );
-    };
-
+function result(data, error, isLoading, currentPage, setCurrentPage) {
     return (
         <div className="results">
             <QueryStateHandler
@@ -107,6 +75,55 @@ export const ApartmentResultsList = ({filterParams}): JSX.Element => {
             <></>
         </div>
     );
+}
+
+const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
+    return (
+        <>
+            <div className="list-amount">
+                Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
+            </div>
+            <div className="list-headers">
+                <div className="list-header apartment">Asunto</div>
+                <div className="list-header area">Pinta-ala</div>
+                <div className="list-header address">Osoite</div>
+                <div className="list-header state">Tila</div>
+            </div>
+            <ul className="results-list">
+                {data.contents.map((item: IApartment) => (
+                    <ApartmentListItem
+                        key={item.id}
+                        id={item.id}
+                        hcId={item.links.housing_company.id}
+                        apartmentNumber={item.address.apartment_number}
+                        stair={item.address.stair}
+                        ownerships={item.ownerships}
+                        apartmentType={item.type}
+                        surfaceArea={item.surface_area}
+                        address={item.address}
+                        state={item.state}
+                    />
+                ))}
+            </ul>
+        </>
+    );
+};
+
+export const ApartmentResultsList = ({filterParams}): JSX.Element => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
+
+    return result(data, error, isLoading, currentPage, setCurrentPage);
+};
+
+export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Element => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const {data, error, isLoading} = useGetHousingCompanyApartmentsQuery({
+        housingCompanyId: housingCompanyId,
+        params: {page: currentPage},
+    });
+
+    return result(data, error, isLoading, currentPage, setCurrentPage);
 };
 
 const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {

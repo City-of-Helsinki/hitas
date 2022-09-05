@@ -116,14 +116,25 @@ export interface IApartmentAddress {
     stair: string;
 }
 
+export interface IApartmentLink {
+    id: string;
+    link: string;
+}
+
+export interface IApartmentLinks {
+    housing_company: IApartmentLink;
+    real_estate: IApartmentLink;
+    building: IApartmentLink;
+    apartment: IApartmentLink;
+}
+
 export interface IApartment {
     readonly id: string;
     state: ApartmentState;
-    apartment_type: string;
+    links: IApartmentLinks;
+    type: string;
     surface_area: number;
-    address: IAddress;
-    apartment_number: number;
-    stair: string;
+    address: IApartmentAddress;
     completion_date: string | null;
     housing_company: string;
     ownerships: Array<IOwnership>;
@@ -146,6 +157,16 @@ export interface IApartmentPrices {
     second_purchase_date: string | null;
 
     construction: IApartmentConstructionPrices;
+}
+
+export interface IHousingCompanyApartmentQuery {
+    housingCompanyId: string;
+    params: object;
+}
+
+export interface IApartmentQuery {
+    housingCompanyId: string;
+    apartmentId: string;
 }
 
 export interface IApartmentDetails {

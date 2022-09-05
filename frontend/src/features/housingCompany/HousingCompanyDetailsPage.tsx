@@ -7,7 +7,7 @@ import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, QueryStateHandler} from "../../common/components";
 import {IHousingCompanyDetails} from "../../common/models";
 import {formatAddress} from "../../common/utils";
-import {ApartmentResultsList} from "../apartment/ApartmentListPage";
+import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
 const HousingCompanyDetailsPage = () => {
     const params = useParams();
@@ -148,7 +148,7 @@ const HousingCompanyDetailsPage = () => {
                     <div className="apartment-list__wrapper">
                         <h2>Asunnot</h2>
                         <div className="listing">
-                            <ApartmentResultsList filterParams={{housing_company: params.housingCompanyId}} />
+                            <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                         </div>
                         <div className="results"></div>
                     </div>

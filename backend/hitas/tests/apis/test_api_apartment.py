@@ -1,14 +1,12 @@
+import uuid
 from typing import Any
-from uuid import UUID
 
 import pytest
 from django.db.models import ProtectedError
 from django.urls import reverse
-from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas import exceptions
-from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Ownership, Person
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Ownership, Person, RealEstate
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -18,6 +16,7 @@ from hitas.tests.factories import (
     HousingCompanyFactory,
     OwnershipFactory,
     PersonFactory,
+    RealEstateFactory,
 )
 from hitas.views.apartment import ApartmentDetailSerializer
 
@@ -26,107 +25,160 @@ from hitas.views.apartment import ApartmentDetailSerializer
 
 @pytest.mark.django_db
 def test__api__apartment__list__empty(api_client: HitasAPIClient):
-    response = api_client.get(reverse("hitas:apartment-list"))
+    building = BuildingFactory.create()
+
+    response = api_client.get(reverse("hitas:apartment-list", args=[building.real_estate.housing_company.uuid.hex]))
+
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["contents"] == []
-    assert response.json()["page"] == {
-        "size": 0,
-        "current_page": 1,
-        "total_items": 0,
-        "total_pages": 1,
-        "links": {
-            "next": None,
-            "previous": None,
+    assert response.json() == {
+        "contents": [],
+        "page": {
+            "size": 0,
+            "current_page": 1,
+            "total_items": 0,
+            "total_pages": 1,
+            "links": {
+                "next": None,
+                "previous": None,
+            },
         },
     }
 
 
 @pytest.mark.django_db
 def test__api__apartment__list(api_client: HitasAPIClient):
-    ap1: Apartment = ApartmentFactory.create()
-    ap2: Apartment = ApartmentFactory.create()
-    hc1: HousingCompany = ap1.building.real_estate.housing_company
-    hc2: HousingCompany = ap2.building.real_estate.housing_company
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    b: Building = BuildingFactory.create(real_estate=re)
+    ap1: Apartment = ApartmentFactory.create(building=b)
+    ap2: Apartment = ApartmentFactory.create(building=b)
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
-    response = api_client.get(reverse("hitas:apartment-list"))
+    response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
+
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["contents"] == [
-        {
-            "id": ap1.uuid.hex,
-            "state": ap1.state.value,
-            "type": ap1.apartment_type.value,
-            "surface_area": float(ap1.surface_area),
-            "address": {
-                "street_address": ap1.street_address,
-                "postal_code": hc1.postal_code.value,
-                "city": hc1.postal_code.city,
-                "apartment_number": ap1.apartment_number,
-                "stair": ap1.stair,
-                "floor": ap1.floor,
-            },
-            "housing_company": {
-                "id": hc1.uuid.hex,
-                "name": hc1.display_name,
-            },
-            "completion_date": str(ap1.completion_date),
-            "ownerships": [
-                {
-                    "owner": {
-                        "id": o1.owner.uuid.hex,
-                        "first_name": o1.owner.first_name,
-                        "last_name": o1.owner.last_name,
-                        "social_security_number": o1.owner.social_security_number,
-                        "email": o1.owner.email,
-                    },
-                    "percentage": float(o1.percentage),
-                    "start_date": str(o1.start_date) if o1.start_date else None,
-                    "end_date": None,
+    assert response.json() == {
+        "contents": [
+            {
+                "id": ap1.uuid.hex,
+                "state": ap1.state.value,
+                "type": ap1.apartment_type.value,
+                "surface_area": float(ap1.surface_area),
+                "address": {
+                    "street_address": ap1.street_address,
+                    "postal_code": hc.postal_code.value,
+                    "city": hc.postal_code.city,
+                    "apartment_number": ap1.apartment_number,
+                    "stair": ap1.stair,
+                    "floor": ap1.floor,
                 },
-                {
-                    "owner": {
-                        "id": o2.owner.uuid.hex,
-                        "first_name": o2.owner.first_name,
-                        "last_name": o2.owner.last_name,
-                        "social_security_number": o2.owner.social_security_number,
-                        "email": o2.owner.email,
+                "completion_date": str(ap1.completion_date),
+                "ownerships": [
+                    {
+                        "owner": {
+                            "id": o1.owner.uuid.hex,
+                            "first_name": o1.owner.first_name,
+                            "last_name": o1.owner.last_name,
+                            "social_security_number": o1.owner.social_security_number,
+                            "email": o1.owner.email,
+                        },
+                        "percentage": float(o1.percentage),
+                        "start_date": str(o1.start_date) if o1.start_date else None,
+                        "end_date": None,
                     },
-                    "percentage": float(o2.percentage),
-                    "start_date": str(o2.start_date) if o2.start_date else None,
-                    "end_date": None,
+                    {
+                        "owner": {
+                            "id": o2.owner.uuid.hex,
+                            "first_name": o2.owner.first_name,
+                            "last_name": o2.owner.last_name,
+                            "social_security_number": o2.owner.social_security_number,
+                            "email": o2.owner.email,
+                        },
+                        "percentage": float(o2.percentage),
+                        "start_date": str(o2.start_date) if o2.start_date else None,
+                        "end_date": None,
+                    },
+                ],
+                "links": {
+                    "housing_company": {
+                        "id": hc.uuid.hex,
+                        "display_name": hc.display_name,
+                        "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
+                    },
+                    "real_estate": {
+                        "id": ap1.building.real_estate.uuid.hex,
+                        "link": (
+                            f"/api/v1/housing-companies/{hc.uuid.hex}"
+                            f"/real-estates/{ap1.building.real_estate.uuid.hex}"
+                        ),
+                    },
+                    "building": {
+                        "id": ap1.building.uuid.hex,
+                        "link": (
+                            f"/api/v1/housing-companies/{hc.uuid.hex}"
+                            f"/real-estates/{ap1.building.real_estate.uuid.hex}"
+                            f"/buildings/{ap1.building.uuid.hex}"
+                        ),
+                    },
+                    "apartment": {
+                        "id": ap1.uuid.hex,
+                        "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
+                    },
                 },
-            ],
-        },
-        {
-            "id": ap2.uuid.hex,
-            "state": ap2.state.value,
-            "type": ap2.apartment_type.value,
-            "surface_area": float(ap2.surface_area),
-            "address": {
-                "street_address": ap2.street_address,
-                "postal_code": hc2.postal_code.value,
-                "city": hc2.postal_code.city,
-                "apartment_number": ap2.apartment_number,
-                "stair": ap2.stair,
-                "floor": ap2.floor,
             },
-            "housing_company": {
-                "id": hc2.uuid.hex,
-                "name": hc2.display_name,
+            {
+                "id": ap2.uuid.hex,
+                "state": ap2.state.value,
+                "type": ap2.apartment_type.value,
+                "surface_area": float(ap2.surface_area),
+                "address": {
+                    "street_address": ap2.street_address,
+                    "postal_code": hc.postal_code.value,
+                    "city": hc.postal_code.city,
+                    "apartment_number": ap2.apartment_number,
+                    "stair": ap2.stair,
+                    "floor": ap2.floor,
+                },
+                "completion_date": str(ap2.completion_date),
+                "ownerships": [],
+                "links": {
+                    "housing_company": {
+                        "id": hc.uuid.hex,
+                        "display_name": hc.display_name,
+                        "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
+                    },
+                    "real_estate": {
+                        "id": ap2.building.real_estate.uuid.hex,
+                        "link": (
+                            f"/api/v1/housing-companies/{hc.uuid.hex}"
+                            f"/real-estates/{ap2.building.real_estate.uuid.hex}"
+                        ),
+                    },
+                    "building": {
+                        "id": ap2.building.uuid.hex,
+                        "link": (
+                            f"/api/v1/housing-companies/{hc.uuid.hex}"
+                            f"/real-estates/{ap2.building.real_estate.uuid.hex}"
+                            f"/buildings/{ap2.building.uuid.hex}"
+                        ),
+                    },
+                    "apartment": {
+                        "id": ap2.uuid.hex,
+                        "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap2.uuid.hex}",
+                    },
+                },
             },
-            "completion_date": str(ap2.completion_date),
-            "ownerships": [],
-        },
-    ]
-    assert response.json()["page"] == {
-        "size": 2,
-        "current_page": 1,
-        "total_items": 2,
-        "total_pages": 1,
-        "links": {
-            "next": None,
-            "previous": None,
+        ],
+        "page": {
+            "size": 2,
+            "current_page": 1,
+            "total_items": 2,
+            "total_pages": 1,
+            "links": {
+                "next": None,
+                "previous": None,
+            },
         },
     }
 
@@ -140,7 +192,13 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     hc: HousingCompany = ap.building.real_estate.housing_company
     owner: Ownership = OwnershipFactory.create(apartment=ap)
 
-    response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[hc.uuid.hex, ap.uuid.hex],
+        )
+    )
+
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": ap.uuid.hex,
@@ -180,11 +238,28 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "additional_work": ap.additional_work_during_construction,
             },
         },
-        "building": ap.building.uuid.hex,
-        "real_estate": ap.building.real_estate.uuid.hex,
-        "housing_company": {
-            "id": hc.uuid.hex,
-            "name": hc.display_name,
+        "links": {
+            "housing_company": {
+                "id": hc.uuid.hex,
+                "display_name": hc.display_name,
+                "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
+            },
+            "real_estate": {
+                "id": ap.building.real_estate.uuid.hex,
+                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/real-estates/{ap.building.real_estate.uuid.hex}",
+            },
+            "building": {
+                "id": ap.building.uuid.hex,
+                "link": (
+                    f"/api/v1/housing-companies/{hc.uuid.hex}"
+                    f"/real-estates/{ap.building.real_estate.uuid.hex}"
+                    f"/buildings/{ap.building.uuid.hex}"
+                ),
+            },
+            "apartment": {
+                "id": ap.uuid.hex,
+                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap.uuid.hex}",
+            },
         },
         "ownerships": [
             {
@@ -206,20 +281,71 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
 @pytest.mark.django_db
-def test__api__apartment__read__fail(api_client: HitasAPIClient, invalid_id):
-    ApartmentFactory.create()
+def test__api__apartment__invalid_apartment_id(api_client: HitasAPIClient, invalid_id):
+    a: Apartment = ApartmentFactory.create()
 
-    response = api_client.get(reverse("hitas:apartment-detail", args=[invalid_id]))
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[
+                a.building.real_estate.housing_company.uuid.hex,
+                invalid_id,
+            ],
+        )
+    )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
-    assert response.json() == exceptions.HitasModelNotFound(model=Apartment).data
+    assert response.json() == {
+        "error": "apartment_not_found",
+        "message": "Apartment not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment__incorrect_housing_company_id(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create()
+    hc: HousingCompany = HousingCompanyFactory.create()
+
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[hc.uuid.hex, a.uuid.hex],
+        )
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "apartment_not_found",
+        "message": "Apartment not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment__invalid_housing_company_id(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create()
+
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[uuid.uuid4().hex, a.uuid.hex],
+        )
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "housing_company_not_found",
+        "message": "Housing company not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
 
 
 # Create tests
 
 
-def get_apartment_create_data() -> dict[str, Any]:
+def get_apartment_create_data(building: Building) -> dict[str, Any]:
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
-    building: Building = BuildingFactory.create()
     person1: Person = PersonFactory.create()
     person2: Person = PersonFactory.create()
 
@@ -233,7 +359,6 @@ def get_apartment_create_data() -> dict[str, Any]:
         },
         "address": {
             "street_address": "TestStreet 3",
-            "postal_code": building.real_estate.housing_company.postal_code.value,
             "apartment_number": 58,
             "floor": "1",
             "stair": "A",
@@ -252,8 +377,6 @@ def get_apartment_create_data() -> dict[str, Any]:
                 "additional_work": 456,
             },
         },
-        "building": building.uuid.hex,
-        "notes": "Lorem ipsum",
         "ownerships": [
             {
                 "owner": {"id": person1.uuid.hex},
@@ -268,6 +391,8 @@ def get_apartment_create_data() -> dict[str, Any]:
                 "end_date": None,
             },
         ],
+        "building": building.uuid.hex,
+        "notes": "Lorem ipsum",
     }
     return data
 
@@ -275,7 +400,9 @@ def get_apartment_create_data() -> dict[str, Any]:
 @pytest.mark.parametrize("minimal_data", [False, True])
 @pytest.mark.django_db
 def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool):
-    data = get_apartment_create_data()
+    b = BuildingFactory.create()
+
+    data = get_apartment_create_data(b)
     if minimal_data:
         data.update(
             {
@@ -286,14 +413,26 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         del data["shares"]
         del data["prices"]
 
-    response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
+    response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
     assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     ap = Apartment.objects.first()
     assert response.json()["id"] == ap.uuid.hex
     assert len(response.json()["ownerships"]) == 0 if minimal_data else 2
 
-    get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
+    get_response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
     assert response.json() == get_response.json()
 
 
@@ -548,13 +687,21 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 )
 @pytest.mark.django_db
 def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
-    PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
-    PersonFactory.create(uuid=UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
+    PersonFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    PersonFactory.create(uuid=uuid.UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
+    b: Building = BuildingFactory.create()
 
-    data = get_apartment_create_data()
+    data = get_apartment_create_data(b)
     data.update(invalid_data)
 
-    response = api_client.post(reverse("hitas:apartment-list"), data=data, format="json")
+    response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",
@@ -565,14 +712,61 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClient):
+    b1: Building = BuildingFactory.create()
+    b2: Building = BuildingFactory.create()
+    data = get_apartment_create_data(b1)
+    data["building"] = (b2.uuid.hex,)
+
+    response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b1.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "building_not_found",
+        "message": "Building not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment__create__invalid_building_id(api_client: HitasAPIClient):
+    b: Building = BuildingFactory.create()
+    data = get_apartment_create_data(b)
+    data["building"] = "foo"
+
+    response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "building_not_found",
+        "message": "Building not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
 # Update tests
 
 
 @pytest.mark.django_db
 def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
+    b: Building = ap.building
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
-    building: Building = BuildingFactory.create()
     OwnershipFactory.create(apartment=ap)
 
     data = {
@@ -585,7 +779,7 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
         },
         "address": {
             "street_address": "TestStreet 3",
-            "postal_code": building.real_estate.housing_company.postal_code.value,
+            "postal_code": b.real_estate.housing_company.postal_code.value,
             "city": "Helsinki",
             "apartment_number": 9,
             "floor": "5",
@@ -604,12 +798,19 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
                 "additional_work": 77777,
             },
         },
-        "building": building.uuid.hex,
         "notes": "Test Notes",
+        "building": b.uuid.hex,
         "ownerships": [],
     }
 
-    response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
+    response = api_client.put(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
     assert response.status_code == status.HTTP_200_OK, response.json()
 
     ap.refresh_from_db()
@@ -633,11 +834,16 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
-    assert ap.building == building
+    assert ap.building_id == b.id
     assert ap.notes == data["notes"]
     assert ap.ownerships.all().count() == 0
 
-    get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
+    get_response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
     assert response.json() == get_response.json()
 
 
@@ -691,21 +897,35 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner_data: list):
     ap: Apartment = ApartmentFactory.create()
+    b: Building = ap.building
     OwnershipFactory.create(apartment=ap)
-    PersonFactory.create(uuid=UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
-    PersonFactory.create(uuid=UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
-    PersonFactory.create(uuid=UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
+    PersonFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    PersonFactory.create(uuid=uuid.UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
+    PersonFactory.create(uuid=uuid.UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
 
     data = ApartmentDetailSerializer(ap).data
     data["ownerships"] = owner_data
+    data["building"] = b.uuid.hex
 
-    response = api_client.put(reverse("hitas:apartment-detail", args=[ap.uuid.hex]), data=data, format="json")
+    response = api_client.put(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
     assert response.status_code == status.HTTP_200_OK, response.json()
 
     ap.refresh_from_db()
     assert ap.ownerships.all().count() == len(owner_data)
 
-    get_response = api_client.get(reverse("hitas:apartment-detail", args=[ap.uuid.hex]))
+    get_response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
     assert response.json() == get_response.json()
 
 
@@ -714,9 +934,15 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
 
 @pytest.mark.django_db
 def test__api__apartment__delete(api_client: HitasAPIClient):
-    hc: Apartment = ApartmentFactory.create()
+    a: Apartment = ApartmentFactory.create()
 
-    url = reverse("hitas:apartment-detail", kwargs={"uuid": hc.uuid.hex})
+    url = reverse(
+        "hitas:apartment-detail",
+        args=[
+            a.building.real_estate.housing_company.uuid.hex,
+            a.uuid.hex,
+        ],
+    )
     response = api_client.delete(url)
     assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
@@ -726,48 +952,16 @@ def test__api__apartment__delete(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=ap)
+    a: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(apartment=a)
 
-    url = reverse("hitas:apartment-detail", kwargs={"uuid": ap.uuid.hex})
+    url = reverse(
+        "hitas:apartment-detail",
+        args=[
+            a.building.real_estate.housing_company.uuid.hex,
+            a.uuid.hex,
+        ],
+    )
     with pytest.raises(ProtectedError):  # TODO: Return better error message from the API?
         response = api_client.delete(url)
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-
-
-# Filter tests
-
-
-@pytest.mark.parametrize(
-    "selected_filter",
-    [
-        {"housing_company": "38432c233a914dfb9c2f54d9f5ad9063"},
-        {"housing_company_name": "testdisplay"},
-        {"street_address": "test-str"},
-        {"postal_code": "99999"},
-        {"owner_name": "megatr"},
-        {"owner_name": "etimus pri"},
-        {"owner_social_security_number": "010199-123A"},
-    ],
-)
-@pytest.mark.django_db
-def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
-    ApartmentFactory.create(
-        state=ApartmentState.FREE,
-        building__real_estate__housing_company__uuid=UUID("38432c23-3a91-4dfb-9c2f-54d9f5ad9063"),
-    )
-
-    ApartmentFactory.create(
-        state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
-    )
-    ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__first_name="Megatron")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__last_name="Opetimus Prime")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__social_security_number="010199-123A")
-    hc = HousingCompanyFactory.create(postal_code__value="99999")
-    ApartmentFactory.create(building__real_estate__housing_company=hc)
-
-    url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 1, response.json()

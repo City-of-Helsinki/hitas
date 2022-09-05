@@ -50,14 +50,17 @@ const SalesCondition = ({
 
 const ApartmentDetailsPage = (): JSX.Element => {
     const params = useParams();
-    const {data, error, isLoading} = useGetApartmentDetailQuery(params.apartmentId as string);
+    const {data, error, isLoading} = useGetApartmentDetailQuery({
+        housingCompanyId: params.housingCompanyId as string,
+        apartmentId: params.apartmentId as string,
+    });
 
-    const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}) => {
+    const LoadedApartmentDetails = ({data}: {data}) => {
         return (
             <>
                 <h1 className={"main-heading"}>
-                    <Link to={`/housing-companies/${data.housing_company.id}`}>
-                        <span className={"name"}>{data.housing_company.name}</span>
+                    <Link to={`/housing-companies/${data.links.housing_company.id}`}>
+                        <span className={"name"}>{data.links.housing_company.display_name}</span>
                         <span className="address">{formatAddress(data.address)}</span>
                         <StatusLabel>{data.state}</StatusLabel>
                     </Link>
@@ -83,7 +86,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                         <SalesCondition
                             name="Arabian unelma (valm.2015)"
                             address="Arabiankatu 5 C 2, 00440"
-                            url={`/housing-companies/${data.housing_company.id}`}
+                            url={`/housing-companies/${data.links.housing_company.id}`}
                             isConfirmed={true}
                         />
                         <label>Vahvistamaton myyntiehto</label>

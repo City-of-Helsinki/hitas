@@ -1,10 +1,9 @@
 from collections import OrderedDict
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import SkipField, empty
@@ -17,42 +16,10 @@ from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasDecimalField,
     HitasEnumField,
-    HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
-    HitasUUIDFilter,
     UUIDRelatedField,
 )
-
-
-class ApartmentFilterSet(HitasFilterSet):
-    housing_company = HitasUUIDFilter(field_name="building__real_estate__housing_company__uuid")
-    housing_company_name = filters.CharFilter(
-        field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
-    )
-    street_address = filters.CharFilter(lookup_expr="icontains")
-    postal_code = filters.CharFilter(field_name="building__real_estate__housing_company__postal_code__value")
-    owner_name = filters.CharFilter(method="owner_name_filter")
-    owner_social_security_number = filters.CharFilter(
-        field_name="ownerships__owner__social_security_number", lookup_expr="icontains"
-    )
-
-    def owner_name_filter(self, queryset, name, value):
-        return queryset.filter(
-            Q(ownerships__owner__first_name__icontains=value) | Q(ownerships__owner__last_name__icontains=value)
-        )
-
-    class Meta:
-        model = Apartment
-        fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_social_security_number"]
-
-
-class HousingCompanySerializer(HitasModelSerializer):
-    name = serializers.CharField(source="display_name")
-
-    class Meta:
-        model = HousingCompany
-        fields = ["id", "name"]
 
 
 class ApartmentHitasAddressSerializer(serializers.Serializer):
@@ -120,6 +87,52 @@ class PricesSerializer(serializers.Serializer):
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
 
 
+def create_links(instance: Apartment) -> Dict[str, Any]:
+    return {
+        "housing_company": {
+            "id": instance.building.real_estate.housing_company.uuid.hex,
+            "display_name": instance.building.real_estate.housing_company.display_name,
+            "link": reverse(
+                "hitas:housing-company-detail",
+                kwargs={
+                    "uuid": instance.building.real_estate.housing_company.uuid.hex,
+                },
+            ),
+        },
+        "real_estate": {
+            "id": instance.building.real_estate.uuid.hex,
+            "link": reverse(
+                "hitas:real-estate-detail",
+                kwargs={
+                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "uuid": instance.building.real_estate.uuid.hex,
+                },
+            ),
+        },
+        "building": {
+            "id": instance.building.uuid.hex,
+            "link": reverse(
+                "hitas:building-detail",
+                kwargs={
+                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "real_estate_uuid": instance.building.real_estate.uuid.hex,
+                    "uuid": instance.building.uuid.hex,
+                },
+            ),
+        },
+        "apartment": {
+            "id": instance.uuid.hex,
+            "link": reverse(
+                "hitas:apartment-detail",
+                kwargs={
+                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "uuid": instance.uuid.hex,
+                },
+            ),
+        },
+    }
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     type = ApartmentTypeSerializer(source="apartment_type")
@@ -128,14 +141,12 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     surface_area = HitasDecimalField()
     shares = SharesSerializer(source="*", required=False, allow_null=True)
     prices = PricesSerializer(source="*", required=False, allow_null=True)
-
-    building = UUIDRelatedField(queryset=Building.objects.all())
-    real_estate = serializers.SerializerMethodField()
-    housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
     ownerships = OwnershipSerializer(many=True, read_only=False)
+    links = serializers.SerializerMethodField()
+    building = UUIDRelatedField(queryset=Building.objects.all(), write_only=True)
 
-    def get_real_estate(self, instance: Apartment) -> str:
-        return instance.building.real_estate.uuid.hex
+    def get_links(self, instance: Apartment):
+        return create_links(instance)
 
     def validate_ownerships(self, ownerships: OrderedDict):
         if not ownerships:
@@ -206,20 +217,18 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "type",
             "surface_area",
             "shares",
+            "links",
             "address",
             "prices",
             "completion_date",
-            "building",
-            "real_estate",
-            "housing_company",
             "ownerships",
             "notes",
+            "building",
         ]
 
 
 class ApartmentListSerializer(ApartmentDetailSerializer):
     type = serializers.CharField(source="apartment_type.value")
-    housing_company = HousingCompanySerializer(source="building.real_estate.housing_company", read_only=True)
 
     class Meta:
         model = Apartment
@@ -230,8 +239,8 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "surface_area",
             "address",
             "completion_date",
-            "housing_company",
             "ownerships",
+            "links",
         ]
 
 
@@ -263,20 +272,23 @@ class ApartmentViewSet(HitasModelViewSet):
             "notes",
             "completion_date",
             "building__uuid",
-            "building__real_estate__housing_company__uuid",
-            "building__real_estate__housing_company__display_name",
             "building__real_estate__uuid",
             "apartment_type__uuid",
             "apartment_type__value",
             "apartment_type__legacy_code_number",
             "apartment_type__description",
+            "building__real_estate__housing_company__uuid",
+            "building__real_estate__housing_company__display_name",
             "building__real_estate__housing_company__postal_code__value",
             "building__real_estate__housing_company__postal_code__city",
         )
 
     def get_list_queryset(self):
+        hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
+
         return (
-            Apartment.objects.prefetch_related("ownerships", "ownerships__owner")
+            Apartment.objects.filter(building__real_estate__housing_company__id=hc_id)
+            .prefetch_related("ownerships", "ownerships__owner")
             .select_related(
                 "building",
                 "building__real_estate",
@@ -293,14 +305,13 @@ class ApartmentViewSet(HitasModelViewSet):
                 "floor",
                 "stair",
                 "completion_date",
+                "apartment_type__value",
+                "building__uuid",
+                "building__real_estate__uuid",
                 "building__real_estate__housing_company__uuid",
                 "building__real_estate__housing_company__display_name",
-                "apartment_type__value",
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
             )
             .order_by("id")
         )
-
-    def get_filterset_class(self):
-        return ApartmentFilterSet
