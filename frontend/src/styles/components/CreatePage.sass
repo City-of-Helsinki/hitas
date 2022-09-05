@@ -1,0 +1,19 @@
+@use 'hds-design-tokens' as *
+
+.view--create
+  margin-bottom: $spacing-layout-2-xl
+
+  .field-sets
+    display: flex
+    width: 100%
+    gap: 1em
+
+    fieldset
+      width: 50%
+      flex-grow: 1
+
+  [class*="input-field"]
+    height: 81px
+
+  .input-field--textArea
+    height: auto
