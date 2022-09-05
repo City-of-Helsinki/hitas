@@ -32,6 +32,10 @@ export default function Router() {
                         element={<HousingCompanyCreatePage />}
                     />
                     <Route
+                        path=":housingCompanyId/apartments/:apartmentId"
+                        element={<ApartmentDetailsPage />}
+                    />
+                    <Route
                         path=":housingCompanyId"
                         element={<HousingCompanyDetailsPage />}
                     />

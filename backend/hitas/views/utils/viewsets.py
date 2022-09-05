@@ -9,7 +9,7 @@ from hitas.exceptions import HitasModelNotFound
 from hitas.views.utils import HitasFilterSet, HitasPagination
 
 
-class HitasModelViewSet(viewsets.ModelViewSet):
+class HitasModelMixin:
     serializer_class = None
     list_serializer_class = None
     model_class = None
@@ -76,3 +76,7 @@ class HitasModelViewSet(viewsets.ModelViewSet):
         HitasModelFilterSet.__name__ = f"{self.model_class}FilterSet"
 
         return HitasModelFilterSet
+
+
+class HitasModelViewSet(HitasModelMixin, viewsets.ModelViewSet):
+    pass

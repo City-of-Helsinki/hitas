@@ -275,7 +275,7 @@ paths:
 
   /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}:
     get:
-      description: Fetch a single housing company by id
+      description: Fetch a single real estate by id
       operationId: read-housing-company-real-estate
       tags:
         - Real estates
@@ -353,7 +353,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      description: Remove a real estate from a housing company
+      description: Remove a real estate
       operationId: delete-housing-company-real-estate
       tags:
         - Real estates
@@ -479,7 +479,7 @@ paths:
 
   /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings/{building_id}:
     get:
-      description: Fetch a single housing company by id
+      description: Fetch a single real estate by id
       operationId: read-housing-company-real-estate-building
       tags:
         - Buildings
@@ -571,7 +571,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      description: Remove a building from from a housing company's real estate
+      description: Remove a building
       operationId: delete-housing-company-real-estate-building
       tags:
         - Buildings
@@ -607,23 +607,205 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/housing-companies/{housing_company_id}/apartments:
+    get:
+      description: Fetch apartments for a housing company
+      operationId: list-apartments
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of apartments
+          content:
+            application/json:
+              schema:
+                description: Single page of apartments
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of apartments
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Apartment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new apartment for a housing company
+      operationId: create-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApartmentDetails'
+      responses:
+        '201':
+          description: Successfully added a new apartment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}:
+    get:
+      description: Fetch a single apartment by id
+      operationId: read-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        '200':
+          description: Successfully read an apartment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      description: Update an apartment
+      operationId: update-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApartmentDetails'
+      responses:
+        '200':
+          description: Successfully updated an apartment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApartmentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove an apartment
+      operationId: delete-apartment
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        '204':
+          description: Apartment successfully removed.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/apartments:
     get:
-      description: Fetch apartments
-      operationId: list-apartments
+      description: List and search all apartments across all housing companies
+      operationId: list-all-apartments
       tags:
         - Apartments
       parameters:
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
-        - name: housing_company
-          description: Search apartments that belong to housing company with given id
-          required: false
-          in: query
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
         - name: housing_company_name
           description: Search apartments that belong to housing companies with display name containing the given search string (case-insensitive)
           required: false
@@ -684,122 +866,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-    post:
-      description: Add a new apartment
-      operationId: create-apartment
-      tags:
-        - Apartments
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Apartment'
-      responses:
-        '201':
-          description: Successfully added a new apartment
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApartmentDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/apartments/{apartment_id}:
-    get:
-      description: Fetch a single apartment by id
-      operationId: read-apartment
-      tags:
-        - Apartments
-      parameters:
-        - name: apartment_id
-          required: true
-          in: path
-          description: Apartment ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
-      responses:
-        '200':
-          description: Successfully read a apartment details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApartmentDetails'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      description: Update a apartment
-      operationId: update-apartment
-      tags:
-        - Apartments
-      parameters:
-        - name: apartment_id
-          required: true
-          in: path
-          description: Apartment ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApartmentDetails'
-      responses:
-        '200':
-          description: Successfully updated a apartment
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApartmentDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-    delete:
-      description: Remove a apartment
-      operationId: delete-apartment
-      tags:
-        - Apartments
-      parameters:
-        - name: apartment_id
-          required: true
-          in: path
-          description: Apartment ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
-      responses:
-        '204':
-          description: Apartment successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -1812,7 +1878,7 @@ paths:
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
         '200':
-          description: Successfully read a apartment type details
+          description: Successfully read an apartment type details
           content:
             application/json:
               schema:
@@ -1824,7 +1890,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
-      description: Update a apartment type
+      description: Update an apartment type
       operationId: update-apartment-type
       tags:
         - Apartment types
@@ -1844,7 +1910,7 @@ paths:
               $ref: '#/components/schemas/Code'
       responses:
         '200':
-          description: Successfully updated a apartment type
+          description: Successfully updated an apartment type
           content:
             application/json:
               schema:
@@ -1861,7 +1927,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      description: Remove a apartment type
+      description: Remove an apartment type
       operationId: delete-apartment-type
       tags:
         - Apartment types
@@ -2256,22 +2322,24 @@ components:
         - surface_area
         - address
         - completion_date
-        - housing_company
         - ownerships
+        - links
       properties:
         id:
           description: Apartment ID
           type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
-          readOnly: true
+          example: b477389cb3514fb1b444052a39bfb65d
         state:
           $ref: '#/components/schemas/ApartmentState'
         type:
+          description: Apartment type
           type: string
-          readOnly: true
+          example: h+k
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
+          minimum: 0
+          example: 67
         address:
           $ref: '#/components/schemas/HitasAddress'
         completion_date:
@@ -2279,14 +2347,173 @@ components:
           type: string
           format: date
           nullable: true
-        housing_company:
-          $ref: '#/components/schemas/MinimalHousingCompany'
         ownerships:
           description: List of apartment's ownerships
           type: array
-          readOnly: true
           items:
             $ref: '#/components/schemas/Ownership'
+        links:
+          $ref: '#/components/schemas/ApartmentLinks'
+
+    ApartmentDetails:
+      description: Single apartment details
+      type: object
+      required:
+        - id
+        - state
+        - type
+        - surface_area
+        - shares
+        - address
+        - completion_date
+        - ownerships
+        - links
+        - building
+        - notes
+      properties:
+        id:
+          description: Apartment ID
+          type: string
+          readOnly: true
+          example: b477389cb3514fb1b444052a39bfb65d
+        state:
+          $ref: '#/components/schemas/ApartmentState'
+        type:
+          allOf:
+            - $ref: '#/components/schemas/Code'
+            - $ref: '#/components/schemas/ReadOnlyCode'
+        surface_area:
+          description: Surface area of the apartment measured in square meters
+          type: number
+          minimum: 0
+          example: 67
+        shares:
+          description: Share information
+          type: object
+          nullable: true
+          required:
+            - start
+            - end
+            - total
+          properties:
+            start:
+              description: First share number
+              type: integer
+              minimum: 0
+              example: 100
+            end:
+              description: Last share number
+              type: integer
+              minimum: 0
+              example: 150
+            total:
+              description: Total number of shares
+              type: integer
+              minimum: 0
+              readOnly: true
+              example: 50
+        address:
+          $ref: '#/components/schemas/ApartmentAddress'
+        completion_date:
+          description: Date that the apartment's building was completed on
+          type: string
+          format: date
+          nullable: true
+        prices:
+          $ref: '#/components/schemas/ApartmentPrices'
+        ownerships:
+          description: List of apartment's ownerships
+          type: array
+          items:
+            $ref: '#/components/schemas/Ownership'
+        links:
+          $ref: '#/components/schemas/ApartmentLinks'
+        building:
+          description: Building ID this apartment is associated with
+          type: string
+          writeOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        notes:
+          description: Apartment notes
+          type: string
+          nullable: true
+          example: Random notes about the apartment...
+
+    ApartmentLinks:
+      description: Links to apartment's related object
+      type: object
+      readOnly: true
+      required:
+        - housing_company
+        - real_estate
+        - building
+        - apartment
+      properties:
+        housing_company:
+          description: Links to apartment's housing company
+          type: object
+          required:
+            - id
+            - display_name
+            - link
+          properties:
+            id:
+              description: Housing company ID
+              type: string
+              example: a3181b8fa60b47df8ccba0d554a913bb
+            display_name:
+              description: Housing company's display name
+              type: string
+              example: Taloyhtiö Helmi
+            link:
+              description: API link to housing company
+              type: string
+              example: /api/v1/housing-companies/a3181b8fa60b47df8ccba0d554a913bb
+        real_estate:
+          description: Links to apartment's real estate
+          type: object
+          required:
+            - id
+            - link
+          properties:
+            id:
+              description: Real estate ID
+              type: string
+              example: c86eaa399ce141d89d962d46bb81ab2b
+            link:
+              description: API link to real estate
+              type: string
+              example: /api/v1/housing-companies/a3181b8fa60b47df8ccba0d554a913bb/real-estates/c86eaa399ce141d89d962d46bb81ab2b
+        building:
+          description: Links to apartment's building
+          type: object
+          required:
+            - id
+            - link
+          properties:
+            id:
+              description: Building ID
+              type: string
+              example: dc1072975bab4ba69f64814f021c6785
+            link:
+              description: API link to building
+              type: string
+              example: /api/v1/housing-companies/a3181b8fa60b47df8ccba0d554a913bb/real-estates/c86eaa399ce141d89d962d46bb81ab2b/buildings/dc1072975bab4ba69f64814f021c6785
+        apartment:
+          description: Links to apartment's details
+          type: object
+          required:
+            - id
+            - link
+          properties:
+            id:
+              description: Apartment own ID
+              type: string
+              example: b477389cb3514fb1b444052a39bfb65d
+            link:
+              description: API link to read apartment's details
+              type: string
+              example: /api/v1/housing-companies/a3181b8fa60b47df8ccba0d554a913bb/apartments/b477389cb3514fb1b444052a39bfb65d
 
     ApartmentPrices:
       description: Single apartment price information
@@ -2357,92 +2584,6 @@ components:
               nullable: true
               example: 8610
 
-    ApartmentDetails:
-      description: Single apartment details
-      type: object
-      required:
-        - id
-        - state
-        - type
-        - surface_area
-        - address
-        - completion_date
-        - housing_company
-        - shares
-        - ownerships
-      properties:
-        id:
-          description: Apartment ID
-          type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
-          readOnly: true
-        state:
-          $ref: '#/components/schemas/ApartmentState'
-        type:
-          allOf:
-            - $ref: '#/components/schemas/Code'
-            - $ref: '#/components/schemas/ReadOnlyCode'
-        surface_area:
-          description: Surface area of the apartment measured in square meters
-          type: number
-        shares:
-          description: Share information
-          type: object
-          nullable: true
-          required:
-            - start
-            - end
-            - total
-          properties:
-            start:
-              description: First share number
-              type: integer
-              minimum: 0
-              example: 100
-            end:
-              description: Last share number
-              type: integer
-              minimum: 0
-              example: 150
-            total:
-              description: Total number of shares
-              type: integer
-              minimum: 0
-              readOnly: true
-              example: 50
-        address:
-          $ref: '#/components/schemas/ApartmentAddress'
-        completion_date:
-          description: Date that the apartment's building was completed on
-          type: string
-          format: date
-          nullable: true
-        prices:
-          $ref: '#/components/schemas/ApartmentPrices'
-        building:
-          description: ID of the building this apartment belongs to
-          type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
-          readOnly: true
-        real_estate:
-          description: ID of the real estate this apartment belongs to
-          type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
-          readOnly: true
-        housing_company:
-          $ref: '#/components/schemas/MinimalHousingCompany'
-        ownerships:
-          description: List of apartment's ownerships
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Ownership'
-        notes:
-          description: Apartment notes
-          type: string
-          nullable: true
-          example: Random notes about the apartment...
-
     Ownership:
       description: Ownership information
       type: object
@@ -2453,21 +2594,26 @@ components:
         - end_date
       properties:
         owner:
-          $ref: '#/components/schemas/Person'
+          allOf:
+            - $ref: '#/components/schemas/Person'
+            - $ref: '#/components/schemas/ReadOnlyPerson'
         percentage:
           description: Percentage that the person owns of the apartment
           type: number
           minimum: 0
           maximum: 100
+          example: 100
         start_date:
           description: Date owner took ownership of the apartment
           type: string
           format: date
+          example: 2010-01-01
           nullable: true
         end_date:
           description: Date owner released ownership of the apartment
           type: string
           format: date
+          example: null
           nullable: true
 
     Person:
@@ -2500,8 +2646,20 @@ components:
         email:
           description: Email for this person
           type: string
-          example: martti.virtanen@example.com
           nullable: true
+          example: martti.virtanen@example.com
+
+    ReadOnlyPerson:
+      description: Read-only person
+      properties:
+        first_name:
+          readOnly: true
+        last_name:
+          readOnly: true
+        social_security_number:
+          readOnly: true
+        email:
+          readOnly: true
 
     Address:
       description: Address information

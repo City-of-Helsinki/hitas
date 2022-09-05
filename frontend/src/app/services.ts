@@ -3,7 +3,9 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
     IApartmentDetails,
     IApartmentListResponse,
+    IApartmentQuery,
     ICodeResponse,
+    IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
@@ -53,8 +55,17 @@ export const hitasApi = createApi({
                 params: params,
             }),
         }),
-        getApartmentDetail: builder.query<IApartmentDetails, string>({
-            query: (id) => `apartments/${id}`,
+        getHousingCompanyApartments: builder.query<IApartmentListResponse, IHousingCompanyApartmentQuery>({
+            query: (params: IHousingCompanyApartmentQuery) => ({
+                url: `housing-companies/${params.housingCompanyId}/apartments`,
+                params: params.params,
+            }),
+        }),
+        getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
+            query: (params: IApartmentQuery) => ({
+                url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
+                params: params,
+            }),
         }),
         // Property Manager
         getPropertyManagers: builder.query<IApartmentListResponse, object>({
@@ -89,6 +100,7 @@ export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyDetailQuery,
     useCreateHousingCompanyMutation,
+    useGetHousingCompanyApartmentsQuery,
     useGetApartmentsQuery,
     useGetApartmentDetailQuery,
     useGetPropertyManagersQuery,
