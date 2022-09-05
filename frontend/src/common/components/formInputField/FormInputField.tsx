@@ -3,7 +3,6 @@ import React, {useEffect, useState} from "react";
 import {dotted} from "../../utils";
 import FormDateInputField from "./FormDateInputField";
 import FormDropdownInputField from "./FormDropdownInputField";
-import FormMoneyInputField from "./FormMoneyInputField";
 import FormNumberInputField from "./FormNumberInputField";
 import FormPostalCodeInputField from "./FormPostalCodeInputField";
 import FormRelatedModelInputField from "./FormRelatedModelInputField";
@@ -31,7 +30,7 @@ type FormInputFieldProps = {
     error;
 } & (
     | {
-          inputType?: "text" | "textArea" | "postalCode" | "money" | "number" | "date";
+          inputType?: "text" | "textArea" | "postalCode" | "number" | "date";
       }
     | {
           inputType: "select" | "combobox";
@@ -115,14 +114,6 @@ export default function FormInputField({
             <FormPostalCodeInputField
                 {...commonProps}
                 setIsInvalid={setIsInvalid}
-                {...rest}
-            />
-        );
-    }
-    if (inputType === "money") {
-        return (
-            <FormMoneyInputField
-                {...commonProps}
                 {...rest}
             />
         );
