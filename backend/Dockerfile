@@ -40,7 +40,8 @@ RUN apt-get install -y --no-install-recommends \
 #
 # Set defaults for pip and poetry
 #
-ENV POETRY_VERSION=1.1.13 \
+ENV POETRY_VERSION=1.2.0 \
+    POETRY_VIRTUALENVS_CREATE=false \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
@@ -59,7 +60,10 @@ RUN python -m venv /hitas/venv && /hitas/venv/bin/pip install wheel
 RUN mkdir /hitas/build
 WORKDIR /hitas/build
 COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
-RUN poetry export --without-hashes | /hitas/venv/bin/pip install -r /dev/stdin
+# POETRY_VIRTUALENVS_CREATE and writing to /tmp instead of stdout should be
+# removed after next poetry release (currently 1.2.0)
+RUN poetry export --without-hashes --output /tmp/requirements.txt \
+    && /hitas/venv/bin/pip install -r /tmp/requirements.txt
 
 #
 # Build image for django static content and translations
