@@ -64,14 +64,17 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     legacy_id = ValueOrNullField(read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
 
-    def get_area(self, obj: HousingCompany) -> Dict[str, any]:
+    @staticmethod
+    def get_area(obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.city, "cost_area": obj.postal_code.cost_area}
 
-    def get_date(self, obj: HousingCompany) -> Optional[datetime.date]:
+    @staticmethod
+    def get_date(obj: HousingCompany) -> Optional[datetime.date]:
         """SerializerMethodField is used instead of DateField due to date being an annotated value"""
         return getattr(obj, "date", None)
 
-    def get_last_modified(self, obj: HousingCompany) -> Dict[str, Any]:
+    @staticmethod
+    def get_last_modified(obj: HousingCompany) -> Dict[str, Any]:
         return {
             "user": {
                 "username": safe_attrgetter(obj, "last_modified_by.username", default=None),
