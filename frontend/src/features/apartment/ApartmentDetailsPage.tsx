@@ -142,12 +142,12 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                                 label="Osakkeiden lukumäärä"
                                                 value={data.shares ? data.shares.total : 0}
                                             />
-                                            {data.shares &&
+                                            {data.shares && (
                                                 <DetailField
                                                     label="Osakkeet"
                                                     value={`${data.shares.start} - ${data.shares.end}`}
                                                 />
-                                            }
+                                            )}
                                             <DetailField
                                                 label="Luovutushinta"
                                                 value={`${data.prices.debt_free_purchase_price} €`}
