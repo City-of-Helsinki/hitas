@@ -1,7 +1,8 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from django.db.models import Min, Prefetch
+from django.db.models import F, IntegerField, Min, Prefetch, Sum
+from django.db.models.functions import Round
 from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
@@ -63,6 +64,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     notes = ValueOrNullField(required=False)
     legacy_id = ValueOrNullField(read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
+    summary = serializers.SerializerMethodField()
 
     @staticmethod
     def get_area(obj: HousingCompany) -> Dict[str, any]:
@@ -72,6 +74,14 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     def get_date(obj: HousingCompany) -> Optional[datetime.date]:
         """SerializerMethodField is used instead of DateField due to date being an annotated value"""
         return getattr(obj, "date", None)
+
+    @staticmethod
+    def get_summary(obj: HousingCompany) -> Dict[str, int]:
+        return {
+            "average_price_per_square_meter": getattr(obj, "avg_price_per_square_meter", 0) or 0,
+            "total_surface_area": getattr(obj, "sum_surface_area", 0) or 0,
+            "total_shares": getattr(obj, "sum_total_shares", 0) or 0,
+        }
 
     @staticmethod
     def get_last_modified(obj: HousingCompany) -> Dict[str, Any]:
@@ -106,6 +116,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "legacy_id",
             "notification_date",
             "last_modified",
+            "summary",
         ]
 
 
@@ -198,6 +209,25 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "postal_code__cost_area",
             )
             .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
+            .annotate(
+                sum_acquisition_price=Sum(
+                    F("real_estates__buildings__apartments__debt_free_purchase_price")
+                    + F("real_estates__buildings__apartments__primary_loan_amount")
+                )
+            )
+            .annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
+            .annotate(
+                avg_price_per_square_meter=Round(
+                    F("sum_acquisition_price") / F("sum_surface_area"), output_field=IntegerField()
+                )
+            )
+            .annotate(
+                sum_total_shares=Sum(
+                    F("real_estates__buildings__apartments__share_number_end")
+                    - F("real_estates__buildings__apartments__share_number_start")
+                    + 1
+                )
+            )
         )
 
     def get_filterset_class(self):

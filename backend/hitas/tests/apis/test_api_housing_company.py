@@ -182,10 +182,34 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
-    ApartmentFactory.create(building=hc1_re1_bu1, completion_date=date(2022, 1, 1))
-    hc1_re1_bu1_ap2: Apartment = ApartmentFactory.create(building=hc1_re1_bu1, completion_date=date(2020, 1, 1))
+    ApartmentFactory.create(
+        building=hc1_re1_bu1,
+        completion_date=date(2022, 1, 1),
+        debt_free_purchase_price=100,
+        primary_loan_amount=200,
+        surface_area=10,
+        share_number_end=100,
+        share_number_start=1,
+    )
+    hc1_re1_bu1_ap2: Apartment = ApartmentFactory.create(
+        building=hc1_re1_bu1,
+        completion_date=date(2020, 1, 1),
+        debt_free_purchase_price=300,
+        primary_loan_amount=400,
+        surface_area=20,
+        share_number_end=200,
+        share_number_start=101,
+    )
     hc1_re1_bu2: Building = BuildingFactory.create(real_estate=hc1_re1)
-    ApartmentFactory.create(building=hc1_re1_bu2, completion_date=date(2021, 1, 1))
+    ApartmentFactory.create(
+        building=hc1_re1_bu2,
+        completion_date=date(2021, 1, 1),
+        debt_free_purchase_price=500,
+        primary_loan_amount=600,
+        surface_area=20,
+        share_number_end=450,
+        share_number_start=201,
+    )
     hc1_re2: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2)
 
@@ -202,6 +226,11 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": str(hc1_re1_bu1_ap2.completion_date),
+        "summary": {
+            "average_price_per_square_meter": 42,  # (100+200+300+400+500+600) / (10+20+20) = 2100 / 50 = 42
+            "total_shares": 450,  # (100 - 1 + 1) + (200 - 101 + 1) + (450 - 201 + 1) = 100 + 100 + 250 = 450
+            "total_surface_area": 50.0,  # 10+20+20
+        },
         "real_estates": [
             {
                 "id": hc1_re1.uuid.hex,
@@ -299,6 +328,21 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
             },
         },
     }
+
+
+@pytest.mark.django_db
+def test__api__housing_company__retrieve_rounding(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc, debt_free_purchase_price=1, primary_loan_amount=2, surface_area=1
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc, debt_free_purchase_price=1, primary_loan_amount=1, surface_area=1
+    )
+
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["summary"]["average_price_per_square_meter"] == 3
 
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
