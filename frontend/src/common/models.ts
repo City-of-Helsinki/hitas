@@ -57,17 +57,6 @@ export interface IHousingCompanyDetails {
     };
 }
 
-export interface IApartmentWritable {
-    readonly id?: string;
-    state: "sold" | "reserved" | "free";
-    surface_area: number | null;
-    address: {street_address: string};
-    apartment_number: number | null;
-    stair: string | null;
-    completion_date?: Date;
-    housing_company: {name: string};
-}
-
 export interface IHousingCompanyWritable {
     readonly id?: string;
     name: IHousingCompanyDetailsName;
@@ -185,6 +174,8 @@ export interface IApartmentQuery {
     apartmentId: string;
 }
 
+export type ApartmentState = "free" | "reserved" | "sold";
+
 export interface IApartmentDetails {
     readonly id: string;
     state: ApartmentState;
@@ -205,7 +196,19 @@ export interface IApartmentDetails {
     notes: string;
 }
 
-export type ApartmentState = "free" | "reserved" | "sold";
+export interface IApartmentWritable {
+    readonly id?: string;
+    state: ApartmentState;
+    surface_area: number | null;
+    address: {street_address: string};
+    apartment_number: number | null;
+    apartment_type: {id: string};
+    apartment_building: string;
+    ownerships: [string];
+    stair: string | null;
+    completion_date?: Date;
+    housing_company: {name: string};
+}
 
 export interface IPropertyManager {
     readonly id: string;
