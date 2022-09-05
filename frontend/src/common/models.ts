@@ -199,15 +199,26 @@ export interface IApartmentDetails {
 export interface IApartmentWritable {
     readonly id?: string;
     state: ApartmentState;
-    surface_area: number | null;
-    address: {street_address: string};
-    apartment_number: number | null;
     apartment_type: {id: string};
-    apartment_building: string;
-    ownerships: [string];
-    stair: string | null;
+    surface_area: number;
+    share_number_start: number;
+    share_number_end: number;
+    address: IApartmentAddress;
+    apartment_number: number;
+    floor: number;
+    stair: string;
     completion_date?: Date;
+    debt_free_purchase_price: number;
+    purchase_price: number;
+    acquisition_price: number;
+    primary_loan_amount: number;
+    loans_during_construction: number;
+    interest_during_construction: number;
+    building: {id: string};
+    real_estate: {id: string};
     housing_company: {name: string};
+    ownerships: IOwnership[];
+    notes: string;
 }
 
 export interface IPropertyManager {
