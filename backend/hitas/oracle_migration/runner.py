@@ -94,9 +94,16 @@ def run(
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
     if anonymize:
+        print("Creating anonymized data...")
+        print()
         anonymize_data()
+    else:
+        print("Creating *REAL* non-anonymized data...")
+        print()
 
     if truncate or truncate_only:
+        print("Removing existing data...")
+        print()
         do_truncate()
 
     if truncate_only:

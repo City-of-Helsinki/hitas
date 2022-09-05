@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "Hitas database migration tool."
 
     def add_arguments(self, parser: CommandParser) -> None:
-        parser.add_argument("--anonymize", action="store_true", help="Create anonymous data.")
+        parser.add_argument("--skip-anonymize", action="store_true", help="Skip creating anonymous data.")
         parser.add_argument("--debug", action="store_true", help="Show debug information.")
         parser.add_argument(
             "--truncate", action="store_true", help="Truncate hitas tables before starting the migration."
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             options["oracle_user"],
             oracle_pw,
             options["debug"],
-            options["anonymize"],
+            not options["skip_anonymize"],
             options["truncate"],
             options["truncate_only"],
         )
