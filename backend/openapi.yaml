@@ -2087,6 +2087,7 @@ components:
         - state
         - business_id
         - real_estates
+        - summary
       properties:
         id:
           description: Housing company ID
@@ -2160,6 +2161,30 @@ components:
           allOf:
             - $ref: '#/components/schemas/PropertyManager'
             - $ref: '#/components/schemas/ReadOnlyPropertyManager'
+        summary:
+          description: Summary data for this housing company across all apartments
+          type: object
+          readOnly: true
+          required:
+            - average_price_per_square_meter
+            - total_surface_area
+            - total_shares
+          properties:
+            average_price_per_square_meter:
+              description: Average square meter price
+              type: number
+              minimum: 0
+              example: 123000
+            total_surface_area:
+              description: Total surface area across all apartments
+              type: number
+              minimum: 0
+              example: 20452.2
+            total_shares:
+              description: Total number of shares across all apartments
+              type: number
+              minimum: 0
+              example: 98500
         acquisition_price:
           description: Acquisition price information
           type: object
