@@ -22,6 +22,7 @@ type FormInputFieldProps = {
     label: string;
     field?: string;
     fieldPath: string;
+    unit?: string;
     validator?: (value) => boolean;
     required?: boolean;
     tooltipText?: string;
@@ -49,6 +50,7 @@ export default function FormInputField({
     label,
     field,
     fieldPath,
+    unit,
     required,
     validator,
     formData,
@@ -87,6 +89,7 @@ export default function FormInputField({
         invalid: isInvalid,
         setFieldValue: setFieldValue,
         errorText: errorMessage,
+        className: "input-field--" + inputType,
     };
 
     if (inputType === "text" || inputType === "textArea") {
@@ -102,6 +105,7 @@ export default function FormInputField({
         return (
             <FormNumberInputField
                 {...commonProps}
+                unit={unit}
                 {...rest}
             />
         );
