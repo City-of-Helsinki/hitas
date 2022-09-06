@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 
 import {Button, Dialog, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Link} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateApartmentMutation, useGetApartmentTypesQuery} from "../../app/services";
 import {FormInputField} from "../../common/components";
-import {IApartmentWritable, ICode} from "../../common/models";
+import {ApartmentState, IApartmentWritable, ICode} from "../../common/models";
 
 const Ownership = (children) => <li className="ownership-item">{children}</li>;
 
@@ -14,8 +15,8 @@ const ApartmentCreatePage = () => {
     const [isAddOwnershipModalVisible, setIsAddOwnershipModalVisible] = useState(false);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     // Create a new apartment
-    const [formData, setFormData] = useImmer<IApartmentWritable>({
-        state: "free",
+    const blankForm = {
+        state: "free" as ApartmentState,
         apartment_type: {id: ""},
         surface_area: 0,
         share_number_start: 0,
@@ -60,7 +61,8 @@ const ApartmentCreatePage = () => {
             },
         ],
         notes: "",
-    });
+    };
+    const [formData, setFormData] = useImmer<IApartmentWritable>(blankForm as IApartmentWritable);
     const [createApartment, {error}] = useCreateApartmentMutation();
     const handleSaveButtonClicked = () => {
         try {
@@ -90,14 +92,8 @@ const ApartmentCreatePage = () => {
                         gridGap: "1em",
                     }}
                 >
-                    <FormInputField
-                        label="Katuosoite"
-                        fieldPath="address.street_address"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
+                    <label>Katuosoite</label>
+                    <div>Jokukatu 4</div>
                     <FormInputField
                         label="Rappu"
                         fieldPath="stair"
@@ -124,17 +120,11 @@ const ApartmentCreatePage = () => {
                         setFormData={setFormData}
                         error={error}
                     />
-                    <FormInputField
-                        label="Asunto-osakeyhtiö"
-                        fieldPath="housing_company.name"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
+                    <label>Asunto-osakeyhtiö</label>
+                    <div>Arabian helmi</div>
                     <FormInputField
                         inputType="relatedModel"
-                        label="asuntotyyppi"
+                        label="Asuntotyyppi"
                         fieldPath="apartment_type.id"
                         queryFunction={useGetApartmentTypesQuery}
                         relatedModelSearchField="value"
@@ -198,7 +188,7 @@ const ApartmentCreatePage = () => {
                     <FormInputField
                         inputType="number"
                         unit="€"
-                        label="Hankintahinta"
+                        label="Rakennusaikaiset laina"
                         fieldPath="loans_during_construction"
                         required
                         formData={formData}
@@ -208,7 +198,7 @@ const ApartmentCreatePage = () => {
                     <FormInputField
                         inputType="number"
                         unit="€"
-                        label="Hankintahinta"
+                        label="Rakennusaikaiset korot"
                         fieldPath="interest_during_construction"
                         required
                         formData={formData}
@@ -227,6 +217,7 @@ const ApartmentCreatePage = () => {
                     )}
                     <Button
                         onClick={addOwner}
+                        variant="secondary"
                         theme="black"
                     >
                         Lisää omistajuus
@@ -331,18 +322,23 @@ const ApartmentCreatePage = () => {
                 ) : (
                     <Dialog.ActionButtons>
                         <Button
-                            onClick={() => setIsEndModalVisible(false)}
+                            onClick={() => {
+                                setFormData(blankForm);
+                                setIsEndModalVisible(false);
+                            }}
                             variant="secondary"
                             theme={"black"}
                         >
                             Luo uusi asunto
                         </Button>
-                        <Button
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Palaa yhtiön asuntolistaukseen
-                        </Button>
+                        <Link to={`/apartments/`}>
+                            <Button
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Palaa yhtiön asuntolistaukseen
+                            </Button>
+                        </Link>
                     </Dialog.ActionButtons>
                 )}
             </Dialog>
