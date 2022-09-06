@@ -69,6 +69,8 @@ paths:
                       $ref: '#/components/schemas/HousingCompany'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -96,6 +98,8 @@ paths:
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -160,6 +164,8 @@ paths:
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -187,6 +193,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -229,6 +237,8 @@ paths:
                       $ref: '#/components/schemas/RealEstate'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -264,6 +274,8 @@ paths:
                 $ref: '#/components/schemas/RealEstate'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -343,6 +355,8 @@ paths:
                 $ref: '#/components/schemas/RealEstate'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -377,6 +391,8 @@ paths:
           description: Real estate successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -426,6 +442,8 @@ paths:
                       $ref: '#/components/schemas/Building'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -468,6 +486,8 @@ paths:
                 $ref: '#/components/schemas/Building'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -561,6 +581,8 @@ paths:
                 $ref: '#/components/schemas/Building'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -602,6 +624,8 @@ paths:
           description: Building successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -644,6 +668,8 @@ paths:
                       $ref: '#/components/schemas/Apartment'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -679,6 +705,8 @@ paths:
                 $ref: '#/components/schemas/ApartmentDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -758,6 +786,8 @@ paths:
                 $ref: '#/components/schemas/ApartmentDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -792,6 +822,8 @@ paths:
           description: Apartment successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -862,6 +894,8 @@ paths:
                       $ref: '#/components/schemas/Apartment'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -900,6 +934,8 @@ paths:
                       $ref: '#/components/schemas/Person'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -927,6 +963,8 @@ paths:
                 $ref: '#/components/schemas/Person'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -991,6 +1029,8 @@ paths:
                 $ref: '#/components/schemas/Person'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1018,6 +1058,8 @@ paths:
           description: Person successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1054,6 +1096,8 @@ paths:
                       $ref: '#/components/schemas/PropertyManager'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1081,6 +1125,8 @@ paths:
                 $ref: '#/components/schemas/PropertyManager'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1145,6 +1191,8 @@ paths:
                 $ref: '#/components/schemas/PropertyManager'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1172,6 +1220,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1210,6 +1260,8 @@ paths:
                       $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1237,6 +1289,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1301,6 +1355,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1328,6 +1384,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1364,6 +1422,8 @@ paths:
                       $ref: '#/components/schemas/HitasPostalCode'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1391,6 +1451,8 @@ paths:
                 $ref: '#/components/schemas/HitasPostalCode'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1455,6 +1517,8 @@ paths:
                 $ref: '#/components/schemas/HitasPostalCode'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1482,6 +1546,8 @@ paths:
           description: Postal code successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1518,6 +1584,8 @@ paths:
                       $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1545,6 +1613,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1609,6 +1679,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1636,6 +1708,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1672,6 +1746,8 @@ paths:
                       $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1699,6 +1775,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1763,6 +1841,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1790,6 +1870,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1826,6 +1908,8 @@ paths:
                       $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1853,6 +1937,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1917,6 +2003,8 @@ paths:
                 $ref: '#/components/schemas/Code'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1944,6 +2032,8 @@ paths:
           description: Housing company successfully removed.
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -2980,6 +3070,32 @@ components:
                 type: string
                 example: Length exceeds maximum length of 50
 
+    UnauthorizedError:
+      description: Unauthorized error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [401]
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Unauthorized"]
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: The request requires authentication
+        error:
+          description: Error reason
+          type: string
+          enum: [unauthorized]
+
     NotFoundError:
       description: Not found error
       type: object
@@ -3127,6 +3243,18 @@ components:
               - field: email
                 message: Email is required
 
+    Unauthorized:
+      description: The request was not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          example:
+            status: 401
+            reason: Unauthorized
+            error: unauthorized
+            message: The request requires an authentication
+
     NotFound:
       description: The specified resource was not found
       content:
@@ -3139,18 +3267,6 @@ components:
             error: housing_company_not_found
             message: Housing company not found
 
-    UnsupportedMediaType:
-      description: Only 'application/json' content-type is supported.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UnsupportedMediaTypeError'
-          example:
-            status: 415
-            reason: Unsupported Media Type
-            error: unsupported_media_type
-            message: Only 'application/json' Content-Type is supported.
-
     NotAcceptable:
       description: Only 'application/json' content-type is supported.
       content:
@@ -3161,6 +3277,18 @@ components:
             status: 405
             reason: Not Acceptable
             error: not_acceptable
+            message: Only 'application/json' Content-Type is supported.
+
+    UnsupportedMediaType:
+      description: Only 'application/json' content-type is supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            status: 415
+            reason: Unsupported Media Type
+            error: unsupported_media_type
             message: Only 'application/json' Content-Type is supported.
 
     InternalServerError:

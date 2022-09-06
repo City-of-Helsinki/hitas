@@ -1,6 +1,8 @@
 import operator
 from typing import Any, Optional
 
+from rest_framework.authentication import TokenAuthentication
+
 
 def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
     """
@@ -16,3 +18,7 @@ def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
         return operator.attrgetter(dotted_path)(obj)
     except AttributeError:
         return default
+
+
+class BearerAuthentication(TokenAuthentication):
+    keyword = "Bearer"

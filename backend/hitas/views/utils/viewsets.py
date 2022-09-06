@@ -13,7 +13,6 @@ class HitasModelMixin:
     serializer_class = None
     list_serializer_class = None
     model_class = None
-    permission_classes = []
     lookup_field = "uuid"
     pagination_class = HitasPagination
 

@@ -756,6 +756,14 @@
     }
   },
   {
+    "model": "authtoken.token",
+    "pk": "52bf0606e0a0075c990fecc0afa555e5dae56404",
+    "fields": {
+      "user": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
+      "created": "2022-09-07T06:42:16.586Z"
+    }
+  },
+  {
     "model": "hitas.apartment",
     "pk": 1,
     "fields": {
