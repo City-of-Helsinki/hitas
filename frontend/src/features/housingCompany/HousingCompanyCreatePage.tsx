@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Button, Dialog, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Link} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
@@ -16,7 +17,8 @@ import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IProp
 import {validateBusinessId} from "../../common/utils";
 
 const HousingCompanyCreatePage = (): JSX.Element => {
-    const [formData, setFormData] = useImmer<IHousingCompanyWritable>({
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+    const blankForm = {
         acquisition_price: {
             initial: null,
             realized: null,
@@ -38,11 +40,18 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         property_manager: {id: ""},
         state: "not_ready",
         sales_price_catalogue_confirmation_date: null,
-    });
+    };
+    const [formData, setFormData] = useImmer<IHousingCompanyWritable>(blankForm as IHousingCompanyWritable);
     const [createHousingCompany, {error}] = useCreateHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
-        createHousingCompany(formData);
+        try {
+            createHousingCompany(formData);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsEndModalVisible(true);
+        }
     };
 
     return (
@@ -234,6 +243,61 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             >
                 Tallenna
             </Button>
+            {/*
+             Save attempt modal dialog
+             */}
+            <Dialog
+                id="modification__end-modal"
+                closeButtonLabelText={"args.closeButtonLabelText"}
+                aria-labelledby={"finish-modal"}
+                isOpen={isEndModalVisible}
+                close={() => setIsEndModalVisible(false)}
+                boxShadow={true}
+            >
+                <Dialog.Header
+                    id="modification__end-modal__header"
+                    title={`Tallennus ${error ? "epä" : ""}onnistui`}
+                />
+                <Dialog.Content>{error ? "Tapahtui virhe" : `${formData.name.official} luotu!`}</Dialog.Content>
+                {error ? (
+                    <Dialog.ActionButtons>
+                        <Link to={`/housing-companies/`}>
+                            <Button
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Takaisin yhtiölistaukseen
+                            </Button>
+                        </Link>
+                        <Button
+                            onClick={() => setIsEndModalVisible(false)}
+                            variant="secondary"
+                            theme={"black"}
+                        >
+                            Sulje
+                        </Button>
+                    </Dialog.ActionButtons>
+                ) : (
+                    <Dialog.ActionButtons>
+                        <Link to={`/housing-companies/${formData.id}`}>
+                            <Button
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Yhtiön sivulle
+                            </Button>
+                        </Link>
+                        <Link to={`/housing-companies/`}>
+                            <Button
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Takaisin yhtiölistaukseen
+                            </Button>
+                        </Link>
+                    </Dialog.ActionButtons>
+                )}
+            </Dialog>
         </div>
     );
 };
