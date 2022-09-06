@@ -19,7 +19,13 @@ def exception_handler(exc, context):
             for field_name, error in exc.get_full_details().items():
                 fields.extend(_convert_fields(field_name, error))
 
-            return BadRequestException(fields).to_response()
+            return BadRequest(fields).to_response()
+
+        if isinstance(exc, exceptions.NotAuthenticated):
+            return Unauthorized("The request requires an authentication").to_response()
+
+        if isinstance(exc, exceptions.AuthenticationFailed):
+            return Unauthorized("The request contained an invalid authentication token").to_response()
 
         if isinstance(exc, exceptions.MethodNotAllowed):
             return MethodNotAllowed().to_response()
@@ -31,7 +37,7 @@ def exception_handler(exc, context):
             return NotAcceptable().to_response()
 
         if isinstance(exc, exceptions.ParseError):
-            return BadRequestException().to_response()
+            return BadRequest().to_response()
 
         return drf_exc_handler(exc, context)
 
@@ -110,7 +116,20 @@ class MethodNotAllowed(HitasException):
         )
 
 
-class BadRequestException(HitasException):
+class Unauthorized(HitasException):
+    def __init__(self, message: str):
+        super().__init__(
+            status_code=401,
+            data={
+                "status": 401,
+                "reason": "Unauthorized",
+                "message": message,
+                "error": "unauthorized",
+            },
+        )
+
+
+class BadRequest(HitasException):
     def __init__(self, fields=None):
         super().__init__(
             status_code=400,

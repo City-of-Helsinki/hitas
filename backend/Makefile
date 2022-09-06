@@ -18,6 +18,6 @@ format:
 	flake8 .
 
 dump:
-	./manage.py dumpdata users hitas > initial.json
+	./manage.py dumpdata users authtoken hitas > initial.json
 	cat initial.json | jq > initial-formatted.json
 	mv initial-formatted.json initial.json

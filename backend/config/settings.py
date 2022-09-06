@@ -1,6 +1,7 @@
 import os
 
 import environ
+import rest_framework.authentication
 from django.utils.translation import gettext_lazy as _
 
 # Set up .env
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "hitas",
     "nested_inline",
     "rest_framework",
+    "rest_framework.authtoken",
     "django_filters",
     "health_check",
     "corsheaders",
@@ -87,11 +89,18 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
 
+
+class BearerAuth(rest_framework.authentication.TokenAuthentication):
+    keyword = "Bearer"
+
+
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["hitas.utils.BearerAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
 # Disable browseable API renderer if DEBUG is not set

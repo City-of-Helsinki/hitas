@@ -23,11 +23,21 @@ export class Config {
         window.__env !== undefined
             ? window.__env.API_URL
             : process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1";
+    static token =
+        window.__env !== undefined
+            ? window.__env.AUTH_TOKEN
+            : process.env.REACT_APP_AUTH_TOKEN || "52bf0606e0a0075c990fecc0afa555e5dae56404";
 }
 
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
-    baseQuery: fetchBaseQuery({baseUrl: Config.api_url}),
+    baseQuery: fetchBaseQuery({
+        baseUrl: Config.api_url,
+        prepareHeaders: (headers) => {
+            headers.set("Authorization", "Bearer " + Config.token)
+            return headers;
+        },
+    }),
     endpoints: (builder) => ({
         // HousingCompany
         getHousingCompanies: builder.query<IHousingCompanyListResponse, object>({
