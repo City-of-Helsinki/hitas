@@ -763,19 +763,23 @@
       "building": 1,
       "state": "reserved",
       "apartment_type": 100,
-      "completion_date": "2014-06-02",
       "surface_area": "60.00",
       "share_number_start": 1,
       "share_number_end": 49,
+      "completion_date": "2014-06-02",
       "street_address": "Matinkatu 22",
       "apartment_number": 1,
-      "floor": 1,
+      "floor": "1",
       "stair": "A",
       "debt_free_purchase_price": 11000,
-      "purchase_price": 22000,
       "primary_loan_amount": 44000,
+      "purchase_price": "22000.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 55000,
       "interest_during_construction": 66000,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": null
     }
   },
@@ -787,19 +791,23 @@
       "building": 2,
       "state": "free",
       "apartment_type": 128,
-      "completion_date": "2014-06-02",
       "surface_area": "43.67",
       "share_number_start": 50,
       "share_number_end": 100,
+      "completion_date": "2014-06-02",
       "street_address": "Bengalinkuja 4",
       "apartment_number": 68,
-      "floor": 4,
+      "floor": "4",
       "stair": "z",
       "debt_free_purchase_price": 19817680,
-      "purchase_price": 14353544,
       "primary_loan_amount": 15222953,
+      "purchase_price": "14353544.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 17863409,
       "interest_during_construction": 1600059,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Nulla eos maiores illo reprehenderit. Sunt ducimus laborum nulla eveniet laboriosam.\nIpsa molestias aspernatur non occaecati."
     }
   },
@@ -810,20 +818,24 @@
       "uuid": "231c4898-3918-4cad-9c6b-63d99fa1de62",
       "building": 3,
       "state": "free",
-      "completion_date": "2014-06-02",
       "apartment_type": 129,
       "surface_area": "13.40",
       "share_number_start": 1,
       "share_number_end": 50,
+      "completion_date": "2014-06-02",
       "street_address": "Iltatähdenkatu 7",
       "apartment_number": 2,
-      "floor": 5,
+      "floor": "5",
       "stair": "W",
       "debt_free_purchase_price": 11584201,
-      "purchase_price": 10198118,
       "primary_loan_amount": 18304503,
+      "purchase_price": "10198118.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 12426834,
       "interest_during_construction": 1142622,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Voluptatem veritatis sit dolorem. Earum sint quidem quos voluptate cumque numquam. Esse architecto dolorum sit.\nRerum incidunt velit quis quibusdam."
     }
   },
@@ -835,19 +847,23 @@
       "building": 4,
       "state": "sold",
       "apartment_type": 129,
-      "completion_date": "2014-06-02",
       "surface_area": "97.35",
       "share_number_start": 1,
       "share_number_end": 50,
+      "completion_date": "2014-06-02",
       "street_address": "Lautamiehenbulevardi 04",
       "apartment_number": 95,
-      "floor": 2,
+      "floor": "2",
       "stair": "Q",
       "debt_free_purchase_price": 10807807,
-      "purchase_price": 16806534,
       "primary_loan_amount": 16844104,
+      "purchase_price": "16806534.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 14996460,
       "interest_during_construction": 1114073,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Quos magnam quaerat provident asperiores praesentium provident. Illo quasi commodi. Consequatur nobis corporis mollitia."
     }
   },
@@ -859,19 +875,23 @@
       "building": 5,
       "state": "sold",
       "apartment_type": 130,
-      "completion_date": "2014-06-02",
       "surface_area": "11.72",
       "share_number_start": 1,
       "share_number_end": 500,
+      "completion_date": "2014-06-02",
       "street_address": "Ylipalonpolku 7",
       "apartment_number": 39,
-      "floor": 6,
+      "floor": "6",
       "stair": "q",
       "debt_free_purchase_price": 15818308,
-      "purchase_price": 19167654,
       "primary_loan_amount": 14639110,
+      "purchase_price": "19167654.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 16386070,
       "interest_during_construction": 1552263,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Fugit omnis modi voluptatibus ut. Sequi quaerat quasi omnis labore expedita repudiandae. Excepturi aperiam voluptatum animi quod quae."
     }
   },
@@ -883,19 +903,23 @@
       "building": 6,
       "state": "sold",
       "apartment_type": 129,
-      "completion_date": "2014-06-02",
       "surface_area": "16.01",
       "share_number_start": 1,
       "share_number_end": 50,
+      "completion_date": "2014-06-02",
       "street_address": "Iltatähdenbulevardi 909",
       "apartment_number": 87,
-      "floor": 9,
+      "floor": "9",
       "stair": "o",
       "debt_free_purchase_price": 194932,
-      "purchase_price": 101511,
       "primary_loan_amount": 120237,
+      "purchase_price": "101511.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 147004,
       "interest_during_construction": 12997,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Necessitatibus quidem quisquam expedita laboriosam. Minus explicabo voluptates exercitationem beatae."
     }
   },
@@ -907,19 +931,23 @@
       "building": 7,
       "state": "sold",
       "apartment_type": 129,
-      "completion_date": "2014-06-02",
       "surface_area": "14.36",
       "share_number_start": 1001,
       "share_number_end": 1500,
+      "completion_date": "2014-06-02",
       "street_address": "Fabianinbulevardi 565",
       "apartment_number": 88,
-      "floor": 9,
+      "floor": "9",
       "stair": "A",
       "debt_free_purchase_price": 166968,
-      "purchase_price": 119595,
       "primary_loan_amount": 150795,
+      "purchase_price": "119595.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 110982,
       "interest_during_construction": 17174,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "Eum quos praesentium cupiditate odio odit quibusdam. Fuga placeat ipsum quasi. Blanditiis praesentium odio sit id adipisci minima pariatur."
     }
   },
@@ -931,19 +959,23 @@
       "building": 8,
       "state": "sold",
       "apartment_type": 129,
-      "completion_date": "2014-06-02",
       "surface_area": "40.91",
       "share_number_start": 30,
       "share_number_end": 50,
+      "completion_date": "2014-06-02",
       "street_address": "Yrjöntie 703",
       "apartment_number": 53,
-      "floor": 8,
+      "floor": "8",
       "stair": "P",
       "debt_free_purchase_price": 106031,
-      "purchase_price": 185278,
       "primary_loan_amount": 102128,
+      "purchase_price": "185278.00",
+      "first_purchase_date": null,
+      "second_purchase_date": null,
+      "additional_work_during_construction": 0,
       "loans_during_construction": 131965,
       "interest_during_construction": 16209,
+      "debt_free_purchase_price_during_construction": 0,
       "notes": "At occaecati explicabo iste fuga magni. Occaecati tenetur a itaque animi quo odit totam. Quod maxime magni optio.\nOdio animi consequatur. Eligendi ut maxime laborum quae minus."
     }
   },
@@ -1501,406 +1533,6 @@
       "legacy_code_number": "912",
       "legacy_start_date": "2022-06-10T12:53:10.143Z",
       "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 1,
-    "fields": {
-      "uuid": "75592d94-970c-4862-81d1-53ccd672ae3e",
-      "value": "00100",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 2,
-    "fields": {
-      "uuid": "b8ada237-479c-410d-962c-306c22b186e0",
-      "value": "00150",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 3,
-    "fields": {
-      "uuid": "82d6115c-4058-45d1-a993-2d4225124929",
-      "value": "00190",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 4,
-    "fields": {
-      "uuid": "679e2218-7db9-4358-b904-da6f350cd6a3",
-      "value": "00230",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 5,
-    "fields": {
-      "uuid": "aced7b38-19be-4769-b1f6-804893cc2ff3",
-      "value": "00420",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 6,
-    "fields": {
-      "uuid": "ee7a9635-56b2-4518-af25-36bf311df6a4",
-      "value": "00530",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 7,
-    "fields": {
-      "uuid": "a9854cee-618a-4f4d-8e6b-20798990597e",
-      "value": "00620",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 8,
-    "fields": {
-      "uuid": "9d58382c-65a4-4f51-b609-46fe13f27f44",
-      "value": "00710",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 9,
-    "fields": {
-      "uuid": "24bc0687-6c91-43f2-8097-68987c6b7899",
-      "value": "00890",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 10,
-    "fields": {
-      "uuid": "3c63efb8-6f87-416c-856f-83622f4090a6",
-      "value": "00940",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 11,
-    "fields": {
-      "uuid": "70870539-58f9-49f9-9517-6128d342fec9",
-      "value": "01020",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 12,
-    "fields": {
-      "uuid": "fe5cbba3-3da2-4980-9cf1-3758acd1cbaa",
-      "value": "00020",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 13,
-    "fields": {
-      "uuid": "c6737eb2-be39-403a-8c29-dcb601da13c7",
-      "value": "00950",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 14,
-    "fields": {
-      "uuid": "27b92601-98e1-458b-89ad-cb64ad5fe86b",
-      "value": "00220",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 15,
-    "fields": {
-      "uuid": "a41a3dda-84d8-492a-b6a9-1a3eb2e58605",
-      "value": "00470",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 16,
-    "fields": {
-      "uuid": "4b72a40b-286b-4ce5-8574-1d5684187cca",
-      "value": "00990",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 17,
-    "fields": {
-      "uuid": "a484f296-f975-4cb2-8f37-977d3d9073c8",
-      "value": "00340",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 18,
-    "fields": {
-      "uuid": "2dbd3780-ce9d-44bd-a8a5-f12f70951bde",
-      "value": "00660",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 19,
-    "fields": {
-      "uuid": "827c0813-df89-46cf-a87a-abfd1bb003e2",
-      "value": "00520",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 20,
-    "fields": {
-      "uuid": "4da06ac7-f1ea-440f-addc-0f53830eaab5",
-      "value": "00850",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 21,
-    "fields": {
-      "uuid": "482f649e-ad74-4053-9feb-9d4c6cd6897d",
-      "value": "00290",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 22,
-    "fields": {
-      "uuid": "60586cf9-56a6-4586-b8d9-f95cb88769db",
-      "value": "00240",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 23,
-    "fields": {
-      "uuid": "2106516d-0e34-4f93-a72e-32610ce3093a",
-      "value": "00450",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 24,
-    "fields": {
-      "uuid": "c3f81039-ce1d-4d6d-80a8-538774a92973",
-      "value": "00460",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 25,
-    "fields": {
-      "uuid": "825fd6d3-bdfa-44a7-929d-692f82d95312",
-      "value": "00640",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 26,
-    "fields": {
-      "uuid": "daa8104c-5241-4f66-91c9-5f3cbc761a34",
-      "value": "00610",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 27,
-    "fields": {
-      "uuid": "1a8cc501-c900-4aa6-a760-066946aef409",
-      "value": "00350",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 28,
-    "fields": {
-      "uuid": "9a3c4e2f-a741-4469-8f35-3a649caa2355",
-      "value": "00170",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 29,
-    "fields": {
-      "uuid": "7785845b-9dd3-4603-b79a-1006095e42b0",
-      "value": "00270",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 30,
-    "fields": {
-      "uuid": "2214c454-6564-44ae-ac75-f5f1ee5eaed4",
-      "value": "00480",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 31,
-    "fields": {
-      "uuid": "190ab006-1334-478e-be39-489fc4f6441a",
-      "value": "00820",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 32,
-    "fields": {
-      "uuid": "8fee4ea0-4bcf-4191-a1f0-67b620e7eb41",
-      "value": "00320",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 33,
-    "fields": {
-      "uuid": "dc2548a8-ade6-4cde-872e-aa93240cadf9",
-      "value": "00900",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 34,
-    "fields": {
-      "uuid": "bfe36a1d-f032-4ce3-927f-2c8c1c3fb5eb",
-      "value": "00490",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 35,
-    "fields": {
-      "uuid": "f94e8cd6-b814-4288-adce-817f0653486e",
-      "value": "00540",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 36,
-    "fields": {
-      "uuid": "91771d5b-d867-4f21-b78d-efe71f7a7ee6",
-      "value": "00260",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 37,
-    "fields": {
-      "uuid": "666616a2-308e-4155-988d-ccf7234fb02c",
-      "value": "00690",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 38,
-    "fields": {
-      "uuid": "55f06525-545c-4b28-84a4-5430dece01e7",
-      "value": "00750",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 39,
-    "fields": {
-      "uuid": "82a34c14-4f7d-41e5-b81a-8ad6e98340ed",
-      "value": "00930",
-      "city": "Helsinki",
-      "cost_area": 1
-    }
-  },
-  {
-    "model": "hitas.hitaspostalcode",
-    "pk": 40,
-    "fields": {
-      "uuid": "c8328f3b-24cd-4710-9d6a-eb5a93e5e168",
-      "value": "00880",
-      "city": "Helsinki",
-      "cost_area": 1
     }
   },
   {
@@ -3948,6 +3580,406 @@
     }
   },
   {
+    "model": "hitas.hitaspostalcode",
+    "pk": 1,
+    "fields": {
+      "uuid": "75592d94-970c-4862-81d1-53ccd672ae3e",
+      "value": "00100",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 2,
+    "fields": {
+      "uuid": "b8ada237-479c-410d-962c-306c22b186e0",
+      "value": "00150",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 3,
+    "fields": {
+      "uuid": "82d6115c-4058-45d1-a993-2d4225124929",
+      "value": "00190",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 4,
+    "fields": {
+      "uuid": "679e2218-7db9-4358-b904-da6f350cd6a3",
+      "value": "00230",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 5,
+    "fields": {
+      "uuid": "aced7b38-19be-4769-b1f6-804893cc2ff3",
+      "value": "00420",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 6,
+    "fields": {
+      "uuid": "ee7a9635-56b2-4518-af25-36bf311df6a4",
+      "value": "00530",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 7,
+    "fields": {
+      "uuid": "a9854cee-618a-4f4d-8e6b-20798990597e",
+      "value": "00620",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 8,
+    "fields": {
+      "uuid": "9d58382c-65a4-4f51-b609-46fe13f27f44",
+      "value": "00710",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 9,
+    "fields": {
+      "uuid": "24bc0687-6c91-43f2-8097-68987c6b7899",
+      "value": "00890",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 10,
+    "fields": {
+      "uuid": "3c63efb8-6f87-416c-856f-83622f4090a6",
+      "value": "00940",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 11,
+    "fields": {
+      "uuid": "70870539-58f9-49f9-9517-6128d342fec9",
+      "value": "01020",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 12,
+    "fields": {
+      "uuid": "fe5cbba3-3da2-4980-9cf1-3758acd1cbaa",
+      "value": "00020",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 13,
+    "fields": {
+      "uuid": "c6737eb2-be39-403a-8c29-dcb601da13c7",
+      "value": "00950",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 14,
+    "fields": {
+      "uuid": "27b92601-98e1-458b-89ad-cb64ad5fe86b",
+      "value": "00220",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 15,
+    "fields": {
+      "uuid": "a41a3dda-84d8-492a-b6a9-1a3eb2e58605",
+      "value": "00470",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 16,
+    "fields": {
+      "uuid": "4b72a40b-286b-4ce5-8574-1d5684187cca",
+      "value": "00990",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 17,
+    "fields": {
+      "uuid": "a484f296-f975-4cb2-8f37-977d3d9073c8",
+      "value": "00340",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 18,
+    "fields": {
+      "uuid": "2dbd3780-ce9d-44bd-a8a5-f12f70951bde",
+      "value": "00660",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 19,
+    "fields": {
+      "uuid": "827c0813-df89-46cf-a87a-abfd1bb003e2",
+      "value": "00520",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 20,
+    "fields": {
+      "uuid": "4da06ac7-f1ea-440f-addc-0f53830eaab5",
+      "value": "00850",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 21,
+    "fields": {
+      "uuid": "482f649e-ad74-4053-9feb-9d4c6cd6897d",
+      "value": "00290",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 22,
+    "fields": {
+      "uuid": "60586cf9-56a6-4586-b8d9-f95cb88769db",
+      "value": "00240",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 23,
+    "fields": {
+      "uuid": "2106516d-0e34-4f93-a72e-32610ce3093a",
+      "value": "00450",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 24,
+    "fields": {
+      "uuid": "c3f81039-ce1d-4d6d-80a8-538774a92973",
+      "value": "00460",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 25,
+    "fields": {
+      "uuid": "825fd6d3-bdfa-44a7-929d-692f82d95312",
+      "value": "00640",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 26,
+    "fields": {
+      "uuid": "daa8104c-5241-4f66-91c9-5f3cbc761a34",
+      "value": "00610",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 27,
+    "fields": {
+      "uuid": "1a8cc501-c900-4aa6-a760-066946aef409",
+      "value": "00350",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 28,
+    "fields": {
+      "uuid": "9a3c4e2f-a741-4469-8f35-3a649caa2355",
+      "value": "00170",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 29,
+    "fields": {
+      "uuid": "7785845b-9dd3-4603-b79a-1006095e42b0",
+      "value": "00270",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 30,
+    "fields": {
+      "uuid": "2214c454-6564-44ae-ac75-f5f1ee5eaed4",
+      "value": "00480",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 31,
+    "fields": {
+      "uuid": "190ab006-1334-478e-be39-489fc4f6441a",
+      "value": "00820",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 32,
+    "fields": {
+      "uuid": "8fee4ea0-4bcf-4191-a1f0-67b620e7eb41",
+      "value": "00320",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 33,
+    "fields": {
+      "uuid": "dc2548a8-ade6-4cde-872e-aa93240cadf9",
+      "value": "00900",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 34,
+    "fields": {
+      "uuid": "bfe36a1d-f032-4ce3-927f-2c8c1c3fb5eb",
+      "value": "00490",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 35,
+    "fields": {
+      "uuid": "f94e8cd6-b814-4288-adce-817f0653486e",
+      "value": "00540",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 36,
+    "fields": {
+      "uuid": "91771d5b-d867-4f21-b78d-efe71f7a7ee6",
+      "value": "00260",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 37,
+    "fields": {
+      "uuid": "666616a2-308e-4155-988d-ccf7234fb02c",
+      "value": "00690",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 38,
+    "fields": {
+      "uuid": "55f06525-545c-4b28-84a4-5430dece01e7",
+      "value": "00750",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 39,
+    "fields": {
+      "uuid": "82a34c14-4f7d-41e5-b81a-8ad6e98340ed",
+      "value": "00930",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
+    "model": "hitas.hitaspostalcode",
+    "pk": 40,
+    "fields": {
+      "uuid": "c8328f3b-24cd-4710-9d6a-eb5a93e5e168",
+      "value": "00880",
+      "city": "Helsinki",
+      "cost_area": 1
+    }
+  },
+  {
     "model": "hitas.propertymanager",
     "pk": 2,
     "fields": {
@@ -3955,7 +3987,8 @@
       "name": "EA-isännöinti Oy",
       "email": "not-known@example.com",
       "street_address": "Värikuja 1 B 13",
-      "postal_code": 1
+      "postal_code": "1",
+      "city": ""
     }
   },
   {
@@ -3966,7 +3999,8 @@
       "name": "Maria Rossi-Karvonen",
       "email": "yleinonen@example.org",
       "street_address": "Porinpolku 7",
-      "postal_code": 7
+      "postal_code": "7",
+      "city": ""
     }
   },
   {
@@ -3977,7 +4011,8 @@
       "name": "Leena Vartiainen",
       "email": "sara15@example.net",
       "street_address": "Taimistonkuja 28",
-      "postal_code": 13
+      "postal_code": "13",
+      "city": ""
     }
   },
   {
@@ -3988,7 +4023,8 @@
       "name": "Jukka Ruotsalainen-Reinikainen",
       "email": "karjalainenkristian@example.net",
       "street_address": "Walentin Chorellin polku 2",
-      "postal_code": 18
+      "postal_code": "18",
+      "city": ""
     }
   },
   {
@@ -3999,7 +4035,8 @@
       "name": "Ilkka Salonen",
       "email": "nylundsanna@example.org",
       "street_address": "Franzéninkatu 1",
-      "postal_code": 24
+      "postal_code": "24",
+      "city": ""
     }
   },
   {
@@ -4010,7 +4047,8 @@
       "name": "Tuulikki Salo",
       "email": "erkki98@example.net",
       "street_address": "Nervanderinpolku 06",
-      "postal_code": 29
+      "postal_code": "29",
+      "city": ""
     }
   },
   {
@@ -4021,7 +4059,8 @@
       "name": "Hannu Räsänen",
       "email": "pentti86@example.com",
       "street_address": "Ostoskuja 1",
-      "postal_code": 17
+      "postal_code": "17",
+      "city": ""
     }
   },
   {
@@ -4032,7 +4071,8 @@
       "name": "Kyllikki Saarinen",
       "email": "uusitaloelisabeth@example.net",
       "street_address": "Taavetti Laitisen polku 6",
-      "postal_code": 38
+      "postal_code": "38",
+      "city": ""
     }
   },
   {
