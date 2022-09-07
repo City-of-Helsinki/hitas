@@ -307,6 +307,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "django-safedelete"
+version = "1.3.0"
+description = "Mask your objects instead of deleting them from your database."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Django = "*"
+
+[[package]]
 name = "djangorestframework"
 version = "3.13.1"
 description = "Web APIs for Django, made easy."
@@ -1163,7 +1174,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ec37fb20399e66aae717e657630ae5339b346c15f14b76e24dd641e230d3f537"
+content-hash = "05052b3496c3cf53e4133cf0738e0016d01a2f3853c99c7e054153ed580de330"
 
 [metadata.files]
 appnope = [
@@ -1264,6 +1275,7 @@ django-nested-inline = [
     {file = "django-nested-inline-0.4.5.tar.gz", hash = "sha256:d7e51dc1ebf805df53ec7ff9b4108dfe1dfb8a7e02212700a4e467f2caafe34b"},
     {file = "django_nested_inline-0.4.5-py3-none-any.whl", hash = "sha256:fc6998e7d607c1414e25897ae1a544105ada93d63c5cff3ac9582fbf14d8ec63"},
 ]
+django-safedelete = []
 djangorestframework = [
     {file = "djangorestframework-3.13.1-py3-none-any.whl", hash = "sha256:24c4bf58ed7e85d1fe4ba250ab2da926d263cd57d64b03e8dcef0ac683f8b1aa"},
     {file = "djangorestframework-3.13.1.tar.gz", hash = "sha256:0c33407ce23acc68eca2a6e46424b008c9c02eceb8cf18581921d0092bc1f2ee"},

@@ -3,12 +3,15 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from safedelete.models import SOFT_DELETE_CASCADE, SafeDeleteModel
 
 
-class HitasModel(models.Model):
+class HitasModel(SafeDeleteModel):
     """
     Abstract model for Hitas entities without an externally visible ID
     """
+
+    _safedelete_policy = SOFT_DELETE_CASCADE
 
     class Meta:
         abstract = True
@@ -17,10 +20,12 @@ class HitasModel(models.Model):
         return f"<{type(self).__name__}:{self.pk}>"
 
 
-class ExternalHitasModel(models.Model):
+class ExternalHitasModel(SafeDeleteModel):
     """
     Abstract model for Hitas entities with an externally visible ID in UUID format
     """
+
+    _safedelete_policy = SOFT_DELETE_CASCADE
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 

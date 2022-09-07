@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
-from django.db.models import ProtectedError
 from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
@@ -30,6 +29,7 @@ from hitas.tests.factories import (
     FinancingMethodFactory,
     HitasPostalCodeFactory,
     HousingCompanyFactory,
+    OwnershipFactory,
     PropertyManagerFactory,
     RealEstateFactory,
 )
@@ -590,14 +590,20 @@ def test__api__housing_company__delete(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__housing_company__delete__with_real_estate(api_client: HitasAPIClient):
+def test__api__housing_company__delete__with_references(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
-    RealEstateFactory.create(housing_company=hc)
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    bu: Building = BuildingFactory.create(real_estate=re)
+    a: Apartment = ApartmentFactory.create(building=bu)
+    OwnershipFactory.create(apartment=a)
 
     url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
-    with pytest.raises(ProtectedError):  # TODO: Return better error message from the API?
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Filter tests

@@ -20,7 +20,7 @@ class ApartmentState(Enum):
 
 # Huoneisto / Asunto
 class Apartment(ExternalHitasModel):
-    building = models.ForeignKey("Building", on_delete=models.PROTECT, related_name="apartments")
+    building = models.ForeignKey("Building", on_delete=models.CASCADE, related_name="apartments")
 
     state = EnumField(ApartmentState, default=ApartmentState.FREE)
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")

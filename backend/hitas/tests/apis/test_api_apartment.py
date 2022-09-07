@@ -2,7 +2,6 @@ import uuid
 from typing import Any
 
 import pytest
-from django.db.models import ProtectedError
 from django.urls import reverse
 from rest_framework import status
 
@@ -951,7 +950,7 @@ def test__api__apartment__delete(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
+def test__api__apartment__delete__with_references(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create()
     OwnershipFactory.create(apartment=a)
 
@@ -962,6 +961,8 @@ def test__api__apartment__delete__invalid(api_client: HitasAPIClient):
             a.uuid.hex,
         ],
     )
-    with pytest.raises(ProtectedError):  # TODO: Return better error message from the API?
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

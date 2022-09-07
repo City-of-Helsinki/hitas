@@ -7,7 +7,7 @@ from hitas.models.utils import validate_property_id
 
 # Kiinteistö
 class RealEstate(ExternalHitasModel):
-    housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")
+    housing_company = models.ForeignKey("HousingCompany", on_delete=models.CASCADE, related_name="real_estates")
 
     # 'kiinteistötunnus'
     property_identifier = models.CharField(
