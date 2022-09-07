@@ -1,16 +1,21 @@
 import React, {useState} from "react";
 
 import {Button, Dialog, Fieldset, IconSaveDisketteFill} from "hds-react";
-import {Link} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {useCreateApartmentMutation, useGetApartmentTypesQuery} from "../../app/services";
-import {FormInputField} from "../../common/components";
-import {ApartmentState, IApartmentWritable, ICode} from "../../common/models";
+import {
+    useCreateApartmentMutation,
+    useGetApartmentTypesQuery,
+    useGetHousingCompaniesQuery,
+    useGetPersonsQuery,
+} from "../../app/services";
+import {FormInputField, SaveDialogModal} from "../../common/components";
+import {ApartmentState, ApartmentStates, IApartmentWritable, ICode} from "../../common/models";
 
 const Ownership = (children) => <li className="ownership-item">{children}</li>;
 
 const ApartmentCreatePage = () => {
+    // eslint-disable-next-line no-unused-vars
     const [currentOwnership, setCurrentOwnership] = useState(0);
     const [isAddOwnershipModalVisible, setIsAddOwnershipModalVisible] = useState(false);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
@@ -48,22 +53,13 @@ const ApartmentCreatePage = () => {
                 end_date: "",
                 owner: {
                     id: "",
-                    first_name: "",
-                    last_name: "",
-                    social_security_number: "",
-                    email: "",
-                    address: {
-                        street_address: "",
-                        postal_code: "",
-                        city: "",
-                    },
                 },
             },
         ],
         notes: "",
     };
     const [formData, setFormData] = useImmer<IApartmentWritable>(blankForm as IApartmentWritable);
-    const [createApartment, {error}] = useCreateApartmentMutation();
+    const [createApartment, {data, error, isLoading}] = useCreateApartmentMutation();
     const handleSaveButtonClicked = () => {
         try {
             createApartment(formData);
@@ -78,6 +74,7 @@ const ApartmentCreatePage = () => {
         setCurrentOwnership(() => {
             return formData.ownerships.length;
         });
+        console.log(formData.ownerships);
         setIsAddOwnershipModalVisible(true);
     };
     return (
@@ -92,8 +89,27 @@ const ApartmentCreatePage = () => {
                         gridGap: "1em",
                     }}
                 >
-                    <label>Katuosoite</label>
-                    <div>Jokukatu 4</div>
+                    <FormInputField
+                        inputType={"select"}
+                        label="Tila"
+                        fieldPath="state"
+                        options={(() =>
+                            ApartmentStates.map((state) => {
+                                return {label: state};
+                            }))()}
+                        required
+                        formData={formData}
+                        setFormData={setFormData}
+                        error={error}
+                    />
+                    <FormInputField
+                        label="Katuosoite"
+                        fieldPath="address.street_address"
+                        required
+                        formData={formData}
+                        setFormData={setFormData}
+                        error={error}
+                    />
                     <FormInputField
                         label="Rappu"
                         fieldPath="stair"
@@ -120,8 +136,18 @@ const ApartmentCreatePage = () => {
                         setFormData={setFormData}
                         error={error}
                     />
-                    <label>Asunto-osakeyhtiö</label>
-                    <div>Arabian helmi</div>
+                    <FormInputField
+                        inputType="relatedModel"
+                        label="Asunto-osakeyhtiö"
+                        fieldPath="housing_company.id"
+                        queryFunction={useGetHousingCompaniesQuery}
+                        relatedModelSearchField="value"
+                        getRelatedModelLabel={(obj: ICode) => obj.value}
+                        required
+                        formData={formData}
+                        setFormData={setFormData}
+                        error={error}
+                    />
                     <FormInputField
                         inputType="relatedModel"
                         label="Asuntotyyppi"
@@ -248,8 +274,12 @@ const ApartmentCreatePage = () => {
                 />
                 <Dialog.Content>
                     <FormInputField
+                        inputType="relatedModel"
                         label={"Omistaja"}
-                        fieldPath={`ownerships[${currentOwnership}].owner`}
+                        fieldPath={`ownerships[0].owner`}
+                        queryFunction={useGetPersonsQuery}
+                        relatedModelSearchField="value"
+                        getRelatedModelLabel={(obj: ICode) => obj.value}
                         formData={formData}
                         setFormData={setFormData}
                         error={error}
@@ -257,25 +287,7 @@ const ApartmentCreatePage = () => {
                     <FormInputField
                         inputType="number"
                         label="Omistajuusprosentti"
-                        fieldPath={`ownerships[${currentOwnership}].percentage`}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="date"
-                        label="Alkamispäivä"
-                        fieldPath={`ownerships[${currentOwnership}].start_date`}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="date"
-                        label="Päättymispäivä"
-                        fieldPath={`ownerships[${currentOwnership}].end_date`}
-                        required
+                        fieldPath={`ownerships[0].percentage`}
                         formData={formData}
                         setFormData={setFormData}
                         error={error}
@@ -292,56 +304,13 @@ const ApartmentCreatePage = () => {
             {/*
              Save attempt modal dialog
              */}
-            <Dialog
-                id="modification__end-modal"
-                closeButtonLabelText={"args.closeButtonLabelText"}
-                aria-labelledby={"finish-modal"}
-                isOpen={isEndModalVisible}
-                close={() => setIsEndModalVisible(false)}
-                boxShadow={true}
-            >
-                <Dialog.Header
-                    id="modification__end-modal__header"
-                    title={`Luonti ${error ? "epä" : ""}onnistui`}
-                />
-                <Dialog.Content>
-                    {error
-                        ? "Tapahtui virhe"
-                        : `Asunto ${formData.building} ${formData.address.apartment_number} luotu!`}
-                </Dialog.Content>
-                {error ? (
-                    <Dialog.ActionButtons>
-                        <Button
-                            onClick={() => setIsEndModalVisible(false)}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Sulje
-                        </Button>
-                    </Dialog.ActionButtons>
-                ) : (
-                    <Dialog.ActionButtons>
-                        <Button
-                            onClick={() => {
-                                setFormData(blankForm);
-                                setIsEndModalVisible(false);
-                            }}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Luo uusi asunto
-                        </Button>
-                        <Link to={`/apartments/`}>
-                            <Button
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Palaa yhtiön asuntolistaukseen
-                            </Button>
-                        </Link>
-                    </Dialog.ActionButtons>
-                )}
-            </Dialog>
+            <SaveDialogModal
+                data={data}
+                error={error}
+                isLoading={isLoading}
+                isVisible={isEndModalVisible}
+                setIsVisible={setIsEndModalVisible}
+            />
         </div>
     );
 };

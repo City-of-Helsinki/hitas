@@ -129,6 +129,12 @@ export const hitasApi = createApi({
                 params: params,
             }),
         }),
+        getPersons: builder.query<ICodeResponse, object>({
+            query: (params: object) => ({
+                url: "persons",
+                params: params,
+            }),
+        }),
     }),
 });
 
@@ -146,4 +152,5 @@ export const {
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
     useGetFinancingMethodsQuery,
+    useGetPersonsQuery,
 } = hitasApi;

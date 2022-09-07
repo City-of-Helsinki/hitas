@@ -174,7 +174,9 @@ export interface IApartmentQuery {
     apartmentId: string;
 }
 
-export type ApartmentState = "free" | "reserved" | "sold";
+export const ApartmentStates = ["free", "reserved", "sold"] as const;
+
+export type ApartmentState = typeof ApartmentStates[number];
 
 export interface IApartmentDetails {
     readonly id: string;
