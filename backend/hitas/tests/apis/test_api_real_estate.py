@@ -3,9 +3,15 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import Building, HousingCompany, RealEstate
+from hitas.models import Apartment, Building, HousingCompany, RealEstate
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import BuildingFactory, HousingCompanyFactory, RealEstateFactory
+from hitas.tests.factories import (
+    ApartmentFactory,
+    BuildingFactory,
+    HousingCompanyFactory,
+    OwnershipFactory,
+    RealEstateFactory,
+)
 
 # List tests
 
@@ -244,6 +250,23 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__real_estate__delete(api_client: HitasAPIClient):
     re: RealEstate = RealEstateFactory.create()
+
+    url = reverse(
+        "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": re.uuid.hex}
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+@pytest.mark.django_db
+def test__api__real_estate__delete__with_references(api_client: HitasAPIClient):
+    re: RealEstate = RealEstateFactory.create()
+    bu: Building = BuildingFactory.create(real_estate=re)
+    a: Apartment = ApartmentFactory.create(building=bu)
+    OwnershipFactory.create(apartment=a)
 
     url = reverse(
         "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": re.uuid.hex}

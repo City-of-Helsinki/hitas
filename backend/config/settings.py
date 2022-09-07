@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_filters",
     "health_check",
     "corsheaders",
+    "safedelete",
 ]
 
 MIDDLEWARE = [
