@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Dialog, Fieldset, IconSaveDisketteFill} from "hds-react";
-import {Link} from "react-router-dom";
+import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {
@@ -12,7 +11,7 @@ import {
     useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
 } from "../../app/services";
-import {FormInputField} from "../../common/components";
+import {FormInputField, SaveDialogModal} from "../../common/components";
 import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IPropertyManager} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
@@ -42,16 +41,11 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         sales_price_catalogue_confirmation_date: null,
     };
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(blankForm as IHousingCompanyWritable);
-    const [createHousingCompany, {error}] = useCreateHousingCompanyMutation();
+    const [createHousingCompany, {data, error, isLoading}] = useCreateHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
-        try {
-            createHousingCompany(formData);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsEndModalVisible(true);
-        }
+        createHousingCompany(formData);
+        setIsEndModalVisible(true);
     };
 
     return (
@@ -246,58 +240,13 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             {/*
              Save attempt modal dialog
              */}
-            <Dialog
-                id="modification__end-modal"
-                closeButtonLabelText={"args.closeButtonLabelText"}
-                aria-labelledby={"finish-modal"}
-                isOpen={isEndModalVisible}
-                close={() => setIsEndModalVisible(false)}
-                boxShadow={true}
-            >
-                <Dialog.Header
-                    id="modification__end-modal__header"
-                    title={`Tallennus ${error ? "epä" : ""}onnistui`}
-                />
-                <Dialog.Content>{error ? "Tapahtui virhe" : `${formData.name.official} luotu!`}</Dialog.Content>
-                {error ? (
-                    <Dialog.ActionButtons>
-                        <Link to={`/housing-companies/`}>
-                            <Button
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Takaisin yhtiölistaukseen
-                            </Button>
-                        </Link>
-                        <Button
-                            onClick={() => setIsEndModalVisible(false)}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Sulje
-                        </Button>
-                    </Dialog.ActionButtons>
-                ) : (
-                    <Dialog.ActionButtons>
-                        <Link to={`/housing-companies/${formData.id}`}>
-                            <Button
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Yhtiön sivulle
-                            </Button>
-                        </Link>
-                        <Link to={`/housing-companies/`}>
-                            <Button
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Takaisin yhtiölistaukseen
-                            </Button>
-                        </Link>
-                    </Dialog.ActionButtons>
-                )}
-            </Dialog>
+            <SaveDialogModal
+                data={data}
+                error={error}
+                isLoading={isLoading}
+                isVisible={isEndModalVisible}
+                setIsVisible={setIsEndModalVisible}
+            />
         </div>
     );
 };

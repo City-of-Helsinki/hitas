@@ -4,6 +4,7 @@ import FilterPostalCodeField from "./FilterPostalCodeField";
 import FilterTextInputField from "./FilterTextInputField";
 import ListPageNumbers from "./ListPageNumbers";
 import QueryStateHandler from "./QueryStateHandler";
+import SaveDialogModal from "./SaveDialogModal";
 import FormInputField from "./formInputField/FormInputField";
 
 export {
@@ -14,4 +15,5 @@ export {
     FormInputField,
     ListPageNumbers,
     QueryStateHandler,
+    SaveDialogModal,
 };
