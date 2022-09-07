@@ -191,8 +191,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -389,8 +387,6 @@ paths:
       responses:
         '204':
           description: Real estate successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -622,8 +618,6 @@ paths:
       responses:
         '204':
           description: Building successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -820,8 +814,6 @@ paths:
       responses:
         '204':
           description: Apartment successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1056,8 +1048,6 @@ paths:
       responses:
         '204':
           description: Person successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1218,8 +1208,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1382,8 +1370,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1544,8 +1530,6 @@ paths:
       responses:
         '204':
           description: Postal code successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1706,8 +1690,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1868,8 +1850,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2030,8 +2010,6 @@ paths:
       responses:
         '204':
           description: Housing company successfully removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
