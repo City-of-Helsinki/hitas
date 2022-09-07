@@ -63,6 +63,10 @@ const HousingCompanyDetailsPage = () => {
                                             label="Ensisijaislaina"
                                             value={`${data.primary_loan} €`} // TODO: Format number
                                         />
+                                        <DetailField
+                                            label="Keskineliöhinta"
+                                            value={`${data.summary?.average_price_per_square_meter} €/m²`}
+                                        />
                                     </div>
                                     <div className="column">
                                         <DetailField
@@ -85,12 +89,16 @@ const HousingCompanyDetailsPage = () => {
                                             value={data.business_id}
                                         />
                                         <DetailField
+                                            label="Osakkeiden lukumäärä"
+                                            value={`${data.summary?.total_shares} kpl`}
+                                        />
+                                        <DetailField
                                             label="Huoneistojen lukumäärä"
                                             value="120"
                                         />
                                         <DetailField
                                             label="Huoneistojen pinta-ala"
-                                            value="2 045 m²"
+                                            value={`${data.summary?.total_surface_area} m²`}
                                         />
                                         <DetailField
                                             label="Myyntihintaluettelon vahvistamispäivä"

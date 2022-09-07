@@ -50,6 +50,11 @@ export interface IHousingCompanyDetails {
         datetime: Date;
     };
     real_estates: Array<IRealEstate>;
+    summary: {
+        average_price_per_square_meter: number;
+        total_shares: number;
+        total_surface_area: number;
+    };
 }
 
 export interface IHousingCompanyWritable {
