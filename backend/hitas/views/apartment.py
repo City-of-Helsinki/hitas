@@ -3,7 +3,6 @@ from typing import Any, Dict, Union
 
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import SkipField, empty
@@ -157,18 +156,20 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             if not 0 < op <= 100:
                 raise ValidationError(
                     {
-                        "percentage": _(
-                            "Ownership percentage greater than 0 and less than or equal to 100. (Given value was {})"
-                        ).format(op)
+                        "percentage": (
+                            "Ownership percentage greater than 0 and"
+                            f" less than or equal to 100. Given value was {op}."
+                        )
                     },
                 )
 
         if (sum_op := sum(o["percentage"] for o in ownerships)) != 100:
             raise ValidationError(
                 {
-                    "percentage": _(
-                        "Ownership percentage of all ownerships combined must be equal to 100. (Given sum was {})"
-                    ).format(sum_op)
+                    "percentage": (
+                        "Ownership percentage of all ownerships combined"
+                        f" must be equal to 100. Given sum was {sum_op}."
+                    )
                 }
             )
 
