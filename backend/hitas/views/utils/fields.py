@@ -2,6 +2,7 @@ from uuid import UUID
 
 from enumfields import Enum
 from rest_framework import serializers
+from rest_framework.fields import empty
 from rest_framework.relations import SlugRelatedField
 
 from hitas.exceptions import HitasModelNotFound
@@ -32,6 +33,12 @@ class UUIDField(serializers.Field):
 class UUIDRelatedField(SlugRelatedField):
     def __init__(self, **kwargs):
         super().__init__(slug_field="uuid", **kwargs)
+
+    def run_validation(self, data=empty):
+        if data == "":
+            raise serializers.ValidationError(code="blank")
+
+        return super().run_validation(data)
 
     def to_representation(self, obj):
         return getattr(obj, self.slug_field).hex

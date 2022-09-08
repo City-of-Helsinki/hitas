@@ -112,11 +112,11 @@ def test__api__postal_code__create(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "invalid_data,field",
     [
-        ({"value": None}, {"field": "value", "message": "This field is mandatory and cannot be blank."}),
+        ({"value": None}, {"field": "value", "message": "This field is mandatory and cannot be null."}),
         ({"value": ""}, {"field": "value", "message": "This field is mandatory and cannot be blank."}),
-        ({"city": None}, {"field": "city", "message": "This field is mandatory and cannot be blank."}),
+        ({"city": None}, {"field": "city", "message": "This field is mandatory and cannot be null."}),
         ({"city": ""}, {"field": "city", "message": "This field is mandatory and cannot be blank."}),
-        ({"cost_area": None}, {"field": "cost_area", "message": "This field is mandatory and cannot be blank."}),
+        ({"cost_area": None}, {"field": "cost_area", "message": "This field is mandatory and cannot be null."}),
         ({"cost_area": "foo"}, {"field": "cost_area", "message": "A valid integer is required."}),
         ({"cost_area": -1}, {"field": "cost_area", "message": "Ensure this value is greater than or equal to 1."}),
         ({"cost_area": 0}, {"field": "cost_area", "message": "Ensure this value is greater than or equal to 1."}),

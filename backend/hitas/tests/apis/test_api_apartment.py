@@ -438,15 +438,15 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 @pytest.mark.parametrize(
     "invalid_data,fields",
     [
-        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
+        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be null."}]),
         ({"state": "invalid_state"}, [{"field": "state", "message": "Unsupported ApartmentState 'invalid_state'."}]),
         (
             {"type": None},
-            [{"field": "type", "message": "This field is mandatory and cannot be blank."}],
+            [{"field": "type", "message": "This field is mandatory and cannot be null."}],
         ),
         (
             {"surface_area": None},
-            [{"field": "surface_area", "message": "This field is mandatory and cannot be blank."}],
+            [{"field": "surface_area", "message": "This field is mandatory and cannot be null."}],
         ),
         ({"surface_area": "foo"}, [{"field": "surface_area", "message": "A valid number is required."}]),
         (
@@ -457,23 +457,23 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             {"shares": {"start": "foo"}},
             [
                 {"field": "shares.start", "message": "A valid integer is required."},
-                {"field": "shares.end", "message": "This field is mandatory and cannot be blank."},
+                {"field": "shares.end", "message": "This field is mandatory and cannot be null."},
             ],
         ),
         (
             {"shares": {"end": "foo"}},
             [
-                {"field": "shares.start", "message": "This field is mandatory and cannot be blank."},
+                {"field": "shares.start", "message": "This field is mandatory and cannot be null."},
                 {"field": "shares.end", "message": "A valid integer is required."},
             ],
         ),
         (
             {"shares": {"start": 100}},
-            [{"field": "shares.end", "message": "This field is mandatory and cannot be blank."}],
+            [{"field": "shares.end", "message": "This field is mandatory and cannot be null."}],
         ),
         (
             {"shares": {"start": None, "end": 100}},
-            [{"field": "shares.start", "message": "This field is mandatory and cannot be blank."}],
+            [{"field": "shares.start", "message": "This field is mandatory and cannot be null."}],
         ),
         (
             {"shares": {"start": 100, "end": 50}},
@@ -486,7 +486,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 {"field": "shares.end", "message": "Ensure this value is greater than or equal to 1."},
             ],
         ),
-        ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be blank."}]),
+        ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be null."}]),
         (
             {
                 "address": {
@@ -496,8 +496,22 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 }
             },
             [
+                {"field": "address.street_address", "message": "This field is mandatory and cannot be null."},
+                {"field": "address.apartment_number", "message": "This field is mandatory and cannot be null."},
+                {"field": "address.stair", "message": "This field is mandatory and cannot be null."},
+            ],
+        ),
+        (
+            {
+                "address": {
+                    "street_address": "",
+                    "apartment_number": "",
+                    "stair": "",
+                }
+            },
+            [
                 {"field": "address.street_address", "message": "This field is mandatory and cannot be blank."},
-                {"field": "address.apartment_number", "message": "This field is mandatory and cannot be blank."},
+                {"field": "address.apartment_number", "message": "A valid integer is required."},
                 {"field": "address.stair", "message": "This field is mandatory and cannot be blank."},
             ],
         ),
@@ -564,8 +578,9 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 }
             ],
         ),
-        ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
-        ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be blank."}]),
+        ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be null."}]),
+        ({"building": ""}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
+        ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be null."}]),
         (
             {
                 "ownerships": [
