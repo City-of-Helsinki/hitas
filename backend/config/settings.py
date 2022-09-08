@@ -162,6 +162,6 @@ LANGUAGES = [
 LOCALE_PATHS = ["./templates/locale"]
 
 TIME_ZONE = "Europe/Helsinki"
-USE_I18N = True
+USE_I18N = False
 USE_L10N = True
 USE_TZ = True
