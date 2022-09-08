@@ -74,7 +74,14 @@ class HitasEnumField(serializers.ChoiceField):
         return enum.value
 
     def to_internal_value(self, data: str):
+        if data == "":
+            raise serializers.ValidationError(code="blank")
+
         try:
             return self.enum_class(data)
         except ValueError:
-            raise serializers.ValidationError(f"Unsupported {self.enum_class.__name__} '{data}'.")
+            supported_values = [f"'{e.value}'" for e in self.enum_class]
+
+            raise serializers.ValidationError(
+                f"Unsupported value '{data}'. Supported values are: [{', '.join(supported_values)}]."
+            )

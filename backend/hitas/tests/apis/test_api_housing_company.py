@@ -448,7 +448,18 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         ({"business_id": "123"}, {"field": "business_id", "message": "'123' is not a valid business id."}),
         ({"name": None}, {"field": "name", "message": "This field is mandatory and cannot be null."}),
         ({"name": 0}, {"field": "name", "message": "Invalid data. Expected a dictionary, but got int."}),
-        ({"state": "invalid_state"}, {"field": "state", "message": "Unsupported HousingCompanyState 'invalid_state'."}),
+        ({"state": None}, {"field": "state", "message": "This field is mandatory and cannot be null."}),
+        (
+            {"state": "invalid_state"},
+            {
+                "field": "state",
+                "message": (
+                    "Unsupported value 'invalid_state'. Supported values are:"
+                    " ['not_ready', 'lt_30_years', 'gt_30_years_not_free', 'gt_30_years_free', "
+                    "'gt_30_years_plot_department_notification', 'half_hitas', 'ready_no_statistics']."
+                ),
+            },
+        ),
         ({"address": None}, {"field": "address", "message": "This field is mandatory and cannot be null."}),
         ({"address": 123}, {"field": "address", "message": "Invalid data. Expected a dictionary, but got int."}),
         (

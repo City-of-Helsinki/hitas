@@ -439,7 +439,16 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
     "invalid_data,fields",
     [
         ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be null."}]),
-        ({"state": "invalid_state"}, [{"field": "state", "message": "Unsupported ApartmentState 'invalid_state'."}]),
+        ({"state": ""}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
+        (
+            {"state": "invalid_state"},
+            [
+                {
+                    "field": "state",
+                    "message": "Unsupported value 'invalid_state'. Supported values are: ['free', 'reserved', 'sold'].",
+                }
+            ],
+        ),
         (
             {"type": None},
             [{"field": "type", "message": "This field is mandatory and cannot be null."}],
