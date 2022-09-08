@@ -147,6 +147,20 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def get_links(self, instance: Apartment):
         return create_links(instance)
 
+    def validate_building(self, building: Building):
+        housing_company_uuid = self.context["view"].kwargs["housing_company_uuid"]
+        try:
+            import uuid
+
+            hc = HousingCompany.objects.only("id").get(uuid=uuid.UUID(hex=housing_company_uuid))
+        except (HousingCompany.DoesNotExist, ValueError, TypeError):
+            raise
+
+        if building.real_estate.housing_company.id != hc.id:
+            raise ValidationError(f"Object does not exist with given id '{building.uuid.hex}'.", code="invalid")
+
+        return building
+
     def validate_ownerships(self, ownerships: OrderedDict):
         if not ownerships:
             return ownerships
