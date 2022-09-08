@@ -740,7 +740,7 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
     b1: Building = BuildingFactory.create()
     b2: Building = BuildingFactory.create()
     data = get_apartment_create_data(b1)
-    data["building"] = (b2.uuid.hex,)
+    data["building"] = b2.uuid.hex
 
     response = api_client.post(
         reverse(
