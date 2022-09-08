@@ -1,25 +1,21 @@
 import React, {useState} from "react";
 
-import {Button, Dialog, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {
     useCreateApartmentMutation,
     useGetApartmentTypesQuery,
-    useGetHousingCompaniesQuery,
-    useGetPersonsQuery,
+    useGetHousingCompaniesQuery, // useGetPersonsQuery,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
-import {ApartmentState, ApartmentStates, IApartmentWritable, ICode} from "../../common/models";
-
-const Ownership = (children) => <li className="ownership-item">{children}</li>;
+import {ApartmentState, ApartmentStates, IApartmentWritable, ICode, IOwnership} from "../../common/models";
 
 const ApartmentCreatePage = () => {
     // eslint-disable-next-line no-unused-vars
-    const [currentOwnership, setCurrentOwnership] = useState(0);
-    const [isAddOwnershipModalVisible, setIsAddOwnershipModalVisible] = useState(false);
+    const [currentOwnerships, setCurrentOwnerships] = useState(0);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    // Create a new apartment
+    const blankOwnership = {owner: {id: ""}, percentage: 0};
     const blankForm = {
         state: "free" as ApartmentState,
         apartment_type: {id: ""},
@@ -46,20 +42,33 @@ const ApartmentCreatePage = () => {
         building: {id: ""},
         real_estate: {id: ""},
         housing_company: {name: ""},
-        ownerships: [
-            {
-                percentage: 100,
-                start_date: "",
-                end_date: "",
-                owner: {
-                    id: "",
-                },
-            },
-        ],
+        ownerships: [blankOwnership],
         notes: "",
     };
     const [formData, setFormData] = useImmer<IApartmentWritable>(blankForm as IApartmentWritable);
+    const [formOwnerships, setFormOwnerships] = useImmer([blankOwnership] as Array<IOwnership>);
     const [createApartment, {data, error, isLoading}] = useCreateApartmentMutation();
+    const Ownership = (ownership) => (
+        <li className="ownership-item">
+            <FormInputField
+                label="Omistaja"
+                fieldPath="owner"
+                required
+                formData={formOwnerships}
+                setFormData={setFormOwnerships}
+                error={error}
+            />
+            <FormInputField
+                inputType="number"
+                label="Omistusprosentti"
+                fieldPath={`percentage`}
+                required
+                formData={formOwnerships}
+                setFormData={setFormOwnerships}
+                error={error}
+            />
+        </li>
+    );
     const handleSaveButtonClicked = () => {
         try {
             createApartment(formData);
@@ -71,11 +80,10 @@ const ApartmentCreatePage = () => {
         }
     };
     const addOwner = () => {
-        setCurrentOwnership(() => {
-            return formData.ownerships.length;
+        setCurrentOwnerships(() => {
+            return formOwnerships.length + 1;
         });
         console.log(formData.ownerships);
-        setIsAddOwnershipModalVisible(true);
     };
     return (
         <div className="view--create view--set-apartment">
@@ -120,6 +128,15 @@ const ApartmentCreatePage = () => {
                     />
                     <FormInputField
                         inputType="number"
+                        label="Kerros"
+                        fieldPath="floor"
+                        required
+                        formData={formData}
+                        setFormData={setFormData}
+                        error={error}
+                    />
+                    <FormInputField
+                        inputType="number"
                         label="Asunnon numero"
                         fieldPath="apartment_number"
                         required
@@ -139,6 +156,7 @@ const ApartmentCreatePage = () => {
                     <FormInputField
                         inputType="relatedModel"
                         label="Asunto-osakeyhtiö"
+                        field="id"
                         fieldPath="housing_company.id"
                         queryFunction={useGetHousingCompaniesQuery}
                         relatedModelSearchField="value"
@@ -151,6 +169,7 @@ const ApartmentCreatePage = () => {
                     <FormInputField
                         inputType="relatedModel"
                         label="Asuntotyyppi"
+                        field="id"
                         fieldPath="apartment_type.id"
                         queryFunction={useGetApartmentTypesQuery}
                         relatedModelSearchField="value"
@@ -231,16 +250,15 @@ const ApartmentCreatePage = () => {
                         setFormData={setFormData}
                         error={error}
                     />
-                    <legend>Omistajuudet</legend>
-                    {formData.ownerships.length ? (
-                        <div>Ei omistajuuksia</div>
-                    ) : (
-                        <ul className="ownerships-list">
-                            {formData.ownerships.map((ownership, num) => (
-                                <Ownership key={num}>asdf</Ownership>
-                            ))}
-                        </ul>
-                    )}
+                    <h4>Omistajuudet</h4>
+                    <ul className="ownerships-list">
+                        {formOwnerships.map((ownership, num) => (
+                            <Ownership
+                                key={num}
+                                ownership={ownership}
+                            />
+                        ))}
+                    </ul>
                     <Button
                         onClick={addOwner}
                         variant="secondary"
@@ -257,50 +275,6 @@ const ApartmentCreatePage = () => {
             >
                 Tallenna
             </Button>
-            {/*
-             Add ownership dialog
-             */}
-            <Dialog
-                id="modification__add-ownership"
-                closeButtonLabelText={"args.closeButtonLabelText"}
-                aria-labelledby="add-ownership"
-                isOpen={isAddOwnershipModalVisible}
-                close={() => setIsAddOwnershipModalVisible(false)}
-                boxShadow={true}
-            >
-                <Dialog.Header
-                    id="modification__add-ownership__header"
-                    title="Omistajuus"
-                />
-                <Dialog.Content>
-                    <FormInputField
-                        inputType="relatedModel"
-                        label={"Omistaja"}
-                        fieldPath={`ownerships[0].owner`}
-                        queryFunction={useGetPersonsQuery}
-                        relatedModelSearchField="value"
-                        getRelatedModelLabel={(obj: ICode) => obj.value}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="number"
-                        label="Omistajuusprosentti"
-                        fieldPath={`ownerships[0].percentage`}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <Button
-                        onClick={() => setIsEndModalVisible(false)}
-                        variant="secondary"
-                        theme={"black"}
-                    >
-                        Tallenna omistajuus
-                    </Button>
-                </Dialog.Content>
-            </Dialog>
             {/*
              Save attempt modal dialog
              */}
