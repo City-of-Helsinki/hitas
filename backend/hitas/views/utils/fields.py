@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.core.exceptions import ObjectDoesNotExist
 from enumfields import Enum
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -40,14 +41,15 @@ class UUIDRelatedField(SlugRelatedField):
 
         return super().run_validation(data)
 
-    def to_representation(self, obj):
-        return getattr(obj, self.slug_field).hex
+    def to_representation(self, uuid):
+        return uuid.hex
 
-    def to_internal_value(self, data: str):
+    def to_internal_value(self, data):
+        queryset = self.get_queryset()
         try:
-            return super().to_internal_value(data=UUID(hex=str(data)))
-        except ValueError:
-            raise HitasModelNotFound(model=self.get_queryset().model)
+            return queryset.get(**{self.slug_field: UUID(hex=str(data))})
+        except (ObjectDoesNotExist, TypeError, ValueError):
+            raise serializers.ValidationError(f"Object does not exist with given id '{data}'.", code="invalid")
 
 
 class HitasPostalCodeField(SlugRelatedField):
