@@ -10,7 +10,7 @@ from rest_framework.fields import SkipField, empty
 from hitas.models import Apartment, Building, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
 from hitas.models.utils import validate_share_numbers
-from hitas.views.codes import ApartmentTypeSerializer
+from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasDecimalField,
@@ -134,7 +134,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
-    type = ApartmentTypeSerializer(source="apartment_type")
+    type = ReadOnlyApartmentTypeSerializer(source="apartment_type")
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
@@ -144,7 +144,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     links = serializers.SerializerMethodField()
     building = UUIDRelatedField(queryset=Building.objects.all(), write_only=True)
 
-    def get_links(self, instance: Apartment):
+    @staticmethod
+    def get_links(instance: Apartment):
         return create_links(instance)
 
     def validate_building(self, building: Building):
@@ -161,7 +162,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         return building
 
-    def validate_ownerships(self, ownerships: OrderedDict):
+    @staticmethod
+    def validate_ownerships(ownerships: OrderedDict):
         if not ownerships:
             return ownerships
 

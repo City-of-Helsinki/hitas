@@ -475,6 +475,10 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "financing_method.id", "message": "This field is mandatory and cannot be null."},
         ),
         (
+            {"financing_method": {"id": "foo"}},
+            {"field": "financing_method.id", "message": "Object does not exist with given id 'foo'."},
+        ),
+        (
             {"building_type": None},
             {"field": "building_type", "message": "This field is mandatory and cannot be null."},
         ),
@@ -486,8 +490,16 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"building_type": {}},
             {"field": "building_type.id", "message": "This field is mandatory and cannot be null."},
         ),
+        (
+            {"building_type": {"id": "foo"}},
+            {"field": "building_type.id", "message": "Object does not exist with given id 'foo'."},
+        ),
         ({"developer": None}, {"field": "developer", "message": "This field is mandatory and cannot be null."}),
         ({"developer": 123}, {"field": "developer", "message": "Invalid data. Expected a dictionary, but got int."}),
+        (
+            {"developer": {"id": "foo"}},
+            {"field": "developer.id", "message": "Object does not exist with given id 'foo'."},
+        ),
         (
             {"property_manager": None},
             {"field": "property_manager", "message": "This field is mandatory and cannot be null."},
@@ -499,6 +511,10 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         (
             {"property_manager": {}},
             {"field": "property_manager.id", "message": "This field is mandatory and cannot be null."},
+        ),
+        (
+            {"property_manager": {"id": "foo"}},
+            {"field": "property_manager.id", "message": "Object does not exist with given id 'foo'."},
         ),
         (
             {"acquisition_price": None},
@@ -522,15 +538,6 @@ def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient,
         "reason": "Bad Request",
         "status": 400,
     }
-
-
-@pytest.mark.django_db
-def test__api__housing_company__create__invalid_foreign_key(api_client: HitasAPIClient):
-    data = get_housing_company_create_data()
-    data.update({"property_manager": {"id": "foo"}})
-
-    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 # Update tests

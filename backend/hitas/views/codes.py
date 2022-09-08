@@ -2,7 +2,8 @@ from django_filters.rest_framework import filters
 from rest_framework import serializers
 
 from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
-from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDField
+from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
+from hitas.views.utils.serializers import ReadOnlySerializer
 
 
 class AbstractCodeSerializer(HitasModelSerializer):
@@ -17,25 +18,8 @@ class AbstractCodeSerializer(HitasModelSerializer):
         abstract = True
 
 
-class AbstractReadOnlyCodeSerializer(HitasModelSerializer):
-    id = UUIDField(source="uuid")
-    value = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
-    code = serializers.CharField(source="legacy_code_number", read_only=True)
-
-    class Meta:
-        model = AbstractCode
-        fields = ["id", "value", "description", "code"]
-        abstract = True
-
-
 class BuildingTypeSerializer(AbstractCodeSerializer):
     class Meta(AbstractCodeSerializer.Meta):
-        model = BuildingType
-
-
-class ReadOnlyBuildingTypeSerializer(AbstractReadOnlyCodeSerializer):
-    class Meta(AbstractReadOnlyCodeSerializer.Meta):
         model = BuildingType
 
 
@@ -44,24 +28,36 @@ class FinancingMethodSerializer(AbstractCodeSerializer):
         model = FinancingMethod
 
 
-class ReadOnlyFinancingMethodSerializer(AbstractReadOnlyCodeSerializer):
-    class Meta(AbstractReadOnlyCodeSerializer.Meta):
-        model = FinancingMethod
-
-
 class DeveloperSerializer(AbstractCodeSerializer):
     class Meta(AbstractCodeSerializer.Meta):
-        model = Developer
-
-
-class ReadOnlyDeveloperSerializer(AbstractReadOnlyCodeSerializer):
-    class Meta(AbstractReadOnlyCodeSerializer.Meta):
         model = Developer
 
 
 class ApartmentTypeSerializer(AbstractCodeSerializer):
     class Meta(AbstractCodeSerializer.Meta):
         model = ApartmentType
+
+
+def define_read_only_serializer(model_class):
+    class DynamicReadOnlySerializer(ReadOnlySerializer):
+        id = UUIDRelatedField(queryset=model_class.objects, source="uuid")
+        value = serializers.CharField(read_only=True)
+        description = serializers.CharField(read_only=True)
+        code = serializers.CharField(source="legacy_code_number", read_only=True)
+
+        def get_model_class(self):
+            return model_class
+
+        class Meta:
+            fields = ["id", "value", "description", "code"]
+
+    return DynamicReadOnlySerializer
+
+
+ReadOnlyApartmentTypeSerializer = define_read_only_serializer(ApartmentType)
+ReadOnlyDeveloperSerializer = define_read_only_serializer(Developer)
+ReadOnlyFinancingMethodSerializer = define_read_only_serializer(FinancingMethod)
+ReadOnlyBuildingTypeSerializer = define_read_only_serializer(BuildingType)
 
 
 class AbstractCodeViewSet(HitasModelViewSet):

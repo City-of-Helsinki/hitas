@@ -454,6 +454,18 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             [{"field": "type", "message": "This field is mandatory and cannot be null."}],
         ),
         (
+            {"type": {}},
+            [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
+        ),
+        (
+            {"type": {"id": None}},
+            [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
+        ),
+        (
+            {"type": {"id": "foo"}},
+            [{"field": "type.id", "message": "Object does not exist with given id 'foo'."}],
+        ),
+        (
             {"surface_area": None},
             [{"field": "surface_area", "message": "This field is mandatory and cannot be null."}],
         ),
@@ -589,6 +601,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be null."}]),
         ({"building": ""}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
+        ({"building": "foo"}, [{"field": "building", "message": "Object does not exist with given id 'foo'."}]),
         ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be null."}]),
         (
             {
@@ -706,6 +719,44 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 {"field": "ownerships.percentage", "message": "A valid number is required."},
             ],
         ),
+        (
+            {
+                "ownerships": [
+                    {
+                        "owner": {"id": "foo"},
+                        "percentage": 50,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
+                    },
+                    {
+                        "owner": {"id": None},
+                        "percentage": 30,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
+                    },
+                    {
+                        "owner": {"id": "27771d28e27145caa7efbd99d2e40601"},
+                        "percentage": 20,
+                        "start_date": "2020-01-01",
+                        "end_date": None,
+                    },
+                ]
+            },
+            [
+                {
+                    "field": "ownerships.owner.id",
+                    "message": "Object does not exist with given id 'foo'.",
+                },
+                {
+                    "field": "ownerships.owner.id",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "ownerships.owner.id",
+                    "message": "Object does not exist with given id '27771d28e27145caa7efbd99d2e40601'.",
+                },
+            ],
+        ),
     ],
 )
 @pytest.mark.django_db
@@ -750,35 +801,13 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
         data=data,
         format="json",
     )
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
-        "error": "building_not_found",
-        "message": "Building not found",
-        "reason": "Not Found",
-        "status": 404,
-    }
-
-
-@pytest.mark.django_db
-def test__api__apartment__create__invalid_building_id(api_client: HitasAPIClient):
-    b: Building = BuildingFactory.create()
-    data = get_apartment_create_data(b)
-    data["building"] = "foo"
-
-    response = api_client.post(
-        reverse(
-            "hitas:apartment-list",
-            args=[b.real_estate.housing_company.uuid.hex],
-        ),
-        data=data,
-        format="json",
-    )
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
-    assert response.json() == {
-        "error": "building_not_found",
-        "message": "Building not found",
-        "reason": "Not Found",
-        "status": 404,
+        "error": "bad_request",
+        "fields": [{"field": "building", "message": f"Object does not exist with given id '{b2.uuid.hex}'."}],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
     }
 
 
