@@ -207,7 +207,9 @@ def _convert_field_errors(field_name: str, errors: List[Dict[str, Any]]):
             formatted_field_name = f"{field_name}.{nested_field_name}"
             error = error[nested_field_name][0]
 
-        if error["code"] in ["required", "null", "blank"]:
+        if error["code"] in ["required", "null"]:
+            retval.append({"field": formatted_field_name, "message": "This field is mandatory and cannot be null."})
+        elif error["code"] in ["blank"]:
             retval.append({"field": formatted_field_name, "message": "This field is mandatory and cannot be blank."})
         elif error["code"] in ["invalid", "invalid_choice", "min_value", "max_value"]:
             retval.append({"field": formatted_field_name, "message": error["message"]})
