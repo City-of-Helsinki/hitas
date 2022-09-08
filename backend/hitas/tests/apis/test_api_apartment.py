@@ -611,7 +611,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 {
                     "field": "ownerships.percentage",
                     "message": "Ownership percentage of all ownerships combined must"
-                    " be equal to 100. (Given sum was 150.00)",
+                    " be equal to 100. Given sum was 150.00.",
                 }
             ],
         ),
@@ -636,7 +636,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 {
                     "field": "ownerships.percentage",
                     "message": "Ownership percentage of all ownerships combined must"
-                    " be equal to 100. (Given sum was 20.00)",
+                    " be equal to 100. Given sum was 20.00.",
                 }
             ],
         ),
@@ -661,7 +661,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 {
                     "field": "ownerships.percentage",
                     "message": "Ownership percentage greater than 0 and less than"
-                    " or equal to 100. (Given value was 0.00)",
+                    " or equal to 100. Given value was 0.00.",
                 }
             ],
         ),
