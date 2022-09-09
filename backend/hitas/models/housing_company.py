@@ -30,9 +30,9 @@ class HousingCompanyState(Enum):
 # Taloyhtiö
 class HousingCompany(ExternalHitasModel):
     # Official spelling of the housing company name
-    official_name = models.CharField(max_length=1024)
+    official_name = models.CharField(max_length=1024, unique=True)
     # More human-friendly housing company name
-    display_name = models.CharField(max_length=1024)
+    display_name = models.CharField(max_length=1024, unique=True)
 
     state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
     # Business ID / 'y-tunnus'

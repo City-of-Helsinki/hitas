@@ -6,7 +6,8 @@ docker-build:
 	docker-compose up --detach --build
 
 docker-build-backend-only:
-	docker-compose up --detach --build hitas-backend
+	docker-compose build hitas-backend
+	docker-compose up --detach hitas-backend
 
 tests:
 	pytest --cov

@@ -6,6 +6,7 @@ from django.db.models.functions import Round
 from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from hitas.models import HousingCompany, HousingCompanyState, RealEstate
 from hitas.utils import safe_attrgetter
@@ -39,9 +40,24 @@ class HousingCompanyFilterSet(HitasFilterSet):
         fields = ["display_name", "street_address", "postal_code", "property_manager", "developer"]
 
 
+class HitasUniqueValidator(UniqueValidator):
+    def __init__(self, queryset, field, message=None, lookup="exact"):
+        self.field = field
+        super().__init__(queryset, message=message, lookup=lookup)
+
+    def __call__(self, value, serializer_field):
+        self.message = f"{self.field} provided is already in use. Conflicting {self.field.lower()}: '{value}'."
+        super().__call__(value, serializer_field)
+
+
 class HousingCompanyNameSerializer(serializers.Serializer):
-    display = serializers.CharField(source="display_name")
-    official = serializers.CharField(source="official_name")
+    display = serializers.CharField(
+        source="display_name", validators=[HitasUniqueValidator(queryset=HousingCompany.objects, field="Display name")]
+    )
+    official = serializers.CharField(
+        source="official_name",
+        validators=[HitasUniqueValidator(queryset=HousingCompany.objects, field="Official name")],
+    )
 
 
 class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):

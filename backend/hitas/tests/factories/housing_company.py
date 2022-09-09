@@ -14,7 +14,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     class Meta:
         model = HousingCompany
 
-    display_name = factory.Faker("last_name")
+    display_name = factory.Sequence(lambda n: f"Test Housing company {n:03}")
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = HousingCompanyState.NOT_READY
     business_id = factory.Faker("company_business_id")
