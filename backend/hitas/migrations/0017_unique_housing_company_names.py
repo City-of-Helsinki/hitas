@@ -24,6 +24,15 @@ class Migration(migrations.Migration):
             name='display_name',
             field=models.CharField(max_length=1024, unique=True),
         ),
+        migrations.RunSQL("""
+            UPDATE hitas_housingcompany
+                SET official_name=official_name || '-migration-' || id
+                WHERE id in (
+                    SELECT id FROM hitas_housingcompany WHERE official_name in (
+                        SELECT official_name FROM hitas_housingcompany GROUP BY official_name HAVING COUNT(*) > 1
+                    )
+                );
+        """),
         migrations.AlterField(
             model_name='housingcompany',
             name='official_name',
