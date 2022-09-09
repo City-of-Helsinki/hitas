@@ -417,6 +417,50 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
 
 
 @pytest.mark.django_db
+def test__api__housing_company__create__duplicate_official_name(api_client: HitasAPIClient):
+    existing_hc: HousingCompany = HousingCompanyFactory.create(official_name="test-official-name")
+    data = get_housing_company_create_data()
+    data["name"]["official"] = existing_hc.official_name
+
+    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "name.official",
+                "message": "Official name provided is already in use. Conflicting official name: 'test-official-name'.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
+@pytest.mark.django_db
+def test__api__housing_company__create__duplicate_display_name(api_client: HitasAPIClient):
+    existing_hc: HousingCompany = HousingCompanyFactory.create(display_name="test-display-name")
+    data = get_housing_company_create_data()
+    data["name"]["display"] = existing_hc.display_name
+
+    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "name.display",
+                "message": "Display name provided is already in use. Conflicting display name: 'test-display-name'.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
+@pytest.mark.django_db
 def test__api__housing_company__create__empty(api_client: HitasAPIClient):
     response = api_client.post(reverse("hitas:housing-company-list"), data={}, format="json")
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
