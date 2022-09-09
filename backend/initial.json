@@ -1467,7 +1467,7 @@
       "value": "Uusi Hitas I (vapaarahoitteinen)",
       "description": "",
       "in_use": true,
-      "order": 17,
+      "order": 0,
       "legacy_code_number": "811",
       "legacy_start_date": "2022-06-10T12:53:10.142Z",
       "legacy_end_date": null
@@ -1481,7 +1481,7 @@
       "value": "Uusi Hitas II (vapaarahoitteinen)",
       "description": "",
       "in_use": true,
-      "order": 18,
+      "order": 0,
       "legacy_code_number": "812",
       "legacy_start_date": "2022-06-10T12:53:10.142Z",
       "legacy_end_date": null
