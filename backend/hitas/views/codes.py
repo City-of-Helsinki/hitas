@@ -62,7 +62,7 @@ ReadOnlyBuildingTypeSerializer = define_read_only_serializer(BuildingType)
 
 class AbstractCodeViewSet(HitasModelViewSet):
     def get_queryset(self):
-        return self.model_class.objects.all().order_by("id")
+        return self.model_class.objects.all().order_by("order", "id")
 
     def get_filterset_class(self):
         class CodeFilterSet(HitasFilterSet):

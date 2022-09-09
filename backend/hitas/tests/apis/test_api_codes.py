@@ -41,24 +41,24 @@ def test__api__codes__list__empty(api_client: HitasAPIClient, url_basename, mode
 @pytest.mark.parametrize(*_code_parameters)
 @pytest.mark.django_db
 def test__api__code__list(api_client: HitasAPIClient, url_basename, model, factory):
-    code1 = factory.create(value="1")
-    code2 = factory.create(value="2")
+    code1 = factory.create(value="1", order=2)
+    code2 = factory.create(value="2", order=1)
 
     url = reverse(f"hitas:{url_basename}-list")
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
-            "id": code1.uuid.hex,
-            "value": code1.value,
-            "description": code1.description,
-            "code": code1.legacy_code_number,
-        },
-        {
             "id": code2.uuid.hex,
             "value": code2.value,
             "description": code2.description,
             "code": code2.legacy_code_number,
+        },
+        {
+            "id": code1.uuid.hex,
+            "value": code1.value,
+            "description": code1.description,
+            "code": code1.legacy_code_number,
         },
     ]
     assert response.json()["page"] == {
