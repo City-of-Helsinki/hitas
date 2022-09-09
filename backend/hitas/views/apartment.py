@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -9,7 +9,6 @@ from rest_framework.fields import SkipField, empty
 
 from hitas.models import Apartment, Building, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
-from hitas.models.utils import validate_share_numbers
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -37,6 +36,12 @@ class SharesSerializer(serializers.Serializer):
 
     def get_total(self, instance: Apartment) -> int:
         return instance.shares_count
+
+    def validate(self, data):
+        if data["share_number_start"] > data["share_number_end"]:
+            raise ValidationError("'shares.start' must not be greater than 'shares.end'.")
+
+        return data
 
     def run_validation(self, data=empty):
         value = super().run_validation(data)
@@ -190,13 +195,6 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             )
 
         return ownerships
-
-    def validate(self, data: Union[OrderedDict, Apartment]):
-        if type(data) == OrderedDict:
-            validate_share_numbers(start=data.get("share_number_start"), end=data.get("share_number_end"))
-        else:
-            validate_share_numbers(start=data.share_number_start, end=data.share_number_end)
-        return data
 
     def create(self, validated_data: dict[str, Any]):
         ownerships = validated_data.pop("ownerships")

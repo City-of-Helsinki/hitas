@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
-from hitas.models.utils import validate_share_numbers
 
 
 class ApartmentState(Enum):
@@ -79,9 +78,6 @@ class Apartment(ExternalHitasModel):
 
         return self.share_number_end - self.share_number_start + 1
 
-    def validate_share_numbers(self) -> None:
-        validate_share_numbers(start=self.share_number_start, end=self.share_number_end)
-
     class Meta:
         verbose_name = _("Apartment")
         verbose_name_plural = _("Apartments")
@@ -95,6 +91,15 @@ class Apartment(ExternalHitasModel):
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_end_gte_1",
                 check=models.Q(share_number_end__gte=1),
+            ),
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_share_number_both_set",
+                # Don't know if there's a better way to say (share_number_start IS NULL) == (share_number_end IS NULL)
+                # at least Q(share_number_start__isnull=Q(share_number_end__isnull=True)) seems not to work
+                check=(
+                    models.Q(share_number_start__isnull=False, share_number_end__isnull=False)
+                    | models.Q(share_number_start__isnull=True, share_number_end__isnull=True)
+                ),
             ),
             models.CheckConstraint(
                 name="%(app_label)s_%(class)s_share_number_start_lte_share_number_end",

@@ -46,19 +46,3 @@ def validate_building_id(value: Optional[str]) -> None:
             params={"value": value},
         )
     # TODO: verify building id with the check digit
-
-
-def validate_share_numbers(start: Optional[int], end: Optional[int]) -> None:
-    # TODO Validate overlap in share numbers across other HousingCompany shares
-    if not start and not end:
-        return
-    if not start or not end:
-        raise ValidationError(
-            _("You must enter both: %(start)s and %(end)s or neither."),
-            params={"start": "share_number_start", "end": "share_number_end"},
-        )
-    if start > end:
-        raise ValidationError(
-            _("%(start)s must not be greater than %(end)s"),
-            params={"start": "share_number_start", "end": "share_number_end"},
-        )

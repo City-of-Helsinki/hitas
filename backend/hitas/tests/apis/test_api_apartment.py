@@ -498,7 +498,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         (
             {"shares": {"start": 100, "end": 50}},
-            [{"field": "non_field_errors", "message": "share_number_start must not be greater than share_number_end"}],
+            [{"field": "shares", "message": "'shares.start' must not be greater than 'shares.end'."}],
         ),
         (
             {"shares": {"start": 0, "end": 0}},
