@@ -1,9 +1,10 @@
 from copy import deepcopy
 from uuid import UUID
 
+from django.core.validators import RegexValidator
 from django_filters import CharFilter
 from django_filters.constants import EMPTY_VALUES
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filterset
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filters, filterset
 
 # By default exact matches are used
 # Set a lookup expression for all text-type fields
@@ -17,6 +18,25 @@ for (field_class, filter_class) in FILTER_FOR_DBFIELD_DEFAULTS.items():
 
 class HitasFilterSet(FilterSet):
     FILTER_DEFAULTS = FILTER_FOR_DBFIELD_DEFAULTS
+
+
+class HitasCharFilter(filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        kwargs["min_length"] = 3
+        super().__init__(*args, **kwargs)
+
+
+class HitasPostalCodeFilter(filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        kwargs["validators"] = [RegexValidator(r"^\d{5}$")]
+        super().__init__(*args, **kwargs)
+
+
+class HitasSSNFilter(filters.CharFilter):
+    def __init__(self, *args, **kwargs):
+        kwargs["min_length"] = 11
+        kwargs["max_length"] = 11
+        super().__init__(*args, **kwargs)
 
 
 class HitasFilterBackend(DjangoFilterBackend):

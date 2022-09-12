@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django_filters.rest_framework import filters
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import mixins, serializers, viewsets
 
@@ -7,17 +6,26 @@ from hitas.models import Apartment
 from hitas.models.apartment import ApartmentState
 from hitas.views.apartment import ApartmentHitasAddressSerializer, create_links
 from hitas.views.ownership import OwnershipSerializer
-from hitas.views.utils import HitasDecimalField, HitasEnumField, HitasFilterSet, HitasModelMixin, HitasModelSerializer
+from hitas.views.utils import (
+    HitasCharFilter,
+    HitasDecimalField,
+    HitasEnumField,
+    HitasFilterSet,
+    HitasModelMixin,
+    HitasModelSerializer,
+    HitasPostalCodeFilter,
+)
+from hitas.views.utils.filters import HitasSSNFilter
 
 
 class ApartmentFilterSet(HitasFilterSet):
-    housing_company_name = filters.CharFilter(
+    housing_company_name = HitasCharFilter(
         field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
     )
-    street_address = filters.CharFilter(lookup_expr="icontains")
-    postal_code = filters.CharFilter(field_name="building__real_estate__housing_company__postal_code__value")
-    owner_name = filters.CharFilter(method="owner_name_filter")
-    owner_social_security_number = filters.CharFilter(
+    street_address = HitasCharFilter(lookup_expr="icontains")
+    postal_code = HitasPostalCodeFilter(field_name="building__real_estate__housing_company__postal_code__value")
+    owner_name = HitasCharFilter(method="owner_name_filter")
+    owner_social_security_number = HitasSSNFilter(
         field_name="ownerships__owner__social_security_number", lookup_expr="icontains"
     )
 

@@ -197,3 +197,64 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 1, response.json()
+
+
+@pytest.mark.parametrize(
+    "selected_filter,fields",
+    [
+        (
+            {"housing_company_name": "aa"},
+            [{"field": "housing_company_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+        ),
+        (
+            {"street_address": "aa"},
+            [{"field": "street_address", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+        ),
+        (
+            {"postal_code": "abcde"},
+            [{"field": "postal_code", "message": "Enter a valid value."}],
+        ),
+        (
+            {"postal_code": "1234"},
+            [{"field": "postal_code", "message": "Enter a valid value."}],
+        ),
+        (
+            {"postal_code": "123456"},
+            [{"field": "postal_code", "message": "Enter a valid value."}],
+        ),
+        (
+            {"owner_name": "aa"},
+            [{"field": "owner_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+        ),
+        (
+            {"owner_social_security_number": "1234567890"},
+            [
+                {
+                    "field": "owner_social_security_number",
+                    "message": "Ensure this value has at least 11 characters (it has 10).",
+                }
+            ],
+        ),
+        (
+            {"owner_social_security_number": "123456789012"},
+            [
+                {
+                    "field": "owner_social_security_number",
+                    "message": "Ensure this value has at most 11 characters (it has 12).",
+                }
+            ],
+        ),
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment__filter__invalid_data(api_client: HitasAPIClient, selected_filter, fields):
+    url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
