@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional
 
 from django.db.models import F, IntegerField, Min, Prefetch, Sum
 from django.db.models.functions import Round
-from django_filters.rest_framework import filters
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -19,21 +18,23 @@ from hitas.views.property_manager import ReadOnlyPropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
 from hitas.views.utils import (
     HitasAddressSerializer,
+    HitasCharFilter,
     HitasDecimalField,
     HitasEnumField,
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
+    HitasPostalCodeFilter,
     ValueOrNullField,
 )
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
-    display_name = filters.CharFilter(lookup_expr="icontains")
-    street_address = filters.CharFilter(lookup_expr="icontains")
-    postal_code = filters.CharFilter(field_name="postal_code__value")
-    property_manager = filters.CharFilter(field_name="property_manager__name", lookup_expr="icontains")
-    developer = filters.CharFilter(field_name="developer__value", lookup_expr="icontains")
+    display_name = HitasCharFilter(lookup_expr="icontains")
+    street_address = HitasCharFilter(lookup_expr="icontains")
+    postal_code = HitasPostalCodeFilter(field_name="postal_code__value")
+    property_manager = HitasCharFilter(field_name="property_manager__name", lookup_expr="icontains")
+    developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
 
     class Meta:
         model = HousingCompany

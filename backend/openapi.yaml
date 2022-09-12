@@ -19,6 +19,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 3
             example: helmi
         - name: street_address
           description: Search housing companies with street address containing the given search string (case-insensitive)
@@ -26,6 +27,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 3
             example: Hannunkatu
         - name: postal_code
           description: Search housing companies located in given postal code
@@ -33,6 +35,7 @@ paths:
           in: query
           schema:
             type: string
+            pattern: '^\d{5}$'
             example: "00100"
         - name: developer
           description: Search housing companies with developer name containing the given search string (case-insensitive)
@@ -40,6 +43,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 5
             example: Rakennuttaja
         - name: property_manager
           description: Search housing companies with property manager name matching to the given search string (case-insensitive)
@@ -47,6 +51,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 5
             example: isännöinti
       responses:
         '200':
@@ -836,6 +841,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 3
             example: helmi
         - name: street_address
           description: Search apartments with street address containing the given search string (case-insensitive)
@@ -843,6 +849,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 3
             example: Hannunkatu
         - name: postal_code
           description: Search apartments located in given postal code
@@ -850,6 +857,7 @@ paths:
           in: query
           schema:
             type: string
+            pattern: '^\d{5}$'
             example: "00100"
         - name: owner_name
           description: Search apartments whose owner first name or last name contains the given search string (case-insensitive)
@@ -857,6 +865,7 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 3
             example: matti
         - name: owner_social_security_number
           description: Search apartments whose social security number matches the given search string (case-insensitive)
@@ -864,6 +873,8 @@ paths:
           in: query
           schema:
             type: string
+            minLength: 11
+            maxLength: 11
             example: 131052-308T
       responses:
         '200':
