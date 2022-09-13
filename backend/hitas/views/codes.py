@@ -1,8 +1,7 @@
-from django_filters.rest_framework import filters
 from rest_framework import serializers
 
 from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
-from hitas.views.utils import HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
+from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
 from hitas.views.utils.serializers import ReadOnlySerializer
 
 
@@ -66,11 +65,11 @@ class AbstractCodeViewSet(HitasModelViewSet):
 
     def get_filterset_class(self):
         class CodeFilterSet(HitasFilterSet):
-            code = filters.CharFilter(field_name="legacy_code_number", lookup_expr="exact")
+            value = HitasCharFilter(lookup_expr="icontains")
 
             class Meta:
                 model = self.model_class
-                fields = ["value", "description", "code"]
+                fields = ["value"]
 
         CodeFilterSet.__name__ = f"{self.model_class}FilterSet"
 
