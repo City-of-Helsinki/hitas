@@ -1,12 +1,10 @@
 from uuid import UUID
 
-from django.db import models
 from django.http import Http404
-from django_filters.rest_framework import filters
 from rest_framework import viewsets
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.views.utils import HitasFilterSet, HitasPagination
+from hitas.views.utils import HitasPagination
 
 
 class HitasModelMixin:
@@ -55,26 +53,6 @@ class HitasModelMixin:
             return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
         except model_class.DoesNotExist:
             raise HitasModelNotFound(model=model_class)
-
-    def get_filterset_class(self):
-        """Automagically generate a Filter Set class for subclassing ViewSets"""
-
-        class HitasModelFilterSet(HitasFilterSet):
-
-            if (
-                hasattr(self.model_class, "postal_code")
-                and hasattr(self.model_class.postal_code, "field")
-                and self.model_class.postal_code.field.__class__ == models.ForeignKey
-            ):
-                postal_code = filters.CharFilter(field_name="postal_code__value")
-
-            class Meta:
-                model = self.model_class
-                fields = "__all__"
-
-        HitasModelFilterSet.__name__ = f"{self.model_class}FilterSet"
-
-        return HitasModelFilterSet
 
 
 class HitasModelViewSet(HitasModelMixin, viewsets.ModelViewSet):
