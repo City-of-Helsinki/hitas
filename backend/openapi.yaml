@@ -1091,6 +1091,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -3240,6 +3242,40 @@ components:
           enum: [not_acceptable]
           example: not_acceptable
 
+    ConflictError:
+      description: Conflict error
+      type: object
+      required:
+        - status
+        - reason
+        - message
+        - error
+      properties:
+        status:
+          description: Error code
+          type: integer
+          enum: [409]
+          example: 409
+        reason:
+          description: Error phrase
+          type: string
+          enum: ["Conflict"]
+          example: Conflict
+        message:
+          description: Human-readable details about the error
+          type: string
+          example: Person has active ownerships and cannot be removed.
+        error:
+          description: |-
+            Error reason
+
+            Can have the following values:
+            - person_in_use
+          type: string
+          example: person_in_use
+          x-extensible-enum:
+            - person_in_use
+
     UnsupportedMediaTypeError:
       description: Unsupported media type error
       type: object
@@ -3353,6 +3389,18 @@ components:
             reason: Not Acceptable
             error: not_acceptable
             message: Only 'application/json' Content-Type is supported.
+
+    Conflict:
+      description: The request could not be completed due to a conflict with the current state of the resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConflictError'
+          example:
+            status: 409
+            reason: Conflict
+            error: person_in_use
+            message: Person has active ownerships and cannot be removed.
 
     UnsupportedMediaType:
       description: Only 'application/json' content-type is supported.
