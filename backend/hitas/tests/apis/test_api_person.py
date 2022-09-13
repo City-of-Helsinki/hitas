@@ -7,7 +7,7 @@ from rest_framework import status
 
 from hitas.models import Person
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import PersonFactory
+from hitas.tests.factories import OwnershipFactory, PersonFactory
 
 # List tests
 
@@ -192,6 +192,22 @@ def test__api__person__delete(api_client: HitasAPIClient):
 
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+
+
+@pytest.mark.django_db
+def test__api__person__delete__active_ownerships(api_client: HitasAPIClient):
+    person: Person = PersonFactory.create()
+    OwnershipFactory.create(owner=person)
+
+    url = reverse("hitas:person-detail", kwargs={"uuid": person.uuid.hex})
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert {
+        "error": "person_in_use",
+        "message": "Person has active ownerships and cannot be removed.",
+        "reason": "Conflict",
+        "status": 409,
+    } == response.json()
 
 
 # Filter tests
