@@ -174,6 +174,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         {"owner_name": "megatr"},
         {"owner_name": "etimus pri"},
         {"owner_social_security_number": "010199-123A"},
+        {"owner_social_security_number": "010199-123a"},
     ],
 )
 @pytest.mark.django_db
