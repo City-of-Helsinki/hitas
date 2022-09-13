@@ -92,6 +92,12 @@ def test__api__person__retrieve__invalid_id(api_client: HitasAPIClient):
     url = reverse("hitas:person-detail", kwargs={"uuid": "foo"})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert {
+        "error": "person_not_found",
+        "message": "Person not found",
+        "reason": "Not Found",
+        "status": 404,
+    } == response.json()
 
 
 # Create tests

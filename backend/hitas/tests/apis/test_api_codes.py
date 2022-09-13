@@ -100,6 +100,12 @@ def test__api__code__retrieve__invalid_id(api_client: HitasAPIClient, url_basena
     url = reverse(f"hitas:{url_basename}-detail", kwargs={"uuid": "foo"})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert {
+        "error": f'{url_basename.replace("-", "_")}_not_found',
+        "message": f'{url_basename.capitalize().replace("-", " ")} not found',
+        "reason": "Not Found",
+        "status": 404,
+    } == response.json()
 
 
 # Create tests

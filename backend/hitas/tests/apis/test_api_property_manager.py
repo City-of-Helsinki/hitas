@@ -99,6 +99,12 @@ def test__api__property_manager__retrieve__invalid_id(api_client: HitasAPIClient
     url = reverse("hitas:property-manager-detail", kwargs={"uuid": "foo"})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "property_manager_not_found",
+        "message": "Property manager not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
 
 
 # Create tests
