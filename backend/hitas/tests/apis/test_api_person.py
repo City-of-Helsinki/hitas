@@ -102,7 +102,7 @@ def get_person_create_data() -> dict[str, Any]:
         "first_name": "fake-first-name",
         "last_name": "fake-last-name",
         "social_security_number": "010199-123Y",
-        "email": "test@hitas.com",
+        "email": "hitas@example.com",
     }
 
 
@@ -155,7 +155,7 @@ def test__api__person__update(api_client: HitasAPIClient):
         "first_name": "Matti Matias",
         "last_name": "Meikäläinen",
         "social_security_number": "010199-123Y",
-        "email": "test@hitas.com",
+        "email": "test@example.com",
     }
 
     url = reverse("hitas:person-detail", kwargs={"uuid": person.uuid.hex})
@@ -194,11 +194,13 @@ def test__api__person__delete(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "selected_filter",
     [
-        {"first_name": "fake-first"},
-        {"first_name": "first-name"},
-        {"last_name": "fake-last"},
+        {"name": "fake-first"},
+        {"name": "first-name"},
+        {"name": "fake-last"},
         {"social_security_number": "010199-123Y"},
-        {"email": "hitas"},
+        {"social_security_number": "010199-123y"},
+        {"email": "hitas@example.com"},
+        {"email": "HITAS@EXAMPLE.com"},
     ],
 )
 @pytest.mark.django_db
