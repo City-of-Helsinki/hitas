@@ -3190,14 +3190,26 @@ components:
             - housing_company_not_found
             - housing_company_property_not_found
             - housing_company_building_not_found
+            - apartment_not_found
             - postal_code_not_found
+            - property_manager_not_found
+            - financing_method_not_found
+            - building_type_not_found
+            - developer_not_found
+            - apartment_type_not_found
           type: string
           example: housing_company_not_found
           x-extensible-enum:
             - housing_company_not_found
             - housing_company_property_not_found
             - housing_company_building_not_found
+            - apartment_not_found
             - postal_code_not_found
+            - property_manager_not_found
+            - financing_method_not_found
+            - building_type_not_found
+            - developer_not_found
+            - apartment_type_not_found
 
     NotAcceptableError:
       description: Not acceptable error

@@ -36,7 +36,7 @@ class BuildingType(AbstractCode):
 # Rahoitusmuoto
 class FinancingMethod(AbstractCode):
     class Meta(AbstractCode.Meta):
-        verbose_name = _("Financing methods")
+        verbose_name = _("Financing method")
         verbose_name_plural = _("Financing methods")
 
 
