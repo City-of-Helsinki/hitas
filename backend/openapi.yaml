@@ -916,6 +916,31 @@ paths:
       tags:
         - Persons
       parameters:
+        - name: name
+          description: Search persons with first name or last name containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: Matti
+        - name: social_security_number
+          description: Search persons whose social security number matches the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 11
+            maxLength: 11
+            example: 131052-308T
+        - name: email
+          description: Search persons whose email address matches the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: matti.meikalainen@example.com
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
