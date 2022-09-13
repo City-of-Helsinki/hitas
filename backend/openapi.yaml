@@ -1102,6 +1102,14 @@ paths:
       tags:
         - Property managers
       parameters:
+        - name: name
+          description: Search property managers with name containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: Matti
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
