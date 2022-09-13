@@ -2,6 +2,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
+from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 
@@ -19,6 +20,8 @@ class ApartmentState(Enum):
 
 # Huoneisto / Asunto
 class Apartment(ExternalHitasModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     building = models.ForeignKey("Building", on_delete=models.CASCADE, related_name="apartments")
 
     state = EnumField(ApartmentState, default=ApartmentState.FREE)

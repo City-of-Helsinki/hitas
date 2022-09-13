@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
+from safedelete.models import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 from hitas.models.utils import validate_business_id
@@ -29,6 +30,8 @@ class HousingCompanyState(Enum):
 
 # Taloyhtiö
 class HousingCompany(ExternalHitasModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     # Official spelling of the housing company name
     official_name = models.CharField(max_length=1024, unique=True)
     # More human-friendly housing company name
