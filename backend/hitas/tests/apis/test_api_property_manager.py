@@ -212,11 +212,6 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
         {"name": "TestN"},
         {"name": "testname"},
         {"name": "stNa"},
-        {"email": "test@hitas.com"},
-        {"email": "hitas.com"},
-        {"street_address": "test-street"},
-        {"postal_code": "99999"},
-        {"city": "test-city"},
     ],
 )
 @pytest.mark.django_db

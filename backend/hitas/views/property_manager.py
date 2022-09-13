@@ -3,13 +3,21 @@ import uuid
 from rest_framework import serializers
 
 from hitas.models import PropertyManager
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
+from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
 
 
 class PropertyManagerAddressSerializer(HitasModelSerializer):
     class Meta:
         model = PropertyManager
         fields = ["street_address", "postal_code", "city"]
+
+
+class PropertyManagerFilterSet(HitasFilterSet):
+    name = HitasCharFilter(lookup_expr="icontains")
+
+    class Meta:
+        model = PropertyManager
+        fields = ["name"]
 
 
 class PropertyManagerSerializer(HitasModelSerializer):
@@ -49,3 +57,6 @@ class PropertyManagerViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         return PropertyManager.objects.all().order_by("id")
+
+    def get_filterset_class(self):
+        return PropertyManagerFilterSet
