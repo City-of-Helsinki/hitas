@@ -141,6 +141,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a housing company
       operationId: update-housing-company
@@ -750,6 +751,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update an apartment
       operationId: update-apartment
@@ -1004,6 +1006,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a person
       operationId: update-person
@@ -1164,6 +1167,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a property manager
       operationId: update-property-manager
@@ -1326,6 +1330,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a developer
       operationId: update-developer
@@ -1486,6 +1491,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a postal code
       operationId: update-postal-code
@@ -1646,6 +1652,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a building type
       operationId: update-building-type
@@ -1806,6 +1813,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update a financing method
       operationId: update-financing-method
@@ -1966,6 +1974,7 @@ paths:
           $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
     put:
       description: Update an apartment type
       operationId: update-apartment-type
@@ -2090,12 +2099,12 @@ components:
               description: Link to next page
               type: string
               nullable: true
-              example: 'http://example.com/api/v1/housing-companies?page=4'
+              example: 'https://example.com/api/v1/housing-companies?page=4'
             previous:
               description: Link to previous page
               type: string
               nullable: true
-              example: 'http://example.com/api/v1/housing-companies?page=2'
+              example: 'https://example.com/api/v1/housing-companies?page=2'
       required:
         - size
         - total_items
