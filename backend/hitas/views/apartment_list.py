@@ -14,8 +14,8 @@ from hitas.views.utils import (
     HitasModelMixin,
     HitasModelSerializer,
     HitasPostalCodeFilter,
+    HitasSSNFilter,
 )
-from hitas.views.utils.filters import HitasSSNFilter
 
 
 class ApartmentFilterSet(HitasFilterSet):
@@ -26,7 +26,7 @@ class ApartmentFilterSet(HitasFilterSet):
     postal_code = HitasPostalCodeFilter(field_name="building__real_estate__housing_company__postal_code__value")
     owner_name = HitasCharFilter(method="owner_name_filter")
     owner_social_security_number = HitasSSNFilter(
-        field_name="ownerships__owner__social_security_number", lookup_expr="icontains"
+        field_name="ownerships__owner__social_security_number", lookup_expr="iexact"
     )
 
     def owner_name_filter(self, queryset, name, value):

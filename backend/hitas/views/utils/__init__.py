@@ -11,6 +11,7 @@ from hitas.views.utils.filters import (
     HitasFilterBackend,
     HitasFilterSet,
     HitasPostalCodeFilter,
+    HitasSSNFilter,
     HitasUUIDFilter,
 )
 from hitas.views.utils.paginator import HitasPagination
