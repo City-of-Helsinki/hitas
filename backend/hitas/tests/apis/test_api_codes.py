@@ -196,15 +196,12 @@ def test__api__code__delete(api_client: HitasAPIClient, url_basename, model, fac
     "selected_filter,result_count",
     [
         [{"value": "TestN"}, 1],
-        [{"description": "TestD"}, 1],
-        [{"code": "111"}, 1],
-        [{"code": "11"}, 0],
+        [{"value": "testn"}, 1],
     ],
 )
 @pytest.mark.django_db
 def test__api__code__filter(api_client: HitasAPIClient, url_basename, model, factory, selected_filter, result_count):
     factory.create(legacy_code_number="111", value="TestName")
-    factory.create(legacy_code_number="112", value="Second Code", description="TestDescription")
     factory.create(legacy_code_number="113", value="123")
 
     url = reverse(f"hitas:{url_basename}-list") + "?" + urlencode(selected_filter)

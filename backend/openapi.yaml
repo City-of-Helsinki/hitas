@@ -1273,6 +1273,14 @@ paths:
       tags:
         - Developers
       parameters:
+        - name: value
+          description: Search developers with value containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: Sato
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
@@ -1595,6 +1603,14 @@ paths:
       tags:
         - Building types
       parameters:
+        - name: value
+          description: Search building types with value containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: kerrostalo
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
@@ -1756,6 +1772,14 @@ paths:
       tags:
         - Financing methods
       parameters:
+        - name: value
+          description: Search financing methods with value containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: Hitas II
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
@@ -1917,6 +1941,14 @@ paths:
       tags:
         - Apartment types
       parameters:
+        - name: value
+          description: Search apartment types with value containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            example: h+kk
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
