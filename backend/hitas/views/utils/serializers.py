@@ -17,7 +17,7 @@ class ReadOnlySerializer(serializers.Serializer):
             return {}
 
     def get_model_class(self):
-        pass
+        raise NotImplementedError()
 
     class Meta:
         abstract = True
