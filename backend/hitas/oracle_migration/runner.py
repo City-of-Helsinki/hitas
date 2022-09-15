@@ -6,6 +6,7 @@ from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar
 import pytz
 from django.contrib.auth import get_user_model
 from django.db import models
+from safedelete import HARD_DELETE
 from sqlalchemy import create_engine
 from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
@@ -512,16 +513,13 @@ def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
 
 
 def do_truncate():
-    Ownership.objects.all().delete()
-    Apartment.objects.all().delete()
+    HousingCompany.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
+
     ApartmentType.objects.all().delete()
-    Building.objects.all().delete()
-    RealEstate.objects.all().delete()
-    HousingCompany.objects.all().delete()
     PropertyManager.objects.all().delete()
     BuildingType.objects.all().delete()
     Developer.objects.all().delete()
     FinancingMethod.objects.all().delete()
     Person.objects.all().delete()
-    HitasPostalCode.objects.all().delete()
+    HitasPostalCode.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
     get_user_model().objects.all().delete()
