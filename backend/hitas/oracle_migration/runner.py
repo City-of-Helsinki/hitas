@@ -202,6 +202,16 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
         new.property_manager = converted_data.property_managers_by_oracle_id[hc["property_manager_id"]]
         new.last_modified_by = converted_data.users_by_username.get(hc["last_modified_by"])
 
+        # FIXME: this name is in the test dataset file but will be fixed in test/prod environments
+        # This is a temporary solution to ignore the only instance of housing companies with non-unique name
+        if new.display_name == "Auroranlinna":
+            import uuid
+
+            suffix = "-" + str(uuid.uuid4())
+
+            new.display_name += suffix
+            new.official_name += suffix
+
         # Only save postal codes linked to housing companies
         if new.postal_code._state.adding:
             new.postal_code.save()
