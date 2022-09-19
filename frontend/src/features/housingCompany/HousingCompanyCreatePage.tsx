@@ -277,6 +277,8 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             <SaveDialogModal
                 data={data}
                 error={error}
+                baseURL="/housing-companies/"
+                itemName="Yhtiön"
                 isLoading={isLoading}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
