@@ -10,6 +10,7 @@ interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
     queryFunction;
     relatedModelSearchField: string;
     getRelatedModelLabel: (unknown) => string;
+    placeholder?: string;
 }
 
 export default function FormRelatedModelInputField({
@@ -21,11 +22,12 @@ export default function FormRelatedModelInputField({
     queryFunction,
     relatedModelSearchField,
     getRelatedModelLabel,
+    placeholder,
     ...rest
 }: FormRelatedModelInputFieldProps): JSX.Element {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [internalFilterValue, setInternalFilterValue] = useState("");
-    const [displayedValue, setDisplayedValue] = useState("");
+    const [displayedValue, setDisplayedValue] = useState(placeholder);
 
     const {data, isLoading} = queryFunction({[relatedModelSearchField]: internalFilterValue}, {skip: !isModalVisible});
 

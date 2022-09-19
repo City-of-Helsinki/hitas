@@ -28,6 +28,7 @@ type FormInputFieldProps = {
     formData: object;
     setFormData: (draft) => void;
     error;
+    placeholder?: string;
 } & (
     | {
           inputType?: "text" | "textArea" | "postalCode" | "number" | "date";
@@ -55,6 +56,7 @@ export default function FormInputField({
     formData,
     setFormData,
     error,
+    placeholder,
     ...rest
 }: FormInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
@@ -88,7 +90,7 @@ export default function FormInputField({
         invalid: isInvalid,
         setFieldValue: setFieldValue,
         errorText: errorMessage,
-        className: "input-field--" + inputType,
+        className: "input-field input-field--" + inputType,
     };
 
     if (inputType === "text" || inputType === "textArea") {
@@ -96,6 +98,7 @@ export default function FormInputField({
             <FormTextInputField
                 {...commonProps}
                 size={inputType === "text" ? "small" : "large"}
+                placeholder={placeholder}
                 {...rest}
             />
         );
@@ -148,6 +151,7 @@ export default function FormInputField({
         return (
             <FormRelatedModelInputField
                 {...commonProps}
+                placeholder={placeholder}
                 field={field as string}
                 fieldPath={fieldPath}
                 {...rest}
