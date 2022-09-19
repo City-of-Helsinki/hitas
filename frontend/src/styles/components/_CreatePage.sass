@@ -1,19 +1,78 @@
 @use 'hds-design-tokens' as *
+@use '../utils/mixins' as mix
 
 .view--create
   margin-bottom: $spacing-layout-2-xl
+  @include mix.flexbox()
+  @include mix.flex-flow(column)
 
   .field-sets
     display: flex
     width: 100%
     gap: 1em
+    background-color: $color-engel-medium-light
+    padding: 1em
 
     fieldset
+      display: flex
+      flex-flow: column nowrap
+      gap: 1em
       width: 50%
       flex-grow: 1
 
+      > .row
+        display: flex
+        justify-content: space-between
+        gap: inherit
+
+    h4
+      margin-bottom: 0
+
   [class*="input-field"]
     height: 81px
+    flex-grow: 1
 
   .input-field--textArea
     height: auto
+
+  .ownership-item
+    display: flex
+    gap: 1em
+    position: relative
+
+    label
+      height: 21px
+      white-space: nowrap
+      position: absolute
+      top: 0
+
+      & + div
+        padding-top: 25px
+
+    .owner
+      flex-grow: 1
+
+      label
+        left: 0
+
+    .percentage
+      width: 8ch
+
+      label
+        right: 0
+
+    > [class*="icon_hds"]
+      margin-top: 10px
+
+  .shares-fields
+    display: flex
+    flex-flow: row nowrap
+    justify-content: space-between
+
+  .ownership-headings
+    @include mix.flexbox()
+    width: 100%
+    justify-content: space-between
+
+  > button
+    margin: $spacing-layout-s auto

@@ -37,7 +37,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         notes: "",
         primary_loan: null,
         property_manager: {id: ""},
-        state: "not_ready",
+        state: "Ei valmis",
         sales_price_catalogue_confirmation_date: null,
     };
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(blankForm as IHousingCompanyWritable);
@@ -47,11 +47,33 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         createHousingCompany(formData);
         setIsEndModalVisible(true);
     };
-
+    const stateName = (state) => {
+        switch (state) {
+            case "not_ready":
+                return "Ei valmis";
+            case "lt_30_years":
+                return "Alle 30-vuotta";
+            case "gt_30_years_not_free":
+                return "Yli 30-vuotta, ei vapautunut";
+            case "gt_30_years_free":
+                return "Yli 30-vuotta, vapautunut";
+            case "gt_30_years_plot_department_notification":
+                return "Yli 30-vuotta, vapautunut tonttiosaston ilmoitus";
+            case "half_hitas":
+                return "Puoli-hitas";
+            case "ready_no_statistics":
+                return "Valmis, ei tilastoihin";
+            default:
+                return "VIRHE";
+        }
+    };
+    const stateOptions = HousingCompanyStates.map((state) => {
+        return {label: stateName(state), value: state};
+    });
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
-                <span>Uusi asunto-yhtiö</span>
+                <span>Uusi yhtiö</span>
             </h1>
             <div className="field-sets">
                 <Fieldset
@@ -62,75 +84,81 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         gridGap: "1em",
                     }}
                 >
-                    <FormInputField
-                        label="Yhtiön hakunimi"
-                        fieldPath="name.display"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        label="Yhtiön virallinen nimi"
-                        fieldPath="name.official"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        label="Virallinen osoite"
-                        fieldPath="address.street_address"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="relatedModel"
-                        label="Postinumero"
-                        field="value"
-                        fieldPath="address.postal_code"
-                        queryFunction={useGetPostalCodesQuery}
-                        relatedModelSearchField="value"
-                        getRelatedModelLabel={(obj: IPostalCode) => obj.value}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType={"select"}
-                        label="Tila"
-                        fieldPath="state"
-                        options={(() =>
-                            HousingCompanyStates.map((state) => {
-                                return {label: state};
-                            }))()}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="number"
-                        unit="€"
-                        label="Hankinta-arvo"
-                        fieldPath="acquisition_price.initial"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="number"
-                        unit="€"
-                        label="Toteutunut hankinta-arvo"
-                        fieldPath="acquisition_price.realized"
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
+                    <div className="row">
+                        <FormInputField
+                            label="Yhtiön virallinen nimi"
+                            fieldPath="name.official"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            label="Yhtiön hakunimi"
+                            fieldPath="name.display"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            label="Katuosoite"
+                            fieldPath="address.street_address"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="relatedModel"
+                            label="Postinumero"
+                            field="value"
+                            fieldPath="address.postal_code"
+                            queryFunction={useGetPostalCodesQuery}
+                            relatedModelSearchField="value"
+                            getRelatedModelLabel={(obj: IPostalCode) => obj.value}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType={"select"}
+                            label="Tila"
+                            field="state"
+                            fieldPath="state"
+                            options={stateOptions}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="number"
+                            unit="€"
+                            label="Hankinta-arvo"
+                            fieldPath="acquisition_price.initial"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="number"
+                            unit="€"
+                            label="Toteutunut hankinta-arvo"
+                            fieldPath="acquisition_price.realized"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
                     <FormInputField
                         inputType="textArea"
                         label="Huomioitavaa"
@@ -148,73 +176,79 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         gridGap: "1em",
                     }}
                 >
-                    <FormInputField
-                        label="Y-Tunnus"
-                        fieldPath="business_id"
-                        validator={validateBusinessId}
-                        tooltipText={"Esimerkki arvo: '1234567-8'"}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="date"
-                        label="Myyntihintaluettelon vahvistamispäivä"
-                        fieldPath="sales_price_catalogue_confirmation_date"
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="number"
-                        unit="€"
-                        label="Ensisijainen laina"
-                        fieldPath="primary_loan"
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="relatedModel"
-                        label="Rahoitusmuoto"
-                        field="id"
-                        fieldPath="financing_method.id"
-                        queryFunction={useGetFinancingMethodsQuery}
-                        relatedModelSearchField="value"
-                        getRelatedModelLabel={(obj: ICode) => obj.value}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="relatedModel"
-                        label="Talotyyppi"
-                        field="id"
-                        fieldPath="building_type.id"
-                        queryFunction={useGetBuildingTypesQuery}
-                        relatedModelSearchField="value"
-                        getRelatedModelLabel={(obj: ICode) => obj.value}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                    <FormInputField
-                        inputType="relatedModel"
-                        label="Rakennuttaja"
-                        field="id"
-                        fieldPath="developer.id"
-                        queryFunction={useGetDevelopersQuery}
-                        relatedModelSearchField="value"
-                        getRelatedModelLabel={(obj: ICode) => obj.value}
-                        required
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
+                    <div className="row">
+                        <FormInputField
+                            label="Y-Tunnus"
+                            fieldPath="business_id"
+                            validator={validateBusinessId}
+                            tooltipText={"Esimerkki arvo: '1234567-8'"}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="date"
+                            label="Myyntihintaluettelon vahvistamispäivä"
+                            fieldPath="sales_price_catalogue_confirmation_date"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="number"
+                            unit="€"
+                            label="Ensisijainen laina"
+                            fieldPath="primary_loan"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="relatedModel"
+                            label="Rahoitusmuoto"
+                            field="id"
+                            fieldPath="financing_method.id"
+                            queryFunction={useGetFinancingMethodsQuery}
+                            relatedModelSearchField="value"
+                            getRelatedModelLabel={(obj: ICode) => obj.value}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="relatedModel"
+                            label="Talotyyppi"
+                            field="id"
+                            fieldPath="building_type.id"
+                            queryFunction={useGetBuildingTypesQuery}
+                            relatedModelSearchField="value"
+                            getRelatedModelLabel={(obj: ICode) => obj.value}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="relatedModel"
+                            label="Rakennuttaja"
+                            field="id"
+                            fieldPath="developer.id"
+                            queryFunction={useGetDevelopersQuery}
+                            relatedModelSearchField="value"
+                            getRelatedModelLabel={(obj: ICode) => obj.value}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
                     <FormInputField
                         inputType="relatedModel"
                         label="Isännöitsijä"
