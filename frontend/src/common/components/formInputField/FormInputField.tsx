@@ -19,7 +19,7 @@ export interface CommonFormInputFieldProps {
 
 type FormInputFieldProps = {
     label: string;
-    field?: string;
+    requestedField?: string;
     fieldPath: string;
     unit?: string;
     validator?: (value) => boolean;
@@ -48,7 +48,7 @@ type FormInputFieldProps = {
 export default function FormInputField({
     inputType = "text",
     label,
-    field,
+    requestedField,
     fieldPath,
     unit,
     required,
@@ -152,7 +152,7 @@ export default function FormInputField({
             <FormRelatedModelInputField
                 {...commonProps}
                 placeholder={placeholder}
-                field={field as string}
+                requestedField={requestedField as string}
                 fieldPath={fieldPath}
                 {...rest}
             />

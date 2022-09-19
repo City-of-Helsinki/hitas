@@ -17,6 +17,7 @@ import {
     ApartmentStates,
     IApartmentWritable,
     ICode,
+    IHousingCompany,
     IHousingCompanyDetails,
     IOwnership,
     IPerson,
@@ -101,7 +102,6 @@ const ApartmentCreatePage = () => {
         const stateOptions = ApartmentStates.map((state) => {
             return {label: stateName(state), value: state};
         });
-        console.log(stateOptions, buildingOptions);
         return (
             <div className="view--create view--set-apartment">
                 <h1 className="main-heading">Uusi asunto</h1>
@@ -110,12 +110,12 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Asunto-osakeyhtiö"
-                            field="id"
-                            fieldPath="housing_company.id"
-                            placeholder={data.name.official}
+                            requestedField="id"
+                            fieldPath="housing_company"
+                            placeholder={data.name.display}
                             queryFunction={useGetHousingCompaniesQuery}
                             relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
+                            getRelatedModelLabel={(obj: IHousingCompany) => obj.name}
                             required
                             formData={formData}
                             setFormData={setFormData}
@@ -127,20 +127,6 @@ const ApartmentCreatePage = () => {
                                 label="Rakennus"
                                 fieldPath="building.id"
                                 options={buildingOptions}
-                                required
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                            />
-                            <FormInputField
-                                inputType="relatedModel"
-                                label="Postinumero"
-                                field="postal_code"
-                                fieldPath="address.postal_code"
-                                placeholder={data.address.postal_code}
-                                queryFunction={useGetApartmentTypesQuery}
-                                relatedModelSearchField="value"
-                                getRelatedModelLabel={(obj: ICode) => obj.value}
                                 required
                                 formData={formData}
                                 setFormData={setFormData}
@@ -188,7 +174,7 @@ const ApartmentCreatePage = () => {
                             <FormInputField
                                 inputType="relatedModel"
                                 label="Asuntotyyppi"
-                                field="value"
+                                requestedField="value"
                                 fieldPath="apartment_type.id"
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
@@ -318,7 +304,7 @@ const ApartmentCreatePage = () => {
                                             <FormInputField
                                                 inputType="relatedModel"
                                                 label=""
-                                                field="id"
+                                                requestedField="id"
                                                 fieldPath="id"
                                                 queryFunction={useGetPersonsQuery}
                                                 relatedModelSearchField="last_name"

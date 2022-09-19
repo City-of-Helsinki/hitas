@@ -116,7 +116,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Postinumero"
-                            field="value"
+                            requestedField="value"
                             fieldPath="address.postal_code"
                             queryFunction={useGetPostalCodesQuery}
                             relatedModelSearchField="value"
@@ -129,7 +129,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType={"select"}
                             label="Tila"
-                            field="state"
+                            requestedField="state"
                             fieldPath="state"
                             options={stateOptions}
                             required
@@ -210,7 +210,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Rahoitusmuoto"
-                            field="id"
+                            requestedField="id"
                             fieldPath="financing_method.id"
                             queryFunction={useGetFinancingMethodsQuery}
                             relatedModelSearchField="value"
@@ -225,7 +225,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Talotyyppi"
-                            field="id"
+                            requestedField="id"
                             fieldPath="building_type.id"
                             queryFunction={useGetBuildingTypesQuery}
                             relatedModelSearchField="value"
@@ -238,7 +238,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Rakennuttaja"
-                            field="id"
+                            requestedField="id"
                             fieldPath="developer.id"
                             queryFunction={useGetDevelopersQuery}
                             relatedModelSearchField="value"
@@ -252,7 +252,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     <FormInputField
                         inputType="relatedModel"
                         label="Isännöitsijä"
-                        field="id"
+                        requestedField="id"
                         fieldPath="property_manager.id"
                         queryFunction={useGetPropertyManagersQuery}
                         relatedModelSearchField="name"
