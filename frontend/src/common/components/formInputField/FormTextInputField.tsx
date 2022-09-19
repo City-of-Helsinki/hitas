@@ -6,11 +6,13 @@ import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormTextInputFieldProps extends CommonFormInputFieldProps {
     size: "small" | "large";
+    placeholder?: string;
 }
 
 export default function FormTextInputField({
     setFieldValue,
     size = "small",
+    placeholder,
     ...rest
 }: FormTextInputFieldProps): JSX.Element {
     function handleOnChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -19,6 +21,7 @@ export default function FormTextInputField({
 
     const inputProps = {
         onChange: handleOnChange,
+        placeholder,
         ...rest,
     };
 

@@ -10,9 +10,10 @@ interface FormNumberInputFieldProps extends Omit<CommonFormInputFieldProps, "val
 }
 
 export default function FormNumberInputField({setFieldValue, unit, ...rest}: FormNumberInputFieldProps): JSX.Element {
+    const fractionDigits = unit === "€" ? 2 : 0;
     return (
         <NumberInput
-            onChange={(e) => setFieldValue(Number(Number(e.target.value).toFixed(2)))}
+            onChange={(e) => setFieldValue(Number(Number(e.target.value).toFixed(fractionDigits)))}
             unit={unit ? unit : ""}
             {...rest}
         />
