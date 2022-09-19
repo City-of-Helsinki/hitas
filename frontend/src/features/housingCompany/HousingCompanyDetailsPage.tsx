@@ -157,7 +157,7 @@ const HousingCompanyDetailsPage = () => {
                     <div className="list-wrapper list-wrapper--apartments">
                         <h2>
                             <span>Asunnot</span>
-                            <Link to={`/apartments/create/`}>
+                            <Link to={`apartments/create`}>
                                 <Button
                                     theme="black"
                                     size="small"
