@@ -209,7 +209,7 @@ export interface IApartmentWritable {
     apartment_number: number;
     floor: number;
     stair: string;
-    completion_date?: Date;
+    completion_date?: Date | null;
     debt_free_purchase_price: number;
     purchase_price: number;
     acquisition_price: number;
@@ -219,7 +219,7 @@ export interface IApartmentWritable {
     building: {id: string};
     real_estate: {id: string};
     housing_company: {name: string};
-    ownerships: IOwnership[];
+    ownerships: IOwnership[] | null;
     notes: string;
 }
 
