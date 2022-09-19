@@ -35,7 +35,14 @@ type FormInputFieldProps = {
       }
     | {
           inputType: "select" | "combobox";
-          options: {label: string}[];
+          options: {
+              label: string;
+              value?: string;
+          }[];
+          defaultValue?: {
+              label: string;
+              value?: string;
+          };
       }
     | {
           inputType: "relatedModel";
@@ -122,8 +129,12 @@ export default function FormInputField({
         );
     }
     if (inputType === "combobox" || inputType === "select") {
-        if (!("options" in rest) || rest.options === undefined || !rest.options.length)
+        if (!("options" in rest) || rest.options === undefined)
             throw new Error("`options` argument is required when `inputType` is `select` or `combobox`.");
+
+        if (!rest.options.length) {
+            commonProps.invalid = true;
+        }
 
         return (
             <FormDropdownInputField

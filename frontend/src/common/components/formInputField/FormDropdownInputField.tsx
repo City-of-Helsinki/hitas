@@ -5,7 +5,14 @@ import {Combobox, Select} from "hds-react";
 import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormDropdownInputFieldProps extends CommonFormInputFieldProps {
-    options: {label: string}[];
+    options: {
+        label: string;
+        value?: string;
+    }[];
+    defaultValue?: {
+        label: string;
+        value?: string;
+    };
     searchable?: boolean;
 }
 
@@ -16,9 +23,9 @@ export default function FormDropdownInputField({
     required,
     ...rest
 }: FormDropdownInputFieldProps): JSX.Element {
-    const onSelectionChange = (newValue: {label: string}) => {
+    const onSelectionChange = (newValue: {label: string; value?: string}) => {
         if (newValue) {
-            setFieldValue(newValue.label);
+            setFieldValue(newValue?.value ? newValue?.value : newValue?.label);
         } else if (!required) {
             setFieldValue(null);
         }

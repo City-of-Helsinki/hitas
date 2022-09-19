@@ -13,7 +13,6 @@ import {
 } from "../../app/services";
 import {FormInputField, QueryStateHandler, SaveDialogModal} from "../../common/components";
 import {
-    ApartmentState,
     ApartmentStates,
     IApartmentWritable,
     ICode,
@@ -34,7 +33,7 @@ const ApartmentCreatePage = () => {
         percentage: 100,
     };
     const blankForm: IApartmentWritable = {
-        state: "Vapaa" as ApartmentState,
+        state: "free",
         apartment_type: {id: ""},
         surface_area: 0,
         share_number_start: 0,
@@ -191,6 +190,7 @@ const ApartmentCreatePage = () => {
                                 label="Tila"
                                 fieldPath="state"
                                 options={stateOptions}
+                                defaultValue={{label: "Vapaa", value: "free"}}
                                 required
                                 formData={formData}
                                 setFormData={setFormData}
@@ -228,6 +228,8 @@ const ApartmentCreatePage = () => {
                                 setFormData={setFormData}
                                 error={error}
                             />
+                        </div>
+                        <div className="row">
                             <FormInputField
                                 inputType="number"
                                 unit="€"
@@ -238,8 +240,6 @@ const ApartmentCreatePage = () => {
                                 setFormData={setFormData}
                                 error={error}
                             />
-                        </div>
-                        <div className="row">
                             <FormInputField
                                 inputType="number"
                                 unit="€"
@@ -249,6 +249,8 @@ const ApartmentCreatePage = () => {
                                 setFormData={setFormData}
                                 error={error}
                             />
+                        </div>
+                        <div className="row">
                             <FormInputField
                                 inputType="number"
                                 label="Osakkeet, alku"
@@ -288,7 +290,10 @@ const ApartmentCreatePage = () => {
                                 error={error}
                             />
                         </div>
-                        <h4>Omistajuudet</h4>
+                    </Fieldset>
+                </div>
+                <div className="field-sets">
+                    <Fieldset heading={"Omistajuudet"}>
                         <ul className="ownerships-list">
                             <legend className={"ownership-headings"}>
                                 <span>Omistaja</span>
@@ -350,6 +355,7 @@ const ApartmentCreatePage = () => {
                             Lisää omistajuus
                         </Button>
                     </Fieldset>
+                    <Fieldset heading={""}></Fieldset>
                 </div>
                 <Button
                     iconLeft={<IconSaveDisketteFill />}

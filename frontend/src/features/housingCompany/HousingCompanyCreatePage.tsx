@@ -37,7 +37,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         notes: "",
         primary_loan: null,
         property_manager: {id: ""},
-        state: "Ei valmis",
+        state: "",
         sales_price_catalogue_confirmation_date: null,
     };
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(blankForm as IHousingCompanyWritable);
@@ -132,6 +132,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             requestedField="state"
                             fieldPath="state"
                             options={stateOptions}
+                            defaultValue={{label: "Ei valmis", value: "not_ready"}}
                             required
                             formData={formData}
                             setFormData={setFormData}
