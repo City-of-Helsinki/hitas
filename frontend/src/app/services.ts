@@ -35,7 +35,7 @@ export const hitasApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: Config.api_url,
         prepareHeaders: (headers) => {
-            headers.set("Authorization", "Bearer " + Config.token)
+            headers.set("Authorization", "Bearer " + Config.token);
             return headers;
         },
     }),
