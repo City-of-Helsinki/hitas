@@ -376,6 +376,8 @@ const ApartmentCreatePage = () => {
                  Save attempt modal dialog
                  */}
                 <SaveDialogModal
+                    itemName={"asunnon"}
+                    baseURL={"/apartments/"}
                     data={savedData}
                     error={saveError}
                     isLoading={isSaving}
