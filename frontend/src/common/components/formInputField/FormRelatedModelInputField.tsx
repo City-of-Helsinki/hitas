@@ -6,7 +6,7 @@ import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
     fieldPath: string;
-    field: string;
+    requestedField: string;
     queryFunction;
     relatedModelSearchField: string;
     getRelatedModelLabel: (unknown) => string;
@@ -16,7 +16,7 @@ interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
 export default function FormRelatedModelInputField({
     label,
     value,
-    field,
+    requestedField,
     fieldPath,
     setFieldValue,
     queryFunction,
@@ -39,7 +39,7 @@ export default function FormRelatedModelInputField({
             const objId = rows[0];
             const obj = data.contents[data.contents.findIndex((obj) => obj.id === objId)];
             setDisplayedValue(getRelatedModelLabel(obj));
-            setFieldValue(obj[field]);
+            setFieldValue(obj[requestedField]);
             closeModal();
         }
     };
