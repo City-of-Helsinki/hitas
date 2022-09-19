@@ -32,23 +32,31 @@ export default function Router() {
                         path="create"
                         element={<HousingCompanyCreatePage />}
                     />
-                    <Route
-                        path=":housingCompanyId/apartments/:apartmentId"
-                        element={<ApartmentDetailsPage />}
-                    />
-                    <Route
-                        path=":housingCompanyId"
-                        element={<HousingCompanyDetailsPage />}
-                    />
+                    <Route path=":housingCompanyId">
+                        <Route
+                            index
+                            element={<HousingCompanyDetailsPage />}
+                        />
+                        <Route path={"apartments"}>
+                            <Route
+                                index
+                                element={<HousingCompanyDetailsPage />}
+                            />
+                            <Route
+                                path={"create"}
+                                element={<ApartmentCreatePage />}
+                            />
+                            <Route
+                                path=":apartmentId"
+                                element={<ApartmentDetailsPage />}
+                            />
+                        </Route>
+                    </Route>
                 </Route>
                 <Route path="apartments">
                     <Route
                         index
                         element={<ApartmentListPage />}
-                    />
-                    <Route
-                        path="create"
-                        element={<ApartmentCreatePage />}
                     />
                     <Route
                         path=":apartmentId"
