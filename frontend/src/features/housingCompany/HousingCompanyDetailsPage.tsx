@@ -132,27 +132,53 @@ const HousingCompanyDetailsPage = () => {
                         </Tabs>
                     </div>
                     <div className="list-wrapper list-wrapper--upgrades">
-                        <h2 className="upgrade-list__heading">Yhtiökohtaiset parannukset</h2>
-                        <ul className="upgrade-list__list">
-                            <li className="upgrade-list__list-headers">
+                        <h2 className="detail-list__heading">Yhtiökohtaiset parannukset</h2>
+                        <ul className="detail-list__list">
+                            <li className="detail-list__list-headers">
                                 <div>Nimi</div>
                                 <div>Summa</div>
                                 <div>Valmistumispvm</div>
-                                <div>Jyvitys</div>
+                                <div>Jakoperuste</div>
                             </li>
-                            <li className="upgrade-list__list-item">
+                            <li className="detail-list__list-item">
                                 <div>Parvekelasien lisäys</div>
                                 <div>340 000 €</div>
                                 <div>1.1.2015</div>
                                 <div>Neliöiden mukaan</div>
                             </li>
-                            <li className="upgrade-list__list-item">
+                            <li className="detail-list__list-item">
                                 <div>Hissin rakennus</div>
                                 <div>2 340 000 €</div>
                                 <div>1.12.2021</div>
                                 <div>Neliöiden mukaan</div>
                             </li>
                         </ul>
+                    </div>
+                    <div style={{display: "flex", flexFlow: "row nowrap", gap: "1em"}}>
+                        <div className="list-wrapper list-wrapper--real-estates">
+                            <h2 className="detail-list__heading">Kiinteistöt</h2>
+                            <ul className="detail-list__list">
+                                {data.real_estates.map((item) => (
+                                    <li className="detail-list__list-item">
+                                        <div>{item.address.street_address}</div>
+                                        <div>{item.property_identifier}</div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="list-wrapper list-wrapper--buildings">
+                            <h2 className="detail-list__heading">Rakennukset</h2>
+                            <ul className="detail-list__list">
+                                {data.real_estates.flatMap((realEstate) => {
+                                    return realEstate.buildings.map((building) => (
+                                        <li className="detail-list__list-item">
+                                            <div>{building.address.street_address}</div>
+                                            <div>{building.building_identifier}</div>
+                                        </li>
+                                    ));
+                                })}
+                            </ul>
+                        </div>
                     </div>
                     <div className="list-wrapper list-wrapper--apartments">
                         <h2>
