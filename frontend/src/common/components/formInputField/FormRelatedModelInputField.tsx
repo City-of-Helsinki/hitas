@@ -7,7 +7,7 @@ import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
     fieldPath: string;
-    requestedField: string;
+    requestedField?: string;
     queryFunction;
     relatedModelSearchField: string;
     getRelatedModelLabel: (unknown) => string;
@@ -17,7 +17,7 @@ interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
 export default function FormRelatedModelInputField({
     label,
     value,
-    requestedField,
+    requestedField = "id",
     fieldPath,
     setFieldValue,
     queryFunction,

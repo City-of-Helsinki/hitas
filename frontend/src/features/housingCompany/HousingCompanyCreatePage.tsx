@@ -129,7 +129,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType={"select"}
                             label="Tila"
-                            requestedField="state"
                             fieldPath="state"
                             options={stateOptions}
                             defaultValue={{label: "Ei valmis", value: "not_ready"}}
@@ -211,7 +210,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Rahoitusmuoto"
-                            requestedField="id"
                             fieldPath="financing_method.id"
                             queryFunction={useGetFinancingMethodsQuery}
                             relatedModelSearchField="value"
@@ -226,7 +224,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Talotyyppi"
-                            requestedField="id"
                             fieldPath="building_type.id"
                             queryFunction={useGetBuildingTypesQuery}
                             relatedModelSearchField="value"
@@ -239,7 +236,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Rakennuttaja"
-                            requestedField="id"
                             fieldPath="developer.id"
                             queryFunction={useGetDevelopersQuery}
                             relatedModelSearchField="value"
@@ -253,7 +249,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     <FormInputField
                         inputType="relatedModel"
                         label="Isännöitsijä"
-                        requestedField="id"
                         fieldPath="property_manager.id"
                         queryFunction={useGetPropertyManagersQuery}
                         relatedModelSearchField="name"
