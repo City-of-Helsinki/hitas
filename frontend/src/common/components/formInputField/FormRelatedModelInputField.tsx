@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 
-import {Button, Dialog, IconCrossCircle, IconSearch, LoadingSpinner, Table, TextInput} from "hds-react";
+import {Button, Dialog, IconCrossCircle, IconSearch, Table, TextInput} from "hds-react";
 
+import QueryStateHandler from "../QueryStateHandler";
 import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormRelatedModelInputFieldProps extends CommonFormInputFieldProps {
@@ -29,7 +30,10 @@ export default function FormRelatedModelInputField({
     const [internalFilterValue, setInternalFilterValue] = useState("");
     const [displayedValue, setDisplayedValue] = useState(placeholder);
 
-    const {data, isLoading} = queryFunction({[relatedModelSearchField]: internalFilterValue}, {skip: !isModalVisible});
+    const {data, error, isLoading} = queryFunction(
+        {[relatedModelSearchField]: internalFilterValue},
+        {skip: !isModalVisible}
+    );
 
     const openModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
@@ -96,26 +100,26 @@ export default function FormRelatedModelInputField({
                         onButtonClick={() => setInternalFilterValue("")}
                     />
                     <br />
-                    {isLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <>
-                            <Table
-                                cols={cols}
-                                rows={data?.contents}
-                                indexKey="id"
-                                renderIndexCol={false}
-                                checkboxSelection
-                                selectedRows={[]}
-                                setSelectedRows={handleSetSelectedRows}
-                                zebra
-                                theme={tableTheme}
-                            />
-                            <span>
-                                Näytetään {data?.page.size}/{data?.page.total_items} tulosta
-                            </span>
-                        </>
-                    )}
+                    <QueryStateHandler
+                        data={data}
+                        error={error}
+                        isLoading={isLoading}
+                    >
+                        <Table
+                            cols={cols}
+                            rows={data?.contents}
+                            indexKey="id"
+                            renderIndexCol={false}
+                            checkboxSelection
+                            selectedRows={[]}
+                            setSelectedRows={handleSetSelectedRows}
+                            zebra
+                            theme={tableTheme}
+                        />
+                        <span>
+                            Näytetään {data?.page.size}/{data?.page.total_items} tulosta
+                        </span>
+                    </QueryStateHandler>
                 </Dialog.Content>
                 <Dialog.ActionButtons>
                     {/* TODO: Adding to the related data is handled by the Django dashboard for now. This feature is to be shown here later
