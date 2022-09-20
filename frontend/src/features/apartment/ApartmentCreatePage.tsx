@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset, IconCrossCircle, IconPlus, IconSaveDisketteFill, LoadingSpinner} from "hds-react";
+import {Button, Fieldset, IconCrossCircle, IconPlus, IconSaveDisketteFill} from "hds-react";
 import {useParams} from "react-router";
 import {useImmer} from "use-immer";
 
@@ -379,9 +379,7 @@ const ApartmentCreatePage = () => {
             </div>
         );
     };
-    return isLoading ? (
-        <LoadingSpinner />
-    ) : (
+    return (
         <QueryStateHandler
             data={data}
             error={error}
