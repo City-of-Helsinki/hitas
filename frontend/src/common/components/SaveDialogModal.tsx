@@ -46,7 +46,7 @@ export default function SaveDialogModal({
                 <>
                     <Dialog.Content>{`${itemName} tiedot tallennettu!`}</Dialog.Content>
                     <Dialog.ActionButtons>
-                        <Link to={baseURL + "/" + data.id}>
+                        <Link to={baseURL + data.id}>
                             <Button
                                 variant="secondary"
                                 theme={"black"}
