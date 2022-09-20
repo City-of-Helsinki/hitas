@@ -226,7 +226,10 @@
   .company-status
     margin-bottom: 16px
 
-.upgrade-list
+.list-wrapper--real-estates, .list-wrapper--buildings
+  width: 50%
+
+.detail-list
   &__list
     background-color: $color-engel-medium-light
     padding: $spacing-layout-s
@@ -234,7 +237,7 @@
     li
       @include mix.flexbox()
 
-      > *
+      .list-wrapper--upgrades & > *
         width: 25%
 
     &-headers
@@ -246,6 +249,7 @@
 
       &:not(:last-child)
         border-bottom: 1px solid #ccc
+
 
 footer
   width: 100%
