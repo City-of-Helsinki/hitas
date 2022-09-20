@@ -109,7 +109,6 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="relatedModel"
                             label="Asunto-osakeyhtiö"
-                            requestedField="id"
                             fieldPath="housing_company"
                             placeholder={data.name.display}
                             queryFunction={useGetHousingCompaniesQuery}
@@ -309,7 +308,6 @@ const ApartmentCreatePage = () => {
                                             <FormInputField
                                                 inputType="relatedModel"
                                                 label=""
-                                                requestedField="id"
                                                 fieldPath="id"
                                                 queryFunction={useGetPersonsQuery}
                                                 relatedModelSearchField="last_name"
