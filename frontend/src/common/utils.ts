@@ -1,4 +1,4 @@
-import {IAddress, IPerson} from "./models";
+import {IAddress, IApartmentAddress, IPerson} from "./models";
 
 function dotted(obj: object, path: string | string[], value?: number | string | null) {
     /*
@@ -21,7 +21,7 @@ function dotted(obj: object, path: string | string[], value?: number | string | 
     else return dotted(obj[path[0]], path.slice(1), value);
 }
 
-function formatAddress(address: IAddress): string {
+function formatAddress(address: IAddress | IApartmentAddress): string {
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 

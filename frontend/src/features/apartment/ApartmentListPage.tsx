@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
-import {IAddress, IApartment, IApartmentListResponse, IOwnership} from "../../common/models";
+import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
 interface ApartmentListItemProps {
@@ -15,7 +15,7 @@ interface ApartmentListItemProps {
     ownerships: IOwnership[];
     apartmentType: string;
     surfaceArea: number;
-    address: IAddress;
+    address: IApartmentAddress;
     state: string;
     hcId: string;
 }
