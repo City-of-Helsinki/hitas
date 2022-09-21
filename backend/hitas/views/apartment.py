@@ -2,13 +2,14 @@ from collections import OrderedDict
 from typing import Any, Dict
 
 from django.core.exceptions import ValidationError
+from django.db.models import Prefetch
 from django.urls import reverse
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import SkipField, empty
 
-from hitas.models import Apartment, Building, HousingCompany, Ownership
-from hitas.models.apartment import ApartmentState
+from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Ownership, Person
+from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -18,6 +19,19 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
 )
+from hitas.views.utils.serializers import YearMonthSerializer
+
+
+class ImprovementSerializer(serializers.ModelSerializer):
+    completion_date = YearMonthSerializer()
+
+    class Meta:
+        model = ApartmentMarketPriceImprovement
+        fields = [
+            "name",
+            "completion_date",
+            "value",
+        ]
 
 
 class ApartmentHitasAddressSerializer(serializers.Serializer):
@@ -137,6 +151,11 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
     }
 
 
+class ApartmentImprovementSerializer(serializers.Serializer):
+    market_price_index = ImprovementSerializer(many=True, source="market_price_improvements")
+    construction_price_index = ImprovementSerializer(many=True, source="construction_price_improvements")
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type")
@@ -148,6 +167,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     ownerships = OwnershipSerializer(many=True, read_only=False)
     links = serializers.SerializerMethodField()
     building = UUIDRelatedField(queryset=Building.objects.all(), write_only=True)
+    improvements = ApartmentImprovementSerializer(source="*", read_only=True)
 
     @staticmethod
     def get_links(instance: Apartment):
@@ -239,6 +259,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "ownerships",
             "notes",
             "building",
+            "improvements",
         ]
 
 
@@ -303,7 +324,28 @@ class ApartmentViewSet(HitasModelViewSet):
 
         return (
             Apartment.objects.filter(building__real_estate__housing_company__id=hc_id)
-            .prefetch_related("ownerships", "ownerships__owner")
+            .prefetch_related(
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.only("apartment_id", "percentage", "start_date", "end_date", "owner_id"),
+                ),
+                Prefetch(
+                    "ownerships__owner",
+                    Person.objects.only("uuid", "first_name", "last_name", "social_security_number", "email"),
+                ),
+                Prefetch(
+                    "market_price_improvements",
+                    ApartmentMarketPriceImprovement.objects.only(
+                        "name", "completion_date", "value", "apartment_id"
+                    ).order_by("completion_date", "id"),
+                ),
+                Prefetch(
+                    "construction_price_improvements",
+                    ApartmentConstructionPriceImprovement.objects.only(
+                        "name", "completion_date", "value", "apartment_id", "depreciation_percentage"
+                    ).order_by("completion_date", "id"),
+                ),
+            )
             .select_related(
                 "building",
                 "building__real_estate",

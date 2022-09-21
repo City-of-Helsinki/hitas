@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
+from hitas.models._base import ExternalHitasModel, HitasModel, HitasModelDecimalField
 
 
 class ApartmentState(Enum):
@@ -116,3 +116,30 @@ class Apartment(ExternalHitasModel):
 
     def __str__(self):
         return f"{self.street_address} {self.apartment_number}"
+
+
+class ApartmentMarketPriceImprovement(HitasModel):
+    apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="market_price_improvements")
+    name = models.CharField(max_length=128)
+    completion_date = models.DateField()
+    value = models.PositiveIntegerField(default=0)
+
+
+class DepreciationPercentage(Enum):
+    ZERO = 0.0
+    TWO_POINT_FIVE = 2.5
+    TEN = 10.0
+
+    class Labels:
+        ZERO = "0.0"
+        TWO_AND_HALF = "2.5"
+        TEN = "10.0"
+
+
+class ApartmentConstructionPriceImprovement(HitasModel):
+    apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="construction_price_improvements")
+    name = models.CharField(max_length=128)
+    completion_date = models.DateField()
+    value = models.PositiveIntegerField(default=0)
+
+    depreciation_percentage = EnumField(DepreciationPercentage, default=DepreciationPercentage.TEN)

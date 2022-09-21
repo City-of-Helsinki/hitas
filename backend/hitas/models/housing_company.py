@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
+from hitas.models._base import ExternalHitasModel, HitasModel, HitasModelDecimalField
 from hitas.models.utils import validate_business_id
 
 
@@ -99,3 +99,21 @@ class HousingCompany(ExternalHitasModel):
 
     def __str__(self):
         return self.display_name
+
+
+class HousingCompanyMarketPriceImprovement(HitasModel):
+    housing_company = models.ForeignKey(
+        "HousingCompany", on_delete=models.CASCADE, related_name="market_price_improvements"
+    )
+    name = models.CharField(max_length=128)
+    completion_date = models.DateField()
+    value = models.PositiveIntegerField(default=0)
+
+
+class HousingCompanyConstructionPriceImprovement(HitasModel):
+    housing_company = models.ForeignKey(
+        "HousingCompany", on_delete=models.CASCADE, related_name="construction_price_improvements"
+    )
+    name = models.CharField(max_length=128)
+    completion_date = models.DateField()
+    value = models.PositiveIntegerField(default=0)

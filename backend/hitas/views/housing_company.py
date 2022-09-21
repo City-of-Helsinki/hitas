@@ -7,7 +7,13 @@ from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from hitas.models import HousingCompany, HousingCompanyState, RealEstate
+from hitas.models import (
+    HousingCompany,
+    HousingCompanyConstructionPriceImprovement,
+    HousingCompanyMarketPriceImprovement,
+    HousingCompanyState,
+    RealEstate,
+)
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
@@ -27,6 +33,7 @@ from hitas.views.utils import (
     HitasPostalCodeFilter,
     ValueOrNullField,
 )
+from hitas.views.utils.serializers import YearMonthSerializer
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
@@ -66,6 +73,23 @@ class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
     realized = HitasDecimalField(source="realized_acquisition_price", required=False, allow_null=True)
 
 
+class ImprovementSerializer(serializers.ModelSerializer):
+    completion_date = YearMonthSerializer()
+
+    class Meta:
+        model = HousingCompanyMarketPriceImprovement
+        fields = [
+            "name",
+            "completion_date",
+            "value",
+        ]
+
+
+class HousingCompanyImprovementSerializer(serializers.Serializer):
+    market_price_index = ImprovementSerializer(many=True, source="market_price_improvements")
+    construction_price_index = ImprovementSerializer(many=True, source="construction_price_improvements")
+
+
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
@@ -82,6 +106,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     legacy_id = ValueOrNullField(read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
+    improvements = HousingCompanyImprovementSerializer(source="*", read_only=True)
 
     @staticmethod
     def get_area(obj: HousingCompany) -> Dict[str, any]:
@@ -134,6 +159,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "notification_date",
             "last_modified",
             "summary",
+            "improvements",
         ]
 
 
@@ -173,7 +199,22 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 Prefetch(
                     "real_estates",
                     queryset=RealEstate.objects.prefetch_related("buildings").order_by("id"),
-                )
+                ),
+                Prefetch(
+                    "market_price_improvements",
+                    queryset=HousingCompanyMarketPriceImprovement.objects.only(
+                        "name", "value", "completion_date", "housing_company_id"
+                    ).order_by("completion_date", "id"),
+                ),
+                Prefetch(
+                    "construction_price_improvements",
+                    queryset=HousingCompanyConstructionPriceImprovement.objects.only(
+                        "name",
+                        "value",
+                        "completion_date",
+                        "housing_company_id",
+                    ).order_by("completion_date", "id"),
+                ),
             )
             .select_related(
                 "postal_code",

@@ -54,3 +54,8 @@ class AddressSerializer(serializers.Serializer):
     street_address = serializers.CharField()
     postal_code = serializers.CharField()
     city = serializers.CharField()
+
+
+class YearMonthSerializer(serializers.DateField):
+    format = "%Y-%m"
+    input_formats = [format]

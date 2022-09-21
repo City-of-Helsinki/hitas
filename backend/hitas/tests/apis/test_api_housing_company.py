@@ -327,6 +327,10 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
                 "last_name": hc1.last_modified_by.last_name,
             },
         },
+        "improvements": {
+            "construction_price_index": [],
+            "market_price_index": [],
+        },
     }
 
 

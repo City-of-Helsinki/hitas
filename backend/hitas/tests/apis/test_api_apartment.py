@@ -274,6 +274,10 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "end_date": None,
             },
         ],
+        "improvements": {
+            "construction_price_index": [],
+            "market_price_index": [],
+        },
         "notes": ap.notes,
     }
 
