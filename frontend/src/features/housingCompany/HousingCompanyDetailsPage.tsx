@@ -154,9 +154,19 @@ const HousingCompanyDetailsPage = () => {
                             </li>
                         </ul>
                     </div>
-                    <div style={{display: "flex", flexFlow: "row nowrap", gap: "1em"}}>
+                    <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                         <div className="list-wrapper list-wrapper--real-estates">
-                            <h2 className="detail-list__heading">Kiinteistöt</h2>
+                            <h2 className="detail-list__heading">
+                                <span>Kiinteistöt</span>
+                                <Link to={`real-estates`}>
+                                    <Button
+                                        theme="black"
+                                        size="small"
+                                    >
+                                        <IconPlus />
+                                    </Button>
+                                </Link>
+                            </h2>
                             <ul className="detail-list__list">
                                 {data.real_estates.map((item) => (
                                     <li className="detail-list__list-item">
@@ -167,7 +177,17 @@ const HousingCompanyDetailsPage = () => {
                             </ul>
                         </div>
                         <div className="list-wrapper list-wrapper--buildings">
-                            <h2 className="detail-list__heading">Rakennukset</h2>
+                            <h2 className="detail-list__heading">
+                                <span>Rakennukset</span>
+                                <Link to={`buildings`}>
+                                    <Button
+                                        theme="black"
+                                        size="small"
+                                    >
+                                        <IconPlus />
+                                    </Button>
+                                </Link>
+                            </h2>
                             <ul className="detail-list__list">
                                 {data.real_estates.flatMap((realEstate) => {
                                     return realEstate.buildings.map((building) => (
