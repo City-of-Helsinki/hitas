@@ -117,9 +117,9 @@ export const hitasApi = createApi({
                 params: params,
             }),
         }),
-        createApartment: builder.mutation<IApartmentDetails, IApartmentWritable>({
-            query: (data) => ({
-                url: "apartments",
+        createApartment: builder.mutation<IApartmentDetails, {data: IApartmentWritable; housingCompanyId: string}>({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments`,
                 method: "POST",
                 body: data,
                 headers: {
