@@ -99,16 +99,30 @@ export interface IHousingCompanyDetailsName {
 }
 
 export interface IRealEstate {
-    readonly id: string;
+    readonly id?: string;
     property_identifier: string;
     address: IAddress;
     buildings: Array<IBuilding>;
 }
 
 export interface IBuilding {
-    readonly id: string;
+    readonly id?: string;
     address: IAddress;
     completion_date: string | null;
+    building_identifier: string | null;
+}
+
+export interface IBuildingWritable {
+    readonly id?: string;
+    address: {street_address: string};
+    building_identifier: string | null;
+    real_estate_id: string;
+}
+
+export interface IBuildingWritable {
+    readonly id?: string;
+    address: {street_address: string};
+    completion_date?: string | null;
     building_identifier: string | null;
 }
 

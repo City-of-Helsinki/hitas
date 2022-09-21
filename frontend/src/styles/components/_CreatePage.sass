@@ -2,6 +2,7 @@
 @use '../utils/mixins' as mix
 
 .view--create
+  position: relative
   margin-bottom: $spacing-layout-2-xl
   @include mix.flexbox()
   @include mix.flex-flow(column)
@@ -73,6 +74,13 @@
     @include mix.flexbox()
     width: 100%
     justify-content: space-between
+
+  .buttons
+    @include mix.flexbox()
+    width: 100%
+    justify-content: center
+    padding: $spacing-layout-s
+    gap: $spacing-layout-s
 
   > button
     margin: $spacing-layout-s auto

@@ -11,6 +11,8 @@ import Reports from "./features/Reports";
 import {ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
 import ApartmentCreatePage from "./features/apartment/ApartmentCreatePage";
 import {HousingCompanyCreatePage, HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
+import BuildingsCreatePage from "./features/housingCompany/BuildingsCreatePage";
+import RealEstatesCreatePage from "./features/housingCompany/RealEstatesCreatePage";
 
 export default function Router() {
     return (
@@ -36,6 +38,14 @@ export default function Router() {
                         <Route
                             index
                             element={<HousingCompanyDetailsPage />}
+                        />
+                        <Route
+                            path="real-estates"
+                            element={<RealEstatesCreatePage />}
+                        />
+                        <Route
+                            path="buildings"
+                            element={<BuildingsCreatePage />}
                         />
                         <Route path={"apartments"}>
                             <Route

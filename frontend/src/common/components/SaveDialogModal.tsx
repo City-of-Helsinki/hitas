@@ -5,10 +5,10 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, LoadingSpinner} from "hds-react";
 import {Link, useNavigate} from "react-router-dom";
 
-import {IApartmentDetails, IHousingCompanyDetails} from "../models";
+import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../models";
 
 interface SaveStateProps {
-    data: IHousingCompanyDetails | IApartmentDetails | undefined;
+    data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     baseURL: string;
     itemName: string;

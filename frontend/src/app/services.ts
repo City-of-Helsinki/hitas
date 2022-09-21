@@ -5,12 +5,15 @@ import {
     IApartmentListResponse,
     IApartmentQuery,
     IApartmentWritable,
+    IBuilding,
+    IBuildingWritable,
     ICodeResponse,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
     IPostalCodeResponse,
+    IRealEstate,
 } from "../common/models";
 
 declare global {
@@ -53,6 +56,33 @@ export const hitasApi = createApi({
         createHousingCompany: builder.mutation<IHousingCompanyDetails, IHousingCompanyWritable>({
             query: (data) => ({
                 url: "housing-companies",
+                method: "POST",
+                body: data,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }),
+        }),
+        createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates`,
+                method: "POST",
+                body: data,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }),
+        }),
+        createBuilding: builder.mutation<
+            IBuilding,
+            {
+                data: IBuildingWritable;
+                housingCompanyId: string;
+                realEstateId: string;
+            }
+        >({
+            query: ({data, housingCompanyId, realEstateId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
                 method: "POST",
                 body: data,
                 headers: {
@@ -142,6 +172,8 @@ export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyDetailQuery,
     useCreateHousingCompanyMutation,
+    useCreateRealEstateMutation,
+    useCreateBuildingMutation,
     useGetHousingCompanyApartmentsQuery,
     useGetPostalCodesQuery,
     useGetApartmentsQuery,
