@@ -7,7 +7,7 @@ import pytz
 from django.contrib.auth import get_user_model
 from django.db import models
 from safedelete import HARD_DELETE
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, desc
 from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.sql import select
@@ -15,6 +15,8 @@ from sqlalchemy.sql import select
 from hitas.models import (
     AbstractCode,
     Apartment,
+    ApartmentConstructionPriceImprovement,
+    ApartmentMarketPriceImprovement,
     ApartmentState,
     ApartmentType,
     Building,
@@ -23,21 +25,30 @@ from hitas.models import (
     FinancingMethod,
     HitasPostalCode,
     HousingCompany,
+    HousingCompanyConstructionPriceImprovement,
+    HousingCompanyMarketPriceImprovement,
     HousingCompanyState,
     Ownership,
     Person,
     PropertyManager,
     RealEstate,
 )
+from hitas.models.apartment import DepreciationPercentage
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
+    apartment_construction_price_indices,
+    apartment_market_price_indices,
     apartment_ownerships,
     apartments,
     codebooks,
     codes,
     companies,
+    company_construction_price_indices,
+    company_market_price_indices,
+    construction_price_indices,
+    market_price_indices,
     property_managers,
     real_estates,
     users,
@@ -151,6 +162,9 @@ def run(
             # Housing companies
             converted_data.created_housing_companies_by_oracle_id = create_housing_companies(connection, converted_data)
 
+            # Housing company improvements
+            create_housing_company_improvements(connection, converted_data)
+
             # Real estates (and buildings) and apartments
             converted_data.apartments_by_oracle_id = {}
             for chc in converted_data.created_housing_companies_by_oracle_id.values():
@@ -172,6 +186,9 @@ def run(
             print()
             print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.")
             print()
+
+            # Apartment improvements
+            create_apartment_improvements(connection, converted_data)
 
             # Apartment owners
             create_ownerships(connection, converted_data)
@@ -223,6 +240,74 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
     print()
 
     return housing_companies_by_id
+
+
+def create_housing_company_improvements(
+    connection: Connection, converted_data: ConvertedData
+) -> dict[int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]]:
+    created: dict[
+        int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]
+    ] = {}
+
+    for company_oracle_id, v in converted_data.created_housing_companies_by_oracle_id.items():
+        created[v.value.id] = ([], [])
+
+        #
+        # Construction price index
+        #
+        construction_price_index = connection.execute(
+            select(construction_price_indices)
+            .where(construction_price_indices.c.company_id == company_oracle_id)
+            .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
+        ).first()
+
+        if construction_price_index:
+            cpi_improvements = connection.execute(
+                select(company_construction_price_indices).where(
+                    company_construction_price_indices.c.max_price_index_id == construction_price_index.id
+                )
+            ).fetchall()
+
+            for cpi_improvement in cpi_improvements:
+                new = HousingCompanyConstructionPriceImprovement(
+                    housing_company=v.value,
+                    name=cpi_improvement["name"],
+                    completion_date=cpi_improvement["completion_date"],
+                    value=cpi_improvement["value"],
+                )
+                new.save()
+                created[v.value.id][0].append(new)
+
+        #
+        # Market price index
+        #
+        market_price_index = connection.execute(
+            select(market_price_indices)
+            .where(market_price_indices.c.company_id == company_oracle_id)
+            .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
+        ).first()
+
+        if market_price_index:
+            mpi_improvements = connection.execute(
+                select(company_market_price_indices).where(
+                    company_market_price_indices.c.max_price_index_id == market_price_index.id
+                )
+            ).fetchall()
+
+            for mpi_improvement in mpi_improvements:
+                new = HousingCompanyMarketPriceImprovement(
+                    housing_company=v.value,
+                    name=mpi_improvement["name"],
+                    completion_date=mpi_improvement["completion_date"],
+                    value=mpi_improvement["value"],
+                )
+                new.save()
+                created[v.value.id][1].append(new)
+
+    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} housing company improvements.")
+    print()
+
+    return created
 
 
 def create_real_estates_and_buildings(
@@ -302,6 +387,87 @@ def create_apartments(
         Apartment.objects.bulk_create(bulk_apartments)
 
     return apartments_by_id
+
+
+def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
+    match value:
+        case "000":
+            return DepreciationPercentage.ZERO
+        case "001":
+            return DepreciationPercentage.TWO_POINT_FIVE
+        case "002":
+            return DepreciationPercentage.TEN
+        case _:
+            raise ValueError(f"Invalid value '{value}'.")
+
+
+def create_apartment_improvements(
+    connection: Connection, converted_data: ConvertedData
+) -> dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]]:
+    created: dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]] = {}
+
+    for apartment_oracle_id, v in converted_data.apartments_by_oracle_id.items():
+        created[v.id] = ([], [])
+
+        #
+        # Construction price index
+        #
+        construction_price_index = connection.execute(
+            select(construction_price_indices)
+            .where(construction_price_indices.c.apartment_id == apartment_oracle_id)
+            .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
+        ).first()
+
+        if construction_price_index:
+            cpi_improvements = connection.execute(
+                select(apartment_construction_price_indices).where(
+                    apartment_construction_price_indices.c.max_price_index_id == construction_price_index.id
+                )
+            ).fetchall()
+
+            for cpi_improvement in cpi_improvements:
+                new = ApartmentConstructionPriceImprovement(
+                    apartment=v,
+                    name=cpi_improvement["name"],
+                    completion_date=cpi_improvement["completion_date"],
+                    value=cpi_improvement["value"],
+                    depreciation_percentage=value_to_depreciation_percentage(
+                        cpi_improvement["depreciation_percentage"]
+                    ),
+                )
+                new.save()
+                created[v.id][0].append(new)
+
+        #
+        # Market price index
+        #
+        market_price_index = connection.execute(
+            select(market_price_indices)
+            .where(market_price_indices.c.apartment_id == apartment_oracle_id)
+            .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
+        ).first()
+
+        if market_price_index:
+            mpi_improvements = connection.execute(
+                select(apartment_market_price_indices).where(
+                    apartment_market_price_indices.c.max_price_index_id == market_price_index.id
+                )
+            ).fetchall()
+
+            for mpi_improvement in mpi_improvements:
+                new = ApartmentMarketPriceImprovement(
+                    apartment=v,
+                    name=mpi_improvement["name"],
+                    completion_date=mpi_improvement["completion_date"],
+                    value=mpi_improvement["value"],
+                )
+                new.save()
+                created[v.id][1].append(new)
+
+    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} apartment improvements.")
+    print()
+
+    return created
 
 
 def split_person_name(name) -> Tuple[str, str]:
