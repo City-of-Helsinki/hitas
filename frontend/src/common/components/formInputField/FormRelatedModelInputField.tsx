@@ -59,7 +59,7 @@ export default function FormRelatedModelInputField({
     const cols = [
         {key: "id", headerName: "Not rendered"},
         {
-            key: "age",
+            key: "value",
             headerName: label,
             transform: getRelatedModelLabel,
         },
@@ -69,7 +69,7 @@ export default function FormRelatedModelInputField({
         <div>
             <TextInput
                 label={label}
-                value={displayedValue || value}
+                value={displayedValue || (!displayedValue && placeholder) || value}
                 onChange={() => null} // Disable typing
                 buttonIcon={<IconSearch />}
                 onButtonClick={openModal}

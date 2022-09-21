@@ -62,7 +62,6 @@ export default function FormInputField({
     formData,
     setFormData,
     error,
-    placeholder,
     ...rest
 }: FormInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
@@ -104,7 +103,6 @@ export default function FormInputField({
             <FormTextInputField
                 {...commonProps}
                 size={inputType === "text" ? "small" : "large"}
-                placeholder={placeholder}
                 {...rest}
             />
         );
@@ -161,7 +159,6 @@ export default function FormInputField({
         return (
             <FormRelatedModelInputField
                 {...commonProps}
-                placeholder={placeholder}
                 fieldPath={fieldPath}
                 {...rest}
             />
