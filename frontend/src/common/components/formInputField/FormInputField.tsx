@@ -25,7 +25,8 @@ type FormInputFieldProps = {
     required?: boolean;
     tooltipText?: string;
     formData: object;
-    setFormData: (draft) => void;
+    setFormData?: (draft) => void;
+    setterFunction?;
     error;
     placeholder?: string;
 } & (
@@ -61,6 +62,7 @@ export default function FormInputField({
     validator,
     formData,
     setFormData,
+    setterFunction, // Alternate value setter which allows managing the data outside this form field
     error,
     ...rest
 }: FormInputFieldProps): JSX.Element {
@@ -71,9 +73,15 @@ export default function FormInputField({
         if (validator !== undefined) setIsInvalid(!validator(value));
         else if (required) setIsInvalid(!value);
 
-        setFormData((draft) => {
-            dotted(draft, fieldPath, value);
-        });
+        if (setterFunction === undefined) {
+            if (setFormData === undefined) throw new Error("setFormData MISSING");
+
+            setFormData((draft) => {
+                dotted(draft, fieldPath, value);
+            });
+        } else {
+            setterFunction(value);
+        }
     };
 
     useEffect(() => {
