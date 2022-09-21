@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, Integer, MetaData, String, Table
+from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, Integer, String, Table
 
+from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
     HitasAnonymizedName,
     HitasAnonymizedNameCommaSeparated,
@@ -7,7 +8,6 @@ from hitas.oracle_migration.types import (
     HitasBoolean,
 )
 
-metadata_obj = MetaData(schema="HIDAS")
 companies = Table(
     "HITYHTIO",
     metadata_obj,
@@ -68,7 +68,7 @@ companies = Table(
     Column("D_LASKVOIMPVM", Date, nullable=False),
     Column("N_SAANTELYTARKLKM", Integer, nullable=False),
     Column("C_HINTAKONTROLLOITU", HitasBoolean, nullable=False),
-    ForeignKeyConstraint(["additional_info_key", "id"], ["HITLISAT.type", "HITLISAT.object_id"]),
+    ForeignKeyConstraint(("additional_info_key", "id"), ["HITLISAT.type", "HITLISAT.object_id"]),
 )
 
 company_addresses = Table(
@@ -164,7 +164,7 @@ apartments = Table(
     Column("C_MYYTAVA", HitasBoolean, nullable=False),
     Column("KG_VTUNNUS", Integer, nullable=False),
     Column("D_VARAPVM", Date),  # Always null
-    ForeignKeyConstraint(["additional_info_key", "id"], ["HITLISAT.type", "HITLISAT.object_id"]),
+    ForeignKeyConstraint(("additional_info_key", "id"), ["HITLISAT.type", "HITLISAT.object_id"]),
 )
 
 apartment_ownerships = Table(
@@ -176,89 +176,6 @@ apartment_ownerships = Table(
     Column("C_SOTU", HitasAnonymizedSSN(11), key="social_security_number"),
     Column("C_OMNIMIUPPER", String(50)),
     Column("N_PROSENTTIOSUUS", Float, key="percentage"),
-    Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
-)
-
-codebooks = Table(
-    "OKOODISTO",
-    metadata_obj,
-    Column("KG_KOODISTO", Integer, key="id", primary_key=True),
-    Column("C_KOODISTOID", String(16), key="code_type", nullable=False),
-    Column("C_NIMI", String(50), nullable=False),
-    Column("C_LYHENNE", String(20)),
-    Column("C_SELITE", String(80)),
-    Column("N_KOODIMAX", Integer, nullable=False),
-    Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
-)
-
-codes = Table(
-    "OKOODI",
-    metadata_obj,
-    Column("KG_OKOODI", Integer, key="id", primary_key=True),
-    Column("C_KOODISTOID", String(16), key="code_type", nullable=False, index=True),
-    Column("C_KOODIID", String(12), key="code_id", nullable=False, index=True),
-    Column("D_ALKUPVM", Date, key="start_date", nullable=False),
-    Column("D_LOPPUPVM", Date, key="end_date", nullable=False),
-    Column("C_NIMI", String(50), key="value", nullable=False),
-    Column("C_LYHENNE", String(20)),
-    Column("C_SELITE", String(80), key="description"),
-    Column("KG_KOODISTO", Integer, ForeignKey("OKOODISTO.id"), key="codebook_id", nullable=False),
-    Column("C_KAYTOSSA", HitasBoolean, key="in_use", nullable=False),
-    Column("N_JARJESTYS", Integer, key="order", nullable=False),
-    Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
-)
-
-property_managers = Table(
-    "HITISANTA",
-    metadata_obj,
-    Column("KG_ITUNNUS", Integer, key="id", primary_key=True),
-    Column("C_TOIMISTO", String(100), key="name", nullable=False),
-    Column("C_SUKUNIMI", String(50)),
-    Column("C_ETUNIMI", String(30)),
-    Column("C_KATUOS", String(50), key="address", nullable=False),
-    Column("C_POSKOODI", String(16), nullable=False),  # Always 'POSTINROT'
-    Column("C_POSTINRO", String(12), key="postal_code", nullable=False),
-    Column("C_PTP", String(30), key="city", nullable=False),
-    Column("C_PUHELIN", String(20)),
-    Column("C_GSM", String(20)),
-    Column("C_TELEFAX", String(20)),
-    Column("C_EMAIL", String(50), key="email"),
-    Column("C_LISATIETO", HitasBoolean, nullable=False),
-    Column("C_LISATVIITE", String(10), key="additional_info_key"),  # Always 'HITISANTA'
-    Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
-    ForeignKeyConstraint(["additional_info_key", "id"], ["HITLISAT.type", "HITLISAT.object_id"]),
-)
-
-additional_infos = Table(
-    "HITLISAT",
-    metadata_obj,
-    Column("C_LISATVIITE", String(10), key="type", primary_key=True, nullable=False),
-    Column("KG_LTUNNUS", Integer, key="object_id", primary_key=True, nullable=False),
-    Column("TEKSTI1", String(100), nullable=False),
-    Column("TEKSTI2", String(100)),
-    Column("TEKSTI3", String(100)),
-    Column("TEKSTI4", String(100)),
-    Column("TEKSTI5", String(100)),
-    Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
-)
-
-users = Table(
-    "HITKAYTT",
-    metadata_obj,
-    Column("KG_KOODI", Integer, key="id", primary_key=True),
-    Column("C_KAYTTUNN", String(10), key="username", nullable=False),
-    Column("C_SALASANA", String(10), key="password", nullable=False),
-    Column("C_KRYHKOODI", String(16), nullable=False),
-    Column("C_KAYRYHMA", String(12), nullable=False),
-    Column("C_SELITE", String(50), key="name", nullable=False),
-    Column("C_KAYTOSSA", HitasBoolean, key="is_active", nullable=False),
-    Column("C_SISKIRJ", HitasBoolean, nullable=False),
-    Column("D_SISKAIKA", Date),
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )
