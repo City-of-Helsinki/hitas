@@ -1,15 +1,16 @@
 import React, {useState} from "react";
 
 import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {useLocation} from "react-router";
 import {useImmer} from "use-immer";
 
 import {
-    useCreateHousingCompanyMutation,
     useGetBuildingTypesQuery,
     useGetDevelopersQuery,
     useGetFinancingMethodsQuery,
     useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
+    useSaveHousingCompanyMutation,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
 import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IPropertyManager} from "../../common/models";
@@ -37,35 +38,40 @@ const getHousingCompanyStateName = (state) => {
 };
 
 const HousingCompanyCreatePage = (): JSX.Element => {
+    const {state} = useLocation();
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const blankForm = {
-        acquisition_price: {
-            initial: null,
-            realized: null,
-        },
-        address: {
-            postal_code: "",
-            street_address: "",
-        },
-        building_type: {id: ""},
-        business_id: "",
-        developer: {id: ""},
-        financing_method: {id: ""},
-        name: {
-            display: "",
-            official: "",
-        },
-        notes: "",
-        primary_loan: null,
-        property_manager: {id: ""},
-        state: "",
-        sales_price_catalogue_confirmation_date: null,
-    };
-    const [formData, setFormData] = useImmer<IHousingCompanyWritable>(blankForm as IHousingCompanyWritable);
-    const [createHousingCompany, {data, error, isLoading}] = useCreateHousingCompanyMutation();
+
+    const initialFormData: IHousingCompanyWritable =
+        state?.housingCompany === undefined
+            ? {
+                  acquisition_price: {
+                      initial: null,
+                      realized: null,
+                  },
+                  address: {
+                      postal_code: "",
+                      street_address: "",
+                  },
+                  building_type: {id: ""},
+                  business_id: "",
+                  developer: {id: ""},
+                  financing_method: {id: ""},
+                  name: {
+                      display: "",
+                      official: "",
+                  },
+                  notes: "",
+                  primary_loan: null,
+                  property_manager: {id: ""},
+                  state: "not_ready",
+                  sales_price_catalogue_confirmation_date: null,
+              }
+            : state.housingCompany;
+    const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
+    const [createHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
-        createHousingCompany(formData);
+        createHousingCompany({data: formData, id: state?.housingCompany.id});
         setIsEndModalVisible(true);
     };
     const stateOptions = HousingCompanyStates.map((state) => {
@@ -196,6 +202,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             inputType="relatedModel"
                             label="Rahoitusmuoto"
                             fieldPath="financing_method.id"
+                            placeholder={state?.housingCompany.financing_method.value}
                             queryFunction={useGetFinancingMethodsQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -210,6 +217,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             inputType="relatedModel"
                             label="Talotyyppi"
                             fieldPath="building_type.id"
+                            placeholder={state?.housingCompany.building_type.value}
                             queryFunction={useGetBuildingTypesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -222,6 +230,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             inputType="relatedModel"
                             label="Rakennuttaja"
                             fieldPath="developer.id"
+                            placeholder={state?.housingCompany.developer.value}
                             queryFunction={useGetDevelopersQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -235,6 +244,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         inputType="relatedModel"
                         label="Isännöitsijä"
                         fieldPath="property_manager.id"
+                        placeholder={state?.housingCompany.property_manager.name}
                         queryFunction={useGetPropertyManagersQuery}
                         relatedModelSearchField="name"
                         getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
