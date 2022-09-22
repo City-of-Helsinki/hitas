@@ -635,6 +635,35 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     assert response.json() == get_response.json()
 
 
+@pytest.mark.django_db
+def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+
+    data = {
+        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "address": {
+            "street_address": hc.street_address,
+            "postal_code": hc.postal_code.value,
+        },
+        "building_type": {"id": hc.building_type.uuid.hex},
+        "business_id": hc.business_id,
+        "developer": {"id": hc.developer.uuid.hex},
+        "financing_method": {"id": hc.financing_method.uuid.hex},
+        "name": {
+            "display": hc.display_name,
+            "official": hc.official_name,
+        },
+        "notes": hc.notes,
+        "primary_loan": hc.primary_loan,
+        "property_manager": {"id": hc.property_manager.uuid.hex},
+        "state": hc.state.value,
+        "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
+    }
+
+    response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+
 # Delete tests
 
 
