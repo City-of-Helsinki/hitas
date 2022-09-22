@@ -37,3 +37,12 @@ class HitasModelDecimalField(models.DecimalField):
         if validators is None:
             validators = [MinValueValidator(Decimal("0"))]
         super().__init__(max_digits=max_digits, decimal_places=decimal_places, validators=validators, **kwargs)
+
+
+class HitasImprovement(HitasModel):
+    name = models.CharField(max_length=128)
+    completion_date = models.DateField()
+    value = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        abstract = True
