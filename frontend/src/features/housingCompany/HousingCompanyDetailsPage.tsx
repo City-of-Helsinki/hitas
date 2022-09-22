@@ -168,8 +168,11 @@ const HousingCompanyDetailsPage = () => {
                                 </Link>
                             </h2>
                             <ul className="detail-list__list">
-                                {data.real_estates.map((item) => (
-                                    <li className="detail-list__list-item">
+                                {data.real_estates.map((item, num) => (
+                                    <li
+                                        className="detail-list__list-item"
+                                        key={num}
+                                    >
                                         <div>{item.address.street_address}</div>
                                         <div>{item.property_identifier}</div>
                                     </li>
@@ -190,8 +193,11 @@ const HousingCompanyDetailsPage = () => {
                             </h2>
                             <ul className="detail-list__list">
                                 {data.real_estates.flatMap((realEstate) => {
-                                    return realEstate.buildings.map((building) => (
-                                        <li className="detail-list__list-item">
+                                    return realEstate.buildings.map((building, num) => (
+                                        <li
+                                            className="detail-list__list-item"
+                                            key={num}
+                                        >
                                             <div>{building.address.street_address}</div>
                                             <div>{building.building_identifier}</div>
                                         </li>

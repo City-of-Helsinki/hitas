@@ -40,41 +40,14 @@ const BuildingsCreatePage = (): JSX.Element => {
                       value: realEstate.id,
                   };
               });
-
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
-                <span>Uusi rakennus</span>
+                <span>Uusi kiinteistö</span>
             </h1>
             <div className="field-sets">
-                <Fieldset
-                    heading=""
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gridGap: "1em",
-                    }}
-                >
+                <Fieldset heading="">
                     <div className="row">
-                        <FormInputField
-                            label="Katuosoite"
-                            fieldPath="address.street_address"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            label="Rakennustunnus"
-                            fieldPath="building_identifier"
-                            tooltipText='Esimerkkiarvo: "100012345A"'
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className={"row"}>
                         <FormInputField
                             inputType={"select"}
                             label="Kiinteistö"
@@ -84,6 +57,27 @@ const BuildingsCreatePage = (): JSX.Element => {
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            label="Katuosoite"
+                            fieldPath="address.street_address"
+                            options={realEstateOptions}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            label="Rakennustunnus"
+                            fieldPath="building_identifier"
+                            tooltipText='Esimerkkiarvo: "123456789A"'
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                            className="building-identifier-field"
                         />
                     </div>
                 </Fieldset>
@@ -107,8 +101,9 @@ const BuildingsCreatePage = (): JSX.Element => {
             <SaveDialogModal
                 data={saveData}
                 error={saveError}
-                baseURL="/housing-companies/"
                 itemName="Rakennuksen"
+                linkURL={"/housing-companies/" + params.housingCompanyId}
+                linkText="Takaisin yhtiön sivulle"
                 isLoading={isSaving}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
