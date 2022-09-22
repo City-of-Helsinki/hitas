@@ -138,6 +138,10 @@ const HousingCompanyDetailsPage = () => {
                                             label="Talotyyppi"
                                             value={data.building_type.value}
                                         />
+                                        <DetailField
+                                            label="Yhtiön arkisto tunnus"
+                                            value={data.legacy_id}
+                                        />
                                     </div>
                                 </div>
                             </Tabs.TabPanel>
