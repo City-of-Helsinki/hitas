@@ -102,6 +102,14 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
+            <FilterIntegerField
+                label="Yhtiön tunnus"
+                minLength={3}
+                maxLength={10}
+                filterFieldName="legacy_id"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
         </div>
     );
 };
