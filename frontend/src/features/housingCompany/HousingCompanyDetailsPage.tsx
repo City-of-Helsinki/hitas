@@ -1,6 +1,6 @@
 import React from "react";
 
-import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
+import {Button, IconPen, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
 import {Link} from "react-router-dom";
 
@@ -17,7 +17,22 @@ const HousingCompanyDetailsPage = () => {
     const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
         return (
             <>
-                <h1 className="main-heading">{data.name.display}</h1>
+                <h1 className="main-heading">
+                    {data.name.display}
+                    <Link
+                        to={{pathname: "edit"}}
+                        state={{housingCompany: data}}
+                    >
+                        <Button
+                            theme="black"
+                            size="small"
+                            iconLeft={<IconPen />}
+                        >
+                            Muokkaa
+                        </Button>
+                    </Link>
+                </h1>
+
                 <div className="company-status">
                     <StatusLabel>Vapautunut 1.6.2022 ({data.state})</StatusLabel>
                 </div>

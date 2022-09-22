@@ -53,10 +53,10 @@ export const hitasApi = createApi({
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
         }),
-        createHousingCompany: builder.mutation<IHousingCompanyDetails, IHousingCompanyWritable>({
-            query: (data) => ({
-                url: "housing-companies",
-                method: "POST",
+        saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
+            query: ({data, id}) => ({
+                url: `housing-companies${id ? `/${id}` : ""}`,
+                method: id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: {
                     "Content-type": "application/json; charset=UTF-8",
@@ -171,7 +171,7 @@ export const hitasApi = createApi({
 export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyDetailQuery,
-    useCreateHousingCompanyMutation,
+    useSaveHousingCompanyMutation,
     useCreateRealEstateMutation,
     useCreateBuildingMutation,
     useGetHousingCompanyApartmentsQuery,

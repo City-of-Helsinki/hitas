@@ -43,6 +43,10 @@ export default function Router() {
                             element={<HousingCompanyDetailsPage />}
                         />
                         <Route
+                            path="edit"
+                            element={<HousingCompanyCreatePage />}
+                        />
+                        <Route
                             path="real-estates"
                             element={<RealEstatesCreatePage />}
                         />
