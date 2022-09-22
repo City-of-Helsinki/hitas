@@ -8,11 +8,14 @@ import {store} from "./app/store";
 import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
-import {ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
-import ApartmentCreatePage from "./features/apartment/ApartmentCreatePage";
-import {HousingCompanyCreatePage, HousingCompanyDetailsPage, HousingCompanyListPage} from "./features/housingCompany";
-import BuildingsCreatePage from "./features/housingCompany/BuildingsCreatePage";
-import RealEstatesCreatePage from "./features/housingCompany/RealEstatesCreatePage";
+import {ApartmentCreatePage, ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
+import {
+    BuildingsCreatePage,
+    HousingCompanyCreatePage,
+    HousingCompanyDetailsPage,
+    HousingCompanyListPage,
+    RealEstatesCreatePage,
+} from "./features/housingCompany";
 
 export default function Router() {
     return (

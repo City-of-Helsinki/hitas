@@ -9,7 +9,7 @@ import {useCreateRealEstateMutation} from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
 import {IRealEstate} from "../../common/models";
 
-const HousingCompanyCreatePage = (): JSX.Element => {
+const RealEstatesCreatePage = (): JSX.Element => {
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const blankForm = {
         address: {
@@ -86,4 +86,4 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     );
 };
 
-export default HousingCompanyCreatePage;
+export default RealEstatesCreatePage;
