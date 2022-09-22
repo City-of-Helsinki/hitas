@@ -969,6 +969,7 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
         {"property_manager": "TestPropertyManager"},
         {"developer": "TestDeveloper"},
         {"postal_code": "99999"},
+        {"legacy_id": "999"},
     ],
 )
 @pytest.mark.django_db
@@ -980,6 +981,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
     HousingCompanyFactory.create(postal_code__value="99999")
+    HousingCompanyFactory.create(legacy_id="999")
     RealEstateFactory.create(property_identifier="1-1234-321-56", housing_company=hc)
     RealEstateFactory.create(property_identifier="1111-1111-1111-1111", housing_company=hc)
 

@@ -43,6 +43,7 @@ class HousingCompanyFilterSet(HitasFilterSet):
     postal_code = HitasPostalCodeFilter(field_name="postal_code__value")
     property_manager = HitasCharFilter(field_name="property_manager__name", lookup_expr="icontains")
     developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
+    legacy_id = HitasCharFilter(lookup_expr="iexact")
 
     class Meta:
         model = HousingCompany
