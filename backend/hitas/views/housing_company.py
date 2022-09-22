@@ -5,7 +5,7 @@ from django.db.models import F, IntegerField, Min, Prefetch, Sum
 from django.db.models.functions import Round
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.exceptions import ValidationError
 
 from hitas.models import (
     HousingCompany,
@@ -48,24 +48,31 @@ class HousingCompanyFilterSet(HitasFilterSet):
         fields = ["display_name", "street_address", "postal_code", "property_manager", "developer"]
 
 
-class HitasUniqueValidator(UniqueValidator):
-    def __init__(self, queryset, field, message=None, lookup="exact"):
-        self.field = field
-        super().__init__(queryset, message=message, lookup=lookup)
-
-    def __call__(self, value, serializer_field):
-        self.message = f"{self.field} provided is already in use. Conflicting {self.field.lower()}: '{value}'."
-        super().__call__(value, serializer_field)
-
-
 class HousingCompanyNameSerializer(serializers.Serializer):
-    display = serializers.CharField(
-        source="display_name", validators=[HitasUniqueValidator(queryset=HousingCompany.objects, field="Display name")]
-    )
-    official = serializers.CharField(
-        source="official_name",
-        validators=[HitasUniqueValidator(queryset=HousingCompany.objects, field="Official name")],
-    )
+    display = serializers.CharField(source="display_name")
+    official = serializers.CharField(source="official_name")
+
+    def _validate_qs(self):
+        qs = HousingCompany.objects
+        if self.parent.instance:
+            qs = qs.exclude(id=self.parent.instance.id)
+        return qs
+
+    def validate_display(self, value):
+        if self._validate_qs().filter(display_name=value).exists():
+            raise ValidationError(
+                f"Display name provided is already in use. Conflicting display name: '{value}'.", code="unique"
+            )
+
+        return value
+
+    def validate_official(self, value):
+        if self._validate_qs().filter(official_name=value).exists():
+            raise ValidationError(
+                f"Official name provided is already in use. Conflicting official name: '{value}'.", code="unique"
+            )
+
+        return value
 
 
 class HousingCompanyAcquisitionPriceSerializer(serializers.Serializer):
