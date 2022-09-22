@@ -32,7 +32,7 @@ const RealEstatesCreatePage = (): JSX.Element => {
                 <span>Uusi rakennus</span>
             </h1>
             <div className="field-sets">
-                <Fieldset heading="Rakennuksen tiedot">
+                <Fieldset heading="">
                     <div className="row">
                         <FormInputField
                             label="Katuosoite"
@@ -45,7 +45,7 @@ const RealEstatesCreatePage = (): JSX.Element => {
                         <FormInputField
                             label="Kiinteistötunnus"
                             fieldPath="property_identifier"
-                            tooltipText={'Esimerkkiarvo: "196-15-74-3"'}
+                            tooltipText={'Esimerkkiarvo: "1234-5678-9012-3456"'}
                             required
                             formData={formData}
                             setFormData={setFormData}
@@ -70,14 +70,12 @@ const RealEstatesCreatePage = (): JSX.Element => {
                     Tallenna
                 </Button>
             </div>
-            {/*
-             Save attempt modal dialog
-             */}
             <SaveDialogModal
                 data={data}
                 error={error}
-                baseURL="/housing-companies/"
                 itemName="Kiinteistön"
+                linkURL={"/housing-companies/" + params.housingCompanyId}
+                linkText="Takaisin yhtiön sivulle"
                 isLoading={isLoading}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}

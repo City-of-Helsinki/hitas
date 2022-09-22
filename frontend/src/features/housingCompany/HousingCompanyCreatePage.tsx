@@ -15,6 +15,27 @@ import {FormInputField, SaveDialogModal} from "../../common/components";
 import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IPropertyManager} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
+const getHousingCompanyStateName = (state) => {
+    switch (state) {
+        case "not_ready":
+            return "Ei valmis";
+        case "lt_30_years":
+            return "Alle 30-vuotta";
+        case "gt_30_years_not_free":
+            return "Yli 30-vuotta, ei vapautunut";
+        case "gt_30_years_free":
+            return "Yli 30-vuotta, vapautunut";
+        case "gt_30_years_plot_department_notification":
+            return "Yli 30-vuotta, vapautunut tonttiosaston ilmoitus";
+        case "half_hitas":
+            return "Puoli-hitas";
+        case "ready_no_statistics":
+            return "Valmis, ei tilastoihin";
+        default:
+            return "VIRHE";
+    }
+};
+
 const HousingCompanyCreatePage = (): JSX.Element => {
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const blankForm = {
@@ -47,28 +68,8 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         createHousingCompany(formData);
         setIsEndModalVisible(true);
     };
-    const stateName = (state) => {
-        switch (state) {
-            case "not_ready":
-                return "Ei valmis";
-            case "lt_30_years":
-                return "Alle 30-vuotta";
-            case "gt_30_years_not_free":
-                return "Yli 30-vuotta, ei vapautunut";
-            case "gt_30_years_free":
-                return "Yli 30-vuotta, vapautunut";
-            case "gt_30_years_plot_department_notification":
-                return "Yli 30-vuotta, vapautunut tonttiosaston ilmoitus";
-            case "half_hitas":
-                return "Puoli-hitas";
-            case "ready_no_statistics":
-                return "Valmis, ei tilastoihin";
-            default:
-                return "VIRHE";
-        }
-    };
     const stateOptions = HousingCompanyStates.map((state) => {
-        return {label: stateName(state), value: state};
+        return {label: getHousingCompanyStateName(state), value: state};
     });
     return (
         <div className="view--create view--create-company">
@@ -76,14 +77,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <span>Uusi yhtiö</span>
             </h1>
             <div className="field-sets">
-                <Fieldset
-                    heading="Perustiedot"
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gridGap: "1em",
-                    }}
-                >
+                <Fieldset heading="Perustiedot">
                     <div className="row">
                         <FormInputField
                             label="Yhtiön virallinen nimi"
@@ -168,21 +162,13 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         error={error}
                     />
                 </Fieldset>
-                <Fieldset
-                    heading="Lisätiedot"
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gridGap: "1em",
-                    }}
-                >
+                <Fieldset heading="Lisätiedot">
                     <div className="row">
                         <FormInputField
                             label="Y-Tunnus"
                             fieldPath="business_id"
                             validator={validateBusinessId}
                             tooltipText={"Esimerkki arvo: '1234567-8'"}
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -202,7 +188,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             unit="€"
                             label="Ensisijainen laina"
                             fieldPath="primary_loan"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -253,7 +238,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         queryFunction={useGetPropertyManagersQuery}
                         relatedModelSearchField="name"
                         getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
-                        required
                         formData={formData}
                         setFormData={setFormData}
                         error={error}
