@@ -29,6 +29,7 @@ type FormInputFieldProps = {
     setterFunction?;
     error;
     placeholder?: string;
+    className?: string;
 } & (
     | {
           inputType?: "text" | "textArea" | "postalCode" | "number" | "date";
@@ -64,6 +65,7 @@ export default function FormInputField({
     setFormData,
     setterFunction, // Alternate value setter which allows managing the data outside this form field
     error,
+    className,
     ...rest
 }: FormInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
@@ -103,7 +105,7 @@ export default function FormInputField({
         invalid: isInvalid,
         setFieldValue: setFieldValue,
         errorText: errorMessage,
-        className: "input-field input-field--" + inputType,
+        className: `input-field input-field--${inputType} ${className ? className : ""}`,
     };
 
     if (inputType === "text" || inputType === "textArea") {
