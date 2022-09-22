@@ -10,8 +10,10 @@ import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from 
 interface SaveStateProps {
     data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
-    baseURL: string;
-    itemName: string;
+    baseURL?: string;
+    itemName?: string;
+    linkURL?: string;
+    linkText?: string;
     isLoading: boolean;
     isVisible: boolean;
     setIsVisible;
@@ -22,6 +24,8 @@ export default function SaveDialogModal({
     error,
     baseURL,
     itemName,
+    linkText,
+    linkURL,
     isLoading,
     isVisible,
     setIsVisible,
@@ -46,21 +50,34 @@ export default function SaveDialogModal({
                 <>
                     <Dialog.Content>{`${itemName} tiedot tallennettu!`}</Dialog.Content>
                     <Dialog.ActionButtons>
-                        <Link to={baseURL + data.id}>
-                            <Button
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                {itemName} sivulle
-                            </Button>
-                        </Link>
-                        <Button
-                            onClick={() => navigate(-1)}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Palaa edelliselle sivulle
-                        </Button>
+                        {linkURL && linkText ? (
+                            <Link to={linkURL}>
+                                <Button
+                                    variant="secondary"
+                                    theme={"black"}
+                                >
+                                    {linkText}
+                                </Button>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link to={(baseURL as string) + data?.id}>
+                                    <Button
+                                        variant="secondary"
+                                        theme={"black"}
+                                    >
+                                        {`${itemName} sivulle`}
+                                    </Button>
+                                </Link>
+                                <Button
+                                    onClick={() => navigate(-1)}
+                                    variant="secondary"
+                                    theme={"black"}
+                                >
+                                    Palaa edelliselle sivulle
+                                </Button>
+                            </>
+                        )}
                     </Dialog.ActionButtons>
                 </>
             ) : (
