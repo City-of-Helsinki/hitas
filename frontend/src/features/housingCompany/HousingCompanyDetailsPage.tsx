@@ -168,13 +168,13 @@ const HousingCompanyDetailsPage = () => {
                                 </Link>
                             </h2>
                             <ul className="detail-list__list">
-                                {data.real_estates.map((item, num) => (
+                                {data.real_estates.map((realEstate) => (
                                     <li
                                         className="detail-list__list-item"
-                                        key={num}
+                                        key={`real-estate-${realEstate.id}`}
                                     >
-                                        <div>{item.address.street_address}</div>
-                                        <div>{item.property_identifier}</div>
+                                        <div>{realEstate.address.street_address}</div>
+                                        <div>{realEstate.property_identifier}</div>
                                     </li>
                                 ))}
                             </ul>
@@ -193,10 +193,10 @@ const HousingCompanyDetailsPage = () => {
                             </h2>
                             <ul className="detail-list__list">
                                 {data.real_estates.flatMap((realEstate) => {
-                                    return realEstate.buildings.map((building, num) => (
+                                    return realEstate.buildings.map((building) => (
                                         <li
                                             className="detail-list__list-item"
-                                            key={num}
+                                            key={`building-${building.id}`}
                                         >
                                             <div>{building.address.street_address}</div>
                                             <div>{building.building_identifier}</div>
@@ -209,7 +209,7 @@ const HousingCompanyDetailsPage = () => {
                     <div className="list-wrapper list-wrapper--apartments">
                         <h2>
                             <span>Asunnot</span>
-                            <Link to={`apartments/create`}>
+                            <Link to={"apartments/create"}>
                                 <Button
                                     theme="black"
                                     size="small"
