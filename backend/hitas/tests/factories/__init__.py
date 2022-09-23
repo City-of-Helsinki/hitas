@@ -1,17 +1,13 @@
 import factory
 
+from hitas.tests.factories.apartment import ApartmentFactory
 from hitas.tests.factories.codes import (
     ApartmentTypeFactory,
     BuildingTypeFactory,
     DeveloperFactory,
     FinancingMethodFactory,
 )
-from hitas.tests.factories.housing_company import (
-    ApartmentFactory,
-    BuildingFactory,
-    HousingCompanyFactory,
-    RealEstateFactory,
-)
+from hitas.tests.factories.housing_company import BuildingFactory, HousingCompanyFactory, RealEstateFactory
 from hitas.tests.factories.person import OwnershipFactory, PersonFactory
 from hitas.tests.factories.postal_code import HitasPostalCodeFactory
 from hitas.tests.factories.property_manager import PropertyManagerFactory
