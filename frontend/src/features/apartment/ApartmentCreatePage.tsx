@@ -66,6 +66,10 @@ const ApartmentCreatePage = () => {
         },
         building: "",
         ownerships: [],
+        improvements: {
+            market_price_index: [],
+            construction_price_index: [],
+        },
         notes: "",
     });
     const [formOwnershipsList, setFormOwnershipsList] = useImmer<IOwnership[]>([]);

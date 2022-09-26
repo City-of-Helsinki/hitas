@@ -55,6 +55,10 @@ export interface IHousingCompanyDetails {
         total_shares: number;
         total_surface_area: number;
     };
+    improvements: {
+        market_price_index: object[];
+        construction_price_index: object[];
+    };
 }
 
 export interface IHousingCompanyWritable {
@@ -208,6 +212,10 @@ export interface IApartmentDetails {
     real_estate: string;
     housing_company: IHousingCompany;
     ownerships: Array<IOwnership>;
+    improvements: {
+        market_price_index: object[];
+        construction_price_index: object[];
+    };
     notes: string;
 }
 
@@ -225,6 +233,10 @@ export interface IApartmentWritable {
     prices: IApartmentPrices;
     building: string;
     ownerships: IOwnership[] | null;
+    improvements: {
+        market_price_index: object[];
+        construction_price_index: object[];
+    };
     notes: string;
 }
 
