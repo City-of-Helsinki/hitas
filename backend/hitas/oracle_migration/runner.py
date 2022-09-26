@@ -394,7 +394,7 @@ def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
         case "000":
             return DepreciationPercentage.ZERO
         case "001":
-            return DepreciationPercentage.TWO_POINT_FIVE
+            return DepreciationPercentage.TWO_AND_HALF
         case "002":
             return DepreciationPercentage.TEN
         case _:
