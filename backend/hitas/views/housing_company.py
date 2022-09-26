@@ -295,5 +295,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
             )
         )
 
-    def get_filterset_class(self):
+    @staticmethod
+    def get_filterset_class():
         return HousingCompanyFilterSet
