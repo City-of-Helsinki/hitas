@@ -16,6 +16,8 @@ from hitas.models import (
     FinancingMethod,
     HitasPostalCode,
     HousingCompany,
+    HousingCompanyConstructionPriceImprovement,
+    HousingCompanyMarketPriceImprovement,
     HousingCompanyState,
     PropertyManager,
     RealEstate,
@@ -28,7 +30,9 @@ from hitas.tests.factories import (
     DeveloperFactory,
     FinancingMethodFactory,
     HitasPostalCodeFactory,
+    HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyFactory,
+    HousingCompanyMarketPriceImprovementFactory,
     OwnershipFactory,
     PropertyManagerFactory,
     RealEstateFactory,
@@ -212,6 +216,12 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     )
     hc1_re2: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2)
+    mpi: HousingCompanyConstructionPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc1
+    )
+    cpi: HousingCompanyConstructionPriceImprovement = HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc1
+    )
 
     # Second HousingCompany with a building
     BuildingFactory.create()
@@ -328,8 +338,20 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
             },
         },
         "improvements": {
-            "construction_price_index": [],
-            "market_price_index": [],
+            "construction_price_index": [
+                {
+                    "name": cpi.name,
+                    "value": cpi.value,
+                    "completion_date": cpi.completion_date.strftime("%Y-%m"),
+                },
+            ],
+            "market_price_index": [
+                {
+                    "name": mpi.name,
+                    "value": mpi.value,
+                    "completion_date": mpi.completion_date.strftime("%Y-%m"),
+                },
+            ],
         },
     }
 
@@ -393,6 +415,27 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "property_manager": {"id": property_manager.uuid.hex},
         "state": "not_ready",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
+        "improvements": {
+            "construction_price_index": [
+                {
+                    "value": 1234,
+                    "name": "construction-price-index-improvement-1",
+                    "completion_date": "2017-01",
+                },
+                {
+                    "value": 2345,
+                    "name": "construction-price-index-improvement-2",
+                    "completion_date": "2018-12",
+                },
+            ],
+            "market_price_index": [
+                {
+                    "value": 3456,
+                    "name": "market-price-index-improvement",
+                    "completion_date": "2022-05",
+                }
+            ],
+        },
     }
     return data
 
@@ -407,6 +450,10 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
                 "acquisition_price": {"initial": 10.00, "realized": None},
                 "notes": "",
                 "sales_price_catalogue_confirmation_date": None,
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [],
+                },
             }
         )
 
@@ -481,6 +528,7 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "property_manager", "message": "This field is mandatory and cannot be null."},
             {"field": "acquisition_price", "message": "This field is mandatory and cannot be null."},
             {"field": "primary_loan", "message": "This field is mandatory and cannot be null."},
+            {"field": "improvements", "message": "This field is mandatory and cannot be null."},
         ],
         "message": "Bad request",
         "reason": "Bad Request",
@@ -570,6 +618,90 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         ),
         ({"primary_loan": None}, {"field": "primary_loan", "message": "This field is mandatory and cannot be null."}),
         ({"primary_loan": "foo"}, {"field": "primary_loan", "message": "A valid number is required."}),
+        ({"improvements": None}, {"field": "improvements", "message": "This field is mandatory and cannot be null."}),
+        (
+            {"improvements": {"market_price_index": None, "construction_price_index": []}},
+            {"field": "improvements.market_price_index", "message": "This field is mandatory and cannot be null."},
+        ),
+        (
+            {"improvements": {"market_price_index": [], "construction_price_index": None}},
+            {
+                "field": "improvements.construction_price_index",
+                "message": "This field is mandatory and cannot be null.",
+            },
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [
+                        {
+                            "name": "foo",
+                            "value": 10,
+                            "completion_date": "2022-01-01",
+                        }
+                    ],
+                    "construction_price_index": [],
+                }
+            },
+            {
+                "field": "improvements.market_price_index.completion_date",
+                "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+            },
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [
+                        {
+                            "name": "foo",
+                            "value": -1,
+                            "completion_date": "2022-01",
+                        }
+                    ],
+                    "construction_price_index": [],
+                }
+            },
+            {
+                "field": "improvements.market_price_index.value",
+                "message": "Ensure this value is greater than or equal to 0.",
+            },
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [
+                        {
+                            "name": "foo",
+                            "value": 10,
+                            "completion_date": "2022-01-01",
+                        }
+                    ],
+                }
+            },
+            {
+                "field": "improvements.construction_price_index.completion_date",
+                "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+            },
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [
+                        {
+                            "name": "foo",
+                            "value": -1,
+                            "completion_date": "2022-01",
+                        }
+                    ],
+                }
+            },
+            {
+                "field": "improvements.construction_price_index.value",
+                "message": "Ensure this value is greater than or equal to 0.",
+            },
+        ),
     ],
 )
 @pytest.mark.django_db
@@ -618,6 +750,16 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "property_manager": {"id": property_manager.uuid.hex},
         "state": HousingCompanyState.LESS_THAN_30_YEARS.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
+        "improvements": {
+            "construction_price_index": [
+                {
+                    "value": 1234,
+                    "name": "new-name",
+                    "completion_date": "2017-01",
+                }
+            ],
+            "market_price_index": [],
+        },
     }
 
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
@@ -637,6 +779,119 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.json() == get_response.json()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__update__improvements(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    mpi1: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2010, 1, 1)
+    )
+    HousingCompanyMarketPriceImprovementFactory.create(housing_company=hc, completion_date=date(2015, 5, 1))
+    mpi3: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2020, 10, 1)
+    )
+    HousingCompanyConstructionPriceImprovementFactory.create(housing_company=hc, completion_date=date(2020, 1, 1))
+    cpi2: HousingCompanyConstructionPriceImprovement = HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2020, 2, 1)
+    )
+    cpi3: HousingCompanyConstructionPriceImprovement = HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2020, 3, 1)
+    )
+
+    cpi2.value = 999999
+
+    def improvement_to_dict(i):
+        return {
+            "value": i.value,
+            "completion_date": i.completion_date.strftime("%Y-%m"),
+            "name": i.name,
+        }
+
+    data = {
+        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "address": {
+            "street_address": hc.street_address,
+            "postal_code": hc.postal_code.value,
+        },
+        "building_type": {"id": hc.building_type.uuid.hex},
+        "business_id": hc.business_id,
+        "developer": {"id": hc.developer.uuid.hex},
+        "financing_method": {"id": hc.financing_method.uuid.hex},
+        "name": {
+            "display": hc.display_name,
+            "official": hc.official_name,
+        },
+        "notes": hc.notes,
+        "primary_loan": hc.primary_loan,
+        "property_manager": {"id": hc.property_manager.uuid.hex},
+        "state": hc.state.value,
+        "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
+        "improvements": {
+            "construction_price_index": list(
+                map(improvement_to_dict, [cpi3, cpi2])
+            ),  # remove cpi1, modify 2, change order
+            "market_price_index": list(map(improvement_to_dict, [mpi1, mpi3])),  # remove mpi2
+        },
+    }
+
+    response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
+    assert get_response.json() == get_response.json()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__update__add_improvement(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    mpi1: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2010, 1, 1)
+    )
+    cpi1: HousingCompanyConstructionPriceImprovement = HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc, completion_date=date(2020, 1, 1)
+    )
+    cpi2 = HousingCompanyMarketPriceImprovementFactory(
+        housing_company=hc, completion_date=date(2011, 1, 1), value=10, name="new-improvement"
+    )
+
+    def improvement_to_dict(i):
+        return {
+            "value": i.value,
+            "completion_date": i.completion_date.strftime("%Y-%m"),
+            "name": i.name,
+        }
+
+    data = {
+        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "address": {
+            "street_address": hc.street_address,
+            "postal_code": hc.postal_code.value,
+        },
+        "building_type": {"id": hc.building_type.uuid.hex},
+        "business_id": hc.business_id,
+        "developer": {"id": hc.developer.uuid.hex},
+        "financing_method": {"id": hc.financing_method.uuid.hex},
+        "name": {
+            "display": hc.display_name,
+            "official": hc.official_name,
+        },
+        "notes": hc.notes,
+        "primary_loan": hc.primary_loan,
+        "property_manager": {"id": hc.property_manager.uuid.hex},
+        "state": hc.state.value,
+        "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
+        "improvements": {
+            "construction_price_index": list(map(improvement_to_dict, [cpi1, cpi2])),
+            "market_price_index": list(map(improvement_to_dict, [mpi1])),
+        },
+    }
+
+    response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
+    assert get_response.json() == get_response.json()
 
 
 @pytest.mark.django_db
@@ -661,7 +916,10 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
         "state": hc.state.value,
-        "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
+        "improvements": {
+            "construction_price_index": [],
+            "market_price_index": [],
+        },
     }
 
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")

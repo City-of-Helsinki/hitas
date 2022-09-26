@@ -4,8 +4,9 @@ import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
 
-from hitas.models import Apartment
-from hitas.models.apartment import ApartmentState
+from hitas.models import Apartment, ApartmentConstructionPriceImprovement, ApartmentMarketPriceImprovement
+from hitas.models.apartment import ApartmentState, DepreciationPercentage
+from hitas.tests.factories._base import AbstractImprovementFactory
 
 
 class ApartmentFactory(DjangoModelFactory):
@@ -29,3 +30,18 @@ class ApartmentFactory(DjangoModelFactory):
     loans_during_construction = fuzzy.FuzzyInteger(100000, 200000)
     interest_during_construction = fuzzy.FuzzyInteger(10000, 20000)
     notes = factory.Faker("text")
+
+
+class ApartmentMarketPriceImprovementFactory(AbstractImprovementFactory):
+    class Meta:
+        model = ApartmentMarketPriceImprovement
+
+    apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
+
+
+class ApartmentConstructionPriceImprovementFactory(AbstractImprovementFactory):
+    class Meta:
+        model = ApartmentConstructionPriceImprovement
+
+    apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
+    depreciation_percentage = fuzzy.FuzzyChoice(state[0] for state in DepreciationPercentage.choices())

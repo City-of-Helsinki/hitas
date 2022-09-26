@@ -33,6 +33,7 @@ from hitas.views.utils import (
     HitasPostalCodeFilter,
     ValueOrNullField,
 )
+from hitas.views.utils.merge import merge_model
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
@@ -113,7 +114,44 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     legacy_id = ValueOrNullField(read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
-    improvements = HousingCompanyImprovementSerializer(source="*", read_only=True)
+    improvements = HousingCompanyImprovementSerializer(source="*")
+
+    def create(self, validated_data):
+        mpi = validated_data.pop("market_price_improvements")
+        cpi = validated_data.pop("construction_price_improvements")
+
+        instance: HousingCompany = super().create(validated_data)
+
+        for improvement in mpi:
+            HousingCompanyMarketPriceImprovement.objects.create(housing_company=instance, **improvement)
+        for improvement in cpi:
+            HousingCompanyConstructionPriceImprovement.objects.create(housing_company=instance, **improvement)
+
+        return instance
+
+    def update(self, instance: HousingCompany, validated_data: dict[str, Any]):
+        mpi = validated_data.pop("market_price_improvements")
+        cpi = validated_data.pop("construction_price_improvements")
+
+        instance: HousingCompany = super().update(instance, validated_data)
+
+        merge_model(
+            model_class=HousingCompanyMarketPriceImprovement,
+            existing_qs=instance.market_price_improvements.all(),
+            wanted=mpi,
+            create_defaults={"housing_company": instance},
+            equal_fields=["value", "completion_date", "name"],
+        )
+
+        merge_model(
+            model_class=HousingCompanyConstructionPriceImprovement,
+            existing_qs=instance.construction_price_improvements.all(),
+            wanted=cpi,
+            create_defaults={"housing_company": instance},
+            equal_fields=["value", "completion_date", "name"],
+        )
+
+        return instance
 
     @staticmethod
     def get_area(obj: HousingCompany) -> Dict[str, any]:

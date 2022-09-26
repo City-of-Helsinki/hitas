@@ -6,7 +6,15 @@ import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
 
-from hitas.models import Building, HousingCompany, HousingCompanyState, RealEstate
+from hitas.models import (
+    Building,
+    HousingCompany,
+    HousingCompanyConstructionPriceImprovement,
+    HousingCompanyMarketPriceImprovement,
+    HousingCompanyState,
+    RealEstate,
+)
+from hitas.tests.factories._base import AbstractImprovementFactory
 
 
 class HousingCompanyFactory(DjangoModelFactory):
@@ -55,3 +63,17 @@ class BuildingFactory(DjangoModelFactory):
     real_estate = factory.SubFactory("hitas.tests.factories.RealEstateFactory")
     building_identifier = factory.Faker("bothify", text="1########?")
     street_address = factory.Faker("street_address")
+
+
+class HousingCompanyMarketPriceImprovementFactory(AbstractImprovementFactory):
+    class Meta:
+        model = HousingCompanyMarketPriceImprovement
+
+    housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
+
+
+class HousingCompanyConstructionPriceImprovementFactory(AbstractImprovementFactory):
+    class Meta:
+        model = HousingCompanyConstructionPriceImprovement
+
+    housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
