@@ -124,7 +124,7 @@ class ApartmentMarketPriceImprovement(HitasImprovement):
 
 class DepreciationPercentage(Enum):
     ZERO = 0.0
-    TWO_POINT_FIVE = 2.5
+    TWO_AND_HALF = 2.5
     TEN = 10.0
 
     class Labels:
