@@ -2429,7 +2429,6 @@ components:
         improvements:
           description: Contains housing company improvements
           type: object
-          readOnly: true
           required:
             - market_price_index
             - construction_price_index

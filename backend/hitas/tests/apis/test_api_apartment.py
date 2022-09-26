@@ -5,11 +5,22 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, ApartmentType, Building, HousingCompany, Ownership, Person, RealEstate
-from hitas.models.apartment import ApartmentState
+from hitas.models import (
+    Apartment,
+    ApartmentMarketPriceImprovement,
+    ApartmentType,
+    Building,
+    HousingCompany,
+    Ownership,
+    Person,
+    RealEstate,
+)
+from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
+    ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
+    ApartmentMarketPriceImprovementFactory,
     ApartmentTypeFactory,
     BuildingFactory,
     HousingCompanyFactory,
@@ -190,6 +201,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
     hc: HousingCompany = ap.building.real_estate.housing_company
     owner: Ownership = OwnershipFactory.create(apartment=ap)
+    cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
+    mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
     response = api_client.get(
         reverse(
@@ -275,8 +288,21 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             },
         ],
         "improvements": {
-            "construction_price_index": [],
-            "market_price_index": [],
+            "construction_price_index": [
+                {
+                    "name": cpi.name,
+                    "value": cpi.value,
+                    "completion_date": cpi.completion_date.strftime("%Y-%m"),
+                    "depreciation_percentage": cpi.depreciation_percentage.value,
+                },
+            ],
+            "market_price_index": [
+                {
+                    "name": mpi.name,
+                    "value": mpi.value,
+                    "completion_date": mpi.completion_date.strftime("%Y-%m"),
+                },
+            ],
         },
         "notes": ap.notes,
     }
@@ -394,6 +420,25 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
                 "end_date": None,
             },
         ],
+        "improvements": {
+            "construction_price_index": [
+                {
+                    "value": 1234,
+                    "name": "test-construction-price-1",
+                    "completion_date": "2020-01",
+                    "depreciation_percentage": 10,
+                },
+                {
+                    "value": 2345,
+                    "name": "test-construction-price-2",
+                    "completion_date": "2023-12",
+                    "depreciation_percentage": 2.5,
+                },
+            ],
+            "market_price_index": [
+                {"value": 3456, "name": "test-market-price-1", "completion_date": "1998-05"},
+            ],
+        },
         "building": building.uuid.hex,
         "notes": "Lorem ipsum",
     }
@@ -411,6 +456,10 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             {
                 "notes": "",
                 "ownerships": [],
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [],
+                },
             }
         )
         del data["shares"]
@@ -761,6 +810,126 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 },
             ],
         ),
+        ({"improvements": None}, [{"field": "improvements", "message": "This field is mandatory and cannot be null."}]),
+        (
+            {"improvements": {}},
+            [
+                {"field": "improvements.market_price_index", "message": "This field is mandatory and cannot be null."},
+                {
+                    "field": "improvements.construction_price_index",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+            ],
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [{}],
+                    "construction_price_index": [],
+                }
+            },
+            [
+                {
+                    "field": "improvements.market_price_index.name",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "improvements.market_price_index.completion_date",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "improvements.market_price_index.value",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+            ],
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [
+                        {
+                            "name": "",
+                            "completion_date": "2022-01-01",
+                            "value": -1,
+                        }
+                    ],
+                    "construction_price_index": [],
+                }
+            },
+            [
+                {
+                    "field": "improvements.market_price_index.name",
+                    "message": "This field is mandatory and cannot be blank.",
+                },
+                {
+                    "field": "improvements.market_price_index.completion_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                },
+                {
+                    "field": "improvements.market_price_index.value",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                },
+            ],
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [{}],
+                }
+            },
+            [
+                {
+                    "field": "improvements.construction_price_index.name",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "improvements.construction_price_index.completion_date",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "improvements.construction_price_index.value",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+                {
+                    "field": "improvements.construction_price_index.depreciation_percentage",
+                    "message": "This field is mandatory and cannot be null.",
+                },
+            ],
+        ),
+        (
+            {
+                "improvements": {
+                    "market_price_index": [],
+                    "construction_price_index": [
+                        {
+                            "name": "",
+                            "completion_date": "2022-01-01",
+                            "value": -1,
+                            "depreciation_percentage": 8.0,
+                        }
+                    ],
+                }
+            },
+            [
+                {
+                    "field": "improvements.construction_price_index.name",
+                    "message": "This field is mandatory and cannot be blank.",
+                },
+                {
+                    "field": "improvements.construction_price_index.completion_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                },
+                {
+                    "field": "improvements.construction_price_index.value",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                },
+                {
+                    "field": "improvements.construction_price_index.depreciation_percentage",
+                    "message": "Unsupported value '8.0'. Supported values are: [0.0, 2.5, 10.0].",
+                },
+            ],
+        ),
     ],
 )
 @pytest.mark.django_db
@@ -819,15 +988,15 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
 
 
 @pytest.mark.django_db
-def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
+def test__api__apartment__update__clear_ownerships_and_improvements(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
-    b: Building = ap.building
-    apartment_type: ApartmentType = ApartmentTypeFactory.create()
     OwnershipFactory.create(apartment=ap)
+    ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
+    ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
     data = {
         "state": ApartmentState.SOLD.value,
-        "type": {"id": apartment_type.uuid.hex},
+        "type": {"id": ap.apartment_type.uuid.hex},
         "surface_area": 100,
         "shares": {
             "start": 101,
@@ -835,7 +1004,7 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
         },
         "address": {
             "street_address": "TestStreet 3",
-            "postal_code": b.real_estate.housing_company.postal_code.value,
+            "postal_code": ap.building.real_estate.housing_company.postal_code.value,
             "city": "Helsinki",
             "apartment_number": 9,
             "floor": "5",
@@ -855,14 +1024,18 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
             },
         },
         "notes": "Test Notes",
-        "building": b.uuid.hex,
+        "building": ap.building.uuid.hex,
         "ownerships": [],
+        "improvements": {
+            "construction_price_index": [],
+            "market_price_index": [],
+        },
     }
 
     response = api_client.put(
         reverse(
             "hitas:apartment-detail",
-            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+            args=[ap.building.real_estate.housing_company.uuid.hex, ap.uuid.hex],
         ),
         data=data,
         format="json",
@@ -871,7 +1044,7 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
 
     ap.refresh_from_db()
     assert ap.state.value == data["state"]
-    assert ap.apartment_type == apartment_type
+    assert ap.apartment_type.uuid.hex == data["type"]["id"]
     assert ap.surface_area == data["surface_area"]
     assert ap.share_number_start == data["shares"]["start"]
     assert ap.share_number_end == data["shares"]["end"]
@@ -890,14 +1063,16 @@ def test__api__apartment__update__clear_ownerships(api_client: HitasAPIClient):
     assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
-    assert ap.building_id == b.id
+    assert ap.building_id == ap.building.id
     assert ap.notes == data["notes"]
-    assert ap.ownerships.all().count() == 0
+    assert ap.ownerships.count() == 0
+    assert ap.construction_price_improvements.count() == 0
+    assert ap.market_price_improvements.count() == 0
 
     get_response = api_client.get(
         reverse(
             "hitas:apartment-detail",
-            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+            args=[ap.building.real_estate.housing_company.uuid.hex, ap.uuid.hex],
         )
     )
     assert response.json() == get_response.json()

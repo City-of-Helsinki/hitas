@@ -9,7 +9,7 @@ from rest_framework import serializers
 from rest_framework.fields import SkipField, empty
 
 from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Ownership, Person
-from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState
+from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -19,11 +19,14 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
 )
+from hitas.views.utils.merge import merge_model
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
-class ImprovementSerializer(serializers.ModelSerializer):
-    completion_date = YearMonthSerializer()
+class MarketPriceImprovementSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    value = serializers.IntegerField(required=True, min_value=0, allow_null=False)
+    completion_date = YearMonthSerializer(required=True, allow_null=False)
 
     class Meta:
         model = ApartmentMarketPriceImprovement
@@ -31,6 +34,55 @@ class ImprovementSerializer(serializers.ModelSerializer):
             "name",
             "completion_date",
             "value",
+        ]
+
+
+class DepreciationPercentageField(serializers.ChoiceField):
+    def __init__(self, **kwargs):
+        super().__init__(choices=DepreciationPercentage.choices(), **kwargs)
+
+    def to_representation(self, percentage: DepreciationPercentage):
+        match percentage:
+            case DepreciationPercentage.TEN:
+                return 10.0
+            case DepreciationPercentage.TWO_AND_HALF:
+                return 2.5
+            case DepreciationPercentage.ZERO:
+                return 0.0
+            case _:
+                raise NotImplementedError(f"Value '{percentage}' not implemented.")
+
+    def to_internal_value(self, data: float):
+        if data is None:
+            raise serializers.ValidationError(code="blank")
+
+        match data:
+            case 10:
+                return DepreciationPercentage.TEN
+            case 2.5:
+                return DepreciationPercentage.TWO_AND_HALF
+            case 0:
+                return DepreciationPercentage.ZERO
+            case _:
+                supported_values = ["0.0", "2.5", "10.0"]
+
+                raise serializers.ValidationError(
+                    f"Unsupported value '{data}'. Supported values are: [{', '.join(supported_values)}]."
+                )
+
+
+class ConstructionPriceImprovementSerializer(MarketPriceImprovementSerializer):
+    name = serializers.CharField(required=True)
+    completion_date = YearMonthSerializer(required=True)
+    depreciation_percentage = DepreciationPercentageField(required=True)
+
+    class Meta:
+        model = ApartmentConstructionPriceImprovement
+        fields = [
+            "name",
+            "completion_date",
+            "value",
+            "depreciation_percentage",
         ]
 
 
@@ -152,8 +204,10 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
 
 
 class ApartmentImprovementSerializer(serializers.Serializer):
-    market_price_index = ImprovementSerializer(many=True, source="market_price_improvements")
-    construction_price_index = ImprovementSerializer(many=True, source="construction_price_improvements")
+    market_price_index = MarketPriceImprovementSerializer(many=True, source="market_price_improvements")
+    construction_price_index = ConstructionPriceImprovementSerializer(
+        many=True, source="construction_price_improvements"
+    )
 
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
@@ -164,10 +218,10 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     surface_area = HitasDecimalField()
     shares = SharesSerializer(source="*", required=False, allow_null=True)
     prices = PricesSerializer(source="*", required=False, allow_null=True)
-    ownerships = OwnershipSerializer(many=True, read_only=False)
+    ownerships = OwnershipSerializer(many=True)
     links = serializers.SerializerMethodField()
     building = UUIDRelatedField(queryset=Building.objects.all(), write_only=True)
-    improvements = ApartmentImprovementSerializer(source="*", read_only=True)
+    improvements = ApartmentImprovementSerializer(source="*")
 
     @staticmethod
     def get_links(instance: Apartment):
@@ -218,29 +272,52 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     def create(self, validated_data: dict[str, Any]):
         ownerships = validated_data.pop("ownerships")
+        mpi = validated_data.pop("market_price_improvements")
+        cpi = validated_data.pop("construction_price_improvements")
+
         instance: Apartment = super().create(validated_data)
+
         for owner_data in ownerships:
             Ownership.objects.create(apartment=instance, **owner_data)
+
+        for improvement in mpi:
+            ApartmentMarketPriceImprovement.objects.create(apartment=instance, **improvement)
+        for improvement in cpi:
+            ApartmentConstructionPriceImprovement.objects.create(apartment=instance, **improvement)
+
         return instance
 
     def update(self, instance: Apartment, validated_data: dict[str, Any]):
         ownerships = validated_data.pop("ownerships")
+        mpi = validated_data.get("market_price_improvements")
+        cpi = validated_data.get("construction_price_improvements")
+
         instance: Apartment = super().update(instance, validated_data)
 
-        if not ownerships:
-            instance.ownerships.all().delete()
+        # Ownerships
+        merge_model(
+            model_class=Ownership,
+            existing_qs=instance.ownerships.all(),
+            wanted=ownerships,
+            create_defaults={"apartment": instance},
+            equal_fields=["owner", "start_date", "end_date", "percentage"],
+        )
 
-        ownership_objs = []
-        for owner_data in ownerships:
-            owner = owner_data.pop("owner")
-            owner_obj, _ = Ownership.objects.update_or_create(apartment=instance, owner=owner, defaults={**owner_data})
-            ownership_objs.append(owner_obj)
-
-        # Using `instance.ownerships.set(ownership_objs)` does not work here
-        # due to the `Ownership.apartment` field isn't nullable, so the set method fails silently
-        for ownership in instance.ownerships.all():
-            if ownership not in ownership_objs:
-                ownership.delete()
+        # Improvements
+        merge_model(
+            model_class=ApartmentMarketPriceImprovement,
+            existing_qs=instance.market_price_improvements.all(),
+            wanted=mpi,
+            create_defaults={"apartment": instance},
+            equal_fields=["value", "completion_date", "name"],
+        )
+        merge_model(
+            model_class=ApartmentConstructionPriceImprovement,
+            existing_qs=instance.construction_price_improvements.all(),
+            wanted=cpi,
+            create_defaults={"apartment": instance},
+            equal_fields=["value", "completion_date", "name", "depreciation_percentage"],
+        )
 
         return instance
 

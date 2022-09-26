@@ -46,3 +46,4 @@ class HitasImprovement(HitasModel):
 
     class Meta:
         abstract = True
+        ordering = ["completion_date", "id"]
