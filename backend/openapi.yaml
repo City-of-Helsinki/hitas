@@ -2442,14 +2442,14 @@ components:
                 type: object
                 required:
                   - name
-                  - original_value
+                  - value
                   - completion_date
                 properties:
                   name:
                     description: Name of this improvement
                     type: string
                     example: Hissisaneeraus
-                  original_value:
+                  value:
                     description: Original value of this improvement
                     type: number
                     minimum: 0
@@ -2467,14 +2467,14 @@ components:
                 type: object
                 required:
                   - name
-                  - original_value
+                  - value
                   - completion_date
                 properties:
                   name:
                     description: Name of this improvement
                     type: string
                     example: Liittyminen HTV-verkkoon
-                  original_value:
+                  value:
                     description: Original value of this improvement
                     type: number
                     minimum: 0
