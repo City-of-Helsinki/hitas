@@ -2609,6 +2609,7 @@ components:
         - links
         - building
         - notes
+        - improvements
       properties:
         id:
           description: Apartment ID
@@ -2677,6 +2678,78 @@ components:
           type: string
           nullable: true
           example: Random notes about the apartment...
+        improvements:
+          description: Contains housing company improvements
+          type: object
+          required:
+            - market_price_index
+            - construction_price_index
+          properties:
+            market_price_index:
+              description: List of improvements for market price index
+              type: array
+              items:
+                description: Improvement
+                type: object
+                required:
+                  - name
+                  - value
+                  - completion_date
+                properties:
+                  name:
+                    description: Name of this improvement
+                    type: string
+                    example: Hissisaneeraus
+                  value:
+                    description: Original value of this improvement
+                    type: number
+                    minimum: 0
+                    example: 78284
+                  completion_date:
+                    description: When this improvement was completed
+                    type: string
+                    pattern: \d{4}-\d{2}
+                    example: 2005-08
+            construction_price_index:
+              description: List of improvements for construction price index
+              type: array
+              items:
+                description: Improvement
+                type: object
+                required:
+                  - name
+                  - value
+                  - completion_date
+                  - depreciation_percentage
+                properties:
+                  name:
+                    description: Name of this improvement
+                    type: string
+                    example: Liittyminen HTV-verkkoon
+                  value:
+                    description: Original value of this improvement
+                    type: number
+                    minimum: 0
+                    example: 13359
+                  completion_date:
+                    description: When this improvement was completed
+                    type: string
+                    pattern: \d{4}-\d{2}
+                    example: 2004-03
+                  depreciation_percentage:
+                    description: |-
+                      Depreciation percentage.
+
+                      Can have the following values:
+                      - 0
+                      - 2.5
+                      - 10
+                    type: number
+                    example: 10.0
+                    x-extensible-enum:
+                      - 0
+                      - 2.5
+                      - 10
 
     ApartmentLinks:
       description: Links to apartment's related object
