@@ -177,22 +177,14 @@ class InvalidPage(HitasException):
         )
 
 
-def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str, Any]]]):
+def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
     if isinstance(error, list):
-        return _convert_field_errors(field_name, error)
+        return _convert_field_errors_list(field_name, error)
     elif isinstance(error, dict):
-        retval = []
-
-        for subfield_name, suberror in error.items():
-            if subfield_name == api_settings.NON_FIELD_ERRORS_KEY:
-                retval.extend(_convert_field_errors(field_name, suberror))
-            else:
-                retval.extend(_convert_fields(f"{field_name}.{subfield_name}", suberror))
-
-        return retval
+        return _convert_field_errors_dict(field_name, error)
 
 
-def _convert_field_errors(field_name: str, errors: List[Dict[str, Any]]):
+def _convert_field_errors_list(field_name: str, errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     retval = []
 
     for error in errors:
@@ -200,33 +192,45 @@ def _convert_field_errors(field_name: str, errors: List[Dict[str, Any]]):
         if not error:
             continue
 
-        formatted_field_name = field_name
         # Handle nested serializer field errors where error message be in a nested dict
-        while True:
-            if "code" not in error:
-                nested_field_name = next(iter(error))
-                formatted_field_name += f".{nested_field_name}"
-                error = error[nested_field_name]
-                if isinstance(error, list):
-                    error = error[0]
-            else:
-                break
-
-        if error["code"] in ["required", "null"]:
-            retval.append({"field": formatted_field_name, "message": "This field is mandatory and cannot be null."})
-        elif error["code"] in ["blank"]:
-            retval.append({"field": formatted_field_name, "message": "This field is mandatory and cannot be blank."})
-        elif error["code"] in [
-            "invalid",
-            "invalid_choice",
-            "min_value",
-            "max_value",
-            "unique",
-            "min_length",
-            "max_length",
-        ]:
-            retval.append({"field": formatted_field_name, "message": error["message"]})
+        if "code" not in error:
+            retval.extend(_convert_field_errors_dict(field_name, error))
         else:
-            raise Exception(f"Unhandled error code '{error['code']}'.")
+            retval.append(_convert_field_error(field_name, error))
 
     return retval
+
+
+def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[Dict[str, Any]]:
+    retval = []
+
+    for subfield_name, suberror in errors.items():
+        current_name = field_name
+
+        if subfield_name != api_settings.NON_FIELD_ERRORS_KEY:
+            current_name += "." + subfield_name
+
+        if isinstance(suberror, list):
+            retval.extend(_convert_field_errors_list(current_name, suberror))
+        else:
+            retval.extend(_convert_field_errors_dict(current_name, suberror))
+
+    return retval
+
+
+def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, Any]:
+    if error["code"] in ["required", "null"]:
+        return {"field": field_name, "message": "This field is mandatory and cannot be null."}
+    elif error["code"] in ["blank"]:
+        return {"field": field_name, "message": "This field is mandatory and cannot be blank."}
+    elif error["code"] in [
+        "invalid",
+        "min_value",
+        "max_value",
+        "unique",
+        "min_length",
+        "max_length",
+    ]:
+        return {"field": field_name, "message": error["message"]}
+    else:
+        raise Exception(f"Unhandled error code '{error['code']}'.")
