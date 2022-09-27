@@ -42,63 +42,17 @@ export const hitasApi = createApi({
             return headers;
         },
     }),
+    endpoints: (builder) => ({}),
+});
+
+export const listApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
-        // HousingCompany
         getHousingCompanies: builder.query<IHousingCompanyListResponse, object>({
             query: (params: object) => ({
                 url: "housing-companies",
                 params: params,
             }),
         }),
-        getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
-            query: (id) => `housing-companies/${id}`,
-        }),
-        saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
-            query: ({data, id}) => ({
-                url: `housing-companies${id ? `/${id}` : ""}`,
-                method: id === undefined ? "POST" : "PUT",
-                body: data,
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8",
-                },
-            }),
-        }),
-        createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
-            query: ({data, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/real-estates`,
-                method: "POST",
-                body: data,
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8",
-                },
-            }),
-        }),
-        createBuilding: builder.mutation<
-            IBuilding,
-            {
-                data: IBuildingWritable;
-                housingCompanyId: string;
-                realEstateId: string;
-            }
-        >({
-            query: ({data, housingCompanyId, realEstateId}) => ({
-                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
-                method: "POST",
-                body: data,
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8",
-                },
-            }),
-        }),
-        // Postal codes
-        getPostalCodes: builder.query<IPostalCodeResponse, object>({
-            query: (params: object) => ({
-                url: "postal-codes",
-                params: params,
-            }),
-        }),
-
-        // Apartments
         getApartments: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
                 url: "apartments",
@@ -111,23 +65,12 @@ export const hitasApi = createApi({
                 params: params.params,
             }),
         }),
-        getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
-            query: (params: IApartmentQuery) => ({
-                url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
+        getPersons: builder.query<ICodeResponse, object>({
+            query: (params: object) => ({
+                url: "persons",
                 params: params,
             }),
         }),
-        createApartment: builder.mutation<IApartmentDetails, {data: IApartmentWritable; housingCompanyId: string}>({
-            query: ({data, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/apartments`,
-                method: "POST",
-                body: data,
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8",
-                },
-            }),
-        }),
-        // Property Manager
         getPropertyManagers: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
                 url: "property-managers",
@@ -135,6 +78,12 @@ export const hitasApi = createApi({
             }),
         }),
         // Codes
+        getPostalCodes: builder.query<IPostalCodeResponse, object>({
+            query: (params: object) => ({
+                url: "postal-codes",
+                params: params,
+            }),
+        }),
         getDevelopers: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
                 url: "developers",
@@ -159,10 +108,58 @@ export const hitasApi = createApi({
                 params: params,
             }),
         }),
-        getPersons: builder.query<ICodeResponse, object>({
-            query: (params: object) => ({
-                url: "persons",
+    }),
+});
+
+export const detailApi = hitasApi.injectEndpoints({
+    endpoints: (builder) => ({
+        getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
+            query: (id) => `housing-companies/${id}`,
+        }),
+        getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
+            query: (params: IApartmentQuery) => ({
+                url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
                 params: params,
+            }),
+        }),
+    }),
+});
+
+export const mutationApi = hitasApi.injectEndpoints({
+    endpoints: (builder) => ({
+        saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
+            query: ({data, id}) => ({
+                url: `housing-companies${id ? `/${id}` : ""}`,
+                method: id === undefined ? "POST" : "PUT",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+        }),
+        createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+        }),
+        createBuilding: builder.mutation<
+            IBuilding,
+            {data: IBuildingWritable; housingCompanyId: string; realEstateId: string}
+        >({
+            query: ({data, housingCompanyId, realEstateId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+        }),
+        createApartment: builder.mutation<IApartmentDetails, {data: IApartmentWritable; housingCompanyId: string}>({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
         }),
     }),
@@ -170,19 +167,22 @@ export const hitasApi = createApi({
 
 export const {
     useGetHousingCompaniesQuery,
-    useGetHousingCompanyDetailQuery,
-    useSaveHousingCompanyMutation,
-    useCreateRealEstateMutation,
-    useCreateBuildingMutation,
-    useGetHousingCompanyApartmentsQuery,
-    useGetPostalCodesQuery,
     useGetApartmentsQuery,
-    useGetApartmentDetailQuery,
-    useCreateApartmentMutation,
+    useGetHousingCompanyApartmentsQuery,
+    useGetPersonsQuery,
     useGetPropertyManagersQuery,
+    useGetPostalCodesQuery,
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
     useGetFinancingMethodsQuery,
-    useGetPersonsQuery,
-} = hitasApi;
+} = listApi;
+
+export const {useGetHousingCompanyDetailQuery, useGetApartmentDetailQuery} = detailApi;
+
+export const {
+    useSaveHousingCompanyMutation,
+    useCreateRealEstateMutation,
+    useCreateBuildingMutation,
+    useCreateApartmentMutation,
+} = mutationApi;
