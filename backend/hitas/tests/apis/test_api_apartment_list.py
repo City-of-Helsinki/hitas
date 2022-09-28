@@ -173,6 +173,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         {"postal_code": "99999"},
         {"owner_name": "megatr"},
         {"owner_name": "etimus pri"},
+        {"owner_social_security_number": "010199"},
         {"owner_social_security_number": "010199-123A"},
         {"owner_social_security_number": "010199-123a"},
     ],
@@ -228,11 +229,11 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
             [{"field": "owner_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
         ),
         (
-            {"owner_social_security_number": "1234567890"},
+            {"owner_social_security_number": "12345"},
             [
                 {
                     "field": "owner_social_security_number",
-                    "message": "Ensure this value has at least 11 characters (it has 10).",
+                    "message": "Ensure this value has at least 6 characters (it has 5).",
                 }
             ],
         ),

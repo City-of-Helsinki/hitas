@@ -34,7 +34,7 @@ class HitasPostalCodeFilter(filters.CharFilter):
 
 class HitasSSNFilter(filters.CharFilter):
     def __init__(self, *args, **kwargs):
-        kwargs["min_length"] = 11
+        kwargs["min_length"] = 6
         kwargs["max_length"] = 11
         super().__init__(*args, **kwargs)
 
