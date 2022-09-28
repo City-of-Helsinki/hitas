@@ -36,6 +36,13 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.apartment import DepreciationPercentage
+from hitas.models.indices import (
+    ConstructionPriceIndex,
+    ConstructionPriceIndexPre2005,
+    MarketPriceIndex,
+    MarketPriceIndexPre2005,
+    MaxPriceIndex,
+)
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
 from hitas.oracle_migration.oracle_schema import (
@@ -55,6 +62,7 @@ from hitas.oracle_migration.oracle_schema import (
     real_estates,
     users,
 )
+from hitas.oracle_migration.types import str_to_year_month
 
 TZ = pytz.timezone("Europe/Helsinki")
 
@@ -90,6 +98,16 @@ class ConvertedData:
     financing_methods_by_code_number: Dict[str, FinancingMethod] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
     apartment_types_by_code_numer: Dict[str, ApartmentType] = None
+
+
+def create_indices(codes: List[LegacyRow], model_class: type[AbstractCode]) -> None:
+    for code in codes:
+        index = model_class()
+
+        index.value = float(code["value"])
+        index.month = str_to_year_month(code["code_id"])
+
+        index.save()
 
 
 def run(
@@ -154,6 +172,13 @@ def run(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
             converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
+
+            # Indices
+            create_indices(codebooks_by_id["HITASEHIND"], MaxPriceIndex)
+            create_indices(codebooks_by_id["MARKHINTAIND"], MarketPriceIndexPre2005)
+            create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex)
+            create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndexPre2005)
+            create_indices(codebooks_by_id["RAKUSTIND2005"], ConstructionPriceIndex)
 
             # Postal codes
             converted_data.postal_codes_by_postal_code = create_unsaved_postal_codes(codebooks_by_id["POSTINROT"])

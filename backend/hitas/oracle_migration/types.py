@@ -70,7 +70,11 @@ class HitasYearMonth(types.TypeDecorator):
         return value.strftime("%Y%m")
 
     def process_result_value(self, value, dialect):
-        return datetime.datetime.strptime(value, "%Y%m")
+        return str_to_year_month(value)
+
+
+def str_to_year_month(value: str) -> datetime.datetime:
+    return datetime.datetime.strptime(value, "%Y%m")
 
 
 class HitasDuration(types.TypeDecorator):
