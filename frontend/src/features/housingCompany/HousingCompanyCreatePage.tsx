@@ -37,10 +37,13 @@ const getHousingCompanyStateName = (state) => {
     }
 };
 
-const HousingCompanyCreatePage = (): JSX.Element => {
-    const {state} = useLocation();
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+type HousingCompanyState = {
+    housingCompany;
+};
 
+const HousingCompanyCreatePage = (): JSX.Element => {
+    const state = useLocation().state as HousingCompanyState;
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const initialFormData: IHousingCompanyWritable =
         state?.housingCompany === undefined
             ? {
