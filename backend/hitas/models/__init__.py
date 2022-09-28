@@ -12,6 +12,13 @@ from hitas.models.housing_company import (
     HousingCompanyMarketPriceImprovement,
     HousingCompanyState,
 )
+from hitas.models.indices import (
+    ConstructionPriceIndex,
+    ConstructionPriceIndexPre2005,
+    MarketPriceIndex,
+    MarketPriceIndexPre2005,
+    MaxPriceIndex,
+)
 from hitas.models.ownership import Ownership
 from hitas.models.person import Person
 from hitas.models.postal_code import HitasPostalCode
