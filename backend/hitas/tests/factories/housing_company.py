@@ -21,6 +21,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     class Meta:
         model = HousingCompany
 
+    id = factory.Sequence(lambda n: n)
     display_name = factory.Sequence(lambda n: f"Test Housing company {n:03}")
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = fuzzy.FuzzyChoice(state[0] for state in HousingCompanyState.choices())
@@ -41,7 +42,6 @@ class HousingCompanyFactory(DjangoModelFactory):
     primary_loan = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    legacy_id = factory.Sequence(lambda n: f"{n:03}")
     notes = factory.Faker("text")
     last_modified_datetime = fuzzy.FuzzyDate(date(2010, 1, 1))
     last_modified_by = factory.SubFactory("hitas.tests.factories.UserFactory")

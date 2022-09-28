@@ -103,10 +103,10 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
                 setFilterParams={setFilterParams}
             />
             <FilterIntegerField
-                label="Yhtiön tunnus"
-                minLength={3}
+                label="Yhtiön arkistotunnus"
+                minLength={1}
                 maxLength={10}
-                filterFieldName="legacy_id"
+                filterFieldName="archive_id"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
