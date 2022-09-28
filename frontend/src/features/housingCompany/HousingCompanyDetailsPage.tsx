@@ -139,8 +139,8 @@ const HousingCompanyDetailsPage = () => {
                                             value={data.building_type.value}
                                         />
                                         <DetailField
-                                            label="Yhtiön arkisto tunnus"
-                                            value={data.legacy_id}
+                                            label="Yhtiön arkistotunnus"
+                                            value={data.archive_id}
                                         />
                                     </div>
                                 </div>

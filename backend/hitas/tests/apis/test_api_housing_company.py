@@ -327,7 +327,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "primary_loan": float(hc1.primary_loan),
         "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),
         "notes": hc1.notes,
-        "legacy_id": hc1.legacy_id,
+        "archive_id": hc1.id,
         "notification_date": str(hc1.notification_date),
         "last_modified": {
             "datetime": hc1.last_modified_datetime.isoformat().replace("+00:00", "Z"),
@@ -969,7 +969,7 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
         {"property_manager": "TestPropertyManager"},
         {"developer": "TestDeveloper"},
         {"postal_code": "99999"},
-        {"legacy_id": "999"},
+        {"archive_id": 999},
     ],
 )
 @pytest.mark.django_db
@@ -981,7 +981,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
     HousingCompanyFactory.create(postal_code__value="99999")
-    HousingCompanyFactory.create(legacy_id="999")
+    HousingCompanyFactory.create(id=999)
     RealEstateFactory.create(property_identifier="1-1234-321-56", housing_company=hc)
     RealEstateFactory.create(property_identifier="1111-1111-1111-1111", housing_company=hc)
 

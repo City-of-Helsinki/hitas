@@ -39,7 +39,7 @@ export interface IHousingCompanyDetails {
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notification_date: string | null;
-    legacy_id: string | null;
+    archive_id: number;
     notes: string | null;
     last_modified: {
         user: {

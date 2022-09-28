@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from django.db.models import F, IntegerField, Min, Prefetch, Sum
 from django.db.models.functions import Round
+from django_filters import NumberFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -43,11 +44,11 @@ class HousingCompanyFilterSet(HitasFilterSet):
     postal_code = HitasPostalCodeFilter(field_name="postal_code__value")
     property_manager = HitasCharFilter(field_name="property_manager__name", lookup_expr="icontains")
     developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
-    legacy_id = HitasCharFilter(lookup_expr="iexact")
+    archive_id = NumberFilter(field_name="id")
 
     class Meta:
         model = HousingCompany
-        fields = ["display_name", "street_address", "postal_code", "property_manager", "developer"]
+        fields = ["display_name", "street_address", "postal_code", "property_manager", "developer", "archive_id"]
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):
@@ -112,7 +113,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     property_manager = ReadOnlyPropertyManagerSerializer()
     acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
     notes = ValueOrNullField(required=False)
-    legacy_id = ValueOrNullField(read_only=True)
+    archive_id = serializers.IntegerField(source="id", read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
     improvements = HousingCompanyImprovementSerializer(source="*")
@@ -201,7 +202,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "primary_loan",
             "sales_price_catalogue_confirmation_date",
             "notes",
-            "legacy_id",
+            "archive_id",
             "notification_date",
             "last_modified",
             "summary",
@@ -271,6 +272,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "last_modified_by",
             )
             .only(
+                "id",
                 "uuid",
                 "business_id",
                 "display_name",
@@ -282,7 +284,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "primary_loan",
                 "sales_price_catalogue_confirmation_date",
                 "notes",
-                "legacy_id",
                 "notification_date",
                 "last_modified_datetime",
                 "financing_method__uuid",

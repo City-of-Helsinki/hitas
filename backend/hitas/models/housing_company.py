@@ -60,7 +60,6 @@ class HousingCompany(ExternalHitasModel):
     # 'ilmoituspäivä'
     notification_date = models.DateField(null=True, blank=True)
 
-    legacy_id = models.CharField(max_length=10, null=True, blank=True)
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)
     last_modified_by = models.ForeignKey(
