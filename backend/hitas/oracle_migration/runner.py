@@ -5,7 +5,9 @@ from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar
 
 import pytz
 from django.contrib.auth import get_user_model
+from django.db import connection as django_connection
 from django.db import models
+from django.db.models import Max
 from safedelete import HARD_DELETE
 from sqlalchemy import create_engine, desc
 from sqlalchemy.engine import LegacyRow
@@ -199,6 +201,7 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
 
     for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
         new = HousingCompany()
+        new.id = hc[companies.c.id]  # Keep original IDs as archive id
         new.official_name = hc["official_name"]
         new.display_name = hc["display_name"]
         new.state = housing_company_state_from(hc["state_code"])
@@ -209,7 +212,6 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
         new.primary_loan = hc["primary_loan"]
         new.sales_price_catalogue_confirmation_date = date_to_datetime(hc["sales_price_catalogue_confirmation_date"])
         new.notification_date = date_to_datetime(hc["notification_date"])
-        new.legacy_id = hc[companies.c.id]
         new.notes = combine_notes(hc)
         new.last_modified_datetime = date_to_datetime(hc["last_modified"])
         new.building_type = converted_data.building_types_by_code_number[hc["building_type_code"]]
@@ -234,7 +236,12 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
             new.postal_code.save()
 
         new.save()
-        housing_companies_by_id[new.legacy_id] = CreatedHousingCompany(value=new)
+        housing_companies_by_id[new.id] = CreatedHousingCompany(value=new)
+
+    # Update ID sequence as we forced same IDs as Oracle DB had
+    max_id = HousingCompany.objects.aggregate(Max("id"))["id__max"]
+    with django_connection.cursor() as cursor:
+        cursor.execute("ALTER SEQUENCE hitas_housingcompany_id_seq RESTART WITH %s", [max_id + 1])
 
     print(f"Loaded {len(housing_companies_by_id)} housing companies.")
     print()
@@ -317,7 +324,7 @@ def create_real_estates_and_buildings(
     created_real_estates = []
 
     for real_estate in connection.execute(
-        select(real_estates).where(real_estates.c.company_id == housing_company.legacy_id)
+        select(real_estates).where(real_estates.c.company_id == housing_company.id)
     ).fetchall():
         new = RealEstate()
         new.housing_company = housing_company
@@ -348,7 +355,7 @@ def create_apartments(
     for apartment in connection.execute(
         select(apartments, additional_infos)
         .join(additional_infos, isouter=True)
-        .where(apartments.c.company_id == building.real_estate.housing_company.legacy_id)
+        .where(apartments.c.company_id == building.real_estate.housing_company.id)
     ).fetchall():
         new = Apartment()
         new.building = building
