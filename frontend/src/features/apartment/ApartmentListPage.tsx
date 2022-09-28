@@ -135,18 +135,6 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterPostalCodeField
-                label="Postinumero"
-                filterFieldName="postal_code"
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-            />
-            <FilterTextInputField
-                label="Yhtiön nimi"
-                filterFieldName="housing_company_name"
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-            />
             <FilterTextInputField
                 label="Omistajan nimi"
                 filterFieldName="owner_name"
@@ -156,6 +144,18 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
             <FilterTextInputField
                 label="Henkilötunnus"
                 filterFieldName="owner_social_security_number"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <FilterTextInputField
+                label="Yhtiön nimi"
+                filterFieldName="housing_company_name"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <FilterPostalCodeField
+                label="Postinumero"
+                filterFieldName="postal_code"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
