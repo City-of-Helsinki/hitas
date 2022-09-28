@@ -696,13 +696,16 @@ def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
 
 
 def do_truncate():
-    HousingCompany.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
+    for model_class in [
+        HousingCompany,
+        ApartmentType,
+        PropertyManager,
+        BuildingType,
+        Developer,
+        FinancingMethod,
+        Person,
+        HitasPostalCode,
+    ]:
+        model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
 
-    ApartmentType.objects.all().delete()
-    PropertyManager.objects.all().delete()
-    BuildingType.objects.all().delete()
-    Developer.objects.all().delete()
-    FinancingMethod.objects.all().delete()
-    Person.objects.all().delete()
-    HitasPostalCode.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
     get_user_model().objects.all().delete()
