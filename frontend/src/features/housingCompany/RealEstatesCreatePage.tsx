@@ -29,7 +29,7 @@ const RealEstatesCreatePage = (): JSX.Element => {
     return (
         <div className="view--create view--create-real-estate">
             <h1 className="main-heading">
-                <span>Uusi rakennus</span>
+                <span>Uusi kiinteistö</span>
             </h1>
             <div className="field-sets">
                 <Fieldset heading="">

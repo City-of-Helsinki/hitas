@@ -43,7 +43,7 @@ const BuildingsCreatePage = (): JSX.Element => {
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
-                <span>Uusi kiinteistö</span>
+                <span>Uusi rakennus</span>
             </h1>
             <div className="field-sets">
                 <Fieldset heading="">
