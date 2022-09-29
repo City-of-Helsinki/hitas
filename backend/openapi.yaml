@@ -869,7 +869,7 @@ paths:
             type: string
             minLength: 3
             example: matti
-        - name: owner_social_security_number
+        - name: owner_identifier
           description: Search apartments whose social security number matches the given search string (case-insensitive)
           required: false
           in: query
@@ -909,23 +909,23 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /api/v1/persons:
+  /api/v1/owners:
     get:
-      description: Fetch persons
-      operationId: list-persons
+      description: Fetch owners
+      operationId: list-owners
       tags:
-        - Persons
+        - Owners
       parameters:
         - name: name
-          description: Search persons with first name or last name containing the given search string (case-insensitive)
+          description: Search owners with name containing the given search string (case-insensitive)
           required: false
           in: query
           schema:
             type: string
             minLength: 3
             example: Matti
-        - name: social_security_number
-          description: Search persons whose social security number matches the given search string (case-insensitive)
+        - name: identifier
+          description: Search owners whose identifier (social security number, business id, etc) matches the given search string (case-insensitive)
           required: false
           in: query
           schema:
@@ -934,7 +934,7 @@ paths:
             maxLength: 11
             example: 131052-308T
         - name: email
-          description: Search persons whose email address matches the given search string (case-insensitive)
+          description: Search owners whose email address matches the given search string (case-insensitive)
           required: false
           in: query
           schema:
@@ -945,11 +945,11 @@ paths:
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
         '200':
-          description: Successfully fetched list of persons
+          description: Successfully fetched list of owners
           content:
             application/json:
               schema:
-                description: Single page of persons
+                description: Single page of owners
                 type: object
                 required:
                   - page
@@ -958,10 +958,10 @@ paths:
                   page:
                     $ref: '#/components/schemas/PageInfo'
                   contents:
-                    description: List of persons
+                    description: List of owners
                     type: array
                     items:
-                      $ref: '#/components/schemas/Person'
+                      $ref: '#/components/schemas/Owner'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -974,23 +974,23 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     post:
-      description: Add a new person
-      operationId: create-person
+      description: Add a new owner
+      operationId: create-owner
       tags:
-        - Persons
+        - Owners
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Person'
+              $ref: '#/components/schemas/Owner'
       responses:
         '201':
-          description: Successfully added a new person
+          description: Successfully added a new owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Owner'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1004,27 +1004,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/persons/{person_id}:
+  /api/v1/owners/{owner_id}:
     get:
-      description: Fetch a single person by id
-      operationId: read-person
+      description: Fetch a single owner by id
+      operationId: read-owner
       tags:
-        - Persons
+        - Owners
       parameters:
-        - name: person_id
+        - name: owner_id
           required: true
           in: path
-          description: Person ID
+          description: Owner ID
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
         '200':
-          description: Successfully read a person details
+          description: Successfully read a owner details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Owner'
         '404':
           $ref: '#/components/responses/NotFound'
         '406':
@@ -1033,15 +1033,15 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     put:
-      description: Update a person
-      operationId: update-person
+      description: Update a owner
+      operationId: update-owner
       tags:
-        - Persons
+        - Owners
       parameters:
-        - name: person_id
+        - name: owner_id
           required: true
           in: path
-          description: Person ID
+          description: Owner ID
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
@@ -1050,14 +1050,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Person'
+              $ref: '#/components/schemas/Owner'
       responses:
         '200':
-          description: Successfully updated a person
+          description: Successfully updated a owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Owner'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1072,21 +1072,21 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      description: Remove a person
-      operationId: delete-person
+      description: Remove a owner
+      operationId: delete-owner
       tags:
-        - Persons
+        - Owners
       parameters:
-        - name: person_id
+        - name: owner_id
           required: true
           in: path
-          description: Person ID
+          description: Owner ID
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
         '204':
-          description: Person successfully removed.
+          description: Owner successfully removed.
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2906,10 +2906,10 @@ components:
       properties:
         owner:
           allOf:
-            - $ref: '#/components/schemas/Person'
-            - $ref: '#/components/schemas/ReadOnlyPerson'
+            - $ref: '#/components/schemas/Owner'
+            - $ref: '#/components/schemas/ReadOnlyOwner'
         percentage:
-          description: Percentage that the person owns of the apartment
+          description: Percentage that the owner owns of the apartment
           type: number
           minimum: 0
           maximum: 100
@@ -2927,47 +2927,40 @@ components:
           example: null
           nullable: true
 
-    Person:
-      description: Person information
+    Owner:
+      description: Owner information
       type: object
       required:
         - id
-        - first_name
-        - last_name
-        - social_security_number
+        - name
+        - identifier
         - email
       properties:
         id:
-          description: ID of this person
+          description: ID of this owner
           type: string
           example: dc1072975bab4ba69f64814f021c6785
-        first_name:
-          description: First name(s) of this person
+        name:
+          description: Name of this owner
           type: string
-          example: Martti
-        last_name:
-          description: Last name of this person
-          type: string
-          example: Virtanen
-        social_security_number:
-          description: Social security number of this person
+          example: Martti Virtanen
+        identifier:
+          description: Identifier (social security number, business id, etc) of this owner
           type: string
           example: 260969-420B
           nullable: true
         email:
-          description: Email for this person
+          description: Email for this owner
           type: string
           nullable: true
           example: martti.virtanen@example.com
 
-    ReadOnlyPerson:
-      description: Read-only person
+    ReadOnlyOwner:
+      description: Read-only owner
       properties:
-        first_name:
+        name:
           readOnly: true
-        last_name:
-          readOnly: true
-        social_security_number:
+        identifier:
           readOnly: true
         email:
           readOnly: true
@@ -3395,17 +3388,17 @@ components:
         message:
           description: Human-readable details about the error
           type: string
-          example: Person has active ownerships and cannot be removed.
+          example: Owner has active ownerships and cannot be removed.
         error:
           description: |-
             Error reason
 
             Can have the following values:
-            - person_in_use
+            - owner_in_use
           type: string
-          example: person_in_use
+          example: owner_in_use
           x-extensible-enum:
-            - person_in_use
+            - owner_in_use
 
     UnsupportedMediaTypeError:
       description: Unsupported media type error
@@ -3530,8 +3523,8 @@ components:
           example:
             status: 409
             reason: Conflict
-            error: person_in_use
-            message: Person has active ownerships and cannot be removed.
+            error: owner_in_use
+            message: Owner has active ownerships and cannot be removed.
 
     UnsupportedMediaType:
       description: Only 'application/json' content-type is supported.

@@ -126,7 +126,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                             {data.ownerships.map((ownership: IOwnership) => (
                                                 <DetailField
                                                     key={ownership.owner.id}
-                                                    label={`${ownership.owner.first_name} ${ownership.owner.last_name} ${ownership.owner.social_security_number}`}
+                                                    label={`${ownership.owner.name} ${ownership.owner.identifier}`}
                                                     value={`Omistusosuus: ${ownership.percentage}%`}
                                                 />
                                             ))}

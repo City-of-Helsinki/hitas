@@ -8,7 +8,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register(r"housing-companies", views.HousingCompanyViewSet, basename="housing-company")
 router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
-router.register(r"persons", views.PersonViewSet, basename="person")
+router.register(r"owners", views.OwnerViewSet, basename="owner")
 
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")

@@ -11,8 +11,8 @@ from hitas.models import (
     ApartmentType,
     Building,
     HousingCompany,
+    Owner,
     Ownership,
-    Person,
     RealEstate,
 )
 from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
@@ -24,8 +24,8 @@ from hitas.tests.factories import (
     ApartmentTypeFactory,
     BuildingFactory,
     HousingCompanyFactory,
+    OwnerFactory,
     OwnershipFactory,
-    PersonFactory,
     RealEstateFactory,
 )
 from hitas.views.apartment import ApartmentDetailSerializer
@@ -88,9 +88,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     {
                         "owner": {
                             "id": o1.owner.uuid.hex,
-                            "first_name": o1.owner.first_name,
-                            "last_name": o1.owner.last_name,
-                            "social_security_number": o1.owner.social_security_number,
+                            "name": o1.owner.name,
+                            "identifier": o1.owner.identifier,
                             "email": o1.owner.email,
                         },
                         "percentage": float(o1.percentage),
@@ -100,9 +99,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     {
                         "owner": {
                             "id": o2.owner.uuid.hex,
-                            "first_name": o2.owner.first_name,
-                            "last_name": o2.owner.last_name,
-                            "social_security_number": o2.owner.social_security_number,
+                            "name": o2.owner.name,
+                            "identifier": o2.owner.identifier,
                             "email": o2.owner.email,
                         },
                         "percentage": float(o2.percentage),
@@ -277,9 +275,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             {
                 "owner": {
                     "id": owner.owner.uuid.hex,
-                    "first_name": owner.owner.first_name,
-                    "last_name": owner.owner.last_name,
-                    "social_security_number": owner.owner.social_security_number,
+                    "name": owner.owner.name,
+                    "identifier": owner.owner.identifier,
                     "email": owner.owner.email,
                 },
                 "percentage": float(owner.percentage),
@@ -375,8 +372,8 @@ def test__api__apartment__invalid_housing_company_id(api_client: HitasAPIClient)
 
 def get_apartment_create_data(building: Building) -> dict[str, Any]:
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
-    person1: Person = PersonFactory.create()
-    person2: Person = PersonFactory.create()
+    owner1: Owner = OwnerFactory.create()
+    owner2: Owner = OwnerFactory.create()
 
     data = {
         "state": ApartmentState.SOLD.value,
@@ -408,13 +405,13 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         },
         "ownerships": [
             {
-                "owner": {"id": person1.uuid.hex},
+                "owner": {"id": owner1.uuid.hex},
                 "percentage": 50,
                 "start_date": "2020-01-01",
                 "end_date": None,
             },
             {
-                "owner": {"id": person2.uuid.hex},
+                "owner": {"id": owner2.uuid.hex},
                 "percentage": 50,
                 "start_date": "2020-01-01",
                 "end_date": None,
@@ -934,8 +931,8 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 )
 @pytest.mark.django_db
 def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
-    PersonFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
-    PersonFactory.create(uuid=uuid.UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
+    OwnerFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    OwnerFactory.create(uuid=uuid.UUID("0001e769-ae2d-40b9-ae56-ebd615e919d3"))
     b: Building = BuildingFactory.create()
 
     data = get_apartment_create_data(b)
@@ -1130,9 +1127,9 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
     ap: Apartment = ApartmentFactory.create()
     b: Building = ap.building
     OwnershipFactory.create(apartment=ap)
-    PersonFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
-    PersonFactory.create(uuid=uuid.UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
-    PersonFactory.create(uuid=uuid.UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
+    OwnerFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
+    OwnerFactory.create(uuid=uuid.UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
+    OwnerFactory.create(uuid=uuid.UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
 
     data = ApartmentDetailSerializer(ap).data
     data["ownerships"] = owner_data

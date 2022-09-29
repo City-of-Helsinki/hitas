@@ -35,7 +35,7 @@ const ApartmentListItem = ({
     // Combine ownerships into a single formatted string
     const ownershipsString = ownerships.length
         ? ownerships
-              .map((o) => `${o.owner.last_name} ${o.owner.first_name} (${o.owner.social_security_number})`)
+              .map((o) => `${o.owner.name} (${o.owner.identifier})`)
               .join(", ")
         : "Ei omistajuuksia";
     return (
