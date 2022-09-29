@@ -69,9 +69,9 @@ export const listApi = hitasApi.injectEndpoints({
             }),
             providesTags: [{type: "Apartment", id: "LIST"}],
         }),
-        getPersons: builder.query<ICodeResponse, object>({
+        getOwners: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
-                url: "persons",
+                url: "owners",
                 params: params,
             }),
         }),
@@ -185,7 +185,7 @@ export const {
     useGetHousingCompaniesQuery,
     useGetApartmentsQuery,
     useGetHousingCompanyApartmentsQuery,
-    useGetPersonsQuery,
+    useGetOwnersQuery,
     useGetPropertyManagersQuery,
     useGetPostalCodesQuery,
     useGetDevelopersQuery,

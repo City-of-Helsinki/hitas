@@ -1,4 +1,4 @@
-import {IAddress, IApartmentAddress, IPerson} from "./models";
+import {IAddress, IApartmentAddress, IOwner} from "./models";
 
 function dotted(obj: object, path: string | string[], value?: number | string | null) {
     /*
@@ -25,8 +25,8 @@ function formatAddress(address: IAddress | IApartmentAddress): string {
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 
-function formatPerson(person: IPerson): string {
-    return `${person.last_name}, ${person.first_name} (${person.social_security_number})`;
+function formatOwner(owner: IOwner): string {
+    return `${owner.name} (${owner.identifier})`;
 }
 
 function validateBusinessId(value: string): boolean {
@@ -34,4 +34,4 @@ function validateBusinessId(value: string): boolean {
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
-export {dotted, formatAddress, formatPerson, validateBusinessId};
+export {dotted, formatAddress, formatOwner, validateBusinessId};

@@ -8,11 +8,11 @@ import {
     useCreateApartmentMutation,
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
-    useGetPersonsQuery,
+    useGetOwnersQuery,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
-import {ApartmentStates, IApartmentWritable, ICode, IOwnership, IPerson} from "../../common/models";
-import {dotted, formatPerson} from "../../common/utils";
+import {ApartmentStates, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
+import {dotted, formatOwner} from "../../common/utils";
 
 const getApartmentStateLabel = (state) => {
     switch (state) {
@@ -94,7 +94,7 @@ const ApartmentCreatePage = () => {
     const handleAddOwnershipLine = () => {
         setFormOwnershipsList((draft) => {
             draft.push({
-                owner: {id: ""} as IPerson,
+                owner: {id: ""} as IOwner,
                 percentage: 100,
             });
         });
@@ -348,9 +348,9 @@ const ApartmentCreatePage = () => {
                                             inputType="relatedModel"
                                             label=""
                                             fieldPath="owner.id"
-                                            queryFunction={useGetPersonsQuery}
+                                            queryFunction={useGetOwnersQuery}
                                             relatedModelSearchField="last_name"
-                                            getRelatedModelLabel={(obj: IPerson) => formatPerson(obj)}
+                                            getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
                                             required
                                             formData={formOwnershipsList[index]}
                                             setterFunction={handleSetOwnershipLine(index, "owner.id")}

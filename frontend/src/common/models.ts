@@ -248,17 +248,16 @@ export interface IPropertyManager {
     address: IAddress;
 }
 
-export interface IPerson {
+export interface IOwner {
     readonly id: string;
-    first_name: string;
-    last_name: string;
-    social_security_number: string | null;
+    name: string;
+    identifier: string | null;
     email: string | null;
     address: IAddress;
 }
 
 export interface IOwnership {
-    owner: IPerson;
+    owner: IOwner;
     percentage: number;
     start_date?: string | null;
     end_date?: string | null;

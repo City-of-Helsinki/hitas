@@ -9,7 +9,7 @@ from hitas.models._base import HitasModel, HitasModelDecimalField
 
 class Ownership(HitasModel):
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="ownerships")
-    owner = models.ForeignKey("Person", on_delete=models.PROTECT, related_name="ownerships")
+    owner = models.ForeignKey("Owner", on_delete=models.PROTECT, related_name="ownerships")
 
     percentage = HitasModelDecimalField(
         validators=[

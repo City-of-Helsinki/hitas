@@ -8,7 +8,7 @@ from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import SkipField, empty
 
-from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Ownership, Person
+from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Owner, Ownership
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -408,7 +408,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 ),
                 Prefetch(
                     "ownerships__owner",
-                    Person.objects.only("uuid", "first_name", "last_name", "social_security_number", "email"),
+                    Owner.objects.only("uuid", "name", "identifier", "email"),
                 ),
                 Prefetch(
                     "market_price_improvements",

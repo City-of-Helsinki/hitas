@@ -1,4 +1,3 @@
-from django.db.models import Q
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import mixins, serializers, viewsets
 
@@ -14,7 +13,6 @@ from hitas.views.utils import (
     HitasModelMixin,
     HitasModelSerializer,
     HitasPostalCodeFilter,
-    HitasSSNFilter,
 )
 
 
@@ -24,19 +22,14 @@ class ApartmentFilterSet(HitasFilterSet):
     )
     street_address = HitasCharFilter(lookup_expr="icontains")
     postal_code = HitasPostalCodeFilter(field_name="building__real_estate__housing_company__postal_code__value")
-    owner_name = HitasCharFilter(method="owner_name_filter")
-    owner_social_security_number = HitasSSNFilter(
-        field_name="ownerships__owner__social_security_number", lookup_expr="iexact"
+    owner_name = HitasCharFilter(field_name="ownerships__owner__name", lookup_expr="icontains")
+    owner_identifier = HitasCharFilter(
+        field_name="ownerships__owner__identifier", lookup_expr="icontains", max_length=11
     )
-
-    def owner_name_filter(self, queryset, name, value):
-        return queryset.filter(
-            Q(ownerships__owner__first_name__icontains=value) | Q(ownerships__owner__last_name__icontains=value)
-        )
 
     class Meta:
         model = Apartment
-        fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_social_security_number"]
+        fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_identifier"]
 
 
 class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):

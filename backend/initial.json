@@ -3481,101 +3481,92 @@
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 1,
     "fields": {
       "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
-      "first_name": "Matti",
-      "last_name": "Meikäläinen",
-      "social_security_number": "010199-123A",
+      "name": "Matti Meikäläinen",
+      "identifier": "010199-123A",
       "email": "matti@hitas.fi"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 2,
     "fields": {
       "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
-      "first_name": "Kerttu",
-      "last_name": "Kuusisto",
-      "social_security_number": "050462-494C",
+      "name": "Kerttu Kuusisto",
+      "identifier": "050462-494C",
       "email": "juhanisaari@example.com"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 3,
     "fields": {
       "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
-      "first_name": "Juhani",
-      "last_name": "Kujala",
-      "social_security_number": "300505A522H",
+      "name": "Juhani Kujala",
+      "identifier": "300505A522H",
       "email": "kaarinalehto@example.com"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 4,
     "fields": {
       "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
-      "first_name": "Kerttu",
-      "last_name": "Asikainen",
-      "social_security_number": "151124-088K",
+      "name": "Kerttu Asikainen",
+      "identifier": "151124-088K",
       "email": "mattigustafsson@example.org"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 5,
     "fields": {
       "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
-      "first_name": "Jaakko",
-      "last_name": "Virtanen",
-      "social_security_number": "230919-757D",
+      "name": "Jaakko Virtanen",
+      "identifier": "230919-757D",
       "email": "emiliaseppanen@example.net"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 6,
     "fields": {
       "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
-      "first_name": "Marjaana",
-      "last_name": "Myllymäki",
-      "social_security_number": "160339-233A",
+      "name": "Marjaana Myllymäki",
+      "identifier": "160339-233A",
       "email": "artturiihimaki@example.org"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 7,
     "fields": {
       "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
-      "first_name": "Seppo",
-      "last_name": "Lahtinen",
-      "social_security_number": "211283-058H",
+      "name": "Seppo Lahtinen",
+      "identifier": "211283-058H",
       "email": "ensio55@example.org"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 8,
     "fields": {
       "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
-      "first_name": "Riitta",
-      "last_name": "Ojanen",
-      "social_security_number": "160288-587K",
+      "name": "Riitta Ojanen",
+      "identifier": "160288-587K",
       "email": "onurmi@example.org"
     }
   },
   {
-    "model": "hitas.person",
+    "model": "hitas.owner",
     "pk": 9,
     "fields": {
       "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
-      "first_name": "Katariina",
-      "last_name": "Virna",
-      "social_security_number": "111269-222X",
+      "name": "Katariina Virna",
+      "identifier": "111269-222X",
       "email": null
     }
   },

@@ -1,33 +1,31 @@
 from rest_framework import serializers
 
-from hitas.models import Ownership, Person
+from hitas.models import Owner, Ownership
 from hitas.views.utils import HitasDecimalField, UUIDRelatedField
 from hitas.views.utils.serializers import ReadOnlySerializer
 
 
-class PersonSerializer(ReadOnlySerializer):
-    id = UUIDRelatedField(queryset=Person.objects, source="uuid")
+class OwnerSerializer(ReadOnlySerializer):
+    id = UUIDRelatedField(queryset=Owner.objects, source="uuid")
 
-    first_name = serializers.CharField(read_only=True)
-    last_name = serializers.CharField(read_only=True)
-    social_security_number = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    identifier = serializers.CharField(read_only=True)
     email = serializers.CharField(read_only=True)
 
     def get_model_class(self):
-        return Person
+        return Owner
 
     class Meta:
         fields = [
             "id",
-            "first_name",
-            "last_name",
-            "social_security_number",
+            "name",
+            "identifier",
             "email",
         ]
 
 
 class OwnershipSerializer(serializers.ModelSerializer):
-    owner = PersonSerializer()
+    owner = OwnerSerializer()
     percentage = HitasDecimalField(required=True)
 
     class Meta:

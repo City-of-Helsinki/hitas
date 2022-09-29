@@ -60,9 +60,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 {
                     "owner": {
                         "id": o1.owner.uuid.hex,
-                        "first_name": o1.owner.first_name,
-                        "last_name": o1.owner.last_name,
-                        "social_security_number": o1.owner.social_security_number,
+                        "name": o1.owner.name,
+                        "identifier": o1.owner.identifier,
                         "email": o1.owner.email,
                     },
                     "percentage": float(o1.percentage),
@@ -72,9 +71,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 {
                     "owner": {
                         "id": o2.owner.uuid.hex,
-                        "first_name": o2.owner.first_name,
-                        "last_name": o2.owner.last_name,
-                        "social_security_number": o2.owner.social_security_number,
+                        "name": o2.owner.name,
+                        "identifier": o2.owner.identifier,
                         "email": o2.owner.email,
                     },
                     "percentage": float(o2.percentage),
@@ -173,8 +171,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         {"postal_code": "99999"},
         {"owner_name": "megatr"},
         {"owner_name": "etimus pri"},
-        {"owner_social_security_number": "010199-123A"},
-        {"owner_social_security_number": "010199-123a"},
+        {"owner_identifier": "010199-123A"},
+        {"owner_identifier": "010199-123a"},
     ],
 )
 @pytest.mark.django_db
@@ -188,9 +186,8 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__first_name="Megatron")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__last_name="Opetimus Prime")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__social_security_number="010199-123A")
+    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__name="Megatron Opetimus Prime")
+    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__identifier="010199-123A")
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
@@ -228,19 +225,19 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
             [{"field": "owner_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
         ),
         (
-            {"owner_social_security_number": "1234567890"},
+            {"owner_identifier": "12"},
             [
                 {
-                    "field": "owner_social_security_number",
-                    "message": "Ensure this value has at least 11 characters (it has 10).",
+                    "field": "owner_identifier",
+                    "message": "Ensure this value has at least 3 characters (it has 2).",
                 }
             ],
         ),
         (
-            {"owner_social_security_number": "123456789012"},
+            {"owner_identifier": "123456789012"},
             [
                 {
-                    "field": "owner_social_security_number",
+                    "field": "owner_identifier",
                     "message": "Ensure this value has at most 11 characters (it has 12).",
                 }
             ],

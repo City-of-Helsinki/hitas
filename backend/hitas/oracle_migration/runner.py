@@ -1,7 +1,7 @@
 import datetime
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar
+from typing import Callable, Dict, List, Optional, Type, TypeVar
 
 import pytz
 from django.contrib.auth import get_user_model
@@ -30,8 +30,8 @@ from hitas.models import (
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
     HousingCompanyState,
+    Owner,
     Ownership,
-    Person,
     PropertyManager,
     RealEstate,
 )
@@ -502,35 +502,22 @@ def create_apartment_improvements(
     return created
 
 
-def split_person_name(name) -> Tuple[str, str]:
-    if name:
-        splitted_name = name.split(", ", maxsplit=1)
-        if len(splitted_name) == 2:
-            return splitted_name
-        else:
-            return "", name
-
-    return "", ""
-
-
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
     count = 0
-    bulk_persons = []
+    bulk_owners = []
     bulk_ownerships = []
 
     for ownership in connection.execute(
         select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
     ).fetchall():
-        new_person = Person()
-        new_person.first_name, new_person.last_name = split_person_name(ownership["name"])
-        new_person.social_security_number = ownership["social_security_number"]
-        new_person.legacy_social_security_number = True
-        new_person.clean()
-        bulk_persons.append(new_person)
+        new_owner = Owner()
+        new_owner.name = ownership["name"]
+        new_owner.identifier = ownership["social_security_number"]
+        bulk_owners.append(new_owner)
 
         new = Ownership()
         new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
-        new.owner = new_person
+        new.owner = new_owner
         new.percentage = ownership["percentage"]
         new.start_date = None
         new.end_date = None
@@ -538,15 +525,15 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         bulk_ownerships.append(new)
         count += 1
 
-        if len(bulk_persons) == 1000:
-            Person.objects.bulk_create(bulk_persons)
+        if len(bulk_owners) == 1000:
+            Owner.objects.bulk_create(bulk_owners)
             Ownership.objects.bulk_create(bulk_ownerships)
 
-            bulk_persons = []
+            bulk_owners = []
             bulk_ownerships = []
 
-    if len(bulk_persons):
-        Person.objects.bulk_create(bulk_persons)
+    if len(bulk_owners):
+        Owner.objects.bulk_create(bulk_owners)
         Ownership.objects.bulk_create(bulk_ownerships)
 
     print(f"Loaded {count} owners.")
@@ -728,7 +715,7 @@ def do_truncate():
         BuildingType,
         Developer,
         FinancingMethod,
-        Person,
+        Owner,
         HitasPostalCode,
     ]:
         model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)

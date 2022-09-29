@@ -1,14 +1,13 @@
 from django.contrib import admin
 
-from hitas.models import Person
+from hitas.models import Owner
 from hitas.models.ownership import Ownership
 
 
-@admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
+@admin.register(Owner)
+class OwnerAdmin(admin.ModelAdmin):
     list_display = [
-        "last_name",
-        "first_name",
+        "name",
         "email",
     ]
     readonly_fields = ("uuid",)
