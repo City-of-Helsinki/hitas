@@ -48,6 +48,9 @@
       justify-content: space-between
       padding: $spacing-layout-xs
 
+      &:hover
+        background: $color-black-5
+
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
@@ -92,20 +95,21 @@
           @include mix.flexbox
           @include mix.flex-wrap(wrap)
 
-          .housing-company
-            font-size: $fontsize-body-s
-            font-weight: 600
-
           .housing-company, .address
             width: 45%
             margin: 0
             padding-right: 1em
 
+          .housing-company
+            font-size: $fontsize-body-s
+            font-weight: 600
+            margin: -0.3em 0 0.3em
+
           .ownership, .area
             flex-grow: 1
 
           .ownership
-            color: $color-black-40
+            color: $color-black-60
             display: inline-block
             position: relative
             z-index: 10
@@ -118,7 +122,7 @@
             text-overflow: ellipsis
             scrollbar-width: none
             scrollbar-color: transparent transparent
-          //$color-black-30 $color-black-10
+        //$color-black-30 $color-black-10
 
         &:hover .details .ownership
           overflow-x: auto

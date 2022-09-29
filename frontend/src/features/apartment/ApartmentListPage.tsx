@@ -6,7 +6,6 @@ import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/models";
-import {formatAddress} from "../../common/utils";
 
 interface ApartmentListItemProps {
     id: string;
@@ -49,7 +48,11 @@ const ApartmentListItem = ({
                 <div className="details">
                     <div className="housing-company">{housingCompanyName}</div>
                     <div className="ownership">{`${ownershipsString}`}</div>
-                    <div className="address">{formatAddress(address)}</div>
+                    <div className="address">
+                        {address.street_address}
+                        <br />
+                        {`${address.postal_code} ${address.city}`}
+                    </div>
                     <div className="area">{`${surfaceArea} m² ${apartmentType}`}</div>
                 </div>
                 <div className="state">
@@ -89,7 +92,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
             <div className="list-headers">
                 <div className="list-header apartment">Asunto</div>
                 <div className="list-header address">Osoite</div>
-                <div className="list-header area">Omistajuudet / Pinta-ala</div>
+                <div className="list-header area">Omistajuudet / Asunnon tiedot</div>
                 <div className="list-header state">Tila</div>
             </div>
             <ul className="results-list">
@@ -105,6 +108,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                         surfaceArea={item.surface_area}
                         address={item.address}
                         state={item.state}
+                        housingCompanyName={item.links.housing_company.display_name}
                     />
                 ))}
             </ul>
