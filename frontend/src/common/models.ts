@@ -142,6 +142,7 @@ export interface IApartmentAddress {
 export interface IApartmentLink {
     id: string;
     link: string;
+    display_name?: string;
 }
 
 export interface IApartmentLinks {

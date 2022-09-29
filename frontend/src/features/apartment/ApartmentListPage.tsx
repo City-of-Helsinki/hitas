@@ -13,11 +13,12 @@ interface ApartmentListItemProps {
     apartmentNumber: number;
     stair: string;
     ownerships: IOwnership[];
-    apartmentType: string;
+    apartmentType?: string;
     surfaceArea: number;
     address: IApartmentAddress;
     state: string;
     hcId: string;
+    housingCompanyName?: string;
 }
 
 const ApartmentListItem = ({
@@ -25,17 +26,19 @@ const ApartmentListItem = ({
     apartmentNumber,
     stair,
     ownerships,
-    apartmentType,
     surfaceArea,
     address,
     state,
     hcId,
+    housingCompanyName,
+    apartmentType,
 }: ApartmentListItemProps): JSX.Element => {
     // Combine ownerships into a single formatted string
-    const ownershipsString = ownerships
-        .map((o) => `${o.owner.last_name} ${o.owner.first_name} (${o.owner.social_security_number})`)
-        .join(", ");
-
+    const ownershipsString = ownerships.length
+        ? ownerships
+              .map((o) => `${o.owner.last_name} ${o.owner.first_name} (${o.owner.social_security_number})`)
+              .join(", ")
+        : "Ei omistajuuksia";
     return (
         <Link to={`/housing-companies/${hcId}/apartments/${id}`}>
             <li className="results-list__item results-list__item--apartment">
@@ -44,10 +47,10 @@ const ApartmentListItem = ({
                     {apartmentNumber}
                 </div>
                 <div className="details">
-                    <div className="ownership">{`Omistaja: ${ownershipsString}`}</div>
-                    <div className="rooms">{apartmentType}</div>
-                    <div className="area">{surfaceArea} m²</div>
+                    <div className="housing-company">{housingCompanyName}</div>
+                    <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="address">{formatAddress(address)}</div>
+                    <div className="area">{`${surfaceArea} m² ${apartmentType}`}</div>
                 </div>
                 <div className="state">
                     <StatusLabel>{state}</StatusLabel>
@@ -85,8 +88,8 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
             </div>
             <div className="list-headers">
                 <div className="list-header apartment">Asunto</div>
-                <div className="list-header area">Pinta-ala</div>
                 <div className="list-header address">Osoite</div>
+                <div className="list-header area">Omistajuudet / Pinta-ala</div>
                 <div className="list-header state">Tila</div>
             </div>
             <ul className="results-list">

@@ -62,8 +62,13 @@
       label
         right: 0
 
-    > [class*="icon_hds"]
+    // remove-icon
+    > div > [class*="icon_hds"]
       margin-top: 10px
+      cursor: pointer
+
+      &:hover path
+        fill: $color-black-50
 
   .shares-fields
     display: flex
@@ -78,6 +83,7 @@
     @include mix.flexbox()
     width: 100%
     justify-content: space-between
+    margin-bottom: 1em
 
   .buttons
     @include mix.flexbox()
