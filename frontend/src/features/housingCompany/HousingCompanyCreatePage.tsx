@@ -66,7 +66,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   },
                   notes: "",
                   primary_loan: null,
-                  property_manager: {id: ""},
+                  property_manager: null,
                   state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
                   improvements: {
