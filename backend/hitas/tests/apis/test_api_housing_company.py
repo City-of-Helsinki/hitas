@@ -449,6 +449,9 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
     if minimal_data:
         data.update(
             {
+                "business_id": None,
+                "primary_loan": "",
+                "property_manager": None,
                 "acquisition_price": {"initial": 10.00, "realized": None},
                 "notes": "",
                 "sales_price_catalogue_confirmation_date": None,
@@ -522,16 +525,13 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
     assert response.json() == {
         "error": "bad_request",
         "fields": [
-            {"field": "business_id", "message": "This field is mandatory and cannot be null."},
             {"field": "name", "message": "This field is mandatory and cannot be null."},
             {"field": "state", "message": "This field is mandatory and cannot be null."},
             {"field": "address", "message": "This field is mandatory and cannot be null."},
             {"field": "financing_method", "message": "This field is mandatory and cannot be null."},
             {"field": "building_type", "message": "This field is mandatory and cannot be null."},
             {"field": "developer", "message": "This field is mandatory and cannot be null."},
-            {"field": "property_manager", "message": "This field is mandatory and cannot be null."},
             {"field": "acquisition_price", "message": "This field is mandatory and cannot be null."},
-            {"field": "primary_loan", "message": "This field is mandatory and cannot be null."},
             {"field": "improvements", "message": "This field is mandatory and cannot be null."},
         ],
         "message": "Bad request",
@@ -543,7 +543,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "invalid_data,field",
     [
-        ({"business_id": None}, {"field": "business_id", "message": "This field is mandatory and cannot be null."}),
         ({"business_id": "#"}, {"field": "business_id", "message": "'#' is not a valid business id."}),
         ({"business_id": "123"}, {"field": "business_id", "message": "'123' is not a valid business id."}),
         ({"name": None}, {"field": "name", "message": "This field is mandatory and cannot be null."}),
@@ -601,10 +600,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "developer.id", "message": "Object does not exist with given id 'foo'."},
         ),
         (
-            {"property_manager": None},
-            {"field": "property_manager", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
             {"property_manager": 123},
             {"field": "property_manager", "message": "Invalid data. Expected a dictionary, but got int."},
         ),
@@ -620,7 +615,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"acquisition_price": None},
             {"field": "acquisition_price", "message": "This field is mandatory and cannot be null."},
         ),
-        ({"primary_loan": None}, {"field": "primary_loan", "message": "This field is mandatory and cannot be null."}),
         ({"primary_loan": "foo"}, {"field": "primary_loan", "message": "A valid number is required."}),
         ({"improvements": None}, {"field": "improvements", "message": "This field is mandatory and cannot be null."}),
         (

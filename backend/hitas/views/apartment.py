@@ -228,6 +228,9 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return create_links(instance)
 
     def validate_building(self, building: Building):
+        if building is None:
+            raise serializers.ValidationError(code="blank")
+
         housing_company_uuid = self.context["view"].kwargs["housing_company_uuid"]
         try:
             import uuid
