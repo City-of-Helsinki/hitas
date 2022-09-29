@@ -1,7 +1,15 @@
 from rest_framework import serializers
 
 from hitas.models import HitasPostalCode
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
+
+
+class HitasPostalCodeFilterSet(HitasFilterSet):
+    value = HitasCharFilter(lookup_expr="contains")
+
+    class Meta:
+        model = HitasPostalCode
+        fields = ["value"]
 
 
 class HitasPostalCodeSerializer(HitasModelSerializer):
@@ -20,3 +28,6 @@ class HitasPostalCodeViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         return HitasPostalCode.objects.all().order_by("value")
+
+    def get_filterset_class(self):
+        return HitasPostalCodeFilterSet
