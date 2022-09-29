@@ -73,7 +73,6 @@ const RealEstatesCreatePage = (): JSX.Element => {
             <SaveDialogModal
                 data={data}
                 error={error}
-                itemName="Kiinteistön"
                 linkURL={"/housing-companies/" + params.housingCompanyId}
                 linkText="Takaisin yhtiön sivulle"
                 isLoading={isLoading}
