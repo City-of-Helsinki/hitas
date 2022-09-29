@@ -81,13 +81,6 @@ export default function SaveDialogModal({
                     </Dialog.Content>
                     <Dialog.ActionButtons>
                         <Button
-                            onClick={() => navigate(-1)}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Palaa edelliselle sivulle
-                        </Button>
-                        <Button
                             onClick={() => setIsVisible(false)}
                             variant="secondary"
                             theme={"black"}

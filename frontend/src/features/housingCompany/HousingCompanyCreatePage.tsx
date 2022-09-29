@@ -1,7 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
 import {useLocation} from "react-router";
+import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
@@ -76,14 +77,18 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             : state.housingCompany;
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
     const [createHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
-
+    const navigate = useNavigate();
     const handleSaveButtonClicked = () => {
         createHousingCompany({data: formData, id: state?.housingCompany.id});
-        setIsEndModalVisible(true);
     };
     const stateOptions = HousingCompanyStates.map((state) => {
         return {label: getHousingCompanyStateName(state), value: state};
     });
+    useEffect(() => {
+        if (!isLoading && !error && data && data.id) {
+            navigate(`/housing-companies/${data.id}`);
+        } else if (error) setIsEndModalVisible(true);
+    }, [isLoading, error, data, navigate]);
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
