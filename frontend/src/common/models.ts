@@ -23,7 +23,7 @@ export interface IHousingCompany {
 export interface IHousingCompanyDetails {
     readonly id: string;
     name: IHousingCompanyDetailsName;
-    business_id: string;
+    business_id: string | null;
     state: IHousingCompanyState;
     address: IAddress;
     area: IHousingCompanyArea;
@@ -31,7 +31,7 @@ export interface IHousingCompanyDetails {
     financing_method: ICode;
     building_type: ICode;
     developer: ICode;
-    property_manager: IPropertyManager;
+    property_manager: IPropertyManager | null;
     acquisition_price: {
         initial: number;
         realized: number | null;
@@ -64,13 +64,13 @@ export interface IHousingCompanyDetails {
 export interface IHousingCompanyWritable {
     readonly id?: string;
     name: IHousingCompanyDetailsName;
-    business_id: string;
+    business_id: string | null;
     state: IHousingCompanyState;
     address: IAddress;
     financing_method: {id: string};
     building_type: {id: string};
     developer: {id: string};
-    property_manager: {id: string};
+    property_manager: {id: string} | null;
     acquisition_price: {
         initial: number;
         realized: number | null;

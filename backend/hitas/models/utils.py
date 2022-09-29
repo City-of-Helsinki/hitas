@@ -17,6 +17,9 @@ def validate_property_id(value: str) -> None:
 
 
 def validate_business_id(value: str) -> None:
+    if value is None:
+        return
+
     # Example valid value: '1234567-8'
     match = re.search(r"^(\d{7})-(\d)$", value)
 

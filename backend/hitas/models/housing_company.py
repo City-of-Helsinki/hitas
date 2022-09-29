@@ -39,14 +39,18 @@ class HousingCompany(ExternalHitasModel):
 
     state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
     # Business ID / 'y-tunnus'
-    business_id = models.CharField(max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"))
+    business_id = models.CharField(
+        max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"), null=True
+    )
 
     street_address = models.CharField(max_length=1024)
     postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="housing_companies")
 
     building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
     financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
-    property_manager = models.ForeignKey("PropertyManager", on_delete=models.PROTECT, related_name="housing_companies")
+    property_manager = models.ForeignKey(
+        "PropertyManager", on_delete=models.PROTECT, related_name="housing_companies", null=True
+    )
     developer = models.ForeignKey("Developer", on_delete=models.PROTECT, related_name="housing_companies")
 
     # 'hankinta-arvo'
@@ -54,7 +58,7 @@ class HousingCompany(ExternalHitasModel):
     # 'toteutunut hankinta-arvo'
     realized_acquisition_price = HitasModelDecimalField(null=True, blank=True)
     # 'ensisijaislaina'
-    primary_loan = HitasModelDecimalField()
+    primary_loan = HitasModelDecimalField(null=True, blank=True)
     # 'Myyntihintaluettelon vahvistamispäivä'
     sales_price_catalogue_confirmation_date = models.DateField(null=True, blank=True)
     # 'ilmoituspäivä'

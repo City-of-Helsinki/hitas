@@ -14,6 +14,7 @@ from hitas.models import (
     HousingCompanyState,
     RealEstate,
 )
+from hitas.models.utils import validate_business_id
 from hitas.utils import safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
@@ -103,6 +104,7 @@ class HousingCompanyImprovementSerializer(serializers.Serializer):
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
+    business_id = ValueOrNullField(allow_null=True, required=False)
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
@@ -110,7 +112,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     financing_method = ReadOnlyFinancingMethodSerializer()
     building_type = ReadOnlyBuildingTypeSerializer()
     developer = ReadOnlyDeveloperSerializer()
-    property_manager = ReadOnlyPropertyManagerSerializer()
+    property_manager = ReadOnlyPropertyManagerSerializer(allow_null=True, required=False)
     acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
     notes = ValueOrNullField(required=False)
     archive_id = serializers.IntegerField(source="id", read_only=True)
@@ -154,6 +156,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         )
 
         return instance
+
+    def validate_business_id(self, value):
+        validate_business_id(value)
+        return value
 
     @staticmethod
     def get_area(obj: HousingCompany) -> Dict[str, any]:
