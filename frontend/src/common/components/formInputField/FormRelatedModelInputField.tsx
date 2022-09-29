@@ -39,6 +39,10 @@ export default function FormRelatedModelInputField({
 
     const openModal = () => setIsModalVisible(true);
     const closeModal = () => setIsModalVisible(false);
+    const clearFieldValue = () => {
+        setDisplayedValue("");
+        setFieldValue("");
+    };
 
     const handleSetSelectedRows = (rows) => {
         if (rows.length) {
@@ -73,8 +77,8 @@ export default function FormRelatedModelInputField({
                 label={label + (required ? " *" : "")}
                 value={displayedValue || (!displayedValue && placeholder) || value}
                 onChange={() => null} // Disable typing
-                buttonIcon={<IconSearch />}
-                onButtonClick={openModal}
+                buttonIcon={!rest.required && value ? <IconCrossCircle /> : <IconSearch />}
+                onButtonClick={!rest.required && value ? clearFieldValue : openModal}
                 onClick={openModal}
                 {...rest}
             />
