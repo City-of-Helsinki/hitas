@@ -11,7 +11,6 @@ interface SaveStateProps {
     data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     baseURL?: string;
-    itemName?: string;
     linkURL?: string;
     linkText?: string;
     isLoading: boolean;
@@ -23,7 +22,6 @@ export default function SaveDialogModal({
     data,
     error,
     baseURL,
-    itemName,
     linkText,
     linkURL,
     isLoading,
@@ -48,10 +46,10 @@ export default function SaveDialogModal({
                 <LoadingSpinner />
             ) : !error && data ? (
                 <>
-                    <Dialog.Content>{`${itemName} tiedot tallennettu!`}</Dialog.Content>
+                    <Dialog.Content>{`Tiedot tallennettu onnistuneesti!`}</Dialog.Content>
                     <Dialog.ActionButtons>
-                        {linkURL && linkText ? (
-                            <Link to={linkURL}>
+                        <>
+                            <Link to={linkURL ? linkURL : (baseURL as string) + data?.id}>
                                 <Button
                                     variant="secondary"
                                     theme={"black"}
@@ -59,25 +57,21 @@ export default function SaveDialogModal({
                                     {linkText}
                                 </Button>
                             </Link>
-                        ) : (
-                            <>
-                                <Link to={(baseURL as string) + data?.id}>
-                                    <Button
-                                        variant="secondary"
-                                        theme={"black"}
-                                    >
-                                        {`${itemName} sivulle`}
-                                    </Button>
-                                </Link>
-                                <Button
-                                    onClick={() => navigate(-1)}
-                                    variant="secondary"
-                                    theme={"black"}
-                                >
-                                    Palaa edelliselle sivulle
-                                </Button>
-                            </>
-                        )}
+                            <Button
+                                onClick={() => window.location.reload()}
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Syötä uusi
+                            </Button>
+                            <Button
+                                onClick={() => navigate(-1)}
+                                variant="secondary"
+                                theme={"black"}
+                            >
+                                Palaa edelliselle sivulle
+                            </Button>
+                        </>
                     </Dialog.ActionButtons>
                 </>
             ) : (

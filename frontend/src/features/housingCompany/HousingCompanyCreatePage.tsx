@@ -87,7 +87,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
-                <span>Uusi yhtiö</span>
+                <span>{state?.housingCompany ? state?.housingCompany.name.official : "Uusi yhtiö"}</span>
             </h1>
             <div className="field-sets">
                 <Fieldset heading="Perustiedot">
@@ -268,14 +268,11 @@ const HousingCompanyCreatePage = (): JSX.Element => {
             >
                 Tallenna
             </Button>
-            {/*
-             Save attempt modal dialog
-             */}
             <SaveDialogModal
                 data={data}
                 error={error}
                 baseURL="/housing-companies/"
-                itemName="Yhtiön"
+                linkText="Yhtiön sivulle"
                 isLoading={isLoading}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}

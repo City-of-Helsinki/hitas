@@ -101,7 +101,6 @@ const BuildingsCreatePage = (): JSX.Element => {
             <SaveDialogModal
                 data={saveData}
                 error={saveError}
-                itemName="Rakennuksen"
                 linkURL={"/housing-companies/" + params.housingCompanyId}
                 linkText="Takaisin yhtiön sivulle"
                 isLoading={isSaving}

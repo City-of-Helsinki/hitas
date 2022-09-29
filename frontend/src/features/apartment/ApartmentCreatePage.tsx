@@ -412,7 +412,7 @@ const ApartmentCreatePage = () => {
             </Button>
 
             <SaveDialogModal
-                itemName={"asunnon"}
+                linkText={"Asunnon sivulle"}
                 baseURL={"/apartments/"}
                 data={savedData}
                 error={saveError}
