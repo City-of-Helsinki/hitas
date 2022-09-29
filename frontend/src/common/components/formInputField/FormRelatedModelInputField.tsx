@@ -26,12 +26,13 @@ export default function FormRelatedModelInputField({
     placeholder,
     ...rest
 }: FormRelatedModelInputFieldProps): JSX.Element {
+    const MIN_LENGTH = 2;
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [internalFilterValue, setInternalFilterValue] = useState("");
     const [displayedValue, setDisplayedValue] = useState(placeholder);
 
     const {data, error, isLoading} = queryFunction(
-        {[relatedModelSearchField]: internalFilterValue},
+        (internalFilterValue.length >= MIN_LENGTH && {[relatedModelSearchField]: internalFilterValue}) || {},
         {skip: !isModalVisible}
     );
 
