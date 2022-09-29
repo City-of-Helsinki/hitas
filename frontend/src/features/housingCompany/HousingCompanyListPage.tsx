@@ -4,7 +4,7 @@ import {Button, IconPlus, IconSearch} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import {FilterIntegerField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress} from "../../common/utils";
@@ -78,8 +78,10 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterPostalCodeField
+            <FilterIntegerField
                 label="Postinumero"
+                minLength={5}
+                maxLength={5}
                 filterFieldName="postal_code"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}

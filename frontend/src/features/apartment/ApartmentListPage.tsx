@@ -4,7 +4,7 @@ import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
-import {FilterPostalCodeField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import {FilterIntegerField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/models";
 
 interface ApartmentListItemProps {
@@ -143,6 +143,12 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 setFilterParams={setFilterParams}
             />
             <FilterTextInputField
+                label="Yhtiön nimi"
+                filterFieldName="housing_company_name"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <FilterTextInputField
                 label="Omistajan nimi"
                 filterFieldName="owner_name"
                 filterParams={filterParams}
@@ -160,8 +166,10 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterPostalCodeField
+            <FilterIntegerField
                 label="Postinumero"
+                minLength={5}
+                maxLength={5}
                 filterFieldName="postal_code"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}

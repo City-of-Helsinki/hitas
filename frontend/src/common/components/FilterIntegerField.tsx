@@ -2,19 +2,23 @@ import React, {useState} from "react";
 
 import {TextInput} from "hds-react";
 
-interface FilterPostalCodeFieldProps {
+interface FilterIntegerFieldProps {
     label: string;
+    minLength: number;
+    maxLength: number;
     filterFieldName: string;
     filterParams: {string: string | number};
     setFilterParams: (object) => void;
 }
 
-export default function FilterPostalCodeField({
+export default function FilterIntegerField({
     label,
+    minLength, // The minimum length at which the filter is applied
+    maxLength,
     filterFieldName,
     filterParams,
     setFilterParams,
-}: FilterPostalCodeFieldProps): JSX.Element {
+}: FilterIntegerFieldProps): JSX.Element {
     const [inputValue, setInputValue] = useState("");
     const [isInvalid, setIsInvalid] = useState(false);
 
@@ -26,13 +30,13 @@ export default function FilterPostalCodeField({
         if (inputValue !== value) {
             const filters = {...filterParams};
             // Filter is set, and should be cleared
-            if (filters[filterFieldName] && (!value || value.length < 5)) {
+            if (filters[filterFieldName] && (!value || value.length < minLength)) {
                 delete filters[filterFieldName];
                 setFilterParams(filters);
                 return;
             }
             // Filter should be set
-            else if (value.length === 5) {
+            else if (value.length >= minLength) {
                 filters[filterFieldName] = value;
                 setFilterParams(filters);
             }
@@ -40,7 +44,7 @@ export default function FilterPostalCodeField({
     };
 
     const handleOnBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value.length && e.target.value.length !== 5) {
+        if (e.target.value.length && e.target.value.length < minLength) {
             setIsInvalid(true);
         }
     };
@@ -50,7 +54,7 @@ export default function FilterPostalCodeField({
             id={`filter__${filterFieldName}`}
             label={label}
             value={inputValue}
-            maxLength={5}
+            maxLength={maxLength}
             onChange={handleOnChange}
             onBlur={handleOnBlur}
             onFocus={() => setIsInvalid(false)}
