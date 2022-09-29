@@ -2,7 +2,7 @@ import toast, {ToastOptions} from "react-hot-toast";
 
 import {IAddress, IApartmentAddress, IOwner} from "./models";
 
-function dotted(obj: object, path: string | string[], value?: number | string | null) {
+function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
     /*
      Dotted getter and setter
      refs. https://stackoverflow.com/a/6394168/12730861
@@ -16,10 +16,10 @@ function dotted(obj: object, path: string | string[], value?: number | string | 
      > dotted(obj, "a.b.etc", 123); // Setter
      123
      */
-
     if (typeof path == "string") return dotted(obj, path.split("."), value);
     else if (path.length === 1 && value !== undefined) return (obj[path[0]] = value);
     else if (path.length === 0) return obj;
+    else if (path.length && obj === null) return null; // Don't crash hard when there is path left and obj is null
     else return dotted(obj[path[0]], path.slice(1), value);
 }
 

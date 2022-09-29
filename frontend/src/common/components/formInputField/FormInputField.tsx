@@ -84,7 +84,20 @@ export default function FormInputField({
             if (setFormData === undefined) throw new Error("setFormData MISSING");
 
             setFormData((draft) => {
-                dotted(draft, fieldPath, value);
+                // Special case handling to allow setting the root object as null for related model fields
+                if (inputType === "relatedModel" && !required) {
+                    if (value) {
+                        // Handle the case where a null may be in the middle of fieldPath
+                        dotted(draft, fieldPath.split(".").slice(0, -1), {
+                            [fieldPath.split(".").slice(-1).join(".")]: value,
+                        });
+                    } else {
+                        // Set the entire field as null instead of only the field inside related object
+                        dotted(draft, fieldPath.split(".").slice(0, -1), null);
+                    }
+                } else {
+                    dotted(draft, fieldPath, value);
+                }
             });
         } else {
             setterFunction(value);
