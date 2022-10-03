@@ -1,13 +1,13 @@
-import BuildingsCreatePage from "./BuildingsCreatePage";
+import BuildingCreatePage from "./BuildingCreatePage";
 import HousingCompanyCreatePage from "./HousingCompanyCreatePage";
 import HousingCompanyDetailsPage from "./HousingCompanyDetailsPage";
 import HousingCompanyListPage from "./HousingCompanyListPage";
-import RealEstatesCreatePage from "./RealEstatesCreatePage";
+import RealEstateCreatePage from "./RealEstateCreatePage";
 
 export {
     HousingCompanyCreatePage,
     HousingCompanyDetailsPage,
     HousingCompanyListPage,
-    BuildingsCreatePage,
-    RealEstatesCreatePage,
+    BuildingCreatePage,
+    RealEstateCreatePage,
 };

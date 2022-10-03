@@ -5,51 +5,79 @@ import {useParams} from "react-router";
 import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {useCreateRealEstateMutation} from "../../app/services";
+import {useCreateBuildingMutation, useGetHousingCompanyDetailQuery} from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
-import {IRealEstate} from "../../common/models";
+import {IBuildingWritable} from "../../common/models";
 
-const RealEstatesCreatePage = (): JSX.Element => {
+const BuildingCreatePage = (): JSX.Element => {
+    const navigate = useNavigate();
+    const params = useParams();
+    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const blankForm = {
         address: {
             street_address: "",
         },
-        property_identifier: "",
+        building_identifier: "",
     };
-    const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
-    const [createBuilding, {data, error, isLoading}] = useCreateRealEstateMutation();
-    const navigate = useNavigate();
-    const params = useParams();
+    const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm as IBuildingWritable);
+    const [createBuilding, {data: saveData, error: saveError, isLoading: isSaving}] = useCreateBuildingMutation();
+
     const handleSaveButtonClicked = () => {
-        createBuilding({data: formData, housingCompanyId: params.housingCompanyId as string});
+        createBuilding({
+            data: formData,
+            housingCompanyId: params.housingCompanyId as string,
+            realEstateId: formData.real_estate_id as string,
+        });
         setIsEndModalVisible(true);
     };
-
+    const realEstateOptions =
+        isLoading || !data
+            ? []
+            : data.real_estates.map((realEstate) => {
+                  return {
+                      label: `${realEstate.address.street_address} (${realEstate.property_identifier})`,
+                      value: realEstate.id,
+                  };
+              });
     return (
-        <div className="view--create view--create-real-estate">
+        <div className="view--create view--create-company">
             <h1 className="main-heading">
-                <span>Uusi kiinteistö</span>
+                <span>Uusi rakennus</span>
             </h1>
             <div className="field-sets">
                 <Fieldset heading="">
                     <div className="row">
                         <FormInputField
+                            inputType={"select"}
+                            label="Kiinteistö"
+                            fieldPath="real_estate_id"
+                            options={realEstateOptions}
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
+                    <div className="row">
+                        <FormInputField
                             label="Katuosoite"
                             fieldPath="address.street_address"
+                            options={realEstateOptions}
                             required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
                         />
                         <FormInputField
-                            label="Kiinteistötunnus"
-                            fieldPath="property_identifier"
-                            tooltipText={'Esimerkkiarvo: "1234-5678-9012-3456"'}
+                            label="Rakennustunnus"
+                            fieldPath="building_identifier"
+                            tooltipText='Esimerkkiarvo: "123456789A"'
                             required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
+                            className="building-identifier-field"
                         />
                     </div>
                 </Fieldset>
@@ -71,11 +99,11 @@ const RealEstatesCreatePage = (): JSX.Element => {
                 </Button>
             </div>
             <SaveDialogModal
-                data={data}
-                error={error}
+                data={saveData}
+                error={saveError}
                 linkURL={"/housing-companies/" + params.housingCompanyId}
                 linkText="Takaisin yhtiön sivulle"
-                isLoading={isLoading}
+                isLoading={isSaving}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
             />
@@ -83,4 +111,4 @@ const RealEstatesCreatePage = (): JSX.Element => {
     );
 };
 
-export default RealEstatesCreatePage;
+export default BuildingCreatePage;
