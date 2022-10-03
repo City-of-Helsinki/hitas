@@ -57,7 +57,7 @@ export default function Router() {
                         <Route path={"apartments"}>
                             <Route
                                 index
-                                element={<HousingCompanyDetailsPage />}
+                                element={<Navigate to=".." />}
                             />
                             <Route
                                 path={"create"}
