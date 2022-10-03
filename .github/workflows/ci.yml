@@ -64,3 +64,8 @@ jobs:
         SECRET_KEY: xxx
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/github_actions
       run: cd backend && pytest -vvv --cov=. .
+
+    - name: "Test for migration issues"
+      env:
+        SECRET_KEY: xxx
+      run: cd backend && ./manage.py makemigrations --check --no-color --no-input
