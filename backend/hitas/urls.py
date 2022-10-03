@@ -9,6 +9,19 @@ router.register(r"housing-companies", views.HousingCompanyViewSet, basename="hou
 router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
 router.register(r"owners", views.OwnerViewSet, basename="owner")
+router.register(r"indices/max-price-index", views.MaxPriceIndexViewSet, basename="max-price-index")
+router.register(r"indices/market-price-index", views.MarketPriceIndexViewSet, basename="market-price-index")
+router.register(
+    r"indices/market-price-index-pre-2005", views.MarketPriceIndexPre2005ViewSet, basename="market-price-index-pre-2005"
+)
+router.register(
+    r"indices/construction-price-index", views.ConstructionPriceIndexViewSet, basename="construction-price-index"
+)
+router.register(
+    r"indices/construction-price-index-pre-2005",
+    views.ConstructionPriceIndexPre2005ViewSet,
+    basename="construction-price-index-pre-2005",
+)
 
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
