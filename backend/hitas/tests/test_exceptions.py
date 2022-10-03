@@ -14,6 +14,7 @@ from hitas.exceptions import _convert_fields
         ("Official name provided is already in use. Conflicting official name: 'test-official-name'.", "unique", None),
         ("Ensure this value is greater than or equal to 1.", "min_value", None),
         ("Ensure this value is less than or equal to 4.", "max_value", None),
+        ("Ensure that there are no more than 2 decimal places.", "max_decimal_places", None),
     ],
 )
 def test_codes(message: str, code: str, expected_message: str):
