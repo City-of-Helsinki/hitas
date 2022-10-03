@@ -233,6 +233,7 @@ def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, An
         "unique",
         "min_length",
         "max_length",
+        "max_decimal_places",
     ]:
         return {"field": field_name, "message": error["message"]}
     else:
