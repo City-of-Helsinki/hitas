@@ -123,13 +123,6 @@ export interface IBuildingWritable {
     real_estate_id: string;
 }
 
-export interface IBuildingWritable {
-    readonly id?: string;
-    address: {street_address: string};
-    completion_date?: string | null;
-    building_identifier: string | null;
-}
-
 export interface IApartmentAddress {
     street_address: string;
     readonly postal_code?: string;
