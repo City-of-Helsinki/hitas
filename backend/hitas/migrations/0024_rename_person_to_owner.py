@@ -8,7 +8,7 @@ from django.db import models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0022_legacy_id'),
+        ('hitas', '0023_indices'),
     ]
 
     operations = [
