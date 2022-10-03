@@ -2104,6 +2104,109 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Indices
+
+  /api/v1/indices/{index}:
+    get:
+      description: Fetch list of indices
+      operationId: list-index
+      tags:
+        - Indices
+      parameters:
+        - $ref: '#/components/parameters/IndexNameParameter'
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of indices
+          content:
+            application/json:
+              schema:
+                description: Single page of indices
+                type: object
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of indices
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Index'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/indices/{index}/{month}:
+    get:
+      description: Read a single index by month
+      operationId: read-index-value
+      tags:
+        - Indices
+      parameters:
+        - $ref: '#/components/parameters/IndexNameParameter'
+        - name: month
+          required: true
+          in: path
+          description: Month
+          schema:
+            $ref: '#/components/schemas/YearMonth'
+      responses:
+        '200':
+          description: Successfully read a single index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update max value index by month
+      operationId: update-max-value-index
+      tags:
+        - Indices
+      parameters:
+        - $ref: '#/components/parameters/IndexNameParameter'
+        - name: month
+          required: true
+          in: path
+          description: Month
+          schema:
+            $ref: '#/components/schemas/YearMonth'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Index'
+      responses:
+        '200':
+          description: Successfully updated a single index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
@@ -2128,6 +2231,29 @@ components:
         default: 1
         minimum: 1
       description: Specifies the index of the returned page
+
+    IndexNameParameter:
+      in: path
+      name: index
+      required: true
+      schema:
+        description: |-
+          Index name. Can have one of the following values:
+
+          - max-value-index
+          - market-price-index
+          - market-price-index-pre-2005
+          - construction-price-index
+          - construction-price-index-pre-2005
+        type: string
+        example: max-value-index
+        x-extensible-enum:
+          - max-value-index
+          - market-price-index
+          - market-price-index-pre-2005
+          - construction-price-index
+          - construction-price-index-pre-2005
+      description: Specifies the index name used
 
   schemas:
     PageInfo:
@@ -3166,6 +3292,30 @@ components:
           example: ismo@example.com
         address:
           $ref: '#/components/schemas/Address'
+
+    YearMonth:
+      description: Year and month
+      type: string
+      pattern: '^\d{4}-\d{2}$'
+      example: 2022-01
+
+    Index:
+      description: Index contains month this index is active and a its value
+      type: object
+      required:
+        - month
+        - value
+      properties:
+        month:
+          readOnly: true
+          allOf:
+            - $ref: '#/components/schemas/YearMonth'
+        value:
+          description: Value for this index
+          type: number
+          minimum: 0
+          nullable: true
+          example: 127.12
 
     HousingCompanyState:
       description: |-

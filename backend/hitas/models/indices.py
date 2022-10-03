@@ -1,12 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import HitasModel, HitasModelDecimalField
+from hitas.models._base import HitasModelDecimalField
 
 
-class AbstractIndex(HitasModel):
+class AbstractIndex(models.Model):
+    month = models.DateField(primary_key=True)
     value = HitasModelDecimalField()
-    month = models.DateField()
 
     class Meta:
         abstract = True
