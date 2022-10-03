@@ -1,4 +1,5 @@
 import DetailField from "./DetailField";
+import EditButton from "./EditButton";
 import FilterComboboxField from "./FilterComboboxField";
 import FilterIntegerField from "./FilterIntegerField";
 import FilterTextInputField from "./FilterTextInputField";
@@ -16,4 +17,5 @@ export {
     ListPageNumbers,
     QueryStateHandler,
     SaveDialogModal,
+    EditButton,
 };

@@ -1,11 +1,11 @@
 import React from "react";
 
-import {Button, IconPen, IconPlus, StatusLabel, Tabs} from "hds-react";
+import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
 import {Link} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {DetailField, QueryStateHandler} from "../../common/components";
+import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
 import {IHousingCompanyDetails} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
@@ -20,18 +20,7 @@ const HousingCompanyDetailsPage = () => {
             <>
                 <h1 className="main-heading">
                     {data.name.display}
-                    <Link
-                        to={{pathname: "edit"}}
-                        state={{housingCompany: data}}
-                    >
-                        <Button
-                            theme="black"
-                            size="small"
-                            iconLeft={<IconPen />}
-                        >
-                            Muokkaa
-                        </Button>
-                    </Link>
+                    <EditButton state={{housingCompany: data}} />
                 </h1>
 
                 <div className="company-status">
