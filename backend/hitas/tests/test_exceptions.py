@@ -22,6 +22,14 @@ def test_codes(message: str, code: str, expected_message: str):
     assert fields[0] == {"field": "example-field", "message": expected_message or message}
 
 
+def test_single_code():
+    fields = _convert_fields(
+        "example-field", {"message": ErrorDetail(string="Invalid input.", code="blank"), "code": "blank"}
+    )
+    assert len(fields) == 1
+    assert fields[0] == {"field": "example-field", "message": "This field is mandatory and cannot be blank."}
+
+
 def test_multiple():
     fields = _convert_fields(
         "example-field",

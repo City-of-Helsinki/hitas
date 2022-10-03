@@ -182,6 +182,8 @@ def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str,
         return _convert_field_errors_list(field_name, error)
     elif isinstance(error, dict):
         return _convert_field_errors_dict(field_name, error)
+    else:
+        raise NotImplementedError()
 
 
 def _convert_field_errors_list(field_name: str, errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -192,16 +194,15 @@ def _convert_field_errors_list(field_name: str, errors: List[Dict[str, Any]]) ->
         if not error:
             continue
 
-        # Handle nested serializer field errors where error message be in a nested dict
-        if "code" not in error:
-            retval.extend(_convert_field_errors_dict(field_name, error))
-        else:
-            retval.append(_convert_field_error(field_name, error))
+        retval.extend(_convert_field_errors_dict(field_name, error))
 
     return retval
 
 
 def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if "code" in errors:
+        return [_convert_field_error(field_name, errors)]
+
     retval = []
 
     for subfield_name, suberror in errors.items():
@@ -212,8 +213,10 @@ def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[
 
         if isinstance(suberror, list):
             retval.extend(_convert_field_errors_list(current_name, suberror))
-        else:
+        elif isinstance(suberror, dict):
             retval.extend(_convert_field_errors_dict(current_name, suberror))
+        else:
+            raise NotImplementedError()
 
     return retval
 
