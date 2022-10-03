@@ -57,7 +57,12 @@ class OpenAPIUrlPatternWorkaround(DjangoOpenAPIRequest):
 
 
 class HitasAPIClient(APIClient):
-    def generic(self, method, path, data="", content_type="json", secure=False, **kwargs) -> Response:
+    def generic(
+        self, method, path, data="", content_type="json", secure=False, openapi_validate=True, **kwargs
+    ) -> Response:
         response: Response = super().generic(method, path, data, content_type, secure=False, **kwargs)
-        validate_openapi(response)
+
+        if openapi_validate:
+            validate_openapi(response)
+
         return response
