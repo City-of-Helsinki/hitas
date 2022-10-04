@@ -349,7 +349,7 @@ const ApartmentCreatePage = () => {
                                             label=""
                                             fieldPath="owner.id"
                                             queryFunction={useGetOwnersQuery}
-                                            relatedModelSearchField="last_name"
+                                            relatedModelSearchField="name"
                                             getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
                                             required
                                             formData={formOwnershipsList[index]}
