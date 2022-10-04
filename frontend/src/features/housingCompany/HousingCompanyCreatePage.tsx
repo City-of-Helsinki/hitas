@@ -14,7 +14,14 @@ import {
     useSaveHousingCompanyMutation,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
-import {HousingCompanyStates, ICode, IHousingCompanyWritable, IPostalCode, IPropertyManager} from "../../common/models";
+import {
+    HousingCompanyStates,
+    ICode,
+    IHousingCompanyDetails,
+    IHousingCompanyWritable,
+    IPostalCode,
+    IPropertyManager,
+} from "../../common/models";
 import {validateBusinessId} from "../../common/utils";
 
 const getHousingCompanyStateName = (state) => {
@@ -38,15 +45,20 @@ const getHousingCompanyStateName = (state) => {
     }
 };
 
-type HousingCompanyState = {
-    housingCompany;
-};
+interface IHousingCompanyState {
+    pathname: string;
+    state: null | {housingCompany: IHousingCompanyDetails};
+}
 
 const HousingCompanyCreatePage = (): JSX.Element => {
-    const state = useLocation().state as HousingCompanyState;
+    const navigate = useNavigate();
+    const {pathname, state}: IHousingCompanyState = useLocation();
+    const isEditPage = pathname.split("/").at(-1) === "edit";
+
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+
     const initialFormData: IHousingCompanyWritable =
-        state?.housingCompany === undefined
+        state === null || state?.housingCompany === undefined
             ? {
                   acquisition_price: {
                       initial: 0,
@@ -69,26 +81,33 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   property_manager: {id: ""},
                   state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
-                  improvements: {
-                      market_price_index: [],
-                      construction_price_index: [],
-                  },
               }
             : state.housingCompany;
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
     const [createHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
-    const navigate = useNavigate();
+
     const handleSaveButtonClicked = () => {
         createHousingCompany({data: formData, id: state?.housingCompany.id});
     };
+
     const stateOptions = HousingCompanyStates.map((state) => {
         return {label: getHousingCompanyStateName(state), value: state};
     });
+
+    // Navigate user directly to detail page of the just created Housing Company
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
             navigate(`/housing-companies/${data.id}`);
-        } else if (error) setIsEndModalVisible(true);
+        } else if (error) {
+            setIsEndModalVisible(true);
+        }
     }, [isLoading, error, data, navigate]);
+
+    // Redirect user to detail page if state is missing HousingCompany data and user is trying to edit the company
+    useEffect(() => {
+        if (isEditPage && state === null) navigate("..");
+    }, [isEditPage, navigate, pathname, state]);
+
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
@@ -259,21 +278,24 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     />
                 </Fieldset>
             </div>
+
             <Button
                 iconLeft={<IconSaveDisketteFill />}
                 onClick={handleSaveButtonClicked}
                 theme={"black"}
+                isLoading={isLoading}
             >
                 Tallenna
             </Button>
+
             <SaveDialogModal
-                data={data}
-                error={error}
-                baseURL="/housing-companies/"
                 linkText="Yhtiön sivulle"
-                isLoading={isLoading}
+                baseURL="/housing-companies/"
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
+                data={data}
+                error={error}
+                isLoading={isLoading}
             />
         </div>
     );
