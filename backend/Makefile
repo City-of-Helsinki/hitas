@@ -10,6 +10,7 @@ docker-build-backend-only:
 	docker-compose up --detach hitas-backend
 
 tests:
+	./manage.py makemigrations --check --no-color --no-input
 	pytest --cov
 
 format:
