@@ -995,20 +995,20 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     "selected_filter,fields",
     [
         (
-            {"display_name": "aa"},
-            [{"field": "display_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"display_name": "a"},
+            [{"field": "display_name", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"street_address": "aa"},
-            [{"field": "street_address", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"street_address": "a"},
+            [{"field": "street_address", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"property_manager": "aa"},
-            [{"field": "property_manager", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"property_manager": "a"},
+            [{"field": "property_manager", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"developer": "aa"},
-            [{"field": "developer", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"developer": "a"},
+            [{"field": "developer", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
             {"postal_code": "abcde"},

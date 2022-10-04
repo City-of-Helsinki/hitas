@@ -201,12 +201,12 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     "selected_filter,fields",
     [
         (
-            {"housing_company_name": "aa"},
-            [{"field": "housing_company_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"housing_company_name": "a"},
+            [{"field": "housing_company_name", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"street_address": "aa"},
-            [{"field": "street_address", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"street_address": "a"},
+            [{"field": "street_address", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
             {"postal_code": "abcde"},
@@ -221,15 +221,15 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
             [{"field": "postal_code", "message": "Enter a valid value."}],
         ),
         (
-            {"owner_name": "aa"},
-            [{"field": "owner_name", "message": "Ensure this value has at least 3 characters (it has 2)."}],
+            {"owner_name": "a"},
+            [{"field": "owner_name", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"owner_identifier": "12"},
+            {"owner_identifier": "1"},
             [
                 {
                     "field": "owner_identifier",
-                    "message": "Ensure this value has at least 3 characters (it has 2).",
+                    "message": "Ensure this value has at least 2 characters (it has 1).",
                 }
             ],
         ),

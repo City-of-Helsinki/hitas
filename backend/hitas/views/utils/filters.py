@@ -22,7 +22,8 @@ class HitasFilterSet(FilterSet):
 
 class HitasCharFilter(filters.CharFilter):
     def __init__(self, *args, **kwargs):
-        kwargs["min_length"] = 3
+        if not kwargs.get("min_length"):
+            kwargs["min_length"] = 2
         super().__init__(*args, **kwargs)
 
 
