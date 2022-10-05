@@ -10,7 +10,6 @@ from openapi_core.unmarshalling.schemas import oas30_request_schema_unmarshaller
 from openapi_core.validation.request.protocols import Request
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_core.validation.response import openapi_response_validator
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
@@ -41,10 +40,6 @@ def validate_openapi(
 
     if not validate_request and not validate_response:
         return
-
-    # Add the `Content-Type` key to response, so DjangoOpenAPIResponseFactory doesn't crash on DELETE requests
-    if response.status_code == status.HTTP_204_NO_CONTENT:
-        response["Content-Type"] = None
 
     # Validate request
     if validate_request:
