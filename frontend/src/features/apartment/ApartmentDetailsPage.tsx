@@ -177,6 +177,23 @@ const ApartmentDetailsPage = (): JSX.Element => {
                         </Tabs>
                     </div>
                     <div className="list__wrapper list-wrapper--upgrades">
+                        <h2 className="detail-list__heading">Asuntokohtaiset parannukset</h2>
+                        <ul className="detail-list__list">
+                            <li className="detail-list__list-headers">
+                                <div>Nimi</div>
+                                <div>Summa</div>
+                                <div>Valmistumispvm</div>
+                                <div>Jakoperuste</div>
+                            </li>
+                            <li className="detail-list__list-item">
+                                <div>Keittiöremontti</div>
+                                <div>20 000 €</div>
+                                <div>1.12.2021</div>
+                                <div>-</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="list__wrapper list-wrapper--upgrades">
                         <h2 className="detail-list__heading">Yhtiökohtaiset parannukset</h2>
                         <ul className="detail-list__list">
                             <li className="detail-list__list-headers">
