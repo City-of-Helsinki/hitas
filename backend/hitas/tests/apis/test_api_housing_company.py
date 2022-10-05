@@ -700,6 +700,10 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
                 "message": "Ensure this value is greater than or equal to 0.",
             },
         ),
+        (
+            {"notes": None},
+            {"field": "notes", "message": "This field is mandatory and cannot be null."},
+        ),
     ],
 )
 @pytest.mark.django_db
