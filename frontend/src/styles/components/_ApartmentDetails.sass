@@ -60,24 +60,62 @@
     [class^="Card-module_card"]
       @include utils.flexbox()
       flex-flow: column
-      background: $color-engel
+      background: $color-engel-medium-light
       width: 48%
+      position: relative
 
       p
         margin: 0.5rem 0
 
-      .price
-        font-size: $fontsize-heading-l
-        font-weight: 900
-        line-height: 1
-        margin-bottom: 2rem
-
-      label
+      .card-heading
+        font-size: $fontsize-heading-s
         font-weight: 700
         margin-bottom: 0.5rem
 
         &:last-of-type
-          margin-top: $spacing-s
+          margin-top: $spacing-l
+
+      .unconfirmed-prices
+        @include utils.flexbox()
+        flex-flow: column
+        // width: 70%
+
+        .price
+          @include utils.flexbox()
+          flex-flow: row nowrap
+          justify-content: space-between
+          flex-grow: 1
+          font-size: $fontsize-body-s
+          font-weight: normal
+
+          .value
+            color: rgba(0, 0, 0, 0.6)
+
+          &--current-top
+            font-weight: 700
+
+            .value
+              color: $color-black-90
+              font-size: $fontsize-heading-s
+              line-height: 1.1
+
+        .amount
+          font-size: $fontsize-body-l
+
+        .basis
+          margin: $spacing-2-xs 0
+
+        .value
+          font-size: $fontsize-body-l
+
+      .confirmed-price
+        font-size: $fontsize-heading-l
+        font-weight: 900
+
+      .button-confirm
+        position: absolute
+        right: 2rem
+        bottom: 2rem
 
       .sales-condition
         @include utils.flexbox()

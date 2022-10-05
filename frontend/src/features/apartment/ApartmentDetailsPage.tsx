@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {useParams} from "react-router";
 import {Link} from "react-router-dom";
 
@@ -50,6 +50,9 @@ const SalesCondition = ({
 
 const ApartmentDetailsPage = (): JSX.Element => {
     const params = useParams();
+    const [priceMH] = useState(210000);
+    const [priceRH] = useState(250000);
+    const [priceRNH] = useState(130000);
     const {data, error, isLoading} = useGetApartmentDetailQuery({
         housingCompanyId: params.housingCompanyId as string,
         apartmentId: params.apartmentId as string,
@@ -70,26 +73,56 @@ const ApartmentDetailsPage = (): JSX.Element => {
                         {data.address.stair}
                         {data.address.apartment_number}
                     </span>
-                    <span>{data.type.value}</span>
+                    <span>
+                        2 {/* TODO: Substitute with dynamic value once the API supplies one */}
+                        {data.type.value}
+                    </span>
                     <span>{data.surface_area}m²</span>
                     <span>{data.address.floor}.krs</span>
                 </h2>
                 <div className="apartment-action-cards">
                     <Card>
-                        <p>Vahvistamaton enimmäishinta</p>
-                        <p className="price">210 000 €</p>
-                        <p>Vahvistettu enimmäishinta</p>
-                        <p className="price">-</p>
+                        <label className="card-heading">Vahvistamaton enimmäishinta</label>
+                        <div className="unconfirmed-prices">
+                            <div className="price">
+                                <span className="basis">Markkinahintaindeksi</span>
+                                <span className="amount">
+                                    <span className="value">{priceMH}</span> €
+                                </span>
+                            </div>
+                            <div className="price price--current-top">
+                                <span className="basis">Rakennushintaindeksi</span>
+                                <span className="amount">
+                                    <span className="value">{priceRH}</span> €
+                                </span>
+                            </div>
+                            <div className="price">
+                                <span className="basis">Rajaneliöhinta</span>
+                                <span className="amount">
+                                    <span className="value">{priceRNH}</span> €
+                                </span>
+                            </div>
+                        </div>
+                        <label className="card-heading">Vahvistettu enimmäishinta</label>
+                        <p className="confirmed-price">250000€</p>
+                        <Button
+                            className="button-confirm"
+                            theme="black"
+                            size="small"
+                            style={{display: "none"}} // Hidden until it's
+                        >
+                            Vahvista
+                        </Button>
                     </Card>
                     <Card>
-                        <label>Vahvistettu myyntiehto</label>
+                        <label className="card-heading">Vahvistettu myyntiehto</label>
                         <SalesCondition
                             name="Arabian unelma (valm.2015)"
                             address="Arabiankatu 5 C 2, 00440"
                             url={`/housing-companies/${data.links.housing_company.id}`}
                             isConfirmed={true}
                         />
-                        <label>Vahvistamaton myyntiehto</label>
+                        <label className="card-heading">Vahvistamaton myyntiehto</label>
                         <SalesCondition
                             name="Keimolan Ylpeys (valm.2015)"
                             address="Kierretie 5 D 5"
@@ -126,8 +159,14 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                             {data.ownerships.map((ownership: IOwnership) => (
                                                 <DetailField
                                                     key={ownership.owner.id}
-                                                    label={`${ownership.owner.name} ${ownership.owner.identifier}`}
-                                                    value={`Omistusosuus: ${ownership.percentage}%`}
+                                                    value={
+                                                        <>
+                                                            {`${ownership.owner.name}
+                                                                (${ownership.owner.identifier})`}
+                                                            <span> {ownership.percentage}%</span>
+                                                        </>
+                                                    }
+                                                    label={""}
                                                 />
                                             ))}
                                             <DetailField
@@ -200,7 +239,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                 <div>Nimi</div>
                                 <div>Summa</div>
                                 <div>Valmistumispvm</div>
-                                <div>Jyvitys</div>
+                                <div>Jakoperuste</div>
                             </li>
                             <li className="detail-list__list-item">
                                 <div>Parvekelasien lisäys</div>
