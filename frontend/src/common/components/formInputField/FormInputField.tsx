@@ -144,7 +144,13 @@ export default function FormInputField({
         if (!("options" in rest) || rest.options === undefined)
             throw new Error("`options` argument is required when `inputType` is `select` or `combobox`.");
 
-        if (!rest.options.length) {
+        // No options and no value in the field, show the field as invalid
+        // The field may be populated even though there are no options available if the options are still loading
+        // from the API, in which case it should be invalid only when no defaultValue is given
+        if (
+            !rest.options.length &&
+            !(dotted(formData, fieldPath) || rest?.defaultValue?.value === undefined || rest.defaultValue.value === "")
+        ) {
             commonProps.invalid = true;
         }
 
