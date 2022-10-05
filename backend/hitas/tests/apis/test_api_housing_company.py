@@ -971,9 +971,13 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
     "selected_filter",
     [
         {"display_name": "TestDisplayName"},
+        {"display_name": "Di"},
         {"street_address": "test-street"},
+        {"street_address": "te"},
         {"property_manager": "TestPropertyManager"},
+        {"property_manager": "Te"},
         {"developer": "TestDeveloper"},
+        {"developer": "Te"},
         {"postal_code": "99999"},
         {"archive_id": 999},
     ],
@@ -1027,6 +1031,14 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
         (
             {"postal_code": "123456"},
             [{"field": "postal_code", "message": "Enter a valid value."}],
+        ),
+        (
+            {"archive_id": "-1"},
+            [{"field": "archive_id", "message": "Ensure this value is greater than or equal to 1."}],
+        ),
+        (
+            {"archive_id": "0"},
+            [{"field": "archive_id", "message": "Ensure this value is greater than or equal to 1."}],
         ),
     ],
 )

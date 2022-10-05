@@ -10,6 +10,7 @@ from hitas.views.utils.filters import (
     HitasCharFilter,
     HitasFilterBackend,
     HitasFilterSet,
+    HitasNumberFilter,
     HitasPostalCodeFilter,
     HitasSSNFilter,
     HitasUUIDFilter,

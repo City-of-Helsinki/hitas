@@ -3,7 +3,6 @@ from typing import Any, Dict, Optional
 
 from django.db.models import F, IntegerField, Min, Prefetch, Sum
 from django.db.models.functions import Round
-from django_filters import NumberFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -31,6 +30,7 @@ from hitas.views.utils import (
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
+    HitasNumberFilter,
     HitasPostalCodeFilter,
     ValueOrNullField,
 )
@@ -44,7 +44,7 @@ class HousingCompanyFilterSet(HitasFilterSet):
     postal_code = HitasPostalCodeFilter(field_name="postal_code__value")
     property_manager = HitasCharFilter(field_name="property_manager__name", lookup_expr="icontains")
     developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
-    archive_id = NumberFilter(field_name="id")
+    archive_id = HitasNumberFilter(field_name="id", min_value=1)
 
     class Meta:
         model = HousingCompany
