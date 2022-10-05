@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from hitas.views.utils.merge import merge
 
 
-class TestClass:
+class ValueHolder:
     def __init__(self, value, other_value):
         self.value = value
         self.other_value = other_value
@@ -101,9 +101,9 @@ def test__merge__complex_update__total_less():
     wanted1 = {"value": 44, "other_value": 44}  # New one, will replace `existing1`
     wanted2 = {"value": 3, "other_value": 3}  # Existing one, matches `existing3`
 
-    existing1 = TestClass(value=1, other_value=1)
-    existing2 = TestClass(value=2, other_value=2)
-    existing3 = TestClass(value=3, other_value=3)
+    existing1 = ValueHolder(value=1, other_value=1)
+    existing2 = ValueHolder(value=2, other_value=2)
+    existing3 = ValueHolder(value=3, other_value=3)
 
     # Test
     merge([existing1, existing2, existing3], [wanted1, wanted2], create_fn, eq, save_fn, delete_fn)
@@ -133,9 +133,9 @@ def test__merge__complex_update__total_more():
     wanted3 = {"value": 33, "other_value": 33}  # New one, will be created
     wanted4 = {"value": 3, "other_value": 3}  # Existing one, matches `existing3`
 
-    existing1 = TestClass(value=1, other_value=1)
-    existing2 = TestClass(value=2, other_value=2)
-    existing3 = TestClass(value=3, other_value=3)
+    existing1 = ValueHolder(value=1, other_value=1)
+    existing2 = ValueHolder(value=2, other_value=2)
+    existing3 = ValueHolder(value=3, other_value=3)
 
     # Test
     merge([existing1, existing2, existing3], [wanted1, wanted2, wanted3, wanted4], create_fn, eq, save_fn, delete_fn)
