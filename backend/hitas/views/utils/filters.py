@@ -33,6 +33,13 @@ class HitasPostalCodeFilter(filters.CharFilter):
         super().__init__(*args, **kwargs)
 
 
+class HitasNumberFilter(filters.NumberFilter):
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get("min_value"):
+            kwargs["min_value"] = 0
+        super().__init__(*args, **kwargs)
+
+
 class HitasSSNFilter(filters.CharFilter):
     def __init__(self, *args, **kwargs):
         kwargs["min_length"] = 11
