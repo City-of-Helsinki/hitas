@@ -154,6 +154,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Hankinta-arvo"
                             fieldPath="acquisition_price.initial"
                             required
@@ -164,6 +165,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Toteutunut hankinta-arvo"
                             fieldPath="acquisition_price.realized"
                             formData={formData}
@@ -204,6 +206,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Ensisijainen laina"
                             fieldPath="primary_loan"
                             formData={formData}

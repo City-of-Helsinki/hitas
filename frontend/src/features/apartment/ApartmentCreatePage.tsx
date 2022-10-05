@@ -174,8 +174,19 @@ const ApartmentCreatePage = () => {
                     <div className={"row"}>
                         <FormInputField
                             inputType="number"
+                            fractionDigits={2}
                             label="Pinta-ala"
                             fieldPath="surface_area"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="number"
+                            fractionDigits={0}
+                            label="Huoneita"
+                            fieldPath="rooms"
                             required
                             formData={formData}
                             setFormData={setFormData}
@@ -241,6 +252,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Velaton ostohinta"
                             fieldPath="prices.debt_free_purchase_price"
                             required
@@ -251,6 +263,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Ostohinta"
                             fieldPath="prices.purchase_price"
                             required
@@ -263,6 +276,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Ensisijainen laina"
                             fieldPath="primary_loan_amount"
                             formData={formData}
@@ -292,6 +306,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Rakennusaikaiset lainat"
                             fieldPath="prices.construction.loans"
                             formData={formData}
@@ -301,6 +316,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Rakennusaikaiset korot"
                             fieldPath="prices.construction.interest"
                             formData={formData}
@@ -312,6 +328,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Rakennusaikainen velaton ostohinta"
                             fieldPath="prices.construction.debt_free_purchase_price"
                             formData={formData}
@@ -321,6 +338,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
+                            fractionDigits={2}
                             label="Rakennusaikaiset lisätyöt"
                             fieldPath="prices.construction.additional_work"
                             formData={formData}

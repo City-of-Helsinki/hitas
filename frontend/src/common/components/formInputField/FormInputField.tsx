@@ -35,6 +35,11 @@ type FormInputFieldProps = {
           inputType?: "text" | "textArea" | "postalCode" | "number" | "date";
       }
     | {
+          inputType: "number";
+          unit?: string;
+          fractionDigits?: number;
+      }
+    | {
           inputType: "select" | "combobox";
           options: {
               label: string;
