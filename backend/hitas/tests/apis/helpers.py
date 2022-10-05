@@ -7,6 +7,7 @@ from openapi_core import Spec
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
 from openapi_core.templating.paths.datatypes import ServerOperationPath
 from openapi_core.unmarshalling.schemas import oas30_request_schema_unmarshallers_factory
+from openapi_core.unmarshalling.schemas.exceptions import InvalidSchemaValue
 from openapi_core.validation.request.protocols import Request
 from openapi_core.validation.request.validators import RequestValidator
 from openapi_core.validation.response import openapi_response_validator
@@ -48,8 +49,7 @@ def validate_openapi(
         ).validate(
             _openapi_spec, OpenAPIUrlPatternWorkaround(WSGIRequestWorkaround(response.wsgi_request, request_body))
         )
-
-        result.raise_for_errors()
+        handle_result(result)
 
     # Validate response
     if validate_response:
@@ -58,7 +58,16 @@ def validate_openapi(
             OpenAPIUrlPatternWorkaround(response.wsgi_request),
             DjangoOpenAPIResponse(response),
         )
-        result.raise_for_errors()
+        handle_result(result)
+
+
+def handle_result(result):
+    for error in result.errors:
+        if isinstance(error, InvalidSchemaValue):
+            for suberror in error.schema_errors:
+                print(suberror)
+
+    result.raise_for_errors()
 
 
 class RequestValidatorWorkaround(RequestValidator):
