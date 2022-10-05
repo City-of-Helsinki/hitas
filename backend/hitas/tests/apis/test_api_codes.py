@@ -147,7 +147,7 @@ def test__api__code__create__invalid_data(api_client: HitasAPIClient, url_basena
     data.update(invalid_data)
 
     url = reverse(f"hitas:{url_basename}-list")
-    response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json", openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 

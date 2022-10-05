@@ -132,7 +132,9 @@ def test__api__postal_code__create__invalid_data(api_client: HitasAPIClient, inv
     }
     data.update(invalid_data)
 
-    response = api_client.post(reverse("hitas:postal-code-list"), data=data, format="json")
+    response = api_client.post(
+        reverse("hitas:postal-code-list"), data=data, format="json", openapi_validate_request=False
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",

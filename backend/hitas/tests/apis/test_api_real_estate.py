@@ -206,7 +206,7 @@ def test__api__real_estate__create__invalid_property_identifier(api_client: Hita
     }
 
     url = reverse("hitas:real-estate-list", kwargs={"housing_company_uuid": hc.uuid.hex})
-    response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json", openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 

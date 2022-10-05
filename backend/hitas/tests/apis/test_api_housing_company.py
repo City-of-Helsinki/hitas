@@ -156,7 +156,9 @@ def test__api__housing_company__list__paging(api_client: HitasAPIClient):
 @pytest.mark.parametrize("page_number", ["a", "#", " ", ""])
 @pytest.mark.django_db
 def test__api__housing_company__list__paging__invalid(api_client: HitasAPIClient, page_number):
-    response = api_client.get(reverse("hitas:housing-company-list"), {"page": page_number})
+    response = api_client.get(
+        reverse("hitas:housing-company-list"), {"page": page_number}, openapi_validate_request=False
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == exceptions.InvalidPage().data
 
@@ -513,7 +515,9 @@ def test__api__housing_company__create__duplicate_display_name(api_client: Hitas
 
 @pytest.mark.django_db
 def test__api__housing_company__create__empty(api_client: HitasAPIClient):
-    response = api_client.post(reverse("hitas:housing-company-list"), data={}, format="json")
+    response = api_client.post(
+        reverse("hitas:housing-company-list"), data={}, format="json", openapi_validate_request=False
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",
@@ -709,7 +713,9 @@ def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient,
     data = get_housing_company_create_data()
     data.update(invalid_data)
 
-    response = api_client.post(reverse("hitas:housing-company-list"), data=data, format="json")
+    response = api_client.post(
+        reverse("hitas:housing-company-list"), data=data, format="json", openapi_validate_request=False
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",
@@ -1027,7 +1033,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
 @pytest.mark.django_db
 def test__api__housing_company__filter__invalid_data(api_client: HitasAPIClient, selected_filter, fields):
     url = reverse("hitas:housing-company-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
+    response = api_client.get(url, openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",
