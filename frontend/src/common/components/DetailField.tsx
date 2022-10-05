@@ -1,6 +1,6 @@
 interface DetailFieldProps {
     label: string;
-    value: string | number | null | undefined;
+    value: JSX.Element | string | number | null | undefined;
 }
 
 export default function DetailField({label, value}: DetailFieldProps): JSX.Element {
