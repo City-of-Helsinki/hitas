@@ -78,6 +78,10 @@ export interface IHousingCompanyWritable {
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notes: string | null;
+    improvements: {
+        market_price_index: object[];
+        construction_price_index: object[];
+    };
 }
 
 export interface IHousingCompanyArea {

@@ -81,6 +81,10 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   property_manager: {id: ""},
                   state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
+                  improvements: {
+                      market_price_index: [],
+                      construction_price_index: [],
+                  },
               }
             : state.housingCompany;
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
