@@ -181,6 +181,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
         },
         "building": {
             "id": instance.building.uuid.hex,
+            "street_address": instance.building.street_address,
             "link": reverse(
                 "hitas:building-detail",
                 kwargs={

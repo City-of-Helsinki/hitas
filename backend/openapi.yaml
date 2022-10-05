@@ -2990,6 +2990,10 @@ components:
               description: Building ID
               type: string
               example: dc1072975bab4ba69f64814f021c6785
+            street_address:
+              description: Building's street address ID
+              type: string
+              example: Eerikinkatu 22
             link:
               description: API link to building
               type: string

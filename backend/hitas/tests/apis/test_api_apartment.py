@@ -123,6 +123,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     },
                     "building": {
                         "id": ap1.building.uuid.hex,
+                        "street_address": ap1.building.street_address,
                         "link": (
                             f"/api/v1/housing-companies/{hc.uuid.hex}"
                             f"/real-estates/{ap1.building.real_estate.uuid.hex}"
@@ -165,6 +166,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     },
                     "building": {
                         "id": ap2.building.uuid.hex,
+                        "street_address": ap2.building.street_address,
                         "link": (
                             f"/api/v1/housing-companies/{hc.uuid.hex}"
                             f"/real-estates/{ap2.building.real_estate.uuid.hex}"
@@ -260,6 +262,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             },
             "building": {
                 "id": ap.building.uuid.hex,
+                "street_address": ap.building.street_address,
                 "link": (
                     f"/api/v1/housing-companies/{hc.uuid.hex}"
                     f"/real-estates/{ap.building.real_estate.uuid.hex}"
