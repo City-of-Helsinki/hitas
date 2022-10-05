@@ -945,6 +945,7 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
         ),
         data=data,
         format="json",
+        openapi_validate_request=False,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {

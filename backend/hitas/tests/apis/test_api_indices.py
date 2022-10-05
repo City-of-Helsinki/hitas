@@ -136,7 +136,7 @@ def test__api__indices__retrieve__unexisting_valid_month(api_client: HitasAPICli
 @pytest.mark.parametrize("index,month", product(indices, ["foo", "", "0-1", "2022-1", "2022-13", "2022-00"]))
 @pytest.mark.django_db
 def test__api__indices__retrieve__invalid_month(api_client: HitasAPIClient, index, month):
-    response = api_client.get(reverse(f"hitas:{index}-detail", kwargs={"month": "foo"}))
+    response = api_client.get(reverse(f"hitas:{index}-detail", kwargs={"month": "foo"}), openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",

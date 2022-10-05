@@ -247,7 +247,7 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
 @pytest.mark.django_db
 def test__api__apartment__filter__invalid_data(api_client: HitasAPIClient, selected_filter, fields):
     url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
-    response = api_client.get(url)
+    response = api_client.get(url, openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",

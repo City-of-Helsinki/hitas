@@ -266,7 +266,7 @@ def test__api__building__create__invalid_building_identifier(api_client: HitasAP
         "hitas:building-list",
         kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "real_estate_uuid": re.uuid.hex},
     )
-    response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json", openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
 
