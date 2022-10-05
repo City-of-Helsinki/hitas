@@ -178,7 +178,6 @@ def test__api__real_estate__create(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     data = {
         "address": {
-            "postal_code": hc.postal_code.value,
             "street_address": "test-street-address-1",
         },
         "property_identifier": "1-1234-321-56",
@@ -199,7 +198,6 @@ def test__api__real_estate__create__invalid_property_identifier(api_client: Hita
     hc: HousingCompany = HousingCompanyFactory.create()
     data = {
         "address": {
-            "postal_code": hc.postal_code.value,
             "street_address": "test-street-address-1",
         },
         "property_identifier": "1-1234-321-56-a",
@@ -219,7 +217,6 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     data = {
         "address": {
-            "postal_code": hc.postal_code.value,
             "street_address": "test-street-address-1",
         },
         "property_identifier": "1111-1111-1111-1111",
@@ -231,8 +228,8 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
     assert response.json() == {
         "id": re.uuid.hex,
         "address": {
-            "city": "Helsinki",
-            "postal_code": data["address"]["postal_code"],
+            "city": hc.postal_code.city,
+            "postal_code": hc.postal_code.value,
             "street_address": data["address"]["street_address"],
         },
         "property_identifier": data["property_identifier"],

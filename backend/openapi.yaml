@@ -2412,8 +2412,8 @@ components:
         id:
           description: Housing company ID
           type: string
-          example: a3181b8fa60b47df8ccba0d554a913bb
           readOnly: true
+          example: a3181b8fa60b47df8ccba0d554a913bb
         name:
           description: Name information about the housing company
           type: object
@@ -2468,21 +2468,13 @@ components:
           nullable: true
           readOnly: true
         financing_method:
-          allOf:
-            - $ref: '#/components/schemas/Code'
-            - $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: '#/components/schemas/ReadOnlyCode'
         building_type:
-          allOf:
-            - $ref: '#/components/schemas/Code'
-            - $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: '#/components/schemas/ReadOnlyCode'
         developer:
-          allOf:
-            - $ref: '#/components/schemas/Code'
-            - $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: '#/components/schemas/ReadOnlyCode'
         property_manager:
-          allOf:
-            - $ref: '#/components/schemas/PropertyManager'
-            - $ref: '#/components/schemas/ReadOnlyPropertyManager'
+          $ref: '#/components/schemas/ReadOnlyPropertyManager'
         summary:
           description: Summary data for this housing company across all apartments
           type: object
@@ -2571,10 +2563,9 @@ components:
                 - first_name
                 - last_name
               properties:
-                user:
+                username:
                   description: Username of this user
                   type: string
-                  nullable: true
                   example: mameik01
                 first_name:
                   description: First name of this user
@@ -2756,7 +2747,7 @@ components:
           minimum: 0
           example: 67
         address:
-          $ref: '#/components/schemas/HitasAddress'
+          $ref: '#/components/schemas/ApartmentAddress'
         completion_date:
           description: Date that the apartment was completed on
           type: string
@@ -2768,6 +2759,7 @@ components:
           items:
             $ref: '#/components/schemas/Ownership'
         links:
+          readOnly: true
           $ref: '#/components/schemas/ApartmentLinks'
 
     ApartmentDetails:
@@ -2796,9 +2788,7 @@ components:
         state:
           $ref: '#/components/schemas/ApartmentState'
         type:
-          allOf:
-            - $ref: '#/components/schemas/Code'
-            - $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: '#/components/schemas/ReadOnlyCode'
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
@@ -2845,6 +2835,7 @@ components:
           items:
             $ref: '#/components/schemas/Ownership'
         links:
+          readOnly: true
           $ref: '#/components/schemas/ApartmentLinks'
         building:
           description: Building ID this apartment is associated with
@@ -3095,9 +3086,7 @@ components:
         - end_date
       properties:
         owner:
-          allOf:
-            - $ref: '#/components/schemas/Owner'
-            - $ref: '#/components/schemas/ReadOnlyOwner'
+          $ref: '#/components/schemas/ReadOnlyOwner'
         percentage:
           description: Percentage that the owner owns of the apartment
           type: number
@@ -3130,6 +3119,7 @@ components:
         id:
           description: ID of this owner
           type: string
+          readOnly: true
           example: dc1072975bab4ba69f64814f021c6785
         name:
           description: Name of this owner
@@ -3147,14 +3137,62 @@ components:
           example: martti.virtanen@example.com
 
     ReadOnlyOwner:
-      description: Read-only owner
+      description: Owner information
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - identifier
+        - email
       properties:
+        id:
+          description: ID of this owner
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
         name:
+          description: Name of this owner
+          type: string
           readOnly: true
+          example: Martti Virtanen
         identifier:
+          description: Identifier (social security number, business id, etc) of this owner
+          type: string
           readOnly: true
+          nullable: true
+          example: 260969-420B
         email:
+          description: Email for this owner
+          type: string
           readOnly: true
+          nullable: true
+          example: martti.virtanen@example.com
+
+    ReadOnlyAddress:
+      description: Address information
+      type: object
+      additionalProperties: false
+      readOnly: true
+      required:
+        - street_address
+        - postal_code
+        - city
+      properties:
+        street_address:
+          description: Street address
+          type: string
+          readOnly: true
+          example: Torikatu 16 B 4
+        postal_code:
+          description: Postal code
+          type: string
+          readOnly: true
+          example: "90100"
+        city:
+          description: City
+          type: string
+          readOnly: true
+          example: Oulu
 
     Address:
       description: Address information
@@ -3183,10 +3221,16 @@ components:
       type: object
       additionalProperties: false
       required:
+        - id
         - value
         - city
         - cost_area
       properties:
+        id:
+          description: ID of this code
+          type: string
+          readOnly: true
+          example: 21d25cc973d8450f8f89937b9eba0a04
         value:
           description: Hitas postal code
           type: string
@@ -3293,14 +3337,35 @@ components:
           example: Helsinki
 
     ReadOnlyCode:
-      description: Read-only Hitas codebook entry
+      description: Hitas codebook entry
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - value
+        - description
+        - code
       properties:
+        id:
+          description: ID of this code
+          type: string
+          example: 21d25cc973d8450f8f89937b9eba0a04
         value:
+          description: Value for this code
+          type: string
           readOnly: true
+          example: luhtitalo
         description:
+          description: Description of this code
+          type: string
+          nullable: true
           readOnly: true
+          example: This building type is for luhtitalo
         code:
+          description: Code number
+          type: string
           readOnly: true
+          example: 001
 
     Code:
       description: Hitas codebook entry
@@ -3315,6 +3380,7 @@ components:
         id:
           description: ID of this code
           type: string
+          readOnly: true
           example: 21d25cc973d8450f8f89937b9eba0a04
         value:
           description: Value for this code
@@ -3332,13 +3398,31 @@ components:
 
     ReadOnlyPropertyManager:
       description: Property manager information
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - email
+        - address
       properties:
+        id:
+          description: ID of this property manager
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
         name:
+          description: Name of this property manager
+          type: string
           readOnly: true
+          example: Ismo Isännöitsijät Oy
         email:
+          description: Email for this property manager
+          type: string
           readOnly: true
+          example: ismo@example.com
         address:
           readOnly: true
+          $ref: '#/components/schemas/ReadOnlyAddress'
 
     PropertyManager:
       description: Property manager information
@@ -3353,6 +3437,7 @@ components:
         id:
           description: ID of this property manager
           type: string
+          readOnly: true
           example: dc1072975bab4ba69f64814f021c6785
         name:
           description: Name of this property manager
