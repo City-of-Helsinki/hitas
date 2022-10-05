@@ -459,7 +459,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 },
             }
         )
-        del data["shares"]
+        data["shares"] = None
         del data["prices"]
 
     response = api_client.post(
@@ -1002,8 +1002,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
         },
         "address": {
             "street_address": "TestStreet 3",
-            "postal_code": ap.building.real_estate.housing_company.postal_code.value,
-            "city": "Helsinki",
             "apartment_number": 9,
             "floor": "5",
             "stair": "X",
@@ -1024,6 +1022,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
         "notes": "Test Notes",
         "building": ap.building.uuid.hex,
         "ownerships": [],
+        "completion_date": None,
         "improvements": {
             "construction_price_index": [],
             "market_price_index": [],
@@ -1047,8 +1046,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert ap.share_number_start == data["shares"]["start"]
     assert ap.share_number_end == data["shares"]["end"]
     assert ap.street_address == data["address"]["street_address"]
-    assert ap.building.real_estate.housing_company.postal_code.value == data["address"]["postal_code"]
-    assert ap.building.real_estate.housing_company.city == data["address"]["city"]
     assert ap.apartment_number == data["address"]["apartment_number"]
     assert ap.floor == data["address"]["floor"]
     assert ap.stair == data["address"]["stair"]
@@ -1061,7 +1058,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
-    assert ap.building_id == ap.building.id
     assert ap.notes == data["notes"]
     assert ap.ownerships.count() == 0
     assert ap.construction_price_improvements.count() == 0
@@ -1133,6 +1129,14 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
     OwnerFactory.create(uuid=uuid.UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
 
     data = ApartmentDetailSerializer(ap).data
+    del data["id"]
+    del data["type"]["value"]
+    del data["type"]["description"]
+    del data["type"]["code"]
+    del data["shares"]["total"]
+    del data["address"]["postal_code"]
+    del data["address"]["city"]
+    del data["links"]
     data["ownerships"] = owner_data
     data["building"] = b.uuid.hex
 
