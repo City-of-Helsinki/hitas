@@ -2552,7 +2552,6 @@ components:
         notes:
           description: Optional notes for this housing company
           type: string
-          nullable: true
         last_modified:
           description: Last modified information
           type: object

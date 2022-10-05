@@ -114,7 +114,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     developer = ReadOnlyDeveloperSerializer()
     property_manager = ReadOnlyPropertyManagerSerializer(allow_null=True, required=False)
     acquisition_price = HousingCompanyAcquisitionPriceSerializer(source="*")
-    notes = ValueOrNullField(required=False)
+    notes = serializers.CharField(required=False, allow_blank=True)
     archive_id = serializers.IntegerField(source="id", read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
