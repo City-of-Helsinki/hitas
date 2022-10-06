@@ -61,6 +61,7 @@ paths:
               schema:
                 description: Single page of housing companies
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -93,6 +94,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/HousingCompanyDetails'
       responses:
         '201':
@@ -100,6 +102,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -134,6 +137,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '404':
           $ref: '#/components/responses/NotFound'
@@ -160,6 +164,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/HousingCompanyDetails'
       responses:
         '200':
@@ -167,6 +172,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/HousingCompanyDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -228,6 +234,7 @@ paths:
               schema:
                 description: Single page of real estates
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -237,6 +244,7 @@ paths:
                   contents:
                     description: List of real estates
                     type: array
+                    additionalProperties: false
                     items:
                       $ref: '#/components/schemas/RealEstate'
         '400':
@@ -268,6 +276,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/RealEstate'
       responses:
         '201':
@@ -275,6 +284,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/RealEstate'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -316,6 +326,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/RealEstate'
         '404':
           $ref: '#/components/responses/NotFound'
@@ -349,6 +360,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/RealEstate'
       responses:
         '200':
@@ -356,6 +368,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/RealEstate'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -431,6 +444,7 @@ paths:
               schema:
                 description: Single page of buildings
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -478,6 +492,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/Building'
       responses:
         '201':
@@ -485,6 +500,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/Building'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -533,6 +549,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/Building'
         '404':
           $ref: '#/components/responses/NotFound'
@@ -573,6 +590,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/Building'
       responses:
         '200':
@@ -580,6 +598,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/Building'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -655,6 +674,7 @@ paths:
               schema:
                 description: Single page of apartments
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -695,6 +715,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/ApartmentDetails'
       responses:
         '201':
@@ -702,6 +723,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/ApartmentDetails'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -744,6 +766,7 @@ paths:
           content:
             application/json:
               schema:
+                additionalProperties: false
                 $ref: '#/components/schemas/ApartmentDetails'
         '404':
           $ref: '#/components/responses/NotFound'
@@ -777,6 +800,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               $ref: '#/components/schemas/ApartmentDetails'
       responses:
         '200':
@@ -886,6 +910,7 @@ paths:
               schema:
                 description: Single page of apartments
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -951,6 +976,7 @@ paths:
               schema:
                 description: Single page of owners
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1122,6 +1148,7 @@ paths:
               schema:
                 description: Single page of property managers
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1293,6 +1320,7 @@ paths:
               schema:
                 description: Single page of developers
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1454,6 +1482,7 @@ paths:
               schema:
                 description: Single page of postal codes
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1623,6 +1652,7 @@ paths:
               schema:
                 description: Single page of building types
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1792,6 +1822,7 @@ paths:
               schema:
                 description: Single page of financing methods
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -1961,6 +1992,7 @@ paths:
               schema:
                 description: Single page of apartment types
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -2124,6 +2156,7 @@ paths:
               schema:
                 description: Single page of indices
                 type: object
+                additionalProperties: false
                 required:
                   - page
                   - contents
@@ -2259,6 +2292,13 @@ components:
     PageInfo:
       description: Page metadata
       type: object
+      additionalProperties: false
+      required:
+        - size
+        - total_items
+        - current_page
+        - total_pages
+        - links
       properties:
         size:
           description: Size of the returned page
@@ -2287,6 +2327,7 @@ components:
         links:
           description: Links to other pages
           type: object
+          additionalProperties: false
           properties:
             next:
               description: Link to next page
@@ -2298,16 +2339,11 @@ components:
               type: string
               nullable: true
               example: 'https://example.com/api/v1/housing-companies?page=2'
-      required:
-        - size
-        - total_items
-        - current_page
-        - total_pages
-        - links
 
     HousingCompany:
       description: Single housing company
       type: object
+      additionalProperties: false
       required:
         - address
         - area
@@ -2333,6 +2369,7 @@ components:
         area:
           description: Hitas cost area information related to the housing company
           type: object
+          additionalProperties: false
           readOnly: true
           required:
             - name
@@ -2359,6 +2396,7 @@ components:
     HousingCompanyDetails:
       description: Single housing company's details
       type: object
+      additionalProperties: false
       required:
         - address
         - area
@@ -2379,6 +2417,7 @@ components:
         name:
           description: Name information about the housing company
           type: object
+          additionalProperties: false
           required:
             - official
             - display
@@ -2405,6 +2444,7 @@ components:
         area:
           description: Hitas cost area information related to the housing company
           type: object
+          additionalProperties: false
           readOnly: true
           required:
             - name
@@ -2446,6 +2486,7 @@ components:
         summary:
           description: Summary data for this housing company across all apartments
           type: object
+          additionalProperties: false
           readOnly: true
           required:
             - average_price_per_square_meter
@@ -2470,6 +2511,7 @@ components:
         acquisition_price:
           description: Acquisition price information
           type: object
+          additionalProperties: false
           required:
             - initial
             - realized
@@ -2514,6 +2556,7 @@ components:
         last_modified:
           description: Last modified information
           type: object
+          additionalProperties: false
           readOnly: true
           required:
             - user
@@ -2522,6 +2565,7 @@ components:
             user:
               description: User who last modified this housing company
               type: object
+              additionalProperties: false
               required:
                 - username
                 - first_name
@@ -2555,6 +2599,7 @@ components:
         improvements:
           description: Contains housing company improvements
           type: object
+          additionalProperties: false
           required:
             - market_price_index
             - construction_price_index
@@ -2565,6 +2610,7 @@ components:
               items:
                 description: Improvement
                 type: object
+                additionalProperties: false
                 required:
                   - name
                   - value
@@ -2590,6 +2636,7 @@ components:
               items:
                 description: Improvement
                 type: object
+                additionalProperties: false
                 required:
                   - name
                   - value
@@ -2613,6 +2660,7 @@ components:
     RealEstate:
       description: Single real estate
       type: object
+      additionalProperties: false
       required:
         - id
         - property_identifier
@@ -2640,6 +2688,7 @@ components:
     Building:
       description: Single building
       type: object
+      additionalProperties: false
       required:
         - id
         - address
@@ -2661,6 +2710,7 @@ components:
     MinimalHousingCompany:
       description: Housing company identifier
       type: object
+      additionalProperties: false
       required:
         - id
         - name
@@ -2679,6 +2729,7 @@ components:
     Apartment:
       description: Single apartment
       type: object
+      additionalProperties: false
       required:
         - id
         - state
@@ -2722,6 +2773,7 @@ components:
     ApartmentDetails:
       description: Single apartment details
       type: object
+      additionalProperties: false
       required:
         - id
         - state
@@ -2755,6 +2807,7 @@ components:
         shares:
           description: Share information
           type: object
+          additionalProperties: false
           nullable: true
           required:
             - start
@@ -2806,6 +2859,7 @@ components:
         improvements:
           description: Contains housing company improvements
           type: object
+          additionalProperties: false
           required:
             - market_price_index
             - construction_price_index
@@ -2816,6 +2870,7 @@ components:
               items:
                 description: Improvement
                 type: object
+                additionalProperties: false
                 required:
                   - name
                   - value
@@ -2841,6 +2896,7 @@ components:
               items:
                 description: Improvement
                 type: object
+                additionalProperties: false
                 required:
                   - name
                   - value
@@ -2879,6 +2935,7 @@ components:
     ApartmentLinks:
       description: Links to apartment's related object
       type: object
+      additionalProperties: false
       readOnly: true
       required:
         - housing_company
@@ -2889,6 +2946,7 @@ components:
         housing_company:
           description: Links to apartment's housing company
           type: object
+          additionalProperties: false
           required:
             - id
             - display_name
@@ -2909,6 +2967,7 @@ components:
         real_estate:
           description: Links to apartment's real estate
           type: object
+          additionalProperties: false
           required:
             - id
             - link
@@ -2924,6 +2983,7 @@ components:
         building:
           description: Links to apartment's building
           type: object
+          additionalProperties: false
           required:
             - id
             - link
@@ -2939,6 +2999,7 @@ components:
         apartment:
           description: Links to apartment's details
           type: object
+          additionalProperties: false
           required:
             - id
             - link
@@ -2955,6 +3016,7 @@ components:
     ApartmentPrices:
       description: Single apartment price information
       type: object
+      additionalProperties: false
       properties:
         debt_free_purchase_price:
           description: TBD
@@ -2995,6 +3057,7 @@ components:
         construction:
           description: Single apartment construction price information
           type: object
+          additionalProperties: false
           properties:
             loans:
               description: Loans during construction
@@ -3024,6 +3087,7 @@ components:
     Ownership:
       description: Ownership information
       type: object
+      additionalProperties: false
       required:
         - owner
         - percentage
@@ -3056,6 +3120,7 @@ components:
     Owner:
       description: Owner information
       type: object
+      additionalProperties: false
       required:
         - id
         - name
@@ -3094,6 +3159,7 @@ components:
     Address:
       description: Address information
       type: object
+      additionalProperties: false
       required:
         - street_address
         - postal_code
@@ -3115,6 +3181,7 @@ components:
     HitasPostalCode:
       description: Hitas postal code
       type: object
+      additionalProperties: false
       required:
         - value
         - city
@@ -3138,6 +3205,7 @@ components:
     HitasHousingCompanyAddress:
       description: Hitas address information for a housing company (includes postal code)
       type: object
+      additionalProperties: false
       required:
         - street_address
         - postal_code
@@ -3160,6 +3228,7 @@ components:
     ApartmentAddress:
       description: Apartment address information
       type: object
+      additionalProperties: false
       required:
         - street_address
         - postal_code
@@ -3202,6 +3271,7 @@ components:
     HitasAddress:
       description: Hitas address information
       type: object
+      additionalProperties: false
       required:
         - street_address
         - postal_code
@@ -3235,6 +3305,7 @@ components:
     Code:
       description: Hitas codebook entry
       type: object
+      additionalProperties: false
       required:
         - id
         - value
@@ -3272,6 +3343,7 @@ components:
     PropertyManager:
       description: Property manager information
       type: object
+      additionalProperties: false
       required:
         - id
         - name
@@ -3302,6 +3374,7 @@ components:
     Index:
       description: Index contains month this index is active and a its value
       type: object
+      additionalProperties: false
       required:
         - month
         - value
@@ -3360,6 +3433,7 @@ components:
     BadRequestError:
       description: Bad request error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3396,6 +3470,7 @@ components:
           items:
             description: Single field validation details
             type: object
+            additionalProperties: false
             required:
               - field
               - message
@@ -3412,6 +3487,7 @@ components:
     UnauthorizedError:
       description: Unauthorized error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3438,6 +3514,7 @@ components:
     NotFoundError:
       description: Not found error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3490,6 +3567,7 @@ components:
     NotAcceptableError:
       description: Not acceptable error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3519,6 +3597,7 @@ components:
     ConflictError:
       description: Conflict error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3553,6 +3632,7 @@ components:
     UnsupportedMediaTypeError:
       description: Unsupported media type error
       type: object
+      additionalProperties: false
       required:
         - status
         - reason
@@ -3581,6 +3661,7 @@ components:
 
     InternalServerError:
       type: object
+      additionalProperties: false
       description: Internal server error
       required:
         - status
