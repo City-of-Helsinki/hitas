@@ -49,8 +49,8 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         state?.housingCompany === undefined
             ? {
                   acquisition_price: {
-                      initial: null,
-                      realized: null,
+                      initial: 0,
+                      realized: 0,
                   },
                   address: {
                       postal_code: "",
@@ -95,7 +95,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 <span>{state?.housingCompany ? state?.housingCompany.name.official : "Uusi yhtiö"}</span>
             </h1>
             <div className="field-sets">
-                <Fieldset heading="Perustiedot">
+                <Fieldset heading="">
                     <div className="row">
                         <FormInputField
                             label="Yhtiön virallinen nimi"
@@ -166,23 +166,15 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             inputType="number"
                             unit="€"
                             fractionDigits={2}
-                            label="Toteutunut hankinta-arvo"
-                            fieldPath="acquisition_price.realized"
+                            label="Ensisijainen laina"
+                            fieldPath="primary_loan"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
                         />
                     </div>
-                    <FormInputField
-                        inputType="textArea"
-                        label="Huomioitavaa"
-                        fieldPath="notes"
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
                 </Fieldset>
-                <Fieldset heading="Lisätiedot">
+                <Fieldset heading="">
                     <div className="row">
                         <FormInputField
                             label="Y-Tunnus"
@@ -204,16 +196,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                     </div>
                     <div className="row">
                         <FormInputField
-                            inputType="number"
-                            unit="€"
-                            fractionDigits={2}
-                            label="Ensisijainen laina"
-                            fieldPath="primary_loan"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
                             inputType="relatedModel"
                             label="Rahoitusmuoto"
                             fieldPath="financing_method.id"
@@ -226,8 +208,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             setFormData={setFormData}
                             error={error}
                         />
-                    </div>
-                    <div className="row">
                         <FormInputField
                             inputType="relatedModel"
                             label="Talotyyppi"
@@ -241,6 +221,8 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             setFormData={setFormData}
                             error={error}
                         />
+                    </div>
+                    <div className="row">
                         <FormInputField
                             inputType="relatedModel"
                             label="Rakennuttaja"
@@ -254,15 +236,23 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             setFormData={setFormData}
                             error={error}
                         />
+                        <FormInputField
+                            inputType="relatedModel"
+                            label="Isännöitsijä"
+                            fieldPath="property_manager.id"
+                            placeholder={state?.housingCompany.property_manager.name}
+                            queryFunction={useGetPropertyManagersQuery}
+                            relatedModelSearchField="name"
+                            getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
                     </div>
                     <FormInputField
-                        inputType="relatedModel"
-                        label="Isännöitsijä"
-                        fieldPath="property_manager.id"
-                        placeholder={state?.housingCompany.property_manager.name}
-                        queryFunction={useGetPropertyManagersQuery}
-                        relatedModelSearchField="name"
-                        getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
+                        inputType="textArea"
+                        label="Huomioitavaa"
+                        fieldPath="notes"
                         formData={formData}
                         setFormData={setFormData}
                         error={error}
