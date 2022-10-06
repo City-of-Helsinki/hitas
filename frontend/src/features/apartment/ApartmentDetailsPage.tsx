@@ -222,13 +222,11 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                 <div>Nimi</div>
                                 <div>Summa</div>
                                 <div>Valmistumispvm</div>
-                                <div>Jakoperuste</div>
                             </li>
                             <li className="detail-list__list-item">
                                 <div>Keittiöremontti</div>
                                 <div>20 000 €</div>
                                 <div>1.12.2021</div>
-                                <div>-</div>
                             </li>
                         </ul>
                     </div>
