@@ -167,7 +167,6 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             label="Kerros"
                             fieldPath="address.floor"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -177,7 +176,6 @@ const ApartmentCreatePage = () => {
                             fractionDigits={2}
                             label="Pinta-ala"
                             fieldPath="surface_area"
-                            required={true}
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -189,7 +187,6 @@ const ApartmentCreatePage = () => {
                             fractionDigits={0}
                             label="Huoneita"
                             fieldPath="rooms"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -214,7 +211,6 @@ const ApartmentCreatePage = () => {
                             fieldPath="state"
                             options={apartmentStateOptions}
                             defaultValue={{label: "Vapaa", value: "free"}}
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -235,7 +231,6 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             label="Osakkeet, alku"
                             fieldPath="shares.start"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -244,7 +239,6 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             label="Osakkeet, loppu"
                             fieldPath="shares.end"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -257,7 +251,6 @@ const ApartmentCreatePage = () => {
                             fractionDigits={2}
                             label="Velaton ostohinta"
                             fieldPath="prices.debt_free_purchase_price"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -268,7 +261,6 @@ const ApartmentCreatePage = () => {
                             fractionDigits={2}
                             label="Ostohinta"
                             fieldPath="prices.purchase_price"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -373,7 +365,6 @@ const ApartmentCreatePage = () => {
                                                 queryFunction={useGetOwnersQuery}
                                                 relatedModelSearchField="name"
                                                 getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                                required
                                                 formData={formOwnershipsList[index]}
                                                 setterFunction={handleSetOwnershipLine(index, "owner.id")}
                                                 error={error}
@@ -385,7 +376,6 @@ const ApartmentCreatePage = () => {
                                                 label=""
                                                 fieldPath="percentage"
                                                 placeholder={ownership.percentage.toString()}
-                                                required
                                                 formData={formOwnershipsList[index]}
                                                 setterFunction={handleSetOwnershipLine(index, "percentage")}
                                                 error={error}
