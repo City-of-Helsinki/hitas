@@ -56,13 +56,15 @@ export default function FormDateInputField({
     };
 
     return (
-        <DateInput
-            value={(() => getValue())()}
-            onChange={handleOnChange}
-            language={"fi"}
-            disableConfirmation={true}
-            required={required}
-            {...rest}
-        />
+        <div className={`input-field input-field--date${required ? " input-field--required" : ""}`}>
+            <DateInput
+                value={(() => getValue())()}
+                onChange={handleOnChange}
+                language={"fi"}
+                disableConfirmation={true}
+                required={required}
+                {...rest}
+            />
+        </div>
     );
 }

@@ -12,6 +12,7 @@ interface FormTextInputFieldProps extends CommonFormInputFieldProps {
 export default function FormTextInputField({
     setFieldValue,
     size = "small",
+    required,
     ...rest
 }: FormTextInputFieldProps): JSX.Element {
     function handleOnChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -20,11 +21,16 @@ export default function FormTextInputField({
 
     const inputProps = {
         onChange: handleOnChange,
+        required: required,
         ...rest,
     };
 
     if (size === "small") {
-        return <TextInput {...inputProps} />;
+        return (
+            <div className={`input-field input-field--text${required ? " input-field--required" : ""}`}>
+                <TextInput {...inputProps} />
+            </div>
+        );
     } else {
         return <TextArea {...inputProps} />;
     }

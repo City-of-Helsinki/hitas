@@ -41,10 +41,12 @@ export default function FormDropdownInputField({
 
     if (searchable)
         return (
-            <Combobox
-                {...inputProps}
-                toggleButtonAriaLabel="Toggle menu"
-            />
+            <div className={`input-field input-field--dropdown${required ? " input-field--required" : ""}`}>
+                <Combobox
+                    {...inputProps}
+                    toggleButtonAriaLabel="Toggle menu"
+                />
+            </div>
         );
     else {
         return <Select {...inputProps} />;

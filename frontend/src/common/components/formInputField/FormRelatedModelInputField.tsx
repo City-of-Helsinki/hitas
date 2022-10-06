@@ -24,6 +24,7 @@ export default function FormRelatedModelInputField({
     relatedModelSearchField,
     getRelatedModelLabel,
     placeholder,
+    required,
     ...rest
 }: FormRelatedModelInputFieldProps): JSX.Element {
     const MIN_LENGTH = 2;
@@ -67,9 +68,9 @@ export default function FormRelatedModelInputField({
     ];
 
     return (
-        <div>
+        <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>
             <TextInput
-                label={label}
+                label={label + (required ? " *" : "")}
                 value={displayedValue || (!displayedValue && placeholder) || value}
                 onChange={() => null} // Disable typing
                 buttonIcon={<IconSearch />}
