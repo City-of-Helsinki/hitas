@@ -12,6 +12,7 @@ from hitas.models import (
     MarketPriceIndex,
     MarketPriceIndexPre2005,
     MaxPriceIndex,
+    SurfaceAreaPriceCeiling,
 )
 
 faker = Faker(locale="fi_FI")
@@ -48,3 +49,8 @@ class ConstructionPriceIndexFactory(AbstractIndexFactory):
 class ConstructionPriceIndexPre2005Factory(AbstractIndexFactory):
     class Meta:
         model = ConstructionPriceIndexPre2005
+
+
+class SurfaceAreaPriceCeilingFactory(AbstractIndexFactory):
+    class Meta:
+        model = SurfaceAreaPriceCeiling

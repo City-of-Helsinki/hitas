@@ -42,6 +42,7 @@ from hitas.models.indices import (
     MarketPriceIndex,
     MarketPriceIndexPre2005,
     MaxPriceIndex,
+    SurfaceAreaPriceCeiling,
 )
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
@@ -179,6 +180,7 @@ def run(
             create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex)
             create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndexPre2005)
             create_indices(codebooks_by_id["RAKUSTIND2005"], ConstructionPriceIndex)
+            create_indices(codebooks_by_id["RAJAHINNAT"], SurfaceAreaPriceCeiling)
 
             # Postal codes
             converted_data.postal_codes_by_postal_code = create_unsaved_postal_codes(codebooks_by_id["POSTINROT"])

@@ -12,17 +12,7 @@ from hitas.tests.factories.indices import (
     MarketPriceIndexFactory,
     MarketPriceIndexPre2005Factory,
     MaxPriceIndexFactory,
-)
-
-_code_parameters = (
-    "url_basename,model,factory",
-    [
-        ("max-price-index", None, MaxPriceIndexFactory),
-        ("market-price-index", None, MarketPriceIndexFactory),
-        ("market-price-index-pre-2005", None, MarketPriceIndexPre2005Factory),
-        ("construction-price-index", None, ConstructionPriceIndexFactory),
-        ("construction-price-index-pre-2005", None, ConstructionPriceIndexPre2005Factory),
-    ],
+    SurfaceAreaPriceCeilingFactory,
 )
 
 indices = [
@@ -31,6 +21,7 @@ indices = [
     "market-price-index-pre-2005",
     "construction-price-index",
     "construction-price-index-pre-2005",
+    "surface-area-price-ceiling",
 ]
 
 factories = [
@@ -39,6 +30,7 @@ factories = [
     MarketPriceIndexPre2005Factory,
     ConstructionPriceIndexFactory,
     ConstructionPriceIndexPre2005Factory,
+    SurfaceAreaPriceCeilingFactory,
 ]
 
 # List tests
