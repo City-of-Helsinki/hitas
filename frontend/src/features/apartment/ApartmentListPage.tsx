@@ -34,9 +34,7 @@ const ApartmentListItem = ({
 }: ApartmentListItemProps): JSX.Element => {
     // Combine ownerships into a single formatted string
     const ownershipsString = ownerships.length
-        ? ownerships
-              .map((o) => `${o.owner.name} (${o.owner.identifier})`)
-              .join(", ")
+        ? ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
         : "Ei omistajuuksia";
     return (
         <Link to={`/housing-companies/${hcId}/apartments/${id}`}>
@@ -156,7 +154,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
             />
             <FilterTextInputField
                 label="Henkilötunnus"
-                filterFieldName="owner_social_security_number"
+                filterFieldName="owner_identifier"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
