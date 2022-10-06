@@ -14,13 +14,19 @@ export default function FormNumberInputField({
     setFieldValue,
     unit,
     fractionDigits,
+    required,
     ...rest
 }: FormNumberInputFieldProps): JSX.Element {
     return (
-        <NumberInput
-            onChange={(e) => setFieldValue(Number(Number(e.target.value).toFixed(fractionDigits ? fractionDigits : 0)))}
-            unit={unit ? unit : ""}
-            {...rest}
-        />
+        <div className={`input-field input-field--number${required ? " input-field--required" : "foo"}`}>
+            <NumberInput
+                onChange={(e) =>
+                    setFieldValue(Number(Number(e.target.value).toFixed(fractionDigits ? fractionDigits : 0)))
+                }
+                unit={unit ? unit : ""}
+                required={required}
+                {...rest}
+            />
+        </div>
     );
 }

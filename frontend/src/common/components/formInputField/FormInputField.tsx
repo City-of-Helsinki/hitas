@@ -149,11 +149,14 @@ export default function FormInputField({
         }
 
         return (
-            <FormDropdownInputField
-                {...commonProps}
-                searchable={inputType === "combobox"}
-                {...rest}
-            />
+            <div className={`input-field input-field--dropdown${required ? " input-field--required" : ""}`}>
+                <FormDropdownInputField
+                    {...commonProps}
+                    searchable={inputType === "combobox"}
+                    required={required}
+                    {...rest}
+                />
+            </div>
         );
     }
     if (inputType === "date") {
