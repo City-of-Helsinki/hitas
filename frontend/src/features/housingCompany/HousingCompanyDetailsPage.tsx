@@ -15,6 +15,7 @@ const HousingCompanyDetailsPage = () => {
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
 
     const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
+        const exceedsInitial = (data.acquisition_price.realized as number) > (data.acquisition_price.initial as number);
         return (
             <>
                 <h1 className="main-heading">
@@ -73,7 +74,19 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Toteutunut hankinta-arvo"
-                                            value={`${data.acquisition_price.realized} €`} // TODO: Format number
+                                            value={
+                                                <>
+                                                    {data.acquisition_price.realized} €
+                                                    {exceedsInitial ? (
+                                                        <span style={{color: "var(--color-error)"}}>
+                                                            {" "}
+                                                            - ylittää hankinta-arvon!
+                                                        </span>
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </>
+                                            } // TODO: Format number
                                         />
                                         <DetailField
                                             label="Ensisijaislaina"
