@@ -161,6 +161,8 @@ const ApartmentCreatePage = () => {
                             setFormData={setFormData}
                             error={error}
                         />
+                    </div>
+                    <div className={"row"}>
                         <FormInputField
                             inputType="number"
                             label="Kerros"
@@ -170,18 +172,18 @@ const ApartmentCreatePage = () => {
                             setFormData={setFormData}
                             error={error}
                         />
-                    </div>
-                    <div className={"row"}>
                         <FormInputField
                             inputType="number"
                             fractionDigits={2}
                             label="Pinta-ala"
                             fieldPath="surface_area"
-                            required
+                            required={true}
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
                         />
+                    </div>
+                    <div className={"row"}>
                         <FormInputField
                             inputType="number"
                             fractionDigits={0}
@@ -226,6 +228,8 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
+                </Fieldset>
+                <Fieldset heading={""}>
                     <div className="row">
                         <FormInputField
                             inputType="number"
@@ -246,8 +250,6 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
-                </Fieldset>
-                <Fieldset heading={""}>
                     <div className="row">
                         <FormInputField
                             inputType="number"
@@ -267,36 +269,6 @@ const ApartmentCreatePage = () => {
                             label="Ostohinta"
                             fieldPath="prices.purchase_price"
                             required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            fractionDigits={2}
-                            label="Ensisijainen laina"
-                            fieldPath="primary_loan_amount"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="date"
-                            label="Ensimmäinen ostopäivä"
-                            fieldPath="prices.first_purchase_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Viimeinen ostopäivä"
-                            fieldPath="prices.second_purchase_date"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -346,57 +318,90 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="number"
+                            unit="€"
+                            fractionDigits={2}
+                            label="Ensisijainen laina"
+                            fieldPath="primary_loan_amount"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <div />
+                    </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="date"
+                            label="Ensimmäinen ostopäivä"
+                            fieldPath="prices.first_purchase_date"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="date"
+                            label="Viimeinen ostopäivä"
+                            fieldPath="prices.second_purchase_date"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                    </div>
                 </Fieldset>
             </div>
             <div className="field-sets">
                 <Fieldset heading={"Omistajuudet"}>
                     <ul className="ownerships-list">
-                        <legend className={"ownership-headings"}>
-                            <span>Omistaja</span>
-                            <span>Omistajuusprosentti</span>
-                        </legend>
-                        {formOwnershipsList ? (
+                        {formOwnershipsList.length ? (
                             formOwnershipsList.map((ownership, index) => (
-                                <li
-                                    className="ownership-item"
-                                    key={`ownership-item-${index}`}
-                                >
-                                    <div className="owner">
-                                        <FormInputField
-                                            inputType="relatedModel"
-                                            label=""
-                                            fieldPath="owner.id"
-                                            queryFunction={useGetOwnersQuery}
-                                            relatedModelSearchField="name"
-                                            getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                            required
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "owner.id")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="percentage">
-                                        <FormInputField
-                                            inputType="number"
-                                            label=""
-                                            fieldPath="percentage"
-                                            placeholder={ownership.percentage.toString()}
-                                            required
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "percentage")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="icon--remove">
-                                        <IconCrossCircle
-                                            size={"m"}
-                                            onClick={() => handleRemoveOwnershipLine(index)}
-                                        />
-                                    </div>
-                                </li>
+                                <>
+                                    <legend className={"ownership-headings"}>
+                                        <span>Omistaja</span>
+                                        <span>Omistajuusprosentti</span>
+                                    </legend>
+                                    <li
+                                        className="ownership-item"
+                                        key={`ownership-item-${index}`}
+                                    >
+                                        <div className="owner">
+                                            <FormInputField
+                                                inputType="relatedModel"
+                                                label=""
+                                                fieldPath="owner.id"
+                                                queryFunction={useGetOwnersQuery}
+                                                relatedModelSearchField="name"
+                                                getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
+                                                required
+                                                formData={formOwnershipsList[index]}
+                                                setterFunction={handleSetOwnershipLine(index, "owner.id")}
+                                                error={error}
+                                            />
+                                        </div>
+                                        <div className="percentage">
+                                            <FormInputField
+                                                inputType="number"
+                                                label=""
+                                                fieldPath="percentage"
+                                                placeholder={ownership.percentage.toString()}
+                                                required
+                                                formData={formOwnershipsList[index]}
+                                                setterFunction={handleSetOwnershipLine(index, "percentage")}
+                                                error={error}
+                                            />
+                                        </div>
+                                        <div className="icon--remove">
+                                            <IconCrossCircle
+                                                size={"m"}
+                                                onClick={() => handleRemoveOwnershipLine(index)}
+                                            />
+                                        </div>
+                                    </li>
+                                </>
                             ))
                         ) : (
-                            <div>Ei omistajia</div>
+                            <div>Ei omistajuuksia</div>
                         )}
                     </ul>
                     <Button
@@ -431,7 +436,7 @@ const ApartmentCreatePage = () => {
 
             <SaveDialogModal
                 linkText={"Asunnon sivulle"}
-                baseURL={"/apartments/"}
+                baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
                 data={savedData}
                 error={saveError}
                 isLoading={isSaving}
