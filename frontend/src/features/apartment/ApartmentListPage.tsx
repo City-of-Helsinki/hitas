@@ -147,7 +147,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 setFilterParams={setFilterParams}
             />
             <FilterTextInputField
-                label="Henkilötunnus"
+                label="Omistajan henkilötunnus tai y-tunnus"
                 filterFieldName="owner_identifier"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
