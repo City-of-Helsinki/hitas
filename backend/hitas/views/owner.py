@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from hitas.models import Owner, Ownership
-from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet, HitasSSNFilter
+from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
 class OwnerSerializer(HitasModelSerializer):
@@ -18,7 +18,7 @@ class OwnerSerializer(HitasModelSerializer):
 
 class OwnerFilterSet(HitasFilterSet):
     name = HitasCharFilter(lookup_expr="icontains")
-    identifier = HitasSSNFilter(lookup_expr="iexact")
+    identifier = HitasCharFilter(lookup_expr="icontains")
     email = HitasCharFilter(lookup_expr="iexact")
 
     class Meta:
