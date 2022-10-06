@@ -43,3 +43,10 @@ class ConstructionPriceIndexPre2005(AbstractIndex):
     class Meta:
         verbose_name = _("Construction price index for apartments constructed before January 2005")
         verbose_name_plural = _("Construction price indices for apartments constructed before January 2005")
+
+
+# 'Rajaneliöhinta'
+class SurfaceAreaPriceCeiling(AbstractIndex):
+    class Meta:
+        verbose_name = _("Surface area price ceiling")
+        verbose_name_plural = _("Surface area price ceiling")

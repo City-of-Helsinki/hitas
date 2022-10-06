@@ -22,6 +22,11 @@ router.register(
     views.ConstructionPriceIndexPre2005ViewSet,
     basename="construction-price-index-pre-2005",
 )
+router.register(
+    r"indices/surface-area-price-ceiling",
+    views.SurfaceAreaPriceCeilingViewSet,
+    basename="surface-area-price-ceiling",
+)
 
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")

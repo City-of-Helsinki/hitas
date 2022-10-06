@@ -18,6 +18,7 @@ from hitas.models.indices import (
     MarketPriceIndex,
     MarketPriceIndexPre2005,
     MaxPriceIndex,
+    SurfaceAreaPriceCeiling,
 )
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership

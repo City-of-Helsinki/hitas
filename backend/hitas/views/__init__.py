@@ -9,6 +9,7 @@ from hitas.views.indices import (
     MarketPriceIndexPre2005ViewSet,
     MarketPriceIndexViewSet,
     MaxPriceIndexViewSet,
+    SurfaceAreaPriceCeilingViewSet,
 )
 from hitas.views.owner import OwnerViewSet
 from hitas.views.postal_code import HitasPostalCodeViewSet
