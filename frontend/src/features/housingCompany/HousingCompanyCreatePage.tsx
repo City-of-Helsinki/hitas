@@ -21,7 +21,7 @@ import {
     IPostalCode,
     IPropertyManager,
 } from "../../common/models";
-import {validateBusinessId} from "../../common/utils";
+import {hitasToast, validateBusinessId} from "../../common/utils";
 
 const getHousingCompanyStateName = (state) => {
     switch (state) {
@@ -100,6 +100,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     // Navigate user directly to detail page of the just created Housing Company
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
+            hitasToast("Asuntoyhtiö tallennettu onnistuneesti!");
             navigate(`/housing-companies/${data.id}`);
         } else if (error) {
             setIsEndModalVisible(true);

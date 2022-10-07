@@ -12,7 +12,7 @@ import {
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
 import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
-import {dotted, formatOwner} from "../../common/utils";
+import {dotted, formatOwner, hitasToast} from "../../common/utils";
 
 interface IApartmentState {
     pathname: string;
@@ -154,6 +154,7 @@ const ApartmentCreatePage = () => {
     useEffect(() => {
         if (isEditPage) {
             if (!isLoading && !saveError && savedData && savedData.id) {
+                hitasToast("Asunto tallennettu onnistuneesti!");
                 navigate(`/housing-companies/${savedData.links.housing_company.id}/apartments/${savedData.id}`);
             } else if (saveError) {
                 setIsEndModalVisible(true);

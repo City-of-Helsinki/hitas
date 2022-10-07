@@ -1,3 +1,5 @@
+import toast, {ToastOptions} from "react-hot-toast";
+
 import {IAddress, IApartmentAddress, IOwner} from "./models";
 
 function dotted(obj: object, path: string | string[], value?: number | string | null) {
@@ -34,4 +36,9 @@ function validateBusinessId(value: string): boolean {
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
-export {dotted, formatAddress, formatOwner, validateBusinessId};
+// Toast hook with easier Notification typing
+function hitasToast(message: string, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
+    toast(message, {...opts, className: type});
+}
+
+export {dotted, formatAddress, formatOwner, validateBusinessId, hitasToast};
