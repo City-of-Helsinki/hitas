@@ -59,10 +59,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     const initialFormData: IHousingCompanyWritable =
         state === null || state?.housingCompany === undefined
             ? {
-                  acquisition_price: {
-                      initial: 0,
-                      realized: 0,
-                  },
+                  acquisition_price: 0,
                   address: {
                       postal_code: "",
                       street_address: "",
@@ -179,7 +176,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             unit="€"
                             fractionDigits={2}
                             label="Hankinta-arvo"
-                            fieldPath="acquisition_price.initial"
+                            fieldPath="acquisition_price"
                             required
                             formData={formData}
                             setFormData={setFormData}

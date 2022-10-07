@@ -2498,6 +2498,11 @@ components:
               type: number
               minimum: 0
               example: 123000
+            realized_acquisition_price:
+              description: Realized acquisition price
+              type: number
+              minimum: 0
+              example: 112000.00
             total_surface_area:
               description: Total surface area across all apartments
               type: number
@@ -2509,24 +2514,11 @@ components:
               minimum: 0
               example: 98500
         acquisition_price:
-          description: Acquisition price information
-          type: object
-          additionalProperties: false
-          required:
-            - initial
-            - realized
-          properties:
-            initial:
-              description: Initial acquisition price
-              type: number
-              format: float
-              example: 112000.00
-            realized:
-              description: Realized acquisition price
-              type: number
-              format: float
-              nullable: true
-              example: 112000.00
+          description: Initial acquisition price
+          type: number
+          format: float
+          minimum: 0
+          example: 112000.00
         primary_loan:
           description: Primary loan
           type: number

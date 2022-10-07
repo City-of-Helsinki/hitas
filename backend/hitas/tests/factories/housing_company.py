@@ -1,6 +1,4 @@
-import random
 from datetime import date
-from decimal import Decimal
 
 import factory
 from factory import fuzzy
@@ -33,12 +31,6 @@ class HousingCompanyFactory(DjangoModelFactory):
     property_manager = factory.SubFactory("hitas.tests.factories.PropertyManagerFactory")
     developer = factory.SubFactory("hitas.tests.factories.DeveloperFactory")
     acquisition_price = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
-    # Randomise realized price a bit, if housing company is ready, else set it to None
-    realized_acquisition_price = factory.LazyAttribute(
-        lambda self: self.state == HousingCompanyState.NOT_READY
-        and None
-        or round(self.acquisition_price * Decimal(random.uniform(0.5, 1.5)), 2)
-    )
     primary_loan = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))

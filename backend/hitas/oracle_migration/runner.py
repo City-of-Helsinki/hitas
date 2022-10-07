@@ -235,7 +235,6 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
         new.business_id = ""
         new.street_address = hc["address"]
         new.acquisition_price = hc["acquisition_price"]
-        new.realized_acquisition_price = hc["realized_acquisition_price"]
         new.primary_loan = hc["primary_loan"]
         new.sales_price_catalogue_confirmation_date = date_to_datetime(hc["sales_price_catalogue_confirmation_date"])
         new.notification_date = date_to_datetime(hc["notification_date"])
