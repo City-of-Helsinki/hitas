@@ -32,10 +32,7 @@ export interface IHousingCompanyDetails {
     building_type: ICode;
     developer: ICode;
     property_manager: IPropertyManager | null;
-    acquisition_price: {
-        initial: number;
-        realized: number | null;
-    };
+    acquisition_price: number;
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notification_date: string | null;
@@ -52,6 +49,7 @@ export interface IHousingCompanyDetails {
     real_estates: Array<IRealEstate>;
     summary: {
         average_price_per_square_meter: number;
+        realized_acquisition_price: number;
         total_shares: number;
         total_surface_area: number;
     };
@@ -71,10 +69,7 @@ export interface IHousingCompanyWritable {
     building_type: {id: string};
     developer: {id: string};
     property_manager: {id: string} | null;
-    acquisition_price: {
-        initial: number;
-        realized: number | null;
-    };
+    acquisition_price: number;
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
     notes: string | null;

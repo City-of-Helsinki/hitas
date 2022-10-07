@@ -239,6 +239,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": str(hc1_re1_bu1_ap2.completion_date),
         "summary": {
+            "realized_acquisition_price": 2100,  # (100+200+300+400+500+600) = 2100
             "average_price_per_square_meter": 42,  # (100+200+300+400+500+600) / (10+20+20) = 2100 / 50 = 42
             "total_shares": 450,  # (100 - 1 + 1) + (200 - 101 + 1) + (450 - 201 + 1) = 100 + 100 + 250 = 450
             "total_surface_area": 50.0,  # 10+20+20
@@ -322,10 +323,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
             "name": hc1.property_manager.name,
             "email": hc1.property_manager.email,
         },
-        "acquisition_price": {
-            "initial": float(hc1.acquisition_price),
-            "realized": float(hc1.realized_acquisition_price),
-        },
+        "acquisition_price": float(hc1.acquisition_price),
         "primary_loan": float(hc1.primary_loan),
         "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),
         "notes": hc1.notes,
@@ -399,7 +397,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
     property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {
-        "acquisition_price": {"initial": 10.00, "realized": 10.00},
+        "acquisition_price": 10.00,
         "address": {
             "postal_code": postal_code.value,
             "street_address": "test-street-address-1",
@@ -452,7 +450,7 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
                 "business_id": None,
                 "primary_loan": None,
                 "property_manager": None,
-                "acquisition_price": {"initial": 10.00, "realized": None},
+                "acquisition_price": 10.00,
                 "notes": "",
                 "sales_price_catalogue_confirmation_date": None,
                 "improvements": {
@@ -736,7 +734,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {
-        "acquisition_price": {"initial": 10.01, "realized": None},
+        "acquisition_price": 10.01,
         "address": {
             "street_address": "changed-street-address",
             "postal_code": postal_code.value,
@@ -777,7 +775,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     assert hc.street_address == "changed-street-address"
     assert hc.state == HousingCompanyState.LESS_THAN_30_YEARS
     assert hc.acquisition_price == Decimal("10.01")
-    assert hc.realized_acquisition_price is None
     assert hc.notes == ""
     assert response.json()["date"]
 
@@ -813,7 +810,7 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
         }
 
     data = {
-        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "acquisition_price": hc.acquisition_price,
         "address": {
             "street_address": hc.street_address,
             "postal_code": hc.postal_code.value,
@@ -867,7 +864,7 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
         }
 
     data = {
-        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "acquisition_price": hc.acquisition_price,
         "address": {
             "street_address": hc.street_address,
             "postal_code": hc.postal_code.value,
@@ -903,7 +900,7 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
 
     data = {
-        "acquisition_price": {"initial": hc.acquisition_price, "realized": hc.realized_acquisition_price},
+        "acquisition_price": hc.acquisition_price,
         "address": {
             "street_address": hc.street_address,
             "postal_code": hc.postal_code.value,

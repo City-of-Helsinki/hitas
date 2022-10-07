@@ -14,7 +14,7 @@ const HousingCompanyDetailsPage = () => {
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
 
     const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
-        const exceedsInitial = (data.acquisition_price.realized as number) > (data.acquisition_price.initial as number);
+        const exceedsInitial = (data.summary.realized_acquisition_price as number) > (data.acquisition_price as number);
         return (
             <>
                 <h1 className="main-heading">
@@ -58,13 +58,13 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={`${data.acquisition_price.initial} €`} // TODO: Format number
+                                            value={`${data.acquisition_price} €`} // TODO: Format number
                                         />
                                         <DetailField
                                             label="Toteutunut hankinta-arvo"
                                             value={
                                                 <>
-                                                    {data.acquisition_price.realized} €
+                                                    {data.summary.realized_acquisition_price} €
                                                     {exceedsInitial ? (
                                                         <span style={{color: "var(--color-error)"}}>
                                                             {" "}
