@@ -3048,6 +3048,60 @@ components:
           format: date
           nullable: true
           example: 1989-11-17
+        max_prices:
+          description: Apartment's maximum Hitas prices
+          type: object
+          additionalProperties: false
+          required:
+            - confirmed
+            - unconfirmed
+          properties:
+            confirmed:
+              description: Apartment's confirmed maximum Hitas prices
+              type: object
+              additionalProperties: false
+              nullable: true
+            unconfirmed:
+              description: Apartment's unconfirmed maximum Hitas prices
+              type: object
+              additionalProperties: false
+              required:
+                - pre_2005
+                - onwards_2005
+              properties:
+                pre_2005:
+                  description: Apartment's maximum Hitas prices for apartments constructed before 2005
+                  type: object
+                  nullable: true
+                  additionalProperties: false
+                  required:
+                    - construction_price_index
+                    - market_price_index
+                    - surface_area_price_ceiling
+                  properties:
+                    construction_price_index:
+                      $ref: '#/components/schemas/MaximumValue'
+                    market_price_index:
+                      $ref: '#/components/schemas/MaximumValue'
+                    surface_area_price_ceiling:
+                      $ref: '#/components/schemas/MaximumValue'
+                onwards_2005:
+                  description: Apartment's maximum Hitas prices for apartments constructed 2005 onwards
+                  type: object
+                  nullable: true
+                  additionalProperties: false
+                  required:
+                    - construction_price_index
+                    - market_price_index
+                    - surface_area_price_ceiling
+                  properties:
+                    construction_price_index:
+                      $ref: '#/components/schemas/MaximumValue'
+                    market_price_index:
+                      $ref: '#/components/schemas/MaximumValue'
+                    surface_area_price_ceiling:
+                      $ref: '#/components/schemas/MaximumValue'
+
         construction:
           description: Single apartment construction price information
           type: object
@@ -3077,6 +3131,24 @@ components:
               minimum: 0
               nullable: true
               example: 8610
+
+    MaximumValue:
+      description: Maximum value
+      type: object
+      additionalProperties: false
+      required:
+        - value
+        - maximum
+      properties:
+        value:
+          description: Value
+          type: number
+          nullable: true
+          minimum: 0
+          example: 120456
+        maximum:
+          description: Is this value the maximum value for this apartment
+          type: boolean
 
     Ownership:
       description: Ownership information
