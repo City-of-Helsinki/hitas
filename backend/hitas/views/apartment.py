@@ -1,3 +1,5 @@
+import datetime
+import uuid
 from collections import OrderedDict
 from typing import Any, Dict
 
@@ -153,8 +155,69 @@ class PricesSerializer(serializers.Serializer):
     purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     first_purchase_date = serializers.DateField(required=False, allow_null=True)
     second_purchase_date = serializers.DateField(required=False, allow_null=True)
-
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
+    max_prices = serializers.SerializerMethodField()
+
+    def get_max_prices(self, instance: Apartment) -> Dict[str, Any]:
+        return {
+            "unconfirmed": self.get_unconfirmed_max_prices(instance),
+            "confirmed": None,
+        }
+
+    @staticmethod
+    def get_unconfirmed_max_prices(instance: Apartment) -> Dict[str, Any]:
+        pre2005 = None
+        onwards2005 = None
+
+        def instance_values(keys: list[str]):
+            retval = []
+
+            for key in keys:
+                value = getattr(instance, key, None)
+
+                if value is not None:
+                    value = int(value)
+
+                retval.append(value)
+
+            return retval
+
+        def max_with_nones(*values):
+            """
+            Differs from normal max() by allowing None values. Returns None if no max value is found.
+            """
+
+            values = list(filter(None, values))
+            return max(values) if values else None
+
+        def value_obj(v: float, max_value: float):
+            return {"value": v, "maximum": v is not None and v == max_value}
+
+        if instance.completion_date and instance.completion_date < datetime.date(2005, 1, 1):
+            # Handle apartments completed before year 2005
+            cpi, mpi, sapc = instance_values(["cpi_pre2005", "mpi_pre2005", "sapc"])
+            maximum = max_with_nones(cpi, mpi, sapc)
+
+            pre2005 = {
+                "construction_price_index": value_obj(cpi, maximum),
+                "market_price_index": value_obj(mpi, maximum),
+                "surface_area_price_ceiling": value_obj(sapc, maximum),
+            }
+        else:
+            # Handle apartments not yet completed or completed 2005 owwards
+            cpi, mpi, sapc = instance_values(["cpi", "mpi", "sapc"])
+            maximum = max_with_nones(cpi, mpi, sapc)
+
+            onwards2005 = {
+                "construction_price_index": value_obj(cpi, maximum),
+                "market_price_index": value_obj(mpi, maximum),
+                "surface_area_price_ceiling": value_obj(sapc, maximum),
+            }
+
+        return {
+            "pre_2005": pre2005,
+            "onwards_2005": onwards2005,
+        }
 
 
 def create_links(instance: Apartment) -> Dict[str, Any]:
@@ -234,8 +297,6 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         housing_company_uuid = self.context["view"].kwargs["housing_company_uuid"]
         try:
-            import uuid
-
             hc = HousingCompany.objects.only("id").get(uuid=uuid.UUID(hex=housing_company_uuid))
         except (HousingCompany.DoesNotExist, ValueError, TypeError):
             raise
@@ -366,38 +427,73 @@ class ApartmentViewSet(HitasModelViewSet):
     list_serializer_class = ApartmentListSerializer
     model_class = Apartment
 
+    @staticmethod
+    def select_index(table: str, pre2005: bool):
+        comparison = "<" if pre2005 else ">="
+
+        return f"""
+    SELECT
+        ROUND(
+            a.debt_free_purchase_price * current_{table}.value / NULLIF(original_{table}.value, 0)
+        ) AS max_price_{table}
+    FROM hitas_apartment AS a
+    LEFT JOIN hitas_{table} AS original_{table} ON
+        a.completion_date {comparison} '2005-01-01' AND original_{table}.month = DATE_TRUNC('month', a.completion_date)
+    LEFT JOIN hitas_{table} AS current_{table} ON
+        a.completion_date {comparison} '2005-01-01' AND current_{table}.month = DATE_TRUNC('month', NOW())
+    WHERE a.id = hitas_apartment.id
+"""
+
     def get_detail_queryset(self):
-        return self.get_list_queryset().only(
-            "uuid",
-            "state",
-            "surface_area",
-            "street_address",
-            "apartment_number",
-            "floor",
-            "stair",
-            "share_number_start",
-            "share_number_end",
-            "debt_free_purchase_price",
-            "primary_loan_amount",
-            "purchase_price",
-            "first_purchase_date",
-            "second_purchase_date",
-            "additional_work_during_construction",
-            "loans_during_construction",
-            "interest_during_construction",
-            "debt_free_purchase_price_during_construction",
-            "notes",
-            "completion_date",
-            "building__uuid",
-            "building__real_estate__uuid",
-            "apartment_type__uuid",
-            "apartment_type__value",
-            "apartment_type__legacy_code_number",
-            "apartment_type__description",
-            "building__real_estate__housing_company__uuid",
-            "building__real_estate__housing_company__display_name",
-            "building__real_estate__housing_company__postal_code__value",
-            "building__real_estate__housing_company__postal_code__city",
+        return (
+            self.get_list_queryset()
+            .only(
+                "uuid",
+                "state",
+                "surface_area",
+                "street_address",
+                "apartment_number",
+                "floor",
+                "stair",
+                "share_number_start",
+                "share_number_end",
+                "debt_free_purchase_price",
+                "primary_loan_amount",
+                "purchase_price",
+                "first_purchase_date",
+                "second_purchase_date",
+                "additional_work_during_construction",
+                "loans_during_construction",
+                "interest_during_construction",
+                "debt_free_purchase_price_during_construction",
+                "notes",
+                "completion_date",
+                "building__uuid",
+                "building__real_estate__uuid",
+                "apartment_type__uuid",
+                "apartment_type__value",
+                "apartment_type__legacy_code_number",
+                "apartment_type__description",
+                "building__real_estate__housing_company__uuid",
+                "building__real_estate__housing_company__display_name",
+                "building__real_estate__housing_company__postal_code__value",
+                "building__real_estate__housing_company__postal_code__city",
+            )
+            .extra(
+                select={
+                    "cpi": self.select_index("constructionpriceindex", pre2005=False),
+                    "cpi_pre2005": self.select_index("constructionpriceindexpre2005", pre2005=True),
+                    "mpi": self.select_index("marketpriceindex", pre2005=False),
+                    "mpi_pre2005": self.select_index("marketpriceindexpre2005", pre2005=True),
+                    "sapc": """
+    SELECT ROUND(a.surface_area * sapc.value)
+    FROM hitas_apartment AS a
+    LEFT JOIN hitas_surfaceareapriceceiling AS sapc
+        ON sapc.month = DATE_TRUNC('month', NOW())
+    WHERE a.id = hitas_apartment.id
+""",
+                }
+            )
         )
 
     def get_list_queryset(self):
