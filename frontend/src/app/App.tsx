@@ -1,6 +1,7 @@
 import {Container, Footer, Navigation} from "hds-react";
 import {Outlet} from "react-router-dom";
 
+import Notifications from "../common/components/Notifications";
 import "../styles/index.sass";
 
 const App = (): JSX.Element => {
@@ -49,6 +50,8 @@ const App = (): JSX.Element => {
             <Container className="main-content">
                 <Outlet />
             </Container>
+
+            <Notifications />
 
             <Footer />
         </div>

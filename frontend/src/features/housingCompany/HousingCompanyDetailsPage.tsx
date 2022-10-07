@@ -1,7 +1,7 @@
 import React from "react";
 
 import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
@@ -10,8 +10,8 @@ import {formatAddress} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
 const HousingCompanyDetailsPage = () => {
-    const params = useParams();
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
+    const params = useParams() as {readonly housingCompanyId: string};
+    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
 
     const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
         const exceedsInitial = (data.acquisition_price.realized as number) > (data.acquisition_price.initial as number);

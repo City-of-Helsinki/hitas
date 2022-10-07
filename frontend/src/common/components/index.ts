@@ -4,6 +4,7 @@ import FilterComboboxField from "./FilterComboboxField";
 import FilterIntegerField from "./FilterIntegerField";
 import FilterTextInputField from "./FilterTextInputField";
 import ListPageNumbers from "./ListPageNumbers";
+import Notifications from "./Notifications";
 import QueryStateHandler from "./QueryStateHandler";
 import SaveDialogModal from "./SaveDialogModal";
 import FormInputField from "./formInputField/FormInputField";
@@ -18,4 +19,5 @@ export {
     QueryStateHandler,
     SaveDialogModal,
     EditButton,
+    Notifications,
 };
