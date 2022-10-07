@@ -73,7 +73,7 @@ export interface IHousingCompanyWritable {
     property_manager: {id: string};
     acquisition_price: {
         initial: number;
-        realized: number;
+        realized: number | null;
     };
     primary_loan: number | null;
     sales_price_catalogue_confirmation_date: string | null;
