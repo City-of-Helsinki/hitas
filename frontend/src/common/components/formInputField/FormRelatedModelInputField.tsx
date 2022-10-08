@@ -75,10 +75,10 @@ export default function FormRelatedModelInputField({
         <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>
             <TextInput
                 label={label + (required ? " *" : "")}
-                value={displayedValue || (!displayedValue && placeholder) || value}
+                value={displayedValue || (displayedValue === undefined && placeholder) || value}
                 onChange={() => null} // Disable typing
-                buttonIcon={!rest.required && value ? <IconCrossCircle /> : <IconSearch />}
-                onButtonClick={!rest.required && value ? clearFieldValue : openModal}
+                buttonIcon={!required && value ? <IconCrossCircle /> : <IconSearch />}
+                onButtonClick={!required && value ? clearFieldValue : openModal}
                 onClick={openModal}
                 {...rest}
             />
