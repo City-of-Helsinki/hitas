@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 import {Button, Fieldset, IconCrossCircle, IconPlus, IconSaveDisketteFill, TextInput} from "hds-react";
-import {useLocation, useParams} from "react-router";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
