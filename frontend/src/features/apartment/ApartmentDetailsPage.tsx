@@ -5,7 +5,7 @@ import {useParams} from "react-router";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
-import {DetailField, QueryStateHandler} from "../../common/components";
+import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails, IOwnership} from "../../common/models";
 import {formatAddress} from "../../common/utils";
 
@@ -67,6 +67,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                         <span className="address">{formatAddress(data.address)}</span>
                         <StatusLabel>{data.state}</StatusLabel>
                     </Link>
+                    <EditButton state={{apartment: data}} />
                 </h1>
                 <h2 className={"apartment-stats"}>
                     <span className="apartment-stats--number">

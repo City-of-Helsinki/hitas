@@ -1,18 +1,24 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Button, Fieldset, IconCrossCircle, IconPlus, IconSaveDisketteFill, TextInput} from "hds-react";
-import {useParams} from "react-router";
+import {useLocation, useParams} from "react-router";
+import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
-    useCreateApartmentMutation,
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
     useGetOwnersQuery,
+    useSaveApartmentMutation,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
-import {ApartmentStates, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
+import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
 import {dotted, formatOwner} from "../../common/utils";
+
+interface IApartmentState {
+    pathname: string;
+    state: null | {apartment: IApartmentDetails};
+}
 
 const getApartmentStateLabel = (state) => {
     switch (state) {
@@ -26,53 +32,79 @@ const getApartmentStateLabel = (state) => {
             return "VIRHE";
     }
 };
+
 const apartmentStateOptions = ApartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};
 });
 
+const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
+    return {
+        ...ap,
+        ownerships: [], // Stored in a separate state, not needed here
+        building: ap.links.building.id,
+        address: {
+            ...ap.address,
+            street_address: ap.links.building.street_address,
+        },
+    };
+};
+
 const ApartmentCreatePage = () => {
-    const params = useParams();
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
-    const [createApartment, {data: savedData, error: saveError, isLoading: isSaving}] = useCreateApartmentMutation();
+    const navigate = useNavigate();
+
+    const {pathname, state}: IApartmentState = useLocation();
+    const isEditPage = pathname.split("/").at(-1) === "edit";
+
+    const params = useParams() as {readonly housingCompanyId: string};
+
+    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+    const [createApartment, {data: savedData, error: saveError, isLoading: isSaving}] = useSaveApartmentMutation();
+
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
-    const [formData, setFormData] = useImmer<IApartmentWritable>({
-        state: "free",
-        type: {id: ""},
-        surface_area: 0,
-        shares: {
-            start: 0,
-            end: 0,
-        },
-        address: {
-            street_address: "",
-            apartment_number: 0,
-            floor: "",
-            stair: "",
-        },
-        completion_date: null,
-        prices: {
-            debt_free_purchase_price: 0,
-            purchase_price: 0,
-            primary_loan_amount: 0,
-            first_purchase_date: null,
-            second_purchase_date: null,
-            construction: {
-                loans: 0,
-                interest: 0,
-                debt_free_purchase_price: 0,
-                additional_work: 0,
-            },
-        },
-        building: "",
-        ownerships: [],
-        improvements: {
-            market_price_index: [],
-            construction_price_index: [],
-        },
-        notes: "",
-    });
-    const [formOwnershipsList, setFormOwnershipsList] = useImmer<IOwnership[]>([]);
+    const initialFormData: IApartmentWritable =
+        state === null || state?.apartment === undefined
+            ? {
+                  state: "free",
+                  type: {id: ""},
+                  surface_area: 0,
+                  shares: {
+                      start: 0,
+                      end: 0,
+                  },
+                  address: {
+                      street_address: "",
+                      apartment_number: 0,
+                      floor: "",
+                      stair: "",
+                  },
+                  completion_date: null,
+                  prices: {
+                      debt_free_purchase_price: 0,
+                      purchase_price: 0,
+                      primary_loan_amount: 0,
+                      first_purchase_date: null,
+                      second_purchase_date: null,
+                      construction: {
+                          loans: 0,
+                          interest: 0,
+                          debt_free_purchase_price: 0,
+                          additional_work: 0,
+                      },
+                  },
+                  building: "",
+                  ownerships: [],
+                  improvements: {
+                      market_price_index: [],
+                      construction_price_index: [],
+                  },
+                  notes: "",
+              }
+            : convertApartmentDetailToWritable(state.apartment);
+    const [formData, setFormData] = useImmer<IApartmentWritable>(initialFormData);
+    const [formOwnershipsList, setFormOwnershipsList] = useImmer<IOwnership[]>(
+        state?.apartment !== undefined ? state.apartment.ownerships : []
+    );
 
     const handleSaveButtonClicked = () => {
         const formDataWithOwnerships = {
@@ -82,15 +114,24 @@ const ApartmentCreatePage = () => {
                 ...formData.address,
                 street_address: buildingOptions.find((option) => option.value === formData.building)?.label || "",
             },
-            // Clean away ownerships without a selected owner
+
+            // Clean away ownership items that don't have an owner selected
             ownerships: formOwnershipsList.filter((o) => o.owner.id),
         };
 
         setFormData(() => formDataWithOwnerships);
-        createApartment({data: formData, housingCompanyId: params.housingCompanyId as string});
-        setIsEndModalVisible(true);
+        createApartment({
+            data: formData,
+            id: state?.apartment.id,
+            housingCompanyId: params.housingCompanyId,
+        });
+
+        if (!isEditPage) {
+            setIsEndModalVisible(true);
+        }
     };
 
+    // Ownerships
     const handleAddOwnershipLine = () => {
         setFormOwnershipsList((draft) => {
             draft.push({
@@ -110,7 +151,23 @@ const ApartmentCreatePage = () => {
         });
     };
 
-    // Get all buildings that belong to HousingCompany from realestates
+    // Handle saving flow when editing
+    useEffect(() => {
+        if (isEditPage) {
+            if (!isLoading && !saveError && savedData && savedData.id) {
+                navigate(`/housing-companies/${savedData.links.housing_company.id}/apartments/${savedData.id}`);
+            } else if (saveError) {
+                setIsEndModalVisible(true);
+            }
+        }
+    }, [isLoading, saveError, savedData, navigate, isEditPage]);
+
+    // Redirect user to detail page if state is missing Apartment data and user is trying to edit the apartment
+    useEffect(() => {
+        if (isEditPage && state === null) navigate("..");
+    }, [isEditPage, navigate, pathname, state]);
+
+    // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions =
         isLoading || !data
             ? []
@@ -128,7 +185,13 @@ const ApartmentCreatePage = () => {
                     <TextInput
                         id="input-housing_company.name"
                         label="Asunto-osakeyhtiö"
-                        value={data?.name.display || ""}
+                        value={
+                            data?.name.display !== undefined
+                                ? data?.name.display
+                                : state?.apartment !== undefined
+                                ? state.apartment.links.housing_company.display_name
+                                : ""
+                        }
                         disabled
                     />
                     <div className={"row"}>
@@ -136,6 +199,12 @@ const ApartmentCreatePage = () => {
                             inputType={"select"}
                             label="Rakennus"
                             fieldPath="building"
+                            placeholder={formData.address.street_address}
+                            defaultValue={
+                                state?.apartment !== undefined
+                                    ? {label: formData.address.street_address, value: formData.building}
+                                    : {label: "", value: ""}
+                            }
                             options={buildingOptions || []}
                             required
                             formData={formData}
@@ -195,6 +264,7 @@ const ApartmentCreatePage = () => {
                             inputType="relatedModel"
                             label="Asuntotyyppi"
                             fieldPath="type.id"
+                            placeholder={state?.apartment !== undefined ? state.apartment.type.value : ""}
                             queryFunction={useGetApartmentTypesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -347,7 +417,7 @@ const ApartmentCreatePage = () => {
                 <Fieldset heading={"Omistajuudet"}>
                     <ul className="ownerships-list">
                         {formOwnershipsList.length ? (
-                            formOwnershipsList.map((ownership, index) => (
+                            formOwnershipsList.map((ownership: IOwnership, index) => (
                                 <>
                                     <legend className={"ownership-headings"}>
                                         <span>Omistaja</span>
@@ -362,6 +432,7 @@ const ApartmentCreatePage = () => {
                                                 inputType="relatedModel"
                                                 label=""
                                                 fieldPath="owner.id"
+                                                placeholder={ownership?.owner.name || ""}
                                                 queryFunction={useGetOwnersQuery}
                                                 relatedModelSearchField="name"
                                                 getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
@@ -420,6 +491,7 @@ const ApartmentCreatePage = () => {
                 iconLeft={<IconSaveDisketteFill />}
                 onClick={handleSaveButtonClicked}
                 theme={"black"}
+                isLoading={isLoading}
             >
                 Tallenna
             </Button>
@@ -427,11 +499,11 @@ const ApartmentCreatePage = () => {
             <SaveDialogModal
                 linkText={"Asunnon sivulle"}
                 baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
+                isVisible={isEndModalVisible}
+                setIsVisible={setIsEndModalVisible}
                 data={savedData}
                 error={saveError}
                 isLoading={isSaving}
-                isVisible={isEndModalVisible}
-                setIsVisible={setIsEndModalVisible}
             />
         </div>
     );

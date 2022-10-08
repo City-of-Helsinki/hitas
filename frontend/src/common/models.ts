@@ -203,18 +203,21 @@ export interface IApartmentDetails {
         end: number;
         readonly total: number;
     };
+    links: {
+        housing_company: ILinkedModel & {display_name: string};
+        real_estate: ILinkedModel;
+        building: ILinkedModel & {street_address: string};
+        apartment: ILinkedModel;
+    };
     address: IApartmentAddress;
-    completion_date: string | null;
     prices: IApartmentPrices;
-    building: string;
-    real_estate: string;
-    housing_company: IHousingCompany;
-    ownerships: Array<IOwnership>;
+    completion_date: string | null;
+    ownerships: IOwnership[];
+    notes: string;
     improvements: {
         market_price_index: object[];
         construction_price_index: object[];
     };
-    notes: string;
 }
 
 export interface IApartmentWritable {
@@ -227,15 +230,15 @@ export interface IApartmentWritable {
         end: number;
     };
     address: IApartmentAddress;
-    completion_date?: Date | null;
     prices: IApartmentPrices;
+    completion_date?: string | null;
     building: string;
-    ownerships: IOwnership[] | null;
+    ownerships: IOwnership[];
+    notes: string;
     improvements: {
         market_price_index: object[];
         construction_price_index: object[];
     };
-    notes: string;
 }
 
 export interface IPropertyManager {
@@ -258,6 +261,13 @@ export interface IOwnership {
     percentage: number;
     start_date?: string | null;
     end_date?: string | null;
+}
+
+// Non-model data
+
+export interface ILinkedModel {
+    id: string;
+    link: string;
 }
 
 export interface PageInfo {

@@ -63,10 +63,16 @@ export default function Router() {
                                 path={"create"}
                                 element={<ApartmentCreatePage />}
                             />
-                            <Route
-                                path=":apartmentId"
-                                element={<ApartmentDetailsPage />}
-                            />
+                            <Route path=":apartmentId">
+                                <Route
+                                    index
+                                    element={<ApartmentDetailsPage />}
+                                />
+                                <Route
+                                    path="edit"
+                                    element={<ApartmentCreatePage />}
+                                />
+                            </Route>
                         </Route>
                     </Route>
                 </Route>

@@ -33,6 +33,9 @@ export class Config {
             : process.env.REACT_APP_AUTH_TOKEN || "52bf0606e0a0075c990fecc0afa555e5dae56404";
 }
 
+// Helper to return either the passed value prefixed with `/` or an empty string
+const idOrBlank = (id: string | undefined) => (id ? `/${id}` : "");
+
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
     baseQuery: fetchBaseQuery({
@@ -135,7 +138,7 @@ export const mutationApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
             query: ({data, id}) => ({
-                url: `housing-companies${id ? `/${id}` : ""}`,
+                url: `housing-companies${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
@@ -166,10 +169,13 @@ export const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
-        createApartment: builder.mutation<IApartmentDetails, {data: IApartmentWritable; housingCompanyId: string}>({
-            query: ({data, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/apartments`,
-                method: "POST",
+        saveApartment: builder.mutation<
+            IApartmentDetails,
+            {data: IApartmentWritable; id?: string; housingCompanyId: string}
+        >({
+            query: ({data, id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments${idOrBlank(id)}`,
+                method: id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
@@ -200,5 +206,5 @@ export const {
     useSaveHousingCompanyMutation,
     useCreateRealEstateMutation,
     useCreateBuildingMutation,
-    useCreateApartmentMutation,
+    useSaveApartmentMutation,
 } = mutationApi;
