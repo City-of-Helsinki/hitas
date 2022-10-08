@@ -263,7 +263,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             inputType="relatedModel"
                             label="Isännöitsijä"
                             fieldPath="property_manager.id"
-                            placeholder={state?.housingCompany.property_manager.name}
+                            placeholder={state?.housingCompany.property_manager?.name}
                             queryFunction={useGetPropertyManagersQuery}
                             relatedModelSearchField="name"
                             getRelatedModelLabel={(obj: IPropertyManager) => obj.name}

@@ -88,7 +88,11 @@ const HousingCompanyDetailsPage = () => {
                                     <div className="column">
                                         <DetailField
                                             label="Isännöitsijä"
-                                            value={`${data.property_manager.name} (${data.property_manager.email})`}
+                                            value={
+                                                (data.property_manager &&
+                                                    `${data.property_manager.name} (${data.property_manager.email})`) ||
+                                                "-"
+                                            }
                                         />
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
