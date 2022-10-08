@@ -2411,7 +2411,6 @@ components:
         - id
         - name
         - state
-        - business_id
         - real_estates
         - summary
         - improvements
@@ -2442,6 +2441,7 @@ components:
         business_id:
           description: Official business ID
           type: string
+          nullable: true
           pattern: '^\d{7}-\d$'
           example: 1234567-8
         state:
@@ -2481,6 +2481,7 @@ components:
         developer:
           $ref: '#/components/schemas/ReadOnlyCode'
         property_manager:
+          nullable: true
           $ref: '#/components/schemas/ReadOnlyPropertyManager'
         summary:
           description: Summary data for this housing company across all apartments
@@ -3408,7 +3409,8 @@ components:
           example: 001
 
     ReadOnlyPropertyManager:
-      description: Property manager information
+      description: Read-only Property manager information
+      nullable: true
       type: object
       additionalProperties: false
       required:

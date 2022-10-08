@@ -450,7 +450,7 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
         data.update(
             {
                 "business_id": None,
-                "primary_loan": "",
+                "primary_loan": None,
                 "property_manager": None,
                 "acquisition_price": {"initial": 10.00, "realized": None},
                 "notes": "",
@@ -968,8 +968,8 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
         {"display_name": "Di"},
         {"street_address": "test-street"},
         {"street_address": "te"},
-        {"property_manager": "TestPropertyManager"},
-        {"property_manager": "Te"},
+        {"property_manager": "XXTestPropertyManager"},
+        {"property_manager": "xx"},
         {"developer": "TestDeveloper"},
         {"developer": "Te"},
         {"postal_code": "99999"},
@@ -982,7 +982,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
     HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
     HousingCompanyFactory.create(street_address="test-street")
-    HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
+    HousingCompanyFactory.create(property_manager__name="XXTestPropertyManager")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
     HousingCompanyFactory.create(postal_code__value="99999")
     HousingCompanyFactory.create(id=999)
