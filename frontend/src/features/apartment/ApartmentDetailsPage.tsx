@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 
 import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
-import {useParams} from "react-router";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
 import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
