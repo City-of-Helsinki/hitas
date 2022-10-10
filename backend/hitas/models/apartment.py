@@ -27,6 +27,8 @@ class Apartment(ExternalHitasModel):
     state = EnumField(ApartmentState, default=ApartmentState.FREE)
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")
     surface_area = HitasModelDecimalField(help_text=_("Measured in m^2"))
+    # 'Huoneiden määrä'
+    rooms = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
     share_number_start = models.IntegerField(null=True, validators=[MinValueValidator(1)])
     share_number_end = models.IntegerField(null=True, validators=[MinValueValidator(1)])
@@ -36,6 +38,7 @@ class Apartment(ExternalHitasModel):
     street_address = models.CharField(max_length=128)
     # 'Huoneistonumero'
     apartment_number = models.PositiveSmallIntegerField()
+    # 'Kerros'
     floor = models.CharField(max_length=50, blank=True, null=True)
     # 'Porras'
     stair = models.CharField(max_length=16)
