@@ -120,7 +120,7 @@ const ApartmentCreatePage = () => {
 
         setFormData(() => formDataWithOwnerships);
         createApartment({
-            data: formData,
+            data: formDataWithOwnerships,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,
         });
