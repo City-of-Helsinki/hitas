@@ -150,6 +150,7 @@ export interface IApartment {
     links: IApartmentLinks;
     type: string;
     surface_area: number;
+    rooms: number | null;
     address: IApartmentAddress;
     completion_date: string | null;
     housing_company: string;
@@ -193,6 +194,7 @@ export interface IApartmentDetails {
     state: ApartmentState;
     type: ICode;
     surface_area: number;
+    rooms: number | null;
     shares: {
         start: number;
         end: number;
@@ -220,6 +222,7 @@ export interface IApartmentWritable {
     state: ApartmentState;
     type: {id: string};
     surface_area: number;
+    rooms: number | null;
     shares: {
         start: number;
         end: number;

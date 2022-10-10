@@ -67,6 +67,7 @@ const ApartmentCreatePage = () => {
                   state: "free",
                   type: {id: ""},
                   surface_area: 0,
+                  rooms: null,
                   shares: {
                       start: 0,
                       end: 0,
@@ -254,7 +255,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             fractionDigits={0}
-                            label="Huoneita"
+                            label="Huoneiden määrä"
                             fieldPath="rooms"
                             formData={formData}
                             setFormData={setFormData}
