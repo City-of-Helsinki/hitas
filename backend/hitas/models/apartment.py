@@ -49,9 +49,9 @@ class Apartment(ExternalHitasModel):
     primary_loan_amount = models.PositiveIntegerField(default=0)
     # 'Kauppakirjahinta'
     purchase_price = HitasModelDecimalField(blank=True, null=True)
-    # '1. kauppakirjapvm'
+    # '1. Kauppakirjapvm'
     first_purchase_date = models.DateField(null=True, blank=True)
-    # '2. kauppakirjapvm'
+    # '2. Kauppakirjapvm'
     second_purchase_date = models.DateField(null=True, blank=True)
     # 'Rakennusaikaiset lisätyöt'
     additional_work_during_construction = models.PositiveIntegerField(default=0)

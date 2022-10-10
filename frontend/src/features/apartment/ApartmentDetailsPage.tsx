@@ -199,12 +199,28 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                                 value={`${data.prices.primary_loan_amount} €`}
                                             />
                                             <DetailField
+                                                value={`${data.prices.first_purchase_date} €`}
+                                                label="Ensimmäinen ostopäivä"
+                                            />
+                                            <DetailField
+                                                value={`${data.prices.second_purchase_date} €`}
+                                                label="Viimeisin ostopäivä"
+                                            />
+                                            <DetailField
                                                 label="Rakennusaikaiset lainat"
                                                 value={`${data.prices.construction.loans} €`}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset korot"
                                                 value={`${data.prices.construction.interest} €`}
+                                            />
+                                            <DetailField
+                                                label="Luovutushinta (RA)"
+                                                value={`${data.prices.construction.debt_free_purchase_price} €`}
+                                            />
+                                            <DetailField
+                                                label="Rakennusaikaiset lisätyöt"
+                                                value={`${data.prices.construction.additional_work} €`}
                                             />
                                         </div>
                                     </div>
