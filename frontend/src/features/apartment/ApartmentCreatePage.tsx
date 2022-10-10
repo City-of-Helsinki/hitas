@@ -320,7 +320,7 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             unit="€"
                             fractionDigits={2}
-                            label="Velaton ostohinta"
+                            label="Luovutushinta"
                             fieldPath="prices.debt_free_purchase_price"
                             formData={formData}
                             setFormData={setFormData}
@@ -330,7 +330,7 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             unit="€"
                             fractionDigits={2}
-                            label="Ostohinta"
+                            label="Kauppakirjahinta"
                             fieldPath="prices.purchase_price"
                             formData={formData}
                             setFormData={setFormData}
@@ -364,7 +364,7 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             unit="€"
                             fractionDigits={2}
-                            label="Rakennusaikainen velaton ostohinta"
+                            label="Luovutushinta (RA)"
                             fieldPath="prices.construction.debt_free_purchase_price"
                             formData={formData}
                             setFormData={setFormData}
@@ -386,8 +386,8 @@ const ApartmentCreatePage = () => {
                             inputType="number"
                             unit="€"
                             fractionDigits={2}
-                            label="Ensisijainen laina"
-                            fieldPath="primary_loan_amount"
+                            label="Ensisijaislaina"
+                            fieldPath="prices.primary_loan_amount"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -405,7 +405,7 @@ const ApartmentCreatePage = () => {
                         />
                         <FormInputField
                             inputType="date"
-                            label="Viimeinen ostopäivä"
+                            label="Viimeisin ostopäivä"
                             fieldPath="prices.second_purchase_date"
                             formData={formData}
                             setFormData={setFormData}
