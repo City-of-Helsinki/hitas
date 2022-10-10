@@ -5,11 +5,15 @@ import {Navigate, Route, Routes} from "react-router-dom";
 
 import App from "./app/App";
 import {store} from "./app/store";
-import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
-import {ApartmentCreatePage, ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
-import ApartmentImprovementsPage from "./features/apartment/ApartmentImprovementsPage";
+import {
+    ApartmentCreatePage,
+    ApartmentDetailsPage,
+    ApartmentImprovementsPage,
+    ApartmentListPage,
+} from "./features/apartment";
+import {Codes} from "./features/codes";
 import {
     BuildingCreatePage,
     HousingCompanyCreatePage,
