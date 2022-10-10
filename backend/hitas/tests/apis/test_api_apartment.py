@@ -83,6 +83,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "state": ap1.state.value,
                 "type": ap1.apartment_type.value,
                 "surface_area": float(ap1.surface_area),
+                "rooms": ap1.rooms,
                 "address": {
                     "street_address": ap1.street_address,
                     "postal_code": hc.postal_code.value,
@@ -149,6 +150,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "state": ap2.state.value,
                 "type": ap2.apartment_type.value,
                 "surface_area": float(ap2.surface_area),
+                "rooms": ap2.rooms,
                 "address": {
                     "street_address": ap2.street_address,
                     "postal_code": hc.postal_code.value,
@@ -242,6 +244,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "code": ap.apartment_type.legacy_code_number,
         },
         "surface_area": float(ap.surface_area),
+        "rooms": ap.rooms,
         "shares": {
             "start": ap.share_number_start,
             "end": ap.share_number_end,
@@ -514,6 +517,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         "state": ApartmentState.SOLD.value,
         "type": {"id": apartment_type.uuid.hex},
         "surface_area": 69,
+        "rooms": 88,
         "shares": {
             "start": 20,
             "end": 100,
@@ -592,6 +596,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                     "market_price_index": [],
                     "construction_price_index": [],
                 },
+                "rooms": None,
             }
         )
         data["shares"] = None
@@ -1131,6 +1136,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
         "state": ApartmentState.SOLD.value,
         "type": {"id": ap.apartment_type.uuid.hex},
         "surface_area": 100,
+        "rooms": 2,
         "shares": {
             "start": 101,
             "end": 200,

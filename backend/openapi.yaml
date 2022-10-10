@@ -2745,6 +2745,12 @@ components:
           type: number
           minimum: 0
           example: 67
+        rooms:
+          description: The amount of rooms in this apartment
+          type: number
+          nullable: true
+          minimum: 1
+          example: 4
         address:
           $ref: '#/components/schemas/ApartmentAddress'
         completion_date:
@@ -2793,6 +2799,12 @@ components:
           type: number
           minimum: 0
           example: 67
+        rooms:
+          description: The amount of rooms in this apartment
+          type: number
+          nullable: true
+          minimum: 1
+          example: 4
         shares:
           description: Share information
           type: object

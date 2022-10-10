@@ -20,6 +20,7 @@ from hitas.views.utils import (
     HitasModelSerializer,
     HitasModelViewSet,
     UUIDRelatedField,
+    ValueOrNullField,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.serializers import YearMonthSerializer
@@ -280,6 +281,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField()
+    rooms = ValueOrNullField(required=False, allow_null=True)
     shares = SharesSerializer(source="*", required=False, allow_null=True)
     prices = PricesSerializer(source="*", required=False, allow_null=True)
     ownerships = OwnershipSerializer(many=True)
@@ -393,6 +395,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "state",
             "type",
             "surface_area",
+            "rooms",
             "shares",
             "links",
             "address",
@@ -415,6 +418,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "state",
             "type",
             "surface_area",
+            "rooms",
             "address",
             "completion_date",
             "ownerships",
