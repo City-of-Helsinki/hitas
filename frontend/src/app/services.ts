@@ -181,6 +181,7 @@ export const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
+                {type: "Apartment", id: arg.id},
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
