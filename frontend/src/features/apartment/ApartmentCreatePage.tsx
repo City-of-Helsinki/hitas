@@ -56,8 +56,10 @@ const ApartmentCreatePage = () => {
 
     const params = useParams() as {readonly housingCompanyId: string};
 
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-    const [createApartment, {data: savedData, error: saveError, isLoading: isSaving}] = useSaveApartmentMutation();
+    const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
+        params.housingCompanyId
+    );
+    const [createApartment, {data, error, isLoading}] = useSaveApartmentMutation();
 
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
@@ -154,14 +156,14 @@ const ApartmentCreatePage = () => {
     // Handle saving flow when editing
     useEffect(() => {
         if (isEditPage) {
-            if (!isLoading && !saveError && savedData && savedData.id) {
+            if (!isLoading && !error && data && data.id) {
                 hitasToast("Asunto tallennettu onnistuneesti!");
-                navigate(`/housing-companies/${savedData.links.housing_company.id}/apartments/${savedData.id}`);
-            } else if (saveError) {
+                navigate(`/housing-companies/${data.links.housing_company.id}/apartments/${data.id}`);
+            } else if (error) {
                 setIsEndModalVisible(true);
             }
         }
-    }, [isLoading, saveError, savedData, navigate, isEditPage]);
+    }, [isLoading, error, data, navigate, isEditPage]);
 
     // Redirect user to detail page if state is missing Apartment data and user is trying to edit the apartment
     useEffect(() => {
@@ -170,9 +172,9 @@ const ApartmentCreatePage = () => {
 
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions =
-        isLoading || !data
+        housingCompanyIsLoading || !housingCompanyData
             ? []
-            : data.real_estates.flatMap((realEstate) => {
+            : housingCompanyData.real_estates.flatMap((realEstate) => {
                   return realEstate.buildings.map((building) => {
                       return {label: building.address.street_address, value: building.id};
                   });
@@ -187,8 +189,8 @@ const ApartmentCreatePage = () => {
                         id="input-housing_company.name"
                         label="Asunto-osakeyhtiö"
                         value={
-                            data?.name.display !== undefined
-                                ? data?.name.display
+                            housingCompanyData?.name.display !== undefined
+                                ? housingCompanyData?.name.display
                                 : state?.apartment !== undefined
                                 ? state.apartment.links.housing_company.display_name
                                 : ""
@@ -492,7 +494,7 @@ const ApartmentCreatePage = () => {
                 iconLeft={<IconSaveDisketteFill />}
                 onClick={handleSaveButtonClicked}
                 theme={"black"}
-                isLoading={isLoading}
+                isLoading={housingCompanyIsLoading}
             >
                 Tallenna
             </Button>
@@ -502,9 +504,9 @@ const ApartmentCreatePage = () => {
                 baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
-                data={savedData}
-                error={saveError}
-                isLoading={isSaving}
+                data={data}
+                error={error}
+                isLoading={isLoading}
             />
         </div>
     );
