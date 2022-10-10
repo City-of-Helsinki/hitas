@@ -74,7 +74,7 @@ const ApartmentDetailsPage = (): JSX.Element => {
                         {data.address.apartment_number}
                     </span>
                     <span>
-                        2 {/* TODO: Substitute with dynamic value once the API supplies one */}
+                        {data.rooms}
                         {data.type.value}
                     </span>
                     <span>{data.surface_area}m²</span>
