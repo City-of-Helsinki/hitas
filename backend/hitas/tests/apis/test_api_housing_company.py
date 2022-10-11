@@ -969,13 +969,13 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
     "selected_filter",
     [
         {"display_name": "TestDisplayName"},
-        {"display_name": "Di"},
+        {"display_name": "xx"},
         {"street_address": "test-street"},
-        {"street_address": "te"},
-        {"property_manager": "XXTestPropertyManager"},
+        {"street_address": "xx"},
+        {"property_manager": "TestPropertyManager"},
         {"property_manager": "xx"},
         {"developer": "TestDeveloper"},
-        {"developer": "Te"},
+        {"developer": "xx"},
         {"postal_code": "99999"},
         {"archive_id": 999},
     ],
@@ -984,10 +984,14 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
 def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filter):
     hc: HousingCompany = HousingCompanyFactory.create(display_name="TestDisplayName")
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
+    HousingCompanyFactory.create(display_name="test-XX-display")
     HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
     HousingCompanyFactory.create(street_address="test-street")
-    HousingCompanyFactory.create(property_manager__name="XXTestPropertyManager")
+    HousingCompanyFactory.create(street_address="test-XX-street")
+    HousingCompanyFactory.create(property_manager__name="TestPropertyManager")
+    HousingCompanyFactory.create(property_manager__name="test-XX-property")
     HousingCompanyFactory.create(developer__value="TestDeveloper")
+    HousingCompanyFactory.create(developer__value="test-XX-developer")
     HousingCompanyFactory.create(postal_code__value="99999")
     HousingCompanyFactory.create(id=999)
     RealEstateFactory.create(property_identifier="1-1234-321-56", housing_company=hc)
