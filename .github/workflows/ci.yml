@@ -68,4 +68,4 @@ jobs:
     - name: "Test for migration issues"
       env:
         SECRET_KEY: xxx
-      run: cd backend && ./manage.py makemigrations --check --no-color --no-input
+      run: cd backend && ./manage.py makemigrations --check --no-color --no-input --dry-run
