@@ -23,6 +23,8 @@ from hitas.models import (
     ApartmentType,
     Building,
     BuildingType,
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
     Developer,
     FinancingMethod,
     HitasPostalCode,
@@ -30,20 +32,16 @@ from hitas.models import (
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
     HousingCompanyState,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
+    MaxPriceIndex,
     Owner,
     Ownership,
     PropertyManager,
     RealEstate,
-)
-from hitas.models.apartment import DepreciationPercentage
-from hitas.models.indices import (
-    ConstructionPriceIndex,
-    ConstructionPriceIndexPre2005,
-    MarketPriceIndex,
-    MarketPriceIndexPre2005,
-    MaxPriceIndex,
     SurfaceAreaPriceCeiling,
 )
+from hitas.models.apartment import DepreciationPercentage
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data
 from hitas.oracle_migration.oracle_schema import (
@@ -176,10 +174,10 @@ def run(
 
             # Indices
             create_indices(codebooks_by_id["HITASEHIND"], MaxPriceIndex)
-            create_indices(codebooks_by_id["MARKHINTAIND"], MarketPriceIndexPre2005)
-            create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex)
-            create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndexPre2005)
-            create_indices(codebooks_by_id["RAKUSTIND2005"], ConstructionPriceIndex)
+            create_indices(codebooks_by_id["MARKHINTAIND"], MarketPriceIndex)
+            create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex2005Equal100)
+            create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndex)
+            create_indices(codebooks_by_id["RAKUSTIND2005"], ConstructionPriceIndex2005Equal100)
             create_indices(codebooks_by_id["RAJAHINNAT"], SurfaceAreaPriceCeiling)
 
             # Postal codes

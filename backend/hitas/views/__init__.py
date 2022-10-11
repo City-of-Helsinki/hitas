@@ -4,9 +4,9 @@ from hitas.views.building import BuildingViewSet
 from hitas.views.codes import ApartmentTypeViewSet, BuildingTypeViewSet, DeveloperViewSet, FinancingMethodViewSet
 from hitas.views.housing_company import HousingCompanyViewSet
 from hitas.views.indices import (
-    ConstructionPriceIndexPre2005ViewSet,
+    ConstructionPriceIndex2005Equal100ViewSet,
     ConstructionPriceIndexViewSet,
-    MarketPriceIndexPre2005ViewSet,
+    MarketPriceIndex2005Equal100ViewSet,
     MarketPriceIndexViewSet,
     MaxPriceIndexViewSet,
     SurfaceAreaPriceCeilingViewSet,

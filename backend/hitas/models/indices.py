@@ -22,27 +22,27 @@ class MaxPriceIndex(AbstractIndex):
 # 'Markkinahintaindeksi'
 class MarketPriceIndex(AbstractIndex):
     class Meta:
-        verbose_name = _("Market price index for apartments constructed in January 2005 or after")
-        verbose_name_plural = _("Market price indices for apartment constructed in January 2005 or after")
+        verbose_name = _("Market price index for apartments constructed before January 2011")
+        verbose_name_plural = _("Market price indices for apartment constructed before January 2011")
 
 
-class MarketPriceIndexPre2005(AbstractIndex):
+class MarketPriceIndex2005Equal100(AbstractIndex):
     class Meta:
-        verbose_name = _("Market price index for apartments constructed before January 2005")
-        verbose_name_plural = _("Market price indices for apartment constructed before January 2005")
+        verbose_name = _("Market price index for apartments constructed in January 2011 onwards")
+        verbose_name_plural = _("Market price indices for apartment constructed in January 2011 onwards")
 
 
 # 'Rakennuskustannusindeksi'
 class ConstructionPriceIndex(AbstractIndex):
     class Meta:
-        verbose_name = _("Construction price index year for apartments constructed in January 2005 and after")
-        verbose_name_plural = _("Construction price indices for apartments constructed in January 2005 and after")
+        verbose_name = _("Construction price index for apartments constructed before January 2011")
+        verbose_name_plural = _("Construction price indices for apartments constructed before January 2011")
 
 
-class ConstructionPriceIndexPre2005(AbstractIndex):
+class ConstructionPriceIndex2005Equal100(AbstractIndex):
     class Meta:
-        verbose_name = _("Construction price index for apartments constructed before January 2005")
-        verbose_name_plural = _("Construction price indices for apartments constructed before January 2005")
+        verbose_name = _("Construction price index year for apartments constructed in January 2005 onwards")
+        verbose_name_plural = _("Construction price indices for apartments constructed in January 2005 onwards")
 
 
 # 'Rajaneliöhinta'

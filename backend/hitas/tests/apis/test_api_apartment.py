@@ -30,10 +30,10 @@ from hitas.tests.factories import (
     RealEstateFactory,
 )
 from hitas.tests.factories.indices import (
+    ConstructionPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
-    ConstructionPriceIndexPre2005Factory,
+    MarketPriceIndex2005Equal100Factory,
     MarketPriceIndexFactory,
-    MarketPriceIndexPre2005Factory,
     SurfaceAreaPriceCeilingFactory,
 )
 from hitas.views.apartment import ApartmentDetailSerializer
@@ -207,7 +207,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2010, 1, 1),
+        completion_date=datetime.date(2011, 1, 1),
         debt_free_purchase_price=100000,
         surface_area=50,
     )
@@ -216,12 +216,12 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
     mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
-    ConstructionPriceIndexFactory.create(month=ap.completion_date, value=100)
-    MarketPriceIndexFactory.create(month=ap.completion_date, value=200)
+    ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200)
 
     now = datetime.date.today().replace(day=1)
-    ConstructionPriceIndexFactory.create(month=now, value=150)
-    MarketPriceIndexFactory.create(month=now, value=250)
+    ConstructionPriceIndex2005Equal100Factory.create(month=now, value=150)
+    MarketPriceIndex2005Equal100Factory.create(month=now, value=250)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
 
     response = api_client.get(
@@ -272,8 +272,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "max_prices": {
                 "confirmed": None,
                 "unconfirmed": {
-                    "pre_2005": None,
-                    "onwards_2005": {
+                    "pre_2011": None,
+                    "onwards_2011": {
                         "construction_price_index": {
                             "value": 150000,  # 100000 (debt_free_purchase_price) * 150/100
                             "maximum": True,
@@ -349,11 +349,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
 
 def _test_max_prices(
-    api_client: HitasAPIClient, pre_2005: bool, create_completion_indices: bool, create_current_indices: bool
+    api_client: HitasAPIClient, pre_2011: bool, create_completion_indices: bool, create_current_indices: bool
 ):
-    completion_date = datetime.date(2004, 12, 1) if pre_2005 else datetime.date(2005, 1, 1)
-    cpi_factory = ConstructionPriceIndexPre2005Factory if pre_2005 else ConstructionPriceIndexFactory
-    mpi_factory = MarketPriceIndexPre2005Factory if pre_2005 else MarketPriceIndexFactory
+    completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
+    cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
+    mpi_factory = MarketPriceIndexFactory if pre_2011 else MarketPriceIndex2005Equal100Factory
 
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
@@ -395,49 +395,49 @@ def _test_max_prices(
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["prices"]["max_prices"]["unconfirmed"] == {
-        "pre_2005": values if pre_2005 else None,
-        "onwards_2005": None if pre_2005 else values,
+        "pre_2011": values if pre_2011 else None,
+        "onwards_2011": None if pre_2011 else values,
     }
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__2005_onwards__indices_set(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=False, create_completion_indices=True, create_current_indices=True)
+def test__api__apartment__retrieve__2011_onwards__indices_set(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=False, create_completion_indices=True, create_current_indices=True)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__2005_onwards__completion_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=False, create_completion_indices=False, create_current_indices=True)
+def test__api__apartment__retrieve__2011_onwards__completion_indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=False, create_completion_indices=False, create_current_indices=True)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__2005_onwards__current_month_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=False, create_completion_indices=True, create_current_indices=False)
+def test__api__apartment__retrieve__2011_onwards__current_month_indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=False, create_completion_indices=True, create_current_indices=False)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__2005_onwards__indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=False, create_completion_indices=False, create_current_indices=False)
+def test__api__apartment__retrieve__2011_onwards__indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=False, create_completion_indices=False, create_current_indices=False)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2005__indices_set(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=True, create_completion_indices=True, create_current_indices=True)
+def test__api__apartment__retrieve__pre_2011__indices_set(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=True, create_completion_indices=True, create_current_indices=True)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2005__completion_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=True, create_completion_indices=False, create_current_indices=True)
+def test__api__apartment__retrieve__pre_2011__completion_indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=True, create_completion_indices=False, create_current_indices=True)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2005__current_month_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=True, create_completion_indices=True, create_current_indices=False)
+def test__api__apartment__retrieve__pre_2011__current_month_indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=True, create_completion_indices=True, create_current_indices=False)
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2005__indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(api_client, pre_2005=True, create_completion_indices=False, create_current_indices=False)
+def test__api__apartment__retrieve__pre_2011__indices_missing(api_client: HitasAPIClient):
+    _test_max_prices(api_client, pre_2011=True, create_completion_indices=False, create_current_indices=False)
 
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])

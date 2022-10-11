@@ -8,9 +8,9 @@ from faker import Faker
 
 from hitas.models import (
     ConstructionPriceIndex,
-    ConstructionPriceIndexPre2005,
+    ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
-    MarketPriceIndexPre2005,
+    MarketPriceIndex2005Equal100,
     MaxPriceIndex,
     SurfaceAreaPriceCeiling,
 )
@@ -36,9 +36,9 @@ class MarketPriceIndexFactory(AbstractIndexFactory):
         model = MarketPriceIndex
 
 
-class MarketPriceIndexPre2005Factory(AbstractIndexFactory):
+class MarketPriceIndex2005Equal100Factory(AbstractIndexFactory):
     class Meta:
-        model = MarketPriceIndexPre2005
+        model = MarketPriceIndex2005Equal100
 
 
 class ConstructionPriceIndexFactory(AbstractIndexFactory):
@@ -46,9 +46,9 @@ class ConstructionPriceIndexFactory(AbstractIndexFactory):
         model = ConstructionPriceIndex
 
 
-class ConstructionPriceIndexPre2005Factory(AbstractIndexFactory):
+class ConstructionPriceIndex2005Equal100Factory(AbstractIndexFactory):
     class Meta:
-        model = ConstructionPriceIndexPre2005
+        model = ConstructionPriceIndex2005Equal100
 
 
 class SurfaceAreaPriceCeilingFactory(AbstractIndexFactory):

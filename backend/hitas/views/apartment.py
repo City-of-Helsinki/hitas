@@ -166,8 +166,8 @@ class PricesSerializer(serializers.Serializer):
 
     @staticmethod
     def get_unconfirmed_max_prices(instance: Apartment) -> Dict[str, Any]:
-        pre2005 = None
-        onwards2005 = None
+        pre2011 = None
+        onwards2011 = None
 
         def instance_values(keys: list[str]):
             retval = []
@@ -193,30 +193,30 @@ class PricesSerializer(serializers.Serializer):
         def value_obj(v: float, max_value: float):
             return {"value": v, "maximum": v is not None and v == max_value}
 
-        if instance.completion_date and instance.completion_date < datetime.date(2005, 1, 1):
-            # Handle apartments completed before year 2005
-            cpi, mpi, sapc = instance_values(["cpi_pre2005", "mpi_pre2005", "sapc"])
+        if instance.completion_date and instance.completion_date < datetime.date(2011, 1, 1):
+            # Handle apartments completed before year 2011
+            cpi, mpi, sapc = instance_values(["cpi", "mpi", "sapc"])
             maximum = max_with_nones(cpi, mpi, sapc)
 
-            pre2005 = {
+            pre2011 = {
                 "construction_price_index": value_obj(cpi, maximum),
                 "market_price_index": value_obj(mpi, maximum),
                 "surface_area_price_ceiling": value_obj(sapc, maximum),
             }
         else:
-            # Handle apartments not yet completed or completed 2005 owwards
-            cpi, mpi, sapc = instance_values(["cpi", "mpi", "sapc"])
+            # Handle apartments not yet completed or completed 2011 owwards
+            cpi, mpi, sapc = instance_values(["cpi_2005_100", "mpi_2005_100", "sapc"])
             maximum = max_with_nones(cpi, mpi, sapc)
 
-            onwards2005 = {
+            onwards2011 = {
                 "construction_price_index": value_obj(cpi, maximum),
                 "market_price_index": value_obj(mpi, maximum),
                 "surface_area_price_ceiling": value_obj(sapc, maximum),
             }
 
         return {
-            "pre_2005": pre2005,
-            "onwards_2005": onwards2005,
+            "pre_2011": pre2011,
+            "onwards_2011": onwards2011,
         }
 
 
@@ -428,8 +428,8 @@ class ApartmentViewSet(HitasModelViewSet):
     model_class = Apartment
 
     @staticmethod
-    def select_index(table: str, pre2005: bool):
-        comparison = "<" if pre2005 else ">="
+    def select_index(table: str, pre2011: bool):
+        comparison = "<" if pre2011 else ">="
 
         return f"""
     SELECT
@@ -438,9 +438,9 @@ class ApartmentViewSet(HitasModelViewSet):
         ) AS max_price_{table}
     FROM hitas_apartment AS a
     LEFT JOIN hitas_{table} AS original_{table} ON
-        a.completion_date {comparison} '2005-01-01' AND original_{table}.month = DATE_TRUNC('month', a.completion_date)
+        a.completion_date {comparison} '2011-01-01' AND original_{table}.month = DATE_TRUNC('month', a.completion_date)
     LEFT JOIN hitas_{table} AS current_{table} ON
-        a.completion_date {comparison} '2005-01-01' AND current_{table}.month = DATE_TRUNC('month', NOW())
+        a.completion_date {comparison} '2011-01-01' AND current_{table}.month = DATE_TRUNC('month', NOW())
     WHERE a.id = hitas_apartment.id
 """
 
@@ -481,10 +481,10 @@ class ApartmentViewSet(HitasModelViewSet):
             )
             .extra(
                 select={
-                    "cpi": self.select_index("constructionpriceindex", pre2005=False),
-                    "cpi_pre2005": self.select_index("constructionpriceindexpre2005", pre2005=True),
-                    "mpi": self.select_index("marketpriceindex", pre2005=False),
-                    "mpi_pre2005": self.select_index("marketpriceindexpre2005", pre2005=True),
+                    "cpi": self.select_index("constructionpriceindex", pre2011=True),
+                    "cpi_2005_100": self.select_index("constructionpriceindex2005equal100", pre2011=False),
+                    "mpi": self.select_index("marketpriceindex", pre2011=True),
+                    "mpi_2005_100": self.select_index("marketpriceindex2005equal100", pre2011=False),
                     "sapc": """
     SELECT ROUND(a.surface_area * sapc.value)
     FROM hitas_apartment AS a

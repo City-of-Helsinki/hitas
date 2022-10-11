@@ -14,9 +14,9 @@ from hitas.models.housing_company import (
 )
 from hitas.models.indices import (
     ConstructionPriceIndex,
-    ConstructionPriceIndexPre2005,
+    ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
-    MarketPriceIndexPre2005,
+    MarketPriceIndex2005Equal100,
     MaxPriceIndex,
     SurfaceAreaPriceCeiling,
 )
