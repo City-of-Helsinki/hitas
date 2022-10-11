@@ -12,15 +12,17 @@ router.register(r"owners", views.OwnerViewSet, basename="owner")
 router.register(r"indices/max-price-index", views.MaxPriceIndexViewSet, basename="max-price-index")
 router.register(r"indices/market-price-index", views.MarketPriceIndexViewSet, basename="market-price-index")
 router.register(
-    r"indices/market-price-index-pre-2005", views.MarketPriceIndexPre2005ViewSet, basename="market-price-index-pre-2005"
+    r"indices/market-price-index-2005-equal-100",
+    views.MarketPriceIndex2005Equal100ViewSet,
+    basename="market-price-index-2005-equal-100",
 )
 router.register(
     r"indices/construction-price-index", views.ConstructionPriceIndexViewSet, basename="construction-price-index"
 )
 router.register(
-    r"indices/construction-price-index-pre-2005",
-    views.ConstructionPriceIndexPre2005ViewSet,
-    basename="construction-price-index-pre-2005",
+    r"indices/construction-price-index-2005-equal-100",
+    views.ConstructionPriceIndex2005Equal100ViewSet,
+    basename="construction-price-index-2005-equal-100",
 )
 router.register(
     r"indices/surface-area-price-ceiling",

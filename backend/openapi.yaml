@@ -2282,17 +2282,17 @@ components:
 
           - max-value-index
           - market-price-index
-          - market-price-index-pre-2005
+          - market-price-index-2005-equal-100
           - construction-price-index
-          - construction-price-index-pre-2005
+          - construction-price-index-2005-equal-100
         type: string
         example: max-value-index
         x-extensible-enum:
           - max-value-index
           - market-price-index
-          - market-price-index-pre-2005
+          - market-price-index-2005-equal-100
           - construction-price-index
-          - construction-price-index-pre-2005
+          - construction-price-index-2005-equal-100
       description: Specifies the index name used
 
   schemas:
@@ -3066,11 +3066,11 @@ components:
               type: object
               additionalProperties: false
               required:
-                - pre_2005
-                - onwards_2005
+                - pre_2011
+                - onwards_2011
               properties:
-                pre_2005:
-                  description: Apartment's maximum Hitas prices for apartments constructed before 2005
+                pre_2011:
+                  description: Apartment's maximum Hitas prices for apartments constructed before 2011
                   type: object
                   nullable: true
                   additionalProperties: false
@@ -3085,8 +3085,8 @@ components:
                       $ref: '#/components/schemas/MaximumValue'
                     surface_area_price_ceiling:
                       $ref: '#/components/schemas/MaximumValue'
-                onwards_2005:
-                  description: Apartment's maximum Hitas prices for apartments constructed 2005 onwards
+                onwards_2011:
+                  description: Apartment's maximum Hitas prices for apartments constructed 2011 onwards
                   type: object
                   nullable: true
                   additionalProperties: false

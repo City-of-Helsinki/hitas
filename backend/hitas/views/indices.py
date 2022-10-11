@@ -8,9 +8,9 @@ from rest_framework.viewsets import GenericViewSet
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import (
     ConstructionPriceIndex,
-    ConstructionPriceIndexPre2005,
+    ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
-    MarketPriceIndexPre2005,
+    MarketPriceIndex2005Equal100,
     MaxPriceIndex,
     SurfaceAreaPriceCeiling,
 )
@@ -88,9 +88,9 @@ class MarketPriceIndexViewSet(_AbstractIndicesViewSet):
         super().__init__(MarketPriceIndex, **kwargs)
 
 
-class MarketPriceIndexPre2005ViewSet(_AbstractIndicesViewSet):
+class MarketPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
     def __init__(self, **kwargs):
-        super().__init__(MarketPriceIndexPre2005, **kwargs)
+        super().__init__(MarketPriceIndex2005Equal100, **kwargs)
 
 
 class ConstructionPriceIndexViewSet(_AbstractIndicesViewSet):
@@ -98,9 +98,9 @@ class ConstructionPriceIndexViewSet(_AbstractIndicesViewSet):
         super().__init__(ConstructionPriceIndex, **kwargs)
 
 
-class ConstructionPriceIndexPre2005ViewSet(_AbstractIndicesViewSet):
+class ConstructionPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
     def __init__(self, **kwargs):
-        super().__init__(ConstructionPriceIndexPre2005, **kwargs)
+        super().__init__(ConstructionPriceIndex2005Equal100, **kwargs)
 
 
 class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):

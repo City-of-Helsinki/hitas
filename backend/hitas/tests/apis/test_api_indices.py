@@ -7,10 +7,10 @@ from rest_framework import status
 
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories.indices import (
+    ConstructionPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
-    ConstructionPriceIndexPre2005Factory,
+    MarketPriceIndex2005Equal100Factory,
     MarketPriceIndexFactory,
-    MarketPriceIndexPre2005Factory,
     MaxPriceIndexFactory,
     SurfaceAreaPriceCeilingFactory,
 )
@@ -18,18 +18,18 @@ from hitas.tests.factories.indices import (
 indices = [
     "max-price-index",
     "market-price-index",
-    "market-price-index-pre-2005",
+    "market-price-index-2005-equal-100",
     "construction-price-index",
-    "construction-price-index-pre-2005",
+    "construction-price-index-2005-equal-100",
     "surface-area-price-ceiling",
 ]
 
 factories = [
     MaxPriceIndexFactory,
     MarketPriceIndexFactory,
-    MarketPriceIndexPre2005Factory,
+    MarketPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
-    ConstructionPriceIndexPre2005Factory,
+    ConstructionPriceIndex2005Equal100Factory,
     SurfaceAreaPriceCeilingFactory,
 ]
 
