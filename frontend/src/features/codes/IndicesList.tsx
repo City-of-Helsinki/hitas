@@ -5,7 +5,7 @@ import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
 import {FilterTextInputField, FormInputField, ListPageNumbers} from "../../common/components";
-import {IIndex, IIndexResponse, IndexType} from "../../common/models";
+import {IIndex, IndexType} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
 const indices: IndexType[] = [
@@ -41,7 +41,7 @@ const indexOptions = indices.map(({label}) => {
 const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [currentIndex, setCurrentIndex] = useState();
+    const [currentIndex, setCurrentIndex] = useState(indices[0]);
     const {
         data: results,
         error,
@@ -49,7 +49,7 @@ const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
     } = useGetIndicesQuery({
         ...filterParams,
         page: currentPage,
-        indexType: indices[0].label,
+        indexType: currentIndex.label,
     });
     const initialSaveData: IIndex = {index: indices[0], month: "", value: null};
     const [formData, setFormData] = useImmer(initialSaveData);
@@ -70,61 +70,67 @@ const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
             );
         }
     }, [isSaving, saveError, saveData]);
-    const LoadedIndexResultsList = ({data, dialogToggle}: {data: IIndexResponse; dialogToggle}) => {
+    const LoadedIndexResultsList = () => {
         return (
             <div className="results">
-                <div className="list-amount">{`Löytyi ${data.page.total_items}kpl tuloksia`}</div>
-                <div className="list-headers">
-                    <div className="list-header month">Kuukausi</div>
-                    <div className="list-header value">Arvo</div>
-                </div>
-                <ul className="results-list">
-                    <IndexListItem
-                        index={indices[0]}
-                        month={"2022-01"}
-                        value={127.12}
-                    />
-                    <IndexListItem
-                        index={indices[1]}
-                        month={"2022-02"}
-                        value={194.44}
-                    />
-                    <IndexListItem
-                        index={indices[2]}
-                        month={"2022-01"}
-                        value={127.12}
-                    />
-                    <IndexListItem
-                        index={indices[3]}
-                        month={"2022-02"}
-                        value={194.44}
-                    />
-                    <IndexListItem
-                        index={indices[4]}
-                        month={"2022-01"}
-                        value={127.12}
-                    />
-                    <IndexListItem
-                        index={indices[0]}
-                        month={"2022-02"}
-                        value={194.44}
-                    />
-                    {data.contents.map((item: IIndex) => (
-                        <IndexListItem
-                            key={item.month}
-                            index={item.index}
-                            month={item.month}
-                            value={item.value}
-                        />
-                    ))}
-                </ul>
-                <Button
-                    theme="black"
-                    iconLeft={<IconPlus />}
-                    onClick={() => dialogToggle(true)}
-                >
-                    Lisää indeksi
-                </Button>
+                <div className="list-amount">{`Löytyi ${results?.page.total_items}kpl tuloksia`}</div>
+                {error ? (
+                    <span>Virhe</span>
+                ) : (
+                    <>
+                        <div className="list-headers">
+                            <div className="list-header month">Kuukausi</div>
+                            <div className="list-header value">Arvo</div>
+                        </div>
+                        <ul className="results-list">
+                            <IndexListItem
+                                index={indices[0]}
+                                month={"2022-01"}
+                                value={127.12}
+                            />
+                            <IndexListItem
+                                index={indices[1]}
+                                month={"2022-02"}
+                                value={194.44}
+                            />
+                            <IndexListItem
+                                index={indices[2]}
+                                month={"2022-01"}
+                                value={127.12}
+                            />
+                            <IndexListItem
+                                index={indices[3]}
+                                month={"2022-02"}
+                                value={194.44}
+                            />
+                            <IndexListItem
+                                index={indices[4]}
+                                month={"2022-01"}
+                                value={127.12}
+                            />
+                            <IndexListItem
+                                index={indices[0]}
+                                month={"2022-02"}
+                                value={194.44}
+                            />
+                            {results?.contents.map((item: IIndex) => (
+                                <IndexListItem
+                                    key={item.month}
+                                    index={item.index}
+                                    month={item.month}
+                                    value={item.value}
+                                />
+                            ))}
+                        </ul>
+                        <Button
+                            theme="black"
+                            iconLeft={<IconPlus />}
+                            onClick={() => setCreateDialogOpen(true)}
+                        >
+                            Lisää indeksi
+                        </Button>
+                    </>
+                )}
             </div>
         );
     };
@@ -138,21 +144,11 @@ const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
             </div>
         );
     };
-    function result(
-        data,
-        error,
-        isLoading,
-        currentPage,
-        setCurrentPage,
-        currentIndex,
-        setCurrentIndex,
-        filterParams,
-        setFilterParams,
-        createDialogOpen,
-        setCreateDialogOpen
-    ) {
-        const onSelectionChange = (value: {value: string}) => {
-            setCurrentIndex(value.value);
+    function result() {
+        const onSelectionChange = ({value}) => {
+            setCurrentIndex(() => {
+                return {label: value};
+            });
         };
         return !isLoading ? (
             <div className="listing">
@@ -165,14 +161,11 @@ const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
                     />
                     <IconSearch />
                 </div>
-                <LoadedIndexResultsList
-                    data={data as IIndexResponse}
-                    dialogToggle={setCreateDialogOpen}
-                />
+                <LoadedIndexResultsList />
                 <ListPageNumbers
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
-                    pageInfo={data?.page}
+                    pageInfo={results?.page}
                 />
                 <div className="filters">
                     <Combobox
@@ -240,19 +233,7 @@ const IndicesList = ({filterParams, setFilterParams}): JSX.Element => {
             </Dialog>
         );
     };
-    return result(
-        results,
-        error,
-        isLoading,
-        currentPage,
-        setCurrentPage,
-        currentIndex,
-        setCurrentIndex,
-        filterParams,
-        setFilterParams,
-        createDialogOpen,
-        setCreateDialogOpen
-    );
+    return result();
 };
 
 export default IndicesList;
