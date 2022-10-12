@@ -767,11 +767,14 @@
     "model": "hitas.apartment",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a0ed3e6b-b844-4fd5-9db9-2c3c53b193d8",
       "building": 1,
       "state": "reserved",
       "apartment_type": 100,
       "surface_area": "60.00",
+      "rooms": null,
       "share_number_start": 1,
       "share_number_end": 49,
       "completion_date": "2014-06-02",
@@ -795,11 +798,14 @@
     "model": "hitas.apartment",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a65fdf9f-87c8-4c4d-88cf-4116d82b07ed",
       "building": 2,
       "state": "free",
       "apartment_type": 128,
       "surface_area": "43.67",
+      "rooms": null,
       "share_number_start": 50,
       "share_number_end": 100,
       "completion_date": "2014-06-02",
@@ -823,11 +829,14 @@
     "model": "hitas.apartment",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "231c4898-3918-4cad-9c6b-63d99fa1de62",
       "building": 3,
       "state": "free",
       "apartment_type": 129,
       "surface_area": "13.40",
+      "rooms": null,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
@@ -851,11 +860,14 @@
     "model": "hitas.apartment",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c8ded105-4a5d-4fbf-82c2-3ecfbc986744",
       "building": 4,
       "state": "sold",
       "apartment_type": 129,
       "surface_area": "97.35",
+      "rooms": null,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
@@ -879,11 +891,14 @@
     "model": "hitas.apartment",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "8488cfbf-11d7-4fed-9eae-9077ef3b50bc",
       "building": 5,
       "state": "sold",
       "apartment_type": 130,
       "surface_area": "11.72",
+      "rooms": null,
       "share_number_start": 1,
       "share_number_end": 500,
       "completion_date": "2014-06-02",
@@ -907,11 +922,14 @@
     "model": "hitas.apartment",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c03a059a-f54a-458c-84e9-e09351a531cb",
       "building": 6,
       "state": "sold",
       "apartment_type": 129,
       "surface_area": "16.01",
+      "rooms": null,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
@@ -935,11 +953,14 @@
     "model": "hitas.apartment",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "7b237e63-2233-4c94-a566-e9724eed3626",
       "building": 7,
       "state": "sold",
       "apartment_type": 129,
       "surface_area": "14.36",
+      "rooms": null,
       "share_number_start": 1001,
       "share_number_end": 1500,
       "completion_date": "2014-06-02",
@@ -963,11 +984,14 @@
     "model": "hitas.apartment",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "71e9f7d2-4911-44bf-8ab6-71b40462df48",
       "building": 8,
       "state": "sold",
       "apartment_type": 129,
       "surface_area": "40.91",
+      "rooms": null,
       "share_number_start": 30,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
@@ -991,6 +1015,8 @@
     "model": "hitas.building",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
       "real_estate": 1,
       "street_address": "Fakestreet 123",
@@ -1001,6 +1027,8 @@
     "model": "hitas.building",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "be48cc00-3f0c-4419-a584-0c363feb0249",
       "real_estate": 2,
       "street_address": "Berganpolku 048",
@@ -1011,6 +1039,8 @@
     "model": "hitas.building",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0f3561d9-f389-4f0a-a64a-38d4f2e90358",
       "real_estate": 3,
       "street_address": "Porebulevardi 00",
@@ -1021,6 +1051,8 @@
     "model": "hitas.building",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e35d0081-29cf-4208-bd10-d7608fe852c6",
       "real_estate": 4,
       "street_address": "Aidasmäentie 1",
@@ -1031,6 +1063,8 @@
     "model": "hitas.building",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "22c9f4ce-2953-4d24-97fc-c58ec69d1a37",
       "real_estate": 5,
       "street_address": "Berganpolku 7",
@@ -1041,6 +1075,8 @@
     "model": "hitas.building",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "dcd112ff-9e3d-4852-b359-a0f336acb6ae",
       "real_estate": 6,
       "street_address": "Urheilukuja 0",
@@ -1051,6 +1087,8 @@
     "model": "hitas.building",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "12ebf093-a10d-43c1-8075-df552bd6595d",
       "real_estate": 7,
       "street_address": "Winqvistinkuja 0",
@@ -1061,6 +1099,8 @@
     "model": "hitas.building",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4c7f8a59-3e90-4500-8eeb-482dc35e5f16",
       "real_estate": 8,
       "street_address": "Kimalaispolku 382",
@@ -1071,6 +1111,8 @@
     "model": "hitas.buildingtype",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "114211d1-db03-4389-ab6d-49683c8282e1",
       "value": "tuntematon",
       "description": "",
@@ -1085,6 +1127,8 @@
     "model": "hitas.buildingtype",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f3a77a46-9fc3-4b45-ba6d-baeebacd8a33",
       "value": "kerrostalo",
       "description": "",
@@ -1099,6 +1143,8 @@
     "model": "hitas.buildingtype",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "84e5d67b-6090-4d16-bfc2-7a686e0ee515",
       "value": "rivitalo",
       "description": "",
@@ -1113,6 +1159,8 @@
     "model": "hitas.buildingtype",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e7d21da9-f4c6-485a-ab93-17f2767dda57",
       "value": "paritalo",
       "description": "",
@@ -1127,6 +1175,8 @@
     "model": "hitas.buildingtype",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d46238ac-9ec8-44ee-b1c3-0f1f43ed9e37",
       "value": "pienkerrostalo",
       "description": "",
@@ -1141,6 +1191,8 @@
     "model": "hitas.buildingtype",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "1e0e6d39-e885-48cb-9dfb-e444fbf9c481",
       "value": "luhtitalo",
       "description": "",
@@ -1155,6 +1207,8 @@
     "model": "hitas.buildingtype",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "976a10f2-fc95-4de7-a2c9-95db2938de94",
       "value": "omakotitalo",
       "description": "",
@@ -1169,6 +1223,8 @@
     "model": "hitas.buildingtype",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "742e10d3-f65e-470f-8dfb-0c9216a6eff7",
       "value": "rivitalo/kerrostalo",
       "description": "",
@@ -1183,6 +1239,8 @@
     "model": "hitas.buildingtype",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "62a1f517-9d19-42da-9a56-5ccabb54138b",
       "value": "kerrostalo/rivitalo",
       "description": "",
@@ -1197,6 +1255,8 @@
     "model": "hitas.buildingtype",
     "pk": 10,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "8e1b3fd6-49eb-495b-a092-eac3b8a2dcc5",
       "value": "pientalo",
       "description": "",
@@ -1211,6 +1271,8 @@
     "model": "hitas.buildingtype",
     "pk": 11,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6bb1eff5-2da0-4a51-abe9-ee7dfe0fccfc",
       "value": "erillistalo",
       "description": "",
@@ -1225,6 +1287,8 @@
     "model": "hitas.buildingtype",
     "pk": 12,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a2d0ed67-f16d-4870-9293-f111785300b1",
       "value": "rivitalo/erillistalo",
       "description": "",
@@ -1239,6 +1303,8 @@
     "model": "hitas.financingmethod",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
       "value": "tuntematon",
       "description": "",
@@ -1253,6 +1319,8 @@
     "model": "hitas.financingmethod",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
       "value": "vapaarahoitteinen, Hitas I",
       "description": "",
@@ -1267,6 +1335,8 @@
     "model": "hitas.financingmethod",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
       "value": "vapaarahoitteinen, Hitas II",
       "description": "",
@@ -1281,6 +1351,8 @@
     "model": "hitas.financingmethod",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4a9446cf-54cd-4e94-9e26-a44a6fe29ec2",
       "value": "HK valtion laina, Hitas I",
       "description": "",
@@ -1295,6 +1367,8 @@
     "model": "hitas.financingmethod",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6cbfaa4b-b81f-4ee2-9800-fcd3c109a0ac",
       "value": "HK valtion laina, Hitas II",
       "description": "",
@@ -1309,6 +1383,8 @@
     "model": "hitas.financingmethod",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "b1d6c359-fbf9-4b7a-a5d6-caf189835ead",
       "value": "RA valtion laina, Hitas I",
       "description": "",
@@ -1323,6 +1399,8 @@
     "model": "hitas.financingmethod",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "36ecc9af-f5ff-455a-b89f-60f2557a53aa",
       "value": "RA valtion laina, Hitas I",
       "description": "",
@@ -1337,6 +1415,8 @@
     "model": "hitas.financingmethod",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4739ad1c-01d1-4a32-889b-b19f1f8c6a33",
       "value": "HK valtion laina, Hitas I",
       "description": "",
@@ -1351,6 +1431,8 @@
     "model": "hitas.financingmethod",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "1781fdb8-cff3-4c3b-9af0-1cc4ae3c3d36",
       "value": "HK valtion laina, Hitas II",
       "description": "",
@@ -1365,6 +1447,8 @@
     "model": "hitas.financingmethod",
     "pk": 10,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c05bab17-3153-4bc1-91b6-2354e582fcc8",
       "value": "RA valtion laina, Hitas I",
       "description": "",
@@ -1379,6 +1463,8 @@
     "model": "hitas.financingmethod",
     "pk": 11,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "b60c3d06-f3a9-4cec-9c1e-0bd41de324ba",
       "value": "RA valtion laina, Hitas II",
       "description": "",
@@ -1393,6 +1479,8 @@
     "model": "hitas.financingmethod",
     "pk": 12,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "64467849-4239-4a62-983e-5ac66a8153a4",
       "value": "Korkotuki, Hitas I",
       "description": "",
@@ -1407,6 +1495,8 @@
     "model": "hitas.financingmethod",
     "pk": 13,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "485d8561-ad32-4d2b-a384-29f8a28c04a7",
       "value": "Korkotuki, Hitas II",
       "description": "",
@@ -1421,6 +1511,8 @@
     "model": "hitas.financingmethod",
     "pk": 14,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0b957ecb-1ead-4ad1-ae29-e6515fed3077",
       "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
       "description": "",
@@ -1435,6 +1527,8 @@
     "model": "hitas.financingmethod",
     "pk": 15,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4e3943a6-d097-439e-bd68-3ae8d9a072f6",
       "value": "Pitkä korkotukilaina osaomistus Hitas I",
       "description": "",
@@ -1449,6 +1543,8 @@
     "model": "hitas.financingmethod",
     "pk": 16,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6f6ab506-79a0-45f7-a752-65d1a1848dbb",
       "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
       "description": "",
@@ -1463,6 +1559,8 @@
     "model": "hitas.financingmethod",
     "pk": 17,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e062e181-24b9-48fb-a51a-bceec2a37d34",
       "value": "Uusi Hitas I (vapaarahoitteinen)",
       "description": "",
@@ -1477,6 +1575,8 @@
     "model": "hitas.financingmethod",
     "pk": 18,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "793f4bad-0b63-41a7-a6df-1e3dc0337f07",
       "value": "Uusi Hitas II (vapaarahoitteinen)",
       "description": "",
@@ -1491,6 +1591,8 @@
     "model": "hitas.financingmethod",
     "pk": 19,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2913209c-9724-4f8e-82e5-f5a44e9bdfb4",
       "value": "Uusi Hitas I (vanhat säännöt)",
       "description": "",
@@ -1505,6 +1607,8 @@
     "model": "hitas.financingmethod",
     "pk": 20,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "de4dfac0-ca52-46bf-bb8c-394d78a52db7",
       "value": "Uusi Hitas II (vanhat säännöt)",
       "description": "",
@@ -1519,6 +1623,8 @@
     "model": "hitas.financingmethod",
     "pk": 21,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a42bd1a4-ddee-4fca-aa36-461b61742f4c",
       "value": "Vuokratalo Hitas II",
       "description": "",
@@ -1533,6 +1639,8 @@
     "model": "hitas.financingmethod",
     "pk": 22,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3b36f759-4fa8-40f5-a477-574a936374bf",
       "value": "Vuokratalo Hitas I",
       "description": "",
@@ -1547,6 +1655,8 @@
     "model": "hitas.developer",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "06224336-de27-4d87-853a-fb950ba5ecc8",
       "value": "Helsingin Sato Oy",
       "description": "",
@@ -1561,6 +1671,8 @@
     "model": "hitas.developer",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "06d93a73-c212-4aa9-a536-83076d1b7fbf",
       "value": "As Oy Taipale",
       "description": "Laborum corporis hic nihil explicabo repellendus hic.",
@@ -1575,6 +1687,8 @@
     "model": "hitas.developer",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d7cec43d-cb93-45d8-9c6d-634a813aed53",
       "value": "As Oy Simola",
       "description": "Error beatae maiores numquam tempore.",
@@ -1589,6 +1703,8 @@
     "model": "hitas.developer",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "84981cf4-ab1b-48b6-94ce-1775a513a53b",
       "value": "As Oy Laaksonen",
       "description": "Quam nam perferendis assumenda nemo.",
@@ -1603,6 +1719,8 @@
     "model": "hitas.developer",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "eff7cca5-a630-4714-8406-4793bd7e65d6",
       "value": "As Oy Koistinen",
       "description": "Maiores amet repudiandae facilis laboriosam voluptas iure.",
@@ -1617,6 +1735,8 @@
     "model": "hitas.developer",
     "pk": 10,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "1d2ef714-85d7-44fe-969e-97c89847abcc",
       "value": "As Oy Heikkinen",
       "description": "Totam repudiandae dolore officiis.",
@@ -1631,6 +1751,8 @@
     "model": "hitas.developer",
     "pk": 11,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a6fb426e-7406-4a0d-bc1e-bbf7dfc663d6",
       "value": "As Oy Leppänen",
       "description": "Explicabo eveniet consectetur fugit dignissimos provident provident.",
@@ -1645,6 +1767,8 @@
     "model": "hitas.developer",
     "pk": 12,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e4401fa6-3135-40eb-b54f-13bca4fca5f1",
       "value": "As Oy Nyman",
       "description": "Minus accusantium perferendis maiores maiores provident itaque.",
@@ -1659,6 +1783,8 @@
     "model": "hitas.apartmenttype",
     "pk": 22,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "18b0012f-572a-421e-8e18-27da2bda6849",
       "value": "h+k+s+at+var",
       "description": "",
@@ -1673,6 +1799,8 @@
     "model": "hitas.apartmenttype",
     "pk": 23,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "cbdb5072-a856-486c-b0e0-4bb426ae283d",
       "value": "h+k",
       "description": "",
@@ -1687,6 +1815,8 @@
     "model": "hitas.apartmenttype",
     "pk": 24,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "fbf25e5a-b3dd-43a4-a723-887419072cc0",
       "value": "h+kk",
       "description": "",
@@ -1701,6 +1831,8 @@
     "model": "hitas.apartmenttype",
     "pk": 25,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9a264eeb-3a2d-4531-8886-93a36fb151e1",
       "value": "h+tk",
       "description": "",
@@ -1715,6 +1847,8 @@
     "model": "hitas.apartmenttype",
     "pk": 26,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0a98b217-7057-4340-a299-74a3320fcd3f",
       "value": "h+kt",
       "description": "",
@@ -1729,6 +1863,8 @@
     "model": "hitas.apartmenttype",
     "pk": 27,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "506e63af-679a-47c5-88ba-286815d4cc0f",
       "value": "h",
       "description": "",
@@ -1743,6 +1879,8 @@
     "model": "hitas.apartmenttype",
     "pk": 28,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "23f797b8-46be-47f4-9c95-4b27f1894d52",
       "value": "h+k+s",
       "description": "",
@@ -1757,6 +1895,8 @@
     "model": "hitas.apartmenttype",
     "pk": 29,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "decd219d-19d6-46d9-a3f5-543172e6e34b",
       "value": "h+kk+s",
       "description": "",
@@ -1771,6 +1911,8 @@
     "model": "hitas.apartmenttype",
     "pk": 30,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d74ed1e7-8969-47ad-a3e8-5f57a25e0423",
       "value": "h+k+s+työh.",
       "description": "",
@@ -1785,6 +1927,8 @@
     "model": "hitas.apartmenttype",
     "pk": 31,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c9723173-7de8-4ab6-8d9e-0a00aa036949",
       "value": "h+tk+s",
       "description": "",
@@ -1799,6 +1943,8 @@
     "model": "hitas.apartmenttype",
     "pk": 32,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "96525350-99e2-44d1-aa97-681a4ed4b9f1",
       "value": "h+kt+s",
       "description": "",
@@ -1813,6 +1959,8 @@
     "model": "hitas.apartmenttype",
     "pk": 33,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "bc1efbc5-9dda-4257-a0f6-502a3a1353dc",
       "value": "h+kt+r+s",
       "description": "",
@@ -1827,6 +1975,8 @@
     "model": "hitas.apartmenttype",
     "pk": 34,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "49e12129-6585-461d-8959-eeada1697714",
       "value": "h+k+vh",
       "description": "",
@@ -1841,6 +1991,8 @@
     "model": "hitas.apartmenttype",
     "pk": 35,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "786cbd44-c37b-40d0-996f-781bfead019f",
       "value": "h+k+khh",
       "description": "",
@@ -1855,6 +2007,8 @@
     "model": "hitas.apartmenttype",
     "pk": 36,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "86543897-f2cf-457a-b3c7-98f3c1ebfafa",
       "value": "h+kk+alk+s",
       "description": "",
@@ -1869,6 +2023,8 @@
     "model": "hitas.apartmenttype",
     "pk": 37,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "ceed1c9f-5b14-438e-ba85-29e261afd6bd",
       "value": "h+k+alk+s",
       "description": "",
@@ -1883,6 +2039,8 @@
     "model": "hitas.apartmenttype",
     "pk": 38,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a2855e50-5356-43c3-98ac-636e46aa6867",
       "value": "h+ks",
       "description": "",
@@ -1897,6 +2055,8 @@
     "model": "hitas.apartmenttype",
     "pk": 39,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "76e3515b-a4c5-4a5b-9aab-ed8efe1f9831",
       "value": "tpk+alk+s",
       "description": "",
@@ -1911,6 +2071,8 @@
     "model": "hitas.apartmenttype",
     "pk": 40,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0b6bbf7b-f338-4d75-b720-d1133b364690",
       "value": "h+k+s+khh",
       "description": "",
@@ -1925,6 +2087,8 @@
     "model": "hitas.apartmenttype",
     "pk": 41,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f4210023-7416-4d1d-b561-741fc68690bb",
       "value": "h+kk+sali",
       "description": "",
@@ -1939,6 +2103,8 @@
     "model": "hitas.apartmenttype",
     "pk": 42,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "726e5331-d494-4a90-ae95-2fda1804fe30",
       "value": "h+k+s+ver",
       "description": "",
@@ -1953,6 +2119,8 @@
     "model": "hitas.apartmenttype",
     "pk": 43,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "315f2989-feda-4068-8ae2-79118744b24c",
       "value": "h+tk+ver",
       "description": "",
@@ -1967,6 +2135,8 @@
     "model": "hitas.apartmenttype",
     "pk": 44,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "65af3f27-f56f-4f98-ab3f-9a0db5864923",
       "value": "h+k+ver",
       "description": "",
@@ -1981,6 +2151,8 @@
     "model": "hitas.apartmenttype",
     "pk": 45,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f43c7522-14e1-47c3-bcdf-1c6586883aa5",
       "value": "h+k+alk+ver",
       "description": "",
@@ -1995,6 +2167,8 @@
     "model": "hitas.apartmenttype",
     "pk": 46,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3d647f9e-fecf-4607-8d5b-17a8af9d95dd",
       "value": "h+k+s+viherh.",
       "description": "",
@@ -2009,6 +2183,8 @@
     "model": "hitas.apartmenttype",
     "pk": 47,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e00fbce0-f0cf-43b9-89bf-bba4ac99d395",
       "value": "h+kk+s+viherh",
       "description": "",
@@ -2023,6 +2199,8 @@
     "model": "hitas.apartmenttype",
     "pk": 48,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4d7cc03a-98c5-446a-b430-853b4ee846bf",
       "value": "h+k+s+piha",
       "description": "",
@@ -2037,6 +2215,8 @@
     "model": "hitas.apartmenttype",
     "pk": 49,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2eaf0b61-7ed8-42a1-9244-2a9cdb13f237",
       "value": "h+tk+vh",
       "description": "",
@@ -2051,6 +2231,8 @@
     "model": "hitas.apartmenttype",
     "pk": 50,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "268ba6c7-31d8-49f2-a3fe-a222384df050",
       "value": "h+k+rt",
       "description": "",
@@ -2065,6 +2247,8 @@
     "model": "hitas.apartmenttype",
     "pk": 51,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "615da218-2c8d-4c87-8128-64f98f51a23c",
       "value": "h+k+s+tt",
       "description": "",
@@ -2079,6 +2263,8 @@
     "model": "hitas.apartmenttype",
     "pk": 52,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6af8be3d-296c-460f-bbd6-70758736e6b6",
       "value": "h+kk+terassi",
       "description": "",
@@ -2093,6 +2279,8 @@
     "model": "hitas.apartmenttype",
     "pk": 53,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3c37c4e5-9fcd-4d84-931f-032c61ed05b7",
       "value": "h+k+tt+ter",
       "description": "",
@@ -2107,6 +2295,8 @@
     "model": "hitas.apartmenttype",
     "pk": 54,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "73576c8e-cd2b-4a4c-b827-a0ba61fce3a9",
       "value": "h+kt+rt+s+ter",
       "description": "",
@@ -2121,6 +2311,8 @@
     "model": "hitas.apartmenttype",
     "pk": 55,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "39f0507f-f74b-402a-b61f-65189b6ac841",
       "value": "h+kt+rt+s",
       "description": "",
@@ -2135,6 +2327,8 @@
     "model": "hitas.apartmenttype",
     "pk": 56,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "90e75dcb-50dd-4111-bc06-caba69b4d03f",
       "value": "h+kt+rt",
       "description": "",
@@ -2149,6 +2343,8 @@
     "model": "hitas.apartmenttype",
     "pk": 57,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "de575fcc-6da6-4c6f-bb13-33b5a0da814c",
       "value": "h+kt+rt+ter",
       "description": "",
@@ -2163,6 +2359,8 @@
     "model": "hitas.apartmenttype",
     "pk": 58,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0ca5a953-355c-457d-a102-10621a3d896a",
       "value": "h+kt+s+ter",
       "description": "",
@@ -2177,6 +2375,8 @@
     "model": "hitas.apartmenttype",
     "pk": 59,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "844df8cf-e92e-4ee7-bb38-dd0e81898e0c",
       "value": "h+k+rt+ter+piha",
       "description": "",
@@ -2191,6 +2391,8 @@
     "model": "hitas.apartmenttype",
     "pk": 60,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "76651970-9b23-48c0-8b07-31ec56aca5d8",
       "value": "h+kt+s+halli",
       "description": "",
@@ -2205,6 +2407,8 @@
     "model": "hitas.apartmenttype",
     "pk": 61,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d40520e7-6024-42ba-8109-811bb22877f4",
       "value": "h+k+rt+s",
       "description": "",
@@ -2219,6 +2423,8 @@
     "model": "hitas.apartmenttype",
     "pk": 62,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "befd17f5-7bbc-4220-9856-d074c1626cda",
       "value": "h+kt+rt+s+ter+piha",
       "description": "",
@@ -2233,6 +2439,8 @@
     "model": "hitas.apartmenttype",
     "pk": 63,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "36743c62-9dd7-4898-a2fd-90a73c7df86d",
       "value": "h+k+s+vih+th+var",
       "description": "",
@@ -2247,6 +2455,8 @@
     "model": "hitas.apartmenttype",
     "pk": 64,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e6307981-8add-450b-afe2-9185a35cad7c",
       "value": "h+k+s+vih+piha+var",
       "description": "",
@@ -2261,6 +2471,8 @@
     "model": "hitas.apartmenttype",
     "pk": 65,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "27779998-4c97-47d3-886c-225e95a9ff25",
       "value": "h+k+s+terassi",
       "description": "",
@@ -2275,6 +2487,8 @@
     "model": "hitas.apartmenttype",
     "pk": 66,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "be0fbefb-012d-4675-9b78-c87c79d0635e",
       "value": "h+k+s+piha",
       "description": "",
@@ -2289,6 +2503,8 @@
     "model": "hitas.apartmenttype",
     "pk": 67,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "8d02dc18-2958-4e93-bb0b-c3378bd2094d",
       "value": "h+k+s+th+piha",
       "description": "",
@@ -2303,6 +2519,8 @@
     "model": "hitas.apartmenttype",
     "pk": 68,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3deb4c17-a13f-403f-bbd9-490eefc3d6cd",
       "value": "h+k+s+th",
       "description": "",
@@ -2317,6 +2535,8 @@
     "model": "hitas.apartmenttype",
     "pk": 69,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "cd129ec7-03ee-43a4-8c07-c96969bc2741",
       "value": "h+k+s+aula",
       "description": "",
@@ -2331,6 +2551,8 @@
     "model": "hitas.apartmenttype",
     "pk": 70,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "27b4ef86-1e74-4a34-9a4c-b9e43d3df1eb",
       "value": "h+tk+työhuone",
       "description": "",
@@ -2345,6 +2567,8 @@
     "model": "hitas.apartmenttype",
     "pk": 71,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f4388d89-6c96-47a2-bef0-997731e6a65c",
       "value": "h+k+khh+s+piha",
       "description": "",
@@ -2359,6 +2583,8 @@
     "model": "hitas.apartmenttype",
     "pk": 72,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "88b12c1f-ad2d-40a6-868d-8d62f158091c",
       "value": "h+k+khh+s",
       "description": "",
@@ -2373,6 +2599,8 @@
     "model": "hitas.apartmenttype",
     "pk": 73,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a71042d0-f529-479c-aad9-2b4472722a4e",
       "value": "h+alk+kk+s",
       "description": "",
@@ -2387,6 +2615,8 @@
     "model": "hitas.apartmenttype",
     "pk": 74,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d14f368e-4c19-482d-8163-1cb22ae5f9a4",
       "value": "h+k+s+var",
       "description": "",
@@ -2401,6 +2631,8 @@
     "model": "hitas.apartmenttype",
     "pk": 75,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "b6fbe319-78bb-4feb-8969-887daeb3a47e",
       "value": "h+k+työtila",
       "description": "",
@@ -2415,6 +2647,8 @@
     "model": "hitas.apartmenttype",
     "pk": 76,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "85d29e64-4c87-41b1-be22-d7a4317c3c71",
       "value": "h+k+s+er.h",
       "description": "",
@@ -2429,6 +2663,8 @@
     "model": "hitas.apartmenttype",
     "pk": 77,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c779a461-d23d-4930-bccb-7bcaab4a98c1",
       "value": "h+k+s.os+vh",
       "description": "",
@@ -2443,6 +2679,8 @@
     "model": "hitas.apartmenttype",
     "pk": 78,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "eb63f503-8cd3-4f06-bf8a-3960a112109f",
       "value": "h+k+akh+khh+wc+s+ullakko",
       "description": "",
@@ -2457,6 +2695,8 @@
     "model": "hitas.apartmenttype",
     "pk": 79,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "29d6dd64-7843-4c0a-92a3-3260366e417d",
       "value": "h+k+tkh+khh+wc+s+ullakko",
       "description": "",
@@ -2471,6 +2711,8 @@
     "model": "hitas.apartmenttype",
     "pk": 80,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9cac63b0-722f-4171-a2f1-b6528cbbbf94",
       "value": "h+alk+k",
       "description": "",
@@ -2485,6 +2727,8 @@
     "model": "hitas.apartmenttype",
     "pk": 81,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0c10c7ae-0c18-440b-9d12-b8accf85d9e0",
       "value": "h+tk+th",
       "description": "",
@@ -2499,6 +2743,8 @@
     "model": "hitas.apartmenttype",
     "pk": 82,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "143597fe-d28a-4af9-b228-69fe204da443",
       "value": "h+k+s+vih+th",
       "description": "",
@@ -2513,6 +2759,8 @@
     "model": "hitas.apartmenttype",
     "pk": 83,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "502eb7bf-3b10-4646-bf9e-f2288d7e349f",
       "value": "h+tk+s",
       "description": "",
@@ -2527,6 +2775,8 @@
     "model": "hitas.apartmenttype",
     "pk": 84,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "72e12c95-0a90-4972-a7c9-a0c4c55820a9",
       "value": "h+kh",
       "description": "",
@@ -2541,6 +2791,8 @@
     "model": "hitas.apartmenttype",
     "pk": 85,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "59c78cf7-d5ce-4abd-a63e-de93cee87579",
       "value": "h+kh+s",
       "description": "",
@@ -2555,6 +2807,8 @@
     "model": "hitas.apartmenttype",
     "pk": 86,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "602bf212-efe3-4108-bc92-ea690c60f5c0",
       "value": "h+k+s+parvi",
       "description": "",
@@ -2569,6 +2823,8 @@
     "model": "hitas.apartmenttype",
     "pk": 87,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "1f615918-3d29-418b-afac-5a1d4ecf429b",
       "value": "h+kk+s+parvi",
       "description": "",
@@ -2583,6 +2839,8 @@
     "model": "hitas.apartmenttype",
     "pk": 88,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "30030df6-3790-455f-82fe-bf8eeacdeff5",
       "value": "h+kk+th+terassi",
       "description": "",
@@ -2597,6 +2855,8 @@
     "model": "hitas.apartmenttype",
     "pk": 89,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f5095660-9390-47a6-9fdb-f9a15b228c6d",
       "value": "h+k+parvi",
       "description": "",
@@ -2611,6 +2871,8 @@
     "model": "hitas.apartmenttype",
     "pk": 90,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c39771ca-928a-42e3-8f1f-b6c0c79e9186",
       "value": "h+k+irt.v",
       "description": "",
@@ -2625,6 +2887,8 @@
     "model": "hitas.apartmenttype",
     "pk": 91,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e0b91c44-7a3c-4035-a806-b32a3b9b3bbb",
       "value": "h+k+terassi",
       "description": "",
@@ -2639,6 +2903,8 @@
     "model": "hitas.apartmenttype",
     "pk": 92,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e7003aa8-dd3e-44cb-a73b-66b02aa84a77",
       "value": "h+k+s+ullakko",
       "description": "",
@@ -2653,6 +2919,8 @@
     "model": "hitas.apartmenttype",
     "pk": 93,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c3e82a49-d172-4bfe-bd99-d7770d826fe5",
       "value": "h+k+työh.",
       "description": "",
@@ -2667,6 +2935,8 @@
     "model": "hitas.apartmenttype",
     "pk": 94,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f0df3f96-1f37-4c6d-af01-e541743147d4",
       "value": "h+kt+parvi",
       "description": "",
@@ -2681,6 +2951,8 @@
     "model": "hitas.apartmenttype",
     "pk": 95,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e9570a49-bf78-471f-b66c-934347ebdd63",
       "value": "h+k+s+var+at+piha",
       "description": "",
@@ -2695,6 +2967,8 @@
     "model": "hitas.apartmenttype",
     "pk": 96,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0851e141-d2da-4c0e-becb-4e2f3d760422",
       "value": "h+k+s+at+piha",
       "description": "",
@@ -2709,6 +2983,8 @@
     "model": "hitas.apartmenttype",
     "pk": 97,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c2ad2ff3-02da-4057-a6bf-9954d5054159",
       "value": "h+k+s+ulkovar+piha",
       "description": "",
@@ -2723,6 +2999,8 @@
     "model": "hitas.apartmenttype",
     "pk": 98,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "11cc1c7c-a23a-4156-a796-63f9be1100ab",
       "value": "h+k+s+var+ulkovar+piha",
       "description": "",
@@ -2737,6 +3015,8 @@
     "model": "hitas.apartmenttype",
     "pk": 99,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9d6e9144-12f3-4097-844b-8bca54880d25",
       "value": "h+kt+alk",
       "description": "",
@@ -2751,6 +3031,8 @@
     "model": "hitas.apartmenttype",
     "pk": 100,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "692de7f0-4f12-4b6e-9735-e8413a34657a",
       "value": "h+kt+studiotila",
       "description": "",
@@ -2765,6 +3047,8 @@
     "model": "hitas.apartmenttype",
     "pk": 101,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "71753303-e301-4991-95ec-3a41e6c24bce",
       "value": "h+k-studiotila",
       "description": "",
@@ -2779,6 +3063,8 @@
     "model": "hitas.apartmenttype",
     "pk": 102,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "ee269dac-713e-4d70-8940-67222a83e789",
       "value": "h+kt+piha",
       "description": "",
@@ -2793,6 +3079,8 @@
     "model": "hitas.apartmenttype",
     "pk": 103,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "44690644-422f-4ab3-8313-43735951ed68",
       "value": "h+avok",
       "description": "",
@@ -2807,6 +3095,8 @@
     "model": "hitas.apartmenttype",
     "pk": 104,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "dc0507fb-91b7-4d6c-a9c0-8d464a995966",
       "value": "h+k+rt+s+var",
       "description": "",
@@ -2821,6 +3111,8 @@
     "model": "hitas.apartmenttype",
     "pk": 105,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "bc8e4581-e512-4b68-8c5b-21196abb65f0",
       "value": "h+k+so",
       "description": "",
@@ -2835,6 +3127,8 @@
     "model": "hitas.apartmenttype",
     "pk": 106,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3657d3f0-dc4f-42d2-90b1-6db789b27510",
       "value": "pysäköintipaikka",
       "description": "",
@@ -2849,6 +3143,8 @@
     "model": "hitas.apartmenttype",
     "pk": 107,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "0e5d092c-9f35-46e0-9a39-c725f70c0497",
       "value": "h+kt+alk+s",
       "description": "",
@@ -2863,6 +3159,8 @@
     "model": "hitas.apartmenttype",
     "pk": 108,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "23224815-cac4-4243-9fd8-f5dd3748b641",
       "value": "h+kk+työh",
       "description": "",
@@ -2877,6 +3175,8 @@
     "model": "hitas.apartmenttype",
     "pk": 109,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "24280aca-3690-4cd9-ac9d-11e093149e3c",
       "value": "h+kt+autopaikka",
       "description": "",
@@ -2891,6 +3191,8 @@
     "model": "hitas.apartmenttype",
     "pk": 110,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "92b093ba-3413-4feb-977a-5e5d0fb50297",
       "value": "h+k+autopaikka",
       "description": "",
@@ -2905,6 +3207,8 @@
     "model": "hitas.apartmenttype",
     "pk": 111,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "b70d6a6a-36f3-4be4-b4b7-8385f7a4db55",
       "value": "h+k+khh+var+kuisti",
       "description": "",
@@ -2919,6 +3223,8 @@
     "model": "hitas.apartmenttype",
     "pk": 112,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "33da8abc-952f-4ac3-8415-e8bd51a0c412",
       "value": "kt+s+varasto",
       "description": "",
@@ -2933,6 +3239,8 @@
     "model": "hitas.apartmenttype",
     "pk": 113,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "302e11a3-4863-4e53-ba4d-3a8d2f8e0b75",
       "value": "h+työtila",
       "description": "",
@@ -2947,6 +3255,8 @@
     "model": "hitas.apartmenttype",
     "pk": 114,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "325bf953-f95c-430a-8298-cfa695d03b5c",
       "value": "h+terassi",
       "description": "",
@@ -2961,6 +3271,8 @@
     "model": "hitas.apartmenttype",
     "pk": 115,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "36399f24-cdd1-4843-8728-91fae5f0255b",
       "value": "h+kk+työtila",
       "description": "",
@@ -2975,6 +3287,8 @@
     "model": "hitas.apartmenttype",
     "pk": 116,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9abeb2a2-c892-4a4e-ae52-10bdca3da421",
       "value": "h+kk+vh",
       "description": "",
@@ -2989,6 +3303,8 @@
     "model": "hitas.apartmenttype",
     "pk": 117,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4eff9951-49ff-4657-8d32-2c0117eb11ce",
       "value": "h+kt+vh",
       "description": "",
@@ -3003,6 +3319,8 @@
     "model": "hitas.apartmenttype",
     "pk": 118,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "5216cfc5-152c-4a06-b93a-1c65ac330cfd",
       "value": "h+kk+kph",
       "description": "",
@@ -3017,6 +3335,8 @@
     "model": "hitas.apartmenttype",
     "pk": 119,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "01f8ad0f-a149-41c0-8caa-5272439587fb",
       "value": "h+kk+kph+s",
       "description": "",
@@ -3031,6 +3351,8 @@
     "model": "hitas.apartmenttype",
     "pk": 120,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "27c4fe13-caf1-46c2-afbd-64cb9097dc41",
       "value": "h+kt+viherh.",
       "description": "",
@@ -3045,6 +3367,8 @@
     "model": "hitas.apartmenttype",
     "pk": 121,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "8904bca5-56bf-47a3-9ab6-e227463d91ff",
       "value": "h+k+kph",
       "description": "",
@@ -3059,6 +3383,8 @@
     "model": "hitas.apartmenttype",
     "pk": 122,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f1f21ff0-6b07-4db2-8c4e-93d46b555958",
       "value": "h+kt+s+alk",
       "description": "",
@@ -3073,6 +3399,8 @@
     "model": "hitas.apartmenttype",
     "pk": 123,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "adbbd856-7521-4a27-b60e-72289679a78d",
       "value": "h+kt+as.piha",
       "description": "",
@@ -3087,6 +3415,8 @@
     "model": "hitas.apartmenttype",
     "pk": 124,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "bbfa69b3-a970-4120-b4a5-214101029ac0",
       "value": "h+kt+alk",
       "description": "",
@@ -3101,6 +3431,8 @@
     "model": "hitas.apartmenttype",
     "pk": 125,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4e153c6e-3fc3-4e94-996e-aeee7450c5d3",
       "value": "h+kt+prv+viherh.",
       "description": "",
@@ -3115,6 +3447,8 @@
     "model": "hitas.apartmenttype",
     "pk": 126,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a4416274-1403-4de4-8c31-da107dec033c",
       "value": "h+k+et",
       "description": "",
@@ -3129,6 +3463,8 @@
     "model": "hitas.apartmenttype",
     "pk": 127,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a4f8b9fb-ea9a-4401-828a-b08096cd996e",
       "value": "h+k+s+at+var+piha",
       "description": "",
@@ -3143,6 +3479,8 @@
     "model": "hitas.apartmenttype",
     "pk": 128,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a299b34a-5e9c-4bd4-81c7-312b83f536ed",
       "value": "1h",
       "description": "Laborum corporis hic nihil explicabo repellendus hic.",
@@ -3157,6 +3495,8 @@
     "model": "hitas.apartmenttype",
     "pk": 129,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "898c192e-f765-4026-8dd3-b1acf67b6cab",
       "value": "2mh+tupak+s",
       "description": "Error beatae maiores numquam tempore.",
@@ -3171,6 +3511,8 @@
     "model": "hitas.apartmenttype",
     "pk": 130,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "86d2e1c2-be80-4b6d-af40-f05a1dc99696",
       "value": "2h+kk+s",
       "description": "Maiores amet repudiandae facilis laboriosam voluptas iure.",
@@ -3185,6 +3527,8 @@
     "model": "hitas.housingcompany",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "dccd2cbc-9826-4f28-b097-da8209441bbf",
       "official_name": "Asunto Oy Helsingin Rumpupolun palvelutalo",
       "display_name": "Helsingin Rumpupolun palvelutalo",
@@ -3209,6 +3553,8 @@
     "model": "hitas.housingcompany",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "7938b3fd-2b77-4139-b0b7-f410758e09c6",
       "official_name": "As Oy Karjalainen",
       "display_name": "Karjalainen",
@@ -3233,6 +3579,8 @@
     "model": "hitas.housingcompany",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "01c9168e-637b-4ce0-9478-02e9b417d15a",
       "official_name": "As Oy Jokela",
       "display_name": "Jokela",
@@ -3257,6 +3605,8 @@
     "model": "hitas.housingcompany",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9e6e79f6-8ec6-45aa-922f-675950698511",
       "official_name": "As Oy Venäläinen",
       "display_name": "Venäläinen",
@@ -3281,6 +3631,8 @@
     "model": "hitas.housingcompany",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d766a637-751d-4c58-913c-caabf5f10b6c",
       "official_name": "As Oy Lassila",
       "display_name": "Lassila",
@@ -3305,6 +3657,8 @@
     "model": "hitas.housingcompany",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "ba40eec8-1e76-449a-9ab1-1b47753194b5",
       "official_name": "As Oy Salminen",
       "display_name": "Salminen",
@@ -3329,6 +3683,8 @@
     "model": "hitas.housingcompany",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "d45e0c74-8ad2-480f-964c-3209d0dc9c1b",
       "official_name": "As Oy Räsänen",
       "display_name": "Räsänen",
@@ -3353,6 +3709,8 @@
     "model": "hitas.housingcompany",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2980ec08-6887-4297-820c-4150f9146620",
       "official_name": "As Oy Virtanen",
       "display_name": "Virtanen",
@@ -3374,9 +3732,119 @@
     }
   },
   {
+    "model": "hitas.owner",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
+      "name": "Matti Meikäläinen",
+      "identifier": "010199-123A",
+      "email": "matti@hitas.fi"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
+      "name": "Kerttu Kuusisto",
+      "identifier": "050462-494C",
+      "email": "juhanisaari@example.com"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
+      "name": "Juhani Kujala",
+      "identifier": "300505A522H",
+      "email": "kaarinalehto@example.com"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
+      "name": "Kerttu Asikainen",
+      "identifier": "151124-088K",
+      "email": "mattigustafsson@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
+      "name": "Jaakko Virtanen",
+      "identifier": "230919-757D",
+      "email": "emiliaseppanen@example.net"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
+      "name": "Marjaana Myllymäki",
+      "identifier": "160339-233A",
+      "email": "artturiihimaki@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
+      "name": "Seppo Lahtinen",
+      "identifier": "211283-058H",
+      "email": "ensio55@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
+      "name": "Riitta Ojanen",
+      "identifier": "160288-587K",
+      "email": "onurmi@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
+      "name": "Katariina Virna",
+      "identifier": "111269-222X",
+      "email": null
+    }
+  },
+  {
     "model": "hitas.ownership",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 1,
       "owner": 1,
       "percentage": "100.00",
@@ -3388,6 +3856,8 @@
     "model": "hitas.ownership",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 2,
       "owner": 2,
       "percentage": "100.00",
@@ -3399,6 +3869,8 @@
     "model": "hitas.ownership",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 3,
       "owner": 3,
       "percentage": "100.00",
@@ -3410,6 +3882,8 @@
     "model": "hitas.ownership",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 4,
       "percentage": "50.00",
@@ -3421,6 +3895,8 @@
     "model": "hitas.ownership",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 5,
       "owner": 5,
       "percentage": "100.00",
@@ -3432,6 +3908,8 @@
     "model": "hitas.ownership",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 6,
       "owner": 6,
       "percentage": "100.00",
@@ -3443,6 +3921,8 @@
     "model": "hitas.ownership",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 7,
       "owner": 7,
       "percentage": "100.00",
@@ -3454,6 +3934,8 @@
     "model": "hitas.ownership",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 8,
       "owner": 8,
       "percentage": "100.00",
@@ -3465,6 +3947,8 @@
     "model": "hitas.ownership",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 9,
       "percentage": "50.00",
@@ -3473,99 +3957,11 @@
     }
   },
   {
-    "model": "hitas.owner",
-    "pk": 1,
-    "fields": {
-      "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
-      "name": "Matti Meikäläinen",
-      "identifier": "010199-123A",
-      "email": "matti@hitas.fi"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 2,
-    "fields": {
-      "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
-      "name": "Kerttu Kuusisto",
-      "identifier": "050462-494C",
-      "email": "juhanisaari@example.com"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 3,
-    "fields": {
-      "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
-      "name": "Juhani Kujala",
-      "identifier": "300505A522H",
-      "email": "kaarinalehto@example.com"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 4,
-    "fields": {
-      "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
-      "name": "Kerttu Asikainen",
-      "identifier": "151124-088K",
-      "email": "mattigustafsson@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 5,
-    "fields": {
-      "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
-      "name": "Jaakko Virtanen",
-      "identifier": "230919-757D",
-      "email": "emiliaseppanen@example.net"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 6,
-    "fields": {
-      "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
-      "name": "Marjaana Myllymäki",
-      "identifier": "160339-233A",
-      "email": "artturiihimaki@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 7,
-    "fields": {
-      "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
-      "name": "Seppo Lahtinen",
-      "identifier": "211283-058H",
-      "email": "ensio55@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 8,
-    "fields": {
-      "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
-      "name": "Riitta Ojanen",
-      "identifier": "160288-587K",
-      "email": "onurmi@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 9,
-    "fields": {
-      "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
-      "name": "Katariina Virna",
-      "identifier": "111269-222X",
-      "email": null
-    }
-  },
-  {
     "model": "hitas.hitaspostalcode",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "75592d94-970c-4862-81d1-53ccd672ae3e",
       "value": "00100",
       "city": "Helsinki",
@@ -3576,6 +3972,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "b8ada237-479c-410d-962c-306c22b186e0",
       "value": "00150",
       "city": "Helsinki",
@@ -3586,6 +3984,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "82d6115c-4058-45d1-a993-2d4225124929",
       "value": "00190",
       "city": "Helsinki",
@@ -3596,6 +3996,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "679e2218-7db9-4358-b904-da6f350cd6a3",
       "value": "00230",
       "city": "Helsinki",
@@ -3606,6 +4008,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "aced7b38-19be-4769-b1f6-804893cc2ff3",
       "value": "00420",
       "city": "Helsinki",
@@ -3616,6 +4020,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "ee7a9635-56b2-4518-af25-36bf311df6a4",
       "value": "00530",
       "city": "Helsinki",
@@ -3626,6 +4032,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a9854cee-618a-4f4d-8e6b-20798990597e",
       "value": "00620",
       "city": "Helsinki",
@@ -3636,6 +4044,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9d58382c-65a4-4f51-b609-46fe13f27f44",
       "value": "00710",
       "city": "Helsinki",
@@ -3646,6 +4056,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "24bc0687-6c91-43f2-8097-68987c6b7899",
       "value": "00890",
       "city": "Helsinki",
@@ -3656,6 +4068,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 10,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "3c63efb8-6f87-416c-856f-83622f4090a6",
       "value": "00940",
       "city": "Helsinki",
@@ -3666,6 +4080,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 11,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "70870539-58f9-49f9-9517-6128d342fec9",
       "value": "01020",
       "city": "Helsinki",
@@ -3676,6 +4092,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 12,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "fe5cbba3-3da2-4980-9cf1-3758acd1cbaa",
       "value": "00020",
       "city": "Helsinki",
@@ -3686,6 +4104,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 13,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c6737eb2-be39-403a-8c29-dcb601da13c7",
       "value": "00950",
       "city": "Helsinki",
@@ -3696,6 +4116,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 14,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "27b92601-98e1-458b-89ad-cb64ad5fe86b",
       "value": "00220",
       "city": "Helsinki",
@@ -3706,6 +4128,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 15,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a41a3dda-84d8-492a-b6a9-1a3eb2e58605",
       "value": "00470",
       "city": "Helsinki",
@@ -3716,6 +4140,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 16,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4b72a40b-286b-4ce5-8574-1d5684187cca",
       "value": "00990",
       "city": "Helsinki",
@@ -3726,6 +4152,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 17,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a484f296-f975-4cb2-8f37-977d3d9073c8",
       "value": "00340",
       "city": "Helsinki",
@@ -3736,6 +4164,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 18,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2dbd3780-ce9d-44bd-a8a5-f12f70951bde",
       "value": "00660",
       "city": "Helsinki",
@@ -3746,6 +4176,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 19,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "827c0813-df89-46cf-a87a-abfd1bb003e2",
       "value": "00520",
       "city": "Helsinki",
@@ -3756,6 +4188,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 20,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4da06ac7-f1ea-440f-addc-0f53830eaab5",
       "value": "00850",
       "city": "Helsinki",
@@ -3766,6 +4200,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 21,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "482f649e-ad74-4053-9feb-9d4c6cd6897d",
       "value": "00290",
       "city": "Helsinki",
@@ -3776,6 +4212,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 22,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "60586cf9-56a6-4586-b8d9-f95cb88769db",
       "value": "00240",
       "city": "Helsinki",
@@ -3786,6 +4224,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 23,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2106516d-0e34-4f93-a72e-32610ce3093a",
       "value": "00450",
       "city": "Helsinki",
@@ -3796,6 +4236,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 24,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c3f81039-ce1d-4d6d-80a8-538774a92973",
       "value": "00460",
       "city": "Helsinki",
@@ -3806,6 +4248,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 25,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "825fd6d3-bdfa-44a7-929d-692f82d95312",
       "value": "00640",
       "city": "Helsinki",
@@ -3816,6 +4260,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 26,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "daa8104c-5241-4f66-91c9-5f3cbc761a34",
       "value": "00610",
       "city": "Helsinki",
@@ -3826,6 +4272,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 27,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "1a8cc501-c900-4aa6-a760-066946aef409",
       "value": "00350",
       "city": "Helsinki",
@@ -3836,6 +4284,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 28,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "9a3c4e2f-a741-4469-8f35-3a649caa2355",
       "value": "00170",
       "city": "Helsinki",
@@ -3846,6 +4296,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 29,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "7785845b-9dd3-4603-b79a-1006095e42b0",
       "value": "00270",
       "city": "Helsinki",
@@ -3856,6 +4308,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 30,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2214c454-6564-44ae-ac75-f5f1ee5eaed4",
       "value": "00480",
       "city": "Helsinki",
@@ -3866,6 +4320,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 31,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "190ab006-1334-478e-be39-489fc4f6441a",
       "value": "00820",
       "city": "Helsinki",
@@ -3876,6 +4332,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 32,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "8fee4ea0-4bcf-4191-a1f0-67b620e7eb41",
       "value": "00320",
       "city": "Helsinki",
@@ -3886,6 +4344,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 33,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "dc2548a8-ade6-4cde-872e-aa93240cadf9",
       "value": "00900",
       "city": "Helsinki",
@@ -3896,6 +4356,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 34,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "bfe36a1d-f032-4ce3-927f-2c8c1c3fb5eb",
       "value": "00490",
       "city": "Helsinki",
@@ -3906,6 +4368,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 35,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f94e8cd6-b814-4288-adce-817f0653486e",
       "value": "00540",
       "city": "Helsinki",
@@ -3916,6 +4380,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 36,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "91771d5b-d867-4f21-b78d-efe71f7a7ee6",
       "value": "00260",
       "city": "Helsinki",
@@ -3926,6 +4392,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 37,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "666616a2-308e-4155-988d-ccf7234fb02c",
       "value": "00690",
       "city": "Helsinki",
@@ -3936,6 +4404,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 38,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "55f06525-545c-4b28-84a4-5430dece01e7",
       "value": "00750",
       "city": "Helsinki",
@@ -3946,6 +4416,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 39,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "82a34c14-4f7d-41e5-b81a-8ad6e98340ed",
       "value": "00930",
       "city": "Helsinki",
@@ -3956,6 +4428,8 @@
     "model": "hitas.hitaspostalcode",
     "pk": 40,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "c8328f3b-24cd-4710-9d6a-eb5a93e5e168",
       "value": "00880",
       "city": "Helsinki",
@@ -3966,6 +4440,8 @@
     "model": "hitas.propertymanager",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "2d9a7fac-81e5-426d-b3b3-3d6ad6ca9949",
       "name": "EA-isännöinti Oy",
       "email": "not-known@example.com",
@@ -3978,6 +4454,8 @@
     "model": "hitas.propertymanager",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f66e2df2-fda8-455b-8795-cbb7dec6e449",
       "name": "Maria Rossi-Karvonen",
       "email": "yleinonen@example.org",
@@ -3990,6 +4468,8 @@
     "model": "hitas.propertymanager",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "511bea85-ea99-4814-9ec9-51aec40b9e2f",
       "name": "Leena Vartiainen",
       "email": "sara15@example.net",
@@ -4002,6 +4482,8 @@
     "model": "hitas.propertymanager",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6821c8a7-cfbc-49aa-be36-c4be850c5bf9",
       "name": "Jukka Ruotsalainen-Reinikainen",
       "email": "karjalainenkristian@example.net",
@@ -4014,6 +4496,8 @@
     "model": "hitas.propertymanager",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "f902d9d8-8e19-4122-9d8b-6ffa3ef45703",
       "name": "Ilkka Salonen",
       "email": "nylundsanna@example.org",
@@ -4026,6 +4510,8 @@
     "model": "hitas.propertymanager",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "34139541-b598-4658-a1cf-ead48164e7e3",
       "name": "Tuulikki Salo",
       "email": "erkki98@example.net",
@@ -4038,6 +4524,8 @@
     "model": "hitas.propertymanager",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6ce63974-cfcc-48c9-94c8-d44443339991",
       "name": "Hannu Räsänen",
       "email": "pentti86@example.com",
@@ -4050,6 +4538,8 @@
     "model": "hitas.propertymanager",
     "pk": 9,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a32fb176-5c70-4488-bca5-7b56c5fe7f21",
       "name": "Kyllikki Saarinen",
       "email": "uusitaloelisabeth@example.net",
@@ -4062,6 +4552,8 @@
     "model": "hitas.realestate",
     "pk": 1,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "a20254d4-b3ea-4f25-a509-f4f081d9e446",
       "housing_company": 1,
       "property_identifier": "091-020-0015-0003",
@@ -4072,6 +4564,8 @@
     "model": "hitas.realestate",
     "pk": 2,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "5a62b822-5ee2-40ce-aa6e-49644f77ec45",
       "housing_company": 2,
       "property_identifier": "6535-9995-1426-4929",
@@ -4082,6 +4576,8 @@
     "model": "hitas.realestate",
     "pk": 3,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "6a21e0f1-9ad5-49f8-8f0a-94a096a5eac4",
       "housing_company": 3,
       "property_identifier": "4510-9520-6441-3392",
@@ -4092,6 +4588,8 @@
     "model": "hitas.realestate",
     "pk": 4,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "4a8e7cf0-3a7e-45cb-a4fe-a3285799dafa",
       "housing_company": 4,
       "property_identifier": "2059-2641-8704-8619",
@@ -4102,6 +4600,8 @@
     "model": "hitas.realestate",
     "pk": 5,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "91d5c926-f0fc-4ed0-91d8-160ae87b11bb",
       "housing_company": 5,
       "property_identifier": "3032-1618-8490-9881",
@@ -4112,6 +4612,8 @@
     "model": "hitas.realestate",
     "pk": 6,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "367aeceb-6c52-49b9-8f87-d24b3e738927",
       "housing_company": 6,
       "property_identifier": "4669-9138-2027-5229",
@@ -4122,6 +4624,8 @@
     "model": "hitas.realestate",
     "pk": 7,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "e487b17e-13e0-49dc-8c4c-034b7a875ebb",
       "housing_company": 7,
       "property_identifier": "6911-0472-5072-1192",
@@ -4132,6 +4636,8 @@
     "model": "hitas.realestate",
     "pk": 8,
     "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
       "uuid": "5ff86872-53a3-48f9-8dfb-656171ce3315",
       "housing_company": 8,
       "property_identifier": "8440-9485-1889-1839",
