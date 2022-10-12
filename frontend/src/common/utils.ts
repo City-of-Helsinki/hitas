@@ -31,6 +31,18 @@ function formatOwner(owner: IOwner): string {
     return `${owner.name} (${owner.identifier})`;
 }
 
+function formatMoney(value: number | null): string {
+    if (value === null) return "-";
+
+    return new Intl.NumberFormat("fi-FI", {style: "currency", currency: "EUR", minimumFractionDigits: 0}).format(value);
+}
+
+function formatDate(value: string | null): string {
+    if (value === null) return "-";
+
+    return new Date(value).toLocaleDateString("fi-FI");
+}
+
 function validateBusinessId(value: string): boolean {
     // e.g. '1234567-8'
     return !!value.match(/^(\d{7})-(\d)$/);
@@ -41,4 +53,4 @@ function hitasToast(message: string, type?: "success" | "info" | "error" | "aler
     toast(message, {...opts, className: type});
 }
 
-export {dotted, formatAddress, formatOwner, validateBusinessId, hitasToast};
+export {dotted, formatAddress, formatOwner, formatMoney, formatDate, validateBusinessId, hitasToast};

@@ -6,7 +6,7 @@ import {Link, useParams} from "react-router-dom";
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
 import {IHousingCompanyDetails} from "../../common/models";
-import {formatAddress} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
 const HousingCompanyDetailsPage = () => {
@@ -54,17 +54,17 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Valmistumispäivä"
-                                            value={data.date}
+                                            value={formatDate(data.date)}
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={`${data.acquisition_price} €`} // TODO: Format number
+                                            value={formatMoney(data.acquisition_price)}
                                         />
                                         <DetailField
                                             label="Toteutunut hankinta-arvo"
                                             value={
                                                 <>
-                                                    {data.summary.realized_acquisition_price} €
+                                                    {formatMoney(data.summary.realized_acquisition_price)}
                                                     {exceedsInitial ? (
                                                         <span style={{color: "var(--color-error)"}}>
                                                             {" "}
@@ -78,7 +78,7 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Ensisijaislaina"
-                                            value={`${data.primary_loan} €`} // TODO: Format number
+                                            value={formatMoney(data.primary_loan)}
                                         />
                                         <DetailField
                                             label="Keskineliöhinta"
@@ -123,11 +123,11 @@ const HousingCompanyDetailsPage = () => {
                                         />
                                         <DetailField
                                             label="Myyntihintaluettelon vahvistamispäivä"
-                                            value={data.sales_price_catalogue_confirmation_date}
+                                            value={formatDate(data.sales_price_catalogue_confirmation_date)}
                                         />
                                         <DetailField
                                             label="Ilmoituspäivä"
-                                            value={data.notification_date}
+                                            value={formatDate(data.notification_date)}
                                         />
                                         <DetailField
                                             label="Rakennuttaja"

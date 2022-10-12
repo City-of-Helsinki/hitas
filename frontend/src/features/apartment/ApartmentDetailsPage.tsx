@@ -6,7 +6,7 @@ import {Link, useParams} from "react-router-dom";
 import {useGetApartmentDetailQuery} from "../../app/services";
 import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails, IOwnership} from "../../common/models";
-import {formatAddress} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
 const SalesCondition = ({
     name,
@@ -87,24 +87,24 @@ const ApartmentDetailsPage = (): JSX.Element => {
                             <div className="price">
                                 <span className="basis">Markkinahintaindeksi</span>
                                 <span className="amount">
-                                    <span className="value">{priceMH}</span> €
+                                    <span className="value">{formatMoney(priceMH)}</span>
                                 </span>
                             </div>
                             <div className="price price--current-top">
                                 <span className="basis">Rakennushintaindeksi</span>
                                 <span className="amount">
-                                    <span className="value">{priceRH}</span> €
+                                    <span className="value">{formatMoney(priceRH)}</span>
                                 </span>
                             </div>
                             <div className="price">
                                 <span className="basis">Rajaneliöhinta</span>
                                 <span className="amount">
-                                    <span className="value">{priceRNH}</span> €
+                                    <span className="value">{formatMoney(priceRNH)}</span>
                                 </span>
                             </div>
                         </div>
                         <label className="card-heading">Vahvistettu enimmäishinta</label>
-                        <p className="confirmed-price">250000€</p>
+                        <p className="confirmed-price">{formatMoney(250000)}</p>
                         <Button
                             className="button-confirm"
                             theme="black"
@@ -142,15 +142,15 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                     <div className="row">
                                         <DetailField
                                             label="Kauppakirjahinta"
-                                            value={`${data.prices.purchase_price} €`}
+                                            value={formatMoney(data.prices.purchase_price)}
                                         />
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={`${data.prices.acquisition_price} €`}
+                                            value={formatMoney(data.prices.acquisition_price)}
                                         />
                                         <DetailField
                                             label="Valmistumispäivä"
-                                            value={data.completion_date}
+                                            value={formatDate(data.completion_date)}
                                         />
                                     </div>
                                     <div className="columns">
@@ -192,35 +192,35 @@ const ApartmentDetailsPage = (): JSX.Element => {
                                             )}
                                             <DetailField
                                                 label="Luovutushinta"
-                                                value={`${data.prices.debt_free_purchase_price} €`}
+                                                value={formatMoney(data.prices.debt_free_purchase_price)}
                                             />
                                             <DetailField
                                                 label="Ensisijaislaina"
-                                                value={`${data.prices.primary_loan_amount} €`}
+                                                value={formatMoney(data.prices.primary_loan_amount)}
                                             />
                                             <DetailField
-                                                value={`${data.prices.first_purchase_date} €`}
                                                 label="Ensimmäinen ostopäivä"
+                                                value={formatDate(data.prices.first_purchase_date)}
                                             />
                                             <DetailField
-                                                value={`${data.prices.second_purchase_date} €`}
                                                 label="Viimeisin ostopäivä"
+                                                value={formatDate(data.prices.latest_purchase_date)}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset lainat"
-                                                value={`${data.prices.construction.loans} €`}
+                                                value={formatMoney(data.prices.construction.loans)}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset korot"
-                                                value={`${data.prices.construction.interest} €`}
+                                                value={formatMoney(data.prices.construction.interest)}
                                             />
                                             <DetailField
                                                 label="Luovutushinta (RA)"
-                                                value={`${data.prices.construction.debt_free_purchase_price} €`}
+                                                value={formatMoney(data.prices.construction.debt_free_purchase_price)}
                                             />
                                             <DetailField
                                                 label="Rakennusaikaiset lisätyöt"
-                                                value={`${data.prices.construction.additional_work} €`}
+                                                value={formatMoney(data.prices.construction.additional_work)}
                                             />
                                         </div>
                                     </div>
