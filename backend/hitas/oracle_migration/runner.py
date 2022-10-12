@@ -99,6 +99,9 @@ class ConvertedData:
     apartment_types_by_code_numer: Dict[str, ApartmentType] = None
 
 
+BULK_INSERT_THRESHOLD = 1000
+
+
 def create_indices(codes: List[LegacyRow], model_class: type[AbstractCode]) -> None:
     for code in codes:
         index = model_class()
@@ -282,6 +285,9 @@ def create_housing_company_improvements(
         int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]
     ] = {}
 
+    bulk_cpi = []
+    bulk_mpi = []
+
     for company_oracle_id, v in converted_data.created_housing_companies_by_oracle_id.items():
         created[v.value.id] = ([], [])
 
@@ -308,8 +314,12 @@ def create_housing_company_improvements(
                     completion_date=cpi_improvement["completion_date"],
                     value=cpi_improvement["value"],
                 )
-                new.save()
+                bulk_cpi.append(new)
                 created[v.value.id][0].append(new)
+
+        if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
+            HousingCompanyConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
+            bulk_cpi = []
 
         #
         # Market price index
@@ -334,8 +344,17 @@ def create_housing_company_improvements(
                     completion_date=mpi_improvement["completion_date"],
                     value=mpi_improvement["value"],
                 )
-                new.save()
+                bulk_mpi.append(new)
                 created[v.value.id][1].append(new)
+
+        if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
+            HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
+            bulk_mpi = []
+
+    if bulk_cpi:
+        HousingCompanyConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
+    if bulk_mpi:
+        HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
     print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} housing company improvements.")
     print()
@@ -410,7 +429,7 @@ def create_apartments(
 
         bulk_apartments.append(new)
 
-        if len(bulk_apartments) == 1000:
+        if len(bulk_apartments) == BULK_INSERT_THRESHOLD:
             Apartment.objects.bulk_create(bulk_apartments)
             bulk_apartments = []
 
@@ -438,6 +457,9 @@ def create_apartment_improvements(
     connection: Connection, converted_data: ConvertedData
 ) -> dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]]:
     created: dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]] = {}
+
+    bulk_cpi = []
+    bulk_mpi = []
 
     for apartment_oracle_id, v in converted_data.apartments_by_oracle_id.items():
         created[v.id] = ([], [])
@@ -468,8 +490,12 @@ def create_apartment_improvements(
                         cpi_improvement["depreciation_percentage"]
                     ),
                 )
-                new.save()
+                bulk_cpi.append(new)
                 created[v.id][0].append(new)
+
+        if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
+            ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
+            bulk_cpi = []
 
         #
         # Market price index
@@ -494,8 +520,17 @@ def create_apartment_improvements(
                     completion_date=mpi_improvement["completion_date"],
                     value=mpi_improvement["value"],
                 )
-                new.save()
+                bulk_mpi.append(new)
                 created[v.id][1].append(new)
+
+        if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
+            ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
+            bulk_mpi = []
+
+    if bulk_cpi:
+        ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
+    if bulk_mpi:
+        ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
     print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} apartment improvements.")
     print()
@@ -526,7 +561,7 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         bulk_ownerships.append(new)
         count += 1
 
-        if len(bulk_owners) == 1000:
+        if len(bulk_owners) == BULK_INSERT_THRESHOLD:
             Owner.objects.bulk_create(bulk_owners)
             Ownership.objects.bulk_create(bulk_ownerships)
 
