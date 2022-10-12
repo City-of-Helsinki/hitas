@@ -2,8 +2,11 @@ from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, In
 
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
+    HitasAnonymizedAddress,
+    HitasAnonymizedDate,
     HitasAnonymizedName,
     HitasAnonymizedNameCommaSeparated,
+    HitasAnonymizedPropertyIdentifier,
     HitasAnonymizedSSN,
     HitasBoolean,
 )
@@ -12,13 +15,13 @@ companies = Table(
     "HITYHTIO",
     metadata_obj,
     Column("KG_YTUNNUS", Integer, key="id", primary_key=True),
-    Column("C_YHTNIMI", String(100), key="official_name", nullable=False),
-    Column("C_HAKUNIMI", String(50), key="display_name", nullable=False),
-    Column("C_KATUOS", String(50), key="address", nullable=False),
+    Column("C_YHTNIMI", HitasAnonymizedAddress(100, unique=True), key="official_name", nullable=False),
+    Column("C_HAKUNIMI", HitasAnonymizedAddress(50, unique=True), key="display_name", nullable=False),
+    Column("C_KATUOS", HitasAnonymizedAddress(50), key="address", nullable=False),
     Column("C_POSKOODI", String(16), nullable=False),  # Always 'POSTINROT'
     Column("C_POSTINRO", String(12), key="postal_code_code", nullable=False),
     Column("C_PTP", String(12), nullable=False),  # Always 'Helsinki'
-    Column("C_KIINTTUN", String(14), key="property_identifier", nullable=False),
+    Column("C_KIINTTUN", HitasAnonymizedPropertyIdentifier(14), key="property_identifier", nullable=False),
     Column("C_KUNTA", String(3), nullable=False),  # Always '091'
     Column("C_KOSAKOODI", String(16), nullable=False),  # Always 'KAUPOSA'
     Column("C_KAUPOSA", String(12), nullable=False),
@@ -40,7 +43,7 @@ companies = Table(
     Column("N_RAKKORKO", Float, nullable=False),
     Column("N_VIIVKORKO1", Float, nullable=False),  # Always 0
     Column("N_VIIVKORKO2", Float, nullable=False),  # Always 0
-    Column("D_MHLVAHPVM", Date, key="sales_price_catalogue_confirmation_date"),
+    Column("D_MHLVAHPVM", HitasAnonymizedDate, key="sales_price_catalogue_confirmation_date"),
     Column("C_TALOKOODI", String(16), nullable=False),  # Always 'TALOTYYPPI'
     Column("C_TALOTYYP", String(12), key="building_type_code", nullable=False),
     Column("C_RAKEKOODI", String(16), nullable=False),  # Always 'RAKENTAJA'
@@ -56,7 +59,7 @@ companies = Table(
     Column("C_SAANNOSTELY", HitasBoolean, nullable=False),
     Column("C_HITVAPKOODI", String(16), key="state_codebook", nullable=False),  # Always 'HITVAPAUTUS'
     Column("C_HITVAPTYYP", String(12), key="state_code", nullable=False),
-    Column("D_HITVAPILMPVM", Date, key="notification_date"),
+    Column("D_HITVAPILMPVM", HitasAnonymizedDate, key="notification_date"),
     Column("N_MHINDKESKIHINTA", Integer, nullable=False),
     Column("N_RAKINDKESKIHINTA", Integer, nullable=False),
     Column("C_DIAARINRO", String(10)),
@@ -98,7 +101,7 @@ real_estates = Table(
         key="company_id",
         nullable=False,
     ),
-    Column("C_KIINTTUN", String(14), key="property_identifier", nullable=False),
+    Column("C_KIINTTUN", HitasAnonymizedPropertyIdentifier(14), key="property_identifier", nullable=False),
     Column("C_KUNTA", String(3), nullable=False),
     Column("C_KOSAKOODI", String(16), nullable=False),  # Always 'KAUPOSA'
     Column("C_KAUPOSA", String(3), nullable=False),
@@ -125,7 +128,7 @@ apartments = Table(
     Column("C_SOTU1", HitasAnonymizedSSN(11)),
     Column("C_OMNIMI2", HitasAnonymizedName(50), index=True),
     Column("C_SOTU2", HitasAnonymizedSSN(11)),
-    Column("C_KATUOS", String(50), key="street_address", nullable=False),
+    Column("C_KATUOS", HitasAnonymizedAddress(50), key="street_address", nullable=False),
     Column("C_PORRAS", String(3), key="stair", nullable=False),
     Column("N_HUONRO", Integer, key="apartment_number", nullable=False),
     Column("C_OSOITE", String(70), nullable=False, index=True),
@@ -140,14 +143,14 @@ apartments = Table(
     Column("N_OSAKELKM1", Integer, key="share_number_start", nullable=False),
     Column("N_OSAKELKM2", Integer, key="share_number_end", nullable=False),
     Column("N_OSAKEYHT", Integer, nullable=False),
-    Column("D_VALMPVM", Date, key="completion_date"),
+    Column("D_VALMPVM", HitasAnonymizedDate, key="completion_date"),
     Column("N_LUOVHINTA", Integer, key="debt_free_purchase_price", nullable=False),
     Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
     Column("N_ENSIJLAINA", Integer, key="primary_loan_amount", nullable=False),
     Column("N_HANKARVO", Integer, key="acquisition_price", nullable=False),
     Column("N_RAKKORKO", Integer, key="interest_during_construction", nullable=False),
-    Column("D_KAUPPVM1", Date, key="first_purchase_date"),
-    Column("D_KAUPPVM2", Date, key="second_purchase_date"),
+    Column("D_KAUPPVM1", HitasAnonymizedDate, key="first_purchase_date"),
+    Column("D_KAUPPVM2", HitasAnonymizedDate, key="second_purchase_date"),
     Column("N_RAKLAINA", Integer, key="loans_during_construction", nullable=False),
     Column("N_RALUOVHINTA", Integer, key="debt_free_purchase_price_during_construction", nullable=False),
     Column("C_LISATIET", HitasBoolean, nullable=False),
