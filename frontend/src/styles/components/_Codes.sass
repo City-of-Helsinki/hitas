@@ -2,5 +2,52 @@
 @use '../utils' as utils
 
 .view--codes
+  @include utils.flexbox()
+  @include utils.flex-flow(column nowrap)
+  flex-grow: 1
+  [class^="Tabs-module"]
+    [class*="tablistBar"]
+      background-color: white
+
+    [class*="active"]
+      background-color: $color-black-10
+
+      span
+        font-weight: 700
+
+        &:before
+          display: none
+
   [class^="Tabs-module_tabs"]
-    background-color: $color-engel-medium-light
+    @include utils.flexbox()
+    @include utils.flex-flow(column nowrap)
+    @include utils.flex-grow(1)
+
+  .listing
+    background-color: $color-black-10
+
+  .results-list
+    border: 1px solid #ccc
+
+  .results-list__item
+    padding: $spacing-xs $spacing-m
+
+    &:not(:last-child)
+      border: none
+
+    &:nth-child(odd)
+      background-color: $color-engel-light
+
+  &__tab--indices
+    @include utils.flexbox()
+    @include utils.flex-flow(column nowrap)
+    @include utils.flex-grow(1)
+    .listing
+      grid-template-rows: calc(60px + 1rem) auto
+      grid-template-columns: 55% 45%
+      @include utils.flex-grow(1)
+      justify-content: flex-start
+
+    .list-headers
+      @include utils.flexbox()
+      justify-content: space-between

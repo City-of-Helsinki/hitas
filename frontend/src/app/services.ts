@@ -107,10 +107,9 @@ export const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getIndices: builder.query<IIndexResponse, object>({
-            query: (params: object) => ({
-                url: "indices",
-                params: params,
+        getIndices: builder.query<IIndexResponse, {indexType: string}>({
+            query: ({indexType}) => ({
+                url: `indices/${indexType}`,
             }),
         }),
         getDevelopers: builder.query<ICodeResponse, object>({

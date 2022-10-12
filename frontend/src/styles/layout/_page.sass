@@ -8,8 +8,10 @@
   min-height: 100vh
 
 .main-content
+  @include mix.flexbox()
+  @include mix.flex-flow(column nowrap)
   width: 100%
-  margin: 0 auto
+  margin: 0 auto $spacing-layout-xl
   flex-grow: 2
 
 .listing
