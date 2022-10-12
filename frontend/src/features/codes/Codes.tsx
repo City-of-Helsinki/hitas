@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Combobox, IconSearch, LoadingSpinner, Tabs} from "hds-react";
+import {Button, Combobox, IconPlus, IconSearch, LoadingSpinner, Tabs} from "hds-react";
 
 import {useGetIndicesQuery} from "../../app/services";
 import {FilterTextInputField, ListPageNumbers} from "../../common/components";
@@ -175,6 +175,12 @@ const LoadedCodesResultsList = ({data}: {data: IIndexResponse}) => {
                     />
                 ))}
             </ul>
+            <Button
+                theme="black"
+                iconLeft={<IconPlus />}
+            >
+                Lisää indeksi
+            </Button>
         </div>
     );
 };
