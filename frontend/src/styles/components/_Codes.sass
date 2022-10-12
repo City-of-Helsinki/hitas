@@ -1,9 +1,8 @@
-@use 'hds-design-tokens' as *
-@use '../utils' as utils
+@use '../imports' as *
 
 .view--codes
-  @include utils.flexbox()
-  @include utils.flex-flow(column nowrap)
+  @include flexbox()
+  @include flex-flow(column nowrap)
   flex-grow: 1
   [class^="Tabs-module"]
     [class*="tablistBar"]
@@ -19,9 +18,9 @@
           display: none
 
   [class^="Tabs-module_tabs"]
-    @include utils.flexbox()
-    @include utils.flex-flow(column nowrap)
-    @include utils.flex-grow(1)
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    @include flex-grow(1)
 
   .listing
     background-color: $codes-background-color
@@ -39,15 +38,15 @@
       background-color: $color-engel-light
 
   &__tab--indices
-    @include utils.flexbox()
-    @include utils.flex-flow(column nowrap)
-    @include utils.flex-grow(1)
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    @include flex-grow(1)
     .listing
       grid-template-rows: calc(60px + 1rem) auto
       grid-template-columns: 55% 45%
-      @include utils.flex-grow(1)
+      @include flex-grow(1)
       justify-content: flex-start
 
     .list-headers
-      @include utils.flexbox()
+      @include flexbox()
       justify-content: space-between

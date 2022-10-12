@@ -1,11 +1,10 @@
-@use 'hds-design-tokens' as *
-@use '../utils/mixins' as mix
+@use '../imports' as *
 
 .view--create
   position: relative
   margin-bottom: $spacing-layout-2-xl
-  @include mix.flexbox()
-  @include mix.flex-flow(column)
+  @include flexbox()
+  @include flex-flow(column)
 
   .field-sets
     display: flex
@@ -103,13 +102,13 @@
     flex-grow: 0
 
   .ownership-headings
-    @include mix.flexbox()
+    @include flexbox()
     width: 100%
     justify-content: space-between
     margin-bottom: 1em
 
   .buttons
-    @include mix.flexbox()
+    @include flexbox()
     width: 100%
     justify-content: center
     padding: $spacing-layout-s
