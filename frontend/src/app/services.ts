@@ -12,9 +12,11 @@ import {
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
+    IIndex,
     IIndexResponse,
     IPostalCodeResponse,
     IRealEstate,
+    IndexType,
 } from "../common/models";
 
 declare global {
@@ -107,7 +109,7 @@ export const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getIndices: builder.query<IIndexResponse, {indexType: string}>({
+        getIndices: builder.query<IIndexResponse, {indexType: IndexType}>({
             query: ({indexType}) => ({
                 url: `indices/${indexType}`,
             }),
@@ -237,6 +239,14 @@ export const mutationApi = hitasApi.injectEndpoints({
                 },
             ],
         }),
+        saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
+            query: ({data, index, month}) => ({
+                url: `indices/${index}/${month}`,
+                method: "PUT",
+                body: data,
+                headers: {"Content-Type": "application/json; charset=UTF-8"},
+            }),
+        }),
     }),
 });
 
@@ -261,4 +271,5 @@ export const {
     useCreateRealEstateMutation,
     useCreateBuildingMutation,
     useSaveApartmentMutation,
+    useSaveIndexMutation,
 } = mutationApi;
