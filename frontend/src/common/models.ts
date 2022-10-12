@@ -128,7 +128,7 @@ export interface IApartmentAddress {
     readonly city?: string; // Always returned when reading, but not required when writing
     apartment_number: number;
     floor: string | null;
-    stair: string;
+    stair: string | null;
 }
 
 export interface IApartmentLink {
@@ -158,19 +158,19 @@ export interface IApartment {
 }
 
 export interface IApartmentConstructionPrices {
-    loans: number;
-    additional_work: number;
-    interest: number;
-    debt_free_purchase_price: number;
+    loans: number | null;
+    additional_work: number | null;
+    interest: number | null;
+    debt_free_purchase_price: number | null;
 }
 
 export interface IApartmentPrices {
-    debt_free_purchase_price: number;
-    purchase_price: number;
-    primary_loan_amount: number;
+    debt_free_purchase_price: number | null;
+    purchase_price: number | null;
+    primary_loan_amount: number | null;
 
     first_purchase_date: string | null;
-    second_purchase_date: string | null;
+    latest_purchase_date: string | null;
 
     construction: IApartmentConstructionPrices;
 }
@@ -219,15 +219,15 @@ export interface IApartmentDetails {
 
 export interface IApartmentWritable {
     readonly id?: string;
-    state: ApartmentState;
+    state: ApartmentState | null;
     type: {id: string};
-    surface_area: number;
+    surface_area: number | null;
     rooms: number | null;
     shares: {
         start: number;
         end: number;
-    };
-    address: IApartmentAddress;
+    } | null;
+    address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
     prices: IApartmentPrices;
     completion_date?: string | null;
     building: string;

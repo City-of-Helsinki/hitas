@@ -68,30 +68,27 @@ const ApartmentCreatePage = () => {
             ? {
                   state: "free",
                   type: {id: ""},
-                  surface_area: 0,
+                  surface_area: null,
                   rooms: null,
-                  shares: {
-                      start: 0,
-                      end: 0,
-                  },
+                  shares: null,
                   address: {
                       street_address: "",
-                      apartment_number: 0,
-                      floor: "",
-                      stair: "",
+                      apartment_number: null,
+                      floor: null,
+                      stair: null,
                   },
                   completion_date: null,
                   prices: {
-                      debt_free_purchase_price: 0,
-                      purchase_price: 0,
-                      primary_loan_amount: 0,
+                      debt_free_purchase_price: null,
+                      purchase_price: null,
+                      primary_loan_amount: null,
                       first_purchase_date: null,
-                      second_purchase_date: null,
+                      latest_purchase_date: null,
                       construction: {
-                          loans: 0,
-                          interest: 0,
-                          debt_free_purchase_price: 0,
-                          additional_work: 0,
+                          loans: null,
+                          interest: null,
+                          debt_free_purchase_price: null,
+                          additional_work: null,
                       },
                   },
                   building: "",
@@ -408,7 +405,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="date"
                             label="Viimeisin ostopäivä"
-                            fieldPath="prices.second_purchase_date"
+                            fieldPath="prices.latest_purchase_date"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
