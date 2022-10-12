@@ -7,7 +7,7 @@ import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManage
 import {FilterIntegerField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
-import {formatAddress} from "../../common/utils";
+import {formatAddress, formatDate} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {
     return (
@@ -15,7 +15,7 @@ const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {
             <li className="results-list__item">
                 <div className="name">{name}</div>
                 <div className="address">{formatAddress(address)}</div>
-                <div className="date">{date}</div>
+                <div className="date">{formatDate(date)}</div>
             </li>
         </Link>
     );
@@ -43,7 +43,7 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                             id={item.id}
                             name={item.name}
                             address={item.address}
-                            date={item.date}
+                            date={formatDate(item.date)}
                         />
                     ))}
                 </ul>
