@@ -43,7 +43,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import DepreciationPercentage
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
-from hitas.oracle_migration.globals import anonymize_data
+from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
     apartment_construction_price_indices,
@@ -166,7 +166,9 @@ def run(
             converted_data.building_types_by_code_number = create_codes(
                 codebooks_by_id["TALOTYYPPI"], BuildingType, modify_fn=format_building_type
             )
-            converted_data.developers_by_code_number = create_codes(codebooks_by_id["RAKENTAJA"], Developer)
+            converted_data.developers_by_code_number = create_codes(
+                codebooks_by_id["RAKENTAJA"], Developer, sensitive=True
+            )
             converted_data.financing_methods_by_code_number = create_codes(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
@@ -680,13 +682,19 @@ def create_unsaved_postal_codes(codes: List[LegacyRow]) -> Dict[str, HitasPostal
 T = TypeVar("T", bound=AbstractCode)
 
 
-def create_codes(codes: List[LegacyRow], fn: Callable[[], T], modify_fn: Callable[[T], None] = None) -> Dict[str, T]:
+def create_codes(
+    codes: List[LegacyRow], fn: Callable[[], T], modify_fn: Callable[[T], None] = None, sensitive: bool = False
+) -> Dict[str, T]:
     retval = {}
 
     for code in codes:
         new = fn()
 
-        new.value = code["value"]
+        if sensitive and should_anonymize():
+            new.value = faker().company()
+        else:
+            new.value = code["value"]
+
         new.description = code["description"] or ""
         new.in_use = code["in_use"]
         new.order = code["order"]

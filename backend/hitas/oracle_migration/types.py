@@ -1,46 +1,9 @@
 import datetime
+import random
 
 import sqlalchemy.types as types
 
 from hitas.oracle_migration.globals import faker, should_anonymize
-
-
-class HitasAnonymizedSSN(types.TypeDecorator):
-    impl = types.String
-    cache_ok = True
-
-    def process_bind_param(self, value, dialect):
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return None
-
-        return value if not should_anonymize() else faker().ssn()
-
-
-class HitasAnonymizedName(types.TypeDecorator):
-    impl = types.String
-    cache_ok = True
-
-    def process_bind_param(self, value, dialect):
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return None
-
-        return value if not should_anonymize() else faker().name()
-
-
-class HitasAnonymizedNameCommaSeparated(HitasAnonymizedName):
-    def process_result_value(self, value, dialect):
-        if value is None:
-            return None
-
-        return (
-            value if not should_anonymize() else f"{faker().last_name()}, {faker().first_name()} {faker().first_name()}"
-        )
 
 
 class HitasBoolean(types.TypeDecorator):
@@ -110,3 +73,109 @@ class HitasDuration(types.TypeDecorator):
     def process_result_value(self, value, dialect):
         years, months = int(value[:2]), int(value[2:])
         return HitasDuration.Duration(years, months)
+
+
+class HitasAnonymized(types.TypeDecorator):
+    impl = types.String
+    cache_ok = True
+
+    def __init__(self, *args, **kwargs):
+        self.unique = kwargs.pop("unique", False)
+        self.used_fakes = set()
+
+        super().__init__(*args, **kwargs)
+
+    def fake(self, value):
+        raise NotImplementedError()
+
+    def process_bind_param(self, value, dialect):
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+
+        return value if not should_anonymize() else self.generate_fake(value)
+
+    def generate_fake(self, value):
+        return self.generate_unique(value) if self.unique else self.fake(value)
+
+    def generate_unique(self, value):
+        try_count = 0
+        while try_count < 20:
+            fake_value = self.fake(value)
+
+            if fake_value in self.used_fakes:
+                try_count += 1
+                continue
+
+            self.used_fakes.add(fake_value)
+            return fake_value
+
+        raise Exception("Unable to generate unique fake value!")
+
+
+class HitasAnonymizedAddress(HitasAnonymized):
+    def fake(self, value):
+        return faker().street_address() + str(faker().building_number())
+
+
+class HitasAnonymizedName(HitasAnonymized):
+    def fake(self, value):
+        return faker().name()
+
+
+class HitasAnonymizedNameCommaSeparated(HitasAnonymized):
+    def fake(self, value):
+        return f"{faker().last_name()}, {faker().first_name()} {faker().first_name()}"
+
+
+class HitasAnonymizedSSN(HitasAnonymized):
+    def fake(self, value):
+        return faker().ssn()
+
+
+class HitasAnonymizedPropertyIdentifier(HitasAnonymized):
+    def fake(self, value):
+        return (
+            "091"
+            + "0"
+            + str(random.randint(0, 99))
+            + "0"
+            + str(random.randint(0, 999))
+            + "00"
+            + str(random.randint(0, 99))
+        )
+
+
+class HitasAnonymizedText(HitasAnonymized):
+    def fake(self, value):
+        if not value:
+            return value
+
+        return faker().text(max_nb_chars=self.length)
+
+
+class HitasAnonymizedDate(HitasAnonymized):
+    def fake(self, value):
+        beginning_of_year = value.replace(day=1, month=1)
+        beginning_of_next_year = beginning_of_year.replace(year=beginning_of_year.year + 1)
+        return faker().date_between_dates(beginning_of_year, beginning_of_next_year)
+
+
+class HitasAnonymizedEmail(HitasAnonymized):
+    def fake(self, value):
+        if not value:
+            return value
+
+        return faker().email()
+
+
+class HitasAnonymizedCompany(HitasAnonymized):
+    def fake(self, value):
+        return faker().company()
+
+
+class HitasAnonymizedWord(HitasAnonymized):
+    def fake(self, value):
+        return faker().word()
