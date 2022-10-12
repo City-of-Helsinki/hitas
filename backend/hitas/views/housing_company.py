@@ -153,6 +153,8 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return instance
 
     def validate_business_id(self, value):
+        if value == "":
+            value = None
         validate_business_id(value)
         return value
 
