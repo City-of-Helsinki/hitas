@@ -100,7 +100,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                         id={item.id}
                         hcId={item.links.housing_company.id}
                         apartmentNumber={item.address.apartment_number}
-                        stair={item.address.stair}
+                        stair={item.address.stair || ""}
                         ownerships={item.ownerships}
                         apartmentType={item.type}
                         surfaceArea={item.surface_area}
