@@ -38,8 +38,8 @@ class UUIDRelatedField(SlugRelatedField):
     def run_validation(self, data=empty):
         if data == "":
             if self.required:
-                return None
-            raise serializers.ValidationError(code="blank")
+                raise serializers.ValidationError(code="blank")
+            return None
 
         return super().run_validation(data)
 

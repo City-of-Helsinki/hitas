@@ -606,6 +606,14 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "property_manager.id", "message": "This field is mandatory and cannot be null."},
         ),
         (
+            {"property_manager": {"id": None}},
+            {"field": "property_manager.id", "message": "This field is mandatory and cannot be null."},
+        ),
+        (
+            {"property_manager": {"id": ""}},
+            {"field": "property_manager.id", "message": "This field is mandatory and cannot be blank."},
+        ),
+        (
             {"property_manager": {"id": "foo"}},
             {"field": "property_manager.id", "message": "Object does not exist with given id 'foo'."},
         ),
