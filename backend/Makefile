@@ -23,3 +23,9 @@ dump:
 	./manage.py dumpdata users authtoken hitas > initial.json
 	cat initial.json | jq > initial-formatted.json
 	mv initial-formatted.json initial.json
+
+
+hitasmigrate:
+	./manage.py hitasmigrate --truncate
+	DJANGO_SUPERUSER_PASSWORD=hitas python manage.py createsuperuser --username hitas --email foo@example.com --no-input
+	./manage.py token --username hitas --set 52bf0606e0a0075c990fecc0afa555e5dae56404
