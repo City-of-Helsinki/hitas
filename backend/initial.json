@@ -46,7 +46,7 @@
     "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
     "fields": {
       "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
-      "last_login": "2022-06-14T12:40:21.467Z",
+      "last_login": "2022-10-12T17:08:22.619Z",
       "is_superuser": true,
       "username": "hitas",
       "first_name": "",
@@ -1009,6 +1009,343 @@
       "interest_during_construction": 16209,
       "debt_free_purchase_price_during_construction": 0,
       "notes": "At occaecati explicabo iste fuga magni. Occaecati tenetur a itaque animi quo odit totam. Quod maxime magni optio.\nOdio animi consequatur. Eligendi ut maxime laborum quae minus."
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Officiis architecto numquam maxime.",
+      "completion_date": "2011-03-08",
+      "value": 20697,
+      "apartment": 1
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Consectetur architecto ipsa quas debitis.",
+      "completion_date": "2011-12-03",
+      "value": 65252,
+      "apartment": 2
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ab quibusdam soluta laudantium eveniet inventore fugiat.",
+      "completion_date": "2011-09-19",
+      "value": 15030,
+      "apartment": 2
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dolor fugiat dolores quo quae.",
+      "completion_date": "2014-07-24",
+      "value": 7568,
+      "apartment": 3
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Fugit ratione distinctio voluptate iste facilis similique.",
+      "completion_date": "2016-08-30",
+      "value": 6599,
+      "apartment": 4
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ab explicabo debitis adipisci unde facilis.",
+      "completion_date": "2017-11-25",
+      "value": 34980,
+      "apartment": 5
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dolorum ratione unde.",
+      "completion_date": "2012-07-28",
+      "value": 11651,
+      "apartment": 6
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sequi neque ut velit sint libero nihil.",
+      "completion_date": "2012-10-20",
+      "value": 85990,
+      "apartment": 6
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Incidunt asperiores repellat quisquam quibusdam.",
+      "completion_date": "2020-11-07",
+      "value": 96998,
+      "apartment": 6
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Illum recusandae ducimus libero quas sed.",
+      "completion_date": "2012-07-21",
+      "value": 75447,
+      "apartment": 7
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Consequatur natus culpa molestiae voluptate distinctio.",
+      "completion_date": "2020-06-13",
+      "value": 10604,
+      "apartment": 7
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nemo magni mollitia sint numquam quas unde.",
+      "completion_date": "2015-01-28",
+      "value": 62621,
+      "apartment": 8
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Enim perspiciatis sequi dolorum ab.",
+      "completion_date": "2019-03-12",
+      "value": 22659,
+      "apartment": 8
+    }
+  },
+  {
+    "model": "hitas.apartmentmarketpriceimprovement",
+    "pk": 14,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Commodi repudiandae recusandae nam.",
+      "completion_date": "2016-02-07",
+      "value": 51857,
+      "apartment": 8
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Itaque unde aliquam soluta recusandae dolor nesciunt quas.",
+      "completion_date": "2018-02-19",
+      "value": 77530,
+      "apartment": 1,
+      "depreciation_percentage": 2.5
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Deleniti ipsum quaerat rerum incidunt ipsum enim.",
+      "completion_date": "2017-10-09",
+      "value": 72257,
+      "apartment": 2,
+      "depreciation_percentage": 10
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Natus magnam quisquam at incidunt eius.",
+      "completion_date": "2021-08-15",
+      "value": 538,
+      "apartment": 3,
+      "depreciation_percentage": 0
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Repudiandae ipsum rerum aut totam illum ipsa.",
+      "completion_date": "2013-05-12",
+      "value": 50329,
+      "apartment": 3,
+      "depreciation_percentage": 10
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Reiciendis excepturi quas vero numquam mollitia.",
+      "completion_date": "2010-01-18",
+      "value": 25015,
+      "apartment": 4,
+      "depreciation_percentage": 2.5
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Aperiam tempora quidem beatae explicabo.",
+      "completion_date": "2016-10-21",
+      "value": 27619,
+      "apartment": 4,
+      "depreciation_percentage": 0
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Esse laudantium nihil.",
+      "completion_date": "2022-04-07",
+      "value": 78333,
+      "apartment": 5,
+      "depreciation_percentage": 2.5
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Fuga magni ad est neque doloribus.",
+      "completion_date": "2019-09-07",
+      "value": 46216,
+      "apartment": 5,
+      "depreciation_percentage": 2.5
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nihil aut voluptates cupiditate iusto cum provident.",
+      "completion_date": "2016-04-06",
+      "value": 88502,
+      "apartment": 5,
+      "depreciation_percentage": 10
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Eligendi repudiandae occaecati fuga.",
+      "completion_date": "2014-02-25",
+      "value": 61869,
+      "apartment": 6,
+      "depreciation_percentage": 0
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Consequuntur rem neque ad explicabo nulla repellat.",
+      "completion_date": "2019-04-26",
+      "value": 36020,
+      "apartment": 7,
+      "depreciation_percentage": 0
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Modi sapiente officiis dignissimos ab quam tempore suscipit.",
+      "completion_date": "2018-06-20",
+      "value": 83829,
+      "apartment": 8,
+      "depreciation_percentage": 2.5
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nisi nihil nihil dicta autem tenetur ex architecto.",
+      "completion_date": "2013-01-12",
+      "value": 25753,
+      "apartment": 8,
+      "depreciation_percentage": 0
     }
   },
   {
@@ -3729,6 +4066,390 @@
       "notes": "Quos harum similique totam omnis quasi quo. Hic eos earum nam dolorem adipisci.\nQuisquam necessitatibus ducimus architecto maxime. Officiis expedita accusamus pariatur sunt molestias.",
       "last_modified_datetime": "2022-08-02T09:22:01.728Z",
       "last_modified_by": "b3ce65df-3707-4d83-a605-a0c886ff53f7"
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Rem inventore aperiam odio voluptate quidem.",
+      "completion_date": "2015-10-28",
+      "value": 16124,
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dignissimos dolores temporibus facilis.",
+      "completion_date": "2017-09-22",
+      "value": 8767,
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ipsam explicabo praesentium ducimus quas ab repellendus.",
+      "completion_date": "2017-12-15",
+      "value": 87670,
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nulla quia quam iusto quos at quia.",
+      "completion_date": "2020-07-19",
+      "value": 90306,
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Suscipit laudantium nesciunt.",
+      "completion_date": "2015-02-22",
+      "value": 91049,
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Labore odio in.",
+      "completion_date": "2020-12-30",
+      "value": 52437,
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quo ipsam animi voluptatem necessitatibus minus perspiciatis reprehenderit.",
+      "completion_date": "2015-07-28",
+      "value": 83605,
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quo error eveniet quis esse illo doloremque.",
+      "completion_date": "2016-05-09",
+      "value": 78534,
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Praesentium praesentium est illo minus ad.",
+      "completion_date": "2011-03-22",
+      "value": 11299,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Cum quia amet deserunt voluptate.",
+      "completion_date": "2014-09-25",
+      "value": 99019,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ab neque adipisci.",
+      "completion_date": "2016-06-12",
+      "value": 26177,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Iure libero et reiciendis eius.",
+      "completion_date": "2020-10-01",
+      "value": 52257,
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Inventore reiciendis cumque illum ratione aspernatur corrupti.",
+      "completion_date": "2018-01-09",
+      "value": 25121,
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sed tempora deserunt illo possimus autem.",
+      "completion_date": "2016-12-03",
+      "value": 40169,
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Laborum vel veritatis dicta.",
+      "completion_date": "2020-12-04",
+      "value": 70524,
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Aspernatur quae consequatur.",
+      "completion_date": "2011-10-16",
+      "value": 53407,
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Minima cumque corporis voluptate.",
+      "completion_date": "2010-03-24",
+      "value": 63325,
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quidem velit harum nemo.",
+      "completion_date": "2012-01-25",
+      "value": 51857,
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Magni quod repudiandae enim nisi enim reprehenderit.",
+      "completion_date": "2015-04-04",
+      "value": 14141,
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Accusamus consequuntur quae veritatis veniam.",
+      "completion_date": "2018-12-26",
+      "value": 44041,
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Alias ipsa sapiente fugit error doloribus.",
+      "completion_date": "2010-04-04",
+      "value": 46697,
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ratione earum eos ipsum vero alias.",
+      "completion_date": "2019-02-13",
+      "value": 84297,
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sequi vitae corporis accusamus voluptatibus quidem.",
+      "completion_date": "2019-11-01",
+      "value": 11154,
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nobis accusamus sint sunt labore illo vel.",
+      "completion_date": "2010-09-10",
+      "value": 39848,
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Pariatur ipsam qui labore ratione sapiente consequuntur.",
+      "completion_date": "2022-04-05",
+      "value": 14035,
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Porro autem voluptatum atque officiis suscipit facere.",
+      "completion_date": "2021-12-08",
+      "value": 674,
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 14,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Totam nisi ex odit delectus asperiores.",
+      "completion_date": "2017-04-18",
+      "value": 25325,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 15,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sunt architecto nihil quae.",
+      "completion_date": "2010-09-26",
+      "value": 15071,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 16,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dicta occaecati similique numquam.",
+      "completion_date": "2016-04-27",
+      "value": 96890,
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 17,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Vitae est provident.",
+      "completion_date": "2022-07-08",
+      "value": 38122,
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 18,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Tenetur veniam non.",
+      "completion_date": "2021-07-15",
+      "value": 91070,
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 19,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ducimus illo eum voluptate.",
+      "completion_date": "2021-01-02",
+      "value": 5867,
+      "housing_company": 8
     }
   },
   {
