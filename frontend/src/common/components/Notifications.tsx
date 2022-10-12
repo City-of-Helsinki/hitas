@@ -18,8 +18,6 @@ export default function Notifications(): JSX.Element {
     const {toasts, handlers} = useToaster();
     const {calculateOffset, updateHeight} = handlers;
 
-    console.log(toasts);
-
     return (
         <>
             {toasts.map((toast) => {
