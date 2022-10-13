@@ -298,20 +298,16 @@ export interface IPostalCode {
     cost_area: 1 | 2 | 3 | 4;
 }
 
-export type IndexType = {
-    label:
-        | "max-value-index"
-        | "market-price-index"
-        | "market-price-index-2005-equal-100"
-        | "construction-price-index"
-        | "construction-price-index-2005-equal-100"
-        | "surface-area-price-ceiling";
-};
-
 export interface IIndex {
-    index: IndexType;
+    index: string;
     month: string;
     value: number | null;
+}
+
+export interface IIndexQuery {
+    indexType: string;
+    page: number;
+    params?: object;
 }
 
 // List response interfaces

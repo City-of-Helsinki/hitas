@@ -13,10 +13,10 @@ import {
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
     IIndex,
+    IIndexQuery,
     IIndexResponse,
     IPostalCodeResponse,
     IRealEstate,
-    IndexType,
 } from "../common/models";
 
 declare global {
@@ -109,9 +109,10 @@ export const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getIndices: builder.query<IIndexResponse, {indexType: IndexType}>({
-            query: ({indexType}) => ({
-                url: `indices/${indexType}`,
+        getIndices: builder.query<IIndexResponse, IIndexQuery>({
+            query: (params: IIndexQuery) => ({
+                url: `indices/${params.indexType}`,
+                params: params.params,
             }),
         }),
         getDevelopers: builder.query<ICodeResponse, object>({
@@ -232,6 +233,10 @@ export const mutationApi = hitasApi.injectEndpoints({
                 {
                     type: "Apartment",
                     id: "LIST",
+                },
+                {
+                    type: "Apartment",
+                    id: arg.id,
                 },
                 {
                     type: "HousingCompany",
