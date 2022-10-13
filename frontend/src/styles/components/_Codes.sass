@@ -47,6 +47,11 @@
       @include flex-grow(1)
       justify-content: flex-start
 
-    .list-headers
-      @include flexbox()
-      justify-content: space-between
+    .list-headers, .results-list__item
+      .index
+        width: 70%
+      .month
+        width: 20%
+      .value
+        width: 10%
+        text-align: right

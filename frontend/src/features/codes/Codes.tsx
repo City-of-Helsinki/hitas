@@ -1,11 +1,10 @@
-import React, {useState} from "react";
+import React from "react";
 
 import {Tabs} from "hds-react";
 
 import IndicesList from "./IndicesList";
 
 const Codes = (): JSX.Element => {
-    const [filterParams, setFilterParams] = useState({name: ""});
     return (
         <div className="view--codes">
             <h1 className="main-heading">Koodisto</h1>
@@ -16,20 +15,17 @@ const Codes = (): JSX.Element => {
                     <Tabs.Tab>Laskentasäännöt</Tabs.Tab>
                     <Tabs.Tab>Rahoitusmuodot</Tabs.Tab>
                 </Tabs.TabList>
-                <Tabs.TabPanel className="view--codes__tab--indices">
-                    <IndicesList
-                        filterParams={filterParams}
-                        setFilterParams={setFilterParams}
-                    />
+                <Tabs.TabPanel className={"view--codes__tab--indices"}>
+                    <IndicesList />
                 </Tabs.TabPanel>
-                <Tabs.TabPanel>
-                    <h2>Postinumerot</h2>
+                <Tabs.TabPanel className={"view--codes__tab--postalcodes"}>
+                    <h1>Postinumerot</h1>
                 </Tabs.TabPanel>
-                <Tabs.TabPanel>
-                    <h2>Laskentasäännöt</h2>
+                <Tabs.TabPanel className={"view--codes__tab--rules"}>
+                    <h1>Laskentasäännöt</h1>
                 </Tabs.TabPanel>
-                <Tabs.TabPanel>
-                    <h2>Rahoitusmuodot</h2>
+                <Tabs.TabPanel className={"view--codes__tab--fundingmodes"}>
+                    <h1>Rahoitusmuodot</h1>
                 </Tabs.TabPanel>
             </Tabs>
         </div>
