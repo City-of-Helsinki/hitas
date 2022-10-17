@@ -5,6 +5,7 @@ from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models.postal_code import HitasPostalCode
 
 
 class ApartmentState(Enum):
@@ -73,12 +74,12 @@ class Apartment(ExternalHitasModel):
         return self.debt_free_purchase_price + self.primary_loan_amount
 
     @property
-    def postal_code(self):
+    def postal_code(self) -> HitasPostalCode:
         return self.building.postal_code
 
     @property
-    def city(self):
-        return self.postal_code().city
+    def city(self) -> str:
+        return self.postal_code.city
 
     @property
     def shares_count(self) -> int:

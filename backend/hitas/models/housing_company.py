@@ -69,15 +69,15 @@ class HousingCompany(ExternalHitasModel):
     )
 
     @property
-    def city(self):
+    def city(self) -> str:
         return self.postal_code.city
 
     @property
-    def area(self):
+    def area(self) -> int:
         return self.postal_code.cost_area
 
     @property
-    def area_display(self):
+    def area_display(self) -> str:
         return f"{self.city}-{self.area}: {self.postal_code.value}"
 
     def save(self, *args, **kwargs):
