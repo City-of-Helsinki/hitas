@@ -8,7 +8,7 @@ from django.db.models import Prefetch
 from django.urls import reverse
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
-from rest_framework.fields import SkipField, empty
+from rest_framework.fields import empty
 
 from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Owner, Ownership
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
@@ -94,20 +94,26 @@ class ApartmentHitasAddressSerializer(serializers.Serializer):
     postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
     city = serializers.CharField(source="building.real_estate.housing_company.city", read_only=True)
     apartment_number = serializers.IntegerField(min_value=0)
-    floor = serializers.CharField(max_length=50, required=False, allow_null=True)
+    floor = serializers.CharField(max_length=50, required=False, allow_null=True, allow_blank=True)
     stair = serializers.CharField(max_length=16)
 
 
 class SharesSerializer(serializers.Serializer):
-    start = serializers.IntegerField(source="share_number_start", min_value=1)
-    end = serializers.IntegerField(source="share_number_end", min_value=1)
+    start = serializers.IntegerField(source="share_number_start", min_value=1, allow_null=True)
+    end = serializers.IntegerField(source="share_number_end", min_value=1, allow_null=True)
     total = serializers.SerializerMethodField()
 
     def get_total(self, instance: Apartment) -> int:
         return instance.shares_count
 
     def validate(self, data):
-        if data["share_number_start"] > data["share_number_end"]:
+        start, end = data["share_number_start"], data["share_number_end"]
+
+        if start is None and end is None:
+            return data
+        if start is None or end is None:
+            raise ValidationError("Both 'shares.start' and 'shares.end' must be given or be 'null'.")
+        if start > end:
             raise ValidationError("'shares.start' must not be greater than 'shares.end'.")
 
         return data
@@ -116,7 +122,10 @@ class SharesSerializer(serializers.Serializer):
         value = super().run_validation(data)
 
         if value is None:
-            raise SkipField
+            value = {
+                "share_number_start": None,
+                "share_number_end": None,
+            }
 
         return value
 
@@ -155,7 +164,7 @@ class PricesSerializer(serializers.Serializer):
     acquisition_price = serializers.IntegerField(read_only=True)
     purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     first_purchase_date = serializers.DateField(required=False, allow_null=True)
-    second_purchase_date = serializers.DateField(required=False, allow_null=True)
+    latest_purchase_date = serializers.DateField(required=False, allow_null=True)
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
     max_prices = serializers.SerializerMethodField()
 
@@ -205,7 +214,7 @@ class PricesSerializer(serializers.Serializer):
                 "surface_area_price_ceiling": value_obj(sapc, maximum),
             }
         else:
-            # Handle apartments not yet completed or completed 2011 owwards
+            # Handle apartments not yet completed or completed 2011 onwards
             cpi, mpi, sapc = instance_values(["cpi_2005_100", "mpi_2005_100", "sapc"])
             maximum = max_with_nones(cpi, mpi, sapc)
 
@@ -276,11 +285,11 @@ class ApartmentImprovementSerializer(serializers.Serializer):
 
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
-    state = HitasEnumField(enum=ApartmentState)
+    state = HitasEnumField(enum=ApartmentState, required=False, allow_null=True)
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type")
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
-    surface_area = HitasDecimalField()
+    surface_area = HitasDecimalField(required=False, allow_null=True)
     rooms = ValueOrNullField(required=False, allow_null=True)
     shares = SharesSerializer(source="*", required=False, allow_null=True)
     prices = PricesSerializer(source="*", required=False, allow_null=True)
@@ -465,7 +474,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "primary_loan_amount",
                 "purchase_price",
                 "first_purchase_date",
-                "second_purchase_date",
+                "latest_purchase_date",
                 "additional_work_during_construction",
                 "loans_during_construction",
                 "interest_during_construction",

@@ -25,11 +25,15 @@ class ApartmentFactory(DjangoModelFactory):
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = factory.Faker("numerify", text="%")
     stair = factory.Faker("bothify", text="?")  # Random letter
+    first_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    latest_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     debt_free_purchase_price = fuzzy.FuzzyInteger(100000, 200000)
     purchase_price = fuzzy.FuzzyInteger(100000, 200000)
     primary_loan_amount = fuzzy.FuzzyInteger(100000, 200000)
+    additional_work_during_construction = fuzzy.FuzzyInteger(10000, 20000)
     loans_during_construction = fuzzy.FuzzyInteger(100000, 200000)
     interest_during_construction = fuzzy.FuzzyInteger(10000, 20000)
+    debt_free_purchase_price_during_construction = fuzzy.FuzzyInteger(100000, 200000)
     notes = factory.Faker("text")
 
 
