@@ -13,6 +13,7 @@ interface ApartmentListItemProps {
     stair: string;
     ownerships: IOwnership[];
     apartmentType?: string;
+    rooms: number | null;
     surfaceArea: number;
     address: IApartmentAddress;
     state: string;
@@ -30,6 +31,7 @@ const ApartmentListItem = ({
     state,
     hcId,
     housingCompanyName,
+    rooms,
     apartmentType,
 }: ApartmentListItemProps): JSX.Element => {
     // Combine ownerships into a single formatted string
@@ -103,6 +105,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                         stair={item.address.stair || ""}
                         ownerships={item.ownerships}
                         apartmentType={item.type}
+                        rooms={item.rooms}
                         surfaceArea={item.surface_area}
                         address={item.address}
                         state={item.state}
