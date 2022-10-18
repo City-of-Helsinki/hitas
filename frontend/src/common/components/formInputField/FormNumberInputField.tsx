@@ -17,12 +17,15 @@ export default function FormNumberInputField({
     required,
     ...rest
 }: FormNumberInputFieldProps): JSX.Element {
+    const formatNumber = (v: string): number | null => {
+        if (v === "") return null;
+        return Number(Number().toFixed(fractionDigits ? fractionDigits : 0));
+    };
+
     return (
         <div className={`input-field input-field--number${required ? " input-field--required" : "foo"}`}>
             <NumberInput
-                onChange={(e) =>
-                    setFieldValue(Number(Number(e.target.value).toFixed(fractionDigits ? fractionDigits : 0)))
-                }
+                onChange={(e) => setFieldValue(formatNumber(e.target.value))}
                 unit={unit ? unit : ""}
                 required={required}
                 {...rest}
