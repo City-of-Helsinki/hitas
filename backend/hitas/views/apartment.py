@@ -365,8 +365,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     def update(self, instance: Apartment, validated_data: dict[str, Any]):
         ownerships = validated_data.pop("ownerships")
-        mpi = validated_data.get("market_price_improvements")
-        cpi = validated_data.get("construction_price_improvements")
+        mpi = validated_data.pop("market_price_improvements")
+        cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().update(instance, validated_data)
 
