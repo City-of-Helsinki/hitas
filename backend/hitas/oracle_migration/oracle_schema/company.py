@@ -150,7 +150,7 @@ apartments = Table(
     Column("N_HANKARVO", Integer, key="acquisition_price", nullable=False),
     Column("N_RAKKORKO", Integer, key="interest_during_construction", nullable=False),
     Column("D_KAUPPVM1", HitasAnonymizedDate, key="first_purchase_date"),
-    Column("D_KAUPPVM2", HitasAnonymizedDate, key="second_purchase_date"),
+    Column("D_KAUPPVM2", HitasAnonymizedDate, key="latest_purchase_date"),
     Column("N_RAKLAINA", Integer, key="loans_during_construction", nullable=False),
     Column("N_RALUOVHINTA", Integer, key="debt_free_purchase_price_during_construction", nullable=False),
     Column("C_LISATIET", HitasBoolean, nullable=False),

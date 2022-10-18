@@ -183,8 +183,9 @@ def test__api__housing_company__list__paging__too_high(api_client: HitasAPIClien
 # Retrieve tests
 
 
+@pytest.mark.parametrize("apt_with_null_prices", [False, True])
 @pytest.mark.django_db
-def test__api__housing_company__retrieve(api_client: HitasAPIClient):
+def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_null_prices: bool):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
@@ -218,6 +219,21 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient):
     )
     hc1_re2: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re2_bu1: Building = BuildingFactory.create(real_estate=hc1_re2)
+    if apt_with_null_prices:
+        # Make sure an Apartment with null prices doesn't affect Housing Company's summary values
+        ApartmentFactory.create(
+            surface_area=50,
+            first_purchase_date=None,
+            latest_purchase_date=None,
+            debt_free_purchase_price=None,
+            purchase_price=None,
+            primary_loan_amount=None,
+            additional_work_during_construction=None,
+            loans_during_construction=None,
+            interest_during_construction=None,
+            debt_free_purchase_price_during_construction=None,
+        )
+
     mpi: HousingCompanyConstructionPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=hc1
     )
@@ -450,7 +466,6 @@ def test__api__housing_company__create(api_client: HitasAPIClient, minimal_data:
                 "business_id": None,
                 "primary_loan": None,
                 "property_manager": None,
-                "acquisition_price": 10.00,
                 "notes": "",
                 "sales_price_catalogue_confirmation_date": None,
                 "improvements": {

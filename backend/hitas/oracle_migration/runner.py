@@ -412,7 +412,7 @@ def create_apartments(
         new.floor = apartment["floor"]
         new.stair = apartment["stair"]
         new.first_purchase_date = apartment["first_purchase_date"]
-        new.second_purchase_date = apartment["second_purchase_date"]
+        new.latest_purchase_date = apartment["latest_purchase_date"]
         new.debt_free_purchase_price = apartment["debt_free_purchase_price"]
         new.purchase_price = apartment["purchase_price"]
         new.additional_work_during_construction = apartment["additional_work_during_construction"]

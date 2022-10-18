@@ -19,7 +19,6 @@ class HousingCompanyFactory(DjangoModelFactory):
     class Meta:
         model = HousingCompany
 
-    id = factory.Sequence(lambda n: n)
     display_name = factory.Sequence(lambda n: f"Test Housing company {n:03}")
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = fuzzy.FuzzyChoice(state[0] for state in HousingCompanyState.choices())

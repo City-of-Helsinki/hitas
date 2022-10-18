@@ -264,8 +264,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "primary_loan_amount": ap.primary_loan_amount,
             "acquisition_price": ap.debt_free_purchase_price + ap.primary_loan_amount,
             "purchase_price": ap.purchase_price,
-            "first_purchase_date": ap.first_purchase_date,
-            "second_purchase_date": ap.second_purchase_date,
+            "first_purchase_date": ap.first_purchase_date.strftime("%Y-%m-%d"),
+            "latest_purchase_date": ap.latest_purchase_date.strftime("%Y-%m-%d"),
             "construction": {
                 "loans": ap.loans_during_construction,
                 "interest": ap.interest_during_construction,
@@ -352,7 +352,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
 
 def _test_max_prices(
-    api_client: HitasAPIClient, pre_2011: bool, create_completion_indices: bool, create_current_indices: bool
+    api_client: HitasAPIClient,
+    pre_2011: bool,
+    create_completion_indices: bool,
+    create_current_indices: bool,
+    null_values: bool = False,
 ):
     completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
     cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
@@ -360,8 +364,8 @@ def _test_max_prices(
 
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
-        debt_free_purchase_price=100000,
-        surface_area=50,
+        debt_free_purchase_price=100000 if not null_values else None,
+        surface_area=50 if not null_values else None,
     )
 
     if create_completion_indices:
@@ -383,16 +387,16 @@ def _test_max_prices(
 
     values = {
         "construction_price_index": {
-            "value": 150000 if create_current_indices and create_completion_indices else None,
-            "maximum": create_current_indices and create_completion_indices,
+            "value": 150000 if create_current_indices and create_completion_indices and not null_values else None,
+            "maximum": create_current_indices and create_completion_indices and not null_values,
         },
         "market_price_index": {
-            "value": 125000 if create_current_indices and create_completion_indices else None,
+            "value": 125000 if create_current_indices and create_completion_indices and not null_values else None,
             "maximum": False,
         },
         "surface_area_price_ceiling": {
-            "value": 150000 if create_current_indices else None,
-            "maximum": create_current_indices,
+            "value": 150000 if create_current_indices and not null_values else None,
+            "maximum": create_current_indices and not null_values,
         },
     }
 
@@ -441,6 +445,30 @@ def test__api__apartment__retrieve__pre_2011__current_month_indices_missing(api_
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__indices_missing(api_client: HitasAPIClient):
     _test_max_prices(api_client, pre_2011=True, create_completion_indices=False, create_current_indices=False)
+
+
+@pytest.mark.parametrize(
+    "pre_2011,create_completion_indices,create_current_indices",
+    (
+        [True, False, False],
+        [False, True, False],
+        [True, True, False],
+        [False, False, True],
+        [True, False, True],
+        [True, True, True],
+    ),
+)
+@pytest.mark.django_db
+def test__api__apartment__retrieve__indices__null_values(
+    api_client: HitasAPIClient, pre_2011, create_completion_indices, create_current_indices
+):
+    _test_max_prices(
+        api_client,
+        pre_2011=pre_2011,
+        create_completion_indices=create_completion_indices,
+        create_current_indices=create_current_indices,
+        null_values=True,
+    )
 
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
@@ -534,7 +562,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
             "purchase_price": 23456,
             "primary_loan_amount": 34567,
             "first_purchase_date": "2000-01-01",
-            "second_purchase_date": "2020-05-05",
+            "latest_purchase_date": "2020-05-05",
             "construction": {
                 "loans": 123,
                 "interest": 234,
@@ -581,17 +609,41 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
     return data
 
 
-@pytest.mark.parametrize("minimal_data", [False, True])
+@pytest.mark.parametrize("data_extent", ["full", "nulled", "missing"])
 @pytest.mark.django_db
-def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool):
+def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
     b = BuildingFactory.create()
 
     data = get_apartment_create_data(b)
-    if minimal_data:
+    if data_extent == "nulled":
         data.update(
             {
-                "notes": "",
+                "state": None,
+                "surface_area": None,
+                "shares": None,
+                "address": {
+                    "street_address": data["address"]["street_address"],
+                    "apartment_number": data["address"]["apartment_number"],
+                    "floor": None,
+                    "stair": data["address"]["stair"],
+                },
+                "prices": {
+                    "debt_free_purchase_price": None,
+                    "primary_loan_amount": None,
+                    "acquisition_price": None,
+                    "purchase_price": None,
+                    "first_purchase_date": None,
+                    "latest_purchase_date": None,
+                    "construction": {
+                        "loans": None,
+                        "additional_work": None,
+                        "interest": None,
+                        "debt_free_purchase_price": None,
+                    },
+                },
+                "completion_date": None,
                 "ownerships": [],
+                "notes": None,
                 "improvements": {
                     "market_price_index": [],
                     "construction_price_index": [],
@@ -599,7 +651,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
                 "rooms": None,
             }
         )
-        data["shares"] = None
+    elif data_extent == "missing":
         del data["prices"]
 
     response = api_client.post(
@@ -614,7 +666,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 
     ap = Apartment.objects.first()
     assert response.json()["id"] == ap.uuid.hex
-    assert len(response.json()["ownerships"]) == 0 if minimal_data else 2
+    assert len(response.json()["ownerships"]) == (0 if data_extent == "nulled" else 2)
 
     get_response = api_client.get(
         reverse(
@@ -628,7 +680,6 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
 @pytest.mark.parametrize(
     "invalid_data,fields",
     [
-        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be null."}]),
         ({"state": ""}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
         (
             {"state": "invalid_state"},
@@ -652,12 +703,12 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
             [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
         ),
         (
-            {"type": {"id": "foo"}},
-            [{"field": "type.id", "message": "Object does not exist with given id 'foo'."}],
+            {"type": {"id": ""}},
+            [{"field": "type.id", "message": "This field is mandatory and cannot be blank."}],
         ),
         (
-            {"surface_area": None},
-            [{"field": "surface_area", "message": "This field is mandatory and cannot be null."}],
+            {"type": {"id": "foo"}},
+            [{"field": "type.id", "message": "Object does not exist with given id 'foo'."}],
         ),
         ({"surface_area": "foo"}, [{"field": "surface_area", "message": "A valid number is required."}]),
         (
@@ -684,7 +735,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, minimal_data: bool)
         ),
         (
             {"shares": {"start": None, "end": 100}},
-            [{"field": "shares.start", "message": "This field is mandatory and cannot be null."}],
+            [{"field": "shares", "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'."}],
         ),
         (
             {"shares": {"start": 100, "end": 50}},
@@ -1152,7 +1203,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
             "purchase_price": 22222,
             "primary_loan_amount": 33333,
             "first_purchase_date": "1999-01-01",
-            "second_purchase_date": "2010-08-01",
+            "latest_purchase_date": "2010-08-01",
             "construction": {
                 "loans": 44444,
                 "interest": 55555,
@@ -1194,7 +1245,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert ap.purchase_price == data["prices"]["purchase_price"]
     assert ap.primary_loan_amount == data["prices"]["primary_loan_amount"]
     assert str(ap.first_purchase_date) == data["prices"]["first_purchase_date"]
-    assert str(ap.second_purchase_date) == data["prices"]["second_purchase_date"]
+    assert str(ap.latest_purchase_date) == data["prices"]["latest_purchase_date"]
     assert ap.loans_during_construction == data["prices"]["construction"]["loans"]
     assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]

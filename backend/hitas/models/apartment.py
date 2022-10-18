@@ -24,9 +24,9 @@ class Apartment(ExternalHitasModel):
 
     building = models.ForeignKey("Building", on_delete=models.CASCADE, related_name="apartments")
 
-    state = EnumField(ApartmentState, default=ApartmentState.FREE)
+    state = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")
-    surface_area = HitasModelDecimalField(help_text=_("Measured in m^2"))
+    surface_area = HitasModelDecimalField(null=True, help_text=_("Measured in m^2"))
     # 'Huoneiden määrä'
     rooms = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
@@ -44,29 +44,32 @@ class Apartment(ExternalHitasModel):
     stair = models.CharField(max_length=16)
 
     # 'Luovutushinta'
-    debt_free_purchase_price = models.PositiveIntegerField(default=0)
+    debt_free_purchase_price = models.PositiveIntegerField(null=True)
     # 'Ensisijaislaina'
-    primary_loan_amount = models.PositiveIntegerField(default=0)
+    primary_loan_amount = models.PositiveIntegerField(default=0, null=True)
     # 'Kauppakirjahinta'
-    purchase_price = HitasModelDecimalField(blank=True, null=True)
-    # '1. Kauppakirjapvm'
+    purchase_price = HitasModelDecimalField(null=True, blank=True)
+    # 'Ensimmäinen kauppakirjapvm'
     first_purchase_date = models.DateField(null=True, blank=True)
-    # '2. Kauppakirjapvm'
-    second_purchase_date = models.DateField(null=True, blank=True)
+    # 'Viimeisin kauppakirjapvm'
+    latest_purchase_date = models.DateField(null=True, blank=True)
     # 'Rakennusaikaiset lisätyöt'
-    additional_work_during_construction = models.PositiveIntegerField(default=0)
+    additional_work_during_construction = models.PositiveIntegerField(null=True)
     # 'Rakennusaikaiset lainat'
-    loans_during_construction = models.PositiveIntegerField(default=0)
+    loans_during_construction = models.PositiveIntegerField(null=True)
     # 'Rakennusaikaiset korot'
-    interest_during_construction = models.PositiveIntegerField(default=0)
+    interest_during_construction = models.PositiveIntegerField(null=True)
     # 'Luovutushinta (RA)'
-    debt_free_purchase_price_during_construction = models.PositiveIntegerField(default=0)
+    debt_free_purchase_price_during_construction = models.PositiveIntegerField(null=True)
 
     notes = models.TextField(blank=True, null=True)
 
     # 'Hankinta-arvo'
     @property
     def acquisition_price(self):
+        if self.debt_free_purchase_price is None or self.primary_loan_amount is None:
+            return None
+
         return self.debt_free_purchase_price + self.primary_loan_amount
 
     @property

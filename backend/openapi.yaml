@@ -2735,6 +2735,7 @@ components:
           type: string
           example: b477389cb3514fb1b444052a39bfb65d
         state:
+          nullable: true
           $ref: '#/components/schemas/ApartmentState'
         type:
           description: Apartment type
@@ -2743,6 +2744,7 @@ components:
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
+          nullable: true
           minimum: 0
           example: 67
         rooms:
@@ -2791,12 +2793,14 @@ components:
           readOnly: true
           example: b477389cb3514fb1b444052a39bfb65d
         state:
+          nullable: true
           $ref: '#/components/schemas/ApartmentState'
         type:
           $ref: '#/components/schemas/ReadOnlyCode'
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
+          nullable: true
           minimum: 0
           example: 67
         rooms:
@@ -2818,11 +2822,13 @@ components:
             start:
               description: First share number
               type: integer
+              nullable: true
               minimum: 0
               example: 100
             end:
               description: Last share number
               type: integer
+              nullable: true
               minimum: 0
               example: 150
             total:
@@ -3054,7 +3060,7 @@ components:
           format: date
           nullable: true
           example: 1985-12-10
-        second_purchase_date:
+        latest_purchase_date:
           description: TBD
           type: string
           format: date
@@ -3595,6 +3601,7 @@ components:
         - reserved
         - sold
       type: string
+      nullable: true
       example: sold
       x-extensible-enum:
         - free
