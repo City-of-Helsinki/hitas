@@ -22,6 +22,25 @@
     @include flex-flow(column nowrap)
     @include flex-grow(1)
 
+  .results
+    grid-row: 1
+    grid-column: 2
+
+  .filters
+    padding: 0 2rem 0 0
+    grid-row: 1
+    grid-column: 1
+
+    .index-actions
+      @include flexbox()
+      .list-amount
+        @include flexbox()
+        margin-bottom: 0
+        padding-left: $spacing-layout-xs
+        flex-grow: 1
+        // justify-content: center
+        align-items: center
+
   .listing
     background-color: $codes-background-color
 
@@ -33,21 +52,26 @@
 
     &:not(:last-child)
       border: none
-
+    &:hover
+      background-color: $color-engel
     &:nth-child(odd)
       background-color: $color-engel-light
+      &:hover
+        background-color: $color-engel
 
   &__tab--indices
     @include flexbox()
     @include flex-flow(column nowrap)
     @include flex-grow(1)
     .listing
-      grid-template-rows: calc(60px + 1rem) auto
-      grid-template-columns: 55% 45%
+      grid-template-rows: auto
+      grid-template-columns: 50% 50%
       @include flex-grow(1)
       justify-content: flex-start
 
     .list-headers, .results-list__item
+      @include flexbox()
+      justify-content: space-between
       .index
         width: 70%
       .month

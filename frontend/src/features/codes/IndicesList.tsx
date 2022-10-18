@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Combobox, Dialog, IconPlus, IconSearch, LoadingSpinner} from "hds-react";
+import {Button, Dialog, IconPlus, LoadingSpinner, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
@@ -57,47 +57,15 @@ const IndicesList = (): JSX.Element => {
     const LoadedIndexResultsList = () => {
         return (
             <div className="results">
-                <div className="list-amount">{`Löytyi ${results?.page.total_items}kpl tuloksia`}</div>
                 {error ? (
                     <span>Virhe</span>
-                ) : (
+                ) : results?.contents.length ? (
                     <>
                         <div className="list-headers">
-                            <div className="list-header index">Indeksi</div>
                             <div className="list-header month">Kuukausi</div>
                             <div className="list-header value">Arvo</div>
                         </div>
                         <ul className="results-list">
-                            <IndexListItem
-                                index={getIndexName(indices[0].label)}
-                                month={"2022-01"}
-                                value={127.12}
-                            />
-                            <IndexListItem
-                                index={getIndexName(indices[1].label)}
-                                month={"2022-02"}
-                                value={194.44}
-                            />
-                            <IndexListItem
-                                index={getIndexName(indices[2].label)}
-                                month={"2022-01"}
-                                value={127.12}
-                            />
-                            <IndexListItem
-                                index={getIndexName(indices[3].label)}
-                                month={"2022-02"}
-                                value={194.44}
-                            />
-                            <IndexListItem
-                                index={getIndexName(indices[4].label)}
-                                month={"2022-01"}
-                                value={127.12}
-                            />
-                            <IndexListItem
-                                index={getIndexName(indices[0].label)}
-                                month={"2022-02"}
-                                value={194.44}
-                            />
                             {results?.contents.map((item: IIndex) => (
                                 <IndexListItem
                                     key={item.month}
@@ -107,28 +75,20 @@ const IndicesList = (): JSX.Element => {
                                 />
                             ))}
                         </ul>
-                        <Button
-                            theme="black"
-                            iconLeft={<IconPlus />}
-                            onClick={() => setCreateDialogOpen(true)}
-                        >
-                            Lisää indeksi
-                        </Button>
                     </>
+                ) : (
+                    <div>Ei tuloksia!</div>
                 )}
             </div>
         );
     };
 
-    const IndexListItem = ({index, month, value}: IIndex) => {
-        return (
-            <div className="results-list__item results-list__item--code">
-                <span className="index">{index}</span>
-                <span className="month">{month}</span>
-                <span className="value">{value}</span>
-            </div>
-        );
-    };
+    const IndexListItem = ({month, value}: IIndex) => (
+        <div className="results-list__item results-list__item--code">
+            <span className="month">{month}</span>
+            <span className="value">{value}</span>
+        </div>
+    );
     const onSelectionChange = ({value}) => {
         setCurrentIndex(() => {
             return {label: value};
@@ -139,34 +99,42 @@ const IndicesList = (): JSX.Element => {
             <div className="listing">
                 {!isLoading ? (
                     <>
-                        <div className="search">
-                            <FilterTextInputField
-                                label=""
-                                filterFieldName="display_name"
-                                filterParams={filterParams}
-                                setFilterParams={setFilterParams}
-                            />
-                            <IconSearch />
-                        </div>
-                        <LoadedIndexResultsList />
-                        <ListPageNumbers
-                            currentPage={currentPage}
-                            setCurrentPage={setCurrentPage}
-                            pageInfo={results?.page}
-                        />
                         <div className="filters">
-                            <Combobox
+                            <Select
                                 label={"Indeksi"}
                                 options={indexOptions}
-                                toggleButtonAriaLabel={"Toggle menu"}
                                 onChange={onSelectionChange}
-                                clearable
+                                defaultValue={{value: indices[0].label, label: getIndexName(indices[0].label)}}
                             />
+                            <div style={{display: "none"}}>
+                                <FilterTextInputField
+                                    label="Kuukausi"
+                                    filterFieldName="month"
+                                    filterParams={filterParams}
+                                    setFilterParams={setFilterParams}
+                                />
+                            </div>
+                            <div className={"index-actions"}>
+                                <div className="list-amount">{`Löytyi ${results?.page.total_items}kpl tuloksia`}</div>
+                                <Button
+                                    theme="black"
+                                    iconLeft={<IconPlus />}
+                                    onClick={() => setCreateDialogOpen(true)}
+                                >
+                                    Lisää indeksi
+                                </Button>
+                            </div>
                         </div>
                         <IndexCreateDialog
                             createDialogOpen={createDialogOpen}
                             closeDialog={closeDialog}
                             setCreateDialogOpen={setCreateDialogOpen}
+                        />
+                        <LoadedIndexResultsList />
+                        <ListPageNumbers
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                            pageInfo={results?.page}
                         />
                     </>
                 ) : (
@@ -179,7 +147,7 @@ const IndicesList = (): JSX.Element => {
     return result();
 };
 
-const IndexCreateDialog = (createDialogOpen, closeDialog, setCreateDialogOpen) => {
+const IndexCreateDialog = ({createDialogOpen, closeDialog, setCreateDialogOpen}) => {
     const initialSaveData: IIndex = {index: indices[0].label, month: "", value: null};
     const [formData, setFormData] = useImmer(initialSaveData);
     const [saveIndex, {data: saveData, error: saveError, isLoading: isSaving}] = useSaveIndexMutation();
@@ -202,64 +170,62 @@ const IndexCreateDialog = (createDialogOpen, closeDialog, setCreateDialogOpen) =
     return isSaving ? (
         <LoadingSpinner />
     ) : (
-        <div className={"test"}>
-            <Dialog
-                id="index-creation-dialog"
-                aria-labelledby={"create-modal"}
-                isOpen={createDialogOpen}
-                close={closeDialog}
-                closeButtonLabelText={"Sulje"}
-                boxShadow={true}
-            >
-                <Dialog.Header
-                    id="index-creation-header"
-                    title={`Uusi indeksi`}
+        <Dialog
+            id="index-creation-dialog"
+            aria-labelledby={"create-modal"}
+            isOpen={createDialogOpen}
+            close={closeDialog}
+            closeButtonLabelText={"Sulje"}
+            boxShadow={true}
+        >
+            <Dialog.Header
+                id="index-creation-header"
+                title={`Uusi indeksi`}
+            />
+            <Dialog.Content>
+                <FormInputField
+                    inputType={"select"}
+                    options={indexOptions}
+                    defaultValue={indexOptions[0]}
+                    label={"Indeksi"}
+                    fieldPath={"index"}
+                    formData={formData}
+                    setFormData={setFormData}
+                    error={saveError}
                 />
-                <Dialog.Content>
-                    <FormInputField
-                        inputType={"select"}
-                        options={indexOptions}
-                        defaultValue={indexOptions[0]}
-                        label={"Indeksi"}
-                        fieldPath={"index"}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={saveError}
-                    />
-                    <FormInputField
-                        label={"Kuukausi"}
-                        fieldPath={"month"}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={saveError}
-                    />
-                    <FormInputField
-                        label={"Arvo"}
-                        fieldPath={"value"}
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={saveError}
-                    />
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <Button
-                        onClick={() => {
-                            setCreateDialogOpen(false);
-                        }}
-                        theme={"black"}
-                        variant={"secondary"}
-                    >
-                        Peruuta
-                    </Button>
-                    <Button
-                        onClick={handleSaveIndex}
-                        theme={"black"}
-                    >
-                        Tallenna
-                    </Button>
-                </Dialog.ActionButtons>
-            </Dialog>
-        </div>
+                <FormInputField
+                    label={"Kuukausi"}
+                    fieldPath={"month"}
+                    formData={formData}
+                    setFormData={setFormData}
+                    error={saveError}
+                />
+                <FormInputField
+                    label={"Arvo"}
+                    fieldPath={"value"}
+                    formData={formData}
+                    setFormData={setFormData}
+                    error={saveError}
+                />
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => {
+                        setCreateDialogOpen(false);
+                    }}
+                    theme={"black"}
+                    variant={"secondary"}
+                >
+                    Peruuta
+                </Button>
+                <Button
+                    onClick={handleSaveIndex}
+                    theme={"black"}
+                >
+                    Tallenna
+                </Button>
+            </Dialog.ActionButtons>
+        </Dialog>
     );
 };
 

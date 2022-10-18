@@ -48,7 +48,7 @@ export const hitasApi = createApi({
             return headers;
         },
     }),
-    tagTypes: ["HousingCompany", "Apartment"],
+    tagTypes: ["HousingCompany", "Apartment", "Index"],
     endpoints: (builder) => ({}),
 });
 
@@ -114,6 +114,12 @@ export const listApi = hitasApi.injectEndpoints({
                 url: `indices/${params.indexType}`,
                 params: params.params,
             }),
+            providesTags: [
+                {
+                    type: "Index",
+                    id: "LIST",
+                },
+            ],
         }),
         getDevelopers: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
@@ -251,6 +257,12 @@ export const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-Type": "application/json; charset=UTF-8"},
             }),
+            invalidatesTags: (result, error, arg) => [
+                {
+                    type: "Index",
+                    id: "LIST",
+                },
+            ],
         }),
     }),
 });
