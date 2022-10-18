@@ -609,6 +609,42 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
     return data
 
 
+def get_minimal_apartment_data(data):
+    return {
+        "state": None,
+        "surface_area": None,
+        "shares": None,
+        "address": {
+            "street_address": data["address"]["street_address"],
+            "apartment_number": data["address"]["apartment_number"],
+            "floor": None,
+            "stair": data["address"]["stair"],
+        },
+        "prices": {
+            "debt_free_purchase_price": None,
+            "primary_loan_amount": None,
+            "acquisition_price": None,
+            "purchase_price": None,
+            "first_purchase_date": None,
+            "latest_purchase_date": None,
+            "construction": {
+                "loans": None,
+                "additional_work": None,
+                "interest": None,
+                "debt_free_purchase_price": None,
+            },
+        },
+        "completion_date": None,
+        "ownerships": [],
+        "notes": None,
+        "improvements": {
+            "market_price_index": [],
+            "construction_price_index": [],
+        },
+        "rooms": None,
+    }
+
+
 @pytest.mark.parametrize("data_extent", ["full", "nulled", "missing"])
 @pytest.mark.django_db
 def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
@@ -616,41 +652,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
 
     data = get_apartment_create_data(b)
     if data_extent == "nulled":
-        data.update(
-            {
-                "state": None,
-                "surface_area": None,
-                "shares": None,
-                "address": {
-                    "street_address": data["address"]["street_address"],
-                    "apartment_number": data["address"]["apartment_number"],
-                    "floor": None,
-                    "stair": data["address"]["stair"],
-                },
-                "prices": {
-                    "debt_free_purchase_price": None,
-                    "primary_loan_amount": None,
-                    "acquisition_price": None,
-                    "purchase_price": None,
-                    "first_purchase_date": None,
-                    "latest_purchase_date": None,
-                    "construction": {
-                        "loans": None,
-                        "additional_work": None,
-                        "interest": None,
-                        "debt_free_purchase_price": None,
-                    },
-                },
-                "completion_date": None,
-                "ownerships": [],
-                "notes": None,
-                "improvements": {
-                    "market_price_index": [],
-                    "construction_price_index": [],
-                },
-                "rooms": None,
-            }
-        )
+        data.update(get_minimal_apartment_data(data))
     elif data_extent == "missing":
         del data["prices"]
 
@@ -675,6 +677,94 @@ def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
         )
     )
     assert response.json() == get_response.json()
+
+
+@pytest.mark.parametrize("minimal_data", [True, False])
+@pytest.mark.django_db
+def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool):
+    b = BuildingFactory.create()
+
+    data = get_apartment_create_data(b)
+    post_response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert post_response.status_code == status.HTTP_201_CREATED, post_response.json()
+
+    if minimal_data:
+        data.update(get_minimal_apartment_data(data))
+    response = api_client.put(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, Apartment.objects.first().uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    res = response.json()
+
+    if not minimal_data:
+        assert post_response.json() == res
+    else:
+        ap = Apartment.objects.first()
+        del res["links"]
+        assert res == {
+            "address": {
+                "apartment_number": ap.apartment_number,
+                "city": "Helsinki",
+                "floor": None,
+                "postal_code": ap.postal_code.value,
+                "stair": ap.stair,
+                "street_address": ap.street_address,
+            },
+            "completion_date": None,
+            "id": ap.uuid.hex,
+            "improvements": {
+                "construction_price_index": [],
+                "market_price_index": [],
+            },
+            "notes": None,
+            "ownerships": [],
+            "prices": {
+                "acquisition_price": None,
+                "construction": {
+                    "additional_work": None,
+                    "debt_free_purchase_price": None,
+                    "interest": None,
+                    "loans": None,
+                },
+                "debt_free_purchase_price": None,
+                "first_purchase_date": None,
+                "latest_purchase_date": None,
+                "max_prices": {
+                    "confirmed": None,
+                    "unconfirmed": {
+                        "onwards_2011": {
+                            "construction_price_index": {"maximum": False, "value": None},
+                            "market_price_index": {"maximum": False, "value": None},
+                            "surface_area_price_ceiling": {"maximum": False, "value": None},
+                        },
+                        "pre_2011": None,
+                    },
+                },
+                "primary_loan_amount": None,
+                "purchase_price": None,
+            },
+            "rooms": None,
+            "shares": None,
+            "state": None,
+            "surface_area": None,
+            "type": {
+                "code": ap.apartment_type.legacy_code_number,
+                "description": ap.apartment_type.description,
+                "id": ap.apartment_type.uuid.hex,
+                "value": ap.apartment_type.value,
+            },
+        }
 
 
 @pytest.mark.parametrize(
