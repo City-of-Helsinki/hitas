@@ -5,13 +5,16 @@ import {Link} from "react-router-dom";
 
 interface EditButtonProps {
     state: object;
+    pathname?: string;
+    className?: string;
 }
 
-export default function EditButton({state}: EditButtonProps): JSX.Element {
+export default function EditButton({state, pathname = "edit", className}: EditButtonProps): JSX.Element {
     return (
         <Link
-            to={{pathname: "edit"}}
+            to={{pathname: pathname}}
             state={state}
+            className={className}
         >
             <Button
                 theme="black"
