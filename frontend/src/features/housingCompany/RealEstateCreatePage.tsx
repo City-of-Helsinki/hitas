@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Button, Fieldset} from "hds-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateRealEstateMutation} from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
+import SaveButton from "../../common/components/SaveButton";
 import {IRealEstate} from "../../common/models";
 
 const RealEstateCreatePage = (): JSX.Element => {
@@ -61,13 +62,10 @@ const RealEstateCreatePage = (): JSX.Element => {
                 >
                     Takaisin
                 </Button>
-                <Button
-                    iconLeft={<IconSaveDisketteFill />}
+                <SaveButton
                     onClick={handleSaveButtonClicked}
-                    theme={"black"}
-                >
-                    Tallenna
-                </Button>
+                    isLoading={isLoading}
+                />
             </div>
             <SaveDialogModal
                 data={data}
