@@ -34,8 +34,11 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                     <div>Valmistumispvm</div>
                     {showDepreciationPercentage && <div>Poistoprosentti</div>}
                 </li>
-                {data.improvements.market_price_index.map((item) => (
-                    <li className="detail-list__list-item">
+                {data.improvements.market_price_index.map((item, index) => (
+                    <li
+                        className="detail-list__list-item"
+                        key={`market-item-${index}`}
+                    >
                         <div>Markkinahinta</div>
                         <div>{item.name}</div>
                         <div>{formatMoney(item.value)}</div>
@@ -43,8 +46,11 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                         {showDepreciationPercentage && <div>-</div>}
                     </li>
                 ))}
-                {data.improvements.construction_price_index.map((item) => (
-                    <li className="detail-list__list-item">
+                {data.improvements.construction_price_index.map((item, index) => (
+                    <li
+                        className="detail-list__list-item"
+                        key={`market-item-${index}`}
+                    >
                         <div>Rakennuskustannus</div>
                         <div>{item.name}</div>
                         <div>{formatMoney(item.value)}</div>

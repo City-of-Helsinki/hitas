@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Fieldset, IconCrossCircle, IconPlus, TextInput} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
+import {v4 as uuidv4} from "uuid";
 
 import {
     useGetApartmentTypesQuery,
@@ -102,8 +103,8 @@ const ApartmentCreatePage = () => {
               }
             : convertApartmentDetailToWritable(state.apartment);
     const [formData, setFormData] = useImmer<IApartmentWritable>(initialFormData);
-    const [formOwnershipsList, setFormOwnershipsList] = useImmer<IOwnership[]>(
-        state?.apartment !== undefined ? state.apartment.ownerships : []
+    const [formOwnershipsList, setFormOwnershipsList] = useImmer<(IOwnership & {key: string})[]>(
+        state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : []
     );
 
     const handleSaveButtonClicked = () => {
@@ -135,6 +136,7 @@ const ApartmentCreatePage = () => {
     const handleAddOwnershipLine = () => {
         setFormOwnershipsList((draft) => {
             draft.push({
+                key: uuidv4(),
                 owner: {id: ""} as IOwner,
                 percentage: 100,
             });
@@ -411,16 +413,13 @@ const ApartmentCreatePage = () => {
                 <Fieldset heading={"Omistajuudet"}>
                     <ul className="ownerships-list">
                         {formOwnershipsList.length ? (
-                            formOwnershipsList.map((ownership: IOwnership, index) => (
-                                <>
+                            formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
+                                <div key={`ownership-item-${ownership.key}`}>
                                     <legend className={"ownership-headings"}>
                                         <span>Omistaja</span>
                                         <span>Omistajuusprosentti</span>
                                     </legend>
-                                    <li
-                                        className="ownership-item"
-                                        key={`ownership-item-${index}`}
-                                    >
+                                    <li className="ownership-item">
                                         <div className="owner">
                                             <FormInputField
                                                 inputType="relatedModel"
@@ -454,7 +453,7 @@ const ApartmentCreatePage = () => {
                                             />
                                         </div>
                                     </li>
-                                </>
+                                </div>
                             ))
                         ) : (
                             <div>Ei omistajuuksia</div>
