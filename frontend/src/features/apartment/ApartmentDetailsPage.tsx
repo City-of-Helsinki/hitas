@@ -3,9 +3,9 @@ import React, {useState} from "react";
 import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
-import {useGetApartmentDetailQuery} from "../../app/services";
-import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
-import {IApartmentDetails, IOwnership} from "../../common/models";
+import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../app/services";
+import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {IApartmentDetails, IHousingCompanyDetails, IOwnership} from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
 const SalesCondition = ({
@@ -47,10 +47,18 @@ const SalesCondition = ({
     </div>
 );
 
-const LoadedApartmentDetails = ({data}: {data}) => {
+const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
+    const params = useParams();
     const [priceMH] = useState(210000);
     const [priceRH] = useState(250000);
     const [priceRNH] = useState(130000);
+
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: housingCompanyIsLoading,
+    } = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
+
     return (
         <>
             <h1 className={"main-heading"}>
@@ -223,44 +231,20 @@ const LoadedApartmentDetails = ({data}: {data}) => {
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
-                <div className="list__wrapper list-wrapper--upgrades">
-                    <h2 className="detail-list__heading">Asuntokohtaiset parannukset</h2>
-                    <ul className="detail-list__list">
-                        <li className="detail-list__list-headers">
-                            <div>Nimi</div>
-                            <div>Summa</div>
-                            <div>Valmistumispvm</div>
-                        </li>
-                        <li className="detail-list__list-item">
-                            <div>Keittiöremontti</div>
-                            <div>20 000 €</div>
-                            <div>1.12.2021</div>
-                        </li>
-                    </ul>
-                </div>
-                <div className="list__wrapper list-wrapper--upgrades">
-                    <h2 className="detail-list__heading">Yhtiökohtaiset parannukset</h2>
-                    <ul className="detail-list__list">
-                        <li className="detail-list__list-headers">
-                            <div>Nimi</div>
-                            <div>Summa</div>
-                            <div>Valmistumispvm</div>
-                            <div>Jakoperuste</div>
-                        </li>
-                        <li className="detail-list__list-item">
-                            <div>Parvekelasien lisäys</div>
-                            <div>340 000 €</div>
-                            <div>1.1.2015</div>
-                            <div>Neliöiden mukaan</div>
-                        </li>
-                        <li className="detail-list__list-item">
-                            <div>Hissin rakennus</div>
-                            <div>2 340 000 €</div>
-                            <div>1.12.2021</div>
-                            <div>Neliöiden mukaan</div>
-                        </li>
-                    </ul>
-                </div>
+                <ImprovementsTable
+                    data={data}
+                    title={"Asuntokohtaiset parannukset"}
+                />
+                <QueryStateHandler
+                    data={housingCompanyData}
+                    error={housingCompanyError}
+                    isLoading={housingCompanyIsLoading}
+                >
+                    <ImprovementsTable
+                        data={housingCompanyData as IHousingCompanyDetails}
+                        title={"Yhtiökohtaiset parannukset"}
+                    />
+                </QueryStateHandler>
             </div>
         </>
     );
