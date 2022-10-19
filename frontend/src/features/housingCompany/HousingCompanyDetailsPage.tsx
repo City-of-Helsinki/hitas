@@ -4,7 +4,7 @@ import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {DetailField, EditButton, QueryStateHandler} from "../../common/components";
+import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import {IHousingCompanyDetails} from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
@@ -152,29 +152,10 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
-                <div className="list-wrapper list-wrapper--upgrades">
-                    <h2 className="detail-list__heading">Yhtiökohtaiset parannukset</h2>
-                    <ul className="detail-list__list">
-                        <li className="detail-list__list-headers">
-                            <div>Nimi</div>
-                            <div>Summa</div>
-                            <div>Valmistumispvm</div>
-                            <div>Jakoperuste</div>
-                        </li>
-                        <li className="detail-list__list-item">
-                            <div>Parvekelasien lisäys</div>
-                            <div>340 000 €</div>
-                            <div>1.1.2015</div>
-                            <div>Neliöiden mukaan</div>
-                        </li>
-                        <li className="detail-list__list-item">
-                            <div>Hissin rakennus</div>
-                            <div>2 340 000 €</div>
-                            <div>1.12.2021</div>
-                            <div>Neliöiden mukaan</div>
-                        </li>
-                    </ul>
-                </div>
+                <ImprovementsTable
+                    data={data}
+                    title={"Yhtiökohtaiset parannukset"}
+                />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
                         <h2 className="detail-list__heading">

@@ -11,6 +11,19 @@ export interface ICode {
     code: string;
 }
 
+export interface IApartmentConstructionPriceIndexImprovement {
+    name: string;
+    value: number;
+    completion_date: string;
+    depreciation_percentage: number;
+}
+
+export interface IImprovement {
+    name: string;
+    value: number;
+    completion_date: string;
+}
+
 export interface IHousingCompany {
     readonly id: string;
     name: string;
@@ -54,8 +67,8 @@ export interface IHousingCompanyDetails {
         total_surface_area: number;
     };
     improvements: {
-        market_price_index: object[];
-        construction_price_index: object[];
+        market_price_index: IImprovement[];
+        construction_price_index: IImprovement[];
     };
 }
 
@@ -74,8 +87,8 @@ export interface IHousingCompanyWritable {
     sales_price_catalogue_confirmation_date: string | null;
     notes: string | null;
     improvements: {
-        market_price_index: object[];
-        construction_price_index: object[];
+        market_price_index: IImprovement[];
+        construction_price_index: IImprovement[];
     };
 }
 
@@ -212,8 +225,8 @@ export interface IApartmentDetails {
     ownerships: IOwnership[];
     notes: string;
     improvements: {
-        market_price_index: object[];
-        construction_price_index: object[];
+        market_price_index: IImprovement[];
+        construction_price_index: IApartmentConstructionPriceIndexImprovement[];
     };
 }
 
@@ -234,8 +247,8 @@ export interface IApartmentWritable {
     ownerships: IOwnership[];
     notes: string;
     improvements: {
-        market_price_index: object[];
-        construction_price_index: object[];
+        market_price_index: IImprovement[];
+        construction_price_index: IApartmentConstructionPriceIndexImprovement[];
     };
 }
 
