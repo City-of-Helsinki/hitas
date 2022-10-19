@@ -2,19 +2,30 @@ import React from "react";
 
 import {IApartmentDetails, IHousingCompanyDetails} from "../models";
 import {formatDate, formatMoney} from "../utils";
+import {EditButton} from "./index";
 
 interface ImprovementsTableProps {
     data: IApartmentDetails | IHousingCompanyDetails;
     title: string;
+    editableType?: "apartment" | "housingCompany";
 }
 
-export default function ImprovementsTable({data, title}: ImprovementsTableProps): JSX.Element {
+export default function ImprovementsTable({data, title, editableType}: ImprovementsTableProps): JSX.Element {
     // Detect if this is an apartment to know when to show depreciation column
     const showDepreciationPercentage = "links" in data;
 
     return (
         <div className="list__wrapper list-wrapper--upgrades">
-            <h2 className="detail-list__heading">{title}</h2>
+            <h2 className="detail-list__heading">
+                {title}
+                {editableType !== undefined && (
+                    <EditButton
+                        state={{[editableType]: data}}
+                        pathname={"improvements"}
+                        className="pull-right"
+                    />
+                )}
+            </h2>
             <ul className="detail-list__list">
                 <li className="detail-list__list-headers">
                     <div>Indeksi</div>
