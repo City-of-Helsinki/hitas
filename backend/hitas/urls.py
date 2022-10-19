@@ -38,8 +38,9 @@ router.register(r"developers", views.DeveloperViewSet, basename="developer")
 router.register(r"apartment-types", views.ApartmentTypeViewSet, basename="apartment-type")
 
 # Nested routers
-# /api/v1/housing-companies/{housing_company_id}/real-estates
 housing_company_router = NestedSimpleRouter(router, r"housing-companies", lookup="housing_company")
+
+# /api/v1/housing-companies/{housing_company_id}/real-estates
 housing_company_router.register(r"real-estates", views.RealEstateViewSet, basename="real-estate")
 
 # /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings
@@ -48,10 +49,16 @@ real_estate_router.register(r"buildings", views.BuildingViewSet, basename="build
 
 # /api/v1/housing-companies/{housing_company_id}/apartments
 housing_company_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
+apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", lookup="apartment")
+apartment_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
+
+# /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
+apartment_router.register(r"maximum-price", views.ApartmentMaxPriceViewSet, basename="max-price")
 
 app_name = "hitas"
 urlpatterns = [
     path("", include(router.urls)),
     path("", include(housing_company_router.urls)),
     path("", include(real_estate_router.urls)),
+    path("", include(apartment_router.urls)),
 ]

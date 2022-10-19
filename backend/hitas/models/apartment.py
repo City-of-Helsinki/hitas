@@ -88,6 +88,10 @@ class Apartment(ExternalHitasModel):
 
         return self.share_number_end - self.share_number_start + 1
 
+    @property
+    def address(self) -> str:
+        return f"{self.street_address} {self.stair} {self.apartment_number}"
+
     class Meta:
         verbose_name = _("Apartment")
         verbose_name_plural = _("Apartments")
