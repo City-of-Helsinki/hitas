@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Button, Fieldset} from "hds-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateBuildingMutation, useGetHousingCompanyDetailQuery} from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
+import SaveButton from "../../common/components/SaveButton";
 import {IBuildingWritable} from "../../common/models";
 
 const BuildingCreatePage = (): JSX.Element => {
@@ -89,13 +90,10 @@ const BuildingCreatePage = (): JSX.Element => {
                 >
                     Takaisin
                 </Button>
-                <Button
-                    iconLeft={<IconSaveDisketteFill />}
+                <SaveButton
                     onClick={handleSaveButtonClicked}
-                    theme={"black"}
-                >
-                    Tallenna
-                </Button>
+                    isLoading={isLoading}
+                />
             </div>
             <SaveDialogModal
                 data={saveData}

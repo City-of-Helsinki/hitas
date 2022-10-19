@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Fieldset, IconSaveDisketteFill} from "hds-react";
+import {Fieldset} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
@@ -13,6 +13,7 @@ import {
     useSaveHousingCompanyMutation,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
+import SaveButton from "../../common/components/SaveButton";
 import {
     HousingCompanyStates,
     ICode,
@@ -280,15 +281,10 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                 </Fieldset>
             </div>
 
-            <Button
-                iconLeft={<IconSaveDisketteFill />}
+            <SaveButton
                 onClick={handleSaveButtonClicked}
-                theme={"black"}
                 isLoading={isLoading}
-            >
-                Tallenna
-            </Button>
-
+            />
             <SaveDialogModal
                 linkText="Yhtiön sivulle"
                 baseURL="/housing-companies/"

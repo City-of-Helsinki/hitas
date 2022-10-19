@@ -7,6 +7,7 @@ import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
 import Notifications from "./Notifications";
 import QueryStateHandler from "./QueryStateHandler";
+import SaveButton from "./SaveButton";
 import SaveDialogModal from "./SaveDialogModal";
 import FormInputField from "./formInputField/FormInputField";
 
@@ -21,5 +22,6 @@ export {
     ListPageNumbers,
     Notifications,
     QueryStateHandler,
+    SaveButton,
     SaveDialogModal,
 };

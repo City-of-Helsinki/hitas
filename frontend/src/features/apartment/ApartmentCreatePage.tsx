@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Fieldset, IconCrossCircle, IconPlus, IconSaveDisketteFill, TextInput} from "hds-react";
+import {Button, Fieldset, IconCrossCircle, IconPlus, TextInput} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
@@ -11,6 +11,7 @@ import {
     useSaveApartmentMutation,
 } from "../../app/services";
 import {FormInputField, SaveDialogModal} from "../../common/components";
+import SaveButton from "../../common/components/SaveButton";
 import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
 import {dotted, formatOwner, hitasToast} from "../../common/utils";
 
@@ -480,15 +481,10 @@ const ApartmentCreatePage = () => {
                     </div>
                 </Fieldset>
             </div>
-            <Button
-                iconLeft={<IconSaveDisketteFill />}
+            <SaveButton
                 onClick={handleSaveButtonClicked}
-                theme={"black"}
-                isLoading={housingCompanyIsLoading}
-            >
-                Tallenna
-            </Button>
-
+                isLoading={isLoading}
+            />
             <SaveDialogModal
                 linkText={"Asunnon sivulle"}
                 baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
