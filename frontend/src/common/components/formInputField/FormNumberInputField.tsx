@@ -19,7 +19,7 @@ export default function FormNumberInputField({
 }: FormNumberInputFieldProps): JSX.Element {
     const formatNumber = (v: string): number | null => {
         if (v === "") return null;
-        return Number(Number().toFixed(fractionDigits ? fractionDigits : 0));
+        return Number(Number(v).toFixed(fractionDigits ? fractionDigits : 0));
     };
 
     return (
