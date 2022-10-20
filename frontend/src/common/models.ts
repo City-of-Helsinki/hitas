@@ -15,7 +15,7 @@ export interface IApartmentConstructionPriceIndexImprovement {
     name: string;
     value: number;
     completion_date: string;
-    depreciation_percentage: number;
+    depreciation_percentage: number; // 0.0 | 2.5 | 10.0
 }
 
 export interface IImprovement {
