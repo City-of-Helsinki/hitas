@@ -9,6 +9,7 @@ import Codes from "./features/Codes";
 import Documents from "./features/Documents";
 import Reports from "./features/Reports";
 import {ApartmentCreatePage, ApartmentDetailsPage, ApartmentListPage} from "./features/apartment";
+import ApartmentImprovementsPage from "./features/apartment/ApartmentImprovementsPage";
 import {
     BuildingCreatePage,
     HousingCompanyCreatePage,
@@ -71,6 +72,10 @@ export default function Router() {
                                 <Route
                                     path="edit"
                                     element={<ApartmentCreatePage />}
+                                />
+                                <Route
+                                    path="improvements"
+                                    element={<ApartmentImprovementsPage />}
                                 />
                             </Route>
                         </Route>
