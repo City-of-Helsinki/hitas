@@ -11,22 +11,32 @@ interface FormNumberInputFieldProps extends Omit<CommonFormInputFieldProps, "val
 }
 
 export default function FormNumberInputField({
+    value,
     setFieldValue,
     unit,
-    fractionDigits,
+    fractionDigits = 0,
     required,
     ...rest
 }: FormNumberInputFieldProps): JSX.Element {
-    const formatNumber = (v: string): number | null => {
-        if (v === "") return null;
-        return Number(Number(v).toFixed(fractionDigits ? fractionDigits : 0));
+    // Format the passed value depending on fractionDigits without rounding or stripping trailing zeroes
+    const re = new RegExp(fractionDigits > 0 ? `(\\d+\\.\\d{${fractionDigits}})(\\d)` : "(\\d+)");
+    const toFixedDown = (v: string): string => {
+        if (v[0] === ".") v = "0" + v; // Prepend a zero if string starts with a dot
+        const m = v.toString().match(re);
+        return m ? m[1] : v;
     };
+
+    // These characters are valid in the NumberField, but we don't want to allow them to be entered
+    const bannedCharacters = ["e", "E", "+", "-"];
+    if (fractionDigits === 0) bannedCharacters.push(".");
 
     return (
         <div className={`input-field input-field--number${required ? " input-field--required" : "foo"}`}>
             <NumberInput
-                onChange={(e) => setFieldValue(formatNumber(e.target.value))}
-                unit={unit ? unit : ""}
+                value={value}
+                onChange={(e) => setFieldValue(toFixedDown(e.target.value))}
+                onKeyDown={(e) => bannedCharacters.includes(e.key) && e.preventDefault()}
+                unit={unit || ""}
                 required={required}
                 {...rest}
             />
