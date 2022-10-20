@@ -440,6 +440,7 @@ const ApartmentCreatePage = () => {
                                                 inputType="number"
                                                 label=""
                                                 fieldPath="percentage"
+                                                fractionDigits={2}
                                                 placeholder={ownership.percentage.toString()}
                                                 formData={formOwnershipsList[index]}
                                                 setterFunction={handleSetOwnershipLine(index, "percentage")}
