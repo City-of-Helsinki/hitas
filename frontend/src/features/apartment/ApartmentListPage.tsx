@@ -53,7 +53,7 @@ const ApartmentListItem = ({
                         <br />
                         {`${address.postal_code} ${address.city}`}
                     </div>
-                    <div className="area">{`${surfaceArea} m² ${apartmentType}`}</div>
+                    <div className="area">{`${surfaceArea} m² ${rooms}${apartmentType}`}</div>
                 </div>
                 <div className="state">
                     <StatusLabel>{state}</StatusLabel>
