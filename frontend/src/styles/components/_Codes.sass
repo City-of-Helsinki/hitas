@@ -33,36 +33,39 @@
 
     .index-actions
       @include flexbox()
-      .list-amount
-        @include flexbox()
-        margin-bottom: 0
-        padding-left: $spacing-layout-xs
-        flex-grow: 1
-        // justify-content: center
-        align-items: center
+      justify-content: space-between
+      >:only-child
+        margin: 0 auto
 
   .listing
     background-color: $codes-background-color
 
   .results-list
-    border: 1px solid #ccc
+    border: 1px solid #888
 
   .results-list__item
     padding: $spacing-xs $spacing-m
-
+    cursor: initial
     &:not(:last-child)
       border: none
     &:hover
-      background-color: $color-engel
+      background-color: inherit
     &:nth-child(odd)
-      background-color: $color-engel-light
+      background-color: $color-engel-medium-light
+
+    &--edit-mode
+      cursor: pointer
       &:hover
+        background-color: #DDD
+      &:nth-child(odd):hover
         background-color: $color-engel
 
   &__tab--indices
     @include flexbox()
     @include flex-flow(column nowrap)
     @include flex-grow(1)
+    [class*="Select-module_"]
+      text-transform: capitalize
     .listing
       grid-template-rows: auto
       grid-template-columns: 50% 50%
