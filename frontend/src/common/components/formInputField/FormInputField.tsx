@@ -114,11 +114,12 @@ export default function FormInputField({
         }
     }, [error, errorMessage, setErrorMessage, fieldPath]);
 
+    const value = dotted(formData, fieldPath);
     const commonProps = {
         id: `input-${fieldPath}`,
         key: `input-${fieldPath}`,
         label: label,
-        value: dotted(formData, fieldPath) || "",
+        value: value === undefined || value === null ? "" : value,
         required: required,
         invalid: isInvalid,
         setFieldValue: setFieldValue,
