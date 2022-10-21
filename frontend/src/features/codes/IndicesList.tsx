@@ -86,7 +86,7 @@ const IndicesList = (): JSX.Element => {
                                 <IndexListItem
                                     key={item.month}
                                     month={item.month}
-                                    value={item.value}
+                                    value={item.value as number}
                                 />
                             ))}
                         </ul>
@@ -103,14 +103,12 @@ const IndicesList = (): JSX.Element => {
         );
     };
 
-    const IndexListItem = ({month, value}: IIndex) => (
+    const IndexListItem = ({month, value}: {month: string; value: number}) => (
         <div
             className="results-list__item results-list__item--code"
             onClick={(e) => {
                 e.preventDefault();
-                initData();
-                // setEditMonth((e) => month);
-                // setEditValue((e) => value);
+                setFormData({indexType: currentIndexType.label, month: month, value: value});
                 setCreateDialogOpen(true);
             }}
         >
@@ -146,15 +144,6 @@ const IndicesList = (): JSX.Element => {
                                     setFilterParams={setFilterParams}
                                 />
                             </div>
-                            <div className={"index-actions"}>
-                                <Button
-                                    theme="black"
-                                    iconLeft={<IconPlus />}
-                                    onClick={() => setCreateDialogOpen(true)}
-                                >
-                                    Lisää/päivitä indeksi
-                                </Button>
-                            </div>
                         </div>
                         <EditIndexDialog
                             editDialogOpen={editDialogOpen}
@@ -164,6 +153,15 @@ const IndicesList = (): JSX.Element => {
                             setFormData={setFormData}
                         />
                         <LoadedIndexResultsList />
+                        <div className={"index-actions"}>
+                            <Button
+                                theme="black"
+                                iconLeft={<IconPlus />}
+                                onClick={() => setCreateDialogOpen(true)}
+                            >
+                                Lisää/päivitä indeksi
+                            </Button>
+                        </div>
                     </>
                 ) : (
                     <LoadingSpinner />
@@ -183,6 +181,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             index: formData.indexType as string,
             month: formData.month,
         });
+        closeDialog();
     };
     useEffect(() => {
         if (isSaving) return;
@@ -215,7 +214,6 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                     formData={formData}
                     setFormData={setFormData}
                     error={saveError}
-                    autofocus
                     tooltipText={"Muodossa VVVV-KK, esim 2022-12"}
                 />
                 <FormInputField

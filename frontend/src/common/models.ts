@@ -299,7 +299,7 @@ export interface IPostalCode {
 }
 
 export interface IIndex {
-    index: string;
+    indexType: string;
     month: string;
     value: number | null;
 }

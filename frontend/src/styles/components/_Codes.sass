@@ -39,26 +39,34 @@
 
   .listing
     background-color: $codes-background-color
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    padding-right: $spacing-layout-2-xl
+
+
 
   .results-list
     border: 1px solid #888
 
   .results-list__item
+    position: relative
     padding: $spacing-xs $spacing-m
-    cursor: initial
+    cursor: pointer
     &:not(:last-child)
       border: none
     &:hover
-      background-color: inherit
-    &:nth-child(odd)
       background-color: $color-engel-medium-light
-
-    &--edit-mode
-      cursor: pointer
+      &:after
+        display: block
+        content: "Muokkaa"
+        position: absolute
+        top: 0.75em
+        right: -5rem
+        opacity: 0.25
+    &:nth-child(odd)
+      background-color: $color-engel-light
       &:hover
-        background-color: #DDD
-      &:nth-child(odd):hover
-        background-color: $color-engel
+        background-color: $color-engel-medium-light
 
   &__tab--indices
     @include flexbox()
@@ -82,3 +90,8 @@
       .value
         width: 10%
         text-align: right
+
+  .index-actions
+    padding-top: $spacing-layout-m
+    @include flexbox()
+    justify-content: center
