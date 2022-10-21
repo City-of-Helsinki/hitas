@@ -52,17 +52,25 @@
     position: relative
     padding: $spacing-xs $spacing-m
     cursor: pointer
+    &:after
+      display: block
+      content: "Muokkaa"
+      font-weight: 700
+      position: absolute
+      top: 0.75em
+      right: calc(70px - 5rem)
+      opacity: 0
+      overflow: hidden
+      max-width: 10px
+      transition: all 200ms
     &:not(:last-child)
       border: none
     &:hover
       background-color: $color-engel-medium-light
       &:after
-        display: block
-        content: "Muokkaa"
-        position: absolute
-        top: 0.75em
         right: -5rem
-        opacity: 0.25
+        max-width: 70px
+        opacity: 0.2
     &:nth-child(odd)
       background-color: $color-engel-light
       &:hover

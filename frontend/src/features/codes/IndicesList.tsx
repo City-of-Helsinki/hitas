@@ -4,7 +4,7 @@ import {Button, Dialog, IconPlus, LoadingSpinner, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FilterTextInputField, FormInputField, ListPageNumbers} from "../../common/components";
+import {FormInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -19,17 +19,17 @@ const indexTypes: {label: string}[] = [
 const getIndexTypeName = (indexType: string): string => {
     switch (indexType) {
         case "max-price-index":
-            return "enimmäishintaindeksi";
+            return "Enimmäishintaindeksi";
         case "market-price-index":
-            return "markkinahintaindeksi";
+            return "Markkinahintaindeksi (ennen 2005)";
         case "market-price-index-2005-equal-100":
-            return "markkinahintaindeksi (ennen v. 2005)";
+            return "Markkinahintaindeksi (2005 eteenpäin)";
         case "construction-price-index":
-            return "rakennushintaindeksi";
+            return "Rakennuskustannusindeksi (ennen 2005)";
         case "construction-price-index-2005-equal-100":
-            return "rakennushintaindeksi (ennen v. 2005)";
+            return "Rakennuskustannusindeksi (2005 eteenpäin)";
         case "surface-area-price-ceiling":
-            return "rajaneliöhintaindeksi";
+            return "Rajaneliöhinta";
         default:
             return "VIRHE";
     }
@@ -38,7 +38,92 @@ const indexOptions = indexTypes.map(({label}) => {
     return {label: getIndexTypeName(label), value: label};
 });
 
+const IndexListItem = ({month, value, editFn}: {month: string; value: number; editFn}) => (
+    <div
+        className="results-list__item results-list__item--code"
+        onClick={(e) => {
+            e.preventDefault();
+            editFn({month: month, value: value});
+        }}
+    >
+        <span className="month">{month}</span>
+        <span className="value">{value}</span>
+    </div>
+);
+
+const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
+    return (
+        <div className="results">
+            {data.page.total_pages > 1 && (
+                <div className={"results__page-counter"}>
+                    Sivu {currentPage} / {data.page.total_pages}
+                </div>
+            )}
+            <div className="list-headers">
+                <div className="list-header month">Kuukausi</div>
+                <div className="list-header value">Arvo</div>
+            </div>
+            <ul className="results-list">
+                {data?.contents.map((item: IIndex) => (
+                    <IndexListItem
+                        key={item.month}
+                        month={item.month}
+                        value={item.value as number}
+                        editFn={editFn}
+                    />
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const IndexResultList = ({setFormData, setCreateDialogOpen, indexType}) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const {data, error, isLoading} = useGetIndicesQuery({
+        indexType: indexType.label,
+        params: {
+            page: currentPage,
+            limit: 12,
+        },
+    });
+    return (
+        <div className="results">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                {!isLoading && !error ? (
+                    <>
+                        <LoadedIndexResultsList
+                            data={data}
+                            editFn={({month, value}) => {
+                                setFormData({
+                                    indexType: indexType,
+                                    month: month,
+                                    value: value,
+                                });
+                                setCreateDialogOpen(true);
+                            }}
+                            currentPage={currentPage}
+                        />
+                        <ListPageNumbers
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                            pageInfo={data?.page}
+                        />
+                    </>
+                ) : (
+                    <LoadingSpinner />
+                )}
+            </QueryStateHandler>
+            <></>
+        </div>
+    );
+};
+
 const IndicesList = (): JSX.Element => {
+    const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [editMonth, setEditMonth] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<number | null>(null);
     const initialSaveData: IIndex = {
@@ -47,7 +132,6 @@ const IndicesList = (): JSX.Element => {
         value: editValue || null,
     };
     const [formData, setFormData] = useImmer(initialSaveData);
-    const [filterParams, setFilterParams] = useState({string: ""});
     const [editDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
     const initData = () => {
         setEditMonth(null);
@@ -58,119 +142,47 @@ const IndicesList = (): JSX.Element => {
         initData();
         setCreateDialogOpen(false);
     };
-    const [currentPage, setCurrentPage] = useState(1);
-    const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
-    const {
-        data: results,
-        error,
-        isLoading,
-    } = useGetIndicesQuery({
-        ...filterParams,
-        page: currentPage,
-        indexType: currentIndexType.label,
-    });
-
-    const LoadedIndexResultsList = () => {
-        return (
-            <div className="results">
-                {error ? (
-                    <span>Virhe</span>
-                ) : results?.contents.length ? (
-                    <>
-                        <div className="list-headers">
-                            <div className="list-header month">Kuukausi</div>
-                            <div className="list-header value">Arvo</div>
-                        </div>
-                        <ul className="results-list">
-                            {results?.contents.map((item: IIndex) => (
-                                <IndexListItem
-                                    key={item.month}
-                                    month={item.month}
-                                    value={item.value as number}
-                                />
-                            ))}
-                        </ul>
-                    </>
-                ) : (
-                    <div>Ei löytynyt yhtään "{getIndexTypeName(currentIndexType.label)}" tyyppistä indeksiä.</div>
-                )}
-                <ListPageNumbers
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    pageInfo={results?.page}
-                />
-            </div>
-        );
-    };
-
-    const IndexListItem = ({month, value}: {month: string; value: number}) => (
-        <div
-            className="results-list__item results-list__item--code"
-            onClick={(e) => {
-                e.preventDefault();
-                setFormData({indexType: currentIndexType.label, month: month, value: value});
-                setCreateDialogOpen(true);
-            }}
-        >
-            <span className="month">{month}</span>
-            <span className="value">{value}</span>
-        </div>
-    );
     const onSelectionChange = ({value}) => {
         setEditMonth(null);
         setEditValue(null);
         setCurrentIndexType(() => ({label: value}));
     };
-    function result() {
-        return (
-            <div className="listing">
-                {!isLoading ? (
-                    <>
-                        <div className="filters">
-                            <Select
-                                label={"Indeksityyppi"}
-                                options={indexOptions}
-                                onChange={onSelectionChange}
-                                defaultValue={{
-                                    value: indexTypes[0].label,
-                                    label: getIndexTypeName(indexTypes[0].label),
-                                }}
-                            />
-                            <div style={{display: "none"}}>
-                                <FilterTextInputField
-                                    label="Kuukausi"
-                                    filterFieldName="month"
-                                    filterParams={filterParams}
-                                    setFilterParams={setFilterParams}
-                                />
-                            </div>
-                        </div>
-                        <EditIndexDialog
-                            editDialogOpen={editDialogOpen}
-                            closeDialog={closeDialog}
-                            indexType={currentIndexType}
-                            formData={formData}
-                            setFormData={setFormData}
-                        />
-                        <LoadedIndexResultsList />
-                        <div className={"index-actions"}>
-                            <Button
-                                theme="black"
-                                iconLeft={<IconPlus />}
-                                onClick={() => setCreateDialogOpen(true)}
-                            >
-                                Lisää/päivitä indeksi
-                            </Button>
-                        </div>
-                    </>
-                ) : (
-                    <LoadingSpinner />
-                )}
+    return (
+        <div className="listing">
+            <div className="filters">
+                <Select
+                    label={"Indeksityyppi"}
+                    options={indexOptions}
+                    onChange={onSelectionChange}
+                    defaultValue={{
+                        value: indexTypes[0].label,
+                        label: getIndexTypeName(indexTypes[0].label),
+                    }}
+                />
             </div>
-        );
-    }
-
-    return result();
+            <IndexResultList
+                indexType={currentIndexType}
+                setFormData={setFormData}
+                setCreateDialogOpen={setCreateDialogOpen}
+            />
+            <div className={"index-actions"}>
+                <Button
+                    theme="black"
+                    iconLeft={<IconPlus />}
+                    onClick={() => setCreateDialogOpen(true)}
+                >
+                    Lisää/päivitä indeksi
+                </Button>
+            </div>
+            <EditIndexDialog
+                editDialogOpen={editDialogOpen}
+                closeDialog={closeDialog}
+                indexType={currentIndexType}
+                formData={formData}
+                setFormData={setFormData}
+            />
+        </div>
+    );
 };
 
 const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, closeDialog}) => {
@@ -178,7 +190,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
-            index: formData.indexType as string,
+            index: indexType as string,
             month: formData.month,
         });
         closeDialog();
@@ -205,7 +217,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
         >
             <Dialog.Header
                 id="index-creation-header"
-                title={"Tallenna " + getIndexTypeName(indexType.label)}
+                title={"Tallenna " + getIndexTypeName(indexType.label).toLowerCase()}
             />
             <Dialog.Content>
                 <FormInputField

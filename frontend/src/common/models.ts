@@ -306,7 +306,6 @@ export interface IIndex {
 
 export interface IIndexQuery {
     indexType: string;
-    page: number;
     params?: object;
 }
 
