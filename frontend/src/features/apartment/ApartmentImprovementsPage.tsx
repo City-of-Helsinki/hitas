@@ -169,35 +169,34 @@ const ApartmentImprovementsPage = () => {
                         {marketIndexImprovements.length ? (
                             marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
                                 <div key={`market-improvement-item-${improvement.key}`}>
-                                    <legend className={"ownership-headings"}>
-                                        <span>Nimi</span>
-                                        <span>Arvo</span>
-                                        <span>Päivä</span>
-                                    </legend>
                                     <li className="ownership-item">
                                         <FormInputField
                                             inputType="text"
-                                            label=""
+                                            label="Nimi"
                                             fieldPath="name"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "name")}
                                             error={error}
+                                            required
                                         />
                                         <FormInputField
                                             inputType="number"
-                                            label=""
+                                            label="Arvo"
                                             fieldPath="value"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "value")}
                                             error={error}
+                                            required
                                         />
                                         <FormInputField
                                             inputType="text"
-                                            label=""
+                                            label="Kuukausi"
                                             fieldPath="completion_date"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "completion_date")}
                                             error={error}
+                                            tooltipText={"Esimerkki arvo: '2022-01'"}
+                                            required
                                         />
                                         <ImprovementRemoveLineButton
                                             onClick={() => handleRemoveMarketImprovementLine(index)}
@@ -216,32 +215,28 @@ const ApartmentImprovementsPage = () => {
                         {constructionIndexImprovements.length ? (
                             constructionIndexImprovements.map((improvement: IWritableConsImprovement, index) => (
                                 <div key={improvement.key}>
-                                    <legend className={"ownership-headings"}>
-                                        <span>Nimi</span>
-                                        <span>Arvo</span>
-                                        <span>Päivä</span>
-                                        <span>Poistoprosentti</span>
-                                    </legend>
                                     <li className="ownership-item">
                                         <FormInputField
                                             inputType="text"
-                                            label=""
+                                            label="Nimi"
                                             fieldPath="name"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(index, "name")}
                                             error={error}
+                                            required
                                         />
                                         <FormInputField
                                             inputType="number"
-                                            label=""
+                                            label="Arvo"
                                             fieldPath="value"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(index, "value")}
                                             error={error}
+                                            required
                                         />
                                         <FormInputField
                                             inputType="text"
-                                            label=""
+                                            label="Kuukausi"
                                             fieldPath="completion_date"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(
@@ -249,10 +244,11 @@ const ApartmentImprovementsPage = () => {
                                                 "completion_date"
                                             )}
                                             error={error}
+                                            required
                                         />
                                         <FormInputField
                                             inputType="select"
-                                            label=""
+                                            label="Poistoprosentti"
                                             fieldPath="depreciation_percentage"
                                             options={depreciationChoices}
                                             placeholder={improvement.depreciation_percentage.toString()}
