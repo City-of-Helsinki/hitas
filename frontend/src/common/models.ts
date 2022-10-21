@@ -237,9 +237,9 @@ export interface IApartmentWritable {
     surface_area: number | null;
     rooms: number | null;
     shares: {
-        start: number;
-        end: number;
-    } | null;
+        start: number | null;
+        end: number | null;
+    };
     address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
     prices: IApartmentPrices;
     completion_date?: string | null;

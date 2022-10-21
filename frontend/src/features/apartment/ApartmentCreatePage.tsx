@@ -72,7 +72,10 @@ const ApartmentCreatePage = () => {
                   type: {id: ""},
                   surface_area: null,
                   rooms: null,
-                  shares: null,
+                  shares: {
+                      start: null,
+                      end: null,
+                  },
                   address: {
                       street_address: "",
                       apartment_number: null,
