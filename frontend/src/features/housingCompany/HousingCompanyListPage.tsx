@@ -43,7 +43,7 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                             id={item.id}
                             name={item.name}
                             address={item.address}
-                            date={formatDate(item.date)}
+                            date={item.date}
                         />
                     ))}
                 </ul>
