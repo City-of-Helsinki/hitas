@@ -1,7 +1,7 @@
 import React from "react";
 
 import {IApartmentDetails, IHousingCompanyDetails} from "../models";
-import {formatDate, formatMoney} from "../utils";
+import {formatMoney} from "../utils";
 import {EditButton} from "./index";
 
 interface ImprovementsTableProps {
@@ -31,7 +31,7 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                     <div>Indeksi</div>
                     <div>Nimi</div>
                     <div>Summa</div>
-                    <div>Valmistumispvm</div>
+                    <div>Valmistumiskuukausi</div>
                     {showDepreciationPercentage && <div>Poistoprosentti</div>}
                 </li>
                 {data.improvements.market_price_index.map((item, index) => (
@@ -42,7 +42,7 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                         <div>Markkinahinta</div>
                         <div>{item.name}</div>
                         <div>{formatMoney(item.value)}</div>
-                        <div>{formatDate(item.completion_date)}</div>
+                        <div>{item.completion_date}</div>
                         {showDepreciationPercentage && <div>-</div>}
                     </li>
                 ))}
@@ -54,7 +54,7 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                         <div>Rakennuskustannus</div>
                         <div>{item.name}</div>
                         <div>{formatMoney(item.value)}</div>
-                        <div>{formatDate(item.completion_date)}</div>
+                        <div>{item.completion_date}</div>
                         {showDepreciationPercentage && <div>{item.depreciation_percentage}%</div>}
                     </li>
                 ))}
