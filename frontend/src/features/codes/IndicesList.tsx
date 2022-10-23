@@ -4,7 +4,7 @@ import {Button, Dialog, IconPlus, LoadingSpinner, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FormInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -54,11 +54,10 @@ const IndexListItem = ({month, value, editFn}: {month: string; value: number; ed
 const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     return (
         <div className="results">
-            {data.page.total_pages > 1 && (
-                <div className={"results__page-counter"}>
-                    Sivu {currentPage} / {data.page.total_pages}
-                </div>
-            )}
+            <PageCounter
+                currentPage={currentPage}
+                totalPages={data.page.total_pages}
+            />
             <div className="list-headers">
                 <div className="list-header month">Kuukausi</div>
                 <div className="list-header value">Arvo</div>
