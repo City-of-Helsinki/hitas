@@ -64,7 +64,7 @@ const ApartmentImprovementsPage = () => {
     const {state}: {state: {apartment: IApartmentDetails}} = useLocation();
     const params = useParams() as {readonly housingCompanyId: string};
 
-    const [createApartment, {data, error, isLoading}] = useSaveApartmentMutation();
+    const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
 
     const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(state.apartment);
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
@@ -88,7 +88,7 @@ const ApartmentImprovementsPage = () => {
             },
         };
 
-        createApartment({
+        saveApartment({
             data: formData,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,

@@ -61,7 +61,7 @@ const ApartmentCreatePage = () => {
     const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
-    const [createApartment, {data, error, isLoading}] = useSaveApartmentMutation();
+    const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
 
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
@@ -124,7 +124,7 @@ const ApartmentCreatePage = () => {
         };
 
         setFormData(() => formDataWithOwnerships);
-        createApartment({
+        saveApartment({
             data: formDataWithOwnerships,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,
