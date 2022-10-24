@@ -2496,7 +2496,7 @@ components:
           description: Official business ID
           type: string
           nullable: true
-          pattern: '^\d{7}-\d$'
+          pattern: '^$|^\d{7}-\d$'
           example: 1234567-8
         state:
           $ref: '#/components/schemas/HousingCompanyState'
@@ -2747,7 +2747,7 @@ components:
         building_identifier:
           description: This building's official identifier
           type: string
-          pattern: '^1\d{8}[A-Za-z0-9]$|^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$'
+          pattern: '^$|^1\d{8}[A-Za-z0-9]$|^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$'
           nullable: true
           example: 100012345A
 

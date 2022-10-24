@@ -763,7 +763,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
             "postal_code": postal_code.value,
         },
         "building_type": {"id": hc.building_type.uuid.hex},
-        "business_id": "1234567-1",
+        "business_id": "",
         "developer": {"id": hc.developer.uuid.hex},
         "financing_method": {"id": financing_method.uuid.hex},
         "name": {
@@ -794,7 +794,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     assert hc.postal_code == postal_code
     assert hc.financing_method == financing_method
     assert hc.property_manager == property_manager
-    assert hc.business_id == "1234567-1"
+    assert hc.business_id is None
     assert hc.street_address == "changed-street-address"
     assert hc.state == HousingCompanyState.LESS_THAN_30_YEARS
     assert hc.acquisition_price == Decimal("10.01")
