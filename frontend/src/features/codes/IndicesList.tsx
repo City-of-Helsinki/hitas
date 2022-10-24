@@ -189,7 +189,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
-            index: indexType as string,
+            index: indexType.label,
             month: formData.month,
         });
         closeDialog();
@@ -225,7 +225,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                     formData={formData}
                     setFormData={setFormData}
                     error={saveError}
-                    tooltipText={"Muodossa VVVV-KK, esim 2022-12"}
+                    tooltipText={"Esim 2022-12"}
                 />
                 <FormInputField
                     label={"Arvo"}
