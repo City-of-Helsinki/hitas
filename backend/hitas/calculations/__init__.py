@@ -1,0 +1,1 @@
+from hitas.calculations.max_price import calculate_max_price

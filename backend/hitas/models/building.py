@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel
+from hitas.models.postal_code import HitasPostalCode
 from hitas.models.utils import validate_building_id
 
 
@@ -24,12 +25,12 @@ class Building(ExternalHitasModel):
     )
 
     @property
-    def postal_code(self):
+    def postal_code(self) -> HitasPostalCode:
         return self.real_estate.postal_code
 
     @property
-    def city(self):
-        return self.postal_code().city
+    def city(self) -> str:
+        return self.postal_code.city
 
     class Meta:
         verbose_name = _("Building")
