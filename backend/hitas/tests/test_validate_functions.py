@@ -1,7 +1,12 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from hitas.models.utils import validate_building_id, validate_business_id, validate_property_id
+from hitas.models.utils import (
+    validate_building_id,
+    validate_business_id,
+    validate_property_id,
+    validate_social_security_number,
+)
 
 
 @pytest.mark.parametrize("business_id", ["1234567-1"])
@@ -82,3 +87,45 @@ def test__validate__building_id__valid(building_id):
 def test__validate__building_id__invalid(building_id):
     with pytest.raises(ValidationError):
         validate_building_id(building_id)
+
+
+@pytest.mark.parametrize(
+    "social_security_number",
+    [
+        "220462-3911",
+        "040583-182W",
+        "120368Y546A",
+        "260976-0796",
+        "010150-8304",
+        "020480X583Y",
+        "031069Y860J",
+        "211033X321F",
+        "300575W813Y",
+        "040958X7212",
+        "290113-2874",
+        "190755V3734",
+        "010101-003T",
+        "010104A7976",
+        "120875+2376",
+    ],
+)
+def test__validate__social_security_number(social_security_number):
+    assert validate_social_security_number(social_security_number)
+
+
+@pytest.mark.parametrize(
+    "social_security_number",
+    [
+        None,
+        "",
+        "A",
+        "AAAAAAAAAAA",
+        "260976-0796A",  # Too long
+        "391399-0796",  # Wrong date
+        "010101-0010",  # Too low seqnum
+        "010101-9000",  # Too high seqnum
+        "010101-000S",  # Invalid check digit
+    ],
+)
+def test__validate__social_security_number__invalid(social_security_number):
+    assert not validate_social_security_number(social_security_number)
