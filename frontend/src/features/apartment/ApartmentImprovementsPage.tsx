@@ -16,10 +16,11 @@ import {
 } from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
-type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string};
+type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};
 type IWritableConsImprovement = Omit<IApartmentConstructionPriceIndexImprovement, "value"> & {
     value: number | null;
     key: string;
+    saved: boolean;
 };
 
 const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
@@ -68,10 +69,10 @@ const ApartmentImprovementsPage = () => {
 
     const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(state.apartment);
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
-        apartmentData.improvements.market_price_index.map((i) => ({...i, key: uuidv4()})) || []
+        apartmentData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
     const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableConsImprovement[]>(
-        apartmentData.improvements.construction_price_index.map((i) => ({...i, key: uuidv4()})) || []
+        apartmentData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
 
     const handleSaveButtonClicked = () => {
@@ -100,6 +101,7 @@ const ApartmentImprovementsPage = () => {
         setMarketIndexImprovements((draft) => {
             draft.push({
                 key: uuidv4(),
+                saved: false,
                 name: "",
                 value: null,
                 completion_date: "",
@@ -112,9 +114,11 @@ const ApartmentImprovementsPage = () => {
         });
     };
     const handleRemoveMarketImprovementLine = (index) => {
-        setMarketIndexImprovements((draft) => {
-            draft.splice(index, 1);
-        });
+        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+            setMarketIndexImprovements((draft) => {
+                draft.splice(index, 1);
+            });
+        }
     };
 
     // Construction
@@ -122,6 +126,7 @@ const ApartmentImprovementsPage = () => {
         setConstructionIndexImprovements((draft) => {
             draft.push({
                 key: uuidv4(),
+                saved: false,
                 name: "",
                 value: null,
                 completion_date: "",
@@ -135,9 +140,11 @@ const ApartmentImprovementsPage = () => {
         });
     };
     const handleRemoveConstructionImprovementLine = (index) => {
-        setConstructionIndexImprovements((draft) => {
-            draft.splice(index, 1);
-        });
+        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+            setConstructionIndexImprovements((draft) => {
+                draft.splice(index, 1);
+            });
+        }
     };
 
     // Handle saving flow when editing

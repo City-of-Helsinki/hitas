@@ -11,7 +11,7 @@ import SaveButton from "../../common/components/SaveButton";
 import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
-type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string};
+type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};
 
 const ImprovementAddLineButton = ({onClick}) => {
     return (
@@ -45,10 +45,10 @@ const HousingCompanyImprovementsPage = () => {
 
     const housingCompanyData: IHousingCompanyWritable = state.housingCompany;
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
-        housingCompanyData.improvements.market_price_index.map((i) => ({...i, key: uuidv4()})) || []
+        housingCompanyData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
     const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableImprovement[]>(
-        housingCompanyData.improvements.construction_price_index.map((i) => ({...i, key: uuidv4()})) || []
+        housingCompanyData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
 
     const handleSaveButtonClicked = () => {
@@ -72,6 +72,7 @@ const HousingCompanyImprovementsPage = () => {
         setMarketIndexImprovements((draft) => {
             draft.push({
                 key: uuidv4(),
+                saved: false,
                 name: "",
                 value: null,
                 completion_date: "",
@@ -84,9 +85,11 @@ const HousingCompanyImprovementsPage = () => {
         });
     };
     const handleRemoveMarketImprovementLine = (index) => {
-        setMarketIndexImprovements((draft) => {
-            draft.splice(index, 1);
-        });
+        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+            setMarketIndexImprovements((draft) => {
+                draft.splice(index, 1);
+            });
+        }
     };
 
     // Construction
@@ -94,6 +97,7 @@ const HousingCompanyImprovementsPage = () => {
         setConstructionIndexImprovements((draft) => {
             draft.push({
                 key: uuidv4(),
+                saved: false,
                 name: "",
                 value: null,
                 completion_date: "",
@@ -106,9 +110,11 @@ const HousingCompanyImprovementsPage = () => {
         });
     };
     const handleRemoveConstructionImprovementLine = (index) => {
-        setConstructionIndexImprovements((draft) => {
-            draft.splice(index, 1);
-        });
+        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+            setConstructionIndexImprovements((draft) => {
+                draft.splice(index, 1);
+            });
+        }
     };
 
     // Handle saving flow when editing
