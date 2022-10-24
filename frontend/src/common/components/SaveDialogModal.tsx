@@ -77,7 +77,8 @@ export default function SaveDialogModal({
             ) : (
                 <>
                     <Dialog.Content>
-                        <>{`Virhe: ${(error as FetchBaseQueryError)?.status}`}</>
+                        <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
+                        <p>{((error as FetchBaseQueryError)?.data as {message?: string})?.message || ""}</p>
                     </Dialog.Content>
                     <Dialog.ActionButtons>
                         <Button
