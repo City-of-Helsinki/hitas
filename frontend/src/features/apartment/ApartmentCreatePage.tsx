@@ -185,7 +185,12 @@ const ApartmentCreatePage = () => {
 
     return (
         <div className="view--create view--set-apartment">
-            <h1 className="main-heading">Uusi asunto</h1>
+            <h1 className="main-heading">
+                {state?.apartment
+                    ? `${state.apartment.address.street_address} - ${state.apartment.address.stair}
+                    ${state.apartment.address.apartment_number}`
+                    : "Uusi asunto"}
+            </h1>
             <div className="field-sets">
                 <Fieldset heading={""}>
                     <TextInput
