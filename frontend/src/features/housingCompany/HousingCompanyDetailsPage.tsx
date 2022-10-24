@@ -155,6 +155,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 <ImprovementsTable
                     data={data}
                     title={"Yhtiökohtaiset parannukset"}
+                    editableType={"housingCompany"}
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
