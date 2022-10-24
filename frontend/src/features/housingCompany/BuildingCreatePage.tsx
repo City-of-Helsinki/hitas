@@ -9,19 +9,34 @@ import {FormInputField, SaveDialogModal} from "../../common/components";
 import SaveButton from "../../common/components/SaveButton";
 import {IBuildingWritable} from "../../common/models";
 
+const blankForm: IBuildingWritable = {
+    real_estate_id: null,
+    address: {
+        street_address: "",
+    },
+    building_identifier: "",
+};
+
 const BuildingCreatePage = (): JSX.Element => {
     const navigate = useNavigate();
-    const params = useParams();
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
+    const params = useParams() as {readonly housingCompanyId: string};
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const blankForm = {
-        address: {
-            street_address: "",
-        },
-        building_identifier: "",
-    };
-    const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm as IBuildingWritable);
-    const [saveBuilding, {data: saveData, error: saveError, isLoading: isSaving}] = useCreateBuildingMutation();
+
+    const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
+    const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
+        params.housingCompanyId
+    );
+    const [saveBuilding, {data, error, isLoading}] = useCreateBuildingMutation();
+
+    const realEstateOptions =
+        housingCompanyIsLoading || !housingCompanyData
+            ? []
+            : housingCompanyData.real_estates.map((realEstate) => {
+                  return {
+                      label: `${realEstate.address.street_address} (${realEstate.property_identifier})`,
+                      value: realEstate.id,
+                  };
+              });
 
     const handleSaveButtonClicked = () => {
         saveBuilding({
@@ -31,15 +46,7 @@ const BuildingCreatePage = (): JSX.Element => {
         });
         setIsEndModalVisible(true);
     };
-    const realEstateOptions =
-        isLoading || !data
-            ? []
-            : data.real_estates.map((realEstate) => {
-                  return {
-                      label: `${realEstate.address.street_address} (${realEstate.property_identifier})`,
-                      value: realEstate.id,
-                  };
-              });
+
     return (
         <div className="view--create view--create-company">
             <h1 className="main-heading">
@@ -92,15 +99,15 @@ const BuildingCreatePage = (): JSX.Element => {
                 </Button>
                 <SaveButton
                     onClick={handleSaveButtonClicked}
-                    isLoading={isLoading}
+                    isLoading={housingCompanyIsLoading}
                 />
             </div>
             <SaveDialogModal
-                data={saveData}
-                error={saveError}
+                data={data}
+                error={error}
                 linkURL={"/housing-companies/" + params.housingCompanyId}
                 linkText="Takaisin yhtiön sivulle"
-                isLoading={isSaving}
+                isLoading={isLoading}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
             />

@@ -132,7 +132,7 @@ export interface IBuildingWritable {
     readonly id?: string;
     address: {street_address: string};
     building_identifier: string | null;
-    real_estate_id: string;
+    real_estate_id: string | null;
 }
 
 export interface IApartmentAddress {
