@@ -136,7 +136,7 @@ apartments = Table(
     Column("C_POSTINRO", String(12), key="postal_code_code", nullable=False),
     Column("C_PTP", String(30), nullable=False),  # Always 'HELSINKI'
     Column("C_KERROS", String(3), key="floor"),
-    Column("N_HUONELKM", Integer, nullable=False),
+    Column("N_HUONELKM", Integer, key="rooms", nullable=False),
     Column("C_HUONKOODI", String(16), nullable=False),  # Always 'HUONETYYPPI'
     Column("C_HUONTYYP", String(12), key="apartment_type_code", nullable=False),
     Column("N_HPALA", Float, key="surface_area", nullable=False),
