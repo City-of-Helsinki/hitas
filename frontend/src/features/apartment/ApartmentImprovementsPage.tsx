@@ -25,6 +25,7 @@ type IWritableConsImprovement = Omit<IApartmentConstructionPriceIndexImprovement
 const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
     return {
         ...ap,
+        shares: ap.shares || {start: null, end: null},
         building: ap.links.building.id,
         address: {
             ...ap.address,

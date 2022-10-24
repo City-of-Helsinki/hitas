@@ -41,6 +41,7 @@ const apartmentStateOptions = ApartmentStates.map((state) => {
 const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
     return {
         ...ap,
+        shares: ap.shares || {start: null, end: null},
         ownerships: [], // Stored in a separate state, not needed here
         building: ap.links.building.id,
         address: {

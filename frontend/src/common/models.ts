@@ -212,7 +212,7 @@ export interface IApartmentDetails {
         start: number;
         end: number;
         readonly total: number;
-    };
+    } | null;
     links: {
         housing_company: ILinkedModel & {display_name: string};
         real_estate: ILinkedModel;
