@@ -185,12 +185,12 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             index: indexType.label,
             month: formData.month,
         });
-        closeDialog();
     };
     useEffect(() => {
         if (isSaving || !saveData) return;
         if (saveData && !saveError) {
             hitasToast("Indeksi tallennettu onnistuneesti", "success");
+            closeDialog();
         } else {
             hitasToast("Indeksin tallennus epäonnistui", "error");
         }
