@@ -92,31 +92,24 @@ const IndexResultList = ({setFormData, setCreateDialogOpen, indexType}) => {
                 error={error}
                 isLoading={isLoading}
             >
-                {!isLoading && !error ? (
-                    <>
-                        <LoadedIndexResultsList
-                            data={data}
-                            editFn={({month, value}) => {
-                                setFormData({
-                                    indexType: indexType,
-                                    month: month,
-                                    value: value,
-                                });
-                                setCreateDialogOpen(true);
-                            }}
-                            currentPage={currentPage}
-                        />
-                        <ListPageNumbers
-                            currentPage={currentPage}
-                            setCurrentPage={setCurrentPage}
-                            pageInfo={data?.page}
-                        />
-                    </>
-                ) : (
-                    <LoadingSpinner />
-                )}
+                <LoadedIndexResultsList
+                    data={data}
+                    editFn={({month, value}) => {
+                        setFormData({
+                            indexType: indexType,
+                            month: month,
+                            value: value,
+                        });
+                        setCreateDialogOpen(true);
+                    }}
+                    currentPage={currentPage}
+                />
+                <ListPageNumbers
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageInfo={data?.page}
+                />
             </QueryStateHandler>
-            <></>
         </div>
     );
 };
@@ -203,9 +196,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             );
         }
     }, [isSaving, saveError, saveData]);
-    return isSaving ? (
-        <LoadingSpinner />
-    ) : (
+    return !isSaving ? (
         <Dialog
             id="index-creation-dialog"
             aria-labelledby={"create-modal"}
@@ -252,6 +243,8 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                 </Button>
             </Dialog.ActionButtons>
         </Dialog>
+    ) : (
+        <LoadingSpinner />
     );
 };
 
