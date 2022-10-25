@@ -86,6 +86,13 @@ def calculate_max_price(
     market_price_index["maximum"] = max_price == market_price_index["max_price"]
     construction_price_index["maximum"] = max_price == construction_price_index["max_price"]
 
+    if market_price_index["maximum"]:
+        max_index = "market_price_index"
+    elif construction_price_index["maximum"]:
+        max_index = "construction_price_index"
+    else:
+        max_index = "surface_area_price_ceiling"
+
     return {
         "calculations": {
             "construction_price_index": construction_price_index,
@@ -93,11 +100,7 @@ def calculate_max_price(
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
         "max_price": max_price,
-        "index": (
-            "market_price_index"
-            if market_price_index["maximum"]
-            else ("construction_price_index" if construction_price_index["maximum"] else "surfare_area_price_ceiling")
-        ),
+        "index": max_index,
         "apartment": {
             "shares": {
                 "start": apartment.share_number_start,
