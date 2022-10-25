@@ -85,10 +85,10 @@ const HousingCompanyCreatePage = (): JSX.Element => {
               }
             : state.housingCompany;
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
-    const [createHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
+    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
-        createHousingCompany({data: formData, id: state?.housingCompany.id});
+        saveHousingCompany({data: formData, id: state?.housingCompany.id});
     };
 
     const stateOptions = HousingCompanyStates.map((state) => {

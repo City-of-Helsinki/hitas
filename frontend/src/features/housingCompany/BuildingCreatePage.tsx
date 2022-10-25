@@ -21,10 +21,10 @@ const BuildingCreatePage = (): JSX.Element => {
         building_identifier: "",
     };
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm as IBuildingWritable);
-    const [createBuilding, {data: saveData, error: saveError, isLoading: isSaving}] = useCreateBuildingMutation();
+    const [saveBuilding, {data: saveData, error: saveError, isLoading: isSaving}] = useCreateBuildingMutation();
 
     const handleSaveButtonClicked = () => {
-        createBuilding({
+        saveBuilding({
             data: formData,
             housingCompanyId: params.housingCompanyId as string,
             realEstateId: formData.real_estate_id as string,

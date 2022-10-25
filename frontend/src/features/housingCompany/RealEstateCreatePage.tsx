@@ -18,11 +18,11 @@ const RealEstateCreatePage = (): JSX.Element => {
         property_identifier: "",
     };
     const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
-    const [createBuilding, {data, error, isLoading}] = useCreateRealEstateMutation();
+    const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
     const navigate = useNavigate();
     const params = useParams();
     const handleSaveButtonClicked = () => {
-        createBuilding({data: formData, housingCompanyId: params.housingCompanyId as string});
+        saveRealEstate({data: formData, housingCompanyId: params.housingCompanyId as string});
         setIsEndModalVisible(true);
     };
 

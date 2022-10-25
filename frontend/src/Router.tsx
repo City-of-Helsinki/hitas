@@ -14,6 +14,7 @@ import {
     BuildingCreatePage,
     HousingCompanyCreatePage,
     HousingCompanyDetailsPage,
+    HousingCompanyImprovementsPage,
     HousingCompanyListPage,
     RealEstateCreatePage,
 } from "./features/housingCompany";
@@ -46,6 +47,10 @@ export default function Router() {
                         <Route
                             path="edit"
                             element={<HousingCompanyCreatePage />}
+                        />
+                        <Route
+                            path="improvements"
+                            element={<HousingCompanyImprovementsPage />}
                         />
                         <Route
                             path="real-estates"

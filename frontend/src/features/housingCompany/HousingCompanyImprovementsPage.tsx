@@ -1,39 +1,17 @@
 import React, {useEffect} from "react";
 
 import {Button, Fieldset, IconCrossCircle, IconPlus} from "hds-react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useSaveApartmentMutation} from "../../app/services";
+import {useSaveHousingCompanyMutation} from "../../app/services";
 import {FormInputField} from "../../common/components";
 import SaveButton from "../../common/components/SaveButton";
-import {
-    IApartmentConstructionPriceIndexImprovement,
-    IApartmentDetails,
-    IApartmentWritable,
-    IImprovement,
-} from "../../common/models";
+import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
 type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};
-type IWritableConsImprovement = Omit<IApartmentConstructionPriceIndexImprovement, "value"> & {
-    value: number | null;
-    key: string;
-    saved: boolean;
-};
-
-const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
-    return {
-        ...ap,
-        shares: ap.shares || {start: null, end: null},
-        building: ap.links.building.id,
-        address: {
-            ...ap.address,
-            street_address: ap.links.building.street_address,
-        },
-    };
-};
 
 const ImprovementAddLineButton = ({onClick}) => {
     return (
@@ -59,41 +37,33 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     );
 };
 
-const depreciationChoices = [{label: "0.0"}, {label: "2.5"}, {label: "10.0"}];
-
-const ApartmentImprovementsPage = () => {
+const HousingCompanyImprovementsPage = () => {
     const navigate = useNavigate();
-    const {state}: {state: {apartment: IApartmentDetails}} = useLocation();
-    const params = useParams() as {readonly housingCompanyId: string};
+    const {state}: {state: {housingCompany: IHousingCompanyDetails}} = useLocation();
 
-    const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
+    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
 
-    const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(state.apartment);
+    const housingCompanyData: IHousingCompanyWritable = state.housingCompany;
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
-        apartmentData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
+        housingCompanyData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
-    const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableConsImprovement[]>(
-        apartmentData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
+    const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableImprovement[]>(
+        housingCompanyData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
 
     const handleSaveButtonClicked = () => {
         const formData = {
-            ...apartmentData,
+            ...housingCompanyData,
             // Don't send empty improvements to the API
             improvements: {
                 market_price_index: marketIndexImprovements.filter((i) => i.value) as IImprovement[],
-                construction_price_index: constructionIndexImprovements
-                    .filter((i) => i.value)
-                    .map((i) => {
-                        return {...i, depreciation_percentage: parseFloat(`${i.depreciation_percentage}`)};
-                    }) as IApartmentConstructionPriceIndexImprovement[],
+                construction_price_index: constructionIndexImprovements.filter((i) => i.value) as IImprovement[],
             },
         };
 
-        saveApartment({
+        saveHousingCompany({
             data: formData,
-            id: state?.apartment.id,
-            housingCompanyId: params.housingCompanyId,
+            id: state?.housingCompany.id,
         });
     };
 
@@ -131,7 +101,6 @@ const ApartmentImprovementsPage = () => {
                 name: "",
                 value: null,
                 completion_date: "",
-                depreciation_percentage: 2.5,
             });
         });
     };
@@ -152,13 +121,13 @@ const ApartmentImprovementsPage = () => {
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
             hitasToast("Parannukset tallennettu onnistuneesti!");
-            navigate(`/housing-companies/${data.links.housing_company.id}/apartments/${data.id}`);
+            navigate(`/housing-companies/${data.id}`);
         } else if (error) {
             hitasToast("Virhe tallentaessa parannuksia!", "error");
         }
     }, [isLoading, error, data, navigate]);
 
-    // Redirect user to detail page if state is missing Apartment data and user is trying to edit the apartment
+    // Redirect user to detail page if state is missing HousingCompany data and user is trying to edit the it
     // FIXME: Currently does not work, as the page crashes on load due to accessing properties of null
     useEffect(() => {
         if (state === null) navigate("..");
@@ -166,11 +135,8 @@ const ApartmentImprovementsPage = () => {
 
     // FIXME: Rename "ownership" class names for elements when styling
     return (
-        <div className="view--create view--set-apartment">
-            <h1 className="main-heading">
-                {apartmentData.address.street_address} - {apartmentData.address.stair}
-                {apartmentData.address.apartment_number} Parannukset
-            </h1>
+        <div className="view--create view--set-housing-company">
+            <h1 className="main-heading">{housingCompanyData.name.display} Parannukset</h1>
             <div className="field-sets">
                 <Fieldset heading={"Markkinahintaindeksi"}>
                     <ul className="ownership-list">
@@ -221,7 +187,7 @@ const ApartmentImprovementsPage = () => {
                 <Fieldset heading={"Rakennuskustanusindeksi"}>
                     <ul className="ownership-list">
                         {constructionIndexImprovements.length ? (
-                            constructionIndexImprovements.map((improvement: IWritableConsImprovement, index) => (
+                            constructionIndexImprovements.map((improvement: IWritableImprovement, index) => (
                                 <div key={improvement.key}>
                                     <li className="ownership-item">
                                         <FormInputField
@@ -255,20 +221,6 @@ const ApartmentImprovementsPage = () => {
                                             error={error}
                                             required
                                         />
-                                        <FormInputField
-                                            inputType="select"
-                                            label="Poistoprosentti"
-                                            fieldPath="depreciation_percentage"
-                                            options={depreciationChoices}
-                                            placeholder={improvement.depreciation_percentage.toString()}
-                                            formData={constructionIndexImprovements[index]}
-                                            setterFunction={handleSetConstructionImprovementLine(
-                                                index,
-                                                "depreciation_percentage"
-                                            )}
-                                            error={error}
-                                            required
-                                        />
                                         <ImprovementRemoveLineButton
                                             onClick={() => handleRemoveConstructionImprovementLine(index)}
                                         />
@@ -290,4 +242,4 @@ const ApartmentImprovementsPage = () => {
     );
 };
 
-export default ApartmentImprovementsPage;
+export default HousingCompanyImprovementsPage;
