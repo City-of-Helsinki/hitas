@@ -65,7 +65,11 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
 
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {
+
+    response_json = response.json()
+    assert_created(response_json.pop("created"))
+
+    assert response_json == {
         "max_price": 223558,
         "valid_until": "2022-10-05",
         "index": "construction_price_index",
@@ -198,7 +202,11 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
 
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {
+
+    response_json = response.json()
+    assert_created(response_json.pop("created"))
+
+    assert response_json == {
         "max_price": 275925,
         "valid_until": "2022-10-05",
         "index": "market_price_index",
@@ -381,3 +389,9 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
         "reason": "Conflict",
         "status": 409,
     }
+
+
+def assert_created(created: str):
+    created = datetime.datetime.fromisoformat(created)
+    # created timestamp is created 0-10 seconds in the past so effectively "now"
+    assert 0 < (datetime.datetime.now() - created).total_seconds() < 10

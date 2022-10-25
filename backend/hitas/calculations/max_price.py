@@ -103,6 +103,7 @@ def calculate_max_price(
             "market_price_index": market_price_index,
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
+        "created": datetime.datetime.now(),
         "valid_until": valid_until,
         "max_price": max_price,
         "index": max_index,
