@@ -188,12 +188,11 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
         closeDialog();
     };
     useEffect(() => {
-        if (isSaving) return;
-        if (saveData) {
-            hitasToast(
-                saveError ? "Indeksin tallennus epäonnistui" : "Indeksi tallennettu onnistuneesti",
-                saveError ? "error" : "success"
-            );
+        if (isSaving || !saveData) return;
+        if (saveData && !saveError) {
+            hitasToast("Indeksi tallennettu onnistuneesti", "success");
+        } else {
+            hitasToast("Indeksin tallennus epäonnistui", "error");
         }
     }, [isSaving, saveError, saveData]);
     return !isSaving ? (
