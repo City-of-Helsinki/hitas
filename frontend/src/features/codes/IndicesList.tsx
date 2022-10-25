@@ -9,25 +9,25 @@ import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
 const indexTypes: {label: string}[] = [
-    {label: "max-price-index"},
     {label: "market-price-index"},
     {label: "market-price-index-2005-equal-100"},
     {label: "construction-price-index"},
     {label: "construction-price-index-2005-equal-100"},
     {label: "surface-area-price-ceiling"},
+    {label: "max-price-index"},
 ];
 const getIndexTypeName = (indexType: string): string => {
     switch (indexType) {
         case "max-price-index":
-            return "Enimmäishintaindeksi";
+            return "Luovutushintaindeksi";
         case "market-price-index":
-            return "Markkinahintaindeksi (ennen 2005)";
+            return "Markkinahintaindeksi (Ennen 2005)";
         case "market-price-index-2005-equal-100":
-            return "Markkinahintaindeksi (2005 eteenpäin)";
+            return "Markkinahintaindeksi";
         case "construction-price-index":
-            return "Rakennuskustannusindeksi (ennen 2005)";
+            return "Rakennuskustannusindeksi (Ennen 2005)";
         case "construction-price-index-2005-equal-100":
-            return "Rakennuskustannusindeksi (2005 eteenpäin)";
+            return "Rakennuskustannusindeksi";
         case "surface-area-price-ceiling":
             return "Rajaneliöhinta";
         default:
@@ -76,8 +76,7 @@ const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     );
 };
 
-const IndexResultList = ({setFormData, setCreateDialogOpen, indexType}) => {
-    const [currentPage, setCurrentPage] = useState(1);
+const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDialogOpen, indexType}) => {
     const {data, error, isLoading} = useGetIndicesQuery({
         indexType: indexType.label,
         params: {
@@ -115,12 +114,14 @@ const IndexResultList = ({setFormData, setCreateDialogOpen, indexType}) => {
 };
 
 const IndicesList = (): JSX.Element => {
+    const todaysDate = new Date();
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [editMonth, setEditMonth] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<number | null>(null);
     const initialSaveData: IIndex = {
         indexType: indexTypes[0].label,
-        month: editMonth || "",
+        month: editMonth || `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
         value: editValue || null,
     };
     const [formData, setFormData] = useImmer(initialSaveData);
@@ -135,6 +136,7 @@ const IndicesList = (): JSX.Element => {
         setCreateDialogOpen(false);
     };
     const onSelectionChange = ({value}) => {
+        setCurrentPage(1);
         setEditMonth(null);
         setEditValue(null);
         setCurrentIndexType(() => ({label: value}));
@@ -153,6 +155,8 @@ const IndicesList = (): JSX.Element => {
                 />
             </div>
             <IndexResultList
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
                 setCreateDialogOpen={setCreateDialogOpen}
