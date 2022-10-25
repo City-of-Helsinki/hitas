@@ -323,3 +323,59 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, q
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.parametrize(
+    "missing_index",
+    [
+        "cpi_completion_date",
+        "mpi_completion_date",
+        "improvement_cpi",
+        "improvement_mpi",
+        "cpi_calculation_date",
+        "mpi_calculation_date",
+        "sapc",
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str):
+    a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2014, 8, 27),
+    )
+    hc: HousingCompany = a.building.real_estate.housing_company
+    HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+    HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+
+    # Create necessary apartment's completion date indices
+    if missing_index != "cpi_completion_date":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=129.29)
+    if missing_index != "mpi_completion_date":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=167.9)
+    if missing_index != "cpi_calculation_date":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
+    if missing_index != "mpi_calculation_date":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
+    if missing_index != "sapc":
+        SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
+    if missing_index != "improvement_cpi":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=129.20)
+    if missing_index != "improvement_mpi":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=171.0)
+
+    query = {
+        "calculation_date": "2022-07-05",
+    }
+
+    response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "index_missing",
+        "message": "One or more indices required for max price calculation is missing.",
+        "reason": "Conflict",
+        "status": 409,
+    }

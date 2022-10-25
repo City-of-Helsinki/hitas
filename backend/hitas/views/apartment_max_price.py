@@ -1,4 +1,5 @@
 import datetime
+from http import HTTPStatus
 
 from rest_framework import serializers
 from rest_framework.mixins import ListModelMixin
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.calculations import calculate_max_price
+from hitas.calculations.max_price import IndexMissingException
 
 
 class ApartmentMaxPriceViewSet(ListModelMixin, ViewSet):
@@ -40,13 +42,24 @@ class ApartmentMaxPriceViewSet(ListModelMixin, ViewSet):
             self._validation_error("apartment_share_housing_company_loans", "A valid number is required.")
 
         # Calculate max price
-        max_prices = calculate_max_price(
-            housing_company_uuid=kwargs["housing_company_uuid"],
-            apartment_uuid=kwargs["apartment_uuid"],
-            calculation_date=calculation_date,
-            apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
-        )
-        return Response(max_prices)
+        try:
+            max_prices = calculate_max_price(
+                housing_company_uuid=kwargs["housing_company_uuid"],
+                apartment_uuid=kwargs["apartment_uuid"],
+                calculation_date=calculation_date,
+                apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
+            )
+            return Response(max_prices)
+        except IndexMissingException:
+            return Response(
+                {
+                    "error": "index_missing",
+                    "message": "One or more indices required for max price calculation is missing.",
+                    "reason": "Conflict",
+                    "status": 409,
+                },
+                status=HTTPStatus.CONFLICT,
+            )
 
     @staticmethod
     def _validation_error(field, details):

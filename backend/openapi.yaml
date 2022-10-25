@@ -911,6 +911,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -4135,10 +4137,12 @@ components:
 
             Can have the following values:
             - owner_in_use
+            - index_missing
           type: string
           example: owner_in_use
           x-extensible-enum:
             - owner_in_use
+            - index_missing
 
     UnsupportedMediaTypeError:
       description: Unsupported media type error

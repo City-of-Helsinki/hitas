@@ -16,6 +16,10 @@ from hitas.models import (
 )
 
 
+class IndexMissingException(Exception):
+    pass
+
+
 def calculate_max_price(
     housing_company_uuid: str,
     apartment_uuid: str,
@@ -37,17 +41,14 @@ def calculate_max_price(
     )
 
     # Check we found the necessary indices
-    # FIXME: handle more gracefully
-    if apartment.calculation_date_cpi_2005eq100 is None:
-        raise Exception("construction price index found for " + str(calculation_date))
-    if apartment.completion_date_cpi_2005eq100 is None:
-        raise Exception("construction price index not found for " + str(apartment.completion_date))
-    if apartment.calculation_date_mpi_2005eq100 is None:
-        raise Exception("market price index not found for " + str(calculation_date))
-    if apartment.completion_date_mpi_2005eq100 is None:
-        raise Exception("market price index not found for " + str(apartment.completion_date))
-    if apartment.surface_area_price_ceiling is None:
-        raise Exception("surface area price ceiling index not found for " + str(calculation_date))
+    if (
+        apartment.calculation_date_cpi_2005eq100 is None
+        or apartment.completion_date_cpi_2005eq100 is None
+        or apartment.calculation_date_mpi_2005eq100 is None
+        or apartment.completion_date_mpi_2005eq100 is None
+        or apartment.surface_area_price_ceiling is None
+    ):
+        raise IndexMissingException()
 
     # Do the max price calculations
     construction_price_index = calculate_index(
@@ -278,7 +279,7 @@ def calculate_index(
         value_addition = improvement.value - excess
 
         if improvement.completion_date_index is None:
-            raise Exception("index not found for " + str(apartment.completion_date))
+            raise IndexMissingException()
 
         improvement_value = value_addition * (calculation_date_index / improvement.completion_date_index)
         apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area
