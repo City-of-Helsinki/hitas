@@ -3087,6 +3087,7 @@ components:
       required:
         - max_price
         - index
+        - valid_until
         - calculations
       properties:
         max_price:
@@ -3094,6 +3095,11 @@ components:
           type: integer
           minimum: 0
           example: 223558
+        valid_until:
+          description: TBD
+          type: string
+          format: date
+          example: 2022-10-05
         index:
           description: TBD
           type: string

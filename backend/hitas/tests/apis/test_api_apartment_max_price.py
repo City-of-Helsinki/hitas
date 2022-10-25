@@ -66,6 +66,9 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
+        "max_price": 223558,
+        "valid_until": "2022-10-05",
+        "index": "construction_price_index",
         "calculations": {
             "construction_price_index": {
                 "max_price": 223558,
@@ -109,12 +112,10 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
             },
             "surface_area_price_ceiling": {
                 "max_price": 146070,
-                "valid_until": "2022-07-05",  # FIXME: dummy value
+                "valid_until": "2022-08-05",  # FIXME: dummy value
                 "maximum": False,
             },
         },
-        "max_price": 223558,
-        "index": "construction_price_index",
         "apartment": {
             "address": {
                 "apartment_number": a.apartment_number,
@@ -198,6 +199,9 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
+        "max_price": 275925,
+        "valid_until": "2022-10-05",
+        "index": "market_price_index",
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {
@@ -241,12 +245,10 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
             },
             "surface_area_price_ceiling": {
                 "max_price": 233712,
-                "valid_until": "2022-07-05",  # FIXME: dummy value
+                "valid_until": "2022-08-05",  # FIXME: dummy value
                 "maximum": False,
             },
         },
-        "max_price": 275925,
-        "index": "market_price_index",
         "apartment": {
             "shares": {"start": 1, "end": 142, "total": 142},
             "rooms": a.rooms,

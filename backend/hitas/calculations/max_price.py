@@ -73,7 +73,7 @@ def calculate_max_price(
     )
     surface_area_price_ceiling = {
         "max_price": roundup(apartment.surface_area_price_ceiling),
-        "valid_until": calculation_date,  # FIXME: use how long index is valid
+        "valid_until": calculation_date + relativedelta(months=1),  # FIXME: use how long index is valid
     }
 
     # Find and mark the maximum
@@ -82,16 +82,20 @@ def calculate_max_price(
         market_price_index["max_price"],
         surface_area_price_ceiling["max_price"],
     )
+
     surface_area_price_ceiling["maximum"] = max_price == surface_area_price_ceiling["max_price"]
     market_price_index["maximum"] = max_price == market_price_index["max_price"]
     construction_price_index["maximum"] = max_price == construction_price_index["max_price"]
 
     if market_price_index["maximum"]:
         max_index = "market_price_index"
+        valid_until = market_price_index["valid_until"]
     elif construction_price_index["maximum"]:
         max_index = "construction_price_index"
+        valid_until = construction_price_index["valid_until"]
     else:
         max_index = "surface_area_price_ceiling"
+        valid_until = surface_area_price_ceiling["valid_until"]
 
     return {
         "calculations": {
@@ -99,6 +103,7 @@ def calculate_max_price(
             "market_price_index": market_price_index,
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
+        "valid_until": valid_until,
         "max_price": max_price,
         "index": max_index,
         "apartment": {
