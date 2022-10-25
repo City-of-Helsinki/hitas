@@ -24,7 +24,7 @@ const Codes = (): JSX.Element => {
                 <Tabs.TabPanel className={"view--codes__tab--rules"}>
                     <h1>Laskentasäännöt</h1>
                 </Tabs.TabPanel>
-                <Tabs.TabPanel className={"view--codes__tab--fundingmodes"}>
+                <Tabs.TabPanel className={"view--codes__tab--financing-methods"}>
                     <h1>Rahoitusmuodot</h1>
                 </Tabs.TabPanel>
             </Tabs>
