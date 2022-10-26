@@ -3,6 +3,8 @@ import datetime
 import pytest
 from dateutil import relativedelta
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.http import urlencode
 from rest_framework import status
 
@@ -392,6 +394,6 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
 
 
 def assert_created(created: str):
-    created = datetime.datetime.fromisoformat(created)
+    created = parse_datetime(created)
     # created timestamp is created 0-10 seconds in the past so effectively "now"
-    assert 0 < (datetime.datetime.now() - created).total_seconds() < 10
+    assert 0 < (timezone.now() - created).total_seconds() < 10

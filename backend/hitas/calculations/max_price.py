@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Prefetch, Sum
+from django.utils import timezone
 
 from hitas.models import (
     Apartment,
@@ -27,7 +28,7 @@ def calculate_max_price(
     apartment_share_of_housing_company_loans: int,
 ):
     if calculation_date is None:
-        calculation_date = datetime.date.today()
+        calculation_date = timezone.now().today()
 
     # Fetch apartment
     apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
@@ -103,7 +104,7 @@ def calculate_max_price(
             "market_price_index": market_price_index,
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
-        "created": datetime.datetime.now(),
+        "created": timezone.now(),
         "valid_until": valid_until,
         "max_price": max_price,
         "index": max_index,
