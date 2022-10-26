@@ -224,6 +224,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                 <FormInputField
                     label={"Arvo"}
                     inputType={"number"}
+                    fractionDigits={2}
                     fieldPath={"value"}
                     formData={formData}
                     setFormData={setFormData}
