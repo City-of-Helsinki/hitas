@@ -118,7 +118,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
             },
             "surface_area_price_ceiling": {
                 "max_price": 146070,
-                "valid_until": "2022-08-05",  # FIXME: dummy value
+                "valid_until": "2022-08-31",
                 "maximum": False,
             },
         },
@@ -255,7 +255,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
             },
             "surface_area_price_ceiling": {
                 "max_price": 233712,
-                "valid_until": "2022-08-05",  # FIXME: dummy value
+                "valid_until": "2022-08-31",
                 "maximum": False,
             },
         },
@@ -264,6 +264,119 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
             "rooms": a.rooms,
             "apartment_type": a.apartment_type.value,
             "surface_area": 48.0,
+            "address": {
+                "street_address": a.street_address,
+                "floor": a.floor,
+                "stair": a.stair,
+                "apartment_number": a.apartment_number,
+                "postal_code": a.postal_code.value,
+                "city": a.postal_code.city,
+            },
+            "ownership": [{"percentage": 100.0, "name": o1.owner.name}],
+        },
+        "housing_company": {
+            "official_name": hc.official_name,
+            "archive_id": hc.id,
+            "property_manager": {
+                "name": hc.property_manager.name,
+                "street_address": hc.property_manager.street_address,
+            },
+        },
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__surface_area_price_ceiling(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        debt_free_purchase_price=107753,
+        primary_loan_amount=61830,
+        additional_work_during_construction=0,
+        completion_date=datetime.date(2012, 1, 13),
+        surface_area=48.5,
+        share_number_start=504,
+        share_number_end=601,
+    )
+    hc: HousingCompany = a.building.real_estate.housing_company
+    # Create another apartment with rest of the surface area
+    ApartmentFactory.create(building__real_estate__housing_company=hc, surface_area=2655)
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0)
+
+    # Create necessary apartment's completion date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=115.9)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=138.1)
+
+    # Create necessary calculation date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 9, 1), value=149.1)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 9, 1), value=189.1)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 9, 1), value=4872)
+
+    query = {
+        "calculation_date": "2022-09-29",
+        "apartment_share_housing_company_loans": 0,
+    }
+
+    response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    response_json = response.json()
+    assert_created(response_json.pop("created"))
+
+    assert response_json == {
+        "max_price": 236292,
+        "valid_until": "2022-11-30",
+        "index": "surface_area_price_ceiling",
+        "calculations": {
+            "construction_price_index": {
+                "calculation_variables": {
+                    "acquisition_price": 169583,
+                    "additional_work_during_construction": 0,
+                    "basic_price": 169583,
+                    "index_adjustment": 48578,
+                    "apartment_improvements": 0,
+                    "housing_company_improvements": 0,
+                    "debt_free_price": 218161,
+                    "debt_free_price_m2": 4498,
+                    "apartment_share_of_housing_company_loans": 0,
+                    "completion_date": "2012-01-13",
+                    "completion_date_index": 115.9,
+                    "calculation_date": "2022-09-29",
+                    "calculation_date_index": 149.1,
+                },
+                "max_price": 218161,
+                "valid_until": "2022-12-29",
+                "maximum": False,
+            },
+            "market_price_index": {
+                "calculation_variables": {
+                    "acquisition_price": 169583,
+                    "additional_work_during_construction": 0,
+                    "basic_price": 169583,
+                    "index_adjustment": 62627,
+                    "apartment_improvements": 0,
+                    "housing_company_improvements": 0,
+                    "debt_free_price": 232210,
+                    "debt_free_price_m2": 4788,
+                    "apartment_share_of_housing_company_loans": 0,
+                    "completion_date": "2012-01-13",
+                    "completion_date_index": 138.1,
+                    "calculation_date": "2022-09-29",
+                    "calculation_date_index": 189.1,
+                },
+                "max_price": 232210,
+                "valid_until": "2022-12-29",
+                "maximum": False,
+            },
+            "surface_area_price_ceiling": {
+                "max_price": 236292,
+                "valid_until": "2022-11-30",
+                "maximum": True,
+            },
+        },
+        "apartment": {
+            "shares": {"start": 504, "end": 601, "total": 98},
+            "rooms": a.rooms,
+            "apartment_type": a.apartment_type.value,
+            "surface_area": 48.5,
             "address": {
                 "street_address": a.street_address,
                 "floor": a.floor,
