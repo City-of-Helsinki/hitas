@@ -16,9 +16,11 @@ class BuildingHitasAddressSerializer(serializers.Serializer):
 
 class BuildingSerializer(HitasModelSerializer):
     address = BuildingHitasAddressSerializer(source="*")
-    building_identifier = ValueOrNullField(required=False)
+    building_identifier = ValueOrNullField(required=False, allow_null=True)
 
     def validate_building_identifier(self, value):
+        if value == "":
+            value = None
         validate_building_id(value)
         return value
 

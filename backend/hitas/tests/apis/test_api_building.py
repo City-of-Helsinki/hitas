@@ -222,14 +222,16 @@ def test__api__building__create(api_client: HitasAPIClient, building_identifier)
     assert response.json() == get_response.json()
 
 
+@pytest.mark.parametrize("building_identifier", [{}, {"building_identifier": None}, {"building_identifier": ""}])
 @pytest.mark.django_db
-def test__api__building__create__no_building_identifier(api_client: HitasAPIClient):
+def test__api__building__create__no_building_identifier(api_client: HitasAPIClient, building_identifier):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     data = {
         "address": {
             "street_address": "test-street-address-1",
         },
+        **building_identifier,
     }
 
     url = reverse(
@@ -249,7 +251,7 @@ def test__api__building__create__no_building_identifier(api_client: HitasAPIClie
     assert response.json() == get_response.json()
 
 
-@pytest.mark.parametrize("building_identifier", ["foo", None])
+@pytest.mark.parametrize("building_identifier", ["foo"])
 @pytest.mark.django_db
 def test__api__building__create__invalid_building_identifier(api_client: HitasAPIClient, building_identifier):
     re: RealEstate = RealEstateFactory.create()
