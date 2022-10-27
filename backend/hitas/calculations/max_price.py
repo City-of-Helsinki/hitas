@@ -280,6 +280,9 @@ def calculate_index(
     # 'yhtiön parannukset'
     apartment_housing_company_improvements = Decimal(0)
     for improvement in housing_company_improvements:
+        if improvement.completion_date_index is None:
+            raise IndexMissingException()
+
         # 'omavastuu'
         excess = 30 * total_surface_area
         if excess >= improvement.value:
@@ -287,9 +290,6 @@ def calculate_index(
 
         # 'arvon lisäys'
         value_addition = improvement.value - excess
-
-        if improvement.completion_date_index is None:
-            raise IndexMissingException()
 
         improvement_value = value_addition * (calculation_date_index / improvement.completion_date_index)
         apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area
