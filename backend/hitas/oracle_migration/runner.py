@@ -763,4 +763,12 @@ def do_truncate():
     ]:
         model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
 
-    get_user_model().objects.all().delete()
+    for model_class in [
+        get_user_model(),
+        SurfaceAreaPriceCeiling,
+        ConstructionPriceIndex2005Equal100,
+        ConstructionPriceIndex,
+        MarketPriceIndex,
+        MarketPriceIndex2005Equal100,
+    ]:
+        model_class.objects.all().delete()
