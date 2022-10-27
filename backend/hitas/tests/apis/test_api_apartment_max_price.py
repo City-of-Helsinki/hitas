@@ -3,6 +3,8 @@ import datetime
 import pytest
 from dateutil import relativedelta
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.http import urlencode
 from rest_framework import status
 
@@ -65,7 +67,14 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
 
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {
+
+    response_json = response.json()
+    assert_created(response_json.pop("created"))
+
+    assert response_json == {
+        "max_price": 223558,
+        "valid_until": "2022-10-05",
+        "index": "construction_price_index",
         "calculations": {
             "construction_price_index": {
                 "max_price": 223558,
@@ -109,12 +118,10 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
             },
             "surface_area_price_ceiling": {
                 "max_price": 146070,
-                "valid_until": "2022-07-05",  # FIXME: dummy value
+                "valid_until": "2022-08-05",  # FIXME: dummy value
                 "maximum": False,
             },
         },
-        "max_price": 223558,
-        "index": "construction_price_index",
         "apartment": {
             "address": {
                 "apartment_number": a.apartment_number,
@@ -197,7 +204,14 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
 
     response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {
+
+    response_json = response.json()
+    assert_created(response_json.pop("created"))
+
+    assert response_json == {
+        "max_price": 275925,
+        "valid_until": "2022-10-05",
+        "index": "market_price_index",
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {
@@ -241,12 +255,10 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
             },
             "surface_area_price_ceiling": {
                 "max_price": 233712,
-                "valid_until": "2022-07-05",  # FIXME: dummy value
+                "valid_until": "2022-08-05",  # FIXME: dummy value
                 "maximum": False,
             },
         },
-        "max_price": 275925,
-        "index": "market_price_index",
         "apartment": {
             "shares": {"start": 1, "end": 142, "total": 142},
             "rooms": a.rooms,
@@ -323,3 +335,65 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, q
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.parametrize(
+    "missing_index",
+    [
+        "cpi_completion_date",
+        "mpi_completion_date",
+        "improvement_cpi",
+        "improvement_mpi",
+        "cpi_calculation_date",
+        "mpi_calculation_date",
+        "sapc",
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str):
+    a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2014, 8, 27),
+    )
+    hc: HousingCompany = a.building.real_estate.housing_company
+    HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=hc, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+    HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=hc, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+
+    # Create necessary apartment's completion date indices
+    if missing_index != "cpi_completion_date":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=129.29)
+    if missing_index != "mpi_completion_date":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=167.9)
+    if missing_index != "cpi_calculation_date":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
+    if missing_index != "mpi_calculation_date":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
+    if missing_index != "sapc":
+        SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
+    if missing_index != "improvement_cpi":
+        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=129.20)
+    if missing_index != "improvement_mpi":
+        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=171.0)
+
+    query = {
+        "calculation_date": "2022-07-05",
+    }
+
+    response = api_client.get(reverse("hitas:max-price-list", args=[hc.uuid, a.uuid]) + "?" + urlencode(query))
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "index_missing",
+        "message": "One or more indices required for max price calculation is missing.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+def assert_created(created: str):
+    created = parse_datetime(created)
+    # created timestamp is created 0-10 seconds in the past so effectively "now"
+    assert 0 < (timezone.now() - created).total_seconds() < 10

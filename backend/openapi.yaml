@@ -911,6 +911,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -3085,6 +3087,8 @@ components:
       required:
         - max_price
         - index
+        - created
+        - valid_until
         - calculations
       properties:
         max_price:
@@ -3092,6 +3096,16 @@ components:
           type: integer
           minimum: 0
           example: 223558
+        created:
+          description: TBD
+          type: string
+          format: date-time
+          example: 2022-07-05T15:39:50.742380
+        valid_until:
+          description: TBD
+          type: string
+          format: date
+          example: 2022-10-05
         index:
           description: TBD
           type: string
@@ -4135,10 +4149,12 @@ components:
 
             Can have the following values:
             - owner_in_use
+            - index_missing
           type: string
           example: owner_in_use
           x-extensible-enum:
             - owner_in_use
+            - index_missing
 
     UnsupportedMediaTypeError:
       description: Unsupported media type error

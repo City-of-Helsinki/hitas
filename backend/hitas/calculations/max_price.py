@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Prefetch, Sum
+from django.utils import timezone
 
 from hitas.models import (
     Apartment,
@@ -16,6 +17,10 @@ from hitas.models import (
 )
 
 
+class IndexMissingException(Exception):
+    pass
+
+
 def calculate_max_price(
     housing_company_uuid: str,
     apartment_uuid: str,
@@ -23,7 +28,7 @@ def calculate_max_price(
     apartment_share_of_housing_company_loans: int,
 ):
     if calculation_date is None:
-        calculation_date = datetime.date.today()
+        calculation_date = timezone.now().today()
 
     # Fetch apartment
     apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
@@ -37,17 +42,14 @@ def calculate_max_price(
     )
 
     # Check we found the necessary indices
-    # FIXME: handle more gracefully
-    if apartment.calculation_date_cpi_2005eq100 is None:
-        raise Exception("construction price index found for " + str(calculation_date))
-    if apartment.completion_date_cpi_2005eq100 is None:
-        raise Exception("construction price index not found for " + str(apartment.completion_date))
-    if apartment.calculation_date_mpi_2005eq100 is None:
-        raise Exception("market price index not found for " + str(calculation_date))
-    if apartment.completion_date_mpi_2005eq100 is None:
-        raise Exception("market price index not found for " + str(apartment.completion_date))
-    if apartment.surface_area_price_ceiling is None:
-        raise Exception("surface area price ceiling index not found for " + str(calculation_date))
+    if (
+        apartment.calculation_date_cpi_2005eq100 is None
+        or apartment.completion_date_cpi_2005eq100 is None
+        or apartment.calculation_date_mpi_2005eq100 is None
+        or apartment.completion_date_mpi_2005eq100 is None
+        or apartment.surface_area_price_ceiling is None
+    ):
+        raise IndexMissingException()
 
     # Do the max price calculations
     construction_price_index = calculate_index(
@@ -72,7 +74,7 @@ def calculate_max_price(
     )
     surface_area_price_ceiling = {
         "max_price": roundup(apartment.surface_area_price_ceiling),
-        "valid_until": calculation_date,  # FIXME: use how long index is valid
+        "valid_until": calculation_date + relativedelta(months=1),  # FIXME: use how long index is valid
     }
 
     # Find and mark the maximum
@@ -81,9 +83,20 @@ def calculate_max_price(
         market_price_index["max_price"],
         surface_area_price_ceiling["max_price"],
     )
+
     surface_area_price_ceiling["maximum"] = max_price == surface_area_price_ceiling["max_price"]
     market_price_index["maximum"] = max_price == market_price_index["max_price"]
     construction_price_index["maximum"] = max_price == construction_price_index["max_price"]
+
+    if market_price_index["maximum"]:
+        max_index = "market_price_index"
+        valid_until = market_price_index["valid_until"]
+    elif construction_price_index["maximum"]:
+        max_index = "construction_price_index"
+        valid_until = construction_price_index["valid_until"]
+    else:
+        max_index = "surface_area_price_ceiling"
+        valid_until = surface_area_price_ceiling["valid_until"]
 
     return {
         "calculations": {
@@ -91,12 +104,10 @@ def calculate_max_price(
             "market_price_index": market_price_index,
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
+        "created": timezone.now(),
+        "valid_until": valid_until,
         "max_price": max_price,
-        "index": (
-            "market_price_index"
-            if market_price_index["maximum"]
-            else ("construction_price_index" if construction_price_index["maximum"] else "surfare_area_price_ceiling")
-        ),
+        "index": max_index,
         "apartment": {
             "shares": {
                 "start": apartment.share_number_start,
@@ -278,7 +289,7 @@ def calculate_index(
         value_addition = improvement.value - excess
 
         if improvement.completion_date_index is None:
-            raise Exception("index not found for " + str(apartment.completion_date))
+            raise IndexMissingException()
 
         improvement_value = value_addition * (calculation_date_index / improvement.completion_date_index)
         apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area
