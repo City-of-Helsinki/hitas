@@ -3184,6 +3184,30 @@ components:
                 - maximum
                 - valid_until
               properties:
+                calculation_variables:
+                  description: Variables used for apartment's surface area price ceiling calculation
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - calculation_date
+                    - calculation_date_value
+                    - surface_area
+                  properties:
+                    calculation_date:
+                      description: Maximum price calculation date.
+                      type: string
+                      format: date
+                      example: "2022-07-05"
+                    calculation_date_value:
+                      description: The value on the calculation date.
+                      type: number
+                      minimum: 0
+                      example: 129.29
+                    surface_area:
+                      description: Apartment's surface area
+                      type: number
+                      minimum: 0
+                      example: 30.0
                 max_price:
                   description: Maximum price for this index
                   type: integer
