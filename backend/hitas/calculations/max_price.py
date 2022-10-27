@@ -74,7 +74,7 @@ def calculate_max_price(
     )
     surface_area_price_ceiling = {
         "max_price": roundup(apartment.surface_area_price_ceiling),
-        "valid_until": calculation_date + relativedelta(months=1),  # FIXME: use how long index is valid
+        "valid_until": surface_area_price_ceiling_validity(calculation_date),
     }
 
     # Find and mark the maximum
@@ -323,6 +323,26 @@ def calculate_index(
         "max_price": max_price,
         "valid_until": calculation_date + relativedelta(months=3),
     }
+
+
+def surface_area_price_ceiling_validity(date: datetime.date) -> datetime.date:
+    """
+    1.2 - 30.4 -> end of May (31.5)
+    1.5 - 31.7 -> end of August (31.8)
+    1.8 - 31.10 -> end of November (30.11)
+    1.11 - 31.1 -> end of February (28/29.2)
+    """
+
+    if date.month == 1:
+        return date.replace(month=3, day=1) - relativedelta(days=1)
+    if 2 <= date.month <= 4:
+        return date.replace(month=5, day=31)
+    elif 5 <= date.month <= 7:
+        return date.replace(month=8, day=31)
+    elif 8 <= date.month <= 10:
+        return date.replace(month=11, day=30)
+    else:
+        return date.replace(year=date.year + 1, month=3, day=1) - relativedelta(days=1)
 
 
 def roundup(v: Decimal) -> int:
