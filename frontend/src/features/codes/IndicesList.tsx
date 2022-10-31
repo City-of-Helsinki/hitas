@@ -21,13 +21,13 @@ const getIndexTypeName = (indexType: string): string => {
         case "max-price-index":
             return "Luovutushintaindeksi";
         case "market-price-index":
-            return "Markkinahintaindeksi (Ennen 2005)";
+            return "Markkinahintaindeksi 1983";
         case "market-price-index-2005-equal-100":
-            return "Markkinahintaindeksi";
+            return "Markkinahintaindeksi 2005";
         case "construction-price-index":
-            return "Rakennuskustannusindeksi (Ennen 2005)";
+            return "Rakennuskustannusindeksi 1980";
         case "construction-price-index-2005-equal-100":
-            return "Rakennuskustannusindeksi";
+            return "Rakennuskustannusindeksi 2005";
         case "surface-area-price-ceiling":
             return "Rajaneliöhinta";
         default:
