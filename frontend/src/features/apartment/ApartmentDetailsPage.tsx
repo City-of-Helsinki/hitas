@@ -184,7 +184,11 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                         ))}
                                         <DetailField
                                             label="Isännöitsijä"
-                                            value="TODO"
+                                            value={
+                                                housingCompanyData && housingCompanyData.property_manager
+                                                    ? housingCompanyData.property_manager.name
+                                                    : "-"
+                                            }
                                         />
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
