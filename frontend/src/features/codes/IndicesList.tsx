@@ -117,28 +117,19 @@ const IndicesList = (): JSX.Element => {
     const todaysDate = new Date();
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [editMonth, setEditMonth] = useState<string | null>(null);
-    const [editValue, setEditValue] = useState<number | null>(null);
     const initialSaveData: IIndex = {
         indexType: indexTypes[0].label,
-        month: editMonth || `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
-        value: editValue || null,
+        month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
+        value: null,
     };
     const [formData, setFormData] = useImmer(initialSaveData);
     const [editDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
-    const initData = () => {
-        setEditMonth(null);
-        setEditValue(null);
-        setFormData(initialSaveData);
-    };
     const closeDialog = () => {
-        initData();
+        setFormData(initialSaveData);
         setCreateDialogOpen(false);
     };
     const onSelectionChange = ({value}) => {
         setCurrentPage(1);
-        setEditMonth(null);
-        setEditValue(null);
         setCurrentIndexType(() => ({label: value}));
     };
     return (
