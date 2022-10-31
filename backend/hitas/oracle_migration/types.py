@@ -36,8 +36,8 @@ class HitasYearMonth(types.TypeDecorator):
         return str_to_year_month(value)
 
 
-def str_to_year_month(value: str) -> datetime.datetime:
-    return datetime.datetime.strptime(value, "%Y%m")
+def str_to_year_month(value: str) -> datetime.date:
+    return datetime.datetime.strptime(value, "%Y%m").date()
 
 
 class HitasDuration(types.TypeDecorator):

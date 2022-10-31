@@ -120,6 +120,11 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 "max_price": 146070,
                 "valid_until": "2022-08-31",
                 "maximum": False,
+                "calculation_variables": {
+                    "calculation_date": "2022-07-05",
+                    "calculation_date_value": 4869.0,
+                    "surface_area": 30,
+                },
             },
         },
         "apartment": {
@@ -148,7 +153,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 "end": a.share_number_end,
                 "total": 2383,
             },
-            "surface_area": a.surface_area,
+            "surface_area": 30,
         },
         "housing_company": {
             "archive_id": hc.id,
@@ -257,6 +262,11 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                 "max_price": 233712,
                 "valid_until": "2022-08-31",
                 "maximum": False,
+                "calculation_variables": {
+                    "calculation_date": "2022-07-05",
+                    "calculation_date_value": 4869.0,
+                    "surface_area": 48.0,
+                },
             },
         },
         "apartment": {
@@ -370,6 +380,11 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                 "max_price": 236292,
                 "valid_until": "2022-11-30",
                 "maximum": True,
+                "calculation_variables": {
+                    "calculation_date": "2022-09-29",
+                    "calculation_date_value": 4872.0,
+                    "surface_area": 48.5,
+                },
             },
         },
         "apartment": {

@@ -75,6 +75,11 @@ def calculate_max_price(
     surface_area_price_ceiling = {
         "max_price": roundup(apartment.surface_area_price_ceiling),
         "valid_until": surface_area_price_ceiling_validity(calculation_date),
+        "calculation_variables": {
+            "calculation_date": calculation_date,
+            "calculation_date_value": apartment.surface_area_price_ceiling_m2,
+            "surface_area": apartment.surface_area,
+        },
     }
 
     # Find and mark the maximum
@@ -248,8 +253,13 @@ WHERE a.id = hitas_apartment.id
         ON sapc.month = DATE_TRUNC('month', %s)
     WHERE a.id = hitas_apartment.id
 """,
+                "surface_area_price_ceiling_m2": """
+    SELECT value
+    FROM hitas_surfaceareapriceceiling
+    WHERE month = DATE_TRUNC('month', %s)
+""",
             },
-            select_params=(calculation_date, calculation_date, calculation_date),
+            select_params=(calculation_date, calculation_date, calculation_date, calculation_date),
         )
         .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
     )
@@ -280,6 +290,9 @@ def calculate_index(
     # 'yhtiön parannukset'
     apartment_housing_company_improvements = Decimal(0)
     for improvement in housing_company_improvements:
+        if improvement.completion_date_index is None:
+            raise IndexMissingException()
+
         # 'omavastuu'
         excess = 30 * total_surface_area
         if excess >= improvement.value:
@@ -287,9 +300,6 @@ def calculate_index(
 
         # 'arvon lisäys'
         value_addition = improvement.value - excess
-
-        if improvement.completion_date_index is None:
-            raise IndexMissingException()
 
         improvement_value = value_addition * (calculation_date_index / improvement.completion_date_index)
         apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area

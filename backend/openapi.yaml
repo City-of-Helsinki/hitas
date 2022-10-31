@@ -884,7 +884,9 @@ paths:
         - name: calculation_date
           required: false
           in: query
-          description: TBD
+          description: |-
+            Date which is used for calculating the maximum price. This cannot be in the future.
+            This mainly affects which indices are used and the validity period.
           schema:
             type: string
             format: date
@@ -892,7 +894,8 @@ paths:
         - name: apartment_share_housing_company_loans
           required: false
           in: query
-          description: TBD
+          description: |-
+            How much the apartment's share of the housing company loans are on the calculation date
           schema:
             type: integer
             minimum: 0
@@ -2241,7 +2244,7 @@ paths:
   /api/v1/indices/{index}/{month}:
     get:
       description: Read a single index by month
-      operationId: read-index-value
+      operationId: read-index
       tags:
         - Indices
       parameters:
@@ -2269,8 +2272,8 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     put:
-      description: Update max value index by month
-      operationId: update-max-value-index
+      description: Update index by month
+      operationId: update-index
       tags:
         - Indices
       parameters:
@@ -2996,8 +2999,34 @@ components:
                       - 2.5
                       - 10
 
+    ApartmentMaxPriceCalculation:
+      description: Calculations for particular index
+      type: object
+      required:
+        - calculation_variables
+        - max_price
+        - maximum
+        - valid_until
+      properties:
+        calculation_variables:
+          $ref: '#/components/schemas/ApartmentMaxPriceCalculationVars'
+        max_price:
+          description: Maximum price for this index
+          type: integer
+          minimum: 0
+          example: 223558
+        valid_until:
+          description: The date until this maximum price calculation is valid.
+          type: string
+          format: date
+          example: 2022-10-05
+        maximum:
+          description: Is this calculated maximum price the highest maximum price.
+          type: boolean
+          example: true
+
     ApartmentMaxPriceCalculationVars:
-      description: TBD
+      description: Variables used for apartment's maximum price calculations
       type: object
       required:
         - acquisition_price
@@ -3015,67 +3044,81 @@ components:
         - calculation_date_index
       properties:
         acquisition_price:
-          description: TBD
+          description: Apartment's acquisition price
           type: integer
           minimum: 0
           example: 199500
         additional_work_during_construction:
-          description: TBD
+          description: Amount of apartment's additional work done during construction
           type: integer
           minimum: 0
           example: 0
         basic_price:
-          description: TBD
+          description: |-
+            Basic price is sum of the apartment's acquisition price and the apartment's
+            additional work during construction.
           type: integer
           minimum: 0
           example: 199500
         index_adjustment:
-          description: TBD
+          description: |-
+            Value increase of the apartment based on the index. Calculated by dividing the
+            calculation date index value with the apartment's completion date's index value
+            and multiplying the result with the apartment's basic price.
           type: integer
           minimum: 0
           example: 26401
         apartment_improvements:
-          description: TBD
+          description: |-
+            Total value of this apartment's improvements. Calculated by summing up all apartment
+            improvement's values together.
           type: integer
           minimum: 0
           example: 0
         housing_company_improvements:
-          description: TBD
+          description: |-
+            Total value of this apartment's housing company's improvements. Calculated by
+            summing up each improvement, first removing the excess and adjusting the improvement
+            by the improvement's completion date index for each improvement.
           type: integer
           minimum: 0
           example: 157
         debt_free_price:
-          description: TBD
+          description: |-
+            Sum of basic price, index adjustment, apartment improvements and housing company
+            improvements.
           type: integer
           minimum: 0
           example: 226058
         debt_free_price_m2:
-          description: TBD
+          description: |-
+            Debt free price divided by the apartment's surface area.
           type: integer
           minimum: 0
           example: 7535
         apartment_share_of_housing_company_loans:
-          description: TBD
+          description: |-
+            How much the apartment's share of the housing company loans are on the calculation date.
           type: integer
           minimum: 0
           example: 2500
         completion_date:
-          description: TBD
+          description: The date the apartment was completed.
           type: string
           format: date
           example: "2019-11-27"
         completion_date_index:
-          description: TBD
+          description: The index value on the apartment's completion date.
           type: number
           minimum: 0
           example: 129.29
         calculation_date:
-          description: TBD
+          description: Maximum price calculation date.
           type: string
           format: date
           example: "2022-07-05"
         calculation_date_index:
-          description: TBD
+          description: The index value on the calculation date.
           type: number
           minimum: 0
           example: 146.4
@@ -3092,26 +3135,36 @@ components:
         - calculations
       properties:
         max_price:
-          description: TBD
+          description: The maximum price for this apartment.
           type: integer
           minimum: 0
           example: 223558
         created:
-          description: TBD
+          description: The timestamp when this maximum price calculation was done.
           type: string
           format: date-time
           example: 2022-07-05T15:39:50.742380
         valid_until:
-          description: TBD
+          description: The date until this maximum price calculation is valid.
           type: string
           format: date
           example: 2022-10-05
         index:
-          description: TBD
+          description: |-
+            The index used for the maximum price calculation.
+
+            Can have the following values:
+            - construction_price_index
+            - market_price_index
+            - surface_area_price_ceiling
           type: string
           example: construction_price_index
+          x-extensible-enum:
+            - construction_price_index
+            - market_price_index
+            - surface_area_price_ceiling
         calculations:
-          description: TBD
+          description: Calculations for each index
           type: object
           required:
             - construction_price_index
@@ -3119,169 +3172,203 @@ components:
             - surface_area_price_ceiling
           properties:
             construction_price_index:
-              description: TBD
+              $ref: '#/components/schemas/ApartmentMaxPriceCalculation'
+            market_price_index:
+              $ref: '#/components/schemas/ApartmentMaxPriceCalculation'
+            surface_area_price_ceiling:
+              description: Calculations for particular index
               type: object
+              additionalProperties: false
               required:
-                - calculation_variables
                 - max_price
                 - maximum
                 - valid_until
               properties:
                 calculation_variables:
-                  $ref: '#/components/schemas/ApartmentMaxPriceCalculationVars'
+                  description: Variables used for apartment's surface area price ceiling calculation
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - calculation_date
+                    - calculation_date_value
+                    - surface_area
+                  properties:
+                    calculation_date:
+                      description: Maximum price calculation date.
+                      type: string
+                      format: date
+                      example: "2022-07-05"
+                    calculation_date_value:
+                      description: The value on the calculation date.
+                      type: number
+                      minimum: 0
+                      example: 129.29
+                    surface_area:
+                      description: Apartment's surface area
+                      type: number
+                      minimum: 0
+                      example: 30.0
                 max_price:
-                  description: TBD
+                  description: Maximum price for this index
                   type: integer
                   minimum: 0
                   example: 223558
                 valid_until:
-                  description: TBD
+                  description: The date until this maximum price calculation is valid.
                   type: string
                   format: date
                   example: 2022-10-05
                 maximum:
-                  description: TBD
+                  description: Is this calculated maximum price the highest maximum price.
                   type: boolean
                   example: true
-            market_price_index:
-              type: object
-              properties:
-                calculation_variables:
-                  $ref: '#/components/schemas/ApartmentMaxPriceCalculationVars'
-                max_price:
-                  description: TBD
-                  type: integer
-                  minimum: 0
-                  example: 222343
-                valid_until:
-                  description: TBD
-                  type: string
-                  format: date
-                  example: 2022-10-05
-                maximum:
-                  description: TBD
-                  type: boolean
-                  example: false
-            surface_area_price_ceiling:
-              type: object
-              properties:
-                max_price:
-                  description: TBD
-                  type: integer
-                  minimum: 0
-                  example: 146070
-                valid_until:
-                  description: TBD
-                  type: string
-                  format: date
-                  example: 2022-10-05
-                maximum:
-                  description: TBD
-                  type: boolean
-                  example: false
+
         apartment:
+          description: Share information
           type: object
+          additionalProperties: false
+          required:
+            - shares
+            - rooms
+            - apartment_type
+            - surface_area
+            - address
+            - ownership
           properties:
             shares:
+              description: Share information
               type: object
+              additionalProperties: false
+              nullable: true
+              required:
+                - start
+                - end
+                - total
               properties:
                 start:
-                  description: TBD
+                  description: First share number
                   type: integer
+                  nullable: true
                   minimum: 0
                   example: 18402
                 end:
-                  description: TBD
+                  description: Last share number
                   type: integer
+                  nullable: true
                   minimum: 0
                   example: 20784
                 total:
-                  description: TBD
+                  description: Total number of shares
                   type: integer
                   minimum: 0
+                  readOnly: true
                   example: 2382
             rooms:
-              description: TBD
+              description: Number of rooms for this apartment
               type: integer
               minimum: 0
               nullable: true
               example: 2
             apartment_type:
-              description: TBD
+              description: Apartment type
               type: string
               example: "h+k"
             surface_area:
-              description: TBD
+              description: Apartment's surface area
               type: number
               minimum: 0
               nullable: true
               example: 30.0
             address:
+              description: Apartment's address
               type: object
+              additionalProperties: false
+              required:
+                - street_address
+                - floor
+                - stair
+                - apartment_number
+                - postal_code
+                - city
               properties:
                 street_address:
-                  description: TBD
+                  description: Apartment's street address
                   type: string
                   example: Torikatu 18
                 floor:
-                  description: TBD
+                  description: Apartment's floor
                   type: string
                   example: "1"
                 stair:
-                  description: TBD
+                  description: Apartment's stair
                   type: string
                   example: B
                 apartment_number:
-                  description: TBD
+                  description: Apartment number
                   type: integer
                   minimum: 0
                   example: 18
                 postal_code:
-                  description: TBD
+                  description: Apartment's postal code
                   type: string
+                  example: "00100"
                 city:
-                  description: TBD
+                  description: Apartment's city
                   type: string
-                  example: "90500"
+                  example: Helsinki
             ownership:
-              description: TBD
+              description: Ownership information
               type: array
               items:
+                description: Single ownership
                 type: object
+                additionalProperties: false
+                required:
+                  - percentage
+                  - name
                 properties:
                   percentage:
-                    description: TBD
+                    description: Ownership percentage of this apartment
                     type: number
                     minimum: 0
                     maximum: 100
                     example: 100.0
                   name:
-                    description: TBD
+                    description: Owner name
                     type: string
                     example: Helsingin kaupunki
         housing_company:
-          description: TBD
+          description: Housing company information for this apartment
           type: object
+          additionalProperties: false
+          required:
+            - official_name
+            - archive_id
+            - property_manager
           properties:
             official_name:
-              description: TBD
+              description: Official name
               type: string
               example: As Oy Helmi
             archive_id:
-              description: TBD
+              description: Archive ID
               type: integer
               minimum: 0
               example: 792
             property_manager:
-              description: TBD
+              description: Property manager information
               type: object
+              additionalProperties: false
+              required:
+                - name
+                - street_address
               properties:
                 name:
-                  description: TBD
+                  description: Name of this property manager
                   type: string
                   example: Isännöinti Isät Oy
                 street_address:
-                  description: TBD
+                  description: Property manager's street address
                   type: string
                   example: Isätie 42
 
@@ -3913,6 +4000,8 @@ components:
           minimum: 0
           nullable: true
           example: 127.12
+        valid_until:
+          $ref: '#/components/schemas/YearMonth'
 
     HousingCompanyState:
       description: |-

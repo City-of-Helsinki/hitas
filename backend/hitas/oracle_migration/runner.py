@@ -42,6 +42,7 @@ from hitas.models import (
     SurfaceAreaPriceCeiling,
 )
 from hitas.models.apartment import DepreciationPercentage
+from hitas.models.indices import AbstractIndex
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
 from hitas.oracle_migration.oracle_schema import (
@@ -102,7 +103,7 @@ class ConvertedData:
 BULK_INSERT_THRESHOLD = 1000
 
 
-def create_indices(codes: List[LegacyRow], model_class: type[AbstractCode]) -> None:
+def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> None:
     for code in codes:
         index = model_class()
 
@@ -763,4 +764,12 @@ def do_truncate():
     ]:
         model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
 
-    get_user_model().objects.all().delete()
+    for model_class in [
+        get_user_model(),
+        SurfaceAreaPriceCeiling,
+        ConstructionPriceIndex2005Equal100,
+        ConstructionPriceIndex,
+        MarketPriceIndex,
+        MarketPriceIndex2005Equal100,
+    ]:
+        model_class.objects.all().delete()
