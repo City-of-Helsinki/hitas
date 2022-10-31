@@ -1,10 +1,14 @@
+import uuid
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
+from rest_framework.utils.encoders import JSONEncoder
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models.housing_company import HousingCompany
 from hitas.models.postal_code import HitasPostalCode
 
 
@@ -72,6 +76,10 @@ class Apartment(ExternalHitasModel):
             return None
 
         return self.debt_free_purchase_price + self.primary_loan_amount
+
+    @property
+    def housing_company(self) -> HousingCompany:
+        return self.building.real_estate.housing_company
 
     @property
     def postal_code(self) -> HitasPostalCode:
@@ -148,3 +156,24 @@ class ApartmentConstructionPriceImprovement(HitasImprovement):
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="construction_price_improvements")
 
     depreciation_percentage = EnumField(DepreciationPercentage, default=DepreciationPercentage.TEN)
+
+
+class ApartmentMaxPriceCalculation(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="max_price_calculations")
+    created_at = models.DateTimeField(auto_created=True)
+    confirmed_at = models.DateTimeField(null=True)
+
+    calculation_date = models.DateField()
+    valid_until = models.DateField()
+
+    max_price = models.IntegerField(null=True, validators=[MinValueValidator(0)])
+
+    json = models.JSONField(encoder=JSONEncoder)
+    # `json_version` is not yet used but can be used later to determinate `json` structure changes etc
+    json_version = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)])
+
+    class Meta:
+        verbose_name = _("Apartment maximum price calculation")
+        verbose_name_plural = _("Apartment maximum price calculations")

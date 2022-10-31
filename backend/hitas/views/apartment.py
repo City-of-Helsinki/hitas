@@ -1,11 +1,12 @@
 import datetime
 import uuid
 from collections import OrderedDict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 from django.urls import reverse
+from django.utils import timezone
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -171,8 +172,43 @@ class PricesSerializer(serializers.Serializer):
     def get_max_prices(self, instance: Apartment) -> Dict[str, Any]:
         return {
             "unconfirmed": self.get_unconfirmed_max_prices(instance),
-            "confirmed": None,
+            "confirmed": self.get_confirmed_max_prices(instance),
         }
+
+    @staticmethod
+    def get_confirmed_max_prices(instance: Apartment) -> Optional[Dict[str, Any]]:
+        latest_confirmed_max_price_calculation = (
+            instance.max_price_calculations.only(
+                "uuid",
+                "created_at",
+                "confirmed_at",
+                "calculation_date",
+                "max_price",
+                "valid_until",
+                "apartment_id",
+            )
+            .filter(
+                confirmed_at__isnull=False,
+            )
+            .order_by("-confirmed_at")
+            .first()
+        )
+
+        return (
+            {
+                "id": latest_confirmed_max_price_calculation.uuid.hex,
+                "max_price": latest_confirmed_max_price_calculation.max_price,
+                "created_at": latest_confirmed_max_price_calculation.created_at,
+                "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,
+                "calculation_date": latest_confirmed_max_price_calculation.calculation_date,
+                "valid": {
+                    "is_valid": latest_confirmed_max_price_calculation.valid_until >= timezone.now().date(),
+                    "valid_until": latest_confirmed_max_price_calculation.valid_until,
+                },
+            }
+            if latest_confirmed_max_price_calculation
+            else None
+        )
 
     @staticmethod
     def get_unconfirmed_max_prices(instance: Apartment) -> Dict[str, Any]:
@@ -233,12 +269,12 @@ class PricesSerializer(serializers.Serializer):
 def create_links(instance: Apartment) -> Dict[str, Any]:
     return {
         "housing_company": {
-            "id": instance.building.real_estate.housing_company.uuid.hex,
-            "display_name": instance.building.real_estate.housing_company.display_name,
+            "id": instance.housing_company.uuid.hex,
+            "display_name": instance.housing_company.display_name,
             "link": reverse(
                 "hitas:housing-company-detail",
                 kwargs={
-                    "uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "uuid": instance.housing_company.uuid.hex,
                 },
             ),
         },
@@ -247,7 +283,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
             "link": reverse(
                 "hitas:real-estate-detail",
                 kwargs={
-                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "housing_company_uuid": instance.housing_company.uuid.hex,
                     "uuid": instance.building.real_estate.uuid.hex,
                 },
             ),
@@ -258,7 +294,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
             "link": reverse(
                 "hitas:building-detail",
                 kwargs={
-                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "housing_company_uuid": instance.housing_company.uuid.hex,
                     "real_estate_uuid": instance.building.real_estate.uuid.hex,
                     "uuid": instance.building.uuid.hex,
                 },
@@ -269,7 +305,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
             "link": reverse(
                 "hitas:apartment-detail",
                 kwargs={
-                    "housing_company_uuid": instance.building.real_estate.housing_company.uuid.hex,
+                    "housing_company_uuid": instance.housing_company.uuid.hex,
                     "uuid": instance.uuid.hex,
                 },
             ),

@@ -53,7 +53,7 @@ apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", loo
 apartment_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
 
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
-apartment_router.register(r"maximum-price", views.ApartmentMaxPriceViewSet, basename="max-price")
+apartment_router.register(r"maximum-prices", views.ApartmentMaxPriceViewSet, basename="maximum-price")
 
 app_name = "hitas"
 urlpatterns = [

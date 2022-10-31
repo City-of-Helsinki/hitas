@@ -2,6 +2,7 @@ from hitas.models.apartment import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
+    ApartmentMaxPriceCalculation,
     ApartmentState,
 )
 from hitas.models.building import Building

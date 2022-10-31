@@ -860,10 +860,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price:
-    get:
-      description: Read a single apartment's maximum price calculation
-      operationId: read-apartment-max-price
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-prices:
+    post:
+      description: Create a single apartment's maximum price calculation
+      operationId: create-apartment-maximum-price
       tags:
         - Apartments
       parameters:
@@ -881,33 +881,145 @@ paths:
           schema:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
-        - name: calculation_date
-          required: false
-          in: query
-          description: |-
-            Date which is used for calculating the maximum price. This cannot be in the future.
-            This mainly affects which indices are used and the validity period.
-          schema:
-            type: string
-            format: date
-            example: 2022-07-05
-        - name: apartment_share_housing_company_loans
-          required: false
-          in: query
-          description: |-
-            How much the apartment's share of the housing company loans are on the calculation date
-          schema:
-            type: integer
-            minimum: 0
-            example: 2500
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              description: TBD
+              type: object
+              additionalProperties: false
+              properties:
+                calculation_date:
+                  description: |-
+                    Date which is used for calculating the maximum price. This cannot be in the future.
+                    This mainly affects which indices are used and the validity period.
+                  type: string
+                  nullable: true
+                  format: date
+                  example: 2022-07-05
+                apartment_share_of_housing_company_loans:
+                  description: |-
+                    How much the apartment's share of the housing company loans are on the calculation date
+                  type: integer
+                  minimum: 0
+                  example: 2500
       responses:
         '200':
-          description: Successfully read an apartment's maximum price
+          description: Successfully created an apartment's maximum price calculation
           content:
             application/json:
               schema:
                 additionalProperties: false
                 $ref: '#/components/schemas/ApartmentMaxPrice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-prices/{calculation_id}:
+    get:
+      description: Read a single apartment's maximum price calculation
+      operationId: read-apartment-maximum-price
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: calculation_id
+          required: true
+          in: path
+          description: Calculation ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      responses:
+        '200':
+          description: Successfully read an apartment's maximum price calculation
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ApartmentMaxPrice'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Confirm a single apartment's maximum price calculation
+      operationId: confirm-apartment-maximum-price
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: calculation_id
+          required: true
+          in: path
+          description: Calculation ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: TBD
+              type: object
+              additionalProperties: false
+              properties:
+                confirm:
+                  description: |-
+                    Date which is used for calculating the maximum price. This cannot be in the future.
+                    This mainly affects which indices are used and the validity period.
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Successfully created an apartment's maximum price calculation
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ApartmentMaxPrice'
+        '204':
+          description: Calculation was successfully rejected and removed.
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -3128,22 +3240,40 @@ components:
       type: object
       additionalProperties: false
       required:
+        - id
+        - confirmed_at
+        - calculation_date
         - max_price
         - index
-        - created
+        - created_at
         - valid_until
         - calculations
       properties:
+        id:
+          description: Maximum price calculation ID
+          type: string
+          example: e65579e3ed0a4cc0b693d9910b41ab08
         max_price:
           description: The maximum price for this apartment.
           type: integer
           minimum: 0
           example: 223558
-        created:
+        created_at:
           description: The timestamp when this maximum price calculation was done.
           type: string
           format: date-time
           example: 2022-07-05T15:39:50.742380
+        calculation_date:
+          description: The timestamp when this maximum price calculation was done.
+          type: string
+          format: date
+          example: 2022-07-05
+        confirmed_at:
+          description: The timestamp when this maximum price calculation was confirmed.
+          type: string
+          format: date-time
+          nullable: true
+          example: 2022-07-05T15:42:39.64745
         valid_until:
           description: The date until this maximum price calculation is valid.
           type: string
@@ -3230,10 +3360,10 @@ components:
           required:
             - shares
             - rooms
-            - apartment_type
+            - type
             - surface_area
             - address
-            - ownership
+            - ownerships
           properties:
             shares:
               description: Share information
@@ -3269,7 +3399,7 @@ components:
               minimum: 0
               nullable: true
               example: 2
-            apartment_type:
+            type:
               description: Apartment type
               type: string
               example: "h+k"
@@ -3316,7 +3446,7 @@ components:
                   description: Apartment's city
                   type: string
                   example: Helsinki
-            ownership:
+            ownerships:
               description: Ownership information
               type: array
               items:
@@ -3511,6 +3641,55 @@ components:
               type: object
               additionalProperties: false
               nullable: true
+              required:
+                - id
+                - created_at
+                - confirmed_at
+                - calculation_date
+                - max_price
+                - valid
+              properties:
+                id:
+                  description: Maximum price calculation ID
+                  type: string
+                  example: e65579e3ed0a4cc0b693d9910b41ab08
+                calculation_date:
+                  description: The timestamp when this maximum price calculation was done.
+                  type: string
+                  format: date
+                  example: 2022-07-05
+                created_at:
+                  description: The timestamp when this maximum price calculation was done.
+                  type: string
+                  format: date-time
+                  example: 2022-07-05T15:39:50.742380
+                confirmed_at:
+                  description: The timestamp when this maximum price calculation was confirmed.
+                  type: string
+                  format: date-time
+                  nullable: true
+                  example: 2022-07-05T15:42:39.64745
+                max_price:
+                  description: The maximum price for this apartment.
+                  type: integer
+                  minimum: 0
+                  example: 223558
+                valid:
+                  type: object
+                  additionalProperties: false
+                  required:
+                    - is_valid
+                    - valid_until
+                  properties:
+                    is_valid:
+                      description: Is this confirmed maximum price still valid?
+                      type: boolean
+                      example: true
+                    valid_until:
+                      description: The date until this maximum price calculation is valid.
+                      type: string
+                      format: date
+                      example: 2022-10-05
             unconfirmed:
               description: Apartment's unconfirmed maximum Hitas prices
               type: object

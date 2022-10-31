@@ -34,8 +34,8 @@ def test__api__apartment__list__empty(api_client: HitasAPIClient):
 def test__api__apartment__list(api_client: HitasAPIClient):
     ap1: Apartment = ApartmentFactory.create()
     ap2: Apartment = ApartmentFactory.create()
-    hc1: HousingCompany = ap1.building.real_estate.housing_company
-    hc2: HousingCompany = ap2.building.real_estate.housing_company
+    hc1: HousingCompany = ap1.housing_company
+    hc2: HousingCompany = ap2.housing_company
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
