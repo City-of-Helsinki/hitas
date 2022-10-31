@@ -178,6 +178,8 @@ export interface IApartmentConstructionPrices {
 }
 
 export interface IApartmentPrices {
+    readonly acquisition_price: number | null;
+
     debt_free_purchase_price: number | null;
     purchase_price: number | null;
     primary_loan_amount: number | null;
@@ -186,7 +188,17 @@ export interface IApartmentPrices {
     latest_purchase_date: string | null;
 
     construction: IApartmentConstructionPrices;
+
+    max_prices: {
+        confirmed: number | null;
+        unconfirmed: {
+            onwards_2011;
+            pre_2011;
+        };
+    };
 }
+
+export type IApartmentPricesWritable = Omit<IApartmentPrices, "max_prices" | "acquisition_price">;
 
 export interface IHousingCompanyApartmentQuery {
     housingCompanyId: string;
@@ -241,7 +253,7 @@ export interface IApartmentWritable {
         end: number | null;
     };
     address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
-    prices: IApartmentPrices;
+    prices: IApartmentPricesWritable;
     completion_date?: string | null;
     building: string;
     ownerships: IOwnership[];

@@ -47,7 +47,7 @@ const SalesCondition = ({
     </div>
 );
 
-const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
+const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
     const params = useParams();
     const {
         data: housingCompanyData,
@@ -120,15 +120,24 @@ const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
                         </div>
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <p className="confirmed-price">TODO</p>
-                    <Button
-                        className="button-confirm"
-                        theme="black"
-                        size="small"
-                        style={{display: "none"}} // Hidden until it's
-                    >
-                        Vahvista
-                    </Button>
+                    <p className="confirmed-price">{data.prices.max_prices.confirmed}</p>
+                    <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
+                        <Button
+                            theme="black"
+                            size="small"
+                            variant="secondary"
+                        >
+                            Lataa Hinta-arvio
+                        </Button>
+                        <Link to={"max-price"}>
+                            <Button
+                                theme="black"
+                                size="small"
+                            >
+                                Vahvista
+                            </Button>
+                        </Link>
+                    </div>
                 </Card>
                 <Card>
                     <label className="card-heading">Vahvistettu myyntiehto</label>
