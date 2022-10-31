@@ -12,8 +12,7 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     HousingCompanyStates,
     ICode,

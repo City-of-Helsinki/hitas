@@ -11,8 +11,7 @@ import {
     useGetOwnersQuery,
     useSaveApartmentMutation,
 } from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, SaveButton, SaveDialogModal} from "../../common/components";
 import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
 import {dotted, formatOwner, hitasToast} from "../../common/utils";
 

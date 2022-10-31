@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset} from "hds-react";
-import {useNavigate, useParams} from "react-router-dom";
+import {Fieldset} from "hds-react";
+import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateBuildingMutation, useGetHousingCompanyDetailQuery} from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {IBuildingWritable} from "../../common/models";
 
 const blankForm: IBuildingWritable = {
@@ -18,7 +17,6 @@ const blankForm: IBuildingWritable = {
 };
 
 const BuildingCreatePage = (): JSX.Element => {
-    const navigate = useNavigate();
     const params = useParams() as {readonly housingCompanyId: string};
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
@@ -89,13 +87,7 @@ const BuildingCreatePage = (): JSX.Element => {
                 </Fieldset>
             </div>
             <div className="buttons">
-                <Button
-                    onClick={() => navigate(-1)}
-                    theme={"black"}
-                    className={"back-button"}
-                >
-                    Takaisin
-                </Button>
+                <NavigateBackButton />
                 <SaveButton
                     onClick={handleSaveButtonClicked}
                     isLoading={housingCompanyIsLoading}

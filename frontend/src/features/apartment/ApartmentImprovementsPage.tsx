@@ -6,8 +6,7 @@ import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveApartmentMutation} from "../../app/services";
-import {FormInputField} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, SaveButton} from "../../common/components";
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,

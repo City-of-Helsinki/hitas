@@ -3,9 +3,10 @@ import React from "react";
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, LoadingSpinner} from "hds-react";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../models";
+import {NavigateBackButton} from "./index";
 
 interface SaveStateProps {
     data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
@@ -28,7 +29,6 @@ export default function SaveDialogModal({
     isVisible,
     setIsVisible,
 }: SaveStateProps): JSX.Element {
-    const navigate = useNavigate();
     return (
         <Dialog
             id="modification__end-modal"
@@ -64,13 +64,7 @@ export default function SaveDialogModal({
                             >
                                 Syötä uusi
                             </Button>
-                            <Button
-                                onClick={() => navigate(-1)}
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Palaa edelliselle sivulle
-                            </Button>
+                            <NavigateBackButton />
                         </>
                     </Dialog.ActionButtons>
                 </>

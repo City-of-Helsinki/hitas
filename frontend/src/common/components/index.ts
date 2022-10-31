@@ -5,6 +5,7 @@ import FilterIntegerField from "./FilterIntegerField";
 import FilterTextInputField from "./FilterTextInputField";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
+import NavigateBackButton from "./NavigateBackButton";
 import Notifications from "./Notifications";
 import PageCounter from "./PageCounter";
 import QueryStateHandler from "./QueryStateHandler";
@@ -21,9 +22,10 @@ export {
     FormInputField,
     ImprovementsTable,
     ListPageNumbers,
+    NavigateBackButton,
     Notifications,
+    PageCounter,
     QueryStateHandler,
     SaveButton,
     SaveDialogModal,
-    PageCounter,
 };

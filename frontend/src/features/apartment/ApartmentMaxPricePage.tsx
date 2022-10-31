@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
-import {FormInputField, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails} from "../../common/models";
 import {formatMoney} from "../../common/utils";
 
@@ -166,12 +166,7 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                 </Fieldset>
             </div>
             <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
-                <Button
-                    theme="black"
-                    variant="secondary"
-                >
-                    Peruuta
-                </Button>
+                <NavigateBackButton />
                 <Button theme="black">Vahvista</Button>
             </div>
         </div>
