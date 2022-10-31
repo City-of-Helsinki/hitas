@@ -130,7 +130,6 @@ export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Elem
         housingCompanyId: housingCompanyId,
         params: {page: currentPage},
     });
-
     return result(data, error, isLoading, currentPage, setCurrentPage);
 };
 

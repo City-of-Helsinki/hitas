@@ -298,6 +298,17 @@ export interface IPostalCode {
     cost_area: 1 | 2 | 3 | 4;
 }
 
+export interface IIndex {
+    indexType: string;
+    month: string;
+    value: number | null;
+}
+
+export interface IIndexQuery {
+    indexType: string;
+    params?: object;
+}
+
 // List response interfaces
 
 export interface IHousingCompanyListResponse {
@@ -318,4 +329,9 @@ export interface ICodeResponse {
 export interface IPostalCodeResponse {
     page: PageInfo;
     contents: IPostalCode[];
+}
+
+export interface IIndexResponse {
+    page: PageInfo;
+    contents: IIndex[];
 }

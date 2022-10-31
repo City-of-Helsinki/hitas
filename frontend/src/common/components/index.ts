@@ -6,6 +6,7 @@ import FilterTextInputField from "./FilterTextInputField";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
 import Notifications from "./Notifications";
+import PageCounter from "./PageCounter";
 import QueryStateHandler from "./QueryStateHandler";
 import SaveButton from "./SaveButton";
 import SaveDialogModal from "./SaveDialogModal";
@@ -24,4 +25,5 @@ export {
     QueryStateHandler,
     SaveButton,
     SaveDialogModal,
+    PageCounter,
 };

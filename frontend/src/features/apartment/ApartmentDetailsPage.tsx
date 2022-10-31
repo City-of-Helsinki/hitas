@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 
 import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
@@ -49,16 +49,15 @@ const SalesCondition = ({
 
 const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
     const params = useParams();
-    const [priceMH] = useState(210000);
-    const [priceRH] = useState(250000);
-    const [priceRNH] = useState(130000);
-
     const {
         data: housingCompanyData,
         error: housingCompanyError,
         isLoading: housingCompanyIsLoading,
     } = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
-
+    const isPre2011 = data.prices.max_prices.unconfirmed.pre_2011 !== null;
+    const unconfirmedPrices = isPre2011
+        ? data.prices.max_prices.unconfirmed.pre_2011
+        : data.prices.max_prices.unconfirmed.onwards_2011;
     return (
         <>
             <h1 className={"main-heading"}>
@@ -85,27 +84,43 @@ const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
                 <Card>
                     <label className="card-heading">Vahvistamaton enimmäishinta</label>
                     <div className="unconfirmed-prices">
-                        <div className="price">
+                        <div
+                            className={`price${
+                                unconfirmedPrices.market_price_index.maximum ? " price--current-top" : ""
+                            }`}
+                        >
                             <span className="basis">Markkinahintaindeksi</span>
                             <span className="amount">
-                                <span className="value">{formatMoney(priceMH)}</span>
+                                <span className="value">{formatMoney(unconfirmedPrices.market_price_index.value)}</span>
                             </span>
                         </div>
-                        <div className="price price--current-top">
+                        <div
+                            className={`price${
+                                unconfirmedPrices.construction_price_index.maximum ? " price--current-top" : ""
+                            }`}
+                        >
                             <span className="basis">Rakennushintaindeksi</span>
                             <span className="amount">
-                                <span className="value">{formatMoney(priceRH)}</span>
+                                <span className="value">
+                                    {formatMoney(unconfirmedPrices.construction_price_index.value)}
+                                </span>
                             </span>
                         </div>
-                        <div className="price">
+                        <div
+                            className={`price${
+                                unconfirmedPrices.surface_area_price_ceiling.maximum ? " price--current-top" : ""
+                            }`}
+                        >
                             <span className="basis">Rajaneliöhinta</span>
                             <span className="amount">
-                                <span className="value">{formatMoney(priceRNH)}</span>
+                                <span className="value">
+                                    {formatMoney(unconfirmedPrices.surface_area_price_ceiling.value)}
+                                </span>
                             </span>
                         </div>
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <p className="confirmed-price">{formatMoney(priceRH)}</p>
+                    <p className="confirmed-price">TODO</p>
                     <Button
                         className="button-confirm"
                         theme="black"

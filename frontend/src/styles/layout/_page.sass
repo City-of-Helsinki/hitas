@@ -1,5 +1,4 @@
-@use 'hds-design-tokens' as *
-@use '../utils/mixins' as mix
+@use '../imports' as *
 
 .App
   display: flex
@@ -8,8 +7,10 @@
   min-height: 100vh
 
 .main-content
+  @include flexbox()
+  @include flex-flow(column nowrap)
   width: 100%
-  margin: 0 auto
+  margin: 0 auto $spacing-layout-xl
   flex-grow: 2
 
 .listing
@@ -24,12 +25,16 @@
 
     [class^="Icon-module"]
       position: absolute
-      top: 0rem
+      top: 1rem
       right: 1rem
 
 .results
   grid-row: 2
 
+  &__page-counter
+    @include flexbox()
+    justify-content: center
+    font-weight: bold
   &-list
     background: white
     list-style: none
@@ -44,7 +49,7 @@
 
     &__item
       cursor: pointer
-      @include mix.flexbox
+      @include flexbox()
       justify-content: space-between
       padding: $spacing-layout-xs
 
@@ -55,7 +60,7 @@
         border-bottom: 1px solid #ccc
 
       .name, .address, .date, .number, .state, .details > div
-        @include mix.flexbox
+        @include flexbox
         flex-flow: column nowrap
         justify-content: center
 
@@ -91,9 +96,9 @@
         .details
           width: calc(100% - 1.5rem - 90px)
           font-size: $fontsize-body-l
-          @include mix.flex-grow(1)
-          @include mix.flexbox
-          @include mix.flex-wrap(wrap)
+          @include flex-grow(1)
+          @include flexbox()
+          @include flex-wrap(wrap)
 
           .housing-company, .address
             width: 45%
@@ -210,8 +215,8 @@
     background: white
     margin: $spacing-layout-s
     padding: $spacing-layout-s
-    @include mix.flexbox()
-    @include mix.flex-flow(row nowrap)
+    @include flexbox()
+    @include flex-flow(row nowrap)
 
     .column
       width: 50%
@@ -257,7 +262,7 @@
     padding: $spacing-layout-s
 
     li
-      @include mix.flexbox()
+      @include flexbox()
       justify-content: space-between
 
       .list-wrapper--upgrades & > *
