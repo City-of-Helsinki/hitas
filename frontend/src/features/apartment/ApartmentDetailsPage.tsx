@@ -47,6 +47,17 @@ const SalesCondition = ({
     </div>
 );
 
+const UnconfirmedPriceRow = ({label, unconfirmedPrice}) => {
+    return (
+        <div className={`price${unconfirmedPrice.maximum ? " price--current-top" : ""}`}>
+            <span className="basis">{label}</span>
+            <span className="amount">
+                <span className="value">{formatMoney(unconfirmedPrice.value)}</span>
+            </span>
+        </div>
+    );
+};
+
 const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
     const params = useParams();
     const {
@@ -84,40 +95,18 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 <Card>
                     <label className="card-heading">Vahvistamaton enimmäishinta</label>
                     <div className="unconfirmed-prices">
-                        <div
-                            className={`price${
-                                unconfirmedPrices.market_price_index.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Markkinahintaindeksi</span>
-                            <span className="amount">
-                                <span className="value">{formatMoney(unconfirmedPrices.market_price_index.value)}</span>
-                            </span>
-                        </div>
-                        <div
-                            className={`price${
-                                unconfirmedPrices.construction_price_index.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Rakennushintaindeksi</span>
-                            <span className="amount">
-                                <span className="value">
-                                    {formatMoney(unconfirmedPrices.construction_price_index.value)}
-                                </span>
-                            </span>
-                        </div>
-                        <div
-                            className={`price${
-                                unconfirmedPrices.surface_area_price_ceiling.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Rajaneliöhinta</span>
-                            <span className="amount">
-                                <span className="value">
-                                    {formatMoney(unconfirmedPrices.surface_area_price_ceiling.value)}
-                                </span>
-                            </span>
-                        </div>
+                        <UnconfirmedPriceRow
+                            label="Markkinahintaindeksi"
+                            unconfirmedPrice={unconfirmedPrices.market_price_index}
+                        />
+                        <UnconfirmedPriceRow
+                            label="Rakennushintaindeksi"
+                            unconfirmedPrice={unconfirmedPrices.construction_price_index}
+                        />
+                        <UnconfirmedPriceRow
+                            label="Rajaneliöhinta"
+                            unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
+                        />
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
                     <p className="confirmed-price">{data.prices.max_prices.confirmed}</p>
