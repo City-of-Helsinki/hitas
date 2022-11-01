@@ -110,7 +110,10 @@ const HousingCompanyImprovementsPage = () => {
         });
     };
     const handleRemoveConstructionImprovementLine = (index) => {
-        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+        if (
+            !constructionIndexImprovements[index].saved ||
+            window.confirm("Haluatko poistaa tallennetun parannuksen?")
+        ) {
             setConstructionIndexImprovements((draft) => {
                 draft.splice(index, 1);
             });

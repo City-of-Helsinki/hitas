@@ -8,9 +8,10 @@ interface ImprovementsTableProps {
     data: IApartmentDetails | IHousingCompanyDetails;
     title: string;
     editableType?: "apartment" | "housingCompany";
+    editPath?: string;
 }
 
-export default function ImprovementsTable({data, title, editableType}: ImprovementsTableProps): JSX.Element {
+export default function ImprovementsTable({data, title, editableType, editPath}: ImprovementsTableProps): JSX.Element {
     // Detect if this is an apartment to know when to show depreciation column
     const showDepreciationPercentage = "links" in data;
 
@@ -21,7 +22,7 @@ export default function ImprovementsTable({data, title, editableType}: Improveme
                 {editableType !== undefined && (
                     <EditButton
                         state={{[editableType]: data}}
-                        pathname={"improvements"}
+                        pathname={editPath || "improvements"}
                         className="pull-right"
                     />
                 )}

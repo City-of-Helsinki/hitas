@@ -259,6 +259,8 @@ const LoadedApartmentDetails = ({data}: {data}): JSX.Element => {
                     <ImprovementsTable
                         data={housingCompanyData as IHousingCompanyDetails}
                         title={"Yhtiökohtaiset parannukset"}
+                        editableType={"housingCompany"}
+                        editPath={`/housing-companies/${housingCompanyData?.id}/improvements`}
                     />
                 </QueryStateHandler>
             </div>
