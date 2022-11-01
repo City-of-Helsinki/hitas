@@ -80,7 +80,6 @@ const BuildingCreatePage = (): JSX.Element => {
                             label="Rakennustunnus"
                             fieldPath="building_identifier"
                             tooltipText='Esimerkkiarvo: "123456789A"'
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
