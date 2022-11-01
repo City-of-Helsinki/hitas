@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Dialog, IconPlus, LoadingSpinner, Select} from "hds-react";
+import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler} from "../../common/components";
+import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler, SaveButton} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -113,15 +113,16 @@ const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDia
     );
 };
 
+const todaysDate = new Date();
+const initialSaveData: IIndex = {
+    indexType: indexTypes[0].label,
+    month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
+    value: null,
+};
+
 const IndicesList = (): JSX.Element => {
-    const todaysDate = new Date();
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    const initialSaveData: IIndex = {
-        indexType: indexTypes[0].label,
-        month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
-        value: null,
-    };
     const [formData, setFormData] = useImmer(initialSaveData);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -163,7 +164,7 @@ const IndicesList = (): JSX.Element => {
                     Lisää/päivitä indeksi
                 </Button>
             </div>
-            <EditIndexDialog
+            <EditIndexModal
                 indexType={currentIndexType}
                 formData={formData}
                 setFormData={setFormData}
@@ -174,7 +175,7 @@ const IndicesList = (): JSX.Element => {
     );
 };
 
-const EditIndexDialog = ({indexType, formData, setFormData, isModalOpen, closeModal}) => {
+const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeModal}) => {
     const [saveIndex, {data, error, isLoading}] = useSaveIndexMutation();
     const handleSaveIndex = () => {
         saveIndex({
@@ -195,7 +196,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, isModalOpen, closeMo
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading, error, data]);
 
-    return !isLoading ? (
+    return (
         <Dialog
             id="index-creation-dialog"
             aria-labelledby="create-modal"
@@ -235,16 +236,12 @@ const EditIndexDialog = ({indexType, formData, setFormData, isModalOpen, closeMo
                 >
                     Peruuta
                 </Button>
-                <Button
+                <SaveButton
                     onClick={handleSaveIndex}
-                    theme="black"
-                >
-                    Tallenna
-                </Button>
+                    isLoading={isLoading}
+                />
             </Dialog.ActionButtons>
         </Dialog>
-    ) : (
-        <LoadingSpinner />
     );
 };
 
