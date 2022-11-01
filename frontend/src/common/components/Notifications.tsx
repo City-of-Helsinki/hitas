@@ -50,7 +50,7 @@ export default function Notifications(): JSX.Element {
                     >
                         <Notification
                             type={(toast.className as "success" | "info" | "error" | "alert") || "success"}
-                            closeButtonLabelText={"Sulje"}
+                            closeButtonLabelText="Sulje"
                             closeAnimationDuration={1000}
                             boxShadow
                             style={{

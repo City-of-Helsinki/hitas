@@ -8,7 +8,7 @@ interface PageCounterProps {
 const PageCounter = ({currentPage, totalPages}: PageCounterProps) => {
     if (totalPages <= 1) return <></>;
     return (
-        <div className={"results__page-counter"}>
+        <div className="results__page-counter">
             Sivu {currentPage} / {totalPages}
         </div>
     );

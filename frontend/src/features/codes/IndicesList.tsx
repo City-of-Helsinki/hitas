@@ -136,7 +136,7 @@ const IndicesList = (): JSX.Element => {
         <div className="listing">
             <div className="filters">
                 <Select
-                    label={"Indeksityyppi"}
+                    label="Indeksityyppi"
                     options={indexOptions}
                     onChange={onSelectionChange}
                     defaultValue={{
@@ -152,7 +152,7 @@ const IndicesList = (): JSX.Element => {
                 setFormData={setFormData}
                 setCreateDialogOpen={setCreateDialogOpen}
             />
-            <div className={"index-actions"}>
+            <div className="index-actions">
                 <Button
                     theme="black"
                     iconLeft={<IconPlus />}
@@ -189,15 +189,15 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
         } else {
             hitasToast("Indeksin tallennus epäonnistui", "error");
         }
-    }, [isSaving, saveError, saveData]);
+    }, [isSaving, saveError, saveData, closeDialog]);
     return !isSaving ? (
         <Dialog
             id="index-creation-dialog"
-            aria-labelledby={"create-modal"}
+            aria-labelledby="create-modal"
             isOpen={editDialogOpen}
             close={() => closeDialog()}
-            closeButtonLabelText={"Sulje"}
-            boxShadow={true}
+            closeButtonLabelText="Sulje"
+            boxShadow
         >
             <Dialog.Header
                 id="index-creation-header"
@@ -205,18 +205,18 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             />
             <Dialog.Content>
                 <FormInputField
-                    label={"Kuukausi"}
-                    fieldPath={"month"}
+                    label="Kuukausi"
+                    fieldPath="month"
                     formData={formData}
                     setFormData={setFormData}
                     error={saveError}
-                    tooltipText={"Esim 2022-12"}
+                    tooltipText="Esim 2022-12"
                 />
                 <FormInputField
-                    label={"Arvo"}
-                    inputType={"number"}
+                    label="Arvo"
+                    inputType="number"
                     fractionDigits={2}
-                    fieldPath={"value"}
+                    fieldPath="value"
                     formData={formData}
                     setFormData={setFormData}
                     error={saveError}
@@ -225,14 +225,14 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             <Dialog.ActionButtons>
                 <Button
                     onClick={() => closeDialog()}
-                    theme={"black"}
-                    variant={"secondary"}
+                    theme="black"
+                    variant="secondary"
                 >
                     Peruuta
                 </Button>
                 <Button
                     onClick={handleSaveIndex}
-                    theme={"black"}
+                    theme="black"
                 >
                     Tallenna
                 </Button>

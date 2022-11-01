@@ -170,13 +170,13 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
             />
             <TextInput
                 id="filter__ostajaehdokas"
-                label={"Ostajaehdokas"}
+                label="Ostajaehdokas"
                 disabled
             />
             <Checkbox
                 id="sales_condition"
                 label="Löytyy myyntiehto"
-                disabled={true}
+                disabled
             />
         </div>
     );

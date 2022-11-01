@@ -11,7 +11,7 @@ export default function SaveButton({onClick, isLoading}: SaveButtonProps): JSX.E
     return (
         <Button
             iconLeft={<IconSaveDisketteFill />}
-            theme={"black"}
+            theme="black"
             onClick={onClick}
             isLoading={isLoading}
         >

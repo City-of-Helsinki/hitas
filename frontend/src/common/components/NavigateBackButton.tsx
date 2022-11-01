@@ -8,10 +8,10 @@ export default function NavigateBackButton(): JSX.Element {
     return (
         <Button
             iconLeft={<IconArrowLeft />}
-            theme={"black"}
-            variant={"secondary"}
+            theme="black"
+            variant="secondary"
+            className="back-button"
             onClick={() => navigate(-1)}
-            className={"back-button"}
         >
             Takaisin
         </Button>

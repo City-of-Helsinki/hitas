@@ -32,15 +32,15 @@ export default function SaveDialogModal({
     return (
         <Dialog
             id="modification__end-modal"
-            closeButtonLabelText={"args.closeButtonLabelText"}
-            aria-labelledby={"finish-modal"}
+            closeButtonLabelText="args.closeButtonLabelText"
+            aria-labelledby="finish-modal"
             isOpen={isVisible}
             close={() => setIsVisible(false)}
-            boxShadow={true}
+            boxShadow
         >
             <Dialog.Header
                 id="modification__end-modal__header"
-                title={`Tallennetaan tietokantaan`}
+                title="Tallennetaan tietokantaan"
             />
             {isLoading ? (
                 <LoadingSpinner />

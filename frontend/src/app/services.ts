@@ -255,7 +255,7 @@ export const mutationApi = hitasApi.injectEndpoints({
                 url: `indices/${index}/${month}`,
                 method: "PUT",
                 body: data,
-                headers: {"Content-Type": "application/json; charset=UTF-8"},
+                headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
             invalidatesTags: (result, error, arg) => [
                 {

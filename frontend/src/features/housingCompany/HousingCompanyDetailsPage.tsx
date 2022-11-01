@@ -150,14 +150,14 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 </div>
                 <ImprovementsTable
                     data={data}
-                    title={"Yhtiökohtaiset parannukset"}
-                    editableType={"housingCompany"}
+                    title="Yhtiökohtaiset parannukset"
+                    editableType="housingCompany"
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
                         <h2 className="detail-list__heading">
                             <span>Kiinteistöt</span>
-                            <Link to={`real-estates`}>
+                            <Link to="real-estates">
                                 <Button
                                     theme="black"
                                     size="small"
@@ -181,7 +181,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="list-wrapper list-wrapper--buildings">
                         <h2 className="detail-list__heading">
                             <span>Rakennukset</span>
-                            <Link to={`buildings`}>
+                            <Link to="buildings">
                                 <Button
                                     theme="black"
                                     size="small"
@@ -208,7 +208,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 <div className="list-wrapper list-wrapper--apartments">
                     <h2>
                         <span>Asunnot</span>
-                        <Link to={"apartments/create"}>
+                        <Link to="apartments/create">
                             <Button
                                 theme="black"
                                 size="small"
@@ -221,7 +221,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="listing">
                         <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                     </div>
-                    <div className="results"></div>
+                    <div className="results" />
                 </div>
             </div>
         </>

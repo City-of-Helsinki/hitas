@@ -65,13 +65,13 @@ export default function Router() {
                             path="buildings"
                             element={<BuildingCreatePage />}
                         />
-                        <Route path={"apartments"}>
+                        <Route path="apartments">
                             <Route
                                 index
                                 element={<Navigate to=".." />}
                             />
                             <Route
-                                path={"create"}
+                                path="create"
                                 element={<ApartmentCreatePage />}
                             />
                             <Route path=":apartmentId">

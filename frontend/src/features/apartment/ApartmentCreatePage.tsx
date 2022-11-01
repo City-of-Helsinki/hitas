@@ -192,7 +192,7 @@ const ApartmentCreatePage = () => {
                     : "Uusi asunto"}
             </h1>
             <div className="field-sets">
-                <Fieldset heading={""}>
+                <Fieldset heading="">
                     <TextInput
                         id="input-housing_company.name"
                         label="Asunto-osakeyhtiö"
@@ -205,9 +205,9 @@ const ApartmentCreatePage = () => {
                         }
                         disabled
                     />
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Rakennus"
                             fieldPath="building"
                             placeholder={formData.address.street_address}
@@ -223,7 +223,7 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
                             label="Rappu"
                             fieldPath="address.stair"
@@ -242,7 +242,7 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
                             inputType="number"
                             label="Kerros"
@@ -261,7 +261,7 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
                             inputType="number"
                             label="Huoneiden määrä"
@@ -284,9 +284,9 @@ const ApartmentCreatePage = () => {
                             error={error}
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Tila"
                             fieldPath="state"
                             options={apartmentStateOptions}
@@ -305,7 +305,7 @@ const ApartmentCreatePage = () => {
                         />
                     </div>
                 </Fieldset>
-                <Fieldset heading={""}>
+                <Fieldset heading="">
                     <div className="row">
                         <FormInputField
                             inputType="number"
@@ -418,12 +418,12 @@ const ApartmentCreatePage = () => {
                 </Fieldset>
             </div>
             <div className="field-sets">
-                <Fieldset heading={"Omistajuudet"}>
+                <Fieldset heading="Omistajuudet">
                     <ul className="ownerships-list">
                         {formOwnershipsList.length ? (
                             formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
                                 <div key={`ownership-item-${ownership.key}`}>
-                                    <legend className={"ownership-headings"}>
+                                    <legend className="ownership-headings">
                                         <span>Omistaja</span>
                                         <span>Omistajuusprosentti</span>
                                     </legend>
@@ -456,7 +456,7 @@ const ApartmentCreatePage = () => {
                                         </div>
                                         <div className="icon--remove">
                                             <IconCrossCircle
-                                                size={"m"}
+                                                size="m"
                                                 onClick={() => handleRemoveOwnershipLine(index)}
                                             />
                                         </div>
@@ -476,7 +476,7 @@ const ApartmentCreatePage = () => {
                         Lisää omistajuus
                     </Button>
                 </Fieldset>
-                <Fieldset heading={""}>
+                <Fieldset heading="">
                     <div className="row">
                         <FormInputField
                             inputType="textArea"
@@ -494,7 +494,7 @@ const ApartmentCreatePage = () => {
                 isLoading={isLoading}
             />
             <SaveDialogModal
-                linkText={"Asunnon sivulle"}
+                linkText="Asunnon sivulle"
                 baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}

@@ -159,7 +159,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             error={error}
                         />
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Tila"
                             fieldPath="state"
                             options={stateOptions}
@@ -200,7 +200,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             label="Y-Tunnus"
                             fieldPath="business_id"
                             validator={validateBusinessId}
-                            tooltipText={"Esimerkki arvo: '1234567-8'"}
+                            tooltipText="Esimerkki arvo: '1234567-8'"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}

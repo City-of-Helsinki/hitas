@@ -51,7 +51,7 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     return (
         <div className="icon--remove">
             <IconCrossCircle
-                size={"m"}
+                size="m"
                 onClick={(index) => onClick(index)}
             />
         </div>
@@ -171,7 +171,7 @@ const ApartmentImprovementsPage = () => {
                 {apartmentData.address.apartment_number} Parannukset
             </h1>
             <div className="field-sets">
-                <Fieldset heading={"Markkinahintaindeksi"}>
+                <Fieldset heading="Markkinahintaindeksi">
                     <ul className="ownership-list">
                         {marketIndexImprovements.length ? (
                             marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
@@ -199,7 +199,7 @@ const ApartmentImprovementsPage = () => {
                                             inputType="text"
                                             label="Kuukausi"
                                             fieldPath="completion_date"
-                                            tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
+                                            tooltipText="Muodossa 'YYYY-MM', esim. '2022-01'"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "completion_date")}
                                             error={error}
@@ -217,7 +217,7 @@ const ApartmentImprovementsPage = () => {
                     </ul>
                     <ImprovementAddLineButton onClick={handleAddMarketImprovementLine} />
                 </Fieldset>
-                <Fieldset heading={"Rakennuskustanusindeksi"}>
+                <Fieldset heading="Rakennuskustanusindeksi">
                     <ul className="ownership-list">
                         {constructionIndexImprovements.length ? (
                             constructionIndexImprovements.map((improvement: IWritableConsImprovement, index) => (
@@ -245,7 +245,7 @@ const ApartmentImprovementsPage = () => {
                                             inputType="text"
                                             label="Kuukausi"
                                             fieldPath="completion_date"
-                                            tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
+                                            tooltipText="Muodossa 'YYYY-MM', esim. '2022-01'"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(
                                                 index,

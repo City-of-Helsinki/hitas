@@ -54,7 +54,7 @@ const BuildingCreatePage = (): JSX.Element => {
                 <Fieldset heading="">
                     <div className="row">
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Kiinteistö"
                             fieldPath="real_estate_id"
                             options={realEstateOptions}
