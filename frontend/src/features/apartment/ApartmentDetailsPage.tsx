@@ -63,7 +63,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
     const {
         data: housingCompanyData,
         error: housingCompanyError,
-        isLoading: housingCompanyIsLoading,
+        isLoading: isHousingCompanyLoading,
     } = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
     const isPre2011 = data.prices.max_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
@@ -256,7 +256,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 <QueryStateHandler
                     data={housingCompanyData}
                     error={housingCompanyError}
-                    isLoading={housingCompanyIsLoading}
+                    isLoading={isHousingCompanyLoading}
                 >
                     <ImprovementsTable
                         data={housingCompanyData as IHousingCompanyDetails}

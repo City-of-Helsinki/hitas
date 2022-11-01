@@ -123,15 +123,17 @@ const IndicesList = (): JSX.Element => {
         value: null,
     };
     const [formData, setFormData] = useImmer(initialSaveData);
-    const [editDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
-    const closeDialog = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const closeModal = () => {
         setFormData(initialSaveData);
-        setCreateDialogOpen(false);
+        setIsModalOpen(false);
     };
     const onSelectionChange = ({value}) => {
         setCurrentPage(1);
         setCurrentIndexType(() => ({label: value}));
     };
+
     return (
         <div className="listing">
             <div className="filters">
@@ -150,30 +152,30 @@ const IndicesList = (): JSX.Element => {
                 setCurrentPage={setCurrentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
-                setCreateDialogOpen={setCreateDialogOpen}
+                setCreateDialogOpen={setIsModalOpen}
             />
             <div className="index-actions">
                 <Button
                     theme="black"
                     iconLeft={<IconPlus />}
-                    onClick={() => setCreateDialogOpen(true)}
+                    onClick={() => setIsModalOpen(true)}
                 >
                     Lisää/päivitä indeksi
                 </Button>
             </div>
             <EditIndexDialog
-                editDialogOpen={editDialogOpen}
-                closeDialog={closeDialog}
                 indexType={currentIndexType}
                 formData={formData}
                 setFormData={setFormData}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
             />
         </div>
     );
 };
 
-const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, closeDialog}) => {
-    const [saveIndex, {data: saveData, error: saveError, isLoading: isSaving}] = useSaveIndexMutation();
+const EditIndexDialog = ({indexType, formData, setFormData, isModalOpen, closeModal}) => {
+    const [saveIndex, {data, error, isLoading}] = useSaveIndexMutation();
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
@@ -181,21 +183,24 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             month: formData.month,
         });
     };
+
     useEffect(() => {
-        if (isSaving || !saveData) return;
-        if (saveData && !saveError) {
+        if (isLoading || !data) return;
+        if (data && !error) {
             hitasToast("Indeksi tallennettu onnistuneesti", "success");
-            closeDialog();
+            closeModal();
         } else {
             hitasToast("Indeksin tallennus epäonnistui", "error");
         }
-    }, [isSaving, saveError, saveData, closeDialog]);
-    return !isSaving ? (
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, error, data]);
+
+    return !isLoading ? (
         <Dialog
             id="index-creation-dialog"
             aria-labelledby="create-modal"
-            isOpen={editDialogOpen}
-            close={() => closeDialog()}
+            isOpen={isModalOpen}
+            close={() => closeModal()}
             closeButtonLabelText="Sulje"
             boxShadow
         >
@@ -209,7 +214,7 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                     fieldPath="month"
                     formData={formData}
                     setFormData={setFormData}
-                    error={saveError}
+                    error={error}
                     tooltipText="Esim 2022-12"
                 />
                 <FormInputField
@@ -219,12 +224,12 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
                     fieldPath="value"
                     formData={formData}
                     setFormData={setFormData}
-                    error={saveError}
+                    error={error}
                 />
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
-                    onClick={() => closeDialog()}
+                    onClick={() => closeModal()}
                     theme="black"
                     variant="secondary"
                 >

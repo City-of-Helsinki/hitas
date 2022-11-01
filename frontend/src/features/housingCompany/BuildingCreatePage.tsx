@@ -21,13 +21,13 @@ const BuildingCreatePage = (): JSX.Element => {
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
-    const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
+    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
     const [saveBuilding, {data, error, isLoading}] = useCreateBuildingMutation();
 
     const realEstateOptions =
-        housingCompanyIsLoading || !housingCompanyData
+        isHousingCompanyLoading || !housingCompanyData
             ? []
             : housingCompanyData.real_estates.map((realEstate) => {
                   return {
@@ -90,7 +90,7 @@ const BuildingCreatePage = (): JSX.Element => {
                 <NavigateBackButton />
                 <SaveButton
                     onClick={handleSaveButtonClicked}
-                    isLoading={housingCompanyIsLoading}
+                    isLoading={isHousingCompanyLoading}
                 />
             </div>
             <SaveDialogModal

@@ -58,7 +58,7 @@ const ApartmentCreatePage = () => {
 
     const params = useParams() as {readonly housingCompanyId: string};
 
-    const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
+    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
     const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
@@ -175,7 +175,7 @@ const ApartmentCreatePage = () => {
 
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions =
-        housingCompanyIsLoading || !housingCompanyData
+        isHousingCompanyLoading || !housingCompanyData
             ? []
             : housingCompanyData.real_estates.flatMap((realEstate) => {
                   return realEstate.buildings.map((building) => {
