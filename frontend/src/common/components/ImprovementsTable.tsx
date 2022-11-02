@@ -13,7 +13,7 @@ interface ImprovementsTableProps {
 
 export default function ImprovementsTable({data, title, editableType, editPath}: ImprovementsTableProps): JSX.Element {
     // Detect if this is an apartment to know when to show depreciation column
-    const showDepreciationPercentage = "links" in data;
+    const isApartment = "links" in data;
 
     return (
         <div className="list__wrapper list-wrapper--upgrades">
@@ -35,7 +35,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                             <div>Nimi</div>
                             <div>Summa</div>
                             <div>Valmistumiskuukausi</div>
-                            {showDepreciationPercentage && <div>Poistoprosentti</div>}
+                            {isApartment && <div>Poistoprosentti</div>}
                         </li>
                         {data.improvements.market_price_index.map((item, index) => (
                             <li
@@ -46,7 +46,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                                 <div>{item.name}</div>
                                 <div>{formatMoney(item.value)}</div>
                                 <div>{item.completion_date}</div>
-                                {showDepreciationPercentage && <div>-</div>}
+                                {isApartment && <div>-</div>}
                             </li>
                         ))}
                         {data.improvements.construction_price_index.map((item, index) => (
@@ -58,7 +58,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                                 <div>{item.name}</div>
                                 <div>{formatMoney(item.value)}</div>
                                 <div>{item.completion_date}</div>
-                                {showDepreciationPercentage && <div>{item.depreciation_percentage}%</div>}
+                                {isApartment && <div>{item.depreciation_percentage}%</div>}
                             </li>
                         ))}
                     </>
