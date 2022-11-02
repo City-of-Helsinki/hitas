@@ -16,14 +16,25 @@ interface QueryLoadingProps {
         | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     isLoading: boolean;
+    errorComponent?: JSX.Element;
     children: JSX.Element | JSX.Element[];
 }
 
-export default function QueryStateHandler({data, error, isLoading, children}: QueryLoadingProps): JSX.Element {
+export default function QueryStateHandler({
+    data,
+    error,
+    isLoading,
+    errorComponent,
+    children,
+}: QueryLoadingProps): JSX.Element {
     // When loading or an error has occurred, show an appropriate message, otherwise return children
 
+    if (errorComponent === undefined) {
+        errorComponent = <p>Virhe</p>;
+    }
+
     return error ? (
-        <p>Virhe</p>
+        errorComponent
     ) : isLoading ? (
         <LoadingSpinner />
     ) : data && (!("contents" in data) || data.contents.length) ? (

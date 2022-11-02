@@ -12,8 +12,7 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     HousingCompanyStates,
     ICode,
@@ -160,7 +159,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             error={error}
                         />
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Tila"
                             fieldPath="state"
                             options={stateOptions}
@@ -201,7 +200,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             label="Y-Tunnus"
                             fieldPath="business_id"
                             validator={validateBusinessId}
-                            tooltipText={"Esimerkki arvo: '1234567-8'"}
+                            tooltipText="Esimerkki arvo: '1234567-8'"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}

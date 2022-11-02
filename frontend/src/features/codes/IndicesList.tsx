@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Dialog, IconPlus, LoadingSpinner, Select} from "hds-react";
+import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler} from "../../common/components";
+import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler, SaveButton} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -113,30 +113,33 @@ const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDia
     );
 };
 
+const todaysDate = new Date();
+const initialSaveData: IIndex = {
+    indexType: indexTypes[0].label,
+    month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
+    value: null,
+};
+
 const IndicesList = (): JSX.Element => {
-    const todaysDate = new Date();
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    const initialSaveData: IIndex = {
-        indexType: indexTypes[0].label,
-        month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
-        value: null,
-    };
     const [formData, setFormData] = useImmer(initialSaveData);
-    const [editDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
-    const closeDialog = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const closeModal = () => {
         setFormData(initialSaveData);
-        setCreateDialogOpen(false);
+        setIsModalOpen(false);
     };
     const onSelectionChange = ({value}) => {
         setCurrentPage(1);
         setCurrentIndexType(() => ({label: value}));
     };
+
     return (
         <div className="listing">
             <div className="filters">
                 <Select
-                    label={"Indeksityyppi"}
+                    label="Indeksityyppi"
                     options={indexOptions}
                     onChange={onSelectionChange}
                     defaultValue={{
@@ -150,30 +153,30 @@ const IndicesList = (): JSX.Element => {
                 setCurrentPage={setCurrentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
-                setCreateDialogOpen={setCreateDialogOpen}
+                setCreateDialogOpen={setIsModalOpen}
             />
-            <div className={"index-actions"}>
+            <div className="index-actions">
                 <Button
                     theme="black"
                     iconLeft={<IconPlus />}
-                    onClick={() => setCreateDialogOpen(true)}
+                    onClick={() => setIsModalOpen(true)}
                 >
                     Lisää/päivitä indeksi
                 </Button>
             </div>
-            <EditIndexDialog
-                editDialogOpen={editDialogOpen}
-                closeDialog={closeDialog}
+            <EditIndexModal
                 indexType={currentIndexType}
                 formData={formData}
                 setFormData={setFormData}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
             />
         </div>
     );
 };
 
-const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, closeDialog}) => {
-    const [saveIndex, {data: saveData, error: saveError, isLoading: isSaving}] = useSaveIndexMutation();
+const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeModal}) => {
+    const [saveIndex, {data, error, isLoading}] = useSaveIndexMutation();
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
@@ -181,23 +184,26 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             month: formData.month,
         });
     };
+
     useEffect(() => {
-        if (isSaving || !saveData) return;
-        if (saveData && !saveError) {
+        if (isLoading || !data) return;
+        if (data && !error) {
             hitasToast("Indeksi tallennettu onnistuneesti", "success");
-            closeDialog();
+            closeModal();
         } else {
             hitasToast("Indeksin tallennus epäonnistui", "error");
         }
-    }, [isSaving, saveError, saveData]);
-    return !isSaving ? (
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, error, data]);
+
+    return (
         <Dialog
             id="index-creation-dialog"
-            aria-labelledby={"create-modal"}
-            isOpen={editDialogOpen}
-            close={() => closeDialog()}
-            closeButtonLabelText={"Sulje"}
-            boxShadow={true}
+            aria-labelledby="create-modal"
+            isOpen={isModalOpen}
+            close={() => closeModal()}
+            closeButtonLabelText="Sulje"
+            boxShadow
         >
             <Dialog.Header
                 id="index-creation-header"
@@ -205,41 +211,37 @@ const EditIndexDialog = ({indexType, formData, setFormData, editDialogOpen, clos
             />
             <Dialog.Content>
                 <FormInputField
-                    label={"Kuukausi"}
-                    fieldPath={"month"}
+                    label="Kuukausi"
+                    fieldPath="month"
                     formData={formData}
                     setFormData={setFormData}
-                    error={saveError}
-                    tooltipText={"Esim 2022-12"}
+                    error={error}
+                    tooltipText="Esim 2022-12"
                 />
                 <FormInputField
-                    label={"Arvo"}
-                    inputType={"number"}
+                    label="Arvo"
+                    inputType="number"
                     fractionDigits={2}
-                    fieldPath={"value"}
+                    fieldPath="value"
                     formData={formData}
                     setFormData={setFormData}
-                    error={saveError}
+                    error={error}
                 />
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
-                    onClick={() => closeDialog()}
-                    theme={"black"}
-                    variant={"secondary"}
+                    onClick={() => closeModal()}
+                    theme="black"
+                    variant="secondary"
                 >
                     Peruuta
                 </Button>
-                <Button
+                <SaveButton
                     onClick={handleSaveIndex}
-                    theme={"black"}
-                >
-                    Tallenna
-                </Button>
+                    isLoading={isLoading}
+                />
             </Dialog.ActionButtons>
         </Dialog>
-    ) : (
-        <LoadingSpinner />
     );
 };
 

@@ -15,16 +15,16 @@ const Codes = (): JSX.Element => {
                     <Tabs.Tab>Laskentasäännöt</Tabs.Tab>
                     <Tabs.Tab>Rahoitusmuodot</Tabs.Tab>
                 </Tabs.TabList>
-                <Tabs.TabPanel className={"view--codes__tab--indices"}>
+                <Tabs.TabPanel className="view--codes__tab--indices">
                     <IndicesList />
                 </Tabs.TabPanel>
-                <Tabs.TabPanel className={"view--codes__tab--postalcodes"}>
+                <Tabs.TabPanel className="view--codes__tab--postalcodes">
                     <h1>Postinumerot</h1>
                 </Tabs.TabPanel>
-                <Tabs.TabPanel className={"view--codes__tab--rules"}>
+                <Tabs.TabPanel className="view--codes__tab--rules">
                     <h1>Laskentasäännöt</h1>
                 </Tabs.TabPanel>
-                <Tabs.TabPanel className={"view--codes__tab--financing-methods"}>
+                <Tabs.TabPanel className="view--codes__tab--financing-methods">
                     <h1>Rahoitusmuodot</h1>
                 </Tabs.TabPanel>
             </Tabs>

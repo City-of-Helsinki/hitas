@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset} from "hds-react";
-import {useNavigate, useParams} from "react-router-dom";
+import {Fieldset} from "hds-react";
+import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateBuildingMutation, useGetHousingCompanyDetailQuery} from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {IBuildingWritable} from "../../common/models";
 
 const blankForm: IBuildingWritable = {
@@ -18,18 +17,17 @@ const blankForm: IBuildingWritable = {
 };
 
 const BuildingCreatePage = (): JSX.Element => {
-    const navigate = useNavigate();
     const params = useParams() as {readonly housingCompanyId: string};
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
-    const {data: housingCompanyData, isLoading: housingCompanyIsLoading} = useGetHousingCompanyDetailQuery(
+    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
     const [saveBuilding, {data, error, isLoading}] = useCreateBuildingMutation();
 
     const realEstateOptions =
-        housingCompanyIsLoading || !housingCompanyData
+        isHousingCompanyLoading || !housingCompanyData
             ? []
             : housingCompanyData.real_estates.map((realEstate) => {
                   return {
@@ -56,7 +54,7 @@ const BuildingCreatePage = (): JSX.Element => {
                 <Fieldset heading="">
                     <div className="row">
                         <FormInputField
-                            inputType={"select"}
+                            inputType="select"
                             label="Kiinteistö"
                             fieldPath="real_estate_id"
                             options={realEstateOptions}
@@ -89,16 +87,10 @@ const BuildingCreatePage = (): JSX.Element => {
                 </Fieldset>
             </div>
             <div className="buttons">
-                <Button
-                    onClick={() => navigate(-1)}
-                    theme={"black"}
-                    className={"back-button"}
-                >
-                    Takaisin
-                </Button>
+                <NavigateBackButton />
                 <SaveButton
                     onClick={handleSaveButtonClicked}
-                    isLoading={housingCompanyIsLoading}
+                    isLoading={isHousingCompanyLoading}
                 />
             </div>
             <SaveDialogModal

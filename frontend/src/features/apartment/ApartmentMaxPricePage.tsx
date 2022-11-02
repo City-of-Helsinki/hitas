@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useGetApartmentDetailQuery} from "../../app/services";
-import {FormInputField, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails} from "../../common/models";
 import {formatMoney} from "../../common/utils";
 
@@ -94,11 +94,11 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                 {data.address.apartment_number} ({data.links.housing_company.display_name})
             </h1>
             <div className="field-sets">
-                <Fieldset heading={""}>
-                    <div className={"row"}>
+                <Fieldset heading="">
+                    <div className="row">
                         <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
                             inputType="number"
                             unit="€"
@@ -107,7 +107,7 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                             required
                             formData={formData}
                             setFormData={setFormData}
-                            error={""} // FIXME
+                            error="" // FIXME
                         />
                         <FormInputField
                             inputType="number"
@@ -117,16 +117,16 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                             required
                             formData={formData}
                             setFormData={setFormData}
-                            error={""} // FIXME
+                            error="" // FIXME
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <ImprovementsTable
                             data={data}
-                            title={"Laskentaan vaikuttavat yhtiön parannukset"}
+                            title="Laskentaan vaikuttavat yhtiön parannukset"
                         />
                     </div>
-                    <div className={"row"}>
+                    <div className="row">
                         <FormInputField
                             inputType="date"
                             label="Laskentapäivämäärä"
@@ -134,7 +134,7 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                             required
                             formData={formData}
                             setFormData={setFormData}
-                            error={""} // FIXME
+                            error="" // FIXME
                         />
                         <TextInput
                             // TODO: Localise date
@@ -166,12 +166,7 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                 </Fieldset>
             </div>
             <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
-                <Button
-                    theme="black"
-                    variant="secondary"
-                >
-                    Peruuta
-                </Button>
+                <NavigateBackButton />
                 <Button theme="black">Vahvista</Button>
             </div>
         </div>

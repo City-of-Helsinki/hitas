@@ -19,7 +19,7 @@ const SalesCondition = ({
     url?: string;
     isConfirmed: boolean;
 }): JSX.Element => (
-    <div className={"sales-condition"}>
+    <div className="sales-condition">
         <div className="icon-container">
             {isConfirmed ? (
                 <IconLock
@@ -47,12 +47,23 @@ const SalesCondition = ({
     </div>
 );
 
+const UnconfirmedPriceRow = ({label, unconfirmedPrice}) => {
+    return (
+        <div className={`price${unconfirmedPrice.maximum ? " price--current-top" : ""}`}>
+            <span className="basis">{label}</span>
+            <span className="amount">
+                <span className="value">{formatMoney(unconfirmedPrice.value)}</span>
+            </span>
+        </div>
+    );
+};
+
 const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
     const params = useParams();
     const {
         data: housingCompanyData,
         error: housingCompanyError,
-        isLoading: housingCompanyIsLoading,
+        isLoading: isHousingCompanyLoading,
     } = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
     const isPre2011 = data.prices.max_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
@@ -60,15 +71,15 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
         : data.prices.max_prices.unconfirmed.onwards_2011;
     return (
         <>
-            <h1 className={"main-heading"}>
+            <h1 className="main-heading">
                 <Link to={`/housing-companies/${data.links.housing_company.id}`}>
-                    <span className={"name"}>{data.links.housing_company.display_name}</span>
+                    <span className="name">{data.links.housing_company.display_name}</span>
                     <span className="address">{formatAddress(data.address)}</span>
                     <StatusLabel>{data.state}</StatusLabel>
                 </Link>
                 <EditButton state={{apartment: data}} />
             </h1>
-            <h2 className={"apartment-stats"}>
+            <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {data.address.stair}
                     {data.address.apartment_number}
@@ -84,40 +95,18 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 <Card>
                     <label className="card-heading">Vahvistamaton enimmäishinta</label>
                     <div className="unconfirmed-prices">
-                        <div
-                            className={`price${
-                                unconfirmedPrices.market_price_index.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Markkinahintaindeksi</span>
-                            <span className="amount">
-                                <span className="value">{formatMoney(unconfirmedPrices.market_price_index.value)}</span>
-                            </span>
-                        </div>
-                        <div
-                            className={`price${
-                                unconfirmedPrices.construction_price_index.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Rakennushintaindeksi</span>
-                            <span className="amount">
-                                <span className="value">
-                                    {formatMoney(unconfirmedPrices.construction_price_index.value)}
-                                </span>
-                            </span>
-                        </div>
-                        <div
-                            className={`price${
-                                unconfirmedPrices.surface_area_price_ceiling.maximum ? " price--current-top" : ""
-                            }`}
-                        >
-                            <span className="basis">Rajaneliöhinta</span>
-                            <span className="amount">
-                                <span className="value">
-                                    {formatMoney(unconfirmedPrices.surface_area_price_ceiling.value)}
-                                </span>
-                            </span>
-                        </div>
+                        <UnconfirmedPriceRow
+                            label="Markkinahintaindeksi"
+                            unconfirmedPrice={unconfirmedPrices.market_price_index}
+                        />
+                        <UnconfirmedPriceRow
+                            label="Rakennushintaindeksi"
+                            unconfirmedPrice={unconfirmedPrices.construction_price_index}
+                        />
+                        <UnconfirmedPriceRow
+                            label="Rajaneliöhinta"
+                            unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
+                        />
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
                     <p className="confirmed-price">{data.prices.max_prices.confirmed}</p>
@@ -129,7 +118,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         >
                             Lataa Hinta-arvio
                         </Button>
-                        <Link to={"max-price"}>
+                        <Link to="max-price">
                             <Button
                                 theme="black"
                                 size="small"
@@ -190,12 +179,16 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                         <span> {ownership.percentage}%</span>
                                                     </>
                                                 }
-                                                label={""}
+                                                label=""
                                             />
                                         ))}
                                         <DetailField
                                             label="Isännöitsijä"
-                                            value="TODO"
+                                            value={
+                                                housingCompanyData && housingCompanyData.property_manager
+                                                    ? housingCompanyData.property_manager.name
+                                                    : "-"
+                                            }
                                         />
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
@@ -257,18 +250,18 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 </div>
                 <ImprovementsTable
                     data={data}
-                    title={"Asuntokohtaiset parannukset"}
-                    editableType={"apartment"}
+                    title="Asuntokohtaiset parannukset"
+                    editableType="apartment"
                 />
                 <QueryStateHandler
                     data={housingCompanyData}
                     error={housingCompanyError}
-                    isLoading={housingCompanyIsLoading}
+                    isLoading={isHousingCompanyLoading}
                 >
                     <ImprovementsTable
                         data={housingCompanyData as IHousingCompanyDetails}
-                        title={"Yhtiökohtaiset parannukset"}
-                        editableType={"housingCompany"}
+                        title="Yhtiökohtaiset parannukset"
+                        editableType="housingCompany"
                         editPath={`/housing-companies/${housingCompanyData?.id}/improvements`}
                     />
                 </QueryStateHandler>

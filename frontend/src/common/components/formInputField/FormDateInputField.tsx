@@ -60,8 +60,8 @@ export default function FormDateInputField({
             <DateInput
                 value={(() => getValue())()}
                 onChange={handleOnChange}
-                language={"fi"}
-                disableConfirmation={true}
+                language="fi"
+                disableConfirmation
                 required={required}
                 {...rest}
             />

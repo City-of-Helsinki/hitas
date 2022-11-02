@@ -84,11 +84,11 @@ export default function FormRelatedModelInputField({
             />
             <Dialog
                 id={`modal-${fieldPath}`}
-                closeButtonLabelText={"args.closeButtonLabelText"}
+                closeButtonLabelText="args.closeButtonLabelText"
                 aria-labelledby={label}
                 isOpen={isModalVisible}
                 close={() => setIsModalVisible(false)}
-                boxShadow={true}
+                boxShadow
                 theme={dialogTheme}
             >
                 <Dialog.Header
@@ -140,7 +140,7 @@ export default function FormRelatedModelInputField({
                     <Button
                         onClick={closeModal}
                         variant="secondary"
-                        theme={"black"}
+                        theme="black"
                     >
                         Sulje
                     </Button>

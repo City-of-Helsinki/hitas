@@ -11,7 +11,6 @@ import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage
 
 const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
     const params = useParams() as {readonly housingCompanyId: string};
-    const exceedsInitial = (data.summary.realized_acquisition_price as number) > (data.acquisition_price as number);
     return (
         <>
             <h1 className="main-heading">
@@ -62,16 +61,14 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                         value={
                                             <>
                                                 {formatMoney(data.summary.realized_acquisition_price)}
-                                                {exceedsInitial ? (
+                                                {data.summary.realized_acquisition_price > data.acquisition_price && (
                                                     <span style={{color: "var(--color-error)"}}>
                                                         {" "}
                                                         - ylittää hankinta-arvon!
                                                     </span>
-                                                ) : (
-                                                    ""
                                                 )}
                                             </>
-                                        } // TODO: Format number
+                                        }
                                     />
                                     <DetailField
                                         label="Ensisijaislaina"
@@ -86,15 +83,14 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     <DetailField
                                         label="Isännöitsijä"
                                         value={
-                                            (data.property_manager &&
-                                                `${data.property_manager.name} (${data.property_manager.email})`) ||
-                                            "-"
+                                            data.property_manager &&
+                                            `${data.property_manager.name} (${data.property_manager.email})`
                                         }
                                     />
                                     <label className="detail-field-label">Huomioitavaa</label>
                                     <textarea
                                         readOnly
-                                        value={(data.notes as string) || ""}
+                                        value={data.notes || ""}
                                     />
                                 </div>
                             </div>
@@ -112,7 +108,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     />
                                     <DetailField
                                         label="Huoneistojen lukumäärä"
-                                        value="120"
+                                        value="TODO"
                                     />
                                     <DetailField
                                         label="Huoneistojen pinta-ala"
@@ -154,14 +150,14 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 </div>
                 <ImprovementsTable
                     data={data}
-                    title={"Yhtiökohtaiset parannukset"}
-                    editableType={"housingCompany"}
+                    title="Yhtiökohtaiset parannukset"
+                    editableType="housingCompany"
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
                         <h2 className="detail-list__heading">
                             <span>Kiinteistöt</span>
-                            <Link to={`real-estates`}>
+                            <Link to="real-estates">
                                 <Button
                                     theme="black"
                                     size="small"
@@ -185,7 +181,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="list-wrapper list-wrapper--buildings">
                         <h2 className="detail-list__heading">
                             <span>Rakennukset</span>
-                            <Link to={`buildings`}>
+                            <Link to="buildings">
                                 <Button
                                     theme="black"
                                     size="small"
@@ -212,7 +208,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 <div className="list-wrapper list-wrapper--apartments">
                     <h2>
                         <span>Asunnot</span>
-                        <Link to={"apartments/create"}>
+                        <Link to="apartments/create">
                             <Button
                                 theme="black"
                                 size="small"
@@ -225,7 +221,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="listing">
                         <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                     </div>
-                    <div className="results"></div>
+                    <div className="results" />
                 </div>
             </div>
         </>

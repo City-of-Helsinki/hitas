@@ -12,13 +12,23 @@
         "prettier"
     ],
     "rules": {
-        "no-console": 1,       // Means warning
-        "prettier/prettier": 2, // Means error
+        "no-console": 1, // 1 = warning
+        "prettier/prettier": 2, // 2 = error
         "comma-dangle": 0,
         "require-jsdoc": 0,
         "max-len": [0, 120, 2],
         "object-curly-spacing": 0,
-        "@typescript-eslint/object-curly-spacing": ["error"]
+        "react/jsx-curly-brace-presence": ["error", {"props": "never", "children": "never"}],
+        "react/self-closing-comp": ["error", {"component": true, "html": true}],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+              "selector": "variable",
+              "types": ["boolean"],
+              "format": ["PascalCase"],
+              "prefix": ["is"]
+            }
+        ]
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -26,7 +36,8 @@
             "jsx": true
         },
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "tsconfig.json"
     },
     "plugins": [
         "@typescript-eslint",

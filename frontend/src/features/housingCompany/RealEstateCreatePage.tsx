@@ -1,12 +1,11 @@
 import React, {useState} from "react";
 
-import {Button, Fieldset} from "hds-react";
-import {useNavigate, useParams} from "react-router-dom";
+import {Fieldset} from "hds-react";
+import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateRealEstateMutation} from "../../app/services";
-import {FormInputField, SaveDialogModal} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {IRealEstate} from "../../common/models";
 
 const RealEstateCreatePage = (): JSX.Element => {
@@ -19,7 +18,6 @@ const RealEstateCreatePage = (): JSX.Element => {
     };
     const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
     const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
-    const navigate = useNavigate();
     const params = useParams();
     const handleSaveButtonClicked = () => {
         saveRealEstate({data: formData, housingCompanyId: params.housingCompanyId as string});
@@ -55,13 +53,7 @@ const RealEstateCreatePage = (): JSX.Element => {
                 </Fieldset>
             </div>
             <div className="buttons">
-                <Button
-                    onClick={() => navigate(-1)}
-                    theme={"black"}
-                    className={"back-button"}
-                >
-                    Takaisin
-                </Button>
+                <NavigateBackButton />
                 <SaveButton
                     onClick={handleSaveButtonClicked}
                     isLoading={isLoading}

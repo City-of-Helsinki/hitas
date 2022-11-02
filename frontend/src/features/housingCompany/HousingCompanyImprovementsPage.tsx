@@ -6,8 +6,7 @@ import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveHousingCompanyMutation} from "../../app/services";
-import {FormInputField} from "../../common/components";
-import SaveButton from "../../common/components/SaveButton";
+import {FormInputField, SaveButton} from "../../common/components";
 import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
@@ -30,7 +29,7 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     return (
         <div className="icon--remove">
             <IconCrossCircle
-                size={"m"}
+                size="m"
                 onClick={(index) => onClick(index)}
             />
         </div>
@@ -141,7 +140,7 @@ const HousingCompanyImprovementsPage = () => {
         <div className="view--create view--set-housing-company">
             <h1 className="main-heading">{housingCompanyData.name.display} Parannukset</h1>
             <div className="field-sets">
-                <Fieldset heading={"Markkinahintaindeksi"}>
+                <Fieldset heading="Markkinahintaindeksi">
                     <ul className="ownership-list">
                         {marketIndexImprovements.length ? (
                             marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
@@ -187,7 +186,7 @@ const HousingCompanyImprovementsPage = () => {
                     </ul>
                     <ImprovementAddLineButton onClick={handleAddMarketImprovementLine} />
                 </Fieldset>
-                <Fieldset heading={"Rakennuskustanusindeksi"}>
+                <Fieldset heading="Rakennuskustanusindeksi">
                     <ul className="ownership-list">
                         {constructionIndexImprovements.length ? (
                             constructionIndexImprovements.map((improvement: IWritableImprovement, index) => (

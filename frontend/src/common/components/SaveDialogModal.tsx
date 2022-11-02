@@ -2,10 +2,11 @@ import React from "react";
 
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Dialog, LoadingSpinner} from "hds-react";
-import {Link, useNavigate} from "react-router-dom";
+import {Button, Dialog} from "hds-react";
+import {Link} from "react-router-dom";
 
 import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../models";
+import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface SaveStateProps {
     data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
@@ -18,6 +19,55 @@ interface SaveStateProps {
     setIsVisible;
 }
 
+const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
+    return (
+        <>
+            <Dialog.Content>Tiedot tallennettu onnistuneesti!</Dialog.Content>
+            <Dialog.ActionButtons>
+                <>
+                    <Link to={linkURL || baseURL + data.id}>
+                        <Button
+                            variant="secondary"
+                            theme="black"
+                        >
+                            {linkText}
+                        </Button>
+                    </Link>
+                    <Button
+                        onClick={() => window.location.reload()}
+                        variant="secondary"
+                        theme="black"
+                    >
+                        Syötä uusi
+                    </Button>
+                    <NavigateBackButton />
+                </>
+            </Dialog.ActionButtons>
+        </>
+    );
+};
+
+const ActionFailed = ({error, setIsVisible}) => {
+    const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
+    return (
+        <>
+            <Dialog.Content>
+                <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
+                <p>{nonFieldError}</p>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Sulje
+                </Button>
+            </Dialog.ActionButtons>
+        </>
+    );
+};
+
 export default function SaveDialogModal({
     data,
     error,
@@ -28,69 +78,37 @@ export default function SaveDialogModal({
     isVisible,
     setIsVisible,
 }: SaveStateProps): JSX.Element {
-    const navigate = useNavigate();
     return (
         <Dialog
             id="modification__end-modal"
-            closeButtonLabelText={"args.closeButtonLabelText"}
-            aria-labelledby={"finish-modal"}
+            closeButtonLabelText="args.closeButtonLabelText"
+            aria-labelledby="finish-modal"
             isOpen={isVisible}
             close={() => setIsVisible(false)}
-            boxShadow={true}
+            boxShadow
         >
             <Dialog.Header
                 id="modification__end-modal__header"
-                title={`Tallennetaan tietokantaan`}
+                title="Tallennetaan tietokantaan"
             />
-            {isLoading ? (
-                <LoadingSpinner />
-            ) : !error && data ? (
-                <>
-                    <Dialog.Content>{`Tiedot tallennettu onnistuneesti!`}</Dialog.Content>
-                    <Dialog.ActionButtons>
-                        <>
-                            <Link to={linkURL ? linkURL : (baseURL as string) + data?.id}>
-                                <Button
-                                    variant="secondary"
-                                    theme={"black"}
-                                >
-                                    {linkText}
-                                </Button>
-                            </Link>
-                            <Button
-                                onClick={() => window.location.reload()}
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Syötä uusi
-                            </Button>
-                            <Button
-                                onClick={() => navigate(-1)}
-                                variant="secondary"
-                                theme={"black"}
-                            >
-                                Palaa edelliselle sivulle
-                            </Button>
-                        </>
-                    </Dialog.ActionButtons>
-                </>
-            ) : (
-                <>
-                    <Dialog.Content>
-                        <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
-                        <p>{((error as FetchBaseQueryError)?.data as {message?: string})?.message || ""}</p>
-                    </Dialog.Content>
-                    <Dialog.ActionButtons>
-                        <Button
-                            onClick={() => setIsVisible(false)}
-                            variant="secondary"
-                            theme={"black"}
-                        >
-                            Sulje
-                        </Button>
-                    </Dialog.ActionButtons>
-                </>
-            )}
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+                errorComponent={
+                    <ActionFailed
+                        error={error}
+                        setIsVisible={setIsVisible}
+                    />
+                }
+            >
+                <ActionSuccess
+                    linkURL={linkURL}
+                    linkText={linkText}
+                    baseURL={baseURL}
+                    data={data}
+                />
+            </QueryStateHandler>
         </Dialog>
     );
 }
