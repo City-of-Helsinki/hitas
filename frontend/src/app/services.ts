@@ -3,6 +3,8 @@ import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {
     IApartmentDetails,
     IApartmentListResponse,
+    IApartmentMaximumPrice,
+    IApartmentMaximumPriceWritable,
     IApartmentQuery,
     IApartmentWritable,
     IBuilding,
@@ -59,36 +61,21 @@ const listApi = hitasApi.injectEndpoints({
                 url: "housing-companies",
                 params: params,
             }),
-            providesTags: [
-                {
-                    type: "HousingCompany",
-                    id: "LIST",
-                },
-            ],
+            providesTags: [{type: "HousingCompany", id: "LIST"}],
         }),
         getApartments: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
                 url: "apartments",
                 params: params,
             }),
-            providesTags: [
-                {
-                    type: "Apartment",
-                    id: "LIST",
-                },
-            ],
+            providesTags: [{type: "Apartment", id: "LIST"}],
         }),
         getHousingCompanyApartments: builder.query<IApartmentListResponse, IHousingCompanyApartmentQuery>({
             query: (params: IHousingCompanyApartmentQuery) => ({
                 url: `housing-companies/${params.housingCompanyId}/apartments`,
                 params: params.params,
             }),
-            providesTags: [
-                {
-                    type: "Apartment",
-                    id: "LIST",
-                },
-            ],
+            providesTags: [{type: "Apartment", id: "LIST"}],
         }),
         getOwners: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
@@ -114,12 +101,7 @@ const listApi = hitasApi.injectEndpoints({
                 url: `indices/${params.indexType}`,
                 params: params.params,
             }),
-            providesTags: [
-                {
-                    type: "Index",
-                    id: "LIST",
-                },
-            ],
+            providesTags: [{type: "Index", id: "LIST"}],
         }),
         getDevelopers: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
@@ -152,24 +134,14 @@ const detailApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
-            providesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: arg,
-                },
-            ],
+            providesTags: (result, error, arg) => [{type: "HousingCompany", id: arg}],
         }),
         getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
             query: (params: IApartmentQuery) => ({
                 url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
                 params: params,
             }),
-            providesTags: (result, error, arg) => [
-                {
-                    type: "Apartment",
-                    id: arg.apartmentId,
-                },
-            ],
+            providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}],
         }),
     }),
 });
@@ -184,14 +156,8 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
             invalidatesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: "LIST",
-                },
-                {
-                    type: "HousingCompany",
-                    id: arg.id,
-                },
+                {type: "HousingCompany", id: "LIST"},
+                {type: "HousingCompany", id: arg.id},
             ],
         }),
         createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
@@ -201,12 +167,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: arg.housingCompanyId,
-                },
-            ],
+            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
         createBuilding: builder.mutation<
             IBuilding,
@@ -218,12 +179,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: arg.housingCompanyId,
-                },
-            ],
+            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
         saveApartment: builder.mutation<
             IApartmentDetails,
@@ -236,19 +192,28 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
             invalidatesTags: (result, error, arg) => [
-                {
-                    type: "Apartment",
-                    id: "LIST",
-                },
-                {
-                    type: "Apartment",
-                    id: arg.id,
-                },
-                {
-                    type: "HousingCompany",
-                    id: arg.housingCompanyId,
-                },
+                {type: "Apartment", id: "LIST"},
+                {type: "Apartment", id: arg.id},
+                {type: "HousingCompany", id: arg.housingCompanyId},
             ],
+        }),
+        saveApartmentMaximumPrice: builder.mutation<
+            IApartmentMaximumPrice,
+            {data: IApartmentMaximumPriceWritable; id?: string; apartmentId: string; housingCompanyId: string}
+        >({
+            query: ({data, id, apartmentId, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices${idOrBlank(id)}`,
+                method: id === undefined ? "POST" : "PUT",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error, arg) => {
+                // Invalidate Apartment Details only when confirming a maximum price
+                if (result && result.confirmed_at) {
+                    return [{type: "Apartment", id: arg.apartmentId}];
+                }
+                return [];
+            },
         }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
@@ -257,12 +222,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [
-                {
-                    type: "Index",
-                    id: "LIST",
-                },
-            ],
+            invalidatesTags: (result, error, arg) => [{type: "Index", id: "LIST"}],
         }),
     }),
 });
@@ -288,5 +248,6 @@ export const {
     useCreateRealEstateMutation,
     useCreateBuildingMutation,
     useSaveApartmentMutation,
+    useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
 } = mutationApi;

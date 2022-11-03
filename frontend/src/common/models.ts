@@ -272,6 +272,84 @@ export interface IApartmentWritable {
     };
 }
 
+// Maximum Price
+
+// //  Maximum Price Fields
+
+interface ICalculation {
+    max_price: number;
+    valid_until: string;
+    maximum: boolean;
+}
+
+interface IIndexCalculationVariables {
+    calculation_variables: {
+        acquisition_price: number;
+        additional_work_during_construction: number;
+        basic_price: number;
+        index_adjustment: number;
+        apartment_improvements: number;
+        housing_company_improvements: number;
+        debt_free_price: number;
+        debt_free_price_m2: number;
+        apartment_share_of_housing_company_loans: number;
+        completion_date: string;
+        completion_date_index: number;
+        calculation_date: string;
+        calculation_date_index: number;
+    };
+}
+
+// // Maximum Price Models
+
+export interface IApartmentMaximumPrice {
+    readonly id: string;
+    created_at: string;
+    confirmed_at: string | null;
+    max_price: number;
+    calculation_date: string;
+    valid_until: string;
+    index: string;
+    calculations: {
+        construction_price_index: ICalculation & IIndexCalculationVariables;
+        market_price_index: ICalculation & IIndexCalculationVariables;
+        surface_area_price_ceiling: ICalculation & {
+            calculation_variables: {
+                calculation_date: string;
+                calculation_date_value: number;
+                surface_area: number;
+            };
+        };
+    };
+    apartment: {
+        address: IApartmentAddress;
+        type: string;
+        ownerships: IOwnership[];
+        rooms: number | null;
+        shares: IApartmentShares;
+        surface_area: number;
+    };
+    housing_company: {
+        archive_id: number;
+        official_name: string;
+        property_manager: {
+            name: string;
+            street_address: string;
+        };
+    };
+}
+
+export type IApartmentMaximumPriceWritable =
+    // Used when creating a calculation
+    | {
+          calculation_date: string | null;
+          apartment_share_of_housing_company_loans: number | null;
+      }
+    // Used when confirming a calculation
+    | {
+          confirm: true;
+      };
+
 // Indices
 
 export interface IIndex {

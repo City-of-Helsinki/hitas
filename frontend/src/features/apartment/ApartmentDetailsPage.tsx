@@ -109,7 +109,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         />
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <p className="confirmed-price">{data.prices.max_prices.confirmed}</p>
+                    <p className="confirmed-price">{formatMoney(data.prices.max_prices.confirmed.max_price)}</p>
                     <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
                         <Button
                             theme="black"

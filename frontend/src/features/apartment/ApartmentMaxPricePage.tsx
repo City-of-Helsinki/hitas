@@ -1,97 +1,135 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 
-import {Button, Card, Fieldset, TextInput} from "hds-react";
-import {useParams} from "react-router-dom";
+import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
+import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {useGetApartmentDetailQuery} from "../../app/services";
-import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
-import {IApartmentDetails} from "../../common/models";
-import {formatMoney} from "../../common/utils";
+import {
+    useGetApartmentDetailQuery,
+    useGetHousingCompanyDetailQuery,
+    useSaveApartmentMaximumPriceMutation,
+} from "../../app/services";
+import {
+    FormInputField,
+    ImprovementsTable,
+    NavigateBackButton,
+    QueryStateHandler,
+    SaveButton,
+} from "../../common/components";
+import {
+    IApartmentDetails,
+    IApartmentMaximumPrice,
+    IApartmentMaximumPriceWritable,
+    IHousingCompanyDetails,
+} from "../../common/models";
+import {formatMoney, hitasToast} from "../../common/utils";
 
 const CalculationRowPrice = ({label, calculation}) => {
+    const maximumBoldedStyle = calculation.maximum ? {fontWeight: 700} : {};
     return (
-        <div className={`price${calculation.maximum ? " price--current-top" : ""}`}>
-            <span className="basis">{label}</span>
-            <span className="amount">
-                <span className="value">{formatMoney(calculation.max_price)}</span>
-            </span>
+        <div>
+            <p style={maximumBoldedStyle}>{label}</p>
+            <p style={maximumBoldedStyle}>{formatMoney(calculation.max_price)}</p>
         </div>
     );
 };
 
-const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element => {
-    const [formData, setFormData] = useImmer({
-        aaa: null,
-        bbb: null,
-        ccc: new Date().toISOString().split("T")[0], // Init with today's date
-        ddd: null,
-    });
+const MaximumPriceModalContent = ({
+    calculation,
+    apartment,
+    setIsModalVisible,
+}: {
+    calculation: IApartmentMaximumPrice;
+    apartment: IApartmentDetails;
+    setIsModalVisible;
+}) => {
+    const navigate = useNavigate();
+    const [confirmMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
-    const calculationResponseData = {
-        max_price: 223558,
-        valid_until: "2022-10-05",
-        index: "construction_price_index",
-        calculations: {
-            construction_price_index: {
-                max_price: 223558,
-                valid_until: "2022-10-05",
-                maximum: true,
-                calculation_variables: {
-                    acquisition_price: 199500,
-                    additional_work_during_construction: 0,
-                    basic_price: 199500,
-                    index_adjustment: 26401,
-                    apartment_improvements: 0,
-                    housing_company_improvements: 157,
-                    debt_free_price: 226058,
-                    debt_free_price_m2: 7535,
-                    apartment_share_of_housing_company_loans: 2500,
-                    completion_date: "2019-11-27",
-                    completion_date_index: 129.29,
-                    calculation_date: "2022-07-05",
-                    calculation_date_index: 146.4,
-                },
-            },
-            market_price_index: {
-                max_price: 222343,
-                valid_until: "2022-10-05",
-                maximum: false,
-                calculation_variables: {
-                    acquisition_price: 199500,
-                    additional_work_during_construction: 0,
-                    basic_price: 199500,
-                    index_adjustment: 25190,
-                    apartment_improvements: 0,
-                    housing_company_improvements: 153,
-                    debt_free_price: 224843,
-                    debt_free_price_m2: 7495,
-                    apartment_share_of_housing_company_loans: 2500,
-                    completion_date: "2019-11-27",
-                    completion_date_index: 167.9,
-                    calculation_date: "2022-07-05",
-                    calculation_date_index: 189.1,
-                },
-            },
-            surface_area_price_ceiling: {
-                max_price: 146070,
-                valid_until: "2022-08-31",
-                maximum: false,
-            },
-        },
-        apartment: {
-            // TOOD
-        },
-        housing_company: {
-            // TOOD
-        },
+    const handleConfirmButton = () => {
+        confirmMaximumPrice({
+            data: {confirm: true},
+            id: calculation.id,
+            apartmentId: apartment.id,
+            housingCompanyId: apartment.links.housing_company.id,
+        });
+        setIsModalVisible(true);
+    };
+
+    useEffect(() => {
+        if (!isLoading && !error && data && data.confirmed_at) {
+            hitasToast("Enimmäishinta vahvistettu!");
+            navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
+        }
+    }, [apartment, data, error, isLoading, navigate]);
+
+    return (
+        <>
+            <Dialog.Content>
+                <div>
+                    <CalculationRowPrice
+                        label="Markkinahintaindeksi"
+                        calculation={calculation.calculations.market_price_index}
+                    />
+                    <CalculationRowPrice
+                        label="Rakennushintaindeksi"
+                        calculation={calculation.calculations.construction_price_index}
+                    />
+                    <CalculationRowPrice
+                        label="Rajaneliöhinta"
+                        calculation={calculation.calculations.surface_area_price_ceiling}
+                    />
+                    <div>
+                        <p>Laskelman voimassaoloaika</p>
+                        <p>{calculation.valid_until}</p>
+                    </div>
+                </div>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsModalVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Peruuta
+                </Button>
+                <SaveButton
+                    onClick={() => handleConfirmButton()}
+                    isLoading={isLoading}
+                />
+            </Dialog.ActionButtons>
+        </>
+    );
+};
+
+const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): JSX.Element => {
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
+        calculation_date: new Date().toISOString().split("T")[0], // Init with today's date in YYYY-MM format
+        apartment_share_of_housing_company_loans: null,
+    });
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: isHousingCompanyLoading,
+    } = useGetHousingCompanyDetailQuery(apartment.links.housing_company.id);
+    const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
+
+    const handleCalculateButton = () => {
+        saveMaximumPrice({
+            data: formData,
+            id: undefined,
+            apartmentId: apartment.id,
+            housingCompanyId: apartment.links.housing_company.id,
+        });
+        setIsModalVisible(true);
     };
 
     return (
         <div className="view--create view--set-apartment">
             <h1 className="main-heading">
-                {data.address.street_address} - {data.address.stair}
-                {data.address.apartment_number} ({data.links.housing_company.display_name})
+                {apartment.address.street_address} - {apartment.address.stair}
+                {apartment.address.apartment_number} ({apartment.links.housing_company.display_name})
             </h1>
             <div className="field-sets">
                 <Fieldset heading="">
@@ -103,72 +141,79 @@ const LoadedApartmentMaxPrice = ({data}: {data: IApartmentDetails}): JSX.Element
                             inputType="number"
                             unit="€"
                             label="Yhtiölainaosuus"
-                            fieldPath="aaa"
+                            fieldPath="apartment_share_of_housing_company_loans"
                             required
                             formData={formData}
                             setFormData={setFormData}
-                            error="" // FIXME
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Rakennusaikaiset parannukset"
-                            fieldPath="bbb"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error="" // FIXME
+                            error={error}
                         />
                     </div>
                     <div className="row">
                         <ImprovementsTable
-                            data={data}
+                            data={apartment}
                             title="Laskentaan vaikuttavat yhtiön parannukset"
                         />
+                    </div>
+                    <div className="row">
+                        <QueryStateHandler
+                            data={housingCompanyData}
+                            error={housingCompanyError}
+                            isLoading={isHousingCompanyLoading}
+                        >
+                            <ImprovementsTable
+                                data={housingCompanyData as IHousingCompanyDetails}
+                                title="Yhtiökohtaiset parannukset"
+                            />
+                        </QueryStateHandler>
                     </div>
                     <div className="row">
                         <FormInputField
                             inputType="date"
                             label="Laskentapäivämäärä"
-                            fieldPath="ccc"
+                            fieldPath="calculation_date"
                             required
                             formData={formData}
                             setFormData={setFormData}
-                            error="" // FIXME
+                            error={error}
                         />
-                        <TextInput
-                            // TODO: Localise date
-                            id="calculationResponseData.valid_until"
-                            label="Laskelman voimassaoloaika"
-                            value={calculationResponseData.valid_until}
-                            disabled
-                        />
-                    </div>
-                    <div className="apartment-action-cards">
-                        <Card>
-                            <label className="card-heading">Vahvistamaton enimmäishinta</label>
-                            <div className="unconfirmed-prices">
-                                <CalculationRowPrice
-                                    label="Markkinahintaindeksi"
-                                    calculation={calculationResponseData.calculations.market_price_index}
-                                />
-                                <CalculationRowPrice
-                                    label="Rakennushintaindeksi"
-                                    calculation={calculationResponseData.calculations.construction_price_index}
-                                />
-                                <CalculationRowPrice
-                                    label="Rajaneliöhinta"
-                                    calculation={calculationResponseData.calculations.surface_area_price_ceiling}
-                                />
-                            </div>
-                        </Card>
                     </div>
                 </Fieldset>
             </div>
-            <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
+            <div>
                 <NavigateBackButton />
-                <Button theme="black">Vahvista</Button>
+                <Button
+                    theme="black"
+                    onClick={handleCalculateButton}
+                    iconLeft={<IconCheck />}
+                >
+                    Laske
+                </Button>
             </div>
+
+            <Dialog
+                id="maximum-price-confirmation-modal"
+                closeButtonLabelText=""
+                aria-labelledby=""
+                isOpen={isModalVisible}
+                close={() => setIsModalVisible(false)}
+                boxShadow
+            >
+                <Dialog.Header
+                    id="maximum-price-confirmation-modal-header"
+                    title="Vahvistetaanko enimmäishinnan laskelma?"
+                />
+                <QueryStateHandler
+                    data={data}
+                    error={error}
+                    isLoading={isLoading}
+                >
+                    <MaximumPriceModalContent
+                        calculation={data as IApartmentMaximumPrice}
+                        apartment={apartment}
+                        setIsModalVisible={setIsModalVisible}
+                    />
+                </QueryStateHandler>
+            </Dialog>
         </div>
     );
 };
@@ -187,7 +232,7 @@ const ApartmentMaxPricePage = (): JSX.Element => {
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedApartmentMaxPrice data={data as IApartmentDetails} />
+                <LoadedApartmentMaxPrice apartment={data as IApartmentDetails} />
             </QueryStateHandler>
         </div>
     );
