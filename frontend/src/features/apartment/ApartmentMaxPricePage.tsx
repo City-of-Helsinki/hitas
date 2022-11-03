@@ -30,7 +30,7 @@ const CalculationRowPrice = ({label, calculation}) => {
     return (
         <div>
             <p style={maximumBoldedStyle}>{label}</p>
-            <p style={maximumBoldedStyle}>{formatMoney(calculation.max_price)}</p>
+            <p style={maximumBoldedStyle}>{formatMoney(calculation.maximum_price)}</p>
         </div>
     );
 };

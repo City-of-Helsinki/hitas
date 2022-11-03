@@ -82,13 +82,13 @@ def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
     apartment_json = apartment_detail.json()
 
     # Verify the apartment has now a confirmed max price
-    confirmed_price = apartment_json["prices"]["max_prices"]["confirmed"]
+    confirmed_price = apartment_json["prices"]["maximum_prices"]["confirmed"]
     assert_created(confirmed_price.pop("confirmed_at"))
     assert confirmed_price == {
         "id": mpc_id,
         "created_at": retrieve_json["created_at"],
         "calculation_date": retrieve_json["calculation_date"],
-        "max_price": retrieve_json["max_price"],
+        "maximum_price": retrieve_json["maximum_price"],
         "valid": {"is_valid": False, "valid_until": retrieve_json["valid_until"]},
     }
 

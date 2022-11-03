@@ -64,7 +64,7 @@ const ConfirmedPrice = ({confirmed}) => {
     }
     return (
         <>
-            <p className="confirmed-price">{formatMoney(confirmed.max_price)}</p>
+            <p className="confirmed-price">{formatMoney(confirmed.maximum_price)}</p>
             <p>Voimassa {confirmed.valid.valid_until} saakka</p>
             <p>Vahvistettu {confirmed.confirmed_at.split("T")[0]}</p>
         </>
@@ -77,10 +77,10 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
         error: housingCompanyError,
         isLoading: isHousingCompanyLoading,
     } = useGetHousingCompanyDetailQuery(data.links.housing_company.id);
-    const isPre2011 = data.prices.max_prices.unconfirmed.pre_2011 !== null;
+    const isPre2011 = data.prices.maximum_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
-        ? data.prices.max_prices.unconfirmed.pre_2011
-        : data.prices.max_prices.unconfirmed.onwards_2011;
+        ? data.prices.maximum_prices.unconfirmed.pre_2011
+        : data.prices.maximum_prices.unconfirmed.onwards_2011;
     return (
         <>
             <h1 className="main-heading">
@@ -121,7 +121,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         />
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <ConfirmedPrice confirmed={data.prices.max_prices.confirmed} />
+                    <ConfirmedPrice confirmed={data.prices.maximum_prices.confirmed} />
                     <div className="align-content-right">
                         <Button
                             theme="black"

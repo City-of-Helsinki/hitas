@@ -3116,13 +3116,13 @@ components:
       type: object
       required:
         - calculation_variables
-        - max_price
+        - maximum_price
         - maximum
         - valid_until
       properties:
         calculation_variables:
           $ref: '#/components/schemas/ApartmentMaxPriceCalculationVars'
-        max_price:
+        maximum_price:
           description: Maximum price for this index
           type: integer
           minimum: 0
@@ -3243,7 +3243,7 @@ components:
         - id
         - confirmed_at
         - calculation_date
-        - max_price
+        - maximum_price
         - index
         - created_at
         - valid_until
@@ -3253,7 +3253,7 @@ components:
           description: Maximum price calculation ID
           type: string
           example: e65579e3ed0a4cc0b693d9910b41ab08
-        max_price:
+        maximum_price:
           description: The maximum price for this apartment.
           type: integer
           minimum: 0
@@ -3310,7 +3310,7 @@ components:
               type: object
               additionalProperties: false
               required:
-                - max_price
+                - maximum_price
                 - maximum
                 - valid_until
               properties:
@@ -3338,7 +3338,7 @@ components:
                       type: number
                       minimum: 0
                       example: 30.0
-                max_price:
+                maximum_price:
                   description: Maximum price for this index
                   type: integer
                   minimum: 0
@@ -3628,7 +3628,7 @@ components:
           format: date
           nullable: true
           example: 1989-11-17
-        max_prices:
+        maximum_prices:
           description: Apartment's maximum Hitas prices
           type: object
           additionalProperties: false
@@ -3646,7 +3646,7 @@ components:
                 - created_at
                 - confirmed_at
                 - calculation_date
-                - max_price
+                - maximum_price
                 - valid
               properties:
                 id:
@@ -3669,7 +3669,7 @@ components:
                   format: date-time
                   nullable: true
                   example: 2022-07-05T15:42:39.64745
-                max_price:
+                maximum_price:
                   description: The maximum price for this apartment.
                   type: integer
                   minimum: 0

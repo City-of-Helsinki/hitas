@@ -71,13 +71,13 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
     mpc_json = {
         "id": mpc.uuid.hex,
         "created_at": mpc.created_at,
-        "max_price": mpc.max_price,
+        "maximum_price": mpc.max_price,
         "calculation_date": mpc.calculation_date,
         "valid_until": mpc.valid_until,
         "index": index,
         "calculations": {
             "construction_price_index": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "construction_price_index",
                 "calculation_variables": {
@@ -97,7 +97,7 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
                 },
             },
             "market_price_index": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "market_price_index",
                 "calculation_variables": {
@@ -117,7 +117,7 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
                 },
             },
             "surface_area_price_ceiling": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "surface_area_price_ceiling",
                 "calculation_variables": {

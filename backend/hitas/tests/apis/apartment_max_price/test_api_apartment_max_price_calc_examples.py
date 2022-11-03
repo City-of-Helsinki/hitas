@@ -72,13 +72,13 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
 
     expected_response = {
         "confirmed_at": None,
-        "max_price": 223558,
+        "maximum_price": 223558,
         "calculation_date": "2022-07-05",
         "valid_until": "2022-10-05",
         "index": "construction_price_index",
         "calculations": {
             "construction_price_index": {
-                "max_price": 223558,
+                "maximum_price": 223558,
                 "valid_until": "2022-10-05",
                 "maximum": True,
                 "calculation_variables": {
@@ -98,7 +98,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 },
             },
             "market_price_index": {
-                "max_price": 222343,
+                "maximum_price": 222343,
                 "valid_until": "2022-10-05",
                 "maximum": False,
                 "calculation_variables": {
@@ -118,7 +118,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 },
             },
             "surface_area_price_ceiling": {
-                "max_price": 146070,
+                "maximum_price": 146070,
                 "valid_until": "2022-08-31",
                 "maximum": False,
                 "calculation_variables": {
@@ -230,7 +230,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
     assert response_json == {
         "confirmed_at": None,
         "calculation_date": "2022-07-05",
-        "max_price": 275925,
+        "maximum_price": 275925,
         "valid_until": "2022-10-05",
         "index": "market_price_index",
         "calculations": {
@@ -250,7 +250,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "calculation_date": "2022-07-05",
                     "calculation_date_index": 146.4,
                 },
-                "max_price": 260464,
+                "maximum_price": 260464,
                 "valid_until": "2022-10-05",
                 "maximum": False,
             },
@@ -270,12 +270,12 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "calculation_date": "2022-07-05",
                     "calculation_date_index": 189.1,
                 },
-                "max_price": 275925,
+                "maximum_price": 275925,
                 "valid_until": "2022-10-05",
                 "maximum": True,
             },
             "surface_area_price_ceiling": {
-                "max_price": 233712,
+                "maximum_price": 233712,
                 "valid_until": "2022-08-31",
                 "maximum": False,
                 "calculation_variables": {
@@ -352,7 +352,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     assert response_json == {
         "confirmed_at": None,
         "calculation_date": "2022-09-29",
-        "max_price": 236292,
+        "maximum_price": 236292,
         "valid_until": "2022-11-30",
         "index": "surface_area_price_ceiling",
         "calculations": {
@@ -372,7 +372,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "calculation_date": "2022-09-29",
                     "calculation_date_index": 149.1,
                 },
-                "max_price": 218161,
+                "maximum_price": 218161,
                 "valid_until": "2022-12-29",
                 "maximum": False,
             },
@@ -392,12 +392,12 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "calculation_date": "2022-09-29",
                     "calculation_date_index": 189.1,
                 },
-                "max_price": 232210,
+                "maximum_price": 232210,
                 "valid_until": "2022-12-29",
                 "maximum": False,
             },
             "surface_area_price_ceiling": {
-                "max_price": 236292,
+                "maximum_price": 236292,
                 "valid_until": "2022-11-30",
                 "maximum": True,
                 "calculation_variables": {
