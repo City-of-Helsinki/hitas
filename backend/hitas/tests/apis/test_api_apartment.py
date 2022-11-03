@@ -213,7 +213,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         debt_free_purchase_price=100000,
         surface_area=50,
     )
-    hc: HousingCompany = ap.building.real_estate.housing_company
+    hc: HousingCompany = ap.housing_company
     owner: Ownership = OwnershipFactory.create(apartment=ap)
     cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
     mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
@@ -381,7 +381,7 @@ def _test_max_prices(
     response = api_client.get(
         reverse(
             "hitas:apartment-detail",
-            args=[ap.building.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
         )
     )
 
@@ -480,7 +480,7 @@ def test__api__apartment__invalid_apartment_id(api_client: HitasAPIClient, inval
         reverse(
             "hitas:apartment-detail",
             args=[
-                a.building.real_estate.housing_company.uuid.hex,
+                a.housing_company.uuid.hex,
                 invalid_id,
             ],
         )
@@ -1314,7 +1314,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     response = api_client.put(
         reverse(
             "hitas:apartment-detail",
-            args=[ap.building.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
         ),
         data=data,
         format="json",
@@ -1348,7 +1348,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     get_response = api_client.get(
         reverse(
             "hitas:apartment-detail",
-            args=[ap.building.real_estate.housing_company.uuid.hex, ap.uuid.hex],
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
         )
     )
     assert response.json() == get_response.json()
@@ -1454,7 +1454,7 @@ def test__api__apartment__delete(api_client: HitasAPIClient):
     url = reverse(
         "hitas:apartment-detail",
         args=[
-            a.building.real_estate.housing_company.uuid.hex,
+            a.housing_company.uuid.hex,
             a.uuid.hex,
         ],
     )
@@ -1473,7 +1473,7 @@ def test__api__apartment__delete__with_references(api_client: HitasAPIClient):
     url = reverse(
         "hitas:apartment-detail",
         args=[
-            a.building.real_estate.housing_company.uuid.hex,
+            a.housing_company.uuid.hex,
             a.uuid.hex,
         ],
     )

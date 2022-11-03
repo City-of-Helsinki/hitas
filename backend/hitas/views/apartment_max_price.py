@@ -1,45 +1,29 @@
-import datetime
 from http import HTTPStatus
 
-from rest_framework import serializers
-from rest_framework.mixins import ListModelMixin
+from django.utils import timezone
+from rest_framework import fields
+from rest_framework.exceptions import ValidationError
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.viewsets import ViewSet
 
 from hitas.calculations import calculate_max_price
 from hitas.calculations.max_price import IndexMissingException
+from hitas.exceptions import HitasModelNotFound
+from hitas.models import Apartment, HousingCompany
+from hitas.models.apartment import ApartmentMaxPriceCalculation
 
 
-class ApartmentMaxPriceViewSet(ListModelMixin, ViewSet):
-    def list(self, request, *args, **kwargs):
-        # Validate calculation date
-        calculation_date = request.query_params.get("calculation_date")
-        if calculation_date is not None:
-            try:
-                # Parse calculation date
-                calculation_date = datetime.date.fromisoformat(calculation_date)
+class ApartmentMaxPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
+    def create(self, request, *args, **kwargs):
+        serializer = CreateCalculationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-                # Calculation date cannot be in the future
-                if calculation_date > datetime.date.today():
-                    self._validation_error("calculation_date", "Field has to be less than or equal to current date.")
-            except ValueError:
-                self._validation_error("calculation_date", "Field has to be a valid date in format 'yyyy-mm-dd'.")
-
-        # Validate apartment share of housing company loans
-        apartment_share_of_housing_company_loans = request.query_params.get(
-            "apartment_share_housing_company_loans", "0"
+        calculation_date = serializer.validated_data.get("calculation_date") or timezone.now().date()
+        apartment_share_of_housing_company_loans = (
+            serializer.validated_data.get("apartment_share_of_housing_company_loans") or 0
         )
-        try:
-            # Parse apartment share of housing company loans
-            apartment_share_of_housing_company_loans = int(apartment_share_of_housing_company_loans)
-
-            # apartment share of housing company loans cannot be a negative number
-            if apartment_share_of_housing_company_loans < 0:
-                self._validation_error(
-                    "apartment_share_housing_company_loans", "Ensure this value is greater than or equal to 0."
-                )
-        except ValueError:
-            self._validation_error("apartment_share_housing_company_loans", "A valid number is required.")
 
         # Calculate max price
         try:
@@ -61,6 +45,96 @@ class ApartmentMaxPriceViewSet(ListModelMixin, ViewSet):
                 status=HTTPStatus.CONFLICT,
             )
 
+    def retrieve(self, request, *args, **kwargs):
+        return self.response(
+            ApartmentMaxPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+                apartment__uuid=kwargs["apartment_uuid"],
+                apartment__building__real_estate__housing_company__uuid=kwargs["housing_company_uuid"],
+                uuid=kwargs["pk"],
+            )
+        )
+
+    def update(self, request, *args, **kwargs):
+        serializer = ConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        confirm = serializer.data["confirm"]
+
+        # Verify housing company and apartment exists (so we can raise an appropriate error)
+        with model_or_404(HousingCompany):
+            hc_id = HousingCompany.objects.only("id").get(uuid=kwargs["housing_company_uuid"])
+        with model_or_404(Apartment):
+            apartment_id = Apartment.objects.only("pk").get(
+                uuid=kwargs["apartment_uuid"], building__real_estate__housing_company_id=hc_id
+            )
+
+        # Try to fetch the maximum price calculation
+        with model_or_404(ApartmentMaxPriceCalculation):
+            ampc = ApartmentMaxPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+                apartment_id=apartment_id,
+                uuid=kwargs["pk"],
+            )
+
+        # Check calculation is not yet confirmed
+        if ampc.confirmed_at is not None:
+            return Response(
+                {
+                    "error": "already_confirmed",
+                    "message": "Maximum price calculation has already been confirmed.",
+                    "reason": "Conflict",
+                    "status": 409,
+                },
+                status=HTTPStatus.CONFLICT,
+            )
+
+        if confirm:
+            # Confirm the calculation by marking the `confirmed_at` to current timestamp and making it the latest
+            # confirmed calculation
+            ampc.confirmed_at = timezone.now()
+            ampc.save()
+
+            # Delete other unconfirmed calculations for this apartment
+            ApartmentMaxPriceCalculation.objects.filter(apartment_id=apartment_id, confirmed_at__isnull=True).delete()
+
+            return self.response(ampc)
+        else:
+            # In case the user wanted not to confirm we will delete the calculation
+            ampc.delete()
+            return Response(status=HTTPStatus.NO_CONTENT)
+
     @staticmethod
-    def _validation_error(field, details):
-        raise serializers.ValidationError({field: details})
+    def response(ampc):
+        retval = ampc.json
+        retval["confirmed_at"] = ampc.confirmed_at
+        return Response(retval)
+
+
+class ConfirmSerializer(Serializer):
+    confirm = fields.BooleanField(required=True)
+
+
+class CreateCalculationSerializer(Serializer):
+    calculation_date = fields.DateField(required=False, allow_null=True)
+    apartment_share_of_housing_company_loans = fields.IntegerField(min_value=0, allow_null=True, required=False)
+
+    @staticmethod
+    def validate_calculation_date(calculation_date):
+        if calculation_date is not None and calculation_date > timezone.now().date():
+            raise ValidationError("Field has to be less than or equal to current date.")
+        return calculation_date
+
+
+def model_or_404(model_class):
+    return ModelDoesNotExistContextManager(model_class)
+
+
+class ModelDoesNotExistContextManager:
+    def __init__(self, model_class):
+        self.model_class = model_class
+
+    def __enter__(self):
+        return self.model_class.objects
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if isinstance(exc_val, self.model_class.DoesNotExist):
+            raise HitasModelNotFound(model=self.model_class)

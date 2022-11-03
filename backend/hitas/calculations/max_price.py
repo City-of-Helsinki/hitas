@@ -1,6 +1,7 @@
 import datetime
+import uuid
 from decimal import ROUND_HALF_UP, Decimal
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Prefetch, Sum
@@ -10,6 +11,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
+    ApartmentMaxPriceCalculation,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
@@ -26,7 +28,7 @@ def calculate_max_price(
     apartment_uuid: str,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: int,
-):
+) -> Dict[str, Any]:
     if calculation_date is None:
         calculation_date = timezone.now().today()
 
@@ -37,7 +39,7 @@ def calculate_max_price(
     total_surface_area = (
         HousingCompany.objects.annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
         .only("id")
-        .get(id=apartment.building.real_estate.housing_company.id)
+        .get(id=apartment.housing_company.id)
         .sum_surface_area
     )
 
@@ -59,7 +61,7 @@ def calculate_max_price(
         total_surface_area,
         apartment_share_of_housing_company_loans,
         apartment.construction_price_improvements.all(),
-        apartment.building.real_estate.housing_company.construction_price_improvements.all(),
+        apartment.housing_company.construction_price_improvements.all(),
         calculation_date,
     )
     market_price_index = calculate_index(
@@ -69,7 +71,7 @@ def calculate_max_price(
         total_surface_area,
         apartment_share_of_housing_company_loans,
         apartment.market_price_improvements.all(),
-        apartment.building.real_estate.housing_company.market_price_improvements.all(),
+        apartment.housing_company.market_price_improvements.all(),
         calculation_date,
     )
     surface_area_price_ceiling = {
@@ -77,8 +79,8 @@ def calculate_max_price(
         "valid_until": surface_area_price_ceiling_validity(calculation_date),
         "calculation_variables": {
             "calculation_date": calculation_date,
-            "calculation_date_value": apartment.surface_area_price_ceiling_m2,
-            "surface_area": apartment.surface_area,
+            "calculation_date_value": roundup(apartment.surface_area_price_ceiling_m2, 2),
+            "surface_area": roundup(apartment.surface_area, 1),
         },
     }
 
@@ -103,16 +105,18 @@ def calculate_max_price(
         max_index = "surface_area_price_ceiling"
         valid_until = surface_area_price_ceiling["valid_until"]
 
-    return {
+    calculation = {
+        "id": uuid.uuid4().hex,
+        "created_at": timezone.now(),
+        "calculation_date": calculation_date,
+        "valid_until": valid_until,
+        "max_price": max_price,
+        "index": max_index,
         "calculations": {
             "construction_price_index": construction_price_index,
             "market_price_index": market_price_index,
             "surface_area_price_ceiling": surface_area_price_ceiling,
         },
-        "created": timezone.now(),
-        "valid_until": valid_until,
-        "max_price": max_price,
-        "index": max_index,
         "apartment": {
             "shares": {
                 "start": apartment.share_number_start,
@@ -120,8 +124,8 @@ def calculate_max_price(
                 "total": apartment.share_number_end - apartment.share_number_start + 1,
             },
             "rooms": apartment.rooms,
-            "apartment_type": apartment.apartment_type.value,
-            "surface_area": apartment.surface_area,
+            "type": apartment.apartment_type.value,
+            "surface_area": roundup(apartment.surface_area, 1),
             "address": {
                 "street_address": apartment.street_address,
                 "floor": apartment.floor,
@@ -130,20 +134,35 @@ def calculate_max_price(
                 "postal_code": apartment.postal_code.value,
                 "city": apartment.postal_code.city,
             },
-            "ownership": [
-                {"percentage": ownership.percentage, "name": ownership.owner.name}
+            "ownerships": [
+                {"percentage": roundup(ownership.percentage, 2), "name": ownership.owner.name}
                 for ownership in apartment.ownerships.all()
             ],
         },
         "housing_company": {
-            "official_name": apartment.building.real_estate.housing_company.official_name,
-            "archive_id": apartment.building.real_estate.housing_company.id,
+            "official_name": apartment.housing_company.official_name,
+            "archive_id": apartment.housing_company.id,
             "property_manager": {
-                "name": apartment.building.real_estate.housing_company.property_manager.name,
-                "street_address": apartment.building.real_estate.housing_company.property_manager.street_address,
+                "name": apartment.housing_company.property_manager.name,
+                "street_address": apartment.housing_company.property_manager.street_address,
             },
         },
     }
+
+    ApartmentMaxPriceCalculation.objects.create(
+        uuid=calculation["id"],
+        apartment=apartment,
+        max_price=max_price,
+        created_at=calculation["created_at"],
+        valid_until=valid_until,
+        calculation_date=calculation_date,
+        json=calculation,
+    )
+
+    # Don't save this to calculation json
+    calculation["confirmed_at"] = None
+
+    return calculation
 
 
 def fetch_apartment(
@@ -326,9 +345,9 @@ def calculate_index(
             "debt_free_price_m2": roundup(shares_debt_free_shares_price / apartment.surface_area),
             "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
             "completion_date": apartment.completion_date,
-            "completion_date_index": completion_date_index,
+            "completion_date_index": roundup(completion_date_index, 2),
             "calculation_date": calculation_date,
-            "calculation_date_index": calculation_date_index,
+            "calculation_date_index": roundup(calculation_date_index, 2),
         },
         "max_price": max_price,
         "valid_until": calculation_date + relativedelta(months=3),
@@ -355,5 +374,9 @@ def surface_area_price_ceiling_validity(date: datetime.date) -> datetime.date:
         return date.replace(year=date.year + 1, month=3, day=1) - relativedelta(days=1)
 
 
-def roundup(v: Decimal) -> int:
-    return int(v.quantize(0, ROUND_HALF_UP))
+def roundup(v: Decimal, decimals=0) -> Union[int, float]:
+    exp = Decimal("1." + ("0" * decimals))
+    if decimals == 0:
+        return int(v.quantize(exp, ROUND_HALF_UP))
+    else:
+        return float(v.quantize(exp, ROUND_HALF_UP))

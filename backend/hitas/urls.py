@@ -9,7 +9,7 @@ router.register(r"housing-companies", views.HousingCompanyViewSet, basename="hou
 router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
 router.register(r"owners", views.OwnerViewSet, basename="owner")
-router.register(r"indices/max-price-index", views.MaxPriceIndexViewSet, basename="max-price-index")
+router.register(r"indices/maximum-price-index", views.MaxPriceIndexViewSet, basename="maximum-price-index")
 router.register(r"indices/market-price-index", views.MarketPriceIndexViewSet, basename="market-price-index")
 router.register(
     r"indices/market-price-index-2005-equal-100",
@@ -53,7 +53,7 @@ apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", loo
 apartment_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
 
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
-apartment_router.register(r"maximum-price", views.ApartmentMaxPriceViewSet, basename="max-price")
+apartment_router.register(r"maximum-prices", views.ApartmentMaxPriceViewSet, basename="maximum-price")
 
 app_name = "hitas"
 urlpatterns = [

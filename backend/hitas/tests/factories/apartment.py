@@ -1,10 +1,19 @@
-from datetime import date
+import random
+from datetime import date, datetime, timezone
 
 import factory
 from factory import fuzzy
 from factory.django import DjangoModelFactory
+from factory.fuzzy import FuzzyDecimal
+from rest_framework.utils import json
+from rest_framework.utils.encoders import JSONEncoder
 
-from hitas.models import Apartment, ApartmentConstructionPriceImprovement, ApartmentMarketPriceImprovement
+from hitas.models import (
+    Apartment,
+    ApartmentConstructionPriceImprovement,
+    ApartmentMarketPriceImprovement,
+    ApartmentMaxPriceCalculation,
+)
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
 from hitas.tests.factories._base import AbstractImprovementFactory
 
@@ -50,3 +59,119 @@ class ApartmentConstructionPriceImprovementFactory(AbstractImprovementFactory):
 
     apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
     depreciation_percentage = fuzzy.FuzzyChoice(state[0] for state in DepreciationPercentage.choices())
+
+
+def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalculation:
+    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(**kwargs)
+
+    index = fuzzy.FuzzyChoice(["market_price_index", "construction_price_index", "surface_area_price_ceiling"]).fuzz()
+    completion_date = fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz()
+    calculation_date = fuzzy.FuzzyDate(date(2020, 1, 1)).fuzz()
+
+    mpc_json = {
+        "id": mpc.uuid.hex,
+        "created_at": mpc.created_at,
+        "max_price": mpc.max_price,
+        "calculation_date": mpc.calculation_date,
+        "valid_until": mpc.valid_until,
+        "index": index,
+        "calculations": {
+            "construction_price_index": {
+                "max_price": random.randint(100_000, 300_000),
+                "valid_until": mpc.valid_until,
+                "maximum": index == "construction_price_index",
+                "calculation_variables": {
+                    "acquisition_price": random.randint(100_000, 300_000),
+                    "additional_work_during_construction": random.randint(0, 50_000),
+                    "basic_price": random.randint(100_000, 300_000),
+                    "index_adjustment": random.randint(10_000, 50_000),
+                    "apartment_improvements": random.randint(0, 10_000),
+                    "housing_company_improvements": random.randint(0, 10_000),
+                    "debt_free_price": random.randint(100_000, 300_000),
+                    "debt_free_price_m2": random.randint(1_000, 10_000),
+                    "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
+                    "completion_date": completion_date,
+                    "completion_date_index": FuzzyDecimal(100, 300).fuzz(),
+                    "calculation_date": calculation_date,
+                    "calculation_date_index": FuzzyDecimal(300, 600).fuzz(),
+                },
+            },
+            "market_price_index": {
+                "max_price": random.randint(100_000, 300_000),
+                "valid_until": mpc.valid_until,
+                "maximum": index == "market_price_index",
+                "calculation_variables": {
+                    "acquisition_price": random.randint(100_000, 300_000),
+                    "additional_work_during_construction": random.randint(0, 50_000),
+                    "basic_price": random.randint(100_000, 300_000),
+                    "index_adjustment": random.randint(10_000, 50_000),
+                    "apartment_improvements": random.randint(0, 10_000),
+                    "housing_company_improvements": random.randint(0, 10_000),
+                    "debt_free_price": random.randint(100_000, 300_000),
+                    "debt_free_price_m2": random.randint(1_000, 10_000),
+                    "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
+                    "completion_date": completion_date,
+                    "completion_date_index": FuzzyDecimal(100, 300).fuzz(),
+                    "calculation_date": calculation_date,
+                    "calculation_date_index": FuzzyDecimal(300, 600).fuzz(),
+                },
+            },
+            "surface_area_price_ceiling": {
+                "max_price": random.randint(100_000, 300_000),
+                "valid_until": mpc.valid_until,
+                "maximum": index == "surface_area_price_ceiling",
+                "calculation_variables": {
+                    "calculation_date": calculation_date,
+                    "calculation_date_value": FuzzyDecimal(3000, 6000).fuzz(),
+                    "surface_area": mpc.apartment.surface_area,
+                },
+            },
+        },
+        "apartment": {
+            "address": {
+                "apartment_number": mpc.apartment.apartment_number,
+                "city": mpc.apartment.city,
+                "floor": mpc.apartment.floor,
+                "postal_code": mpc.apartment.postal_code.value,
+                "stair": mpc.apartment.stair,
+                "street_address": mpc.apartment.street_address,
+            },
+            "type": mpc.apartment.apartment_type.value,
+            "ownerships": [],
+            "rooms": mpc.apartment.rooms,
+            "shares": {
+                "start": mpc.apartment.share_number_start,
+                "end": mpc.apartment.share_number_end,
+                "total": 2383,
+            },
+            "surface_area": 30.0,
+        },
+        "housing_company": {
+            "archive_id": mpc.apartment.housing_company.id,
+            "official_name": mpc.apartment.housing_company.official_name,
+            "property_manager": {
+                "name": mpc.apartment.housing_company.property_manager.name,
+                "street_address": mpc.apartment.housing_company.property_manager.street_address,
+            },
+        },
+    }
+    # Encode and decode to get rid of `Decimal`, `datetime.date`, etc.
+    mpc.json = json.loads(JSONEncoder().encode(mpc_json))
+    mpc.save()
+
+    return mpc
+
+
+class ApartmentMaxPriceCalculationFactory(DjangoModelFactory):
+    class Meta:
+        model = ApartmentMaxPriceCalculation
+
+    apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
+    created_at = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=timezone.utc))
+    confirmed_at = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=timezone.utc))
+
+    calculation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    valid_until = fuzzy.FuzzyDate(date(2010, 1, 1))
+
+    max_price = fuzzy.FuzzyInteger(100000, 200000)
+    json = {}
