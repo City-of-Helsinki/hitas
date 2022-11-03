@@ -34,7 +34,7 @@ from hitas.models import (
     HousingCompanyState,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    MaxPriceIndex,
+    MaximumPriceIndex,
     Owner,
     Ownership,
     PropertyManager,
@@ -179,7 +179,7 @@ def run(
             converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Indices
-            create_indices(codebooks_by_id["HITASEHIND"], MaxPriceIndex)
+            create_indices(codebooks_by_id["HITASEHIND"], MaximumPriceIndex)
             create_indices(codebooks_by_id["MARKHINTAIND"], MarketPriceIndex)
             create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex2005Equal100)
             create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndex)

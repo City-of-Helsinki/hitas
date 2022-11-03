@@ -5,11 +5,11 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, ApartmentMaxPriceCalculation, HousingCompany
+from hitas.models import Apartment, ApartmentMaximumPriceCalculation, HousingCompany
 from hitas.tests.apis.apartment_max_price.utils import assert_created, create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentFactory, HousingCompanyFactory, OwnershipFactory
-from hitas.tests.factories.apartment import ApartmentMaxPriceCalculationFactory
+from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
 
 
 @pytest.mark.django_db
@@ -25,25 +25,25 @@ def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
     )
 
     # Create few unconfirmed calculations that gets removed after confirmation
-    unconfirmed_mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(
+    unconfirmed_mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None, apartment=a
     )
-    unconfirmed_mpc2: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(
+    unconfirmed_mpc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None, apartment=a
     )
-    unconfirmed_mpc_other_apartment: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(
+    unconfirmed_mpc_other_apartment: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None,
         apartment=ApartmentFactory.create(
             building__real_estate__housing_company=a.housing_company,
         ),
     )
-    unconfirmed_mpc_other_hc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(
+    unconfirmed_mpc_other_hc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None
     )
 
     # Create one confirmed calculation so that it's possible to verify the apartment's max price gets updated with the
     # latest calculation
-    confirmed_mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(apartment=a)
+    confirmed_mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(apartment=a)
 
     data = {
         "calculation_date": "2022-07-05",
@@ -93,20 +93,20 @@ def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
     }
 
     # Verify unconfirmed calculations were deleted
-    assert ApartmentMaxPriceCalculation.objects.filter(id=unconfirmed_mpc.id).first() is None
-    assert ApartmentMaxPriceCalculation.objects.filter(id=unconfirmed_mpc2.id).first() is None
+    assert ApartmentMaximumPriceCalculation.objects.filter(id=unconfirmed_mpc.id).first() is None
+    assert ApartmentMaximumPriceCalculation.objects.filter(id=unconfirmed_mpc2.id).first() is None
 
     # Verify confirmed calculations were *not* deleted
-    ApartmentMaxPriceCalculation.objects.get(id=confirmed_mpc.id)
+    ApartmentMaximumPriceCalculation.objects.get(id=confirmed_mpc.id)
 
     # Verify unconfirmed calculations for other housing companies or apartments were *not* deleted
-    ApartmentMaxPriceCalculation.objects.get(id=unconfirmed_mpc_other_apartment.id)
-    ApartmentMaxPriceCalculation.objects.get(id=unconfirmed_mpc_other_hc.id)
+    ApartmentMaximumPriceCalculation.objects.get(id=unconfirmed_mpc_other_apartment.id)
+    ApartmentMaximumPriceCalculation.objects.get(id=unconfirmed_mpc_other_hc.id)
 
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__confirm__false(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None)
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None)
 
     # Create max price calculation
     create_response = api_client.put(
@@ -120,12 +120,12 @@ def test__api__apartment_max_price__confirm__false(api_client: HitasAPIClient):
     assert create_response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify the calculation was removed
-    assert ApartmentMaxPriceCalculation.objects.filter(id=mpc.id).first() is None
+    assert ApartmentMaximumPriceCalculation.objects.filter(id=mpc.id).first() is None
 
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__confirm__already_confirmed(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
     create_response = api_client.put(
@@ -151,7 +151,9 @@ def test__api__apartment_max_price__confirm__incorrect_housing_company_uuid(api_
         completion_date=datetime.date(2019, 11, 27),
     )
     other_hc: HousingCompany = HousingCompanyFactory.create()
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        confirmed_at=None, apartment=a
+    )
 
     # Create max price calculation
     create_response = api_client.put(
@@ -173,7 +175,9 @@ def test__api__apartment_max_price__confirm__nonexistent_housing_company_uuid(ap
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
     )
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        confirmed_at=None, apartment=a
+    )
 
     # Create max price calculation
     create_response = api_client.put(
@@ -195,7 +199,9 @@ def test__api__apartment_max_price__confirm__incorrect_apartment_id(api_client: 
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
     )
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        confirmed_at=None, apartment=a
+    )
     a2: Apartment = ApartmentFactory.create(building__real_estate__housing_company=a.housing_company)
 
     # Create max price calculation
@@ -218,7 +224,9 @@ def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
     )
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        confirmed_at=None, apartment=a
+    )
 
     # Create max price calculation
     create_response = api_client.put(
@@ -240,7 +248,7 @@ def test__api__apartment_max_price__confirm__nonexistent_calculation_id(api_clie
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
     )
-    ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None, apartment=a)
 
     # Create max price calculation
     create_response = api_client.put(
@@ -262,8 +270,8 @@ def test__api__apartment_max_price__confirm__invalid_id(api_client: HitasAPIClie
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
     )
-    ApartmentMaxPriceCalculationFactory.create(confirmed_at=None, apartment=a)
-    mpc2: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(confirmed_at=None)
+    ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None, apartment=a)
+    mpc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None)
 
     # Create max price calculation
     create_response = api_client.put(

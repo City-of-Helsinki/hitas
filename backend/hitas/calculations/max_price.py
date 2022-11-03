@@ -11,7 +11,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
-    ApartmentMaxPriceCalculation,
+    ApartmentMaximumPriceCalculation,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
@@ -149,10 +149,10 @@ def calculate_max_price(
         },
     }
 
-    ApartmentMaxPriceCalculation.objects.create(
+    ApartmentMaximumPriceCalculation.objects.create(
         uuid=calculation["id"],
         apartment=apartment,
-        max_price=max_price,
+        maximum_price=max_price,
         created_at=calculation["created_at"],
         valid_until=valid_until,
         calculation_date=calculation_date,

@@ -11,7 +11,7 @@ from hitas.models import (
     ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    MaxPriceIndex,
+    MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
 
@@ -26,9 +26,9 @@ class AbstractIndexFactory(DjangoModelFactory):
     value = fuzzy.FuzzyDecimal(low=0)
 
 
-class MaxPriceIndexFactory(AbstractIndexFactory):
+class MaximumPriceIndexFactory(AbstractIndexFactory):
     class Meta:
-        model = MaxPriceIndex
+        model = MaximumPriceIndex
 
 
 class MarketPriceIndexFactory(AbstractIndexFactory):

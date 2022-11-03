@@ -158,7 +158,7 @@ class ApartmentConstructionPriceImprovement(HitasImprovement):
     depreciation_percentage = EnumField(DepreciationPercentage, default=DepreciationPercentage.TEN)
 
 
-class ApartmentMaxPriceCalculation(models.Model):
+class ApartmentMaximumPriceCalculation(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="max_price_calculations")
@@ -168,7 +168,7 @@ class ApartmentMaxPriceCalculation(models.Model):
     calculation_date = models.DateField()
     valid_until = models.DateField()
 
-    max_price = models.IntegerField(null=True, validators=[MinValueValidator(0)])
+    maximum_price = models.IntegerField(null=True, validators=[MinValueValidator(0)])
 
     json = models.JSONField(encoder=JSONEncoder)
     # `json_version` is not yet used but can be used later to determinate `json` structure changes etc

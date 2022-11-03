@@ -183,7 +183,7 @@ class PricesSerializer(serializers.Serializer):
                 "created_at",
                 "confirmed_at",
                 "calculation_date",
-                "max_price",
+                "maximum_price",
                 "valid_until",
                 "apartment_id",
             )
@@ -197,7 +197,7 @@ class PricesSerializer(serializers.Serializer):
         return (
             {
                 "id": latest_confirmed_max_price_calculation.uuid.hex,
-                "maximum_price": latest_confirmed_max_price_calculation.max_price,
+                "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
                 "created_at": latest_confirmed_max_price_calculation.created_at,
                 "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,
                 "calculation_date": latest_confirmed_max_price_calculation.calculation_date,

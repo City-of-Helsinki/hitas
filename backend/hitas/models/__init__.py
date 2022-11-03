@@ -2,7 +2,7 @@ from hitas.models.apartment import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
-    ApartmentMaxPriceCalculation,
+    ApartmentMaximumPriceCalculation,
     ApartmentState,
 )
 from hitas.models.building import Building
@@ -18,7 +18,7 @@ from hitas.models.indices import (
     ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    MaxPriceIndex,
+    MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
 from hitas.models.owner import Owner

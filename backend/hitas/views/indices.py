@@ -11,7 +11,7 @@ from hitas.models import (
     ConstructionPriceIndex2005Equal100,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    MaxPriceIndex,
+    MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
 from hitas.views.utils import HitasDecimalField, HitasModelMixin, HitasModelSerializer
@@ -78,9 +78,9 @@ class _AbstractIndicesViewSet(
         return datetime.datetime.strptime(self.kwargs["month"], "%Y-%m").date()
 
 
-class MaxPriceIndexViewSet(_AbstractIndicesViewSet):
+class MaximumPriceIndexViewSet(_AbstractIndicesViewSet):
     def __init__(self, **kwargs):
-        super().__init__(MaxPriceIndex, **kwargs)
+        super().__init__(MaximumPriceIndex, **kwargs)
 
 
 class MarketPriceIndexViewSet(_AbstractIndicesViewSet):

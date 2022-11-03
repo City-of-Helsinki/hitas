@@ -11,7 +11,7 @@ from hitas.tests.factories.indices import (
     ConstructionPriceIndexFactory,
     MarketPriceIndex2005Equal100Factory,
     MarketPriceIndexFactory,
-    MaxPriceIndexFactory,
+    MaximumPriceIndexFactory,
     SurfaceAreaPriceCeilingFactory,
 )
 
@@ -25,7 +25,7 @@ indices = [
 ]
 
 factories = [
-    MaxPriceIndexFactory,
+    MaximumPriceIndexFactory,
     MarketPriceIndexFactory,
     MarketPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,

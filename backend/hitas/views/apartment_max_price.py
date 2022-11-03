@@ -12,10 +12,10 @@ from hitas.calculations import calculate_max_price
 from hitas.calculations.max_price import IndexMissingException
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
-from hitas.models.apartment import ApartmentMaxPriceCalculation
+from hitas.models.apartment import ApartmentMaximumPriceCalculation
 
 
-class ApartmentMaxPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
+class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
     def create(self, request, *args, **kwargs):
         serializer = CreateCalculationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -47,7 +47,7 @@ class ApartmentMaxPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         return self.response(
-            ApartmentMaxPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+            ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
                 apartment__uuid=kwargs["apartment_uuid"],
                 apartment__building__real_estate__housing_company__uuid=kwargs["housing_company_uuid"],
                 uuid=kwargs["pk"],
@@ -69,8 +69,8 @@ class ApartmentMaxPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
             )
 
         # Try to fetch the maximum price calculation
-        with model_or_404(ApartmentMaxPriceCalculation):
-            ampc = ApartmentMaxPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+        with model_or_404(ApartmentMaximumPriceCalculation):
+            ampc = ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
             )
@@ -94,7 +94,9 @@ class ApartmentMaxPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
             ampc.save()
 
             # Delete other unconfirmed calculations for this apartment
-            ApartmentMaxPriceCalculation.objects.filter(apartment_id=apartment_id, confirmed_at__isnull=True).delete()
+            ApartmentMaximumPriceCalculation.objects.filter(
+                apartment_id=apartment_id, confirmed_at__isnull=True
+            ).delete()
 
             return self.response(ampc)
         else:

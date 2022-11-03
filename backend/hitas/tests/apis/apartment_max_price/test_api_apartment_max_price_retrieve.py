@@ -5,19 +5,19 @@ from dateutil import parser as dateparser
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, ApartmentMaxPriceCalculation, HousingCompany
+from hitas.models import Apartment, ApartmentMaximumPriceCalculation, HousingCompany
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import HousingCompanyFactory
 from hitas.tests.factories.apartment import (
     ApartmentFactory,
-    ApartmentMaxPriceCalculationFactory,
+    ApartmentMaximumPriceCalculationFactory,
     create_apartment_max_price_calculation,
 )
 
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = create_apartment_max_price_calculation(confirmed_at=None)
+    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(confirmed_at=None)
 
     response = api_client.get(
         reverse(
@@ -33,7 +33,7 @@ def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPICl
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__confirmed(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = create_apartment_max_price_calculation()
+    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation()
 
     response = api_client.get(
         reverse(
@@ -53,7 +53,7 @@ def test__api__apartment_max_price__retrieve__confirmed(api_client: HitasAPIClie
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__incorrect_housing_company_uuid(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     another_housing_company: HousingCompany = HousingCompanyFactory.create()
 
     # Create max price calculation
@@ -76,7 +76,7 @@ def test__api__apartment_max_price__retrieve__incorrect_housing_company_uuid(api
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__nonexistent_housing_company_id(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
     create_response = api_client.put(
@@ -98,7 +98,7 @@ def test__api__apartment_max_price__retrieve__nonexistent_housing_company_id(api
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__apartment_id_in_another_housing_company(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     another_apartment: Apartment = ApartmentFactory.create()
 
     # Create max price calculation
@@ -121,7 +121,7 @@ def test__api__apartment_max_price__retrieve__apartment_id_in_another_housing_co
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__incorrect_apartment_id(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     another_apartment: Apartment = ApartmentFactory.create(building=mpc.apartment.building)
 
     # Create max price calculation
@@ -144,7 +144,7 @@ def test__api__apartment_max_price__retrieve__incorrect_apartment_id(api_client:
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
     create_response = api_client.put(
@@ -166,9 +166,9 @@ def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__invalid_id(api_client: HitasAPIClient):
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     # Create another calculation to different apartment (and housing company)
-    another_mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create()
+    another_mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
     create_response = api_client.put(

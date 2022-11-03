@@ -911,7 +911,7 @@ paths:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaxPrice'
+                $ref: '#/components/schemas/ApartmentMaximumPrice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -958,7 +958,7 @@ paths:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaxPrice'
+                $ref: '#/components/schemas/ApartmentMaximumPrice'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -1017,7 +1017,7 @@ paths:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaxPrice'
+                $ref: '#/components/schemas/ApartmentMaximumPrice'
         '204':
           description: Calculation was successfully rejected and removed.
         '400':
@@ -3111,7 +3111,7 @@ components:
                       - 2.5
                       - 10
 
-    ApartmentMaxPriceCalculation:
+    ApartmentMaximumPriceCalculation:
       description: Calculations for particular index
       type: object
       required:
@@ -3121,7 +3121,7 @@ components:
         - valid_until
       properties:
         calculation_variables:
-          $ref: '#/components/schemas/ApartmentMaxPriceCalculationVars'
+          $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVars'
         maximum_price:
           description: Maximum price for this index
           type: integer
@@ -3137,7 +3137,7 @@ components:
           type: boolean
           example: true
 
-    ApartmentMaxPriceCalculationVars:
+    ApartmentMaximumPriceCalculationVars:
       description: Variables used for apartment's maximum price calculations
       type: object
       required:
@@ -3235,7 +3235,7 @@ components:
           minimum: 0
           example: 146.4
 
-    ApartmentMaxPrice:
+    ApartmentMaximumPrice:
       description: Single apartment's maximum price calculations
       type: object
       additionalProperties: false
@@ -3302,9 +3302,9 @@ components:
             - surface_area_price_ceiling
           properties:
             construction_price_index:
-              $ref: '#/components/schemas/ApartmentMaxPriceCalculation'
+              $ref: '#/components/schemas/ApartmentMaximumPriceCalculation'
             market_price_index:
-              $ref: '#/components/schemas/ApartmentMaxPriceCalculation'
+              $ref: '#/components/schemas/ApartmentMaximumPriceCalculation'
             surface_area_price_ceiling:
               description: Calculations for particular index
               type: object
