@@ -156,6 +156,17 @@ interface IApartmentLinkedModels {
     readonly apartment: IApartmentLinkedModel;
 }
 
+interface IApartmentUnconfirmedMaximumPrice {
+    maximum: boolean;
+    value: number;
+}
+
+interface IApartmentUnconfirmedMaximumPriceIndices {
+    construction_price_index: IApartmentUnconfirmedMaximumPrice;
+    market_price_index: IApartmentUnconfirmedMaximumPrice;
+    surface_area_price_ceiling: IApartmentUnconfirmedMaximumPrice;
+}
+
 interface IApartmentPrices {
     readonly acquisition_price: number | null;
 
@@ -174,10 +185,20 @@ interface IApartmentPrices {
     };
 
     max_prices: {
-        confirmed: number | null;
+        confirmed: {
+            id: string;
+            calculation_date: string;
+            confirmed_at: string;
+            created_at: string;
+            max_price: number;
+            valid: {
+                is_valid: boolean;
+                valid_until: string;
+            };
+        };
         unconfirmed: {
-            onwards_2011;
-            pre_2011;
+            onwards_2011: IApartmentUnconfirmedMaximumPriceIndices;
+            pre_2011: IApartmentUnconfirmedMaximumPriceIndices;
         };
     };
 }
