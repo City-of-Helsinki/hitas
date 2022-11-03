@@ -85,7 +85,7 @@ const MaximumPriceModalContent = ({
                     </div>
                 </div>
             </Dialog.Content>
-            <Dialog.ActionButtons>
+            <Dialog.ActionButtons className="align-content-right">
                 <Button
                     onClick={() => setIsModalVisible(false)}
                     variant="secondary"
@@ -179,7 +179,10 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                     </div>
                 </Fieldset>
             </div>
-            <div>
+            <div
+                className="align-content-right"
+                style={{marginTop: "10px"}}
+            >
                 <NavigateBackButton />
                 <Button
                     theme="black"
