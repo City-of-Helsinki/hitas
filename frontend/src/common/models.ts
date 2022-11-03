@@ -195,7 +195,7 @@ interface IApartmentPrices {
                 is_valid: boolean;
                 valid_until: string;
             };
-        };
+        } | null;
         unconfirmed: {
             onwards_2011: IApartmentUnconfirmedMaximumPriceIndices;
             pre_2011: IApartmentUnconfirmedMaximumPriceIndices;
@@ -339,16 +339,10 @@ export interface IApartmentMaximumPrice {
     };
 }
 
-export type IApartmentMaximumPriceWritable =
-    // Used when creating a calculation
-    | {
-          calculation_date: string | null;
-          apartment_share_of_housing_company_loans: number | null;
-      }
-    // Used when confirming a calculation
-    | {
-          confirm: true;
-      };
+export interface IApartmentMaximumPriceWritable {
+    calculation_date: string | null;
+    apartment_share_of_housing_company_loans: number | null;
+}
 
 // Indices
 

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 
+import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
@@ -102,6 +103,27 @@ const MaximumPriceModalContent = ({
     );
 };
 
+const MaximumPriceModalError = ({error, setIsModalVisible}) => {
+    const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
+    return (
+        <>
+            <Dialog.Content>
+                <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
+                <p>{nonFieldError}</p>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsModalVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Sulje
+                </Button>
+            </Dialog.ActionButtons>
+        </>
+    );
+};
+
 const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): JSX.Element => {
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
@@ -115,13 +137,27 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
     } = useGetHousingCompanyDetailQuery(apartment.links.housing_company.id);
     const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
+    useEffect(() => {
+        // Field errors, don't show modal as they are displayed on the fields instead
+        if ((error as {data?: {fields: []}})?.data?.fields?.length) {
+            setIsModalVisible(false);
+        }
+    }, [error]);
+
     const handleCalculateButton = () => {
+        // Replace apartment_share_of_housing_company_loans `null` value with a zero (API expects an integer)
+        const parsedFormData = {
+            ...formData,
+            apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
+        };
+
         saveMaximumPrice({
-            data: formData,
+            data: parsedFormData,
             id: undefined,
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
         });
+
         setIsModalVisible(true);
     };
 
@@ -142,7 +178,6 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             unit="€"
                             label="Yhtiölainaosuus"
                             fieldPath="apartment_share_of_housing_company_loans"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -209,6 +244,12 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                     data={data}
                     error={error}
                     isLoading={isLoading}
+                    errorComponent={
+                        <MaximumPriceModalError
+                            error={error}
+                            setIsModalVisible={setIsModalVisible}
+                        />
+                    }
                 >
                     <MaximumPriceModalContent
                         calculation={data as IApartmentMaximumPrice}

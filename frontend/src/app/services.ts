@@ -199,7 +199,12 @@ const mutationApi = hitasApi.injectEndpoints({
         }),
         saveApartmentMaximumPrice: builder.mutation<
             IApartmentMaximumPrice,
-            {data: IApartmentMaximumPriceWritable; id?: string; apartmentId: string; housingCompanyId: string}
+            {
+                data: IApartmentMaximumPriceWritable | {confirm: true};
+                id?: string;
+                apartmentId: string;
+                housingCompanyId: string;
+            }
         >({
             query: ({data, id, apartmentId, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices${idOrBlank(id)}`,
