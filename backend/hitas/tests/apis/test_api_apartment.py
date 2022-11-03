@@ -210,7 +210,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=100000,
+        debt_free_purchase_price=80000,
+        primary_loan_amount=20000,
         surface_area=50,
     )
     hc: HousingCompany = ap.housing_company
@@ -278,11 +279,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "pre_2011": None,
                     "onwards_2011": {
                         "construction_price_index": {
-                            "value": 150000,  # 100000 (debt_free_purchase_price) * 150/100
+                            "value": 150000,  # (80000 + 20000) * 150/100
                             "maximum": True,
                         },
                         "market_price_index": {
-                            "value": 125000,  # 100000 (debt_free_purchase_price) * 250/200
+                            "value": 125000,  # (80000 + 20000) * 250/200
                             "maximum": False,
                         },
                         "surface_area_price_ceiling": {
@@ -364,7 +365,8 @@ def _test_max_prices(
 
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
-        debt_free_purchase_price=100000 if not null_values else None,
+        debt_free_purchase_price=80000 if not null_values else None,
+        primary_loan_amount=20000 if not null_values else None,
         surface_area=50 if not null_values else None,
     )
 
