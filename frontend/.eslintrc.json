@@ -41,6 +41,8 @@
     },
     "plugins": [
         "@typescript-eslint",
-        "prettier"
-    ]
+        "prettier",
+        "react-hooks"
+    ],
+    "ignorePatterns": ["react-app-env.d.ts"]
 }

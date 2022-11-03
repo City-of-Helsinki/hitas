@@ -22,9 +22,12 @@ export default function FilterRelatedModelComboboxField({
     const MIN_LENGTH = 2; // Minimum characters before querying more data from the API
     const [queryFilterValue, setQueryFilterValue] = useState("");
     const [options, setOptions] = useState([{label: "Loading...", disabled: true}]);
-    const [skip, setSkip] = useState(true);
+    const [isQuerySkipped, setIsQuerySkipped] = useState(true);
 
-    const {data} = queryFunction({...(queryFilterValue ? {[labelField]: queryFilterValue} : {})}, {skip: skip});
+    const {data} = queryFunction(
+        {...(queryFilterValue ? {[labelField]: queryFilterValue} : {})},
+        {skip: isQuerySkipped}
+    );
 
     useEffect(() => {
         if (data && data?.contents) {
@@ -96,8 +99,8 @@ export default function FilterRelatedModelComboboxField({
             isOptionDisabled={(option, index: number) => option?.disabled}
             toggleButtonAriaLabel="Toggle menu"
             onChange={onSelectionChange}
-            onFocus={() => setSkip(false)} // Load options only after field is focused to reduce unnecessary api queries
-            onBlur={() => setSkip(true)}
+            onFocus={() => setIsQuerySkipped(false)} // Load options only after field is focused to reduce unnecessary api queries
+            onBlur={() => setIsQuerySkipped(true)}
             filter={filterFunction}
             clearable
         />

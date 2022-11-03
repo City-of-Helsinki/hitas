@@ -36,6 +36,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "eslint-check": "eslint-config-prettier src/index.tsx",
+    "eslint-fix": "eslint src --fix",
     "prettier-format": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --write"
   },
   "browserslist": {
