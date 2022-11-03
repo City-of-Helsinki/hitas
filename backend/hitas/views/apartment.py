@@ -483,7 +483,9 @@ class ApartmentViewSet(HitasModelViewSet):
         return f"""
     SELECT
         ROUND(
-            a.debt_free_purchase_price * current_{table}.value / NULLIF(original_{table}.value, 0)
+            (
+                a.debt_free_purchase_price + a.primary_loan_amount
+            ) * current_{table}.value / NULLIF(original_{table}.value, 0)
         ) AS max_price_{table}
     FROM hitas_apartment AS a
     LEFT JOIN hitas_{table} AS original_{table} ON

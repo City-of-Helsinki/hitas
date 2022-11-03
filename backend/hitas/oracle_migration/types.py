@@ -2,6 +2,7 @@ import datetime
 import random
 
 import sqlalchemy.types as types
+from dateutil.relativedelta import relativedelta
 
 from hitas.oracle_migration.globals import faker, should_anonymize
 
@@ -156,11 +157,18 @@ class HitasAnonymizedText(HitasAnonymized):
         return faker().text(max_nb_chars=self.length)
 
 
-class HitasAnonymizedDate(HitasAnonymized):
+class HitasAnonymizedMonthAndDay(HitasAnonymized):
     def fake(self, value):
         beginning_of_year = value.replace(day=1, month=1)
         beginning_of_next_year = beginning_of_year.replace(year=beginning_of_year.year + 1)
         return faker().date_between_dates(beginning_of_year, beginning_of_next_year)
+
+
+class HitasAnonymizedDay(HitasAnonymized):
+    def fake(self, value):
+        beginning_of_month = value.replace(day=1)
+        beginning_of_next_month = value + relativedelta(months=1)
+        return faker().date_between_dates(beginning_of_month, beginning_of_next_month)
 
 
 class HitasAnonymizedEmail(HitasAnonymized):
