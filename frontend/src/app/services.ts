@@ -52,7 +52,7 @@ export const hitasApi = createApi({
     endpoints: (builder) => ({}),
 });
 
-export const listApi = hitasApi.injectEndpoints({
+const listApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         getHousingCompanies: builder.query<IHousingCompanyListResponse, object>({
             query: (params: object) => ({
@@ -148,7 +148,7 @@ export const listApi = hitasApi.injectEndpoints({
     }),
 });
 
-export const detailApi = hitasApi.injectEndpoints({
+const detailApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
@@ -174,7 +174,7 @@ export const detailApi = hitasApi.injectEndpoints({
     }),
 });
 
-export const mutationApi = hitasApi.injectEndpoints({
+const mutationApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
             query: ({data, id}) => ({

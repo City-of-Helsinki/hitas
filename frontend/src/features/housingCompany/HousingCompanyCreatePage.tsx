@@ -44,14 +44,14 @@ const getHousingCompanyStateName = (state) => {
     }
 };
 
-interface IHousingCompanyState {
+interface IHousingCompanyLocationState {
     pathname: string;
     state: null | {housingCompany: IHousingCompanyDetails};
 }
 
 const HousingCompanyCreatePage = (): JSX.Element => {
     const navigate = useNavigate();
-    const {pathname, state}: IHousingCompanyState = useLocation();
+    const {pathname, state}: IHousingCompanyLocationState = useLocation();
     const isEditPage = pathname.split("/").at(-1) === "edit";
 
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
