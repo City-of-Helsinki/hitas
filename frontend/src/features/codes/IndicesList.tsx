@@ -14,11 +14,11 @@ const indexTypes: {label: string}[] = [
     {label: "construction-price-index"},
     {label: "construction-price-index-2005-equal-100"},
     {label: "surface-area-price-ceiling"},
-    {label: "max-price-index"},
+    {label: "maximum-price-index"},
 ];
 const getIndexTypeName = (indexType: string): string => {
     switch (indexType) {
-        case "max-price-index":
+        case "maximum-price-index":
             return "Luovutushintaindeksi";
         case "market-price-index":
             return "Markkinahintaindeksi 1983";

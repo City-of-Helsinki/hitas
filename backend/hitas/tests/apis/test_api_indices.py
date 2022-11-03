@@ -16,7 +16,7 @@ from hitas.tests.factories.indices import (
 )
 
 indices = [
-    "max-price-index",
+    "maximum-price-index",
     "market-price-index",
     "market-price-index-2005-equal-100",
     "construction-price-index",

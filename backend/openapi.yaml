@@ -2451,15 +2451,15 @@ components:
         description: |-
           Index name. Can have one of the following values:
 
-          - max-value-index
+          - maximum-price-index
           - market-price-index
           - market-price-index-2005-equal-100
           - construction-price-index
           - construction-price-index-2005-equal-100
         type: string
-        example: max-value-index
+        example: maximum-price-index
         x-extensible-enum:
-          - max-value-index
+          - maximum-price-index
           - market-price-index
           - market-price-index-2005-equal-100
           - construction-price-index
