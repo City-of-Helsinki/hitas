@@ -273,7 +273,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "debt_free_purchase_price": ap.debt_free_purchase_price_during_construction,
                 "additional_work": ap.additional_work_during_construction,
             },
-            "max_prices": {
+            "maximum_prices": {
                 "confirmed": None,
                 "unconfirmed": {
                     "pre_2011": None,
@@ -403,7 +403,7 @@ def _test_max_prices(
     }
 
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["prices"]["max_prices"]["unconfirmed"] == {
+    assert response.json()["prices"]["maximum_prices"]["unconfirmed"] == {
         "pre_2011": values if pre_2011 else None,
         "onwards_2011": None if pre_2011 else values,
     }
@@ -742,7 +742,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                 "debt_free_purchase_price": None,
                 "first_purchase_date": None,
                 "latest_purchase_date": None,
-                "max_prices": {
+                "maximum_prices": {
                     "confirmed": None,
                     "unconfirmed": {
                         "onwards_2011": {

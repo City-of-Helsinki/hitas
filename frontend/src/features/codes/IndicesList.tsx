@@ -193,7 +193,7 @@ const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeMod
         } else {
             hitasToast("Indeksin tallennus epäonnistui", "error");
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line
     }, [isLoading, error, data]);
 
     return (

@@ -11,7 +11,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
-    ApartmentMaxPriceCalculation,
+    ApartmentMaximumPriceCalculation,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
@@ -75,7 +75,7 @@ def calculate_max_price(
         calculation_date,
     )
     surface_area_price_ceiling = {
-        "max_price": roundup(apartment.surface_area_price_ceiling),
+        "maximum_price": roundup(apartment.surface_area_price_ceiling),
         "valid_until": surface_area_price_ceiling_validity(calculation_date),
         "calculation_variables": {
             "calculation_date": calculation_date,
@@ -86,14 +86,14 @@ def calculate_max_price(
 
     # Find and mark the maximum
     max_price = max(
-        construction_price_index["max_price"],
-        market_price_index["max_price"],
-        surface_area_price_ceiling["max_price"],
+        construction_price_index["maximum_price"],
+        market_price_index["maximum_price"],
+        surface_area_price_ceiling["maximum_price"],
     )
 
-    surface_area_price_ceiling["maximum"] = max_price == surface_area_price_ceiling["max_price"]
-    market_price_index["maximum"] = max_price == market_price_index["max_price"]
-    construction_price_index["maximum"] = max_price == construction_price_index["max_price"]
+    surface_area_price_ceiling["maximum"] = max_price == surface_area_price_ceiling["maximum_price"]
+    market_price_index["maximum"] = max_price == market_price_index["maximum_price"]
+    construction_price_index["maximum"] = max_price == construction_price_index["maximum_price"]
 
     if market_price_index["maximum"]:
         max_index = "market_price_index"
@@ -110,7 +110,7 @@ def calculate_max_price(
         "created_at": timezone.now(),
         "calculation_date": calculation_date,
         "valid_until": valid_until,
-        "max_price": max_price,
+        "maximum_price": max_price,
         "index": max_index,
         "calculations": {
             "construction_price_index": construction_price_index,
@@ -149,10 +149,10 @@ def calculate_max_price(
         },
     }
 
-    ApartmentMaxPriceCalculation.objects.create(
+    ApartmentMaximumPriceCalculation.objects.create(
         uuid=calculation["id"],
         apartment=apartment,
-        max_price=max_price,
+        maximum_price=max_price,
         created_at=calculation["created_at"],
         valid_until=valid_until,
         calculation_date=calculation_date,
@@ -349,7 +349,7 @@ def calculate_index(
             "calculation_date": calculation_date,
             "calculation_date_index": roundup(calculation_date_index, 2),
         },
-        "max_price": max_price,
+        "maximum_price": max_price,
         "valid_until": calculation_date + relativedelta(months=3),
     }
 

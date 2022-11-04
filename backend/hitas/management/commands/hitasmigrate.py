@@ -2,7 +2,7 @@ import os
 
 from django.core.management.base import BaseCommand, CommandParser
 
-from hitas.oracle_migration.runner import run
+from hitas.models import MigrationDone
 
 
 class Command(BaseCommand):
@@ -15,6 +15,7 @@ class Command(BaseCommand):
             "--truncate", action="store_true", help="Truncate hitas tables before starting the migration."
         )
         parser.add_argument("--truncate-only", action="store_true", help="Truncate hitas tables and quits.")
+        parser.add_argument("--check", action="store_true", help="Checks only if database migration has been done.")
         parser.add_argument("--oracle-host", default="localhost", help="Oracle database host (default: 'localhost').")
         parser.add_argument("--oracle-port", type=int, default=1521, help="Oracle database port (default: 1521).")
         parser.add_argument("--oracle-user", default="system", help="Oracle database user (default: 'system').")
@@ -30,6 +31,16 @@ class Command(BaseCommand):
             oracle_pw = os.environ["HITAS_ORACLE_PASSWORD"]
         except KeyError:
             oracle_pw = options["oracle_password"]
+
+        if MigrationDone.objects.first() and not (options["truncate"] or options["truncate_only"]):
+            print("Migration already done...")
+            exit(1)
+        if options["check"]:
+            return
+
+        # Import migration runner here so its dependencies (like sqlalchemy) are not required for a simple
+        # check if migration is done
+        from hitas.oracle_migration.runner import run
 
         run(
             options["oracle_host"],

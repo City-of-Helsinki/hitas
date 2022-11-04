@@ -167,9 +167,9 @@ class PricesSerializer(serializers.Serializer):
     first_purchase_date = serializers.DateField(required=False, allow_null=True)
     latest_purchase_date = serializers.DateField(required=False, allow_null=True)
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
-    max_prices = serializers.SerializerMethodField()
+    maximum_prices = serializers.SerializerMethodField()
 
-    def get_max_prices(self, instance: Apartment) -> Dict[str, Any]:
+    def get_maximum_prices(self, instance: Apartment) -> Dict[str, Any]:
         return {
             "unconfirmed": self.get_unconfirmed_max_prices(instance),
             "confirmed": self.get_confirmed_max_prices(instance),
@@ -183,7 +183,7 @@ class PricesSerializer(serializers.Serializer):
                 "created_at",
                 "confirmed_at",
                 "calculation_date",
-                "max_price",
+                "maximum_price",
                 "valid_until",
                 "apartment_id",
             )
@@ -197,7 +197,7 @@ class PricesSerializer(serializers.Serializer):
         return (
             {
                 "id": latest_confirmed_max_price_calculation.uuid.hex,
-                "max_price": latest_confirmed_max_price_calculation.max_price,
+                "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
                 "created_at": latest_confirmed_max_price_calculation.created_at,
                 "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,
                 "calculation_date": latest_confirmed_max_price_calculation.calculation_date,

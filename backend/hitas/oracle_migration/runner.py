@@ -34,7 +34,8 @@ from hitas.models import (
     HousingCompanyState,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    MaxPriceIndex,
+    MaximumPriceIndex,
+    MigrationDone,
     Owner,
     Ownership,
     PropertyManager,
@@ -179,7 +180,7 @@ def run(
             converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Indices
-            create_indices(codebooks_by_id["HITASEHIND"], MaxPriceIndex)
+            create_indices(codebooks_by_id["HITASEHIND"], MaximumPriceIndex)
             create_indices(codebooks_by_id["MARKHINTAIND"], MarketPriceIndex)
             create_indices(codebooks_by_id["MARKHINTAIND2005"], MarketPriceIndex2005Equal100)
             create_indices(codebooks_by_id["RAKUSTIND"], ConstructionPriceIndex)
@@ -225,6 +226,8 @@ def run(
 
             # Apartment owners
             create_ownerships(connection, converted_data)
+
+    MigrationDone.objects.create()
 
 
 def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
@@ -771,5 +774,6 @@ def do_truncate():
         ConstructionPriceIndex,
         MarketPriceIndex,
         MarketPriceIndex2005Equal100,
+        MigrationDone,
     ]:
         model_class.objects.all().delete()

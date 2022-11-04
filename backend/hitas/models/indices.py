@@ -13,10 +13,10 @@ class AbstractIndex(models.Model):
 
 
 # 'Enimmäishintaindeksi'
-class MaxPriceIndex(AbstractIndex):
+class MaximumPriceIndex(AbstractIndex):
     class Meta:
-        verbose_name = _("Max price index")
-        verbose_name_plural = _("Max price indices")
+        verbose_name = _("Maximum price index")
+        verbose_name_plural = _("Maximum price indices")
 
 
 # 'Markkinahintaindeksi'

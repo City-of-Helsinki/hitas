@@ -184,13 +184,13 @@ interface IApartmentPrices {
         debt_free_purchase_price: number | null;
     };
 
-    max_prices: {
+    maximum_prices: {
         confirmed: {
             id: string;
             calculation_date: string;
             confirmed_at: string;
             created_at: string;
-            max_price: number;
+            maximum_price: number;
             valid: {
                 is_valid: boolean;
                 valid_until: string;
@@ -261,7 +261,7 @@ export interface IApartmentWritable {
         end: number | null;
     };
     address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
-    prices: Omit<IApartmentPrices, "max_prices" | "acquisition_price">;
+    prices: Omit<IApartmentPrices, "maximum_prices" | "acquisition_price">;
     completion_date?: string | null;
     building: string;
     ownerships: IOwnership[];
@@ -277,7 +277,7 @@ export interface IApartmentWritable {
 // //  Maximum Price Fields
 
 interface ICalculation {
-    max_price: number;
+    maximum_price: number;
     valid_until: string;
     maximum: boolean;
 }
@@ -306,7 +306,7 @@ export interface IApartmentMaximumPrice {
     readonly id: string;
     created_at: string;
     confirmed_at: string | null;
-    max_price: number;
+    maximum_price: number;
     calculation_date: string;
     valid_until: string;
     index: string;

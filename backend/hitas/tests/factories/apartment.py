@@ -12,7 +12,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
-    ApartmentMaxPriceCalculation,
+    ApartmentMaximumPriceCalculation,
 )
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
 from hitas.tests.factories._base import AbstractImprovementFactory
@@ -61,8 +61,8 @@ class ApartmentConstructionPriceImprovementFactory(AbstractImprovementFactory):
     depreciation_percentage = fuzzy.FuzzyChoice(state[0] for state in DepreciationPercentage.choices())
 
 
-def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalculation:
-    mpc: ApartmentMaxPriceCalculation = ApartmentMaxPriceCalculationFactory.create(**kwargs)
+def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCalculation:
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(**kwargs)
 
     index = fuzzy.FuzzyChoice(["market_price_index", "construction_price_index", "surface_area_price_ceiling"]).fuzz()
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz()
@@ -71,13 +71,13 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
     mpc_json = {
         "id": mpc.uuid.hex,
         "created_at": mpc.created_at,
-        "max_price": mpc.max_price,
+        "maximum_price": mpc.maximum_price,
         "calculation_date": mpc.calculation_date,
         "valid_until": mpc.valid_until,
         "index": index,
         "calculations": {
             "construction_price_index": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "construction_price_index",
                 "calculation_variables": {
@@ -97,7 +97,7 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
                 },
             },
             "market_price_index": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "market_price_index",
                 "calculation_variables": {
@@ -117,7 +117,7 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
                 },
             },
             "surface_area_price_ceiling": {
-                "max_price": random.randint(100_000, 300_000),
+                "maximum_price": random.randint(100_000, 300_000),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "surface_area_price_ceiling",
                 "calculation_variables": {
@@ -162,9 +162,9 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaxPriceCalcula
     return mpc
 
 
-class ApartmentMaxPriceCalculationFactory(DjangoModelFactory):
+class ApartmentMaximumPriceCalculationFactory(DjangoModelFactory):
     class Meta:
-        model = ApartmentMaxPriceCalculation
+        model = ApartmentMaximumPriceCalculation
 
     apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
     created_at = fuzzy.FuzzyDateTime(datetime(2010, 1, 1, tzinfo=timezone.utc))
@@ -173,5 +173,5 @@ class ApartmentMaxPriceCalculationFactory(DjangoModelFactory):
     calculation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     valid_until = fuzzy.FuzzyDate(date(2010, 1, 1))
 
-    max_price = fuzzy.FuzzyInteger(100000, 200000)
+    maximum_price = fuzzy.FuzzyInteger(100000, 200000)
     json = {}

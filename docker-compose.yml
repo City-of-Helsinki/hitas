@@ -49,10 +49,18 @@ services:
       - hitas-backend
 
   swagger-editor:
-    image: swaggerapi/swagger-editor:v4.2.9
+    image: swaggerapi/swagger-editor:v4.5.2
     environment:
        SWAGGER_FILE: /swagger/openapi.yaml
     ports:
       - 8090:8080
     volumes:
       - ./backend/openapi.yaml:/swagger/openapi.yaml:ro
+
+  oracle:
+    image: quay.io/maksymbilenko/oracle-12c:latest
+    ports:
+      - 8005:8080
+      - 1521:1521
+    volumes:
+      - ./backend/oracle-data:/u01/app/oracle
