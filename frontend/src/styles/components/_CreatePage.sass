@@ -25,8 +25,11 @@
         justify-content: space-between
         gap: inherit
 
-        > div:not(:first-child:last-child)
-          width: 50%
+        > div
+          position: relative
+          z-index: 2
+          &:not(:first-child:last-child)
+            width: 50%
 
     h4
       margin-bottom: 0
@@ -34,22 +37,29 @@
     label
       font-size: $fontsize-body-s
       height: 20px
+      position: relative
+      z-index: 1
+
+    .input-field
+      position: relative
+      z-index: 1
 
     .input-field--required label
       font-weight: 700
 
+    .input-field--date
+      position: relative
+      z-index: 900 !important
+      transform: translateY(2px)
+
+      [class*="input-wrapper"]
+        transform: translateY(-2px)
 
     .input-field--related-model
       transform: translateY(4px)
 
       [class*="input-wrapper"]
         transform: translateY(-4px)
-
-    .input-field--date
-      transform: translateY(2px)
-
-      [class*="input-wrapper"]
-        transform: translateY(-2px)
 
   [class*="input-field"]
     height: 81px
