@@ -166,7 +166,7 @@ construction_price_indices = Table(
     Column("N_HUOVAH2", Integer, nullable=False),
     Column("N_YHTLAINA2", Integer, nullable=False),
     Column("N_EHINTAM22", Integer, nullable=False),
-    Column("N_EHINTA2", Integer, nullable=False),
+    Column("N_EHINTA2", Integer, key="max_price", nullable=False),
     Column("C_LASKAAVA", String(50)),
     Column("C_LISATIETO1", HitasBoolean, nullable=False),
     Column("C_LISATVIITE1", String(10), nullable=False),  # Always 'HITRAKIND'
@@ -175,7 +175,7 @@ construction_price_indices = Table(
     Column("C_LISATIETO3", HitasBoolean, nullable=False),
     Column("C_LISATVIITE3", String(10), nullable=False),  # Always 'HITRAKIYH'
     Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
+    Column("D_MUUTETTU", Date, key="last_modified", nullable=False),
 )
 
 company_construction_price_indices = Table(
@@ -262,7 +262,7 @@ market_price_indices = Table(
     Column("N_VELHINTA", Integer, nullable=False),
     Column("N_YHTLAINA", Integer, nullable=False),
     Column("N_HUOVAH", Integer, nullable=False),
-    Column("N_EHINTA", Integer, nullable=False),
+    Column("N_EHINTA", Integer, key="max_price", nullable=False),
     Column("N_EHINTAM2", Integer, nullable=False),
     Column("C_LASKAAVA", String(50)),
     Column("C_LISATIETO1", HitasBoolean, nullable=False),
@@ -272,7 +272,7 @@ market_price_indices = Table(
     Column("C_LISATIETO3", HitasBoolean, nullable=False),
     Column("C_LISATVIITE3", String(10), nullable=False),  # Always 'HITMHIYH'
     Column("C_MUUTTAJA", String(10), nullable=False),
-    Column("D_MUUTETTU", Date, nullable=False),
+    Column("D_MUUTETTU", Date, key="last_modified", nullable=False),
     Column("D_VIIMVALMPVM", Date, nullable=False),
     Column("N_RAKINDVPVM", Float, nullable=False),
     Column("N_RAKINDLPVM", Float, nullable=False),

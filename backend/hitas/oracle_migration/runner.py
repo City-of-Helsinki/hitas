@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Type, TypeVar
 
 import pytz
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
 from django.db import models
@@ -19,6 +20,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
+    ApartmentMaximumPriceCalculation,
     ApartmentState,
     ApartmentType,
     Building,
@@ -226,6 +228,9 @@ def run(
 
             # Apartment owners
             create_ownerships(connection, converted_data)
+
+            # Apartment maximum price calculations
+            create_apartment_max_price_calculations(connection, converted_data)
 
     MigrationDone.objects.create()
 
@@ -581,6 +586,27 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
     print()
 
 
+def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
+
+    for mpc in (
+        connection.execute(select(construction_price_indices)).fetchall()
+        + connection.execute(select(market_price_indices)).fetchall()
+    ):
+        if mpc["apartment_id"] not in converted_data.apartments_by_oracle_id:
+            continue
+
+        ApartmentMaximumPriceCalculation.objects.create(
+            apartment=converted_data.apartments_by_oracle_id[mpc["apartment_id"]],
+            created_at=date_to_datetime(mpc["last_modified"]),
+            confirmed_at=date_to_datetime(mpc["last_modified"]),
+            calculation_date=mpc["calculation_date"],
+            valid_until=mpc["calculation_date"] + relativedelta(months=3),
+            maximum_price=mpc["max_price"],
+            json=None,
+            json_version=None,
+        )
+
+
 def create_property_managers(connection: Connection) -> Dict[str, PropertyManager]:
     property_managers_by_id = {}
 
@@ -774,6 +800,7 @@ def do_truncate():
         ConstructionPriceIndex,
         MarketPriceIndex,
         MarketPriceIndex2005Equal100,
+        ApartmentMaximumPriceCalculation,
         MigrationDone,
     ]:
         model_class.objects.all().delete()

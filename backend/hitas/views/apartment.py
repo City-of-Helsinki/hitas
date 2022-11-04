@@ -186,17 +186,23 @@ class PricesSerializer(serializers.Serializer):
                 "maximum_price",
                 "valid_until",
                 "apartment_id",
+                "json_version",
             )
             .filter(
                 confirmed_at__isnull=False,
             )
             .order_by("-confirmed_at")
+            .order_by("-maximum_price")  # migrated calculations have the same datestamp
             .first()
         )
 
         return (
             {
-                "id": latest_confirmed_max_price_calculation.uuid.hex,
+                "id": (
+                    latest_confirmed_max_price_calculation.uuid.hex
+                    if latest_confirmed_max_price_calculation.json_version is not None
+                    else None
+                ),
                 "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
                 "created_at": latest_confirmed_max_price_calculation.created_at,
                 "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,

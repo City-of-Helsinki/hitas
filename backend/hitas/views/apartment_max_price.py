@@ -52,12 +52,16 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
-            return self.response(
-                ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
-                    apartment_id=apartment_id,
-                    uuid=kwargs["pk"],
-                )
+            mpc = ApartmentMaximumPriceCalculation.objects.only(
+                "json_version", "json", "confirmed_at", "apartment_id"
+            ).get(
+                apartment_id=apartment_id,
+                uuid=kwargs["pk"],
             )
+            if mpc.json_version is None:
+                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
+
+            return self.response(mpc)
 
     def update(self, request, *args, **kwargs):
         serializer = ConfirmSerializer(data=request.data)
@@ -70,10 +74,15 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
-            ampc = ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+            ampc = ApartmentMaximumPriceCalculation.objects.only(
+                "json_version", "json", "confirmed_at", "apartment_id"
+            ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
             )
+
+            if ampc.json_version is None:
+                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
 
         # Check calculation is not yet confirmed
         if ampc.confirmed_at is not None:
