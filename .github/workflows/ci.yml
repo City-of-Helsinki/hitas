@@ -69,3 +69,9 @@ jobs:
       env:
         SECRET_KEY: xxx
       run: cd backend && ./manage.py makemigrations --check --no-color --no-input --dry-run
+
+    - name: "Test for building frontend"
+      run: cd frontend && docker build .
+
+    - name: "Test for building backend"
+      run: cd backend && docker build .
