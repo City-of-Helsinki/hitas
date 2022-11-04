@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Any, Tuple
 
 from django.utils import timezone
 from rest_framework import fields
@@ -46,13 +47,17 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             )
 
     def retrieve(self, request, *args, **kwargs):
-        return self.response(
-            ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
-                apartment__uuid=kwargs["apartment_uuid"],
-                apartment__building__real_estate__housing_company__uuid=kwargs["housing_company_uuid"],
-                uuid=kwargs["pk"],
+        # Verify housing company and apartment exists (so we can raise an appropriate error)
+        hc_id, apartment_id = self.verify_housing_company_and_apartment(kwargs)
+
+        # Try to fetch the maximum price calculation
+        with model_or_404(ApartmentMaximumPriceCalculation):
+            return self.response(
+                ApartmentMaximumPriceCalculation.objects.only("json", "confirmed_at", "apartment_id").get(
+                    apartment_id=apartment_id,
+                    uuid=kwargs["pk"],
+                )
             )
-        )
 
     def update(self, request, *args, **kwargs):
         serializer = ConfirmSerializer(data=request.data)
@@ -61,12 +66,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         confirm = serializer.data["confirm"]
 
         # Verify housing company and apartment exists (so we can raise an appropriate error)
-        with model_or_404(HousingCompany):
-            hc_id = HousingCompany.objects.only("id").get(uuid=kwargs["housing_company_uuid"])
-        with model_or_404(Apartment):
-            apartment_id = Apartment.objects.only("pk").get(
-                uuid=kwargs["apartment_uuid"], building__real_estate__housing_company_id=hc_id
-            )
+        hc_id, apartment_id = self.verify_housing_company_and_apartment(kwargs)
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
@@ -103,6 +103,17 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             # In case the user wanted not to confirm we will delete the calculation
             ampc.delete()
             return Response(status=HTTPStatus.NO_CONTENT)
+
+    @staticmethod
+    def verify_housing_company_and_apartment(kwargs: dict[str, Any]) -> Tuple[int, int]:
+        # Verify housing company and apartment exists (so we can raise an appropriate error)
+        with model_or_404(HousingCompany):
+            hc_id = HousingCompany.objects.only("id").get(uuid=kwargs["housing_company_uuid"])
+        with model_or_404(Apartment):
+            apartment_id = Apartment.objects.only("pk").get(
+                uuid=kwargs["apartment_uuid"], building__real_estate__housing_company_id=hc_id
+            )
+        return hc_id, apartment_id
 
     @staticmethod
     def response(ampc):
