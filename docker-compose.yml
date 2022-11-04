@@ -49,7 +49,7 @@ services:
       - hitas-backend
 
   swagger-editor:
-    image: swaggerapi/swagger-editor:v4.2.9
+    image: swaggerapi/swagger-editor:v4.5.2
     environment:
        SWAGGER_FILE: /swagger/openapi.yaml
     ports:
