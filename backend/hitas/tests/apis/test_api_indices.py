@@ -66,8 +66,8 @@ def test__api__indices__list(api_client: HitasAPIClient, index, factory):
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "contents": [
-            {"month": "1999-12", "value": 256},
             {"month": "2022-01", "value": 127.48},
+            {"month": "1999-12", "value": 256},
         ],
         "page": {
             "size": 2,

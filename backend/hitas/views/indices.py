@@ -72,7 +72,7 @@ class _AbstractIndicesViewSet(
             return self.model_class(month=self.kwargs["month"])
 
     def get_queryset(self):
-        return self.model_class.objects.only("month", "value").all().order_by("month")
+        return self.model_class.objects.only("month", "value").all().order_by("-month")
 
     def _get_month(self):
         return datetime.datetime.strptime(self.kwargs["month"], "%Y-%m").date()
