@@ -34,8 +34,15 @@ fi
 
 # Apply initial dataset
 if [[ "${LOAD_INITIAL_DATASET:-"0"}" = "1" ]]; then
-    echo "Loading initial dataset..."
-    ./manage.py loaddata initial.json
+    error_code=0
+    ./manage.py hitasmigrate --check || error_code=$?
+
+    if [ "${error_code}" -ne 0 ]; then
+        echo "Initial dataset is not applied! Migration already done!"
+    else
+        echo "Loading initial dataset..."
+        ./manage.py loaddata initial.json
+    fi
 fi
 
 # Start server

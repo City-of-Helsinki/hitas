@@ -21,6 +21,7 @@ from hitas.models.indices import (
     MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
+from hitas.models.migration_done import MigrationDone
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
 from hitas.models.postal_code import HitasPostalCode

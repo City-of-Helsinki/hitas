@@ -35,6 +35,7 @@ from hitas.models import (
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
     MaximumPriceIndex,
+    MigrationDone,
     Owner,
     Ownership,
     PropertyManager,
@@ -225,6 +226,8 @@ def run(
 
             # Apartment owners
             create_ownerships(connection, converted_data)
+
+    MigrationDone.objects.create()
 
 
 def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
@@ -771,5 +774,6 @@ def do_truncate():
         ConstructionPriceIndex,
         MarketPriceIndex,
         MarketPriceIndex2005Equal100,
+        MigrationDone,
     ]:
         model_class.objects.all().delete()
