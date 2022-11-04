@@ -9,6 +9,7 @@ from rest_framework import status
 from hitas.models import (
     Apartment,
     ApartmentMarketPriceImprovement,
+    ApartmentMaximumPriceCalculation,
     ApartmentType,
     Building,
     HousingCompany,
@@ -29,6 +30,7 @@ from hitas.tests.factories import (
     OwnershipFactory,
     RealEstateFactory,
 )
+from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
@@ -218,6 +220,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     owner: Ownership = OwnershipFactory.create(apartment=ap)
     cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
     mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
+    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(apartment=ap)
 
     ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100)
     MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200)
@@ -274,7 +277,17 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "additional_work": ap.additional_work_during_construction,
             },
             "maximum_prices": {
-                "confirmed": None,
+                "confirmed": {
+                    "id": ampc.uuid.hex,
+                    "created_at": ampc.created_at.isoformat()[:-6] + "Z",
+                    "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
+                    "calculation_date": str(ampc.calculation_date),
+                    "maximum_price": ampc.max_price,
+                    "valid": {
+                        "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
+                        "is_valid": ampc.valid_until >= datetime.date.today(),
+                    },
+                },
                 "unconfirmed": {
                     "pre_2011": None,
                     "onwards_2011": {
