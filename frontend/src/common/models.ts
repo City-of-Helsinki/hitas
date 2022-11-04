@@ -1,21 +1,9 @@
+// Common Fields
+
 export interface IAddress {
     street_address: string;
     postal_code: string;
-    city?: string; // Always returned when reading, but not required when writing
-}
-
-export interface ICode {
-    readonly id: string;
-    value: string;
-    description: string | null;
-    code: string;
-}
-
-export interface IApartmentConstructionPriceIndexImprovement {
-    name: string;
-    value: number;
-    completion_date: string;
-    depreciation_percentage: number; // 0.0 | 2.5 | 10.0
+    readonly city?: string; // Always returned when reading, but not required when writing
 }
 
 export interface IImprovement {
@@ -23,6 +11,33 @@ export interface IImprovement {
     value: number;
     completion_date: string;
 }
+
+// Housing Company
+
+// Housing Company Fields
+
+interface IHousingCompanyArea {
+    name: string;
+    cost_area: number;
+}
+
+export const HousingCompanyStates = [
+    "not_ready",
+    "lt_30_years",
+    "gt_30_years_not_free",
+    "gt_30_years_free",
+    "gt_30_years_plot_department_notification",
+    "half_hitas",
+    "ready_no_statistics",
+] as const;
+type IHousingCompanyState = typeof HousingCompanyStates[number];
+
+interface IHousingCompanyDetailsName {
+    official: string;
+    display: string;
+}
+
+// // Housing Company Models
 
 export interface IHousingCompany {
     readonly id: string;
@@ -59,7 +74,7 @@ export interface IHousingCompanyDetails {
         };
         datetime: Date;
     };
-    real_estates: Array<IRealEstate>;
+    real_estates: IRealEstate[];
     summary: {
         average_price_per_square_meter: number;
         realized_acquisition_price: number;
@@ -92,34 +107,16 @@ export interface IHousingCompanyWritable {
     };
 }
 
-export interface IHousingCompanyArea {
-    name: string;
-    cost_area: number;
-}
-
-export const HousingCompanyStates = [
-    "not_ready",
-    "lt_30_years",
-    "gt_30_years_not_free",
-    "gt_30_years_free",
-    "gt_30_years_plot_department_notification",
-    "half_hitas",
-    "ready_no_statistics",
-] as const;
-
-export type IHousingCompanyState = typeof HousingCompanyStates[number];
-
-export interface IHousingCompanyDetailsName {
-    official: string;
-    display: string;
-}
+// Real Estate
 
 export interface IRealEstate {
     readonly id?: string;
     property_identifier: string;
     address: IAddress;
-    buildings: Array<IBuilding>;
+    buildings: IBuilding[];
 }
+
+// Building
 
 export interface IBuilding {
     readonly id?: string;
@@ -135,6 +132,10 @@ export interface IBuildingWritable {
     real_estate_id: string | null;
 }
 
+// Apartment
+
+// // Apartment Fields
+
 export interface IApartmentAddress {
     street_address: string;
     readonly postal_code?: string;
@@ -144,40 +145,29 @@ export interface IApartmentAddress {
     stair: string | null;
 }
 
-export interface IApartmentLink {
-    id: string;
-    link: string;
-    display_name?: string;
-}
-
-export interface IApartmentLinks {
-    housing_company: IApartmentLink;
-    real_estate: IApartmentLink;
-    building: IApartmentLink;
-    apartment: IApartmentLink;
-}
-
-export interface IApartment {
+interface IApartmentLinkedModel {
     readonly id: string;
-    state: ApartmentState;
-    links: IApartmentLinks;
-    type: string;
-    surface_area: number;
-    rooms: number | null;
-    address: IApartmentAddress;
-    completion_date: string | null;
-    housing_company: string;
-    ownerships: Array<IOwnership>;
+    readonly link: string;
+}
+interface IApartmentLinkedModels {
+    readonly housing_company: IApartmentLinkedModel & {display_name: string};
+    readonly real_estate: IApartmentLinkedModel;
+    readonly building: IApartmentLinkedModel & {street_address: string};
+    readonly apartment: IApartmentLinkedModel;
 }
 
-export interface IApartmentConstructionPrices {
-    loans: number | null;
-    additional_work: number | null;
-    interest: number | null;
-    debt_free_purchase_price: number | null;
+interface IApartmentUnconfirmedMaximumPrice {
+    maximum: boolean;
+    value: number;
 }
 
-export interface IApartmentPrices {
+interface IApartmentUnconfirmedMaximumPriceIndices {
+    construction_price_index: IApartmentUnconfirmedMaximumPrice;
+    market_price_index: IApartmentUnconfirmedMaximumPrice;
+    surface_area_price_ceiling: IApartmentUnconfirmedMaximumPrice;
+}
+
+interface IApartmentPrices {
     readonly acquisition_price: number | null;
 
     debt_free_purchase_price: number | null;
@@ -187,32 +177,59 @@ export interface IApartmentPrices {
     first_purchase_date: string | null;
     latest_purchase_date: string | null;
 
-    construction: IApartmentConstructionPrices;
+    construction: {
+        loans: number | null;
+        additional_work: number | null;
+        interest: number | null;
+        debt_free_purchase_price: number | null;
+    };
 
     max_prices: {
-        confirmed: number | null;
+        confirmed: {
+            id: string;
+            calculation_date: string;
+            confirmed_at: string;
+            created_at: string;
+            max_price: number;
+            valid: {
+                is_valid: boolean;
+                valid_until: string;
+            };
+        } | null;
         unconfirmed: {
-            onwards_2011;
-            pre_2011;
+            onwards_2011: IApartmentUnconfirmedMaximumPriceIndices;
+            pre_2011: IApartmentUnconfirmedMaximumPriceIndices;
         };
     };
 }
 
-export type IApartmentPricesWritable = Omit<IApartmentPrices, "max_prices" | "acquisition_price">;
-
-export interface IHousingCompanyApartmentQuery {
-    housingCompanyId: string;
-    params: object;
-}
-
-export interface IApartmentQuery {
-    housingCompanyId: string;
-    apartmentId: string;
-}
-
 export const ApartmentStates = ["free", "reserved", "sold"] as const;
-
 export type ApartmentState = typeof ApartmentStates[number];
+
+export type IApartmentConstructionPriceIndexImprovement = IImprovement & {
+    depreciation_percentage: number; // 0.0 | 2.5 | 10.0
+};
+
+type IApartmentShares = {
+    start: number;
+    end: number;
+    readonly total: number;
+} | null;
+
+// // Apartment Models
+
+export interface IApartment {
+    readonly id: string;
+    state: ApartmentState;
+    type: string;
+    surface_area: number;
+    rooms: number | null;
+    address: IApartmentAddress;
+    completion_date: string | null;
+    housing_company: string;
+    ownerships: IOwnership[];
+    readonly links: IApartmentLinkedModels;
+}
 
 export interface IApartmentDetails {
     readonly id: string;
@@ -220,17 +237,7 @@ export interface IApartmentDetails {
     type: ICode;
     surface_area: number;
     rooms: number | null;
-    shares: {
-        start: number;
-        end: number;
-        readonly total: number;
-    } | null;
-    links: {
-        housing_company: ILinkedModel & {display_name: string};
-        real_estate: ILinkedModel;
-        building: ILinkedModel & {street_address: string};
-        apartment: ILinkedModel;
-    };
+    shares: IApartmentShares;
     address: IApartmentAddress;
     prices: IApartmentPrices;
     completion_date: string | null;
@@ -240,6 +247,7 @@ export interface IApartmentDetails {
         market_price_index: IImprovement[];
         construction_price_index: IApartmentConstructionPriceIndexImprovement[];
     };
+    readonly links: IApartmentLinkedModels;
 }
 
 export interface IApartmentWritable {
@@ -253,7 +261,7 @@ export interface IApartmentWritable {
         end: number | null;
     };
     address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
-    prices: IApartmentPricesWritable;
+    prices: Omit<IApartmentPrices, "max_prices" | "acquisition_price">;
     completion_date?: string | null;
     building: string;
     ownerships: IOwnership[];
@@ -262,6 +270,101 @@ export interface IApartmentWritable {
         market_price_index: IImprovement[];
         construction_price_index: IApartmentConstructionPriceIndexImprovement[];
     };
+}
+
+// Maximum Price
+
+// //  Maximum Price Fields
+
+interface ICalculation {
+    max_price: number;
+    valid_until: string;
+    maximum: boolean;
+}
+
+interface IIndexCalculationVariables {
+    calculation_variables: {
+        acquisition_price: number;
+        additional_work_during_construction: number;
+        basic_price: number;
+        index_adjustment: number;
+        apartment_improvements: number;
+        housing_company_improvements: number;
+        debt_free_price: number;
+        debt_free_price_m2: number;
+        apartment_share_of_housing_company_loans: number;
+        completion_date: string;
+        completion_date_index: number;
+        calculation_date: string;
+        calculation_date_index: number;
+    };
+}
+
+// // Maximum Price Models
+
+export interface IApartmentMaximumPrice {
+    readonly id: string;
+    created_at: string;
+    confirmed_at: string | null;
+    max_price: number;
+    calculation_date: string;
+    valid_until: string;
+    index: string;
+    calculations: {
+        construction_price_index: ICalculation & IIndexCalculationVariables;
+        market_price_index: ICalculation & IIndexCalculationVariables;
+        surface_area_price_ceiling: ICalculation & {
+            calculation_variables: {
+                calculation_date: string;
+                calculation_date_value: number;
+                surface_area: number;
+            };
+        };
+    };
+    apartment: {
+        address: IApartmentAddress;
+        type: string;
+        ownerships: IOwnership[];
+        rooms: number | null;
+        shares: IApartmentShares;
+        surface_area: number;
+    };
+    housing_company: {
+        archive_id: number;
+        official_name: string;
+        property_manager: {
+            name: string;
+            street_address: string;
+        };
+    };
+}
+
+export interface IApartmentMaximumPriceWritable {
+    calculation_date: string | null;
+    apartment_share_of_housing_company_loans: number | null;
+}
+
+// Indices
+
+export interface IIndex {
+    indexType: string;
+    month: string;
+    value: number | null;
+}
+
+// Other models
+
+export interface ICode {
+    readonly id: string;
+    value: string;
+    description: string | null;
+    code: string;
+}
+
+export interface IPostalCode {
+    value: string;
+    city: string;
+    cost_area: 1 | 2 | 3 | 4;
 }
 
 export interface IPropertyManager {
@@ -286,12 +389,9 @@ export interface IOwnership {
     end_date?: string | null;
 }
 
-// Non-model data
+// Requests / Responses
 
-export interface ILinkedModel {
-    id: string;
-    link: string;
-}
+// // General
 
 export interface PageInfo {
     size: number;
@@ -304,24 +404,7 @@ export interface PageInfo {
     };
 }
 
-export interface IPostalCode {
-    value: string;
-    city: string;
-    cost_area: 1 | 2 | 3 | 4;
-}
-
-export interface IIndex {
-    indexType: string;
-    month: string;
-    value: number | null;
-}
-
-export interface IIndexQuery {
-    indexType: string;
-    params?: object;
-}
-
-// List response interfaces
+// // LIST Responses
 
 export interface IHousingCompanyListResponse {
     page: PageInfo;
@@ -346,4 +429,26 @@ export interface IPostalCodeResponse {
 export interface IIndexResponse {
     page: PageInfo;
     contents: IIndex[];
+}
+
+// // Query Parameters
+
+export interface IHousingCompanyApartmentQuery {
+    housingCompanyId: string;
+    params: {
+        page: number;
+    };
+}
+
+export interface IApartmentQuery {
+    housingCompanyId: string;
+    apartmentId: string;
+}
+
+export interface IIndexQuery {
+    indexType: string;
+    params: {
+        page: number;
+        limit: number;
+    };
 }

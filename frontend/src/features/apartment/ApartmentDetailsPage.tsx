@@ -58,13 +58,25 @@ const UnconfirmedPriceRow = ({label, unconfirmedPrice}) => {
     );
 };
 
+const ConfirmedPrice = ({confirmed}) => {
+    if (!confirmed) {
+        return <p className="confirmed-price">-</p>;
+    }
+    return (
+        <>
+            <p className="confirmed-price">{formatMoney(confirmed.max_price)}</p>
+            <p>Voimassa {confirmed.valid.valid_until} saakka</p>
+            <p>Vahvistettu {confirmed.confirmed_at.split("T")[0]}</p>
+        </>
+    );
+};
+
 const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
-    const params = useParams();
     const {
         data: housingCompanyData,
         error: housingCompanyError,
         isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(params.housingCompanyId as string);
+    } = useGetHousingCompanyDetailQuery(data.links.housing_company.id);
     const isPre2011 = data.prices.max_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
         ? data.prices.max_prices.unconfirmed.pre_2011
@@ -109,8 +121,8 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         />
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <p className="confirmed-price">{data.prices.max_prices.confirmed}</p>
-                    <div style={{display: "flex", flexDirection: "row", justifyContent: "right", gap: "10px"}}>
+                    <ConfirmedPrice confirmed={data.prices.max_prices.confirmed} />
+                    <div className="align-content-right">
                         <Button
                             theme="black"
                             size="small"
