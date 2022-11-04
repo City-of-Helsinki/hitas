@@ -4419,11 +4419,13 @@ components:
             Can have the following values:
             - owner_in_use
             - index_missing
+            - invalid_calculation_result
           type: string
           example: owner_in_use
           x-extensible-enum:
             - owner_in_use
             - index_missing
+            - invalid_calculation_result
 
     UnsupportedMediaTypeError:
       description: Unsupported media type error
