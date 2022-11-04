@@ -113,6 +113,10 @@ def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> 
         index.value = float(code["value"])
         index.month = str_to_year_month(code["code_id"])
 
+        # Skip indices with '0' values
+        if index.value == 0:
+            continue
+
         index.save()
 
 
