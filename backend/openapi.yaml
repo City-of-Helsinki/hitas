@@ -904,6 +904,11 @@ paths:
                   type: integer
                   minimum: 0
                   example: 2500
+                apartment_share_of_housing_company_loans_date:
+                  description: Date for `apartment_share_of_housing_company_loans`
+                  type: string
+                  format: date
+                  example: 2022-07-28
       responses:
         '200':
           description: Successfully created an apartment's maximum price calculation
@@ -3196,6 +3201,7 @@ components:
         - debt_free_price
         - debt_free_price_m2
         - apartment_share_of_housing_company_loans
+        - apartment_share_of_housing_company_loans_date
         - completion_date
         - completion_date_index
         - calculation_date
@@ -3256,10 +3262,15 @@ components:
           example: 7535
         apartment_share_of_housing_company_loans:
           description: |-
-            How much the apartment's share of the housing company loans are on the calculation date.
+            How much the apartment's share of the housing company loans.
           type: integer
           minimum: 0
           example: 2500
+        apartment_share_of_housing_company_loans_date:
+          description: Date for the apartment share of housing company loan
+          type: string
+          format: date
+          example: "2022-07-28"
         completion_date:
           description: The date the apartment was completed.
           type: string

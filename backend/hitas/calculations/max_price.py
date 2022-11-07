@@ -32,8 +32,12 @@ def calculate_max_price(
     apartment_uuid: str,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: int,
+    apartment_share_of_housing_company_loans_date: Optional[datetime.date],
 ) -> Dict[str, Any]:
     if calculation_date is None:
+        calculation_date = timezone.now().today()
+
+    if apartment_share_of_housing_company_loans_date is None:
         calculation_date = timezone.now().today()
 
     # Fetch apartment
@@ -64,6 +68,7 @@ def calculate_max_price(
         apartment.completion_date_cpi_2005eq100,
         total_surface_area,
         apartment_share_of_housing_company_loans,
+        apartment_share_of_housing_company_loans_date,
         apartment.construction_price_improvements.all(),
         apartment.housing_company.construction_price_improvements.all(),
         calculation_date,
@@ -74,6 +79,7 @@ def calculate_max_price(
         apartment.completion_date_mpi_2005eq100,
         total_surface_area,
         apartment_share_of_housing_company_loans,
+        apartment_share_of_housing_company_loans_date,
         apartment.market_price_improvements.all(),
         apartment.housing_company.market_price_improvements.all(),
         calculation_date,
@@ -294,6 +300,7 @@ def calculate_index(
     completion_date_index: Decimal,
     total_surface_area: Decimal,
     apartment_share_of_housing_company_loans: int,
+    apartment_share_of_housing_company_loans_date: datetime.date,
     apartment_improvements: List,
     housing_company_improvements: List,
     calculation_date: datetime.date,
@@ -351,6 +358,7 @@ def calculate_index(
             "debt_free_price": debt_free_shares_price,
             "debt_free_price_m2": roundup(debt_free_shares_price / apartment.surface_area),
             "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
+            "apartment_share_of_housing_company_loans_date": apartment_share_of_housing_company_loans_date,
             "completion_date": apartment.completion_date,
             "completion_date_index": roundup(completion_date_index, 2),
             "calculation_date": calculation_date,
