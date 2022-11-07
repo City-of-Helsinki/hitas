@@ -398,6 +398,27 @@ def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClien
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment__retrieve__confirmed_old_json_version(api_client: HitasAPIClient):
+    ap: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2011, 1, 1),
+        debt_free_purchase_price=80000,
+        primary_loan_amount=20000,
+        surface_area=50,
+    )
+    ApartmentMaximumPriceCalculationFactory.create(apartment=ap, json_version=1)
+
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["prices"]["maximum_prices"]["confirmed"] is None
+
+
 def _test_max_prices(
     api_client: HitasAPIClient,
     pre_2011: bool,

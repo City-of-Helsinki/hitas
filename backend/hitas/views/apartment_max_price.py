@@ -75,6 +75,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
+                json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
             )
             if mpc.json_version is None:
                 raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
@@ -97,6 +98,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
+                json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
             )
 
             if ampc.json_version is None:

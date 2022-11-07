@@ -71,6 +71,25 @@ def test__api__apartment_max_price__retrieve__migrated(api_client: HitasAPIClien
 
 
 @pytest.mark.django_db
+def test__api__apartment_max_price__retrieve__old_json_version(api_client: HitasAPIClient):
+    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(json_version=1)
+
+    response = api_client.get(
+        reverse(
+            "hitas:maximum-price-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+        )
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "apartment_maximum_price_calculation_not_found",
+        "message": "Apartment maximum price calculation not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__incorrect_housing_company_uuid(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     another_housing_company: HousingCompany = HousingCompanyFactory.create()

@@ -4,14 +4,22 @@ from collections import OrderedDict
 from typing import Any, Dict, Optional
 
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.urls import reverse
 from django.utils import timezone
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Owner, Ownership
+from hitas.models import (
+    Apartment,
+    ApartmentConstructionPriceImprovement,
+    ApartmentMaximumPriceCalculation,
+    Building,
+    HousingCompany,
+    Owner,
+    Ownership,
+)
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -189,7 +197,8 @@ class PricesSerializer(serializers.Serializer):
                 "json_version",
             )
             .filter(
-                confirmed_at__isnull=False,
+                Q(confirmed_at__isnull=False),
+                Q(json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION) | Q(json_version__isnull=True),
             )
             .order_by("-confirmed_at")
             .order_by("-maximum_price")  # migrated calculations have the same datestamp
