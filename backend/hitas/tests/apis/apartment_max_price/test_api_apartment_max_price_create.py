@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment
+from hitas.tests.apis.apartment_max_price.utils import create_necessary_indices, monthify, this_month
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -131,6 +132,30 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
     assert response.json() == {
         "error": "index_missing",
         "message": "One or more indices required for max price calculation is missing.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create()
+
+    create_necessary_indices(completion_month=monthify(a.completion_date), calculation_month=this_month())
+
+    data = {
+        "calculation_date": this_month(),
+        "apartment_share_of_housing_company_loans": 9999999999,
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    )
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "invalid_calculation_result",
+        "message": "Maximum price calculation could not be completed.",
         "reason": "Conflict",
         "status": 409,
     }

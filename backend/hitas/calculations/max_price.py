@@ -23,6 +23,10 @@ class IndexMissingException(Exception):
     pass
 
 
+class InvalidCalculationResult(Exception):
+    pass
+
+
 def calculate_max_price(
     housing_company_uuid: str,
     apartment_uuid: str,
@@ -324,14 +328,17 @@ def calculate_index(
         apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area
 
     # 'osakkeiden velaton hinta'
-    shares_debt_free_shares_price = (
+    debt_free_shares_price = (
         basic_price
         + roundup(index_adjustment)
         + roundup(apartment_improvements_sum)
         + roundup(apartment_housing_company_improvements)
     )
     # 'Enimmäismyyntihinta'
-    max_price = shares_debt_free_shares_price - apartment_share_of_housing_company_loans
+    max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
+
+    if max_price <= 0:
+        raise InvalidCalculationResult()
 
     return {
         "calculation_variables": {
@@ -341,8 +348,8 @@ def calculate_index(
             "index_adjustment": roundup(index_adjustment),
             "apartment_improvements": roundup(apartment_improvements_sum),
             "housing_company_improvements": roundup(apartment_housing_company_improvements),
-            "debt_free_price": shares_debt_free_shares_price,
-            "debt_free_price_m2": roundup(shares_debt_free_shares_price / apartment.surface_area),
+            "debt_free_price": debt_free_shares_price,
+            "debt_free_price_m2": roundup(debt_free_shares_price / apartment.surface_area),
             "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
             "completion_date": apartment.completion_date,
             "completion_date_index": roundup(completion_date_index, 2),
