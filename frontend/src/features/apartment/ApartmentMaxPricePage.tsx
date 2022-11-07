@@ -28,9 +28,12 @@ import {formatMoney, hitasToast} from "../../common/utils";
 const CalculationRowPrice = ({label, calculation}) => {
     const maximumBoldedStyle = calculation.maximum ? {fontWeight: 700} : {};
     return (
-        <div>
-            <p style={maximumBoldedStyle}>{label}</p>
-            <p style={maximumBoldedStyle}>{formatMoney(calculation.maximum_price)}</p>
+        <div
+            className="confirmation-modal__calculation-row"
+            style={maximumBoldedStyle}
+        >
+            <label>{label}</label>
+            <p>{formatMoney(calculation.maximum_price)}</p>
         </div>
     );
 };
@@ -162,16 +165,16 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
     };
 
     return (
-        <div className="view--create view--set-apartment">
+        <div className="view--set-apartment">
             <h1 className="main-heading">
-                {apartment.address.street_address} - {apartment.address.stair}
-                {apartment.address.apartment_number} ({apartment.links.housing_company.display_name})
+                <div>
+                    {apartment.address.street_address} - {apartment.address.stair}
+                    {apartment.address.apartment_number} ({apartment.links.housing_company.display_name})
+                </div>
             </h1>
             <div className="field-sets">
                 <Fieldset heading="">
-                    <div className="row">
-                        <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
-                    </div>
+                    <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
                     <div className="row">
                         <FormInputField
                             inputType="number"
@@ -182,26 +185,15 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             setFormData={setFormData}
                             error={error}
                         />
-                    </div>
-                    <div className="row">
-                        <ImprovementsTable
-                            data={apartment}
-                            title="Laskentaan vaikuttavat yhtiön parannukset"
+                        <FormInputField
+                            inputType="date"
+                            label="Yhtiölainaosuuden päivämäärä"
+                            fieldPath="housing_company_loans_date"
+                            required
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
                         />
-                    </div>
-                    <div className="row">
-                        <QueryStateHandler
-                            data={housingCompanyData}
-                            error={housingCompanyError}
-                            isLoading={isHousingCompanyLoading}
-                        >
-                            <ImprovementsTable
-                                data={housingCompanyData as IHousingCompanyDetails}
-                                title="Yhtiökohtaiset parannukset"
-                            />
-                        </QueryStateHandler>
-                    </div>
-                    <div className="row">
                         <FormInputField
                             inputType="date"
                             label="Laskentapäivämäärä"
@@ -212,22 +204,32 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             error={error}
                         />
                     </div>
+                    <ImprovementsTable
+                        data={apartment}
+                        title="Laskentaan vaikuttavat asunnon parannukset"
+                    />
+                    <QueryStateHandler
+                        data={housingCompanyData}
+                        error={housingCompanyError}
+                        isLoading={isHousingCompanyLoading}
+                    >
+                        <ImprovementsTable
+                            data={housingCompanyData as IHousingCompanyDetails}
+                            title="Yhtiökohtaiset parannukset"
+                        />
+                    </QueryStateHandler>
+                    <div className="row">
+                        <NavigateBackButton />
+                        <Button
+                            theme="black"
+                            onClick={handleCalculateButton}
+                            iconLeft={<IconCheck />}
+                        >
+                            Laske
+                        </Button>
+                    </div>
                 </Fieldset>
             </div>
-            <div
-                className="align-content-right"
-                style={{marginTop: "10px"}}
-            >
-                <NavigateBackButton />
-                <Button
-                    theme="black"
-                    onClick={handleCalculateButton}
-                    iconLeft={<IconCheck />}
-                >
-                    Laske
-                </Button>
-            </div>
-
             <Dialog
                 id="maximum-price-confirmation-modal"
                 closeButtonLabelText=""
@@ -270,7 +272,7 @@ const ApartmentMaxPricePage = (): JSX.Element => {
     });
 
     return (
-        <div className="view--apartment-details">
+        <div className="view--apartment view--apartment-details">
             <QueryStateHandler
                 data={data}
                 error={error}

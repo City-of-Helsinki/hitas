@@ -65,8 +65,8 @@ const ConfirmedPrice = ({confirmed}) => {
     return (
         <>
             <p className="confirmed-price">{formatMoney(confirmed.maximum_price)}</p>
-            <p>Voimassa {confirmed.valid.valid_until} saakka</p>
-            <p>Vahvistettu {confirmed.confirmed_at.split("T")[0]}</p>
+            <p>Vahvistettu: {confirmed.confirmed_at.split("T")[0]}</p>
+            <p>Voimassa: {confirmed.valid.valid_until} asti</p>
         </>
     );
 };

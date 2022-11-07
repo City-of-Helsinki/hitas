@@ -1,0 +1,24 @@
+@use '../imports' as *
+
+.view--set-apartment
+  .main-heading
+    align-items: center
+    div
+      height: 30px
+
+  .row
+    @include flexbox()
+    @include flex-flow(row)
+    align-items: flex-end
+    gap: $spacing-layout-s
+    > div
+      flex-grow: 1
+    > button
+      display: inline-flex
+      height: 56px
+
+.confirmation-modal__calculation-row
+  p
+    margin-top: $spacing-xs
+    margin-bottom: $spacing-m
+    font-size: $fontsize-body-l
