@@ -52,21 +52,38 @@ def test__api__apartment_max_price__retrieve__confirmed(api_client: HitasAPIClie
 
 
 @pytest.mark.django_db
+def test__api__apartment_max_price__retrieve__migrated(api_client: HitasAPIClient):
+    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(json=None, json_version=None)
+
+    response = api_client.get(
+        reverse(
+            "hitas:maximum-price-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+        )
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "apartment_maximum_price_calculation_not_found",
+        "message": "Apartment maximum price calculation not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
+
+
+@pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__incorrect_housing_company_uuid(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
     another_housing_company: HousingCompany = HousingCompanyFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[another_housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_not_found",
         "message": "Apartment not found",
         "reason": "Not Found",
@@ -79,16 +96,14 @@ def test__api__apartment_max_price__retrieve__nonexistent_housing_company_id(api
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[uuid.uuid4().hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "housing_company_not_found",
         "message": "Housing company not found",
         "reason": "Not Found",
@@ -102,16 +117,14 @@ def test__api__apartment_max_price__retrieve__apartment_id_in_another_housing_co
     another_apartment: Apartment = ApartmentFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[mpc.apartment.housing_company.uuid.hex, another_apartment.uuid.hex, mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_not_found",
         "message": "Apartment not found",
         "reason": "Not Found",
@@ -125,16 +138,14 @@ def test__api__apartment_max_price__retrieve__incorrect_apartment_id(api_client:
     another_apartment: Apartment = ApartmentFactory.create(building=mpc.apartment.building)
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[mpc.apartment.housing_company.uuid.hex, another_apartment.uuid.hex, mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_maximum_price_calculation_not_found",
         "message": "Apartment maximum price calculation not found",
         "reason": "Not Found",
@@ -147,16 +158,14 @@ def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[mpc.apartment.housing_company.uuid.hex, uuid.uuid4().hex, mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_not_found",
         "message": "Apartment not found",
         "reason": "Not Found",
@@ -171,16 +180,14 @@ def test__api__apartment_max_price__retrieve__invalid_id(api_client: HitasAPICli
     another_mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse(
             "hitas:maximum-price-detail",
             args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, another_mpc.uuid.hex],
-        ),
-        data={"confirm": True},
-        format="json",
+        )
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_maximum_price_calculation_not_found",
         "message": "Apartment maximum price calculation not found",
         "reason": "Not Found",
@@ -193,13 +200,11 @@ def test__api__apartment_max_price__retrieve__nonexistent_calculation_id(api_cli
     a: Apartment = ApartmentFactory.create()
 
     # Create max price calculation
-    create_response = api_client.put(
+    response = api_client.get(
         reverse("hitas:maximum-price-detail", args=[a.housing_company.uuid.hex, a.uuid.hex, uuid.uuid4().hex]),
-        data={"confirm": True},
-        format="json",
     )
-    assert create_response.status_code == status.HTTP_404_NOT_FOUND, create_response.json()
-    assert create_response.json() == {
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
         "error": "apartment_maximum_price_calculation_not_found",
         "message": "Apartment maximum price calculation not found",
         "reason": "Not Found",

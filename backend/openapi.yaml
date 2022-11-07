@@ -3650,8 +3650,9 @@ components:
                 - valid
               properties:
                 id:
-                  description: Maximum price calculation ID
+                  description: Maximum price calculation ID.
                   type: string
+                  nullable: true
                   example: e65579e3ed0a4cc0b693d9910b41ab08
                 calculation_date:
                   description: The timestamp when this maximum price calculation was done.

@@ -170,9 +170,9 @@ class ApartmentMaximumPriceCalculation(models.Model):
 
     maximum_price = models.IntegerField(null=True, validators=[MinValueValidator(0)])
 
-    json = models.JSONField(encoder=JSONEncoder)
+    json = models.JSONField(encoder=JSONEncoder, null=True)
     # `json_version` is not yet used but can be used later to determinate `json` structure changes etc
-    json_version = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)])
+    json_version = models.SmallIntegerField(default=1, validators=[MinValueValidator(1)], null=True)
 
     class Meta:
         verbose_name = _("Apartment maximum price calculation")
