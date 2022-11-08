@@ -5,10 +5,12 @@ from typing import Any, Dict, Optional
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework.decorators import action
 from rest_framework.fields import empty
 
 from hitas.models import (
@@ -32,6 +34,7 @@ from hitas.views.utils import (
     ValueOrNullField,
 )
 from hitas.views.utils.merge import merge_model
+from hitas.views.utils.pdf import render_to_pdf
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
@@ -615,3 +618,16 @@ class ApartmentViewSet(HitasModelViewSet):
             )
             .order_by("id")
         )
+
+    @action(detail=True, methods=["GET"])
+    def unconfirmed_prices_pdf(self, request, **kwargs) -> HttpResponse:
+        apartment = self.get_object()
+
+        filename = f"Hinta-arvio {apartment.address}.pdf"
+        context = {"title": filename, "apartment": ApartmentDetailSerializer(apartment).data}
+        pdf = render_to_pdf("unconfirmed_maximum_price.jinja", context)
+        response = HttpResponse(pdf, content_type="application/pdf")
+        # Download file for user instead of opening it in the browser
+        response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+        response["Access-Control-Expose-Headers"] = "Content-Disposition"
+        return response
