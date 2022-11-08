@@ -1,6 +1,15 @@
 @use '../imports' as *
 
 .view--apartments-listing
+  .results-list
+    height: 1009px
+    background: #eee
+    overflow: hidden
+  .results-list__item
+    height: 100px
+    background: white
+  .results-list > a:last-child
+    border-bottom: 1px solid #ccc
   .listing >  .search [class^="Icon-module"]
     top: 0
   .list-header
