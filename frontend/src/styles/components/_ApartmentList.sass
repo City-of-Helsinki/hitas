@@ -1,18 +1,24 @@
 @use '../imports' as *
 
 .view--apartments-listing
+
   .results-list
     height: 1009px
     background: #eee
     overflow: hidden
+
   .results-list__item
     height: 100px
     background: white
+
   .results-list > a:last-child
     border-bottom: 1px solid #ccc
+
   .listing >  .search [class^="Icon-module"]
     top: 0
+
   .list-header
+
     &.apartment
       width: 11%
 
@@ -24,26 +30,3 @@
 
     &.state
       width: 5%
-
-.view--company-details
-  .list-amount
-    display: none
-
-  .results
-    grid-column-start: 1
-    grid-column-end: 3
-
-  .list-header
-    &.apartment
-      width: 8%
-
-    &.area
-      width: 42%
-
-    &.address
-      width: 36%
-
-    &.state
-      width: 13%
-
-

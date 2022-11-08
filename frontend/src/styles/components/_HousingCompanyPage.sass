@@ -1,0 +1,75 @@
+@use '../imports' as *
+
+.view--housing-company-details
+
+  .company-status
+    margin-bottom: 16px
+
+  .company-details
+    > *
+      margin-bottom: 75px
+
+    .tab-area
+      background: $color-black-5
+      padding-bottom: 0.1px
+
+    .tab-list
+      background-color: white
+
+    &__tab
+      background: white
+      margin: $spacing-layout-s
+      padding: $spacing-layout-s
+      @include flexbox()
+      @include flex-flow(row nowrap)
+
+      .column
+        width: 50%
+        border-left: 1px solid #ccc
+        padding-left: $spacing-layout-xs
+
+        &:not(:first-child)
+          margin-left: $spacing-layout-s
+
+      .detail-field-label
+        display: block
+        font-size: $fontsize-body-m
+        margin-bottom: $spacing-3-xs
+        letter-spacing: 1px
+        color: $color-black-50
+
+      .detail-field-value
+        font-size: $fontsize-body-xl
+        font-weight: 600
+
+        span
+          color: $color-black-50
+          font-weight: 400
+
+        &:not(:last-child)
+          margin-bottom: $spacing-layout-s
+
+      textarea
+        font-size: $fontsize-body-m
+        width: 100%
+        height: 200px
+
+  .list-amount
+    display: none
+
+  .results
+    grid-column-start: 1
+    grid-column-end: 3
+
+  .list-header
+    &.apartment
+      width: 8%
+
+    &.area
+      width: 42%
+
+    &.address
+      width: 36%
+
+    &.state
+      width: 13%
