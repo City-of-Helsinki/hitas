@@ -233,7 +233,7 @@ const HousingCompanyDetailsPage = () => {
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
 
     return (
-        <div className="view--company-details">
+        <div className="view--housing-company-details">
             <QueryStateHandler
                 data={data}
                 error={error}
