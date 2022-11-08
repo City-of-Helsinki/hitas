@@ -218,7 +218,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             title="Yhtiökohtaiset parannukset"
                         />
                     </QueryStateHandler>
-                    <div className="row">
+                    <div className="row row--buttons">
                         <NavigateBackButton />
                         <Button
                             theme="black"

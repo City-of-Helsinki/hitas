@@ -14,6 +14,16 @@ ul, ol
   list-style-type: none
   padding-left: 0
 
+.row
+  @include flexbox()
+  @include flex-flow(row nowrap)
+  &--buttons
+    align-items: center
+    justify-content: space-between
+    >*:only-child
+      margin-left: auto
+      margin-right: auto
+
 .pull-right
   float: right
   align-content: center

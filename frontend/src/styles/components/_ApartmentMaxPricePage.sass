@@ -7,15 +7,10 @@
       height: 30px
 
   .row
-    @include flexbox()
-    @include flex-flow(row)
-    align-items: flex-end
+    justify-content: space-between
     gap: $spacing-layout-s
     > div
       flex-grow: 1
-    > button
-      display: inline-flex
-      height: 56px
 
 .confirmation-modal__calculation-row
   p
