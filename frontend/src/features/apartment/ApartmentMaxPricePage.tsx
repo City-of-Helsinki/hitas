@@ -240,7 +240,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
             >
                 <Dialog.Header
                     id="maximum-price-confirmation-modal-header"
-                    title="Vahvistetaanko enimmäishinnan laskelma?"
+                    title="Vahvistetaanko enimmäishintalaskelma?"
                 />
                 <QueryStateHandler
                     data={data}

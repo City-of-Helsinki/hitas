@@ -20,6 +20,7 @@ import {
     IPostalCodeResponse,
     IRealEstate,
 } from "../common/models";
+import {hitasToast} from "../common/utils";
 
 declare global {
     interface Window {
@@ -40,6 +41,25 @@ export class Config {
 
 // Helper to return either the passed value prefixed with `/` or an empty string
 const idOrBlank = (id: string | undefined) => (id ? `/${id}` : "");
+
+export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) => {
+    if (!apartment.prices.maximum_prices.confirmed) {
+        hitasToast("Enimmäishintalaskelmaa ei ole olemassa", "error");
+        return;
+    }
+
+    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/maximum-prices/${apartment.prices.maximum_prices.confirmed.id}/download`;
+    const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
+    fetch(url, init).then((response) => {
+        response.blob().then((blob) => {
+            const filename = `Enimmäishintalaskelma ${apartment.address.street_address} ${apartment.address.stair} ${apartment.address.apartment_number}`;
+            const alink = document.createElement("a");
+            alink.href = window.URL.createObjectURL(blob);
+            alink.download = `${filename}.pdf`;
+            alink.click();
+        });
+    });
+};
 
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
