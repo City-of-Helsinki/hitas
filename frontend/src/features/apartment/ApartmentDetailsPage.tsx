@@ -3,7 +3,11 @@ import React from "react";
 import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
-import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../app/services";
+import {
+    downloadApartmentMaximumPricePDF,
+    useGetApartmentDetailQuery,
+    useGetHousingCompanyDetailQuery,
+} from "../../app/services";
 import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import {IApartmentDetails, IHousingCompanyDetails, IOwnership} from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
@@ -81,6 +85,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
     const unconfirmedPrices = isPre2011
         ? data.prices.maximum_prices.unconfirmed.pre_2011
         : data.prices.maximum_prices.unconfirmed.onwards_2011;
+
     return (
         <>
             <h1 className="main-heading">
@@ -119,6 +124,15 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                             label="Rajaneliöhinta"
                             unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
                         />
+                        <div className="align-content-right">
+                            <Button
+                                theme="black"
+                                size="small"
+                                variant="secondary"
+                            >
+                                Lataa Hinta-arvio
+                            </Button>
+                        </div>
                     </div>
                     <label className="card-heading">Vahvistettu enimmäishinta</label>
                     <ConfirmedPrice confirmed={data.prices.maximum_prices.confirmed} />
@@ -127,8 +141,10 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                             theme="black"
                             size="small"
                             variant="secondary"
+                            onClick={() => downloadApartmentMaximumPricePDF(data)}
+                            disabled={!data.prices.maximum_prices.confirmed}
                         >
-                            Lataa Hinta-arvio
+                            Lataa enimmäishintalaskelma
                         </Button>
                         <Link to="max-price">
                             <Button
