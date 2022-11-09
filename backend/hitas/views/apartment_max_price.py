@@ -130,6 +130,11 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
     def download(self, request, **kwargs) -> HttpResponse:
         with model_or_404(ApartmentMaximumPriceCalculation):
             mpc = ApartmentMaximumPriceCalculation.objects.get(uuid=kwargs["pk"])
+
+            # Migrated maximum price calculations are missing necessary data necessary to create a PDF
+            if mpc.json_version is None:
+                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
+
             # Make sure the calculation is confirmed
             if mpc.confirmed_at is None:
                 return Response(

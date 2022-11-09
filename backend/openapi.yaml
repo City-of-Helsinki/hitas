@@ -1031,6 +1031,52 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-prices/{calculation_id}/download:
+    get:
+      description: Download a single apartment's maximum price calculation's PDF
+      operationId: read-apartment-maximum-price-pdf
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: calculation_id
+          required: true
+          in: path
+          description: Calculation ID
+          schema:
+            type: string
+            example: e65579e3ed0a4cc0b693d9910b41ab08
+      responses:
+        '200':
+          description: Successfully downloaded an apartment's maximum price calculation's PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/apartments:
     get:
       description: List and search all apartments across all housing companies
