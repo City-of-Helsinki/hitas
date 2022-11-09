@@ -156,7 +156,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
             filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
             context = {"title": filename, "maximum_price_calculation": mpc}
-            pdf = render_to_pdf("confirmed_maximum_price.html", context)
+            pdf = render_to_pdf("confirmed_maximum_price.jinja", context)
             response = HttpResponse(pdf, content_type="application/pdf")
             # Download file for user instead of opening it in the browser
             response.headers["Content-Disposition"] = f"attachment; filename={filename}"
