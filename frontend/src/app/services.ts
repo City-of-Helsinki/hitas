@@ -52,7 +52,7 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) =
     const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
     fetch(url, init).then((response) => {
         response.blob().then((blob) => {
-            const filename = `Enimmäishintalaskelma ${apartment.address.street_address} ${apartment.address.stair} ${apartment.address.apartment_number}`;
+            const filename = response.headers.get("Content-Disposition")?.split("=")[1];
             const alink = document.createElement("a");
             alink.href = window.URL.createObjectURL(blob);
             alink.download = `${filename}.pdf`;

@@ -147,10 +147,13 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                     status=HTTPStatus.CONFLICT,
                 )
 
-            context = {"maximum_price_calculation": mpc}
+            filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
+            context = {"title": filename, "maximum_price_calculation": mpc}
             pdf = render_to_pdf("confirmed_maximum_price.html", context)
             response = HttpResponse(pdf, content_type="application/pdf")
-            response.headers["Content-Disposition"] = "attachment;"  # Download file for user instead of opening it
+            # Download file for user instead of opening it in the browser
+            response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+            response["Access-Control-Expose-Headers"] = "Content-Disposition"
             return response
 
     @staticmethod
