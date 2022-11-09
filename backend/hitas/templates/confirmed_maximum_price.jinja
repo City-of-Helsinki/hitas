@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="fi">
+{% extends "components/base.jinja" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
-</head>
+{% block title %}{{ title }}{% endblock %}
 
-<body>
-<h1>Hello World</h1>
+{% block content %}
+
 <code>{{ maximum_price_calculation.json }}</code>
-</body>
 
-</html>
+{% endblock %}

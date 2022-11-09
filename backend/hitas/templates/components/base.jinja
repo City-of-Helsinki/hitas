@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}HITAS{% endblock %}</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            @frame header_frame {
+                -pdf-frame-content: header_content;
+                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            }
+            @frame content_frame {
+                left: 50pt; width: 512pt; top: 90pt; height: 632pt;
+            }
+            @frame footer_frame_1 {
+                -pdf-frame-content: footer_content_1;
+                left: 50pt; width: 125pt; top: 770pt; height: 80pt;
+            }
+            @frame footer_frame_2 {
+                -pdf-frame-content: footer_content_2;
+                left: 175pt; width: 125pt; top: 770pt; height: 80pt;
+            }
+            @frame footer_frame_3 {
+                -pdf-frame-content: footer_content_3;
+                left: 300pt; width: 125pt; top: 770pt; height: 80pt;
+            }
+            @frame footer_frame_4 {
+                -pdf-frame-content: footer_content_4;
+                left: 425pt; width: 125pt; top: 770pt; height: 80pt;
+            }
+        }
+        body {font-size: 10.5pt;}
+        .static-footer {font-size: 8pt;}
+    </style>
+</head>
+
+<body>
+
+{% block header %}
+    <div id="header_content">
+        -HEADER-
+    </div>
+{% endblock %}
+
+
+{% block content %}
+{% endblock %}
+
+
+{% block footer %}
+    <div class="static-footer">
+        <div id="footer_content_1">
+            <b>Postiosoite</b><br>
+            Asuntopalvelut<br>
+            PL 58231<br>
+            00099 HELSINGIN KAUPUNKI<br>
+        </div>
+        <div id="footer_content_2">
+            <b>Käyntiosoite</b><br>
+            Työpajankatu 8<br>
+            00580 Helsinki<br>
+        </div>
+        <div id="footer_content_3">
+            <b>Puh.</b><br>
+            <b>Email</b> hitas@hel.fi<br>
+            <b>Url</b> <a href="http://www.hel.fi/hitas" style="color: black;">http://www.hel.fi/hitas</a><br>
+        </div>
+        <div id="footer_content_4">
+        </div>
+    </div>
+{% endblock %}
+
+</body>
+</html>
