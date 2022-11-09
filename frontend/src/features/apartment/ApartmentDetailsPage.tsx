@@ -1,10 +1,11 @@
 import React from "react";
 
-import {Button, Card, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, IconDownload, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
     downloadApartmentMaximumPricePDF,
+    downloadApartmentUnconfirmedMaximumPricePDF,
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
@@ -129,6 +130,16 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                 theme="black"
                                 size="small"
                                 variant="secondary"
+                                iconLeft={<IconDownload />}
+                                onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(data)}
+                                disabled={
+                                    // Button should be disabled if any of the price calculations are missing
+                                    !(
+                                        unconfirmedPrices.market_price_index.value &&
+                                        unconfirmedPrices.construction_price_index.value &&
+                                        unconfirmedPrices.surface_area_price_ceiling.value
+                                    )
+                                }
                             >
                                 Lataa Hinta-arvio
                             </Button>
@@ -141,6 +152,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                             theme="black"
                             size="small"
                             variant="secondary"
+                            iconLeft={<IconDownload />}
                             onClick={() => downloadApartmentMaximumPricePDF(data)}
                             disabled={!data.prices.maximum_prices.confirmed}
                         >
