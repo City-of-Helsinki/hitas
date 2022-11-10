@@ -1,5 +1,6 @@
+import datetime
 from http import HTTPStatus
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from django.http import HttpResponse
 from django.utils import timezone
@@ -28,6 +29,9 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         apartment_share_of_housing_company_loans = (
             serializer.validated_data.get("apartment_share_of_housing_company_loans") or 0
         )
+        apartment_share_of_housing_company_loans_date = (
+            serializer.validated_data.get("apartment_share_of_housing_company_loans_date") or timezone.now().date()
+        )
 
         # Calculate max price
         try:
@@ -36,6 +40,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 apartment_uuid=kwargs["apartment_uuid"],
                 calculation_date=calculation_date,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
+                apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
             )
             return Response(max_prices)
         except InvalidCalculationResult:
@@ -70,6 +75,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
+                json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
             )
             if mpc.json_version is None:
                 raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
@@ -92,6 +98,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
+                json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
             )
 
             if ampc.json_version is None:
@@ -181,12 +188,19 @@ class ConfirmSerializer(Serializer):
 class CreateCalculationSerializer(Serializer):
     calculation_date = fields.DateField(required=False, allow_null=True)
     apartment_share_of_housing_company_loans = fields.IntegerField(min_value=0, allow_null=True, required=False)
+    apartment_share_of_housing_company_loans_date = fields.DateField(required=False, allow_null=True)
+
+    def validate_calculation_date(self, date):
+        return self._validate_not_in_future(date)
+
+    def validate_apartment_share_of_housing_company_loans_date(self, date):
+        return self._validate_not_in_future(date)
 
     @staticmethod
-    def validate_calculation_date(calculation_date):
-        if calculation_date is not None and calculation_date > timezone.now().date():
+    def _validate_not_in_future(date: datetime.date) -> Optional[datetime.date]:
+        if date is not None and date > timezone.now().date():
             raise ValidationError("Field has to be less than or equal to current date.")
-        return calculation_date
+        return date
 
 
 def model_or_404(model_class):

@@ -59,6 +59,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
     data = {
         "calculation_date": "2022-07-05",
         "apartment_share_of_housing_company_loans": 2500,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
     }
 
     response = api_client.post(
@@ -91,6 +92,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                     "debt_free_price": 226058,
                     "debt_free_price_m2": 7535,
                     "apartment_share_of_housing_company_loans": 2500,
+                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
                     "completion_date": "2019-11-27",
                     "completion_date_index": 129.29,
                     "calculation_date": "2022-07-05",
@@ -111,6 +113,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                     "debt_free_price": 224843,
                     "debt_free_price_m2": 7495,
                     "apartment_share_of_housing_company_loans": 2500,
+                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
                     "completion_date": "2019-11-27",
                     "completion_date_index": 167.9,
                     "calculation_date": "2022-07-05",
@@ -216,6 +219,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
     data = {
         "calculation_date": "2022-07-05",
         "apartment_share_of_housing_company_loans": 2500,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
     }
 
     response = api_client.post(
@@ -245,6 +249,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "debt_free_price": 262964,
                     "debt_free_price_m2": 5478,
                     "apartment_share_of_housing_company_loans": 2500,
+                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
                     "completion_date": "2014-08-27",
                     "completion_date_index": 123.5,
                     "calculation_date": "2022-07-05",
@@ -265,6 +270,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "debt_free_price": 278425,
                     "debt_free_price_m2": 5801,
                     "apartment_share_of_housing_company_loans": 2500,
+                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
                     "completion_date": "2014-08-27",
                     "completion_date_index": 150.6,
                     "calculation_date": "2022-07-05",
@@ -338,6 +344,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     data = {
         "calculation_date": "2022-09-29",
         "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2022-10-01",
     }
 
     response = api_client.post(
@@ -367,6 +374,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "debt_free_price": 218161,
                     "debt_free_price_m2": 4498,
                     "apartment_share_of_housing_company_loans": 0,
+                    "apartment_share_of_housing_company_loans_date": "2022-10-01",
                     "completion_date": "2012-01-13",
                     "completion_date_index": 115.9,
                     "calculation_date": "2022-09-29",
@@ -387,6 +395,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "debt_free_price": 232210,
                     "debt_free_price_m2": 4788,
                     "apartment_share_of_housing_company_loans": 0,
+                    "apartment_share_of_housing_company_loans_date": "2022-10-01",
                     "completion_date": "2012-01-13",
                     "completion_date_index": 138.1,
                     "calculation_date": "2022-09-29",

@@ -11,7 +11,15 @@ from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from hitas.models import Apartment, ApartmentConstructionPriceImprovement, Building, HousingCompany, Owner, Ownership
+from hitas.models import (
+    Apartment,
+    ApartmentConstructionPriceImprovement,
+    ApartmentMaximumPriceCalculation,
+    Building,
+    HousingCompany,
+    Owner,
+    Ownership,
+)
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -188,9 +196,7 @@ class PricesSerializer(serializers.Serializer):
                 "apartment_id",
                 "json_version",
             )
-            .filter(
-                confirmed_at__isnull=False,
-            )
+            .filter(confirmed_at__isnull=False)
             .order_by("-confirmed_at")
             .order_by("-maximum_price")  # migrated calculations have the same datestamp
             .first()
@@ -200,7 +206,8 @@ class PricesSerializer(serializers.Serializer):
             {
                 "id": (
                     latest_confirmed_max_price_calculation.uuid.hex
-                    if latest_confirmed_max_price_calculation.json_version is not None
+                    if latest_confirmed_max_price_calculation.json_version
+                    == ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION
                     else None
                 ),
                 "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
