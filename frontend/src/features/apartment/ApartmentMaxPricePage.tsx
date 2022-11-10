@@ -132,6 +132,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
     const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
         calculation_date: new Date().toISOString().split("T")[0], // Init with today's date in YYYY-MM format
         apartment_share_of_housing_company_loans: null,
+        apartment_share_of_housing_company_loans_date: null,
     });
     const {
         data: housingCompanyData,
@@ -188,8 +189,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                         <FormInputField
                             inputType="date"
                             label="Yhtiölainaosuuden päivämäärä"
-                            fieldPath="housing_company_loans_date"
-                            required
+                            fieldPath="apartment_share_of_housing_company_loans_date"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -198,7 +198,6 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             inputType="date"
                             label="Laskentapäivämäärä"
                             fieldPath="calculation_date"
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
