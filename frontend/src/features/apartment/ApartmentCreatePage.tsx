@@ -214,7 +214,7 @@ const ApartmentCreatePage = () => {
                             defaultValue={
                                 state?.apartment !== undefined
                                     ? {label: formData.address.street_address, value: formData.building}
-                                    : {label: "", value: ""}
+                                    : {label: buildingOptions[0].label || "", value: buildingOptions[0].value || ""}
                             }
                             options={buildingOptions || []}
                             required
