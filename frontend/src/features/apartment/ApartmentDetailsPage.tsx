@@ -154,7 +154,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                             variant="secondary"
                             iconLeft={<IconDownload />}
                             onClick={() => downloadApartmentMaximumPricePDF(data)}
-                            disabled={!data.prices.maximum_prices.confirmed}
+                            disabled={!data.prices.maximum_prices.confirmed || !data.prices.maximum_prices.confirmed.id}
                         >
                             Lataa enimmäishintalaskelma
                         </Button>

@@ -45,6 +45,11 @@ const idOrBlank = (id: string | undefined) => (id ? `/${id}` : "");
 const handleDownloadPDF = (response) => {
     response.blob().then((blob) => {
         const filename = response.headers.get("Content-Disposition")?.split("=")[1];
+        if (filename === undefined) {
+            hitasToast("Virhe tiedostoa ladattaessa.", "error");
+            return;
+        }
+
         const alink = document.createElement("a");
         alink.href = window.URL.createObjectURL(blob);
         alink.download = `${filename}.pdf`;
@@ -254,7 +259,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [{type: "Index", id: "LIST"}],
+            invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
     }),
 });
