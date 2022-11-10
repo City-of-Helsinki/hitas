@@ -4,7 +4,7 @@ from collections import OrderedDict
 from typing import Any, Dict, Optional
 
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from enumfields.drf import EnumSupportSerializerMixin
@@ -196,10 +196,7 @@ class PricesSerializer(serializers.Serializer):
                 "apartment_id",
                 "json_version",
             )
-            .filter(
-                Q(confirmed_at__isnull=False),
-                Q(json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION) | Q(json_version__isnull=True),
-            )
+            .filter(confirmed_at__isnull=False)
             .order_by("-confirmed_at")
             .order_by("-maximum_price")  # migrated calculations have the same datestamp
             .first()
@@ -209,7 +206,8 @@ class PricesSerializer(serializers.Serializer):
             {
                 "id": (
                     latest_confirmed_max_price_calculation.uuid.hex
-                    if latest_confirmed_max_price_calculation.json_version is not None
+                    if latest_confirmed_max_price_calculation.json_version
+                    == ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION
                     else None
                 ),
                 "maximum_price": latest_confirmed_max_price_calculation.maximum_price,

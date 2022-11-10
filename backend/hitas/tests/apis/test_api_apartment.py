@@ -386,7 +386,7 @@ def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClien
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["prices"]["maximum_prices"]["confirmed"] == {
-        "id": None,
+        "id": None,  # id hidden
         "created_at": ampc.created_at.isoformat()[:-6] + "Z",
         "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
         "calculation_date": str(ampc.calculation_date),
@@ -406,7 +406,9 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
         primary_loan_amount=20000,
         surface_area=50,
     )
-    ApartmentMaximumPriceCalculationFactory.create(apartment=ap, json_version=1)
+    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        apartment=ap, json_version=1
+    )
 
     response = api_client.get(
         reverse(
@@ -416,7 +418,17 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
     )
 
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["prices"]["maximum_prices"]["confirmed"] is None
+    assert response.json()["prices"]["maximum_prices"]["confirmed"] == {
+        "id": None,  # id hidden
+        "created_at": ampc.created_at.isoformat()[:-6] + "Z",
+        "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
+        "calculation_date": str(ampc.calculation_date),
+        "maximum_price": ampc.maximum_price,
+        "valid": {
+            "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
+            "is_valid": ampc.valid_until >= datetime.date.today(),
+        },
+    }
 
 
 def _test_max_prices(
