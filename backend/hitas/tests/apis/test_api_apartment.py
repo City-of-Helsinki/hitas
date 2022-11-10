@@ -480,6 +480,7 @@ def _test_max_prices(
     create_current_indices: bool,
     null_values: bool = False,
 ):
+    # Setup test
     completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
     cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
     mpi_factory = MarketPriceIndexFactory if pre_2011 else MarketPriceIndex2005Equal100Factory
@@ -501,6 +502,7 @@ def _test_max_prices(
         mpi_factory.create(month=now, value=250)
         SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
 
+    # Validate apartment details has correct data returned
     response = api_client.get(
         reverse(
             "hitas:apartment-detail",
@@ -529,6 +531,19 @@ def _test_max_prices(
         "onwards_2011": None if pre_2011 else values,
     }
 
+    # Validate fetching PDF report of unconfirmed prices
+
+    response = api_client.get(
+        reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex]) + "/unconfirmed_prices_pdf",
+        # TODO: Write a validator that can handle pdf return types.
+        openapi_validate_response=False,
+    )
+
+    if create_current_indices and create_completion_indices and not null_values:
+        assert response.status_code == status.HTTP_200_OK, response.json()
+        assert response.get("content-type") == "application/pdf"
+    else:
+        assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
 
 @pytest.mark.django_db

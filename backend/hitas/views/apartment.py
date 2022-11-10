@@ -1,7 +1,8 @@
 import datetime
 import uuid
 from collections import OrderedDict
-from typing import Any, Dict, Optional
+from http import HTTPStatus
+from typing import Any, Dict, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
@@ -12,6 +13,7 @@ from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
+from rest_framework.response import Response
 
 from hitas.models import (
     Apartment,
@@ -620,11 +622,29 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     @action(detail=True, methods=["GET"])
-    def unconfirmed_prices_pdf(self, request, **kwargs) -> HttpResponse:
+    def unconfirmed_prices_pdf(self, request, **kwargs) -> Union[HttpResponse, Response]:
         apartment = self.get_object()
+        apartment_data = ApartmentDetailSerializer(apartment).data
+        ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
+        ump = ump["pre_2011"] if ump["pre_2011"] is not None else ump["onwards_2011"]
+
+        if (
+            ump["construction_price_index"]["value"] is None
+            or ump["market_price_index"]["value"] is None
+            or ump["surface_area_price_ceiling"]["value"] is None
+        ):
+            return Response(
+                {
+                    "error": "index_missing",
+                    "message": "One or more indices required for max price calculation is missing.",
+                    "reason": "Conflict",
+                    "status": 409,
+                },
+                status=HTTPStatus.CONFLICT,
+            )
 
         filename = f"Hinta-arvio {apartment.address}.pdf"
-        context = {"title": filename, "apartment": ApartmentDetailSerializer(apartment).data}
+        context = {"title": filename, "apartment": apartment_data}
         pdf = render_to_pdf("unconfirmed_maximum_price.jinja", context)
         response = HttpResponse(pdf, content_type="application/pdf")
         # Download file for user instead of opening it in the browser

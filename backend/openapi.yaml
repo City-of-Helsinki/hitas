@@ -218,6 +218,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Real Estate
+
   /api/v1/housing-companies/{housing_company_id}/real-estates:
     get:
       description: Fetch real estates for a housing company
@@ -420,6 +422,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+
+  # Building
 
   /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings:
     get:
@@ -658,6 +662,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Apartment
+
   /api/v1/housing-companies/{housing_company_id}/apartments:
     get:
       description: Fetch apartments for a housing company
@@ -745,7 +751,6 @@ paths:
           $ref: '#/components/responses/UnsupportedMediaType'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}:
     get:
@@ -857,6 +862,46 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Apartment maximum price
+
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/unconfirmed_prices_pdf:
+    get:
+      description: Download an apartment's unconfirmed maximum price calculation's PDF
+      operationId: read-apartment-unconfirmed-maximum-price-pdf
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        '200':
+          description: Successfully downloaded an apartment's unconfirmed maximum price calculation's PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -1081,6 +1126,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Apartment
 
   /api/v1/apartments:
     get:
@@ -1162,6 +1208,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Owner
 
   /api/v1/owners:
     get:
@@ -1351,6 +1398,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Property Manager
 
   /api/v1/property-managers:
     get:
@@ -1520,7 +1568,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
 
   # Codes
 
