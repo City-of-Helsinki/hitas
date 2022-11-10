@@ -1,12 +1,20 @@
 import datetime
 import uuid
-from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Dict, List, Optional, Union
+from decimal import Decimal
+from typing import Any, Dict, List, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Prefetch, Sum
 from django.utils import timezone
 
+from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
+from hitas.calculations.helpers import roundup
+from hitas.calculations.improvement import (
+    ImprovementCalculationResult,
+    ImprovementData,
+    ImprovementsResult,
+    calculate_housing_company_improvements_after_2010,
+)
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -17,14 +25,6 @@ from hitas.models import (
     HousingCompanyMarketPriceImprovement,
     Ownership,
 )
-
-
-class IndexMissingException(Exception):
-    pass
-
-
-class InvalidCalculationResult(Exception):
-    pass
 
 
 def calculate_max_price(
@@ -40,10 +40,14 @@ def calculate_max_price(
     if apartment_share_of_housing_company_loans_date is None:
         calculation_date = timezone.now().today()
 
+    #
     # Fetch apartment
+    #
     apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
 
+    #
     # Fetch housing company's total surface area
+    #
     total_surface_area = (
         HousingCompany.objects.annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
         .only("id")
@@ -51,7 +55,9 @@ def calculate_max_price(
         .sum_surface_area
     )
 
+    #
     # Check we found the necessary indices
+    #
     if (
         apartment.calculation_date_cpi_2005eq100 is None
         or apartment.completion_date_cpi_2005eq100 is None
@@ -61,7 +67,9 @@ def calculate_max_price(
     ):
         raise IndexMissingException()
 
-    # Do the max price calculations
+    #
+    # Do the max price calculations for each index and surface area price ceiling
+    #
     construction_price_index = calculate_index(
         apartment,
         apartment.calculation_date_cpi_2005eq100,
@@ -69,7 +77,6 @@ def calculate_max_price(
         total_surface_area,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
-        apartment.construction_price_improvements.all(),
         apartment.housing_company.construction_price_improvements.all(),
         calculation_date,
     )
@@ -80,7 +87,6 @@ def calculate_max_price(
         total_surface_area,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
-        apartment.market_price_improvements.all(),
         apartment.housing_company.market_price_improvements.all(),
         calculation_date,
     )
@@ -94,7 +100,9 @@ def calculate_max_price(
         },
     }
 
+    #
     # Find and mark the maximum
+    #
     max_price = max(
         construction_price_index["maximum_price"],
         market_price_index["maximum_price"],
@@ -115,6 +123,9 @@ def calculate_max_price(
         max_index = "surface_area_price_ceiling"
         valid_until = surface_area_price_ceiling["valid_until"]
 
+    #
+    # Create calculation json object
+    #
     calculation = {
         "id": uuid.uuid4().hex,
         "created_at": timezone.now(),
@@ -159,6 +170,9 @@ def calculate_max_price(
         },
     }
 
+    #
+    # Save the calculation
+    #
     ApartmentMaximumPriceCalculation.objects.create(
         uuid=calculation["id"],
         apartment=apartment,
@@ -301,7 +315,6 @@ def calculate_index(
     total_surface_area: Decimal,
     apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: datetime.date,
-    apartment_improvements: List,
     housing_company_improvements: List,
     calculation_date: datetime.date,
 ):
@@ -313,39 +326,33 @@ def calculate_index(
     # 'indeksin muutos'
     index_adjustment = ((calculation_date_index / completion_date_index) * basic_price) - basic_price
 
-    # 'huoneistokohtaiset parannukset'
-    apartment_improvements_sum = sum(map(lambda i: i.value, apartment_improvements))
-    apartment_improvements_sum *= calculation_date_index / completion_date_index
-
     # 'yhtiön parannukset'
-    apartment_housing_company_improvements = Decimal(0)
-    for improvement in housing_company_improvements:
-        if improvement.completion_date_index is None:
-            raise IndexMissingException()
-
-        # 'omavastuu'
-        excess = 30 * total_surface_area
-        if excess >= improvement.value:
-            continue
-
-        # 'arvon lisäys'
-        value_addition = improvement.value - excess
-
-        improvement_value = value_addition * (calculation_date_index / improvement.completion_date_index)
-        apartment_housing_company_improvements += improvement_value / total_surface_area * apartment.surface_area
+    hc_improvements_result = calculate_housing_company_improvements_after_2010(
+        [
+            ImprovementData(
+                name=i.name,
+                value=i.value,
+                completion_date=i.completion_date,
+                completion_date_index=i.completion_date_index,
+            )
+            for i in housing_company_improvements
+        ],
+        calculation_date_index=calculation_date_index,
+        total_surface_area=total_surface_area,
+        apartment_surface_area=apartment.surface_area,
+    )
 
     # 'osakkeiden velaton hinta'
     debt_free_shares_price = (
         basic_price
         + roundup(index_adjustment)
-        + roundup(apartment_improvements_sum)
-        + roundup(apartment_housing_company_improvements)
+        + roundup(hc_improvements_result.summary.improvement_value_for_apartment)
     )
     # 'Enimmäismyyntihinta'
     max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
     if max_price <= 0:
-        raise InvalidCalculationResult()
+        raise InvalidCalculationResultException()
 
     return {
         "calculation_variables": {
@@ -353,8 +360,8 @@ def calculate_index(
             "additional_work_during_construction": apartment.additional_work_during_construction,
             "basic_price": basic_price,
             "index_adjustment": roundup(index_adjustment),
-            "apartment_improvements": roundup(apartment_improvements_sum),
-            "housing_company_improvements": roundup(apartment_housing_company_improvements),
+            "apartment_improvements": None,
+            "housing_company_improvements": improvement_result_to_json(hc_improvements_result),
             "debt_free_price": debt_free_shares_price,
             "debt_free_price_m2": roundup(debt_free_shares_price / apartment.surface_area),
             "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
@@ -389,9 +396,41 @@ def surface_area_price_ceiling_validity(date: datetime.date) -> datetime.date:
         return date.replace(year=date.year + 1, month=3, day=1) - relativedelta(days=1)
 
 
-def roundup(v: Decimal, decimals=0) -> Union[int, float]:
-    exp = Decimal("1." + ("0" * decimals))
-    if decimals == 0:
-        return int(v.quantize(exp, ROUND_HALF_UP))
-    else:
-        return float(v.quantize(exp, ROUND_HALF_UP))
+def improvement_to_json(result: ImprovementCalculationResult) -> dict[str, any]:
+    return {
+        "name": result.name,
+        "value": result.value,
+        "completion_date": result.completion_date.strftime("%Y-%m"),
+        "value_added": roundup(result.value_added),
+        "depreciation": (
+            {
+                "amount": result.depreciation.amount,
+                "time": {
+                    "years": int(result.depreciation.time_months / 12),
+                    "months": result.depreciation.time_months % 12,
+                },
+            }
+            if result.depreciation
+            else None
+        ),
+        "value_for_housing_company": roundup(result.improvement_value_for_housing_company, 2),
+        "value_for_apartment": roundup(result.improvement_value_for_apartment, 2),
+    }
+
+
+def improvement_result_to_json(result: ImprovementsResult) -> dict[str, any]:
+    return {
+        "items": list(map(improvement_to_json, result.items)),
+        "summary": {
+            "value": result.summary.value,
+            "value_added": roundup(result.summary.value_added),
+            "excess": {
+                "surface_area": result.summary.excess.surface_area,
+                "value_per_square_meter": result.summary.excess.value_per_square_meter,
+                "total": roundup(result.summary.excess.total),
+            },
+            "depreciation": roundup(result.summary.depreciation),
+            "value_for_housing_company": roundup(result.summary.improvement_value_for_housing_company, 2),
+            "value_for_apartment": roundup(result.summary.improvement_value_for_apartment),
+        },
+    }

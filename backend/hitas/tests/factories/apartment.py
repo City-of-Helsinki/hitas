@@ -8,6 +8,7 @@ from factory.fuzzy import FuzzyDecimal
 from rest_framework.utils import json
 from rest_framework.utils.encoders import JSONEncoder
 
+from hitas.calculations.max_price import roundup
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -85,8 +86,32 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCal
                     "additional_work_during_construction": random.randint(0, 50_000),
                     "basic_price": random.randint(100_000, 300_000),
                     "index_adjustment": random.randint(10_000, 50_000),
-                    "apartment_improvements": random.randint(0, 10_000),
-                    "housing_company_improvements": random.randint(0, 10_000),
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": factory.Faker("sentence").evaluate(None, None, {"locale": None}),
+                                "value": random.randint(100_000, 200_000),
+                                "value_added": random.randint(100_00, 200_00),
+                                "completion_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz().strftime("%Y-%m"),
+                                "depreciation": None,
+                                "value_for_housing_company": random.randint(20_000, 30_000),
+                                "value_for_apartment": random.randint(100, 1000),
+                            },
+                        ],
+                        "summary": {
+                            "value": random.randint(100_000, 200_000),
+                            "value_added": random.randint(100_00, 200_00),
+                            "excess": {
+                                "surface_area": mpc.apartment.surface_area,
+                                "value_per_square_meter": 30,
+                                "total": roundup(30 * mpc.apartment.surface_area, 0),
+                            },
+                            "depreciation": 0,
+                            "value_for_housing_company": random.randint(20_000, 30_000),
+                            "value_for_apartment": random.randint(100, 1000),
+                        },
+                    },
                     "debt_free_price": random.randint(100_000, 300_000),
                     "debt_free_price_m2": random.randint(1_000, 10_000),
                     "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
@@ -106,8 +131,32 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCal
                     "additional_work_during_construction": random.randint(0, 50_000),
                     "basic_price": random.randint(100_000, 300_000),
                     "index_adjustment": random.randint(10_000, 50_000),
-                    "apartment_improvements": random.randint(0, 10_000),
-                    "housing_company_improvements": random.randint(0, 10_000),
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": factory.Faker("sentence").evaluate(None, None, {"locale": None}),
+                                "value": random.randint(100_000, 200_000),
+                                "value_added": random.randint(100_00, 200_00),
+                                "completion_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz().strftime("%Y-%m"),
+                                "depreciation": None,
+                                "value_for_housing_company": random.randint(20_000, 30_000),
+                                "value_for_apartment": random.randint(100, 1000),
+                            },
+                        ],
+                        "summary": {
+                            "value": random.randint(100_000, 200_000),
+                            "value_added": random.randint(100_00, 200_00),
+                            "excess": {
+                                "surface_area": mpc.apartment.surface_area,
+                                "value_per_square_meter": 30,
+                                "total": roundup(30 * mpc.apartment.surface_area, 0),
+                            },
+                            "depreciation": 0,
+                            "value_for_housing_company": random.randint(20_000, 30_000),
+                            "value_for_apartment": random.randint(100, 1000),
+                        },
+                    },
                     "debt_free_price": random.randint(100_000, 300_000),
                     "debt_free_price_m2": random.randint(1_000, 10_000),
                     "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
