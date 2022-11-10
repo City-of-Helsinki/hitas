@@ -431,6 +431,48 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_client: HitasAPIClient):
+    ap: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2011, 1, 1),
+        debt_free_purchase_price=80000,
+        primary_loan_amount=20000,
+        surface_area=50,
+    )
+    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        apartment=ap,
+        json=None,
+        json_version=None,
+        maximum_price=100,
+    )
+    ampc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
+        apartment=ap, json=None, json_version=None, maximum_price=200, created_at=ampc.created_at
+    )
+    ApartmentMaximumPriceCalculationFactory.create(
+        apartment=ap, json=None, json_version=None, maximum_price=50, created_at=ampc.created_at
+    )
+
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["prices"]["maximum_prices"]["confirmed"] == {
+        "id": None,
+        "created_at": ampc2.created_at.isoformat()[:-6] + "Z",
+        "confirmed_at": ampc2.confirmed_at.isoformat()[:-6] + "Z",
+        "calculation_date": str(ampc2.calculation_date),
+        "maximum_price": ampc2.maximum_price,
+        "valid": {
+            "valid_until": str(ampc2.valid_until),
+            "is_valid": ampc2.valid_until >= datetime.date.today(),
+        },
+    }
+
+
 def _test_max_prices(
     api_client: HitasAPIClient,
     pre_2011: bool,
@@ -487,47 +529,6 @@ def _test_max_prices(
         "onwards_2011": None if pre_2011 else values,
     }
 
-
-@pytest.mark.django_db
-def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
-    )
-    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
-        apartment=ap,
-        json=None,
-        json_version=None,
-        maximum_price=100,
-    )
-    ampc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
-        apartment=ap, json=None, json_version=None, maximum_price=200, created_at=ampc.created_at
-    )
-    ApartmentMaximumPriceCalculationFactory.create(
-        apartment=ap, json=None, json_version=None, maximum_price=50, created_at=ampc.created_at
-    )
-
-    response = api_client.get(
-        reverse(
-            "hitas:apartment-detail",
-            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
-        )
-    )
-
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["prices"]["maximum_prices"]["confirmed"] == {
-        "id": None,
-        "created_at": ampc2.created_at.isoformat()[:-6] + "Z",
-        "confirmed_at": ampc2.confirmed_at.isoformat()[:-6] + "Z",
-        "calculation_date": str(ampc2.calculation_date),
-        "maximum_price": ampc2.maximum_price,
-        "valid": {
-            "valid_until": str(ampc2.valid_until),
-            "is_valid": ampc2.valid_until >= datetime.date.today(),
-        },
-    }
 
 
 @pytest.mark.django_db
