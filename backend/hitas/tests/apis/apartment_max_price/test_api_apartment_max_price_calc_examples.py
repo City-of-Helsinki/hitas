@@ -67,6 +67,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
         "calculation_date": "2022-07-05",
         "apartment_share_of_housing_company_loans": 2500,
         "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
     }
 
     response = api_client.post(
@@ -222,6 +223,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 "street_address": a.housing_company.property_manager.street_address,
             },
         },
+        "additional_info": "Example",
     }
     assert expected_response == response_json
 
@@ -277,6 +279,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
         "calculation_date": "2022-07-05",
         "apartment_share_of_housing_company_loans": 2500,
         "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
     }
 
     response = api_client.post(
@@ -419,6 +422,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                 "street_address": a.housing_company.property_manager.street_address,
             },
         },
+        "additional_info": "Example",
     }
 
 
@@ -450,6 +454,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         "calculation_date": "2022-09-29",
         "apartment_share_of_housing_company_loans": 0,
         "apartment_share_of_housing_company_loans_date": "2022-10-01",
+        "additional_info": "Example",
     }
 
     response = api_client.post(
@@ -572,4 +577,5 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                 "street_address": a.housing_company.property_manager.street_address,
             },
         },
+        "additional_info": "Example",
     }

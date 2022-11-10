@@ -992,6 +992,10 @@ paths:
                   type: string
                   format: date
                   example: 2022-07-28
+                additional_info:
+                  description: Additional information to be displayed on the generated PDF
+                  type: string
+                  example: Example text
       responses:
         '200':
           description: Successfully created an apartment's maximum price calculation
@@ -3471,6 +3475,7 @@ components:
         - created_at
         - valid_until
         - calculations
+        - additional_info
       properties:
         id:
           description: Maximum price calculation ID
@@ -3575,7 +3580,6 @@ components:
                   description: Is this calculated maximum price the highest maximum price.
                   type: boolean
                   example: true
-
         apartment:
           description: Share information
           type: object
@@ -3724,6 +3728,10 @@ components:
                   description: Property manager's street address
                   type: string
                   example: Isätie 42
+        additional_info:
+          description: Additional information to be displayed on the generated PDF
+          type: string
+          example: Example text
 
     ApartmentLinks:
       description: Links to apartment's related object

@@ -179,7 +179,7 @@ class ApartmentMaximumPriceCalculation(models.Model):
     # development, we don't want to be supporting the old versions. Updating this field will hide all old calculations
     # and thus hiding the old formats. When we are ready to go to production, we should change this back to 1. After
     # this can be useful for doing database migrations.
-    CURRENT_JSON_VERSION = 2
+    CURRENT_JSON_VERSION = 3
     json_version = models.SmallIntegerField(default=CURRENT_JSON_VERSION, validators=[MinValueValidator(1)], null=True)
 
     class Meta:
