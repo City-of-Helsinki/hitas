@@ -252,6 +252,26 @@ const mutationApi = hitasApi.injectEndpoints({
                 return [];
             },
         }),
+        removeApartment: builder.mutation<
+            IApartmentDetails,
+            {
+                data: IApartmentWritable;
+                id?: string;
+                housingCompanyId: string;
+            }
+        >({
+            query: ({data, id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments${idOrBlank(id)}`,
+                method: "DELETE",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {type: "Apartment", id: "LIST"},
+                {type: "Apartment", id: arg.id},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+            ],
+        }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
                 url: `indices/${index}/${month}`,
@@ -285,6 +305,7 @@ export const {
     useCreateRealEstateMutation,
     useCreateBuildingMutation,
     useSaveApartmentMutation,
+    useRemoveApartmentMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
 } = mutationApi;
