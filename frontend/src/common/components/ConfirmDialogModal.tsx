@@ -5,11 +5,12 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
-import RemoveButton from "./RemoveButton";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
-interface RemoveStateProps {
+interface ConfirmDialogModalProps {
     data;
+    modalText: string;
+    successText: string;
     error: FetchBaseQueryError | SerializedError | undefined;
     linkURL?: string;
     linkText?: string;
@@ -20,27 +21,6 @@ interface RemoveStateProps {
     confirmAction;
     cancelAction;
 }
-
-const ActionSuccess = ({linkURL, linkText}) => {
-    return (
-        <>
-            <Dialog.Content>Tiedot poistettu onnistuneesti!</Dialog.Content>
-            <Dialog.ActionButtons>
-                <>
-                    <Link to={linkURL}>
-                        <Button
-                            variant="secondary"
-                            theme="black"
-                        >
-                            {linkText}
-                        </Button>
-                    </Link>
-                    <NavigateBackButton />
-                </>
-            </Dialog.ActionButtons>
-        </>
-    );
-};
 
 const ActionFailed = ({error, setIsVisible}) => {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
@@ -63,32 +43,56 @@ const ActionFailed = ({error, setIsVisible}) => {
     );
 };
 
-export default function RemoveDialogModal({
+const ActionSuccess = ({successText, linkURL, linkText}) => {
+    return (
+        <>
+            <Dialog.Content>{successText}</Dialog.Content>
+            <Dialog.ActionButtons>
+                <>
+                    <Link to={linkURL}>
+                        <Button
+                            variant="secondary"
+                            theme="black"
+                        >
+                            {linkText}
+                        </Button>
+                    </Link>
+                    <NavigateBackButton />
+                </>
+            </Dialog.ActionButtons>
+        </>
+    );
+};
+
+const ConfirmDialogModal = ({
     data,
-    error,
-    linkText,
+    modalText,
+    successText,
     linkURL,
+    linkText,
+    buttonText,
+    error,
     isLoading,
     isVisible,
     setIsVisible,
     confirmAction,
     cancelAction,
-}: RemoveStateProps): JSX.Element {
+}: ConfirmDialogModalProps) => {
     const [isConfirmed, setIsConfirmed] = useState(false);
     return (
         <Dialog
-            id="modification__end-modal"
+            id="confirmation-modal"
             closeButtonLabelText="args.closeButtonLabelText"
-            aria-labelledby="finish-modal"
+            aria-labelledby="confirm-modal"
             isOpen={isVisible}
             close={() => setIsVisible(false)}
             boxShadow
         >
             <Dialog.Header
-                id="modification__end-modal__header"
-                title="Poistetaan tietokannasta"
+                id="confirmation-modal__header"
+                title="Vahvista toiminto"
             />
-            {isConfirmed ? (
+            {isConfirmed && error ? (
                 <QueryStateHandler
                     data={data}
                     error={error}
@@ -103,29 +107,38 @@ export default function RemoveDialogModal({
                     <ActionSuccess
                         linkURL={linkURL}
                         linkText={linkText}
+                        successText={successText}
                     />
                 </QueryStateHandler>
             ) : (
-                <Dialog.Content>
-                    <p>Haluatko varmasti poistaa asunnon?</p>
-                    <div className="row row--buttons">
-                        <Button
-                            theme="black"
-                            variant="secondary"
-                            onClick={cancelAction}
-                        >
-                            Peruuta
-                        </Button>
-                        <RemoveButton
-                            onClick={() => {
-                                setIsConfirmed(true);
-                                confirmAction();
-                            }}
-                            isLoading={isLoading}
-                        />
-                    </div>
-                </Dialog.Content>
+                <>
+                    <Dialog.Content>
+                        <p>{modalText}</p>
+                    </Dialog.Content>
+                    <Dialog.ActionButtons>
+                        <div className="row row--buttons">
+                            <Button
+                                theme="black"
+                                variant="secondary"
+                                onClick={cancelAction}
+                            >
+                                Peruuta
+                            </Button>
+                            <Button
+                                theme="black"
+                                onClick={() => {
+                                    confirmAction();
+                                    setIsConfirmed(true);
+                                }}
+                            >
+                                {buttonText}
+                            </Button>
+                        </div>
+                    </Dialog.ActionButtons>
+                </>
             )}
         </Dialog>
     );
-}
+};
+
+export default ConfirmDialogModal;

@@ -12,9 +12,14 @@ import {
     useRemoveApartmentMutation,
     useSaveApartmentMutation,
 } from "../../app/services";
-import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
-import RemoveButton from "../../common/components/RemoveButton";
-import RemoveDialogModal from "../../common/components/RemoveDialogModal";
+import {
+    ConfirmDialogModal,
+    FormInputField,
+    NavigateBackButton,
+    RemoveButton,
+    SaveButton,
+    SaveDialogModal,
+} from "../../common/components";
 import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
 import {dotted, formatOwner, hitasToast} from "../../common/utils";
 
@@ -187,7 +192,7 @@ const ApartmentCreatePage = () => {
                 setIsRemoveModalVisible(true);
             }
         }
-    }, [isRemoving, removeError, removeData, navigate, isEditPage]);
+    }, [isRemoving, removeError, removeData, navigate, isEditPage, params.housingCompanyId]);
 
     // Handle saving flow when editing
     useEffect(() => {
@@ -524,17 +529,19 @@ const ApartmentCreatePage = () => {
                     isLoading={isLoading}
                 />
             </div>
-            <RemoveDialogModal
-                linkText="Asuntoyhtiön sivulle"
+            <ConfirmDialogModal
+                linkText="Palaa asuntoyhtiön sivulle"
                 linkURL={`/housing-companies/${params.housingCompanyId}`}
+                modalText="Haluatko varmasti poistaa asunnon?"
+                successText="Asunto poistettu"
                 buttonText="Poista"
-                confirmAction={handleConfirmedRemove}
-                cancelAction={() => setIsRemoveModalVisible(false)}
                 isVisible={isRemoveModalVisible}
                 setIsVisible={setIsRemoveModalVisible}
                 data={removeData}
                 error={removeError}
                 isLoading={isRemoving}
+                confirmAction={handleConfirmedRemove}
+                cancelAction={() => setIsRemoveModalVisible(false)}
             />
             <SaveDialogModal
                 linkText="Asunnon sivulle"
