@@ -23,7 +23,7 @@ class AbstractIndexFactory(DjangoModelFactory):
         abstract = True
 
     month = factory.Sequence(lambda n: datetime.date(2000, 1, 1) + relativedelta(months=n))
-    value = fuzzy.FuzzyDecimal(low=0)
+    value = fuzzy.FuzzyDecimal(low=0, high=1000)
 
 
 class MaximumPriceIndexFactory(AbstractIndexFactory):
