@@ -34,6 +34,15 @@ class WSGIRequestWorkaround:
         return getattr(self.r, item)
 
 
+class DjangoOpenAPIResponseWorkaround(DjangoOpenAPIResponse):
+    @property
+    def data(self) -> str:
+        if self.response.headers["content-type"] == "application/json":
+            return self.response.content.decode("utf-8")
+        else:
+            return self.response.content
+
+
 def validate_openapi(
     request_body: str, response: Response, validate_request: bool = True, validate_response: bool = True
 ) -> None:
@@ -56,7 +65,7 @@ def validate_openapi(
         result = openapi_response_validator.validate(
             _openapi_spec,
             OpenAPIUrlPatternWorkaround(response.wsgi_request),
-            DjangoOpenAPIResponse(response),
+            DjangoOpenAPIResponseWorkaround(response),
         )
         handle_result(result)
 

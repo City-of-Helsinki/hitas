@@ -535,8 +535,6 @@ def _test_max_prices(
 
     response = api_client.get(
         reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex]) + "/unconfirmed_prices_pdf",
-        # TODO: Write a validator that can handle pdf return types.
-        openapi_validate_response=False,
     )
 
     if create_current_indices and create_completion_indices and not null_values:

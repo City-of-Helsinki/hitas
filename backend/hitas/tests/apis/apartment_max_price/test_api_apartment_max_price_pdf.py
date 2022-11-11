@@ -37,9 +37,6 @@ def test__api__apartment_max_price__retrieve__confirmed(api_client: HitasAPIClie
             args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
         )
         + "/download",
-        # TODO: Write a validator that can handle pdf return types.
-        # Skip validating response, this prevents `UnicodeDecodeError: 'utf-8' codec can't decode byte...`
-        openapi_validate_response=False,
     )
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.get("content-type") == "application/pdf"
