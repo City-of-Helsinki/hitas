@@ -149,12 +149,11 @@ const ApartmentCreatePage = () => {
     };
 
     const handleConfirmedRemove = () => {
-        const foo = removeApartment({
+        removeApartment({
             data: formData,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,
         });
-        console.log(foo);
     };
 
     // Ownerships
@@ -180,7 +179,6 @@ const ApartmentCreatePage = () => {
 
     // Handle remove flow
     useEffect(() => {
-        console.log(isRemoving, removeError, removeData);
         if (isEditPage) {
             if (!isRemoving && !removeError && removeData === null) {
                 hitasToast("Asunto poistettu onnistuneesti!");
