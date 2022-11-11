@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.viewsets import ViewSet
 
-from hitas.calculations import calculate_max_price
 from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
+from hitas.calculations.max_price import create_max_price_calculation
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
@@ -33,7 +33,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
         # Calculate max price
         try:
-            max_prices = calculate_max_price(
+            max_prices = create_max_price_calculation(
                 housing_company_uuid=kwargs["housing_company_uuid"],
                 apartment_uuid=kwargs["apartment_uuid"],
                 calculation_date=calculation_date,

@@ -27,9 +27,47 @@ from hitas.models import (
 )
 
 
-def calculate_max_price(
+def create_max_price_calculation(
     housing_company_uuid: str,
     apartment_uuid: str,
+    calculation_date: Optional[datetime.date],
+    apartment_share_of_housing_company_loans: Decimal,
+    apartment_share_of_housing_company_loans_date: Optional[datetime.date],
+) -> Dict[str, Any]:
+    #
+    # Fetch apartment
+    #
+    apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
+
+    # Do the calculation
+    calculation = calculate_max_price(
+        apartment,
+        calculation_date,
+        apartment_share_of_housing_company_loans,
+        apartment_share_of_housing_company_loans_date,
+    )
+
+    #
+    # Save the calculation
+    #
+    ApartmentMaximumPriceCalculation.objects.create(
+        uuid=calculation["id"],
+        apartment=apartment,
+        maximum_price=calculation["maximum_price"],
+        created_at=calculation["created_at"],
+        valid_until=calculation["valid_until"],
+        calculation_date=calculation_date,
+        json=calculation,
+    )
+
+    # Don't save this to calculation json
+    calculation["confirmed_at"] = None
+
+    return calculation
+
+
+def calculate_max_price(
+    apartment,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
@@ -39,11 +77,6 @@ def calculate_max_price(
 
     if apartment_share_of_housing_company_loans_date is None:
         calculation_date = timezone.now().today()
-
-    #
-    # Fetch apartment
-    #
-    apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
 
     #
     # Fetch housing company's total surface area
@@ -126,7 +159,7 @@ def calculate_max_price(
     #
     # Create calculation json object
     #
-    calculation = {
+    return {
         "id": uuid.uuid4().hex,
         "created_at": timezone.now(),
         "calculation_date": calculation_date,
@@ -169,24 +202,6 @@ def calculate_max_price(
             },
         },
     }
-
-    #
-    # Save the calculation
-    #
-    ApartmentMaximumPriceCalculation.objects.create(
-        uuid=calculation["id"],
-        apartment=apartment,
-        maximum_price=max_price,
-        created_at=calculation["created_at"],
-        valid_until=valid_until,
-        calculation_date=calculation_date,
-        json=calculation,
-    )
-
-    # Don't save this to calculation json
-    calculation["confirmed_at"] = None
-
-    return calculation
 
 
 def fetch_apartment(
