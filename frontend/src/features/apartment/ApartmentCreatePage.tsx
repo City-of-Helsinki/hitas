@@ -9,9 +9,12 @@ import {
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
     useGetOwnersQuery,
+    useRemoveApartmentMutation,
     useSaveApartmentMutation,
 } from "../../app/services";
-import {FormInputField, SaveButton, SaveDialogModal} from "../../common/components";
+import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import RemoveButton from "../../common/components/RemoveButton";
+import RemoveDialogModal from "../../common/components/RemoveDialogModal";
 import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
 import {dotted, formatOwner, hitasToast} from "../../common/utils";
 
@@ -62,9 +65,19 @@ const ApartmentCreatePage = () => {
         params.housingCompanyId
     );
     const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
-
+    const [removeApartment, {data: removeData, error: removeError, isLoading: isRemoving}] =
+        useRemoveApartmentMutation();
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-
+    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+    // Get all buildings that belong to HousingCompany from RealEstates
+    const buildingOptions =
+        isHousingCompanyLoading || !housingCompanyData
+            ? []
+            : housingCompanyData.real_estates.flatMap((realEstate) => {
+                  return realEstate.buildings.map((building) => {
+                      return {label: building.address.street_address, value: building.id};
+                  });
+              });
     const initialFormData: IApartmentWritable =
         state === null || state?.apartment === undefined
             ? {
@@ -77,7 +90,7 @@ const ApartmentCreatePage = () => {
                       end: null,
                   },
                   address: {
-                      street_address: "",
+                      street_address: (buildingOptions.length === 1 && buildingOptions[0]?.value) || "",
                       apartment_number: null,
                       floor: null,
                       stair: null,
@@ -135,6 +148,15 @@ const ApartmentCreatePage = () => {
         }
     };
 
+    const handleConfirmedRemove = () => {
+        const foo = removeApartment({
+            data: formData,
+            id: state?.apartment.id,
+            housingCompanyId: params.housingCompanyId,
+        });
+        console.log(foo);
+    };
+
     // Ownerships
     const handleAddOwnershipLine = () => {
         setFormOwnershipsList((draft) => {
@@ -156,6 +178,19 @@ const ApartmentCreatePage = () => {
         });
     };
 
+    // Handle remove flow
+    useEffect(() => {
+        console.log(isRemoving, removeError, removeData);
+        if (isEditPage) {
+            if (!isRemoving && !removeError && removeData === null) {
+                hitasToast("Asunto poistettu onnistuneesti!");
+                navigate(`/housing-companies/${params.housingCompanyId}`);
+            } else if (removeError) {
+                setIsRemoveModalVisible(true);
+            }
+        }
+    }, [isRemoving, removeError, removeData, navigate, isEditPage]);
+
     // Handle saving flow when editing
     useEffect(() => {
         if (isEditPage) {
@@ -172,16 +207,6 @@ const ApartmentCreatePage = () => {
     useEffect(() => {
         if (isEditPage && state === null) navigate("..");
     }, [isEditPage, navigate, pathname, state]);
-
-    // Get all buildings that belong to HousingCompany from RealEstates
-    const buildingOptions =
-        isHousingCompanyLoading || !housingCompanyData
-            ? []
-            : housingCompanyData.real_estates.flatMap((realEstate) => {
-                  return realEstate.buildings.map((building) => {
-                      return {label: building.address.street_address, value: building.id};
-                  });
-              });
 
     return (
         <div className="view--create view--set-apartment">
@@ -211,11 +236,10 @@ const ApartmentCreatePage = () => {
                             label="Rakennus"
                             fieldPath="building"
                             placeholder={formData.address.street_address}
-                            defaultValue={
-                                state?.apartment !== undefined
-                                    ? {label: formData.address.street_address, value: formData.building}
-                                    : {label: buildingOptions[0].label || "", value: buildingOptions[0].value || ""}
-                            }
+                            defaultValue={{
+                                label: formData.address.street_address || "",
+                                value: formData.building || "",
+                            }}
                             options={buildingOptions || []}
                             required
                             formData={formData}
@@ -489,9 +513,30 @@ const ApartmentCreatePage = () => {
                     </div>
                 </Fieldset>
             </div>
-            <SaveButton
-                onClick={handleSaveButtonClicked}
-                isLoading={isLoading}
+            <div className="row row--buttons">
+                <NavigateBackButton />
+                {isEditPage && (
+                    <RemoveButton
+                        onClick={() => setIsRemoveModalVisible(true)}
+                        isLoading={isLoading}
+                    />
+                )}
+                <SaveButton
+                    onClick={handleSaveButtonClicked}
+                    isLoading={isLoading}
+                />
+            </div>
+            <RemoveDialogModal
+                linkText="Asuntoyhtiön sivulle"
+                linkURL={`/housing-companies/${params.housingCompanyId}`}
+                buttonText="Poista"
+                confirmAction={handleConfirmedRemove}
+                cancelAction={() => setIsRemoveModalVisible(false)}
+                isVisible={isRemoveModalVisible}
+                setIsVisible={setIsRemoveModalVisible}
+                data={removeData}
+                error={removeError}
+                isLoading={isRemoving}
             />
             <SaveDialogModal
                 linkText="Asunnon sivulle"
