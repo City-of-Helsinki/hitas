@@ -1,17 +1,13 @@
 from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Optional, Union
+from typing import Optional
 
 
-def roundup(v: Decimal, decimals=0) -> Optional[Union[int, float]]:
+def roundup(v: Decimal) -> Optional[float]:
     if v is None:
         return None
 
-    exp = Decimal("1." + ("0" * decimals))
-    if decimals == 0:
-        return int(v.quantize(exp, ROUND_HALF_UP))
-    else:
-        return float(v.quantize(exp, ROUND_HALF_UP))
+    return float(v.quantize(Decimal(".00"), ROUND_HALF_UP))
 
 
 class NoneSum:

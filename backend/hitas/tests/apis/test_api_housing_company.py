@@ -192,18 +192,18 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
     ApartmentFactory.create(
         building=hc1_re1_bu1,
         completion_date=date(2022, 1, 1),
-        debt_free_purchase_price=100,
-        primary_loan_amount=200,
-        surface_area=10,
+        debt_free_purchase_price=100.5,
+        primary_loan_amount=200.0,
+        surface_area=10.5,
         share_number_end=100,
         share_number_start=1,
     )
     hc1_re1_bu1_ap2: Apartment = ApartmentFactory.create(
         building=hc1_re1_bu1,
         completion_date=date(2020, 1, 1),
-        debt_free_purchase_price=300,
-        primary_loan_amount=400,
-        surface_area=20,
+        debt_free_purchase_price=300.5,
+        primary_loan_amount=400.0,
+        surface_area=20.5,
         share_number_end=200,
         share_number_start=101,
     )
@@ -211,9 +211,9 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
     ApartmentFactory.create(
         building=hc1_re1_bu2,
         completion_date=date(2021, 1, 1),
-        debt_free_purchase_price=500,
-        primary_loan_amount=600,
-        surface_area=20,
+        debt_free_purchase_price=500.0,
+        primary_loan_amount=600.5,
+        surface_area=20.0,
         share_number_end=450,
         share_number_start=201,
     )
@@ -255,10 +255,10 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": str(hc1_re1_bu1_ap2.completion_date),
         "summary": {
-            "realized_acquisition_price": 2100,  # (100+200+300+400+500+600) = 2100
-            "average_price_per_square_meter": 42,  # (100+200+300+400+500+600) / (10+20+20) = 2100 / 50 = 42
+            "realized_acquisition_price": 2101.5,  # (100.5+200+300.5+400+500+600.5) = 2101.5
+            "average_price_per_square_meter": 41.0,  # (100+200+300+400+500+600) / (10.5+20.5+20.5) = 2101.5 / 51.0 = 41
             "total_shares": 450,  # (100 - 1 + 1) + (200 - 101 + 1) + (450 - 201 + 1) = 100 + 100 + 250 = 450
-            "total_surface_area": 50.0,  # 10+20+20
+            "total_surface_area": 51.0,  # 10.5+20.5+20
         },
         "real_estates": [
             {
@@ -357,14 +357,14 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
             "construction_price_index": [
                 {
                     "name": cpi.name,
-                    "value": cpi.value,
+                    "value": float(cpi.value),
                     "completion_date": cpi.completion_date.strftime("%Y-%m"),
                 },
             ],
             "market_price_index": [
                 {
                     "name": mpi.name,
-                    "value": mpi.value,
+                    "value": float(mpi.value),
                     "completion_date": mpi.completion_date.strftime("%Y-%m"),
                 },
             ],

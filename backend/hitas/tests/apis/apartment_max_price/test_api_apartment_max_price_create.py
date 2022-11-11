@@ -47,7 +47,7 @@ from hitas.tests.factories.indices import (
         ),
         (
             {"apartment_share_of_housing_company_loans": "foo"},
-            [{"field": "apartment_share_of_housing_company_loans", "message": "A valid integer is required."}],
+            [{"field": "apartment_share_of_housing_company_loans", "message": "A valid number is required."}],
         ),
         (
             {"apartment_share_of_housing_company_loans": "-1"},

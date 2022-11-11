@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from http import HTTPStatus
 from typing import Any, Optional, Tuple
 
@@ -23,9 +24,9 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         serializer.is_valid(raise_exception=True)
 
         calculation_date = serializer.validated_data.get("calculation_date") or timezone.now().date()
-        apartment_share_of_housing_company_loans = (
-            serializer.validated_data.get("apartment_share_of_housing_company_loans") or 0
-        )
+        apartment_share_of_housing_company_loans = serializer.validated_data.get(
+            "apartment_share_of_housing_company_loans"
+        ) or Decimal(0)
         apartment_share_of_housing_company_loans_date = (
             serializer.validated_data.get("apartment_share_of_housing_company_loans_date") or timezone.now().date()
         )
@@ -154,7 +155,9 @@ class ConfirmSerializer(Serializer):
 
 class CreateCalculationSerializer(Serializer):
     calculation_date = fields.DateField(required=False, allow_null=True)
-    apartment_share_of_housing_company_loans = fields.IntegerField(min_value=0, allow_null=True, required=False)
+    apartment_share_of_housing_company_loans = fields.DecimalField(
+        min_value=0, decimal_places=2, max_digits=15, allow_null=True, required=False
+    )
     apartment_share_of_housing_company_loans_date = fields.DateField(required=False, allow_null=True)
 
     def validate_calculation_date(self, date):

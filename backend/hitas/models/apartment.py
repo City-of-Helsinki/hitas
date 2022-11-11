@@ -1,4 +1,6 @@
 import uuid
+from decimal import Decimal
+from typing import Optional
 
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -49,9 +51,9 @@ class Apartment(ExternalHitasModel):
     stair = models.CharField(max_length=16)
 
     # 'Luovutushinta'
-    debt_free_purchase_price = models.PositiveIntegerField(null=True)
+    debt_free_purchase_price = HitasModelDecimalField(null=True)
     # 'Ensisijaislaina'
-    primary_loan_amount = models.PositiveIntegerField(default=0, null=True)
+    primary_loan_amount = HitasModelDecimalField(default=0, null=True)
     # 'Kauppakirjahinta'
     purchase_price = HitasModelDecimalField(null=True, blank=True)
     # 'Ensimmäinen kauppakirjapvm'
@@ -59,19 +61,19 @@ class Apartment(ExternalHitasModel):
     # 'Viimeisin kauppakirjapvm'
     latest_purchase_date = models.DateField(null=True, blank=True)
     # 'Rakennusaikaiset lisätyöt'
-    additional_work_during_construction = models.PositiveIntegerField(null=True)
+    additional_work_during_construction = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset lainat'
-    loans_during_construction = models.PositiveIntegerField(null=True)
+    loans_during_construction = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset korot'
-    interest_during_construction = models.PositiveIntegerField(null=True)
+    interest_during_construction = HitasModelDecimalField(null=True)
     # 'Luovutushinta (RA)'
-    debt_free_purchase_price_during_construction = models.PositiveIntegerField(null=True)
+    debt_free_purchase_price_during_construction = HitasModelDecimalField(null=True)
 
     notes = models.TextField(blank=True, null=True)
 
     # 'Hankinta-arvo'
     @property
-    def acquisition_price(self):
+    def acquisition_price(self) -> Optional[Decimal]:
         if self.debt_free_purchase_price is None or self.primary_loan_amount is None:
             return None
 
@@ -168,7 +170,7 @@ class ApartmentMaximumPriceCalculation(models.Model):
     calculation_date = models.DateField()
     valid_until = models.DateField()
 
-    maximum_price = models.IntegerField(null=True, validators=[MinValueValidator(0)])
+    maximum_price = HitasModelDecimalField(validators=[MinValueValidator(0)])
 
     json = models.JSONField(encoder=JSONEncoder, null=True)
 

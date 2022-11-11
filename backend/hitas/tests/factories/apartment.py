@@ -1,4 +1,3 @@
-import random
 from datetime import date, datetime, timezone
 
 import factory
@@ -37,13 +36,13 @@ class ApartmentFactory(DjangoModelFactory):
     stair = factory.Faker("bothify", text="?")  # Random letter
     first_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     latest_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    debt_free_purchase_price = fuzzy.FuzzyInteger(100000, 200000)
-    purchase_price = fuzzy.FuzzyInteger(100000, 200000)
-    primary_loan_amount = fuzzy.FuzzyInteger(100000, 200000)
-    additional_work_during_construction = fuzzy.FuzzyInteger(10000, 20000)
-    loans_during_construction = fuzzy.FuzzyInteger(100000, 200000)
-    interest_during_construction = fuzzy.FuzzyInteger(10000, 20000)
-    debt_free_purchase_price_during_construction = fuzzy.FuzzyInteger(100000, 200000)
+    debt_free_purchase_price = fuzzy.FuzzyDecimal(100000, 200000)
+    purchase_price = fuzzy.FuzzyDecimal(100000, 200000)
+    primary_loan_amount = fuzzy.FuzzyDecimal(100000, 200000)
+    additional_work_during_construction = fuzzy.FuzzyDecimal(10000, 20000)
+    loans_during_construction = fuzzy.FuzzyDecimal(100000, 200000)
+    interest_during_construction = fuzzy.FuzzyDecimal(10000, 20000)
+    debt_free_purchase_price_during_construction = fuzzy.FuzzyDecimal(100000, 200000)
     notes = factory.Faker("text")
 
 
@@ -78,43 +77,43 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCal
         "index": index,
         "calculations": {
             "construction_price_index": {
-                "maximum_price": random.randint(100_000, 300_000),
+                "maximum_price": FuzzyDecimal(100_000, 300_000).fuzz(),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "construction_price_index",
                 "calculation_variables": {
-                    "acquisition_price": random.randint(100_000, 300_000),
-                    "additional_work_during_construction": random.randint(0, 50_000),
-                    "basic_price": random.randint(100_000, 300_000),
-                    "index_adjustment": random.randint(10_000, 50_000),
+                    "acquisition_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "additional_work_during_construction": FuzzyDecimal(0, 50_000).fuzz(),
+                    "basic_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "index_adjustment": FuzzyDecimal(10_000, 50_000).fuzz(),
                     "apartment_improvements": None,
                     "housing_company_improvements": {
                         "items": [
                             {
                                 "name": factory.Faker("sentence").evaluate(None, None, {"locale": None}),
-                                "value": random.randint(100_000, 200_000),
-                                "value_added": random.randint(100_00, 200_00),
+                                "value": FuzzyDecimal(100_000, 200_000).fuzz(),
+                                "value_added": FuzzyDecimal(100_00, 200_00).fuzz(),
                                 "completion_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz().strftime("%Y-%m"),
                                 "depreciation": None,
-                                "value_for_housing_company": random.randint(20_000, 30_000),
-                                "value_for_apartment": random.randint(100, 1000),
+                                "value_for_housing_company": FuzzyDecimal(20_000, 30_000).fuzz(),
+                                "value_for_apartment": FuzzyDecimal(100, 1000).fuzz(),
                             },
                         ],
                         "summary": {
-                            "value": random.randint(100_000, 200_000),
-                            "value_added": random.randint(100_00, 200_00),
+                            "value": FuzzyDecimal(100_000, 200_000).fuzz(),
+                            "value_added": FuzzyDecimal(100_00, 200_00).fuzz(),
                             "excess": {
                                 "surface_area": mpc.apartment.surface_area,
                                 "value_per_square_meter": 30,
-                                "total": roundup(30 * mpc.apartment.surface_area, 0),
+                                "total": roundup(30 * mpc.apartment.surface_area),
                             },
                             "depreciation": 0,
-                            "value_for_housing_company": random.randint(20_000, 30_000),
-                            "value_for_apartment": random.randint(100, 1000),
+                            "value_for_housing_company": FuzzyDecimal(20_000, 30_000).fuzz(),
+                            "value_for_apartment": FuzzyDecimal(100, 1000).fuzz(),
                         },
                     },
-                    "debt_free_price": random.randint(100_000, 300_000),
-                    "debt_free_price_m2": random.randint(1_000, 10_000),
-                    "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
+                    "debt_free_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "debt_free_price_m2": FuzzyDecimal(1_000, 10_000).fuzz(),
+                    "apartment_share_of_housing_company_loans": FuzzyDecimal(0, 50_000).fuzz(),
                     "apartment_share_of_housing_company_loans_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz(),
                     "completion_date": completion_date,
                     "completion_date_index": FuzzyDecimal(100, 300).fuzz(),
@@ -123,43 +122,43 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCal
                 },
             },
             "market_price_index": {
-                "maximum_price": random.randint(100_000, 300_000),
+                "maximum_price": FuzzyDecimal(100_000, 300_000).fuzz(),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "market_price_index",
                 "calculation_variables": {
-                    "acquisition_price": random.randint(100_000, 300_000),
-                    "additional_work_during_construction": random.randint(0, 50_000),
-                    "basic_price": random.randint(100_000, 300_000),
-                    "index_adjustment": random.randint(10_000, 50_000),
+                    "acquisition_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "additional_work_during_construction": FuzzyDecimal(0, 50_000).fuzz(),
+                    "basic_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "index_adjustment": FuzzyDecimal(10_000, 50_000).fuzz(),
                     "apartment_improvements": None,
                     "housing_company_improvements": {
                         "items": [
                             {
                                 "name": factory.Faker("sentence").evaluate(None, None, {"locale": None}),
-                                "value": random.randint(100_000, 200_000),
-                                "value_added": random.randint(100_00, 200_00),
+                                "value": FuzzyDecimal(100_000, 200_000).fuzz(),
+                                "value_added": FuzzyDecimal(100_00, 200_00).fuzz(),
                                 "completion_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz().strftime("%Y-%m"),
                                 "depreciation": None,
-                                "value_for_housing_company": random.randint(20_000, 30_000),
-                                "value_for_apartment": random.randint(100, 1000),
+                                "value_for_housing_company": FuzzyDecimal(20_000, 30_000).fuzz(),
+                                "value_for_apartment": FuzzyDecimal(100, 1000).fuzz(),
                             },
                         ],
                         "summary": {
-                            "value": random.randint(100_000, 200_000),
-                            "value_added": random.randint(100_00, 200_00),
+                            "value": FuzzyDecimal(100_000, 200_000).fuzz(),
+                            "value_added": FuzzyDecimal(100_00, 200_00).fuzz(),
                             "excess": {
                                 "surface_area": mpc.apartment.surface_area,
                                 "value_per_square_meter": 30,
-                                "total": roundup(30 * mpc.apartment.surface_area, 0),
+                                "total": roundup(30 * mpc.apartment.surface_area),
                             },
                             "depreciation": 0,
-                            "value_for_housing_company": random.randint(20_000, 30_000),
-                            "value_for_apartment": random.randint(100, 1000),
+                            "value_for_housing_company": FuzzyDecimal(20_000, 30_000).fuzz(),
+                            "value_for_apartment": FuzzyDecimal(100, 1000).fuzz(),
                         },
                     },
-                    "debt_free_price": random.randint(100_000, 300_000),
-                    "debt_free_price_m2": random.randint(1_000, 10_000),
-                    "apartment_share_of_housing_company_loans": random.randint(0, 50_000),
+                    "debt_free_price": FuzzyDecimal(100_000, 300_000).fuzz(),
+                    "debt_free_price_m2": FuzzyDecimal(1_000, 10_000).fuzz(),
+                    "apartment_share_of_housing_company_loans": FuzzyDecimal(0, 50_000).fuzz(),
                     "apartment_share_of_housing_company_loans_date": fuzzy.FuzzyDate(date(2010, 1, 1)).fuzz(),
                     "completion_date": completion_date,
                     "completion_date_index": FuzzyDecimal(100, 300).fuzz(),
@@ -168,7 +167,7 @@ def create_apartment_max_price_calculation(**kwargs) -> ApartmentMaximumPriceCal
                 },
             },
             "surface_area_price_ceiling": {
-                "maximum_price": random.randint(100_000, 300_000),
+                "maximum_price": FuzzyDecimal(100_000, 300_000).fuzz(),
                 "valid_until": mpc.valid_until,
                 "maximum": index == "surface_area_price_ceiling",
                 "calculation_variables": {
@@ -224,5 +223,5 @@ class ApartmentMaximumPriceCalculationFactory(DjangoModelFactory):
     calculation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     valid_until = fuzzy.FuzzyDate(date(2010, 1, 1))
 
-    maximum_price = fuzzy.FuzzyInteger(100000, 200000)
+    maximum_price = fuzzy.FuzzyDecimal(100000, 200000)
     json = {}

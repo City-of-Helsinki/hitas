@@ -42,7 +42,7 @@ class HitasModelDecimalField(models.DecimalField):
 class HitasImprovement(HitasModel):
     name = models.CharField(max_length=128)
     completion_date = models.DateField()
-    value = models.PositiveIntegerField(default=0)
+    value = HitasModelDecimalField(validators=[MinValueValidator(0)])
 
     class Meta:
         abstract = True
