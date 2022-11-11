@@ -4,7 +4,12 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, Ownership
+from hitas.models import (
+    Apartment,
+    HousingCompanyConstructionPriceImprovement,
+    HousingCompanyMarketPriceImprovement,
+    Ownership,
+)
 from hitas.tests.apis.apartment_max_price.utils import assert_created, assert_id
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -34,10 +39,12 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
 
-    HousingCompanyConstructionPriceImprovementFactory.create(
-        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+    cpi_improvement: HousingCompanyConstructionPriceImprovement = (
+        HousingCompanyConstructionPriceImprovementFactory.create(
+            housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+        )
     )
-    HousingCompanyMarketPriceImprovementFactory.create(
+    mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
     o1: Ownership = OwnershipFactory.create(apartment=a, percentage=75.2)
@@ -87,8 +94,32 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                     "additional_work_during_construction": 0,
                     "basic_price": 199500,
                     "index_adjustment": 26401,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 157,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": cpi_improvement.name,
+                                "value": 150_000,
+                                "completion_date": "2020-05",
+                                "value_added": 20040,
+                                "depreciation": None,
+                                "value_for_housing_company": 22707.86,
+                                "value_for_apartment": 157.26,
+                            }
+                        ],
+                        "summary": {
+                            "value": 150_000,
+                            "value_added": 20040,
+                            "excess": {
+                                "surface_area": 4332.0,
+                                "value_per_square_meter": 30,
+                                "total": 129960,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": 22707.86,
+                            "value_for_apartment": 157,
+                        },
+                    },
                     "debt_free_price": 226058,
                     "debt_free_price_m2": 7535,
                     "apartment_share_of_housing_company_loans": 2500,
@@ -108,8 +139,32 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                     "additional_work_during_construction": 0,
                     "basic_price": 199500,
                     "index_adjustment": 25190,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 153,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": mpi_improvement.name,
+                                "value": 150_000,
+                                "completion_date": "2020-05",
+                                "value_added": 20040,
+                                "depreciation": None,
+                                "value_for_housing_company": 22161.19,
+                                "value_for_apartment": 153.47,
+                            }
+                        ],
+                        "summary": {
+                            "value": 150_000,
+                            "value_added": 20040,
+                            "excess": {
+                                "surface_area": 4332.0,
+                                "value_per_square_meter": 30,
+                                "total": 129960,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": 22161.19,
+                            "value_for_apartment": 153,
+                        },
+                    },
                     "debt_free_price": 224843,
                     "debt_free_price_m2": 7495,
                     "apartment_share_of_housing_company_loans": 2500,
@@ -195,10 +250,12 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
 
-    HousingCompanyConstructionPriceImprovementFactory.create(
-        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+    cpi_improvement: HousingCompanyConstructionPriceImprovement = (
+        HousingCompanyConstructionPriceImprovementFactory.create(
+            housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+        )
     )
-    HousingCompanyMarketPriceImprovementFactory.create(
+    mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
     o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0)
@@ -244,8 +301,32 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "additional_work_during_construction": 0,
                     "basic_price": 220661,
                     "index_adjustment": 40916,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 1387,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": cpi_improvement.name,
+                                "value": 150_000,
+                                "completion_date": "2020-05",
+                                "value_added": 68910,
+                                "depreciation": None,
+                                "value_for_housing_company": 78083.78,
+                                "value_for_apartment": 1386.62,
+                            }
+                        ],
+                        "summary": {
+                            "value": 150_000,
+                            "value_added": 68910.0,
+                            "excess": {
+                                "surface_area": 2703.0,
+                                "value_per_square_meter": 30,
+                                "total": 81090,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": 78083.78,
+                            "value_for_apartment": 1387,
+                        },
+                    },
                     "debt_free_price": 262964,
                     "debt_free_price_m2": 5478,
                     "apartment_share_of_housing_company_loans": 2500,
@@ -265,8 +346,32 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                     "additional_work_during_construction": 0,
                     "basic_price": 220661,
                     "index_adjustment": 56411,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 1353,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": mpi_improvement.name,
+                                "value": 150_000,
+                                "completion_date": "2020-05",
+                                "value_added": 68910,
+                                "depreciation": None,
+                                "value_for_housing_company": 76203.98,
+                                "value_for_apartment": 1353.23,
+                            }
+                        ],
+                        "summary": {
+                            "value": 150_000,
+                            "value_added": 68910.0,
+                            "excess": {
+                                "surface_area": 2703.0,
+                                "value_per_square_meter": 30,
+                                "total": 81090,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": 76203.98,
+                            "value_for_apartment": 1353,
+                        },
+                    },
                     "debt_free_price": 278425,
                     "debt_free_price_m2": 5801,
                     "apartment_share_of_housing_company_loans": 2500,
@@ -369,8 +474,22 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "additional_work_during_construction": 0,
                     "basic_price": 169583,
                     "index_adjustment": 48578,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 0,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [],
+                        "summary": {
+                            "value": 0,
+                            "value_added": 0,
+                            "excess": {
+                                "surface_area": 2703.5,
+                                "value_per_square_meter": 30,
+                                "total": 81105,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": None,
+                            "value_for_apartment": 0.00,
+                        },
+                    },
                     "debt_free_price": 218161,
                     "debt_free_price_m2": 4498,
                     "apartment_share_of_housing_company_loans": 0,
@@ -390,8 +509,22 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "additional_work_during_construction": 0,
                     "basic_price": 169583,
                     "index_adjustment": 62627,
-                    "apartment_improvements": 0,
-                    "housing_company_improvements": 0,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [],
+                        "summary": {
+                            "value": 0,
+                            "value_added": 0,
+                            "excess": {
+                                "surface_area": 2703.5,
+                                "value_per_square_meter": 30,
+                                "total": 81105,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": None,
+                            "value_for_apartment": 0.00,
+                        },
+                    },
                     "debt_free_price": 232210,
                     "debt_free_price_m2": 4788,
                     "apartment_share_of_housing_company_loans": 0,
