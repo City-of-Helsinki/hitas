@@ -58,6 +58,15 @@ from hitas.tests.factories.indices import (
                 }
             ],
         ),
+        (
+            {"apartment_share_of_housing_company_loans_date": "foo"},
+            [
+                {
+                    "field": "apartment_share_of_housing_company_loans_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+                }
+            ],
+        ),
     ],
 )
 @pytest.mark.django_db
