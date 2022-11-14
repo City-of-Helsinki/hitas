@@ -8,6 +8,21 @@ from hitas.tests.factories.apartment import create_apartment_max_price_calculati
 
 
 @pytest.mark.django_db
+def test__api__apartment_max_price__retrieve(api_client: HitasAPIClient):
+    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation()
+
+    response = api_client.get(
+        reverse(
+            "hitas:maximum-price-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+        )
+        + "/download",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.get("content-type") == "application/pdf"
+
+
+@pytest.mark.django_db
 def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(confirmed_at=None)
 
@@ -25,21 +40,6 @@ def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPICl
         "reason": "Conflict",
         "status": 409,
     }
-
-
-@pytest.mark.django_db
-def test__api__apartment_max_price__retrieve__confirmed(api_client: HitasAPIClient):
-    mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation()
-
-    response = api_client.get(
-        reverse(
-            "hitas:maximum-price-detail",
-            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
-        )
-        + "/download",
-    )
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.get("content-type") == "application/pdf"
 
 
 @pytest.mark.django_db
