@@ -2,10 +2,8 @@ import datetime
 from http import HTTPStatus
 from typing import Any, Optional, Tuple
 
-from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import fields
-from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
@@ -17,7 +15,6 @@ from hitas.calculations.max_price import IndexMissingException, InvalidCalculati
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
-from hitas.views.utils.pdf import get_pdf_response
 
 
 class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
@@ -132,31 +129,6 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
             # In case the user wanted not to confirm we will delete the calculation
             ampc.delete()
             return Response(status=HTTPStatus.NO_CONTENT)
-
-    @action(detail=True, methods=["GET"])
-    def download(self, request, **kwargs) -> HttpResponse:
-        with model_or_404(ApartmentMaximumPriceCalculation):
-            mpc = ApartmentMaximumPriceCalculation.objects.get(uuid=kwargs["pk"])
-
-            # Migrated maximum price calculations are missing necessary data necessary to create a PDF
-            if mpc.json_version is None:
-                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
-
-            # Make sure the calculation is confirmed
-            if mpc.confirmed_at is None:
-                return Response(
-                    {
-                        "error": "not_confirmed",
-                        "message": "Maximum price calculation is not confirmed.",
-                        "reason": "Conflict",
-                        "status": 409,
-                    },
-                    status=HTTPStatus.CONFLICT,
-                )
-
-            filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
-            context = {"maximum_price_calculation": mpc}
-            return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
 
     @staticmethod
     def verify_housing_company_and_apartment(kwargs: dict[str, Any]) -> Tuple[int, int]:

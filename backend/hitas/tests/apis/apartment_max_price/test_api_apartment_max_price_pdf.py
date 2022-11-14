@@ -13,10 +13,10 @@ def test__api__apartment_max_price__retrieve(api_client: HitasAPIClient):
 
     response = api_client.get(
         reverse(
-            "hitas:maximum-price-detail",
-            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+            "hitas:apartment-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
-        + "/download",
+        + "/reports/download-latest-confirmed-prices",
     )
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.get("content-type") == "application/pdf"
@@ -28,18 +28,12 @@ def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPICl
 
     response = api_client.get(
         reverse(
-            "hitas:maximum-price-detail",
-            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+            "hitas:apartment-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
-        + "/download",
+        + "/reports/download-latest-confirmed-prices",
     )
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
-    assert response.json() == {
-        "error": "not_confirmed",
-        "message": "Maximum price calculation is not confirmed.",
-        "reason": "Conflict",
-        "status": 409,
-    }
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
 
 
 @pytest.mark.django_db
@@ -48,9 +42,9 @@ def test__api__apartment_max_price__retrieve__migrated(api_client: HitasAPIClien
 
     response = api_client.get(
         reverse(
-            "hitas:maximum-price-detail",
-            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex, mpc.uuid.hex],
+            "hitas:apartment-detail",
+            args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
-        + "/download",
+        + "/reports/download-latest-confirmed-prices",
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

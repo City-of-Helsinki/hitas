@@ -534,7 +534,8 @@ def _test_max_prices(
     # Validate fetching PDF report of unconfirmed prices
 
     response = api_client.get(
-        reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex]) + "/unconfirmed_prices_pdf",
+        reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex])
+        + "/reports/download-latest-unconfirmed-prices",
     )
 
     if create_current_indices and create_completion_indices and not null_values:
