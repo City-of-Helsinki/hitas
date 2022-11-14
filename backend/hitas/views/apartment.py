@@ -36,7 +36,7 @@ from hitas.views.utils import (
     ValueOrNullField,
 )
 from hitas.views.utils.merge import merge_model
-from hitas.views.utils.pdf import render_to_pdf
+from hitas.views.utils.pdf import get_pdf_response
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
@@ -644,10 +644,5 @@ class ApartmentViewSet(HitasModelViewSet):
             )
 
         filename = f"Hinta-arvio {apartment.address}.pdf"
-        context = {"title": filename, "apartment": apartment_data}
-        pdf = render_to_pdf("unconfirmed_maximum_price.jinja", context)
-        response = HttpResponse(pdf, content_type="application/pdf")
-        # Download file for user instead of opening it in the browser
-        response.headers["Content-Disposition"] = f"attachment; filename={filename}"
-        response["Access-Control-Expose-Headers"] = "Content-Disposition"
-        return response
+        context = {"apartment": apartment_data}
+        return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)

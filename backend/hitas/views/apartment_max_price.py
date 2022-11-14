@@ -17,7 +17,7 @@ from hitas.calculations.max_price import IndexMissingException, InvalidCalculati
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
-from hitas.views.utils.pdf import render_to_pdf
+from hitas.views.utils.pdf import get_pdf_response
 
 
 class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
@@ -155,13 +155,8 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 )
 
             filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
-            context = {"title": filename, "maximum_price_calculation": mpc}
-            pdf = render_to_pdf("confirmed_maximum_price.jinja", context)
-            response = HttpResponse(pdf, content_type="application/pdf")
-            # Download file for user instead of opening it in the browser
-            response.headers["Content-Disposition"] = f"attachment; filename={filename}"
-            response["Access-Control-Expose-Headers"] = "Content-Disposition"
-            return response
+            context = {"maximum_price_calculation": mpc}
+            return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
 
     @staticmethod
     def verify_housing_company_and_apartment(kwargs: dict[str, Any]) -> Tuple[int, int]:

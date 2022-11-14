@@ -134,6 +134,8 @@ TEMPLATES = [
     },
 ]
 
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 AUTH_USER_MODEL = "users.User"

@@ -9,8 +9,6 @@
     {% set prices = apartment.prices.maximum_prices.unconfirmed.onwards_2011 %}
 {% endif %}
 
-{% set is_surface_area_price_ceiling_maximum = prices.surface_area_price_ceiling.maximum %}
-
 {% block content %}
     {% set address = "" %}
     <h3>Helsingin kaupunki</h3>
@@ -18,7 +16,6 @@
         {{ apartment.address.street_address }} {{ apartment.address.stair }} {{ apartment.address.apartment_number }}
         <br>{{ apartment.address.postal_code }} {{ apartment.address.city|upper }}
     </h3>
-
 
     <h4>HITAS-HUONEISTON ENIMMÄISHINTA<br>
     • ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta</h4>
@@ -57,7 +54,7 @@
             <td>Huoneiston ensimmäinen kaupantekoajankohta</td>
             <td>{{ apartment.first_purchase_date|format_date }}</td>
         </tr>
-        {% if is_surface_area_price_ceiling_maximum %}
+        {% if prices.surface_area_price_ceiling.maximum %}
             <tr>
             {% if prices.construction_price_index.value > prices.market_price_index.value %}
                 <td>Hitas-huoneiston velaton enimmäishinta rakennuskustannusindeksillä laskettuna, euroa</td>
@@ -72,7 +69,7 @@
 
     <br>
 
-    {% if not is_surface_area_price_ceiling_maximum %}
+    {% if not prices.surface_area_price_ceiling.maximum %}
         <p style="font-size: 9pt">
         Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää.
         </p>
@@ -98,7 +95,7 @@
     esittää ostajille.
     </p>
 
-    {% if is_surface_area_price_ceiling_maximum %}
+    {% if prices.surface_area_price_ceiling.maximum %}
         <p>Teillä on mahdollisuus myydä huoneistonne myös ilman enimmäishinnan vahvistamista enintään kaupantekoajankohtana voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyjän ja ostajan välillä sopia vapaasti.</p>
         <p>Mikäli osakkeisiin kohdistuu yhtiölainaosuutta, tulee sen osuus vähentää huoneiston velattomasta hinnasta kauppahintaa laskettaessa.</p>
         <b>Rajahintaa tarkistetaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.</b>
