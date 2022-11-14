@@ -156,7 +156,7 @@ interface IApartmentLinkedModels {
     readonly apartment: IApartmentLinkedModel;
 }
 
-interface IApartmentUnconfirmedMaximumPrice {
+export interface IApartmentUnconfirmedMaximumPrice {
     maximum: boolean;
     value: number;
 }
@@ -166,6 +166,18 @@ interface IApartmentUnconfirmedMaximumPriceIndices {
     market_price_index: IApartmentUnconfirmedMaximumPrice;
     surface_area_price_ceiling: IApartmentUnconfirmedMaximumPrice;
 }
+
+export type IApartmentConfirmedMaximumPrice = {
+    id: string | null;
+    calculation_date: string;
+    confirmed_at: string;
+    created_at: string;
+    maximum_price: number;
+    valid: {
+        is_valid: boolean;
+        valid_until: string;
+    };
+} | null;
 
 interface IApartmentPrices {
     readonly acquisition_price: number | null;
@@ -185,17 +197,7 @@ interface IApartmentPrices {
     };
 
     maximum_prices: {
-        confirmed: {
-            id: string;
-            calculation_date: string;
-            confirmed_at: string;
-            created_at: string;
-            maximum_price: number;
-            valid: {
-                is_valid: boolean;
-                valid_until: string;
-            };
-        } | null;
+        confirmed: IApartmentConfirmedMaximumPrice;
         unconfirmed: {
             onwards_2011: IApartmentUnconfirmedMaximumPriceIndices;
             pre_2011: IApartmentUnconfirmedMaximumPriceIndices;

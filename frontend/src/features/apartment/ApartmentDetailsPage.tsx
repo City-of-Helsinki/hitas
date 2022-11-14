@@ -10,20 +10,22 @@ import {
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
 import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
-import {IApartmentDetails, IHousingCompanyDetails, IOwnership} from "../../common/models";
+import {
+    IApartmentConfirmedMaximumPrice,
+    IApartmentDetails,
+    IApartmentUnconfirmedMaximumPrice,
+    IHousingCompanyDetails,
+    IOwnership,
+} from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-const SalesCondition = ({
-    name,
-    address,
-    url,
-    isConfirmed,
-}: {
+interface SalesConditionProps {
     name: string;
     address: string;
     url?: string;
     isConfirmed: boolean;
-}): JSX.Element => (
+}
+const SalesCondition = ({name, address, url, isConfirmed}: SalesConditionProps): JSX.Element => (
     <div className="sales-condition">
         <div className="icon-container">
             {isConfirmed ? (
@@ -52,7 +54,34 @@ const SalesCondition = ({
     </div>
 );
 
-const UnconfirmedPriceRow = ({label, unconfirmedPrice}) => {
+interface ApartmentSalesConditionCardProps {
+    data: IApartmentDetails;
+}
+const ApartmentSalesConditionCard = ({data}: ApartmentSalesConditionCardProps) => {
+    return (
+        <Card>
+            <label className="card-heading">Vahvistettu myyntiehto</label>
+            <SalesCondition
+                name="Arabian unelma (valm.2015)"
+                address="Arabiankatu 5 C 2, 00440"
+                url={`/housing-companies/${data.links.housing_company.id}`}
+                isConfirmed={true}
+            />
+            <label className="card-heading">Vahvistamaton myyntiehto</label>
+            <SalesCondition
+                name="Keimolan Ylpeys (valm.2015)"
+                address="Kierretie 5 D 5"
+                isConfirmed={false}
+            />
+        </Card>
+    );
+};
+
+interface UnconfirmedPriceRowProps {
+    label: string;
+    unconfirmedPrice: IApartmentUnconfirmedMaximumPrice;
+}
+const UnconfirmedPriceRow = ({label, unconfirmedPrice}: UnconfirmedPriceRowProps) => {
     return (
         <div className={`price${unconfirmedPrice.maximum ? " price--current-top" : ""}`}>
             <span className="basis">{label}</span>
@@ -63,10 +92,9 @@ const UnconfirmedPriceRow = ({label, unconfirmedPrice}) => {
     );
 };
 
-const ConfirmedPrice = ({confirmed}) => {
-    if (!confirmed) {
-        return <p className="confirmed-price">-</p>;
-    }
+const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaximumPrice}) => {
+    if (confirmed === null) return <p className="confirmed-price">-</p>;
+
     return (
         <>
             <p className="confirmed-price">{formatMoney(confirmed.maximum_price)}</p>
@@ -76,16 +104,81 @@ const ConfirmedPrice = ({confirmed}) => {
     );
 };
 
+const ApartmentMaximumPricesCard = ({data}: {data: IApartmentDetails}) => {
+    const isPre2011 = data.prices.maximum_prices.unconfirmed.pre_2011 !== null;
+    const unconfirmedPrices = isPre2011
+        ? data.prices.maximum_prices.unconfirmed.pre_2011
+        : data.prices.maximum_prices.unconfirmed.onwards_2011;
+
+    return (
+        <Card>
+            <label className="card-heading">Vahvistamaton enimmäishinta</label>
+            <div className="unconfirmed-prices">
+                <UnconfirmedPriceRow
+                    label="Markkinahintaindeksi"
+                    unconfirmedPrice={unconfirmedPrices.market_price_index}
+                />
+                <UnconfirmedPriceRow
+                    label="Rakennushintaindeksi"
+                    unconfirmedPrice={unconfirmedPrices.construction_price_index}
+                />
+                <UnconfirmedPriceRow
+                    label="Rajaneliöhinta"
+                    unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
+                />
+                <div className="align-content-right">
+                    <Button
+                        theme="black"
+                        size="small"
+                        variant="secondary"
+                        iconLeft={<IconDownload />}
+                        onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(data)}
+                        disabled={
+                            // Button should be disabled if any of the price calculations are missing
+                            !(
+                                unconfirmedPrices.market_price_index.value &&
+                                unconfirmedPrices.construction_price_index.value &&
+                                unconfirmedPrices.surface_area_price_ceiling.value
+                            )
+                        }
+                    >
+                        Lataa Hinta-arvio
+                    </Button>
+                </div>
+            </div>
+
+            <label className="card-heading">Vahvistettu enimmäishinta</label>
+            <ConfirmedPriceDetails confirmed={data.prices.maximum_prices.confirmed} />
+            <div className="align-content-right">
+                <Button
+                    theme="black"
+                    size="small"
+                    variant="secondary"
+                    iconLeft={<IconDownload />}
+                    onClick={() => downloadApartmentMaximumPricePDF(data)}
+                    disabled={!data.prices.maximum_prices.confirmed || !data.prices.maximum_prices.confirmed.id}
+                >
+                    Lataa enimmäishintalaskelma
+                </Button>
+                <Link to="max-price">
+                    <Button
+                        theme="black"
+                        size="small"
+                    >
+                        Vahvista
+                    </Button>
+                </Link>
+            </div>
+        </Card>
+    );
+};
+
 const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
     const {
         data: housingCompanyData,
         error: housingCompanyError,
         isLoading: isHousingCompanyLoading,
     } = useGetHousingCompanyDetailQuery(data.links.housing_company.id);
-    const isPre2011 = data.prices.maximum_prices.unconfirmed.pre_2011 !== null;
-    const unconfirmedPrices = isPre2011
-        ? data.prices.maximum_prices.unconfirmed.pre_2011
-        : data.prices.maximum_prices.unconfirmed.onwards_2011;
 
     return (
         <>
@@ -110,79 +203,8 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 <span>{data.address.floor}.krs</span>
             </h2>
             <div className="apartment-action-cards">
-                <Card>
-                    <label className="card-heading">Vahvistamaton enimmäishinta</label>
-                    <div className="unconfirmed-prices">
-                        <UnconfirmedPriceRow
-                            label="Markkinahintaindeksi"
-                            unconfirmedPrice={unconfirmedPrices.market_price_index}
-                        />
-                        <UnconfirmedPriceRow
-                            label="Rakennushintaindeksi"
-                            unconfirmedPrice={unconfirmedPrices.construction_price_index}
-                        />
-                        <UnconfirmedPriceRow
-                            label="Rajaneliöhinta"
-                            unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
-                        />
-                        <div className="align-content-right">
-                            <Button
-                                theme="black"
-                                size="small"
-                                variant="secondary"
-                                iconLeft={<IconDownload />}
-                                onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(data)}
-                                disabled={
-                                    // Button should be disabled if any of the price calculations are missing
-                                    !(
-                                        unconfirmedPrices.market_price_index.value &&
-                                        unconfirmedPrices.construction_price_index.value &&
-                                        unconfirmedPrices.surface_area_price_ceiling.value
-                                    )
-                                }
-                            >
-                                Lataa Hinta-arvio
-                            </Button>
-                        </div>
-                    </div>
-                    <label className="card-heading">Vahvistettu enimmäishinta</label>
-                    <ConfirmedPrice confirmed={data.prices.maximum_prices.confirmed} />
-                    <div className="align-content-right">
-                        <Button
-                            theme="black"
-                            size="small"
-                            variant="secondary"
-                            iconLeft={<IconDownload />}
-                            onClick={() => downloadApartmentMaximumPricePDF(data)}
-                            disabled={!data.prices.maximum_prices.confirmed || !data.prices.maximum_prices.confirmed.id}
-                        >
-                            Lataa enimmäishintalaskelma
-                        </Button>
-                        <Link to="max-price">
-                            <Button
-                                theme="black"
-                                size="small"
-                            >
-                                Vahvista
-                            </Button>
-                        </Link>
-                    </div>
-                </Card>
-                <Card>
-                    <label className="card-heading">Vahvistettu myyntiehto</label>
-                    <SalesCondition
-                        name="Arabian unelma (valm.2015)"
-                        address="Arabiankatu 5 C 2, 00440"
-                        url={`/housing-companies/${data.links.housing_company.id}`}
-                        isConfirmed={true}
-                    />
-                    <label className="card-heading">Vahvistamaton myyntiehto</label>
-                    <SalesCondition
-                        name="Keimolan Ylpeys (valm.2015)"
-                        address="Kierretie 5 D 5"
-                        isConfirmed={false}
-                    />
-                </Card>
+                <ApartmentMaximumPricesCard data={data} />
+                <ApartmentSalesConditionCard data={data} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
