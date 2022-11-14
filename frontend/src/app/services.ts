@@ -58,7 +58,7 @@ const handleDownloadPDF = (response) => {
 };
 
 export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails) => {
-    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/unconfirmed_prices_pdf`;
+    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
     fetch(url, init).then(handleDownloadPDF);
 };
@@ -68,7 +68,7 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) =
         hitasToast("Enimmäishintalaskelmaa ei ole olemassa", "error");
         return;
     }
-    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/maximum-prices/${apartment.prices.maximum_prices.confirmed.id}/download`;
+    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
     const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
     fetch(url, init).then(handleDownloadPDF);
 };
