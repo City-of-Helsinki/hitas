@@ -133,6 +133,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
         calculation_date: new Date().toISOString().split("T")[0], // Init with today's date in YYYY-MM format
         apartment_share_of_housing_company_loans: null,
         apartment_share_of_housing_company_loans_date: null,
+        additional_info: "",
     });
     const {
         data: housingCompanyData,
@@ -177,32 +178,42 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
                     <div className="row">
+                        <div>
+                            <FormInputField
+                                inputType="number"
+                                unit="€"
+                                label="Yhtiölainaosuus"
+                                fieldPath="apartment_share_of_housing_company_loans"
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
+                            />
+                            <FormInputField
+                                inputType="date"
+                                label="Yhtiölainaosuuden päivämäärä"
+                                fieldPath="apartment_share_of_housing_company_loans_date"
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
+                                maxDate={new Date()}
+                            />
+                            <FormInputField
+                                inputType="date"
+                                label="Laskentapäivämäärä"
+                                fieldPath="calculation_date"
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
+                                maxDate={new Date()}
+                            />
+                        </div>
                         <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Yhtiölainaosuus"
-                            fieldPath="apartment_share_of_housing_company_loans"
+                            inputType="textArea"
+                            label="Lisätieto"
+                            fieldPath="additional_info"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Yhtiölainaosuuden päivämäärä"
-                            fieldPath="apartment_share_of_housing_company_loans_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            maxDate={new Date()}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Laskentapäivämäärä"
-                            fieldPath="calculation_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            maxDate={new Date()}
                         />
                     </div>
                     <ImprovementsTable
