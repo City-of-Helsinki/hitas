@@ -193,6 +193,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
+                            maxDate={new Date()}
                         />
                         <FormInputField
                             inputType="date"
@@ -201,6 +202,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
+                            maxDate={new Date()}
                         />
                     </div>
                     <ImprovementsTable

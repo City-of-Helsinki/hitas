@@ -32,7 +32,11 @@ type FormInputFieldProps = {
     className?: string;
 } & (
     | {
-          inputType?: "text" | "textArea" | "postalCode" | "date";
+          inputType?: "text" | "textArea" | "postalCode";
+      }
+    | {
+          inputType?: "date";
+          maxDate?: Date;
       }
     | {
           inputType: "number";
