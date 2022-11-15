@@ -95,7 +95,7 @@ const ApartmentCreatePage = () => {
                       end: null,
                   },
                   address: {
-                      street_address: (buildingOptions.length === 1 && buildingOptions[0]?.value) || "",
+                      street_address: (buildingOptions.length === 1 && buildingOptions[0].label) || "",
                       apartment_number: null,
                       floor: null,
                       stair: null,
@@ -114,7 +114,7 @@ const ApartmentCreatePage = () => {
                           additional_work: null,
                       },
                   },
-                  building: "",
+                  building: (buildingOptions.length === 1 && buildingOptions[0].value) || "",
                   ownerships: [],
                   improvements: {
                       market_price_index: [],
