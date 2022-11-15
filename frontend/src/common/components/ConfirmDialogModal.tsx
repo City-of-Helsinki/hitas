@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
@@ -78,7 +78,6 @@ const ConfirmDialogModal = ({
     confirmAction,
     cancelAction,
 }: ConfirmDialogModalProps) => {
-    const [isConfirmed, setIsConfirmed] = useState(false);
     return (
         <Dialog
             id="confirmation-modal"
@@ -92,7 +91,7 @@ const ConfirmDialogModal = ({
                 id="confirmation-modal__header"
                 title="Vahvista toiminto"
             />
-            {isConfirmed && error ? (
+            {error ? (
                 <QueryStateHandler
                     data={data}
                     error={error}
@@ -125,7 +124,6 @@ const ConfirmDialogModal = ({
                             theme="black"
                             onClick={() => {
                                 confirmAction();
-                                setIsConfirmed(true);
                             }}
                         >
                             {buttonText}
