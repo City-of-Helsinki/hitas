@@ -111,31 +111,27 @@ const ConfirmDialogModal = ({
                     />
                 </QueryStateHandler>
             ) : (
-                <>
-                    <Dialog.Content>
-                        <p>{modalText}</p>
-                    </Dialog.Content>
-                    <Dialog.ActionButtons>
-                        <div className="row row--buttons">
-                            <Button
-                                theme="black"
-                                variant="secondary"
-                                onClick={cancelAction}
-                            >
-                                Peruuta
-                            </Button>
-                            <Button
-                                theme="black"
-                                onClick={() => {
-                                    confirmAction();
-                                    setIsConfirmed(true);
-                                }}
-                            >
-                                {buttonText}
-                            </Button>
-                        </div>
-                    </Dialog.ActionButtons>
-                </>
+                <Dialog.Content>
+                    <p>{modalText}</p>
+                    <div className="row row--buttons">
+                        <Button
+                            theme="black"
+                            variant="secondary"
+                            onClick={cancelAction}
+                        >
+                            Peruuta
+                        </Button>
+                        <Button
+                            theme="black"
+                            onClick={() => {
+                                confirmAction();
+                                setIsConfirmed(true);
+                            }}
+                        >
+                            {buttonText}
+                        </Button>
+                    </div>
+                </Dialog.Content>
             )}
         </Dialog>
     );
