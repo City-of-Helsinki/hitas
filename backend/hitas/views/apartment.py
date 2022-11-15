@@ -622,7 +622,7 @@ class ApartmentViewSet(HitasModelViewSet):
             .order_by("id")
         )
 
-    @action(detail=True, methods=["GET"], url_path="reports/download-latest-unconfirmed-prices")
+    @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
     def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
@@ -648,7 +648,7 @@ class ApartmentViewSet(HitasModelViewSet):
         context = {"apartment": apartment_data}
         return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
-    @action(detail=True, methods=["GET"], url_path="reports/download-latest-confirmed-prices")
+    @action(detail=True, methods=["POST"], url_path="reports/download-latest-confirmed-prices")
     def download_latest_confirmed_prices(self, request, **kwargs) -> HttpResponse:
         mpc = (
             ApartmentMaximumPriceCalculation.objects.filter(
