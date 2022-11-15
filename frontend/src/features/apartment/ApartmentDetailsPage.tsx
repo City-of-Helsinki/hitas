@@ -1,6 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 
-import {Button, Card, IconDownload, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -10,6 +10,7 @@ import {
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
 import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConfirmedMaximumPrice,
     IApartmentDetails,
@@ -54,17 +55,14 @@ const SalesCondition = ({name, address, url, isConfirmed}: SalesConditionProps):
     </div>
 );
 
-interface ApartmentSalesConditionCardProps {
-    data: IApartmentDetails;
-}
-const ApartmentSalesConditionCard = ({data}: ApartmentSalesConditionCardProps) => {
+const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}) => {
     return (
         <Card>
             <label className="card-heading">Vahvistettu myyntiehto</label>
             <SalesCondition
                 name="Arabian unelma (valm.2015)"
                 address="Arabiankatu 5 C 2, 00440"
-                url={`/housing-companies/${data.links.housing_company.id}`}
+                url={`/housing-companies/${apartment.links.housing_company.id}`}
                 isConfirmed={true}
             />
             <label className="card-heading">Vahvistamaton myyntiehto</label>
@@ -104,11 +102,66 @@ const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaxim
     );
 };
 
-const ApartmentMaximumPricesCard = ({data}: {data: IApartmentDetails}) => {
-    const isPre2011 = data.prices.maximum_prices.unconfirmed.pre_2011 !== null;
+interface UnconfirmedPricesDownloadModalProps {
+    apartment: IApartmentDetails;
+    isVisible: boolean;
+    setIsVisible;
+}
+const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: UnconfirmedPricesDownloadModalProps) => {
+    const [additionalInfo, setAdditionalInfo] = useState("");
+
+    return (
+        <Dialog
+            id="unconfirmed-prices-download-modal"
+            closeButtonLabelText=""
+            aria-labelledby=""
+            isOpen={isVisible}
+            close={() => setIsVisible(false)}
+            boxShadow
+        >
+            <Dialog.Header
+                id="unconfirmed-prices-download-modal__header"
+                title="Lataa Enimmäishinta-arvio"
+            />
+            <Dialog.Content>
+                <FormTextInputField
+                    id="input-additional_details"
+                    key="input-additional_details"
+                    label="Lisätietoja"
+                    size="large"
+                    value={additionalInfo}
+                    setFieldValue={setAdditionalInfo}
+                    tooltipText="Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää. Kentän teksti lisätään tulostettavaan hinta-arvio PDF:ään."
+                />
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                    size="small"
+                >
+                    Sulje
+                </Button>
+                <Button
+                    theme="black"
+                    size="small"
+                    iconLeft={<IconDownload />}
+                    onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(apartment, additionalInfo)}
+                >
+                    Lataa Hinta-arvio
+                </Button>
+            </Dialog.ActionButtons>
+        </Dialog>
+    );
+};
+
+const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails}) => {
+    const isPre2011 = apartment.prices.maximum_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
-        ? data.prices.maximum_prices.unconfirmed.pre_2011
-        : data.prices.maximum_prices.unconfirmed.onwards_2011;
+        ? apartment.prices.maximum_prices.unconfirmed.pre_2011
+        : apartment.prices.maximum_prices.unconfirmed.onwards_2011;
+    const [isUnconfirmedMaximumPriceModalVisible, setIsUnconfirmedMaximumPriceModalVisible] = useState(false);
 
     return (
         <Card>
@@ -131,8 +184,7 @@ const ApartmentMaximumPricesCard = ({data}: {data: IApartmentDetails}) => {
                         theme="black"
                         size="small"
                         variant="secondary"
-                        iconLeft={<IconDownload />}
-                        onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(data)}
+                        onClick={() => setIsUnconfirmedMaximumPriceModalVisible(true)}
                         disabled={
                             // Button should be disabled if any of the price calculations are missing
                             !(
@@ -148,15 +200,17 @@ const ApartmentMaximumPricesCard = ({data}: {data: IApartmentDetails}) => {
             </div>
 
             <label className="card-heading">Vahvistettu enimmäishinta</label>
-            <ConfirmedPriceDetails confirmed={data.prices.maximum_prices.confirmed} />
+            <ConfirmedPriceDetails confirmed={apartment.prices.maximum_prices.confirmed} />
             <div className="align-content-right">
                 <Button
                     theme="black"
                     size="small"
                     variant="secondary"
                     iconLeft={<IconDownload />}
-                    onClick={() => downloadApartmentMaximumPricePDF(data)}
-                    disabled={!data.prices.maximum_prices.confirmed || !data.prices.maximum_prices.confirmed.id}
+                    onClick={() => downloadApartmentMaximumPricePDF(apartment)}
+                    disabled={
+                        !apartment.prices.maximum_prices.confirmed || !apartment.prices.maximum_prices.confirmed.id
+                    }
                 >
                     Lataa enimmäishintalaskelma
                 </Button>
@@ -169,6 +223,12 @@ const ApartmentMaximumPricesCard = ({data}: {data: IApartmentDetails}) => {
                     </Button>
                 </Link>
             </div>
+
+            <UnconfirmedPricesDownloadModal
+                apartment={apartment}
+                isVisible={isUnconfirmedMaximumPriceModalVisible}
+                setIsVisible={setIsUnconfirmedMaximumPriceModalVisible}
+            />
         </Card>
     );
 };
@@ -203,8 +263,8 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                 <span>{data.address.floor}.krs</span>
             </h2>
             <div className="apartment-action-cards">
-                <ApartmentMaximumPricesCard data={data} />
-                <ApartmentSalesConditionCard data={data} />
+                <ApartmentMaximumPricesCard apartment={data} />
+                <ApartmentSalesConditionCard apartment={data} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
