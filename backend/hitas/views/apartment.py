@@ -645,7 +645,7 @@ class ApartmentViewSet(HitasModelViewSet):
             )
 
         filename = f"Hinta-arvio {apartment.address}.pdf"
-        context = {"apartment": apartment_data}
+        context = {"apartment": apartment_data, "additional_info": request.data.get("additional_info", "")}
         return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-confirmed-prices")
