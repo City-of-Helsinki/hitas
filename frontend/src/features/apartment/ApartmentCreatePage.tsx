@@ -139,6 +139,12 @@ const ApartmentCreatePage = () => {
 
             // Clean away ownership items that don't have an owner selected
             ownerships: formOwnershipsList.filter((o) => o.owner.id),
+
+            // Clean share fields
+            shares: {
+                start: formData.shares.start || null,
+                end: formData.shares.end || null,
+            },
         };
 
         setFormData(() => formDataWithOwnerships);
