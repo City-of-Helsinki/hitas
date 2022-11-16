@@ -66,6 +66,8 @@
   },
   "resolutions": {
     "@svgr/webpack": "^6.3.1",
-    "**/recursive-readdir/minimatch": "^3.0.5"
+    "**/recursive-readdir/minimatch": "^3.0.5",
+    "react-scripts/@pmmmwh/react-refresh-webpack-plugin/**/loader-utils": "^2.0.4",
+    "react-scripts/react-dev-utils/loader-utils": "^3.2.1"
   }
 }
