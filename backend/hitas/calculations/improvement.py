@@ -23,9 +23,9 @@ class ImprovementData:
 
 
 class Excess(Enum):
-    AFTER_2010_HOUSING_COMPANY = 30
-    BEFORE_2010_HOUSING_COMPANY = 150
-    BEFORE_2010_APARTMENT = 100
+    AFTER_2010_HOUSING_COMPANY = Decimal("30.0")
+    BEFORE_2010_HOUSING_COMPANY = Decimal("150.0")
+    BEFORE_2010_APARTMENT = Decimal("100.0")
 
 
 @dataclass
@@ -64,7 +64,7 @@ class ImprovementCalculationSummary:
     @dataclass
     class ExcessSummary:
         surface_area: Decimal
-        value_per_square_meter: int
+        value_per_square_meter: Decimal
 
         @property
         def total(self) -> Decimal:

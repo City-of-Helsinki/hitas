@@ -3432,9 +3432,9 @@ components:
                   example: 4332.0
                 value_per_square_meter:
                   description: Excess value per square meter
-                  type: integer
+                  type: number
                   minimum: 0
-                  example: 30
+                  example: 30.0
                 total:
                   description: Excess value per square meter multiplied by apartment's surface area
                   type: number

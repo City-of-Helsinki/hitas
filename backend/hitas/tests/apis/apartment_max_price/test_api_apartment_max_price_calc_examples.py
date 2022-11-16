@@ -112,7 +112,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                             "value_added": 20040.0,
                             "excess": {
                                 "surface_area": 4332.0,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 129960.0,
                             },
                             "depreciation": None,
@@ -157,7 +157,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                             "value_added": 20040.0,
                             "excess": {
                                 "surface_area": 4332.0,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 129960.0,
                             },
                             "depreciation": None,
@@ -319,7 +319,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                             "value_added": 68910.0,
                             "excess": {
                                 "surface_area": 2703.0,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 81090.0,
                             },
                             "depreciation": None,
@@ -364,7 +364,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                             "value_added": 68910.0,
                             "excess": {
                                 "surface_area": 2703.0,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 81090.0,
                             },
                             "depreciation": None,
@@ -482,7 +482,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                             "value_added": 0.0,
                             "excess": {
                                 "surface_area": 2703.5,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 81105.0,
                             },
                             "depreciation": None,
@@ -517,7 +517,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                             "value_added": 0.0,
                             "excess": {
                                 "surface_area": 2703.5,
-                                "value_per_square_meter": 30,
+                                "value_per_square_meter": 30.0,
                                 "total": 81105.0,
                             },
                             "depreciation": None,

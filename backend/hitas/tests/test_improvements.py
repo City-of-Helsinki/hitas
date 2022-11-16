@@ -61,7 +61,7 @@ def test_calculate_housing_company_improvements_after_2010():
     assert result.summary.value_added == 20_040
     assert result.summary.excess is not None
     assert result.summary.excess.total == 129960
-    assert result.summary.excess.value_per_square_meter == 30
+    assert result.summary.excess.value_per_square_meter == 30.0
     assert result.summary.excess.surface_area == 4332
     assert result.summary.depreciation is None
     assert roundup(result.summary.improvement_value_for_housing_company) == Decimal(22_707.86)
