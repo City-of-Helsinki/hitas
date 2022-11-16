@@ -17,7 +17,6 @@ const ImprovementAddLineButton = ({onClick}) => {
         <Button
             onClick={onClick}
             iconLeft={<IconPlus />}
-            variant="secondary"
             theme="black"
         >
             Lisää parannus
@@ -135,7 +134,6 @@ const HousingCompanyImprovementsPage = () => {
         if (state === null) navigate("..");
     }, [navigate, state]);
 
-    // FIXME: Rename "ownership" class names for elements when styling
     return (
         <div className="view--create view--create-improvements">
             <h1 className="main-heading">{housingCompanyData.name.display} Parannukset</h1>
