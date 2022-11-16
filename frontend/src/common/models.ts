@@ -342,6 +342,7 @@ export interface IApartmentMaximumPrice {
 export interface IApartmentMaximumPriceWritable {
     calculation_date: string | null;
     apartment_share_of_housing_company_loans: number | null;
+    apartment_share_of_housing_company_loans_date: string | null;
 }
 
 // Indices
