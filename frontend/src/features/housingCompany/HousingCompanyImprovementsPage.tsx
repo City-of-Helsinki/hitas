@@ -1,12 +1,12 @@
 import React, {useEffect} from "react";
 
-import {Button, Fieldset, IconCrossCircle, IconPlus} from "hds-react";
+import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveHousingCompanyMutation} from "../../app/services";
-import {FormInputField, SaveButton} from "../../common/components";
+import {FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
 import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
@@ -17,7 +17,6 @@ const ImprovementAddLineButton = ({onClick}) => {
         <Button
             onClick={onClick}
             iconLeft={<IconPlus />}
-            variant="secondary"
             theme="black"
         >
             Lisää parannus
@@ -135,20 +134,39 @@ const HousingCompanyImprovementsPage = () => {
         if (state === null) navigate("..");
     }, [navigate, state]);
 
-    // FIXME: Rename "ownership" class names for elements when styling
     return (
-        <div className="view--create view--set-housing-company">
+        <div className="view--create view--create-improvements">
             <h1 className="main-heading">{housingCompanyData.name.display} Parannukset</h1>
             <div className="field-sets">
-                <Fieldset heading="Markkinahintaindeksi">
-                    <ul className="ownership-list">
+                <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
+                    <ul className="improvements-list">
                         {marketIndexImprovements.length ? (
-                            marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
-                                <div key={`market-improvement-item-${improvement.key}`}>
-                                    <li className="ownership-item">
+                            <>
+                                <li className="improvement-headers">
+                                    <header>
+                                        Nimi <span>*</span>
+                                    </header>
+                                    <header>
+                                        Arvo <span>*</span>
+                                    </header>
+                                    <header>
+                                        Kuukausi <span>*</span>
+                                    </header>
+                                    <Tooltip
+                                        className="header__tooltip"
+                                        placement="left-start"
+                                    >
+                                        Muodossa 'YYYY-MM', esim. '2022-01'
+                                    </Tooltip>
+                                </li>
+                                {marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
+                                    <li
+                                        className="improvements-list-item"
+                                        key={`market-improvement-item-${improvement.key}`}
+                                    >
                                         <FormInputField
                                             inputType="text"
-                                            label="Nimi"
+                                            label=""
                                             fieldPath="name"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "name")}
@@ -157,7 +175,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="number"
-                                            label="Arvo"
+                                            label=""
                                             fieldPath="value"
                                             formData={marketIndexImprovements[index]}
                                             setterFunction={handleSetMarketImprovementLine(index, "value")}
@@ -166,7 +184,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="text"
-                                            label="Kuukausi"
+                                            label=""
                                             fieldPath="completion_date"
                                             tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
                                             formData={marketIndexImprovements[index]}
@@ -178,23 +196,45 @@ const HousingCompanyImprovementsPage = () => {
                                             onClick={() => handleRemoveMarketImprovementLine(index)}
                                         />
                                     </li>
-                                </div>
-                            ))
+                                ))}
+                            </>
                         ) : (
                             <div>Ei parannuksia</div>
                         )}
+                        <li className="row row--buttons">
+                            <ImprovementAddLineButton onClick={handleAddMarketImprovementLine} />
+                        </li>
                     </ul>
-                    <ImprovementAddLineButton onClick={handleAddMarketImprovementLine} />
                 </Fieldset>
-                <Fieldset heading="Rakennuskustanusindeksi">
-                    <ul className="ownership-list">
+                <Fieldset heading="Rakennuskustannusindeksillä laskettavat parannukset">
+                    <ul className="improvements-list">
                         {constructionIndexImprovements.length ? (
-                            constructionIndexImprovements.map((improvement: IWritableImprovement, index) => (
-                                <div key={improvement.key}>
-                                    <li className="ownership-item">
+                            <>
+                                <li className="improvement-headers">
+                                    <header>
+                                        Nimi <span>*</span>
+                                    </header>
+                                    <header>
+                                        Arvo <span>*</span>
+                                    </header>
+                                    <header>
+                                        Kuukausi <span>*</span>
+                                    </header>
+                                    <Tooltip
+                                        className="header__tooltip"
+                                        placement="left-start"
+                                    >
+                                        Muodossa 'YYYY-MM', esim. '2022-01'
+                                    </Tooltip>
+                                </li>
+                                {constructionIndexImprovements.map((improvement: IWritableImprovement, index) => (
+                                    <li
+                                        className="improvements-list-item"
+                                        key={improvement.key}
+                                    >
                                         <FormInputField
                                             inputType="text"
-                                            label="Nimi"
+                                            label=""
                                             fieldPath="name"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(index, "name")}
@@ -203,7 +243,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="number"
-                                            label="Arvo"
+                                            label=""
                                             fieldPath="value"
                                             formData={constructionIndexImprovements[index]}
                                             setterFunction={handleSetConstructionImprovementLine(index, "value")}
@@ -212,7 +252,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="text"
-                                            label="Kuukausi"
+                                            label=""
                                             fieldPath="completion_date"
                                             tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
                                             formData={constructionIndexImprovements[index]}
@@ -227,19 +267,24 @@ const HousingCompanyImprovementsPage = () => {
                                             onClick={() => handleRemoveConstructionImprovementLine(index)}
                                         />
                                     </li>
-                                </div>
-                            ))
+                                ))}
+                            </>
                         ) : (
                             <div>Ei parannuksia</div>
                         )}
+                        <li className="row row--buttons">
+                            <ImprovementAddLineButton onClick={handleAddConstructionImprovementLine} />
+                        </li>
                     </ul>
-                    <ImprovementAddLineButton onClick={handleAddConstructionImprovementLine} />
                 </Fieldset>
             </div>
-            <SaveButton
-                onClick={handleSaveButtonClicked}
-                isLoading={isLoading}
-            />
+            <div className="row row--buttons">
+                <NavigateBackButton />
+                <SaveButton
+                    onClick={handleSaveButtonClicked}
+                    isLoading={isLoading}
+                />
+            </div>
         </div>
     );
 };
