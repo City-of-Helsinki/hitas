@@ -1,5 +1,6 @@
 import datetime
 
+from django.db.models import Q
 from rest_framework import mixins
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.response import Response
@@ -14,8 +15,28 @@ from hitas.models import (
     MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
-from hitas.views.utils import HitasDecimalField, HitasModelMixin, HitasModelSerializer
+from hitas.models.indices import AbstractIndex
+from hitas.views.utils import (
+    HitasDecimalField,
+    HitasFilterSet,
+    HitasIntegerFilter,
+    HitasModelMixin,
+    HitasModelSerializer,
+)
 from hitas.views.utils.serializers import YearMonthSerializer
+
+
+class IndicesFilterSet(HitasFilterSet):
+    year = HitasIntegerFilter(method="year_filter", min_value=1970, max_value=2099)
+
+    def year_filter(self, queryset, name, value):
+        return queryset.filter(
+            Q(month__gte=datetime.date(value, month=1, day=1)) & Q(month__lt=datetime.date(value + 1, month=1, day=1))
+        )
+
+    class Meta:
+        model = AbstractIndex
+        fields = ["year"]
 
 
 class IndicesSerializer(HitasModelSerializer):
@@ -76,6 +97,10 @@ class _AbstractIndicesViewSet(
 
     def _get_month(self):
         return datetime.datetime.strptime(self.kwargs["month"], "%Y-%m").date()
+
+    @staticmethod
+    def get_filterset_class():
+        return IndicesFilterSet
 
 
 class MaximumPriceIndexViewSet(_AbstractIndicesViewSet):

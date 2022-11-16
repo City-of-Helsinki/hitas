@@ -82,6 +82,69 @@ def test__api__indices__list(api_client: HitasAPIClient, index, factory):
     }
 
 
+@pytest.mark.parametrize("index,factory", zip(indices, factories))
+@pytest.mark.django_db
+def test__api__indices__list__filter_by_year(api_client: HitasAPIClient, index, factory):
+    factory.create(month=datetime.date(2021, 12, 1), value=256)
+    factory.create(month=datetime.date(2022, 1, 1), value=127.48)
+    factory.create(month=datetime.date(2022, 12, 1), value=150.0)
+    factory.create(month=datetime.date(2023, 1, 1), value=256)
+
+    response = api_client.get(reverse(f"hitas:{index:}-list") + "?year=2022")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "contents": [
+            {"month": "2022-12", "value": 150.0},
+            {"month": "2022-01", "value": 127.48},
+        ],
+        "page": {
+            "size": 2,
+            "current_page": 1,
+            "total_items": 2,
+            "total_pages": 1,
+            "links": {
+                "next": None,
+                "previous": None,
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    "index,test",
+    product(
+        indices,
+        [
+            {
+                "year": "1969",
+                "field": {
+                    "field": "year",
+                    "message": "Ensure this value is greater than or equal to 1970.",
+                },
+            },
+            {
+                "year": "2100",
+                "field": {
+                    "field": "year",
+                    "message": "Ensure this value is less than or equal to 2099.",
+                },
+            },
+        ],
+    ),
+)
+@pytest.mark.django_db
+def test__api__indices__list__filter_by_year__invalid(api_client: HitasAPIClient, index, test):
+    response = api_client.get(reverse(f"hitas:{index:}-list") + "?year=" + test["year"], openapi_validate_request=False)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [test["field"]],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Create
 
 
