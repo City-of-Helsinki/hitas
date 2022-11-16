@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
+    "django_jinja",
     "helusers.apps.HelusersConfig",
     "helusers.apps.HelusersAdminConfig",
     "users",
@@ -113,6 +115,11 @@ else:
 
 TEMPLATES = [
     {
+        "BACKEND": "django_jinja.backend.Jinja2",
+        "DIRS": [],
+        "APP_DIRS": True,
+    },
+    {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [],
         "APP_DIRS": True,
@@ -126,6 +133,8 @@ TEMPLATES = [
         },
     },
 ]
+
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 

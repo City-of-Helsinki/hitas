@@ -355,6 +355,18 @@ python-jose = "*"
 requests = "*"
 
 [[package]]
+name = "django-jinja"
+version = "2.10.2"
+description = "Jinja2 templating language integrated in Django."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+django = ">=2.2"
+jinja2 = ">=3"
+
+[[package]]
 name = "django-nested-inline"
 version = "0.4.5"
 description = "Recursive nesting of inline forms for Django Admin"
@@ -633,6 +645,20 @@ qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["Django (<3.1)", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
+name = "jinja2"
+version = "3.1.2"
+description = "A very fast and expressive template engine."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+MarkupSafe = ">=2.0"
+
+[package.extras]
+i18n = ["Babel (>=2.7)"]
+
+[[package]]
 name = "jsonschema"
 version = "4.17.0"
 description = "An implementation of JSON Schema validation for Python"
@@ -699,7 +725,7 @@ testing = ["coverage", "pyyaml"]
 name = "markupsafe"
 version = "2.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -1560,7 +1586,7 @@ svglib = ">=1.2.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "0c5bb2d7e939ab87c0da7c102c40dd468185b662a685c34436ebf825ddf04d13"
+content-hash = "75590616521687d0a32c58331e1d3f0310df565a447c2c34e48d7a8404931624"
 
 [metadata.files]
 appnope = []
@@ -1620,6 +1646,7 @@ django-helusers = [
     {file = "django-helusers-0.7.1.tar.gz", hash = "sha256:7c63ff403d3db5136fbc61dbb96db7858a74157c832953c1f9dd9032ffac7236"},
     {file = "django_helusers-0.7.1-py3-none-any.whl", hash = "sha256:de84fde5449556622cb1364fd93bde6c58e6037aac64cc72880fccee564776bb"},
 ]
+django-jinja = []
 django-nested-inline = [
     {file = "django-nested-inline-0.4.5.tar.gz", hash = "sha256:d7e51dc1ebf805df53ec7ff9b4108dfe1dfb8a7e02212700a4e467f2caafe34b"},
     {file = "django_nested_inline-0.4.5-py3-none-any.whl", hash = "sha256:fc6998e7d607c1414e25897ae1a544105ada93d63c5cff3ac9582fbf14d8ec63"},
@@ -1667,6 +1694,7 @@ jedi = [
     {file = "jedi-0.18.1-py2.py3-none-any.whl", hash = "sha256:637c9635fcf47945ceb91cd7f320234a7be540ded6f3e99a50cb6febdfd1ba8d"},
     {file = "jedi-0.18.1.tar.gz", hash = "sha256:74137626a64a99c8eb6ae5832d99b3bdd7d29a3850fe2aa80a4126b2a7d949ab"},
 ]
+jinja2 = []
 jsonschema = []
 jsonschema-spec = []
 lazy-object-proxy = []

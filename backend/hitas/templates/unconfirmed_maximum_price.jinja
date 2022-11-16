@@ -1,0 +1,110 @@
+{% extends "components/base.jinja" %}
+{% block title %}{{ title }}{% endblock %}
+
+
+{% set is_pre_2011 = apartment.prices.maximum_prices.unconfirmed.onwards_2011 == none %}
+{% if is_pre_2011 %}
+    {% set prices = apartment.prices.maximum_prices.unconfirmed.pre_2011 %}
+{% else %}
+    {% set prices = apartment.prices.maximum_prices.unconfirmed.onwards_2011 %}
+{% endif %}
+
+{% block content %}
+    {% set address = "" %}
+    <h3>Helsingin kaupunki</h3>
+    <h3>
+        {{ apartment.address.street_address }} {{ apartment.address.stair }} {{ apartment.address.apartment_number }}
+        <br>{{ apartment.address.postal_code }} {{ apartment.address.city|upper }}
+    </h3>
+
+    <h4>HITAS-HUONEISTON ENIMMÄISHINTA<br>
+    • ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta</h4>
+
+    <table>
+        {% for ownership in apartment.ownerships %}
+        <tr>
+            <td>Omistaja ja omistusosuus (%)</td>
+            <td>{{ ownership.owner.name}}</td>
+            <td>{{ ownership.percentage }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <br>
+
+    <table>
+        <tr>
+            <td>Asunto-osakeyhtiö</td>
+            <td>{{ apartment.links.housing_company.display_name }}, Helsinki</td>
+        </tr>
+        <tr>
+            <td>Huoneiston osoite</td>
+            <td>{{ apartment.address.street_address }} {{ apartment.address.stair }} {{ apartment.address.apartment_number }}, {{ apartment.address.postal_code }} {{ apartment.address.city|upper }}</td>
+        </tr>
+        <tr>
+            <td>Alkuperäinen velaton hankintahinta, euroa</td>
+            <td>{{ apartment.prices.debt_free_purchase_price|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>Huoneiston valmistumisajankohta</td>
+            <td>{{ apartment.completion_date|format_date }}</td>
+        </tr>
+        <tr>
+            <td>Huoneiston ensimmäinen kaupantekoajankohta</td>
+            <td>{{ apartment.first_purchase_date|format_date }}</td>
+        </tr>
+        {% if prices.surface_area_price_ceiling.maximum %}
+            <tr>
+            {% if prices.construction_price_index.value > prices.market_price_index.value %}
+                <td>Hitas-huoneiston velaton enimmäishinta rakennuskustannusindeksillä laskettuna, euroa</td>
+                <td>{{ prices.construction_price_index.value|intcomma }}</td>
+            {% else %}
+                <td>Hitas-huoneiston velaton enimmäishinta markkinahintaindeksillä laskettuna, euroa</td>
+                <td>{{ prices.market_price_index.value|intcomma }}</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+    </table>
+
+    <br>
+
+    {% if not prices.surface_area_price_ceiling.maximum %}
+        <p style="font-size: 9pt">
+        Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää.
+        </p>
+    {% endif %}
+
+    <b>Hitas-huoneistonne velaton enimmäishinta on
+        {% if prices.construction_price_index.maximum %}
+            {{ prices.construction_price_index.value|intcomma }} euroa rakennuskustannusindeksillä laskettuna.
+        {% elif prices.market_price_index.maximum %}
+            {{ prices.market_price_index.value|intcomma }} euroa markkinahintaindeksillä laskettuna.
+        {% else %}
+            {{ prices.surface_area_price_ceiling.value|intcomma }} euroa. Velaton enimmäishinta on laskettu voimassaolevan rajahinnan perusteella ({{ apartment.surface_area }} m² * ???? euroa).
+        {% endif %}
+    </b>
+
+    <br>
+    <br>
+
+    <p>
+    Mikäli tarvitsette huoneistonne vahvistetun enimmäishinnan, teidän tulee toimittaa
+    isännöitsijäntodistus tai Hitas-enimmäishinnan vahvistamislomake. Näiden tietojen perusteella
+    vahvistetaan huoneistonne lopullinen enimmäishinta. Laskelma tulee huoneistoa myytäessä
+    esittää ostajille.
+    </p>
+
+    {% if prices.surface_area_price_ceiling.maximum %}
+        <p>Teillä on mahdollisuus myydä huoneistonne myös ilman enimmäishinnan vahvistamista enintään kaupantekoajankohtana voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyjän ja ostajan välillä sopia vapaasti.</p>
+        <p>Mikäli osakkeisiin kohdistuu yhtiölainaosuutta, tulee sen osuus vähentää huoneiston velattomasta hinnasta kauppahintaa laskettaessa.</p>
+        <b>Rajahintaa tarkistetaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.</b>
+    {% endif %}
+    <br>
+    <br>
+
+    <p>
+    Maija Meikäläinen<br>
+    suunnittelija
+    </p>
+{% endblock %}

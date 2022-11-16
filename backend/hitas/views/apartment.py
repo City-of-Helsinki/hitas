@@ -1,16 +1,21 @@
 import datetime
 import uuid
 from collections import OrderedDict
-from typing import Any, Dict, Optional
+from http import HTTPStatus
+from typing import Any, Dict, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework.decorators import action
 from rest_framework.fields import empty
+from rest_framework.response import Response
 
+from hitas.exceptions import HitasModelNotFound
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -32,6 +37,7 @@ from hitas.views.utils import (
     ValueOrNullField,
 )
 from hitas.views.utils.merge import merge_model
+from hitas.views.utils.pdf import get_pdf_response
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
@@ -615,3 +621,48 @@ class ApartmentViewSet(HitasModelViewSet):
             )
             .order_by("id")
         )
+
+    @action(detail=True, methods=["GET"], url_path="reports/download-latest-unconfirmed-prices")
+    def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
+        apartment = self.get_object()
+        apartment_data = ApartmentDetailSerializer(apartment).data
+        ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
+        ump = ump["pre_2011"] if ump["pre_2011"] is not None else ump["onwards_2011"]
+
+        if (
+            ump["construction_price_index"]["value"] is None
+            or ump["market_price_index"]["value"] is None
+            or ump["surface_area_price_ceiling"]["value"] is None
+        ):
+            return Response(
+                {
+                    "error": "index_missing",
+                    "message": "One or more indices required for max price calculation is missing.",
+                    "reason": "Conflict",
+                    "status": 409,
+                },
+                status=HTTPStatus.CONFLICT,
+            )
+
+        filename = f"Hinta-arvio {apartment.address}.pdf"
+        context = {"apartment": apartment_data}
+        return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
+
+    @action(detail=True, methods=["GET"], url_path="reports/download-latest-confirmed-prices")
+    def download_latest_confirmed_prices(self, request, **kwargs) -> HttpResponse:
+        mpc = (
+            ApartmentMaximumPriceCalculation.objects.filter(
+                apartment=self.get_object(),
+                json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
+            )
+            .exclude(confirmed_at=None)
+            .order_by("-confirmed_at")
+            .first()
+        )
+
+        if mpc is None:
+            raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
+
+        filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
+        context = {"maximum_price_calculation": mpc}
+        return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)

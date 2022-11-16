@@ -431,63 +431,6 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
     }
 
 
-def _test_max_prices(
-    api_client: HitasAPIClient,
-    pre_2011: bool,
-    create_completion_indices: bool,
-    create_current_indices: bool,
-    null_values: bool = False,
-):
-    completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
-    cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
-    mpi_factory = MarketPriceIndexFactory if pre_2011 else MarketPriceIndex2005Equal100Factory
-
-    ap: Apartment = ApartmentFactory.create(
-        completion_date=completion_date,
-        debt_free_purchase_price=80000 if not null_values else None,
-        primary_loan_amount=20000 if not null_values else None,
-        surface_area=50 if not null_values else None,
-    )
-
-    if create_completion_indices:
-        cpi_factory.create(month=ap.completion_date, value=100)
-        mpi_factory.create(month=ap.completion_date, value=200)
-
-    if create_current_indices:
-        now = datetime.date.today().replace(day=1)
-        cpi_factory.create(month=now, value=150)
-        mpi_factory.create(month=now, value=250)
-        SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
-
-    response = api_client.get(
-        reverse(
-            "hitas:apartment-detail",
-            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
-        )
-    )
-
-    values = {
-        "construction_price_index": {
-            "value": 150000 if create_current_indices and create_completion_indices and not null_values else None,
-            "maximum": create_current_indices and create_completion_indices and not null_values,
-        },
-        "market_price_index": {
-            "value": 125000 if create_current_indices and create_completion_indices and not null_values else None,
-            "maximum": False,
-        },
-        "surface_area_price_ceiling": {
-            "value": 150000 if create_current_indices and not null_values else None,
-            "maximum": create_current_indices and not null_values,
-        },
-    }
-
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json()["prices"]["maximum_prices"]["unconfirmed"] == {
-        "pre_2011": values if pre_2011 else None,
-        "onwards_2011": None if pre_2011 else values,
-    }
-
-
 @pytest.mark.django_db
 def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
@@ -528,6 +471,78 @@ def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_c
             "is_valid": ampc2.valid_until >= datetime.date.today(),
         },
     }
+
+
+def _test_max_prices(
+    api_client: HitasAPIClient,
+    pre_2011: bool,
+    create_completion_indices: bool,
+    create_current_indices: bool,
+    null_values: bool = False,
+):
+    # Setup test
+    completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
+    cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
+    mpi_factory = MarketPriceIndexFactory if pre_2011 else MarketPriceIndex2005Equal100Factory
+
+    ap: Apartment = ApartmentFactory.create(
+        completion_date=completion_date,
+        debt_free_purchase_price=80000 if not null_values else None,
+        primary_loan_amount=20000 if not null_values else None,
+        surface_area=50 if not null_values else None,
+    )
+
+    if create_completion_indices:
+        cpi_factory.create(month=ap.completion_date, value=100)
+        mpi_factory.create(month=ap.completion_date, value=200)
+
+    if create_current_indices:
+        now = datetime.date.today().replace(day=1)
+        cpi_factory.create(month=now, value=150)
+        mpi_factory.create(month=now, value=250)
+        SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
+
+    # Validate apartment details has correct data returned
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[ap.housing_company.uuid.hex, ap.uuid.hex],
+        )
+    )
+
+    values = {
+        "construction_price_index": {
+            "value": 150000 if create_current_indices and create_completion_indices and not null_values else None,
+            "maximum": create_current_indices and create_completion_indices and not null_values,
+        },
+        "market_price_index": {
+            "value": 125000 if create_current_indices and create_completion_indices and not null_values else None,
+            "maximum": False,
+        },
+        "surface_area_price_ceiling": {
+            "value": 150000 if create_current_indices and not null_values else None,
+            "maximum": create_current_indices and not null_values,
+        },
+    }
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["prices"]["maximum_prices"]["unconfirmed"] == {
+        "pre_2011": values if pre_2011 else None,
+        "onwards_2011": None if pre_2011 else values,
+    }
+
+    # Validate fetching PDF report of unconfirmed prices
+
+    response = api_client.get(
+        reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex])
+        + "/reports/download-latest-unconfirmed-prices",
+    )
+
+    if create_current_indices and create_completion_indices and not null_values:
+        assert response.status_code == status.HTTP_200_OK, response.json()
+        assert response.get("content-type") == "application/pdf"
+    else:
+        assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
 
 @pytest.mark.django_db
