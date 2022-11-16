@@ -25,10 +25,7 @@
         justify-content: space-between
         gap: inherit
 
-        > div
-          position: relative
-          z-index: 2
-          &:not(:first-child:last-child)
+        > div:not(:first-child:last-child)
             width: 50%
 
     h4
@@ -37,11 +34,6 @@
     label
       font-size: $fontsize-body-s
       height: 20px
-      position: relative
-      z-index: 1
-
-    .input-field
-      position: relative
       z-index: 1
 
     .input-field--required label
@@ -49,7 +41,7 @@
 
     .input-field--date
       position: relative
-      z-index: 900 !important
+      z-index: 800 !important
       transform: translateY(2px)
 
       [class*="input-wrapper"]
@@ -126,9 +118,6 @@
 
   > button
     margin: $spacing-layout-s auto
-
-  .row--buttons
-    margin-top: $spacing-layout-s
 
 .view--create-improvements
 
