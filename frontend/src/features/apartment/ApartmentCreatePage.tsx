@@ -155,7 +155,6 @@ const ApartmentCreatePage = () => {
 
     const handleConfirmedRemove = () => {
         removeApartment({
-            data: formData,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,
         });

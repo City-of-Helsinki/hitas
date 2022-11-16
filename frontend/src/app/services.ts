@@ -255,15 +255,13 @@ const mutationApi = hitasApi.injectEndpoints({
         removeApartment: builder.mutation<
             IApartmentDetails,
             {
-                data?: IApartmentWritable;
                 id: string | undefined;
                 housingCompanyId: string;
             }
         >({
-            query: ({data, id, housingCompanyId}) => ({
+            query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${id}`,
                 method: "DELETE",
-                body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
             invalidatesTags: (result, error, arg) => [
