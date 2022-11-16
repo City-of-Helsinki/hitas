@@ -29,5 +29,6 @@ class HitasPostalCodeViewSet(HitasModelViewSet):
     def get_queryset(self):
         return HitasPostalCode.objects.all().order_by("value")
 
-    def get_filterset_class(self):
+    @staticmethod
+    def get_filterset_class():
         return HitasPostalCodeFilterSet

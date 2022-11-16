@@ -2418,6 +2418,16 @@ paths:
         - $ref: '#/components/parameters/IndexNameParameter'
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
+        - name: year
+          required: false
+          in: query
+          description: Fetch indices by year
+          schema:
+            description: Year
+            type: integer
+            minimum: 1970
+            maximum: 2099
+            example: 2022-01
       responses:
         '200':
           description: Successfully fetched list of indices
@@ -2438,6 +2448,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '406':

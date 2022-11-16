@@ -1,6 +1,7 @@
 from copy import deepcopy
 from uuid import UUID
 
+from django import forms
 from django.core.validators import RegexValidator
 from django_filters import CharFilter
 from django_filters.constants import EMPTY_VALUES
@@ -34,6 +35,15 @@ class HitasPostalCodeFilter(filters.CharFilter):
 
 
 class HitasNumberFilter(filters.NumberFilter):
+    def __init__(self, *args, **kwargs):
+        if not kwargs.get("min_value"):
+            kwargs["min_value"] = 0
+        super().__init__(*args, **kwargs)
+
+
+class HitasIntegerFilter(filters.NumberFilter):
+    field_class = forms.IntegerField
+
     def __init__(self, *args, **kwargs):
         if not kwargs.get("min_value"):
             kwargs["min_value"] = 0
