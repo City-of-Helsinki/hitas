@@ -64,6 +64,11 @@
                 <td>{{ prices.market_price_index.value|intcomma }}</td>
             {% endif %}
             </tr>
+        {% else %}
+            <tr>
+                <td>Rakennuttajalta tilatut lisä- ja muutostyöt</td>
+                <td>{{ apartment.prices.construction.additional_work|intcomma }}</td>
+            </tr>
         {% endif %}
     </table>
 
