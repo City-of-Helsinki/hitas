@@ -57,9 +57,18 @@ const handleDownloadPDF = (response) => {
     });
 };
 
-export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails) => {
+const getFetchInit = () => {
+    return {
+        headers: new Headers({Authorization: "Bearer " + Config.token, "Content-Type": "application/json"}),
+        method: "POST",
+    };
+};
+export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails, additionalInfo?: string) => {
     const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
-    const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
+    const init = {
+        ...getFetchInit(),
+        body: JSON.stringify({additional_info: additionalInfo}),
+    };
     fetch(url, init).then(handleDownloadPDF);
 };
 
@@ -69,8 +78,7 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) =
         return;
     }
     const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
-    const init = {headers: new Headers({Authorization: "Bearer " + Config.token})};
-    fetch(url, init).then(handleDownloadPDF);
+    fetch(url, getFetchInit()).then(handleDownloadPDF);
 };
 
 export const hitasApi = createApi({

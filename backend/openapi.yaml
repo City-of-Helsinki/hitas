@@ -868,7 +868,7 @@ paths:
   # Apartment maximum price
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/reports/download-latest-confirmed-prices:
-    get:
+    post:
       description: Download a single apartment's latest maximum price calculation's PDF
       operationId: read-apartment-maximum-price-pdf
       tags:
@@ -906,7 +906,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/reports/download-latest-unconfirmed-prices:
-    get:
+    post:
       description: Download an apartment's latest unconfirmed maximum price calculation's PDF
       operationId: read-apartment-unconfirmed-maximum-price-pdf
       tags:
@@ -926,6 +926,18 @@ paths:
           schema:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                additional_info:
+                  description: Additional textual information to be displayed on the generated PDF
+                  type: string
+                  example: Example text
       responses:
         '200':
           description: Successfully downloaded an apartment's unconfirmed maximum price calculation's PDF
@@ -992,6 +1004,10 @@ paths:
                   type: string
                   format: date
                   example: 2022-07-28
+                additional_info:
+                  description: Additional information to be displayed on the generated PDF
+                  type: string
+                  example: Example text
       responses:
         '200':
           description: Successfully created an apartment's maximum price calculation
@@ -3575,7 +3591,6 @@ components:
                   description: Is this calculated maximum price the highest maximum price.
                   type: boolean
                   example: true
-
         apartment:
           description: Share information
           type: object
@@ -3724,6 +3739,10 @@ components:
                   description: Property manager's street address
                   type: string
                   example: Isätie 42
+        additional_info:
+          description: Additional information to be displayed on the generated PDF
+          type: string
+          example: Example text
 
     ApartmentLinks:
       description: Links to apartment's related object

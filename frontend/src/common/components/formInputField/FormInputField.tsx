@@ -15,6 +15,7 @@ export interface CommonFormInputFieldProps {
     value: string;
     required?: boolean;
     setFieldValue: (value) => void;
+    tooltipText?: string;
 }
 
 type FormInputFieldProps = {

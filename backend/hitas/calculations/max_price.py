@@ -33,6 +33,7 @@ def create_max_price_calculation(
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
+    additional_info: Optional[str],
 ) -> Dict[str, Any]:
     #
     # Fetch apartment
@@ -45,6 +46,7 @@ def create_max_price_calculation(
         calculation_date,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
+        additional_info,
     )
 
     #
@@ -71,6 +73,7 @@ def calculate_max_price(
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
+    additional_info: str = "",
 ) -> Dict[str, Any]:
     if calculation_date is None:
         calculation_date = timezone.now().today()
@@ -201,6 +204,7 @@ def calculate_max_price(
                 "street_address": apartment.housing_company.property_manager.street_address,
             },
         },
+        "additional_info": additional_info,
     }
 
 

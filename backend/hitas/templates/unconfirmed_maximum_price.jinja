@@ -69,9 +69,9 @@
 
     <br>
 
-    {% if not prices.surface_area_price_ceiling.maximum %}
+    {% if additional_info %}
         <p style="font-size: 9pt">
-        Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää.
+            {{ additional_info }}
         </p>
     {% endif %}
 

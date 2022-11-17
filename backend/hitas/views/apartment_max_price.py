@@ -39,6 +39,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 calculation_date=calculation_date,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
+                additional_info=serializer.validated_data.get("additional_info", ""),
             )
             return Response(max_prices)
         except InvalidCalculationResultException:
@@ -159,6 +160,7 @@ class CreateCalculationSerializer(Serializer):
         min_value=0, decimal_places=2, max_digits=15, allow_null=True, required=False
     )
     apartment_share_of_housing_company_loans_date = fields.DateField(required=False, allow_null=True)
+    additional_info = fields.CharField(required=False, allow_null=True, allow_blank=True)
 
     def validate_calculation_date(self, date):
         return self._validate_not_in_future(date)
