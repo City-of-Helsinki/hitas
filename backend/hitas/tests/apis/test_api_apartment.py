@@ -965,11 +965,17 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
         ),
         (
             {"shares": {"start": None, "end": 100}},
-            [{"field": "shares", "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'."}],
+            [
+                {
+                    "field": "shares.start",
+                    "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'.",
+                },
+                {"field": "shares.end", "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'."},
+            ],
         ),
         (
             {"shares": {"start": 100, "end": 50}},
-            [{"field": "shares", "message": "'shares.start' must not be greater than 'shares.end'."}],
+            [{"field": "shares.start", "message": "'shares.start' must not be greater than 'shares.end'."}],
         ),
         (
             {"shares": {"start": 0, "end": 0}},

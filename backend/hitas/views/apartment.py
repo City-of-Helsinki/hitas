@@ -127,9 +127,10 @@ class SharesSerializer(serializers.Serializer):
         if start is None and end is None:
             return data
         if start is None or end is None:
-            raise ValidationError("Both 'shares.start' and 'shares.end' must be given or be 'null'.")
+            err_msg = "Both 'shares.start' and 'shares.end' must be given or be 'null'."
+            raise ValidationError({"start": err_msg, "end": err_msg})
         if start > end:
-            raise ValidationError("'shares.start' must not be greater than 'shares.end'.")
+            raise ValidationError({"start": "'shares.start' must not be greater than 'shares.end'."})
 
         return data
 
