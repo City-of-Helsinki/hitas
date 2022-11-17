@@ -86,7 +86,7 @@
         {% elif prices.market_price_index.maximum %}
             {{ prices.market_price_index.value|intcomma }} euroa markkinahintaindeksillä laskettuna.
         {% else %}
-            {{ prices.surface_area_price_ceiling.value|intcomma }} euroa. Velaton enimmäishinta on laskettu voimassaolevan rajahinnan perusteella ({{ apartment.surface_area }} m² * ???? euroa).
+            {{ prices.surface_area_price_ceiling.value|intcomma }} euroa. Velaton enimmäishinta on laskettu voimassaolevan rajahinnan perusteella ({{ apartment.surface_area }} m² * {{ surface_area_price_ceiling }} euroa).
         {% endif %}
     </b>
 
