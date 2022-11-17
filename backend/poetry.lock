@@ -504,6 +504,18 @@ pycodestyle = ">=2.9.0,<2.10.0"
 pyflakes = ">=2.5.0,<2.6.0"
 
 [[package]]
+name = "flake8-print"
+version = "5.0.0"
+description = "print statement checker plugin for flake8"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+flake8 = ">=3.0"
+pycodestyle = "*"
+
+[[package]]
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
@@ -1586,7 +1598,7 @@ svglib = ">=1.2.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "75590616521687d0a32c58331e1d3f0310df565a447c2c34e48d7a8404931624"
+content-hash = "ad3c39821afedcc9c6e2437e8df4a419810dc8edac9e6abda26155d54400ef82"
 
 [metadata.files]
 appnope = [
@@ -1667,6 +1679,7 @@ factory-boy = [
 ]
 faker = []
 flake8 = []
+flake8-print = []
 future = []
 greenlet = []
 html5lib = []

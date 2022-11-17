@@ -22,7 +22,7 @@ application = get_wsgi_application()
 # Hot warmup
 #
 if settings.UWSGI_WARMUP:
-    print("Running uwsgi warmup...")
+    print("Running uwsgi warmup...")  # noqa: T201
 
     def noop(status, hh, exc_info=None):
         pass
