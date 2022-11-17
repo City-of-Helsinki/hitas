@@ -212,9 +212,9 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
+        debt_free_purchase_price=80000.1,
+        primary_loan_amount=20000.2,
+        surface_area=50.5,
     )
     hc: HousingCompany = ap.housing_company
     owner: Ownership = OwnershipFactory.create(apartment=ap)
@@ -222,13 +222,13 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(apartment=ap)
 
-    ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100)
-    MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200)
+    ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100.5)
+    MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200.5)
 
     now = datetime.date.today().replace(day=1)
-    ConstructionPriceIndex2005Equal100Factory.create(month=now, value=150)
-    MarketPriceIndex2005Equal100Factory.create(month=now, value=250)
-    SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
+    ConstructionPriceIndex2005Equal100Factory.create(month=now, value=150.5)
+    MarketPriceIndex2005Equal100Factory.create(month=now, value=250.5)
+    SurfaceAreaPriceCeilingFactory.create(month=now, value=3000.5)
 
     response = api_client.get(
         reverse(
@@ -264,17 +264,17 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         },
         "completion_date": str(ap.completion_date),
         "prices": {
-            "debt_free_purchase_price": ap.debt_free_purchase_price,
-            "primary_loan_amount": ap.primary_loan_amount,
-            "acquisition_price": ap.debt_free_purchase_price + ap.primary_loan_amount,
-            "purchase_price": ap.purchase_price,
+            "debt_free_purchase_price": float(ap.debt_free_purchase_price),
+            "primary_loan_amount": float(ap.primary_loan_amount),
+            "acquisition_price": float(ap.debt_free_purchase_price + ap.primary_loan_amount),
+            "purchase_price": float(ap.purchase_price),
             "first_purchase_date": ap.first_purchase_date.strftime("%Y-%m-%d"),
             "latest_purchase_date": ap.latest_purchase_date.strftime("%Y-%m-%d"),
             "construction": {
-                "loans": ap.loans_during_construction,
-                "interest": ap.interest_during_construction,
-                "debt_free_purchase_price": ap.debt_free_purchase_price_during_construction,
-                "additional_work": ap.additional_work_during_construction,
+                "loans": float(ap.loans_during_construction),
+                "interest": float(ap.interest_during_construction),
+                "debt_free_purchase_price": float(ap.debt_free_purchase_price_during_construction),
+                "additional_work": float(ap.additional_work_during_construction),
             },
             "maximum_prices": {
                 "confirmed": {
@@ -282,7 +282,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "created_at": ampc.created_at.isoformat()[:-6] + "Z",
                     "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
                     "calculation_date": str(ampc.calculation_date),
-                    "maximum_price": ampc.maximum_price,
+                    "maximum_price": float(ampc.maximum_price),
                     "valid": {
                         "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
                         "is_valid": ampc.valid_until >= datetime.date.today(),
@@ -292,15 +292,15 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "pre_2011": None,
                     "onwards_2011": {
                         "construction_price_index": {
-                            "value": 150000,  # (80000 + 20000) * 150/100
-                            "maximum": True,
+                            "value": 149751.69,  # (80000.1 + 20000.2) * 150.5/100.5
+                            "maximum": False,
                         },
                         "market_price_index": {
-                            "value": 125000,  # (80000 + 20000) * 250/200
+                            "value": 124938.03,  # (80000.1 + 20000.2) * 250/200
                             "maximum": False,
                         },
                         "surface_area_price_ceiling": {
-                            "value": 150000,  # 50 (surface_area) * 3000
+                            "value": 151525.25,  # 50.5 (surface_area) * 3000.5
                             "maximum": True,
                         },
                     },
@@ -348,7 +348,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "construction_price_index": [
                 {
                     "name": cpi.name,
-                    "value": cpi.value,
+                    "value": float(cpi.value),
                     "completion_date": cpi.completion_date.strftime("%Y-%m"),
                     "depreciation_percentage": cpi.depreciation_percentage.value,
                 },
@@ -356,7 +356,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "market_price_index": [
                 {
                     "name": mpi.name,
-                    "value": mpi.value,
+                    "value": float(mpi.value),
                     "completion_date": mpi.completion_date.strftime("%Y-%m"),
                 },
             ],
@@ -390,7 +390,7 @@ def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClien
         "created_at": ampc.created_at.isoformat()[:-6] + "Z",
         "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
         "calculation_date": str(ampc.calculation_date),
-        "maximum_price": ampc.maximum_price,
+        "maximum_price": float(ampc.maximum_price),
         "valid": {
             "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
             "is_valid": ampc.valid_until >= datetime.date.today(),
@@ -423,7 +423,7 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
         "created_at": ampc.created_at.isoformat()[:-6] + "Z",
         "confirmed_at": ampc.confirmed_at.isoformat()[:-6] + "Z",
         "calculation_date": str(ampc.calculation_date),
-        "maximum_price": ampc.maximum_price,
+        "maximum_price": float(ampc.maximum_price),
         "valid": {
             "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
             "is_valid": ampc.valid_until >= datetime.date.today(),
@@ -696,16 +696,16 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         },
         "completion_date": "2022-08-26",
         "prices": {
-            "debt_free_purchase_price": 12345,
-            "purchase_price": 23456,
-            "primary_loan_amount": 34567,
+            "debt_free_purchase_price": 12345.1,
+            "purchase_price": 23456.2,
+            "primary_loan_amount": 34567.3,
             "first_purchase_date": "2000-01-01",
             "latest_purchase_date": "2020-05-05",
             "construction": {
-                "loans": 123,
-                "interest": 234,
-                "debt_free_purchase_price": 345,
-                "additional_work": 456,
+                "loans": 123.1,
+                "interest": 234.2,
+                "debt_free_purchase_price": 345.3,
+                "additional_work": 456.4,
             },
         },
         "ownerships": [
@@ -725,20 +725,20 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         "improvements": {
             "construction_price_index": [
                 {
-                    "value": 1234,
+                    "value": 1234.5,
                     "name": "test-construction-price-1",
                     "completion_date": "2020-01",
                     "depreciation_percentage": 10,
                 },
                 {
-                    "value": 2345,
+                    "value": 2345.6,
                     "name": "test-construction-price-2",
                     "completion_date": "2023-12",
                     "depreciation_percentage": 2.5,
                 },
             ],
             "market_price_index": [
-                {"value": 3456, "name": "test-market-price-1", "completion_date": "1998-05"},
+                {"value": 3456.7, "name": "test-market-price-1", "completion_date": "1998-05"},
             ],
         },
         "building": building.uuid.hex,

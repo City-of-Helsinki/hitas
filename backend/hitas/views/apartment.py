@@ -43,7 +43,7 @@ from hitas.views.utils.serializers import YearMonthSerializer
 
 class MarketPriceImprovementSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True, allow_null=False, allow_blank=False)
-    value = serializers.IntegerField(required=True, min_value=0, allow_null=False)
+    value = HitasDecimalField(required=True, allow_null=False)
     completion_date = YearMonthSerializer(required=True, allow_null=False)
 
     class Meta:
@@ -158,26 +158,29 @@ class SharesSerializer(serializers.Serializer):
 
 
 class ConstructionPrices(serializers.Serializer):
-    loans = serializers.IntegerField(source="loans_during_construction", required=False, allow_null=True, min_value=0)
-    additional_work = serializers.IntegerField(
+    loans = HitasDecimalField(source="loans_during_construction", required=False, allow_null=True)
+    additional_work = HitasDecimalField(
         source="additional_work_during_construction",
         required=False,
         allow_null=True,
-        min_value=0,
     )
-    interest = serializers.IntegerField(
-        source="interest_during_construction", required=False, allow_null=True, min_value=0
+    interest = HitasDecimalField(
+        source="interest_during_construction",
+        required=False,
+        allow_null=True,
     )
-    debt_free_purchase_price = serializers.IntegerField(
-        source="debt_free_purchase_price_during_construction", required=False, allow_null=True, min_value=0
+    debt_free_purchase_price = HitasDecimalField(
+        source="debt_free_purchase_price_during_construction",
+        required=False,
+        allow_null=True,
     )
 
 
 class PricesSerializer(serializers.Serializer):
-    debt_free_purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    primary_loan_amount = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    acquisition_price = serializers.IntegerField(read_only=True)
-    purchase_price = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    debt_free_purchase_price = HitasDecimalField(required=False, allow_null=True)
+    primary_loan_amount = HitasDecimalField(required=False, allow_null=True)
+    acquisition_price = HitasDecimalField(read_only=True)
+    purchase_price = HitasDecimalField(required=False, allow_null=True)
     first_purchase_date = serializers.DateField(required=False, allow_null=True)
     latest_purchase_date = serializers.DateField(required=False, allow_null=True)
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
@@ -239,9 +242,6 @@ class PricesSerializer(serializers.Serializer):
 
             for key in keys:
                 value = getattr(instance, key, None)
-
-                if value is not None:
-                    value = int(value)
 
                 retval.append(value)
 
@@ -504,7 +504,7 @@ class ApartmentViewSet(HitasModelViewSet):
         ROUND(
             (
                 a.debt_free_purchase_price + a.primary_loan_amount
-            ) * current_{table}.value / NULLIF(original_{table}.value, 0)
+            ) * current_{table}.value / NULLIF(original_{table}.value, 0), 2
         ) AS max_price_{table}
     FROM hitas_apartment AS a
     LEFT JOIN hitas_{table} AS original_{table} ON
@@ -558,7 +558,7 @@ class ApartmentViewSet(HitasModelViewSet):
                     "mpi": self.select_index("marketpriceindex", pre2011=True),
                     "mpi_2005_100": self.select_index("marketpriceindex2005equal100", pre2011=False),
                     "sapc": """
-    SELECT ROUND(a.surface_area * sapc.value)
+    SELECT ROUND(a.surface_area * sapc.value, 2)
     FROM hitas_apartment AS a
     LEFT JOIN hitas_surfaceareapriceceiling AS sapc
         ON sapc.month = DATE_TRUNC('month', NOW())

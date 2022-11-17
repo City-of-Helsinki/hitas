@@ -13,7 +13,7 @@ class ImprovementData:
     # Name of the improvement
     name: str
     # Original value of the improvement
-    value: int
+    value: Decimal
     # Completion date of the improvement
     completion_date: datetime.date
     # Completion date index for this improvement. Not needed for all the calculations.
@@ -23,9 +23,9 @@ class ImprovementData:
 
 
 class Excess(Enum):
-    AFTER_2010_HOUSING_COMPANY = 30
-    BEFORE_2010_HOUSING_COMPANY = 150
-    BEFORE_2010_APARTMENT = 100
+    AFTER_2010_HOUSING_COMPANY = Decimal("30.0")
+    BEFORE_2010_HOUSING_COMPANY = Decimal("150.0")
+    BEFORE_2010_APARTMENT = Decimal("100.0")
 
 
 @dataclass
@@ -42,7 +42,7 @@ class ImprovementCalculationResult:
     # Name for the improvement
     name: str
     # Original value for the improvement
-    value: int
+    value: Decimal
     # When the improvement was completed
     completion_date: datetime.date
     # Calculated excess for the improvement or None when excess is not used in the calculation
@@ -64,14 +64,14 @@ class ImprovementCalculationSummary:
     @dataclass
     class ExcessSummary:
         surface_area: Decimal
-        value_per_square_meter: int
+        value_per_square_meter: Decimal
 
         @property
         def total(self) -> Decimal:
             return self.surface_area * self.value_per_square_meter
 
     # Sum of all improvement values
-    value: int
+    value: Decimal
     # Sum of all improvement added values (value - excess)
     value_added: Decimal
     # Excess information (if part of the calculations)
@@ -253,7 +253,7 @@ def calculate_improvement(
 def calculate_multiple_improvements(improvements, calc_fn, total_surface_area, excess_per_square_meter):
     results: List[ImprovementCalculationResult] = []
 
-    summary_value = 0
+    summary_value = Decimal(0)
     summary_value_added = Decimal(0)
     summary_value_for_housing_company = NoneSum(Decimal)
     summary_value_for_apartment = Decimal(0)

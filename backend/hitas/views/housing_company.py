@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from django.db.models import F, IntegerField, Min, Prefetch, Sum
+from django.db.models import F, Min, Prefetch, Sum
 from django.db.models.functions import Round
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
@@ -170,10 +170,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     @staticmethod
     def get_summary(obj: HousingCompany) -> Dict[str, int]:
         return {
-            "realized_acquisition_price": getattr(obj, "sum_acquisition_price", 0) or 0,
-            "average_price_per_square_meter": getattr(obj, "avg_price_per_square_meter", 0) or 0,
-            "total_surface_area": getattr(obj, "sum_surface_area", 0) or 0,
-            "total_shares": getattr(obj, "sum_total_shares", 0) or 0,
+            "realized_acquisition_price": getattr(obj, "sum_acquisition_price", 0.0) or 0.0,
+            "average_price_per_square_meter": getattr(obj, "avg_price_per_square_meter", 0.0) or 0.0,
+            "total_surface_area": getattr(obj, "sum_surface_area", 0.0) or 0.0,
+            "total_shares": getattr(obj, "sum_total_shares", 0.0) or 0.0,
         }
 
     @staticmethod
@@ -324,11 +324,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 )
             )
             .annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
-            .annotate(
-                avg_price_per_square_meter=Round(
-                    F("sum_acquisition_price") / F("sum_surface_area"), output_field=IntegerField()
-                )
-            )
+            .annotate(avg_price_per_square_meter=Round(F("sum_acquisition_price") / F("sum_surface_area"), precision=2))
             .annotate(
                 sum_total_shares=Sum(
                     F("real_estates__buildings__apartments__share_number_end")

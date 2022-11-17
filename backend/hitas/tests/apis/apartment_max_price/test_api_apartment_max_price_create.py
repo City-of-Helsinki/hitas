@@ -47,7 +47,7 @@ from hitas.tests.factories.indices import (
         ),
         (
             {"apartment_share_of_housing_company_loans": "foo"},
-            [{"field": "apartment_share_of_housing_company_loans", "message": "A valid integer is required."}],
+            [{"field": "apartment_share_of_housing_company_loans", "message": "A valid number is required."}],
         ),
         (
             {"apartment_share_of_housing_company_loans": "-1"},
@@ -55,6 +55,15 @@ from hitas.tests.factories.indices import (
                 {
                     "field": "apartment_share_of_housing_company_loans",
                     "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
+        ),
+        (
+            {"apartment_share_of_housing_company_loans_date": "foo"},
+            [
+                {
+                    "field": "apartment_share_of_housing_company_loans_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
                 }
             ],
         ),

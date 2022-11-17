@@ -11,4 +11,4 @@ class AbstractImprovementFactory(DjangoModelFactory):
 
     name = factory.Faker("sentence")
     completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    value = fuzzy.FuzzyInteger(low=1, high=100000)
+    value = fuzzy.FuzzyDecimal(low=1, high=100000)

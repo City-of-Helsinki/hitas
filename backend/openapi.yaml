@@ -984,9 +984,9 @@ paths:
                 apartment_share_of_housing_company_loans:
                   description: |-
                     How much the apartment's share of the housing company loans are on the calculation date
-                  type: integer
+                  type: number
                   minimum: 0
-                  example: 2500
+                  example: 2500.00
                 apartment_share_of_housing_company_loans_date:
                   description: Date for `apartment_share_of_housing_company_loans`
                   type: string
@@ -2887,9 +2887,9 @@ components:
                     example: Hissisaneeraus
                   value:
                     description: Original value of this improvement
-                    type: integer
+                    type: number
                     minimum: 0
-                    example: 78284
+                    example: 78284.25
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
             construction_price_index:
@@ -2910,9 +2910,9 @@ components:
                     example: Liittyminen HTV-verkkoon
                   value:
                     description: Original value of this improvement
-                    type: integer
+                    type: number
                     minimum: 0
-                    example: 13359
+                    example: 13359.75
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
 
@@ -3159,9 +3159,9 @@ components:
                     example: Hissisaneeraus
                   value:
                     description: Original value of this improvement
-                    type: integer
+                    type: number
                     minimum: 0
-                    example: 78284
+                    example: 78284.61
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
             construction_price_index:
@@ -3183,9 +3183,9 @@ components:
                     example: Liittyminen HTV-verkkoon
                   value:
                     description: Original value of this improvement
-                    type: integer
+                    type: number
                     minimum: 0
-                    example: 13359
+                    example: 13359.98
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
                   depreciation_percentage:
@@ -3217,9 +3217,9 @@ components:
           $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVars'
         maximum_price:
           description: Maximum price for this index
-          type: integer
+          type: number
           minimum: 0
-          example: 223558
+          example: 223558.95
         valid_until:
           description: The date until this maximum price calculation is valid.
           type: string
@@ -3251,29 +3251,29 @@ components:
       properties:
         acquisition_price:
           description: Apartment's acquisition price
-          type: integer
+          type: number
           minimum: 0
-          example: 199500
+          example: 199500.03
         additional_work_during_construction:
           description: Amount of apartment's additional work done during construction
-          type: integer
+          type: number
           minimum: 0
-          example: 0
+          example: 0.0
         basic_price:
           description: |-
             Basic price is sum of the apartment's acquisition price and the apartment's
             additional work during construction.
-          type: integer
+          type: number
           minimum: 0
-          example: 199500
+          example: 199500.21
         index_adjustment:
           description: |-
             Value increase of the apartment based on the index. Calculated by dividing the
             calculation date index value with the apartment's completion date's index value
             and multiplying the result with the apartment's basic price.
-          type: integer
+          type: number
           minimum: 0
-          example: 26401
+          example: 26401.54
         apartment_improvements:
           nullable: true
           $ref: '#/components/schemas/ApartmentMaximumPriceImprovements'
@@ -3283,21 +3283,21 @@ components:
           description: |-
             Sum of basic price, index adjustment, apartment improvements and housing company
             improvements.
-          type: integer
+          type: number
           minimum: 0
-          example: 226058
+          example: 226058.97
         debt_free_price_m2:
           description: |-
             Debt free price divided by the apartment's surface area.
-          type: integer
+          type: number
           minimum: 0
-          example: 7535
+          example: 7535.57
         apartment_share_of_housing_company_loans:
           description: |-
             How much the apartment's share of the housing company loans.
-          type: integer
+          type: number
           minimum: 0
-          example: 2500
+          example: 2500.07
         apartment_share_of_housing_company_loans_date:
           description: Date for the apartment share of housing company loan
           type: string
@@ -3354,9 +3354,9 @@ components:
                 example: Liittyminen HTV-verkkoon
               value:
                 description: Original value of this improvement
-                type: integer
+                type: number
                 minimum: 0
-                example: 13359
+                example: 13359.93
               completion_date:
                 $ref: '#/components/schemas/YearMonth'
               value_added:
@@ -3408,9 +3408,9 @@ components:
           properties:
             value:
               description: Sum of improvement values
-              type: integer
+              type: number
               minimum: 0
-              example: 13359
+              example: 13359.85
             value_added:
               description: Sum of improvement value added
               type: number
@@ -3432,9 +3432,9 @@ components:
                   example: 4332.0
                 value_per_square_meter:
                   description: Excess value per square meter
-                  type: integer
+                  type: number
                   minimum: 0
-                  example: 30
+                  example: 30.0
                 total:
                   description: Excess value per square meter multiplied by apartment's surface area
                   type: number
@@ -3478,9 +3478,9 @@ components:
           example: e65579e3ed0a4cc0b693d9910b41ab08
         maximum_price:
           description: The maximum price for this apartment.
-          type: integer
+          type: number
           minimum: 0
-          example: 223558
+          example: 223558.87
         created_at:
           description: The timestamp when this maximum price calculation was done.
           type: string
@@ -3563,9 +3563,9 @@ components:
                       example: 30.0
                 maximum_price:
                   description: Maximum price for this index
-                  type: integer
+                  type: number
                   minimum: 0
-                  example: 223558
+                  example: 223558.83
                 valid_until:
                   description: The date until this maximum price calculation is valid.
                   type: string
@@ -3895,9 +3895,9 @@ components:
                   example: 2022-07-05T15:42:39.64745
                 maximum_price:
                   description: The maximum price for this apartment.
-                  type: integer
+                  type: number
                   minimum: 0
-                  example: 223558
+                  example: 223558.24
                 valid:
                   type: object
                   additionalProperties: false

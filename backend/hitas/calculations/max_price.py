@@ -27,11 +27,49 @@ from hitas.models import (
 )
 
 
-def calculate_max_price(
+def create_max_price_calculation(
     housing_company_uuid: str,
     apartment_uuid: str,
     calculation_date: Optional[datetime.date],
-    apartment_share_of_housing_company_loans: int,
+    apartment_share_of_housing_company_loans: Decimal,
+    apartment_share_of_housing_company_loans_date: Optional[datetime.date],
+) -> Dict[str, Any]:
+    #
+    # Fetch apartment
+    #
+    apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
+
+    # Do the calculation
+    calculation = calculate_max_price(
+        apartment,
+        calculation_date,
+        apartment_share_of_housing_company_loans,
+        apartment_share_of_housing_company_loans_date,
+    )
+
+    #
+    # Save the calculation
+    #
+    ApartmentMaximumPriceCalculation.objects.create(
+        uuid=calculation["id"],
+        apartment=apartment,
+        maximum_price=calculation["maximum_price"],
+        created_at=calculation["created_at"],
+        valid_until=calculation["valid_until"],
+        calculation_date=calculation_date,
+        json=calculation,
+    )
+
+    # Don't save this to calculation json
+    calculation["confirmed_at"] = None
+
+    return calculation
+
+
+def calculate_max_price(
+    apartment,
+    calculation_date: Optional[datetime.date],
+    apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
 ) -> Dict[str, Any]:
     if calculation_date is None:
@@ -39,11 +77,6 @@ def calculate_max_price(
 
     if apartment_share_of_housing_company_loans_date is None:
         calculation_date = timezone.now().today()
-
-    #
-    # Fetch apartment
-    #
-    apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
 
     #
     # Fetch housing company's total surface area
@@ -95,8 +128,8 @@ def calculate_max_price(
         "valid_until": surface_area_price_ceiling_validity(calculation_date),
         "calculation_variables": {
             "calculation_date": calculation_date,
-            "calculation_date_value": roundup(apartment.surface_area_price_ceiling_m2, 2),
-            "surface_area": roundup(apartment.surface_area, 1),
+            "calculation_date_value": roundup(apartment.surface_area_price_ceiling_m2),
+            "surface_area": roundup(apartment.surface_area),
         },
     }
 
@@ -126,7 +159,7 @@ def calculate_max_price(
     #
     # Create calculation json object
     #
-    calculation = {
+    return {
         "id": uuid.uuid4().hex,
         "created_at": timezone.now(),
         "calculation_date": calculation_date,
@@ -146,7 +179,7 @@ def calculate_max_price(
             },
             "rooms": apartment.rooms,
             "type": apartment.apartment_type.value,
-            "surface_area": roundup(apartment.surface_area, 1),
+            "surface_area": apartment.surface_area,
             "address": {
                 "street_address": apartment.street_address,
                 "floor": apartment.floor,
@@ -156,7 +189,7 @@ def calculate_max_price(
                 "city": apartment.postal_code.city,
             },
             "ownerships": [
-                {"percentage": roundup(ownership.percentage, 2), "name": ownership.owner.name}
+                {"percentage": roundup(ownership.percentage), "name": ownership.owner.name}
                 for ownership in apartment.ownerships.all()
             ],
         },
@@ -169,24 +202,6 @@ def calculate_max_price(
             },
         },
     }
-
-    #
-    # Save the calculation
-    #
-    ApartmentMaximumPriceCalculation.objects.create(
-        uuid=calculation["id"],
-        apartment=apartment,
-        maximum_price=max_price,
-        created_at=calculation["created_at"],
-        valid_until=valid_until,
-        calculation_date=calculation_date,
-        json=calculation,
-    )
-
-    # Don't save this to calculation json
-    calculation["confirmed_at"] = None
-
-    return calculation
 
 
 def fetch_apartment(
@@ -313,7 +328,7 @@ def calculate_index(
     calculation_date_index: Decimal,
     completion_date_index: Decimal,
     total_surface_area: Decimal,
-    apartment_share_of_housing_company_loans: int,
+    apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: datetime.date,
     housing_company_improvements: List,
     calculation_date: datetime.date,
@@ -344,9 +359,7 @@ def calculate_index(
 
     # 'osakkeiden velaton hinta'
     debt_free_shares_price = (
-        basic_price
-        + roundup(index_adjustment)
-        + roundup(hc_improvements_result.summary.improvement_value_for_apartment)
+        basic_price + index_adjustment + hc_improvements_result.summary.improvement_value_for_apartment
     )
     # 'Enimmäismyyntihinta'
     max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
@@ -362,16 +375,16 @@ def calculate_index(
             "index_adjustment": roundup(index_adjustment),
             "apartment_improvements": None,
             "housing_company_improvements": improvement_result_to_json(hc_improvements_result),
-            "debt_free_price": debt_free_shares_price,
+            "debt_free_price": roundup(debt_free_shares_price),
             "debt_free_price_m2": roundup(debt_free_shares_price / apartment.surface_area),
-            "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
+            "apartment_share_of_housing_company_loans": roundup(apartment_share_of_housing_company_loans),
             "apartment_share_of_housing_company_loans_date": apartment_share_of_housing_company_loans_date,
             "completion_date": apartment.completion_date,
-            "completion_date_index": roundup(completion_date_index, 2),
+            "completion_date_index": roundup(completion_date_index),
             "calculation_date": calculation_date,
-            "calculation_date_index": roundup(calculation_date_index, 2),
+            "calculation_date_index": roundup(calculation_date_index),
         },
-        "maximum_price": max_price,
+        "maximum_price": roundup(max_price),
         "valid_until": calculation_date + relativedelta(months=3),
     }
 
@@ -413,8 +426,8 @@ def improvement_to_json(result: ImprovementCalculationResult) -> dict[str, any]:
             if result.depreciation
             else None
         ),
-        "value_for_housing_company": roundup(result.improvement_value_for_housing_company, 2),
-        "value_for_apartment": roundup(result.improvement_value_for_apartment, 2),
+        "value_for_housing_company": roundup(result.improvement_value_for_housing_company),
+        "value_for_apartment": roundup(result.improvement_value_for_apartment),
     }
 
 
@@ -430,7 +443,7 @@ def improvement_result_to_json(result: ImprovementsResult) -> dict[str, any]:
                 "total": roundup(result.summary.excess.total),
             },
             "depreciation": roundup(result.summary.depreciation),
-            "value_for_housing_company": roundup(result.summary.improvement_value_for_housing_company, 2),
+            "value_for_housing_company": roundup(result.summary.improvement_value_for_housing_company),
             "value_for_apartment": roundup(result.summary.improvement_value_for_apartment),
         },
     }

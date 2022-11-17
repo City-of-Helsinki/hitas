@@ -74,7 +74,7 @@ def handle_result(result):
     for error in result.errors:
         if isinstance(error, InvalidSchemaValue):
             for suberror in error.schema_errors:
-                print(suberror)
+                print(suberror)  # noqa: T201
 
     result.raise_for_errors()
 
