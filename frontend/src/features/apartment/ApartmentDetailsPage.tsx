@@ -84,7 +84,7 @@ const UnconfirmedPriceRow = ({label, unconfirmedPrice}: UnconfirmedPriceRowProps
         <div className={`price${unconfirmedPrice.maximum ? " price--current-top" : ""}`}>
             <span className="basis">{label}</span>
             <span className="amount">
-                <span className="value">{formatMoney(unconfirmedPrice.value)}</span>
+                <span className="value">{formatMoney(Math.floor(unconfirmedPrice.value))}</span>
             </span>
         </div>
     );
