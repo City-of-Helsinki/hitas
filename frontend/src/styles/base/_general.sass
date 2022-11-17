@@ -19,8 +19,10 @@ ul, ol
   @include flexbox()
   @include flex-flow(row nowrap)
   &--buttons
+    margin-top: $spacing-layout-m
+    margin-bottom: $spacing-layout-s
+.row--buttons, [class*="DialogActionButtons"]
     width: 100%
-    margin: $spacing-layout-m 0 $spacing-layout-s
     align-items: center
     justify-content: space-between
     >*:only-child

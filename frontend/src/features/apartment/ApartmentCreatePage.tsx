@@ -462,7 +462,7 @@ const ApartmentCreatePage = () => {
                                     <li className="ownership-item">
                                         <div className="owner">
                                             <FormInputField
-                                                inputType="relatedModel"
+                                                inputType="ownership"
                                                 label=""
                                                 fieldPath="owner.id"
                                                 placeholder={ownership?.owner.name || ""}
