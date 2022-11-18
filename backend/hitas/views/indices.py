@@ -41,7 +41,7 @@ class IndicesFilterSet(HitasFilterSet):
 
 class IndicesSerializer(HitasModelSerializer):
     month = YearMonthSerializer(read_only=True)
-    value = HitasDecimalField(allow_null=True)
+    value = HitasDecimalField(allow_null=True, min_value=1)
 
     class Meta:
         model = MarketPriceIndex
