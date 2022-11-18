@@ -148,7 +148,7 @@ export default function FormOwnershipInputField({
             setIsAddingNew(false);
             closeModal();
         }
-    }, [createData, createError, isCreating]);
+    }, [createData, createError, isCreating, setFieldValue]);
 
     return (
         <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>
