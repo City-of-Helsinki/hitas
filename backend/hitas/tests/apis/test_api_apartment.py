@@ -368,12 +368,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
-    )
+    ap: Apartment = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap, json=None, json_version=None
     )
@@ -403,9 +398,6 @@ def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClien
 def test__api__apartment__retrieve__confirmed_old_json_version(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
     )
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap, json_version=1
@@ -436,9 +428,6 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
 def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
     )
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap,
