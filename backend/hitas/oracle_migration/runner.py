@@ -1,6 +1,7 @@
 import datetime
 import logging
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Callable, Dict, List, Optional, Type, TypeVar
 
 import pytz
@@ -15,6 +16,7 @@ from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.sql import select
 
+from hitas.calculations.construction_time_interest import Payment, total_construction_time_interest
 from hitas.models import (
     AbstractCode,
     Apartment,
@@ -53,6 +55,7 @@ from hitas.oracle_migration.oracle_schema import (
     apartment_construction_price_indices,
     apartment_market_price_indices,
     apartment_ownerships,
+    apartment_payments,
     apartments,
     codebooks,
     codes,
@@ -85,6 +88,7 @@ class CreatedRealEstate:
 @dataclass
 class CreatedHousingCompany:
     value: HousingCompany = None
+    interest_rate: Decimal = None
     real_estates: List[CreatedRealEstate] = field(default_factory=list)
 
 
@@ -278,7 +282,9 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
             new.postal_code.save()
 
         new.save()
-        housing_companies_by_id[new.id] = CreatedHousingCompany(value=new)
+        housing_companies_by_id[new.id] = CreatedHousingCompany(
+            value=new, interest_rate=hc["construction_time_interest_rate"]
+        )
 
     # Update ID sequence as we forced same IDs as Oracle DB had
     max_id = HousingCompany.objects.aggregate(Max("id"))["id__max"]
@@ -403,6 +409,20 @@ def create_real_estates_and_buildings(
     return created_real_estates
 
 
+def fetch_payments(connection: Connection, apartment_id: int):
+    retval = []
+    for payment in connection.execute(
+        select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
+    ).fetchall():
+        retval.append(
+            Payment(
+                date=payment.date,
+                percentage=Decimal(payment.percentage),
+            )
+        )
+    return retval
+
+
 def create_apartments(
     building: Building, connection: Connection, converted_data: ConvertedData
 ) -> Dict[int, Apartment]:
@@ -432,7 +452,20 @@ def create_apartments(
         new.additional_work_during_construction = apartment["additional_work_during_construction"]
         new.primary_loan_amount = apartment["primary_loan_amount"]
         new.loans_during_construction = apartment["loans_during_construction"]
-        new.interest_during_construction = apartment["interest_during_construction"]
+
+        if apartment["completion_date"]:
+            construction_time_interest = total_construction_time_interest(
+                housing_company_construction_loan_rate=Decimal(
+                    converted_data.created_housing_companies_by_oracle_id[apartment["company_id"]].interest_rate
+                ),
+                apartment_completion_date=apartment["completion_date"].date(),
+                apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
+                apartment_loans_during_construction=Decimal(apartment["loans_during_construction"]),
+                payments=fetch_payments(connection, apartment["id"]),
+            )
+
+            new.interest_during_construction = construction_time_interest
+
         new.debt_free_purchase_price_during_construction = apartment["debt_free_purchase_price_during_construction"]
         new.completion_date = apartment["completion_date"]
         new.notes = combine_notes(apartment)
