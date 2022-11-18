@@ -17,6 +17,7 @@ import {
     IIndex,
     IIndexQuery,
     IIndexResponse,
+    IOwner,
     IPostalCodeResponse,
     IRealEstate,
 } from "../common/models";
@@ -90,7 +91,7 @@ export const hitasApi = createApi({
             return headers;
         },
     }),
-    tagTypes: ["HousingCompany", "Apartment", "Index"],
+    tagTypes: ["HousingCompany", "Apartment", "Index", "Owner"],
     endpoints: (builder) => ({}),
 });
 
@@ -278,6 +279,15 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
+        createOwner: builder.mutation<IOwner, {data: IOwner}>({
+            query: ({data}) => ({
+                url: `owners`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: () => [{type: "Owner"}],
+        }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
                 url: `indices/${index}/${month}`,
@@ -312,6 +322,7 @@ export const {
     useCreateBuildingMutation,
     useSaveApartmentMutation,
     useRemoveApartmentMutation,
+    useCreateOwnerMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
 } = mutationApi;

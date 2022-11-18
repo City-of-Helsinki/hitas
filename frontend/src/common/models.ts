@@ -149,6 +149,7 @@ interface IApartmentLinkedModel {
     readonly id: string;
     readonly link: string;
 }
+
 interface IApartmentLinkedModels {
     readonly housing_company: IApartmentLinkedModel & {display_name: string};
     readonly real_estate: IApartmentLinkedModel;
@@ -379,11 +380,10 @@ export interface IPropertyManager {
 }
 
 export interface IOwner {
-    readonly id: string;
+    readonly id?: string;
     name: string;
     identifier: string | null;
     email: string | null;
-    address: IAddress;
 }
 
 export interface IOwnership {
