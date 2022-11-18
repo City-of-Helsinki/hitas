@@ -436,10 +436,10 @@ def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_c
         maximum_price=100,
     )
     ampc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
-        apartment=ap, json=None, json_version=None, maximum_price=200, created_at=ampc.created_at
+        apartment=ap, json=None, json_version=None, maximum_price=200, confirmed_at=ampc.confirmed_at
     )
     ApartmentMaximumPriceCalculationFactory.create(
-        apartment=ap, json=None, json_version=None, maximum_price=50, created_at=ampc.created_at
+        apartment=ap, json=None, json_version=None, maximum_price=50, confirmed_at=ampc.confirmed_at
     )
 
     response = api_client.get(
