@@ -6,7 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment
-from hitas.tests.apis.apartment_max_price.utils import create_necessary_indices, monthify, this_month
+from hitas.tests.apis.apartment_max_price.utils import create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -18,6 +18,7 @@ from hitas.tests.factories.indices import (
     MarketPriceIndex2005Equal100Factory,
     SurfaceAreaPriceCeilingFactory,
 )
+from hitas.utils import monthify, this_month
 
 
 @pytest.mark.parametrize(

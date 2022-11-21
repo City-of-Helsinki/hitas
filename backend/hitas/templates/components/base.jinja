@@ -6,28 +6,32 @@
     <style>
         @page {
             size: A4 portrait;
-            @frame header_frame {
-                -pdf-frame-content: header_content;
-                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            @frame header_frame_1 {
+                -pdf-frame-content: header_content_1;
+                left: 50pt; width: 225pt; top: 50pt; height: 40pt;
+            }
+            @frame header_frame_2 {
+                -pdf-frame-content: header_content_2;
+                left: 325pt; width: 225pt; top: 50pt; height: 40pt;
             }
             @frame content_frame {
                 left: 50pt; width: 512pt; top: 90pt; height: 632pt;
             }
             @frame footer_frame_1 {
                 -pdf-frame-content: footer_content_1;
-                left: 50pt; width: 125pt; top: 770pt; height: 80pt;
+                left: 50pt; width: 125pt; top: 770pt; height: 50pt;
             }
             @frame footer_frame_2 {
                 -pdf-frame-content: footer_content_2;
-                left: 175pt; width: 125pt; top: 770pt; height: 80pt;
+                left: 175pt; width: 125pt; top: 770pt; height: 50pt;
             }
             @frame footer_frame_3 {
                 -pdf-frame-content: footer_content_3;
-                left: 300pt; width: 125pt; top: 770pt; height: 80pt;
+                left: 300pt; width: 125pt; top: 770pt; height: 50pt;
             }
             @frame footer_frame_4 {
                 -pdf-frame-content: footer_content_4;
-                left: 425pt; width: 125pt; top: 770pt; height: 80pt;
+                left: 425pt; width: 125pt; top: 770pt; height: 50pt;
             }
         }
         body {font-size: 10.5pt;}
@@ -38,8 +42,9 @@
 <body>
 
 {% block header %}
-    <div id="header_content">
-        -HEADER-
+    <div id="header_content_1"></div>
+    <div id="header_content_2">
+        {{ date_today }}
     </div>
 {% endblock %}
 

@@ -24,8 +24,10 @@ from hitas.models import (
     HousingCompany,
     Owner,
     Ownership,
+    SurfaceAreaPriceCeiling,
 )
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
+from hitas.utils import this_month
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -645,8 +647,13 @@ class ApartmentViewSet(HitasModelViewSet):
                 status=HTTPStatus.CONFLICT,
             )
 
+        sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month())
+        context = {
+            "apartment": apartment_data,
+            "additional_info": request.data.get("additional_info", ""),
+            "surface_area_price_ceiling": sapc.value,
+        }
         filename = f"Hinta-arvio {apartment.address}.pdf"
-        context = {"apartment": apartment_data, "additional_info": request.data.get("additional_info", "")}
         return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-confirmed-prices")

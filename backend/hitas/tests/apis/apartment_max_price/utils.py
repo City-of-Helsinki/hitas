@@ -33,11 +33,3 @@ def create_necessary_indices(completion_month: datetime.date, calculation_month:
     ConstructionPriceIndex2005Equal100Factory.create(month=calculation_month, value=146.4)
     MarketPriceIndex2005Equal100Factory.create(month=calculation_month, value=189.1)
     SurfaceAreaPriceCeilingFactory.create(month=calculation_month, value=4869)
-
-
-def this_month() -> datetime.date:
-    return monthify(datetime.date.today())
-
-
-def monthify(date: datetime.date) -> datetime.date:
-    return date.replace(day=1)

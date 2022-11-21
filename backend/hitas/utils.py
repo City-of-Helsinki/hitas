@@ -1,3 +1,4 @@
+import datetime
 import operator
 from typing import Any, Optional
 
@@ -22,3 +23,11 @@ def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
 
 class BearerAuthentication(TokenAuthentication):
     keyword = "Bearer"
+
+
+def this_month() -> datetime.date:
+    return monthify(datetime.date.today())
+
+
+def monthify(date: datetime.date) -> datetime.date:
+    return date.replace(day=1)
