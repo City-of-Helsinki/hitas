@@ -14,13 +14,13 @@ from hitas.models import (
     ApartmentMaximumPriceCalculation,
 )
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
-from hitas.tests.apis.apartment_max_price.utils import monthify
 from hitas.tests.factories._base import AbstractImprovementFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     MarketPriceIndex2005Equal100Factory,
     SurfaceAreaPriceCeilingFactory,
 )
+from hitas.utils import monthify
 
 
 class ApartmentFactory(DjangoModelFactory):
