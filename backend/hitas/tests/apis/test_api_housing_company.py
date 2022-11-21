@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 from decimal import Decimal
 from typing import Any
@@ -1021,6 +1022,57 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 1, response.json()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPIClient):
+    ApartmentFactory.create(completion_date=datetime.date(2012, 1, 1))
+    ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
+    apartment_just_before_2011 = ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
+    apartment_2009 = ApartmentFactory.create(completion_date=datetime.date(2009, 1, 1))
+
+    hc_both_old_and_new = HousingCompanyFactory.create()
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc_both_old_and_new,
+        completion_date=datetime.date(2010, 12, 31),
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc_both_old_and_new,
+        completion_date=datetime.date(2011, 1, 1),
+    )
+
+    url = reverse("hitas:housing-company-list") + "?new_hitas=false"
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 3, response.json()
+    assert response.json()["contents"][0]["id"] == apartment_just_before_2011.housing_company.uuid.hex
+    assert response.json()["contents"][1]["id"] == apartment_2009.housing_company.uuid.hex
+    assert response.json()["contents"][2]["id"] == hc_both_old_and_new.uuid.hex
+
+
+@pytest.mark.django_db
+def test__api__housing_company__filter__new_hitas__true(api_client: HitasAPIClient):
+    apartment_2012 = ApartmentFactory.create(completion_date=datetime.date(2012, 1, 1))
+    apartment_2011 = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
+    ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
+    ApartmentFactory.create(completion_date=datetime.date(2009, 1, 1))
+
+    hc_both_old_and_new = HousingCompanyFactory.create()
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc_both_old_and_new,
+        completion_date=datetime.date(2010, 12, 31),
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc_both_old_and_new,
+        completion_date=datetime.date(2011, 1, 1),
+    )
+
+    url = reverse("hitas:housing-company-list") + "?new_hitas=true"
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 2, response.json()
+    assert response.json()["contents"][0]["id"] == apartment_2012.housing_company.uuid.hex
+    assert response.json()["contents"][1]["id"] == apartment_2011.housing_company.uuid.hex
 
 
 @pytest.mark.parametrize(
