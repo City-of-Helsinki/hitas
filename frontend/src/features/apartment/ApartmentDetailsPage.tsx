@@ -92,12 +92,20 @@ const UnconfirmedPriceRow = ({label, unconfirmedPrice}: UnconfirmedPriceRowProps
 
 const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaximumPrice}) => {
     if (confirmed === null) return <p className="confirmed-price">-</p>;
-
     return (
         <>
-            <p className="confirmed-price">{formatMoney(confirmed.maximum_price)}</p>
-            <p>Vahvistettu: {formatDate(confirmed.confirmed_at.split("T")[0])}</p>
-            <p>Voimassa: {formatDate(confirmed.valid.valid_until)} asti</p>
+            <div className="confirmed-price">{formatMoney(confirmed.maximum_price)}</div>
+            <div className="confirmed-price__date">Vahvistettu: {formatDate(confirmed.confirmed_at.split("T")[0])}</div>
+            <div className="confirmed-price__date">
+                Voimassa:{" "}
+                {new Date() <= new Date(confirmed.valid.valid_until) ? (
+                    `${formatDate(confirmed.valid.valid_until)} asti`
+                ) : (
+                    <span>
+                        <span className="invalid">{formatDate(confirmed.valid.valid_until)} - ei voimassa</span>
+                    </span>
+                )}
+            </div>
         </>
     );
 };
