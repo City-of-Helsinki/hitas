@@ -97,6 +97,9 @@
         </tr>
     </table>
 
+    <pdf:nexttemplate name="template_attachment_1" />
+    <pdf:nextpage />
+
     {% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
         {% set calculation = maximum_price_calculation.json.calculations.market_price_index %}
         {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}

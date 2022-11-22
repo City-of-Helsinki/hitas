@@ -6,19 +6,28 @@
     <style>
         @page {
             size: A4 portrait;
-            @frame header_frame_1 {
-                -pdf-frame-content: header_content_1;
-                left: 50pt; width: 225pt; top: 50pt; height: 40pt;
-            }
-            @frame header_frame_2 {
-                -pdf-frame-content: header_content_2;
-                left: 325pt; width: 225pt; top: 50pt; height: 40pt;
-            }
+            @frame h_date {-pdf-frame-content: header_date; left: 325pt; width: 100pt; top: 50pt; height: 40pt;}
+            @frame content_frame {left: 50pt; width: 512pt; top: 90pt; height: 632pt;}
+            @frame footer {-pdf-frame-content: footer; left: 50pt; width: 500pt; top: 770pt; height: 50pt;}
+        }
+        @page template_attachment_1 {
+            size: A4 portrait;
+            @frame h_page_1 {-pdf-frame-content: header_page_1; left: 450pt; width: 100pt; top: 50pt; height: 40pt;}
+            @frame h_date {-pdf-frame-content: header_date; left: 325pt; width: 100pt; top: 50pt; height: 40pt;}
+            @frame content_frame {left: 50pt; width: 512pt; top: 90pt; height: 632pt;}
+            @frame footer {-pdf-frame-content: footer; left: 50pt; width: 500pt; top: 770pt; height: 50pt;}
+        }
+        @page template_attachment_2 {
+            size: A4 portrait;
+            @frame h_page_2 {-pdf-frame-content: header_page_2; left: 450pt; width: 100pt; top: 50pt; height: 40pt;}
+            @frame h_date {-pdf-frame-content: header_date; left: 325pt; width: 100pt; top: 50pt; height: 40pt;}
             @frame content_frame {left: 50pt; width: 512pt; top: 90pt; height: 632pt;}
             @frame footer {-pdf-frame-content: footer; left: 50pt; width: 500pt; top: 770pt; height: 50pt;}
         }
         body {font-size: 9.5pt;}
         .static-footer {font-size: 7pt; width: 500px;}
+        #header_page_1 {text-align: right;}
+        #header_page_2 {text-align: right;}
     </style>
     {% block style %}
     {% endblock %}
@@ -27,10 +36,9 @@
 <body>
 
 {% block header %}
-    <div id="header_content_1"></div>
-    <div id="header_content_2">
-        {{ date_today }}
-    </div>
+    <div id="header_date">{{ date_today }}</div>
+    <div id="header_page_1">Liite 1</div>
+    <div id="header_page_2">Liite 2</div>
 {% endblock %}
 
 
