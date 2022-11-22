@@ -8,7 +8,6 @@ from django.db.models import Prefetch, Sum
 from django.utils import timezone
 
 from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
-from hitas.calculations.helpers import roundup
 from hitas.calculations.improvement import (
     ImprovementCalculationResult,
     ImprovementData,
@@ -127,12 +126,12 @@ def calculate_max_price(
         calculation_date,
     )
     surface_area_price_ceiling = {
-        "maximum_price": roundup(apartment.surface_area_price_ceiling),
+        "maximum_price": apartment.surface_area_price_ceiling,
         "valid_until": surface_area_price_ceiling_validity(calculation_date),
         "calculation_variables": {
             "calculation_date": calculation_date,
-            "calculation_date_value": roundup(apartment.surface_area_price_ceiling_m2),
-            "surface_area": roundup(apartment.surface_area),
+            "calculation_date_value": apartment.surface_area_price_ceiling_m2,
+            "surface_area": apartment.surface_area,
         },
     }
 
@@ -192,7 +191,7 @@ def calculate_max_price(
                 "city": apartment.postal_code.city,
             },
             "ownerships": [
-                {"percentage": roundup(ownership.percentage), "name": ownership.owner.name}
+                {"percentage": ownership.percentage, "name": ownership.owner.name}
                 for ownership in apartment.ownerships.all()
             ],
         },
@@ -376,19 +375,19 @@ def calculate_index(
             "acquisition_price": apartment.acquisition_price,
             "additional_work_during_construction": apartment.additional_work_during_construction,
             "basic_price": basic_price,
-            "index_adjustment": roundup(index_adjustment),
+            "index_adjustment": index_adjustment,
             "apartment_improvements": None,
             "housing_company_improvements": improvement_result_to_json(hc_improvements_result),
-            "debt_free_price": roundup(debt_free_shares_price),
-            "debt_free_price_m2": roundup(debt_free_shares_price / apartment.surface_area),
-            "apartment_share_of_housing_company_loans": roundup(apartment_share_of_housing_company_loans),
+            "debt_free_price": debt_free_shares_price,
+            "debt_free_price_m2": debt_free_shares_price / apartment.surface_area,
+            "apartment_share_of_housing_company_loans": apartment_share_of_housing_company_loans,
             "apartment_share_of_housing_company_loans_date": apartment_share_of_housing_company_loans_date,
             "completion_date": apartment.completion_date,
-            "completion_date_index": roundup(completion_date_index),
+            "completion_date_index": completion_date_index,
             "calculation_date": calculation_date,
-            "calculation_date_index": roundup(calculation_date_index),
+            "calculation_date_index": calculation_date_index,
         },
-        "maximum_price": roundup(max_price),
+        "maximum_price": max_price,
         "valid_until": calculation_date + relativedelta(months=3),
     }
 
@@ -418,7 +417,7 @@ def improvement_to_json(result: ImprovementCalculationResult) -> dict[str, any]:
         "name": result.name,
         "value": result.value,
         "completion_date": result.completion_date.strftime("%Y-%m"),
-        "value_added": roundup(result.value_added),
+        "value_added": result.value_added,
         "depreciation": (
             {
                 "amount": result.depreciation.amount,
@@ -430,8 +429,8 @@ def improvement_to_json(result: ImprovementCalculationResult) -> dict[str, any]:
             if result.depreciation
             else None
         ),
-        "value_for_housing_company": roundup(result.improvement_value_for_housing_company),
-        "value_for_apartment": roundup(result.improvement_value_for_apartment),
+        "value_for_housing_company": result.improvement_value_for_housing_company,
+        "value_for_apartment": result.improvement_value_for_apartment,
     }
 
 
@@ -440,14 +439,14 @@ def improvement_result_to_json(result: ImprovementsResult) -> dict[str, any]:
         "items": list(map(improvement_to_json, result.items)),
         "summary": {
             "value": result.summary.value,
-            "value_added": roundup(result.summary.value_added),
+            "value_added": result.summary.value_added,
             "excess": {
                 "surface_area": result.summary.excess.surface_area,
                 "value_per_square_meter": result.summary.excess.value_per_square_meter,
-                "total": roundup(result.summary.excess.total),
+                "total": result.summary.excess.total,
             },
-            "depreciation": roundup(result.summary.depreciation),
-            "value_for_housing_company": roundup(result.summary.improvement_value_for_housing_company),
-            "value_for_apartment": roundup(result.summary.improvement_value_for_apartment),
+            "depreciation": result.summary.depreciation,
+            "value_for_housing_company": result.summary.improvement_value_for_housing_company,
+            "value_for_apartment": result.summary.improvement_value_for_apartment,
         },
     }

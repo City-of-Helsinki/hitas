@@ -6,12 +6,12 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
-from rest_framework.utils.encoders import JSONEncoder
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
 from hitas.models.housing_company import HousingCompany
 from hitas.models.postal_code import HitasPostalCode
+from hitas.types import HitasEncoder
 
 
 class ApartmentState(Enum):
@@ -172,14 +172,14 @@ class ApartmentMaximumPriceCalculation(models.Model):
 
     maximum_price = HitasModelDecimalField(validators=[MinValueValidator(0)])
 
-    json = models.JSONField(encoder=JSONEncoder, null=True)
+    json = models.JSONField(encoder=HitasEncoder, null=True)
 
     # `CURRENT_JSON_VERSION` can be used to determinate changes in JSON structure in `json` field. This is useful now
     # when we're constantly changing the json version during the development. When JSON format changes during the
     # development, we don't want to be supporting the old versions. Updating this field will hide all old calculations
     # and thus hiding the old formats. When we are ready to go to production, we should change this back to 1. After
     # this can be useful for doing database migrations.
-    CURRENT_JSON_VERSION = 3
+    CURRENT_JSON_VERSION = 4
     json_version = models.SmallIntegerField(default=CURRENT_JSON_VERSION, validators=[MinValueValidator(1)], null=True)
 
     class Meta:

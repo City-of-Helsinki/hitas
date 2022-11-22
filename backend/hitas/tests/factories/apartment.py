@@ -5,8 +5,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyDate, FuzzyDecimal
 
-from hitas.calculations import calculate_max_price
-from hitas.calculations.max_price import fetch_apartment
+from hitas.calculations.max_price import calculate_max_price, fetch_apartment
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,

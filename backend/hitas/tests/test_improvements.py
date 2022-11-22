@@ -2,12 +2,12 @@ import datetime
 from dataclasses import dataclass
 from decimal import Decimal
 
+from hitas.calculations.helpers import roundup
 from hitas.calculations.improvement import (
     ImprovementData,
     calculate_housing_company_improvements_after_2010,
     calculate_single_housing_company_improvement_after_2010,
 )
-from hitas.calculations.max_price import roundup
 
 
 @dataclass
@@ -34,8 +34,8 @@ def test_calculate_single_housing_company_improvement_after_2010():
     assert result.completion_date == datetime.date(2020, 5, 1)
     assert result.value_added == 20_040
     assert result.depreciation is None
-    assert roundup(result.improvement_value_for_housing_company) == Decimal(22_707.86)
-    assert roundup(result.improvement_value_for_apartment) == Decimal(157.26)
+    assert roundup(result.improvement_value_for_housing_company) == Decimal("22_707.86")
+    assert roundup(result.improvement_value_for_apartment) == Decimal("157.26")
 
 
 def test_calculate_housing_company_improvements_after_2010():
@@ -64,5 +64,5 @@ def test_calculate_housing_company_improvements_after_2010():
     assert result.summary.excess.value_per_square_meter == 30.0
     assert result.summary.excess.surface_area == 4332
     assert result.summary.depreciation is None
-    assert roundup(result.summary.improvement_value_for_housing_company) == Decimal(22_707.86)
-    assert roundup(result.summary.improvement_value_for_apartment) == Decimal(157.26)
+    assert roundup(result.summary.improvement_value_for_housing_company) == Decimal("22_707.86")
+    assert roundup(result.summary.improvement_value_for_apartment) == Decimal("157.26")
