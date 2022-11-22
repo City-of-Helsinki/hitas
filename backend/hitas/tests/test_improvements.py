@@ -21,7 +21,7 @@ def test_calculate_single_housing_company_improvement_after_2010():
     result = calculate_single_housing_company_improvement_after_2010(
         ImprovementData(
             name="Testi",
-            value=150_000,
+            value=Decimal(150_000),
             completion_date=datetime.date(2020, 5, 1),
             completion_date_index=Decimal(129.2),
         ),
@@ -43,7 +43,7 @@ def test_calculate_housing_company_improvements_after_2010():
         improvements=[
             ImprovementData(
                 name="Testi",
-                value=150_000,
+                value=Decimal(150_000),
                 completion_date=datetime.date(2020, 5, 1),
                 completion_date_index=Decimal(129.2),
             )
