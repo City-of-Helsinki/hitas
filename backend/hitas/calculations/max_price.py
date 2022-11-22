@@ -24,6 +24,7 @@ from hitas.models import (
     HousingCompanyMarketPriceImprovement,
     Ownership,
 )
+from hitas.types import Month
 
 
 def create_max_price_calculation(
@@ -416,7 +417,7 @@ def improvement_to_json(result: ImprovementCalculationResult) -> dict[str, any]:
     return {
         "name": result.name,
         "value": result.value,
-        "completion_date": result.completion_date.strftime("%Y-%m"),
+        "completion_date": Month(result.completion_date),
         "value_added": result.value_added,
         "depreciation": (
             {
