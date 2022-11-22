@@ -3263,6 +3263,7 @@ components:
         - acquisition_price
         - additional_work_during_construction
         - basic_price
+        - interest_during_construction
         - index_adjustment
         - apartment_improvements
         - housing_company_improvements
@@ -3283,6 +3284,7 @@ components:
         additional_work_during_construction:
           description: Amount of apartment's additional work done during construction
           type: number
+          nullable: true
           minimum: 0
           example: 0.0
         basic_price:
@@ -3292,6 +3294,13 @@ components:
           type: number
           minimum: 0
           example: 199500.21
+        interest_during_construction:
+          description: |-
+            TBD
+          type: number
+          nullable: true
+          minimum: 0
+          example: 1802.88
         index_adjustment:
           description: |-
             Value increase of the apartment based on the index. Calculated by dividing the
@@ -3397,18 +3406,32 @@ components:
                 nullable: true
                 required:
                   - amount
-                  - time_months
+                  - time
                 properties:
                   amount:
                     description: Amount the value has reduced based on the depreciation calculation.
                     type: number
                     minimum: 0
                     example: 3965.69
-                  time_months:
+                  time:
                     description: Amount of time in months the improvement has depreciated
-                    type: integer
-                    minimum: 0
-                    example: 13
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - years
+                      - months
+                    properties:
+                      years:
+                        description: How many years (in addition to months) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        example: 13
+                      months:
+                        description: How many months (in addition to years) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        maximum: 11
+                        example: 7
               value_for_housing_company:
                 description: Housing company's share of the improvement's value (adjusted to index)
                 type: number

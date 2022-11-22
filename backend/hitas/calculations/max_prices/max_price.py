@@ -232,19 +232,45 @@ def fetch_apartment(
             ),
             Prefetch(
                 "construction_price_improvements",
-                ApartmentConstructionPriceImprovement.objects.only("value", "apartment_id", "depreciation_percentage"),
+                ApartmentConstructionPriceImprovement.objects.only(
+                    "value", "apartment_id", "depreciation_percentage"
+                ).extra(
+                    select={
+                        "completion_date_index": """
+    SELECT completion_date_index.value
+    FROM hitas_constructionpriceindex AS completion_date_index
+    WHERE completion_date_index.month
+         = DATE_TRUNC('month', hitas_apartmentconstructionpriceimprovement.completion_date)
+    """,
+                    },
+                ),
             ),
             Prefetch(
                 "market_price_improvements",
-                ApartmentMarketPriceImprovement.objects.only("value", "apartment_id"),
+                ApartmentMarketPriceImprovement.objects.only("value", "apartment_id").extra(
+                    select={
+                        "completion_date_index": """
+    SELECT completion_date_index.value
+    FROM hitas_marketpriceindex AS completion_date_index
+    WHERE completion_date_index.month
+         = DATE_TRUNC('month', hitas_apartmentmarketpriceimprovement.completion_date)
+    """,
+                    },
+                ),
             ),
             Prefetch(
                 "building__real_estate__housing_company__construction_price_improvements",
                 HousingCompanyConstructionPriceImprovement.objects.only("value", "housing_company_id",).extra(
                     select={
-                        "completion_date_index": """
+                        "completion_date_index_2005eq100": """
     SELECT completion_date_index.value
     FROM hitas_constructionpriceindex2005equal100 AS completion_date_index
+    WHERE completion_date_index.month
+         = DATE_TRUNC('month', hitas_housingcompanyconstructionpriceimprovement.completion_date)
+    """,
+                        "completion_date_index": """
+    SELECT completion_date_index.value
+    FROM hitas_constructionpriceindex AS completion_date_index
     WHERE completion_date_index.month
          = DATE_TRUNC('month', hitas_housingcompanyconstructionpriceimprovement.completion_date)
     """,
@@ -255,9 +281,15 @@ def fetch_apartment(
                 "building__real_estate__housing_company__market_price_improvements",
                 HousingCompanyMarketPriceImprovement.objects.only("value", "housing_company_id",).extra(
                     select={
-                        "completion_date_index": """
+                        "completion_date_index_2005eq100": """
     SELECT completion_date_index.value
     FROM hitas_marketpriceindex2005equal100 AS completion_date_index
+    WHERE completion_date_index.month
+         = DATE_TRUNC('month', hitas_housingcompanymarketpriceimprovement.completion_date)
+    """,
+                        "completion_date_index": """
+    SELECT completion_date_index.value
+    FROM hitas_marketpriceindex AS completion_date_index
     WHERE completion_date_index.month
          = DATE_TRUNC('month', hitas_housingcompanymarketpriceimprovement.completion_date)
     """,
@@ -267,10 +299,22 @@ def fetch_apartment(
         )
         .extra(
             select={
+                "calculation_date_cpi": """
+SELECT calculation_date_index.value
+FROM hitas_constructionpriceindex AS calculation_date_index
+WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
+""",
                 "calculation_date_cpi_2005eq100": """
 SELECT calculation_date_index.value
 FROM hitas_constructionpriceindex2005equal100 AS calculation_date_index
 WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
+""",
+                "completion_date_cpi": """
+SELECT completion_date_index.value
+FROM hitas_apartment AS a
+LEFT JOIN hitas_constructionpriceindex AS completion_date_index ON
+    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
+WHERE a.id = hitas_apartment.id
 """,
                 "completion_date_cpi_2005eq100": """
 SELECT completion_date_index.value
@@ -279,10 +323,22 @@ LEFT JOIN hitas_constructionpriceindex2005equal100 AS completion_date_index ON
     completion_date_index.month = DATE_TRUNC('month', a.completion_date)
 WHERE a.id = hitas_apartment.id
 """,
+                "calculation_date_mpi": """
+SELECT calculation_date_index.value
+FROM hitas_marketpriceindex AS calculation_date_index
+WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
+""",
                 "calculation_date_mpi_2005eq100": """
 SELECT calculation_date_index.value
 FROM hitas_marketpriceindex2005equal100 AS calculation_date_index
 WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
+""",
+                "completion_date_mpi": """
+SELECT completion_date_index.value
+FROM hitas_apartment AS a
+LEFT JOIN hitas_marketpriceindex AS completion_date_index ON
+    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
+WHERE a.id = hitas_apartment.id
 """,
                 "completion_date_mpi_2005eq100": """
 SELECT completion_date_index.value
@@ -304,7 +360,7 @@ WHERE a.id = hitas_apartment.id
     WHERE month = DATE_TRUNC('month', %s)
 """,
             },
-            select_params=(calculation_date, calculation_date, calculation_date, calculation_date),
+            select_params=[calculation_date] * 6,
         )
         .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
     )

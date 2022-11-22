@@ -90,7 +90,7 @@ class Rules2011Onwards(CalculatorRules):
                     name=i.name,
                     value=i.value,
                     completion_date=i.completion_date,
-                    completion_date_index=i.completion_date_index,
+                    completion_date_index=i.completion_date_index_2005eq100,
                 )
                 for i in housing_company_improvements
             ],
@@ -116,6 +116,7 @@ class Rules2011Onwards(CalculatorRules):
             calculation_variables=IndexCalculation.CalculationVars(
                 acquisition_price=apartment.acquisition_price,
                 additional_work_during_construction=apartment.additional_work_during_construction,
+                interest_during_construction=None,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=None,
