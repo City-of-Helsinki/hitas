@@ -1,6 +1,7 @@
 from hitas.oracle_migration.oracle_schema.codes import codebooks, codes
 from hitas.oracle_migration.oracle_schema.company import (
     apartment_ownerships,
+    apartment_payments,
     apartments,
     companies,
     company_addresses,

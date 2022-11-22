@@ -41,7 +41,7 @@ companies = Table(
     Column("N_HANKARVO2", Integer, key="realized_acquisition_price", nullable=False),
     Column("N_ENSISIJLA1", Integer, key="primary_loan", nullable=False),
     Column("N_ENSISIJLA2", Integer, nullable=False),
-    Column("N_RAKKORKO", Float, nullable=False),
+    Column("N_RAKKORKO", Float, key="construction_time_interest_rate", nullable=False),
     Column("N_VIIVKORKO1", Float, nullable=False),  # Always 0
     Column("N_VIIVKORKO2", Float, nullable=False),  # Always 0
     Column("D_MHLVAHPVM", HitasAnonymizedMonthAndDay, key="sales_price_catalogue_confirmation_date"),
@@ -180,6 +180,17 @@ apartment_ownerships = Table(
     Column("C_SOTU", HitasAnonymizedSSN(11), key="social_security_number"),
     Column("C_OMNIMIUPPER", String(50)),
     Column("N_PROSENTTIOSUUS", Float, key="percentage"),
+    Column("C_MUUTTAJA", String(10), nullable=False),
+    Column("D_MUUTETTU", Date, nullable=False),
+)
+
+apartment_payments = Table(
+    "HITMAKSUERA",
+    metadata_obj,
+    Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), primary_key=True, key="apartment_id", nullable=False),
+    Column("KG_MTUNNUS", Integer, primary_key=True, nullable=False),
+    Column("N_MAKSUERA", Integer, key="percentage", nullable=False),
+    Column("D_MAKSUERAPVM", Date, key="date", nullable=False),
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )
