@@ -213,7 +213,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
         debt_free_purchase_price=80000.1,
-        primary_loan_amount=20000.2,
+        primary_loan_amount=15000.3,
+        additional_work_during_construction=4999.9,
         surface_area=50.5,
     )
     hc: HousingCompany = ap.housing_company
@@ -266,7 +267,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         "prices": {
             "debt_free_purchase_price": float(ap.debt_free_purchase_price),
             "primary_loan_amount": float(ap.primary_loan_amount),
-            "acquisition_price": float(ap.debt_free_purchase_price + ap.primary_loan_amount),
+            "acquisition_price": round(float(ap.debt_free_purchase_price + ap.primary_loan_amount), 2),
             "purchase_price": float(ap.purchase_price),
             "first_purchase_date": ap.first_purchase_date.strftime("%Y-%m-%d"),
             "latest_purchase_date": ap.latest_purchase_date.strftime("%Y-%m-%d"),
@@ -292,11 +293,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "pre_2011": None,
                     "onwards_2011": {
                         "construction_price_index": {
-                            "value": 149751.69,  # (80000.1 + 20000.2) * 150.5/100.5
+                            "value": 149751.69,  # (80000.1 + 15000.3 + 4999.9) * 150.5/100.5
                             "maximum": False,
                         },
                         "market_price_index": {
-                            "value": 124938.03,  # (80000.1 + 20000.2) * 250/200
+                            "value": 124938.03,  # (80000.1 + 15000.3 + 4999.9) * 250/200
                             "maximum": False,
                         },
                         "surface_area_price_ceiling": {
@@ -367,12 +368,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
-    )
+    ap: Apartment = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap, json=None, json_version=None
     )
@@ -402,9 +398,6 @@ def test__api__apartment__retrieve__migrated_max_price(api_client: HitasAPIClien
 def test__api__apartment__retrieve__confirmed_old_json_version(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
     )
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap, json_version=1
@@ -435,9 +428,6 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
 def test__api__apartment__retrieve__migrated_max_price__multiple_same_time(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000,
-        primary_loan_amount=20000,
-        surface_area=50,
     )
     ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         apartment=ap,
@@ -488,7 +478,8 @@ def _test_max_prices(
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
         debt_free_purchase_price=80000 if not null_values else None,
-        primary_loan_amount=20000 if not null_values else None,
+        primary_loan_amount=15000 if not null_values else None,
+        additional_work_during_construction=5000 if not null_values else None,
         surface_area=50 if not null_values else None,
     )
 
