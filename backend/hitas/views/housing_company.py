@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from django.db.models import F, Min, Prefetch, Sum
 from django.db.models.functions import Round
+from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -46,10 +47,29 @@ class HousingCompanyFilterSet(HitasFilterSet):
     property_manager = HitasCharFilter(field_name="property_manager__name", lookup_expr="icontains")
     developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
     archive_id = HitasNumberFilter(field_name="id", min_value=1)
+    new_hitas = BooleanFilter(method="new_hitas_filter")
+
+    def new_hitas_filter(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        cutoff_date = datetime.date(2011, 1, 1)
+        if value:
+            return queryset.filter(date__gte=cutoff_date)
+        else:
+            return queryset.filter(date__lt=cutoff_date)
 
     class Meta:
         model = HousingCompany
-        fields = ["display_name", "street_address", "postal_code", "property_manager", "developer", "archive_id"]
+        fields = [
+            "display_name",
+            "street_address",
+            "postal_code",
+            "property_manager",
+            "developer",
+            "archive_id",
+            "new_hitas",
+        ]
 
 
 class HousingCompanyNameSerializer(serializers.Serializer):

@@ -61,6 +61,16 @@ paths:
             type: number
             minimum: 1
             example: 421
+        - name: new_hitas
+          description: |-
+            Search housing companies by completion date. When this parameter is given and is set
+            to `true` then only housing companies completed `2011-01-01` onwards are returned. When
+            this parameter is given and set to `false` then only housing companies completed before
+            `2011-01-01` are returned.
+          required: false
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: Successfully fetched list of housing companies
