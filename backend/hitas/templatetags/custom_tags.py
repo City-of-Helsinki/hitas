@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Union
 
@@ -8,7 +8,7 @@ from num2words import num2words
 
 
 @django_jinja.library.filter
-def format_date(value: Union[str, datetime.date]) -> str:
+def format_date(value: Union[str, datetime]) -> str:
     if type(value) == str:
         value = datetime.strptime(value, "%Y-%m-%d")
 
@@ -27,3 +27,10 @@ def intcomma(value) -> str:
 @django_jinja.library.filter
 def wordify(value: int) -> str:
     return num2words(value, lang="fi")
+
+
+@django_jinja.library.filter
+def is_date_pre_2011(value: Union[str, datetime.date]) -> bool:
+    if type(value) == str:
+        value = datetime.strptime(value, "%Y-%m-%d")
+    return value < date(2011, 1, 1)

@@ -6,25 +6,47 @@
             width: 210px;
         }
 
-        p {
+        .plain-text {
             margin-left: 150px;
         }
 
         .bordered-header {
+            border-style: solid;
+            border-color: black;
             border-left: 2px;
             border-top: 2px;
             border-right: 4px;
             border-bottom: 4px;
-            border-style: solid;
-            border-color: black;
+        }
+        h2.bordered-header {
             text-align: center;
             padding-top: 10px;
             padding-bottom: -5px;
+            margin-left: 125px;
+            margin-right: 125px;
+            margin-bottom: 50px
+        }
+        h3.bordered-header {
+            text-align: left;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: -5px;
+            margin-right: 250px;
+            margin-bottom: 30px
         }
 
         .text-right {
             text-align: right;
             vertical-align: top;
+        }
+
+        .improvement-cell {
+            padding-right: 2px;
+            padding-top: 3px;
+        }
+        .improvement-column {
+            text-align: center;
+            vertical-align: bottom;
         }
     </style>
 {% endblock %}
@@ -33,6 +55,7 @@
 
 {% block content %}
     {% set apartment = maximum_price_calculation.apartment %}
+    {% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
 
     <h3>Helsingin kaupunki</h3>
     <h3>
@@ -69,20 +92,16 @@
 
     <br>
 
-    <p>
+    <p class="plain-text">
         Huoneiston vahvistettu enimmäismyyntihinta on
         {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma }})
         euroa. Enimmäismyyntihinta on voimassa kolme kuukautta laskelman päiväyksestä.
     </p>
-    <p>Jos huoneiston osuus yhtiön lainoista on muuttunut ilmoitetusta määrästä, tulee kaupantekohetkellä huoneistolle
-       kuuluva osuus ottaa huomioon siten, ettei enimmäishintalaskelmassa (liite 1) mainittu osakkeiden velaton hinta
-       ylity.</p>
-    <p>Enimmäishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi
-       julkaistaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1. 11.</p>
-    <p>Kaupungilla on yhtiöjärjestykseen perustuva oikeus lunastaa huoneiston hallintaan oikeuttavat osakkeet kaupan
-       tapahduttua. Hitas-asunto voidaan myydä vain luonnolliselle henkilölle (ei yritykselle).</p>
-    <p>Enimmäishintalaskelma on tulostettu Hitas-rekisteristä ja perustuu huoneiston ja yhtiön tietoihin.</p>
-    <p>Lisätiedot: Maija Meikäläinen, suunnittelija, puhelin 310 00000</p>
+    <p class="plain-text">Jos huoneiston osuus yhtiön lainoista on muuttunut ilmoitetusta määrästä, tulee kaupantekohetkellä huoneistolle kuuluva osuus ottaa huomioon siten, ettei enimmäishintalaskelmassa (liite 1) mainittu osakkeiden velaton hinta ylity.</p>
+    <p class="plain-text">Enimmäishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi julkaistaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1. 11.</p>
+    <p class="plain-text">Kaupungilla on yhtiöjärjestykseen perustuva oikeus lunastaa huoneiston hallintaan oikeuttavat osakkeet kaupan tapahduttua. Hitas-asunto voidaan myydä vain luonnolliselle henkilölle (ei yritykselle).</p>
+    <p class="plain-text">Enimmäishintalaskelma on tulostettu Hitas-rekisteristä ja perustuu huoneiston ja yhtiön tietoihin.</p>
+    <p class="plain-text">Lisätiedot: Maija Meikäläinen, suunnittelija, puhelin 310 00000</p>
 
     <br>
     <br>
@@ -103,9 +122,11 @@
     {% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
         {% set calculation = maximum_price_calculation.json.calculations.market_price_index %}
         {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}
+        {% set show_improvements = true %}
     {% else %}
         {% set calculation = maximum_price_calculation.json.calculations.construction_price_index %}
         {% set index_name = "RAKENNUSKUSTANNUSINDEKSILLÄ" %}
+        {% set show_improvements = false %}
     {% endif %}
 
 
@@ -199,5 +220,57 @@
             <td class="text-right">{{ calculation.calculation_variables.debt_free_price_m2|intcomma }}</td>
         </tr>
     </table>
+
+    {% if is_pre_2011 %}
+        <pdf:nexttemplate name="template_attachment_2" />
+        <pdf:nextpage />
+
+        <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
+        <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
+
+        {# Table max width is 682px #}
+        <table style="font-size: 8pt">
+            <tr style="border-bottom: 1px solid black;">
+                <td class="improvement-cell" style="width: 172px;"><b>Parannus</b></td>
+                <td class="improvement-cell improvement-column" style="width: 60px;"><b>Arvo</b></td>
+                <td class="improvement-cell improvement-column" style="width: 80px;"><b>Valmistunut</b></td>
+                <td class="improvement-cell improvement-column" style="width: 80px;"><b>Arvoa korot-<br>tava osuus</b></td>
+                <td class="improvement-cell improvement-column" style="width: 70px;"><b>Poistoaika</b></td>
+                <td class="improvement-cell improvement-column" style="width: 60px;"><b>Poiston määrä</b></td>
+                <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty yhtiö</b></td>
+                <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty huoneisto</b></td>
+            </tr>
+            {% for improvement in calculation.calculation_variables.housing_company_improvements["items"] %}
+                <tr style="border-bottom: 1px solid black; padding-top: 2px;">
+                    <td class="improvement-cell">{{ improvement.name }}</td>
+                    <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
+                    <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                    <td class="improvement-cell text-right">{{ improvement.value_added|intcomma }}</td>
+                    <td class="improvement-cell text-right">TODO</td>
+                    <td class="improvement-cell text-right">{{ improvement.depreciation|intcomma }}</td>
+                    <td class="improvement-cell text-right">{{ improvement.value_for_housing_company|intcomma }}</td>
+                    <td class="improvement-cell text-right">{{ improvement.value_for_apartment|intcomma }}</td>
+                </tr>
+            {% endfor %}
+            <tr style="padding-top: 2px;">
+                <td class="improvement-cell"><b>Parannukset yhteensä</b></td>
+                <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value|intcomma }}</b></td>
+                <td></td>
+                <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_added|intcomma }}</b></td>
+                <td></td>
+                <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.depreciation|intcomma }}</b></td>
+                <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_housing_company|intcomma }}</b></td>
+                <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</b></td>
+            </tr>
+        </table>
+
+        <br>
+
+        <p>
+        {% set excess = calculation.calculation_variables.housing_company_improvements.summary.excess %}
+        Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa. Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
+        </p>
+
+    {% endif %}
 
 {% endblock %}
