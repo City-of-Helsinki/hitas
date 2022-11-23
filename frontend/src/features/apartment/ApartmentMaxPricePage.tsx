@@ -21,16 +21,20 @@ import {
     IApartmentDetails,
     IApartmentMaximumPrice,
     IApartmentMaximumPriceWritable,
+    ICalculation,
     IHousingCompanyDetails,
+    IIndexCalculationVariables,
 } from "../../common/models";
 import {formatMoney, hitasToast} from "../../common/utils";
 
-const CalculationRowPrice = ({label, calculation}) => {
-    const maximumBoldedStyle = calculation.maximum ? {fontWeight: 700} : {};
+const CalculationRowPrice = ({label, calculation, hover, active}) => {
     return (
         <div
-            className="confirmation-modal__calculation-row"
-            style={maximumBoldedStyle}
+            className={`confirmation-modal__calculation-row${
+                calculation.maximum ? " confirmation-modal__calculation-row--maximum" : ""
+            }${active ? " active" : ""}`}
+            onMouseEnter={() => hover(calculation)}
+            onMouseLeave={() => hover(calculation.calculations[calculation.index])}
         >
             <label>{label}</label>
             <p>{formatMoney(calculation.maximum_price)}</p>
@@ -47,6 +51,9 @@ const MaximumPriceModalContent = ({
     apartment: IApartmentDetails;
     setIsModalVisible;
 }) => {
+    const [highlightedIndex, setHighlightedIndex] = useState<ICalculation & IIndexCalculationVariables>(
+        calculation.calculations[calculation.index]
+    );
     const navigate = useNavigate();
     const [confirmMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
@@ -59,33 +66,97 @@ const MaximumPriceModalContent = ({
         });
         setIsModalVisible(true);
     };
-
     useEffect(() => {
         if (!isLoading && !error && data && data.confirmed_at) {
             hitasToast("Enimmäishinta vahvistettu!");
             navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         }
     }, [apartment, data, error, isLoading, navigate]);
-
+    const BreakdownValue = ({label, value}: {label: string; value?}) => (
+        <div className="confirmation-modal__breakdown-row">
+            <label>{label}</label>
+            <p>{(value && value.toString() + " €") || "0 €"}</p>
+        </div>
+    );
+    const handleIndexHover = (index) => {
+        setHighlightedIndex(index);
+    };
     return (
         <>
             <Dialog.Content>
-                <div>
-                    <CalculationRowPrice
-                        label="Markkinahintaindeksi"
-                        calculation={calculation.calculations.market_price_index}
-                    />
-                    <CalculationRowPrice
-                        label="Rakennushintaindeksi"
-                        calculation={calculation.calculations.construction_price_index}
-                    />
-                    <CalculationRowPrice
-                        label="Rajaneliöhinta"
-                        calculation={calculation.calculations.surface_area_price_ceiling}
-                    />
+                <div className="dialog-content">
                     <div>
-                        <p>Laskelman voimassaoloaika</p>
-                        <p>{calculation.valid_until}</p>
+                        <CalculationRowPrice
+                            label="Markkinahintaindeksi"
+                            calculation={calculation.calculations.market_price_index}
+                            hover={handleIndexHover}
+                            active={calculation.calculations[calculation.index] === "market_price_index"}
+                        />
+                        <CalculationRowPrice
+                            label="Rakennushintaindeksi"
+                            calculation={calculation.calculations.construction_price_index}
+                            hover={handleIndexHover}
+                            active={calculation.calculations[calculation.index] === "market_price_index"}
+                        />
+                        <CalculationRowPrice
+                            label="Rajaneliöhinta"
+                            calculation={calculation.calculations.surface_area_price_ceiling}
+                            hover={handleIndexHover}
+                            active={calculation.calculations[calculation.index] === "market_price_index"}
+                        />
+                        <div>
+                            <p>Laskelman voimassaoloaika</p>
+                            <p>{calculation.valid_until}</p>
+                        </div>
+                    </div>
+                    <div className="confirmation-modal__breakdown">
+                        <BreakdownValue
+                            label="Hankinta-arvo"
+                            value={highlightedIndex.calculation_variables.acquisition_price}
+                        />
+                        <BreakdownValue
+                            label="+ Rakennusaikaiset lisä- ja muutostyöt"
+                            value={highlightedIndex.calculation_variables.additional_work_during_construction}
+                        />
+                        <BreakdownValue
+                            label="= Perushinta"
+                            value={highlightedIndex.calculation_variables.basic_price}
+                        />
+                        <BreakdownValue
+                            label="+ Indeksin muutos"
+                            value={highlightedIndex.calculation_variables.index_adjustment}
+                        />
+                        <BreakdownValue
+                            label="+ Huoneistokohtaiset parannukset"
+                            value={highlightedIndex.calculation_variables.housing_company_improvements?.summary.value}
+                        />
+                        <BreakdownValue
+                            label="+ Osuus yhtiön parannuksista"
+                            value={
+                                highlightedIndex.calculation_variables.housing_company_improvements?.summary
+                                    .value_for_apartment
+                            }
+                        />
+                        <BreakdownValue
+                            label="= Osakkeiden velaton hinta"
+                            value={highlightedIndex.calculation_variables.debt_free_price}
+                        />
+                        <BreakdownValue
+                            label="+ Huoneistokohtaiset vähennykset"
+                            value={highlightedIndex.calculation_variables.debt_free_price_m2}
+                        />
+                        <BreakdownValue
+                            label={`- Osuus yhtiön lainoista ${calculation.calculations.construction_price_index.calculation_variables.calculation_date}`}
+                            value={highlightedIndex.calculation_variables.apartment_share_of_housing_company_loans}
+                        />
+                        <BreakdownValue
+                            label="= Enimmäismyyntihinta"
+                            value={highlightedIndex.maximum_price}
+                        />
+                        <BreakdownValue
+                            label="Velaton hinta euroa/m²"
+                            value={highlightedIndex.calculation_variables.debt_free_price_m2}
+                        />
                     </div>
                 </div>
             </Dialog.Content>

@@ -279,20 +279,25 @@ export interface IApartmentWritable {
 
 // //  Maximum Price Fields
 
-interface ICalculation {
+export interface ICalculation {
     maximum_price: number;
     valid_until: string;
     maximum: boolean;
 }
 
-interface IIndexCalculationVariables {
+export interface IIndexCalculationVariables {
     calculation_variables: {
         acquisition_price: number;
         additional_work_during_construction: number;
         basic_price: number;
         index_adjustment: number;
         apartment_improvements: number;
-        housing_company_improvements: number;
+        housing_company_improvements: {
+            summary: {
+                value: number;
+                value_for_apartment: number;
+            };
+        };
         debt_free_price: number;
         debt_free_price_m2: number;
         apartment_share_of_housing_company_loans: number;
