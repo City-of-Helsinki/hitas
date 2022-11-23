@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from typing import Union
 
 import django_jinja.library
@@ -18,7 +19,9 @@ def format_date(value: Union[str, datetime.date]) -> str:
 
 @django_jinja.library.filter
 def intcomma(value) -> str:
-    return humanize_intcomma(value)
+    if not value:
+        return "0"
+    return humanize_intcomma(Decimal(str(value)).normalize())
 
 
 @django_jinja.library.filter
