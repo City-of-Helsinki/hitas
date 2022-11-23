@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
+import {Button, Dialog, Fieldset, IconCheck, Tabs} from "hds-react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
@@ -21,20 +21,16 @@ import {
     IApartmentDetails,
     IApartmentMaximumPrice,
     IApartmentMaximumPriceWritable,
-    ICalculation,
     IHousingCompanyDetails,
-    IIndexCalculationVariables,
 } from "../../common/models";
 import {formatMoney, hitasToast} from "../../common/utils";
 
-const CalculationRowPrice = ({label, calculation, hover, active}) => {
+const CalculationRowPrice = ({label, calculation}) => {
     return (
         <div
             className={`confirmation-modal__calculation-row${
                 calculation.maximum ? " confirmation-modal__calculation-row--maximum" : ""
-            }${active ? " active" : ""}`}
-            onMouseEnter={() => hover(calculation)}
-            onMouseLeave={() => hover(calculation.calculations[calculation.index])}
+            }`}
         >
             <label>{label}</label>
             <p>{formatMoney(calculation.maximum_price)}</p>
@@ -51,12 +47,20 @@ const MaximumPriceModalContent = ({
     apartment: IApartmentDetails;
     setIsModalVisible;
 }) => {
-    const [highlightedIndex, setHighlightedIndex] = useState<ICalculation & IIndexCalculationVariables>(
-        calculation.calculations[calculation.index]
-    );
     const navigate = useNavigate();
     const [confirmMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
-
+    const initiallyActiveTab = () => {
+        switch (calculation.index) {
+            case "market_price_index":
+                return 0;
+            case "construction_price_index":
+                return 1;
+            case "surface_area_price_ceiling":
+                return 2;
+            default:
+                return 0;
+        }
+    };
     const handleConfirmButton = () => {
         confirmMaximumPrice({
             data: {confirm: true},
@@ -72,92 +76,193 @@ const MaximumPriceModalContent = ({
             navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         }
     }, [apartment, data, error, isLoading, navigate]);
-    const BreakdownValue = ({label, value}: {label: string; value?}) => (
+    const BreakdownValue = ({label, value, unit = "€"}: {label: string; value?: number | string; unit?: string}) => (
         <div className="confirmation-modal__breakdown-row">
             <label>{label}</label>
-            <p>{(value && value.toString() + " €") || "0 €"}</p>
+            <p>{`${(value && value.toString()) || "0"} ${unit}`}</p>
         </div>
     );
-    const handleIndexHover = (index) => {
-        setHighlightedIndex(index);
-    };
+
     return (
         <>
             <Dialog.Content>
-                <div className="dialog-content">
-                    <div>
-                        <CalculationRowPrice
-                            label="Markkinahintaindeksi"
-                            calculation={calculation.calculations.market_price_index}
-                            hover={handleIndexHover}
-                            active={calculation.calculations[calculation.index] === "market_price_index"}
-                        />
-                        <CalculationRowPrice
-                            label="Rakennushintaindeksi"
-                            calculation={calculation.calculations.construction_price_index}
-                            hover={handleIndexHover}
-                            active={calculation.calculations[calculation.index] === "market_price_index"}
-                        />
-                        <CalculationRowPrice
-                            label="Rajaneliöhinta"
-                            calculation={calculation.calculations.surface_area_price_ceiling}
-                            hover={handleIndexHover}
-                            active={calculation.calculations[calculation.index] === "market_price_index"}
-                        />
-                        <div>
-                            <p>Laskelman voimassaoloaika</p>
-                            <p>{calculation.valid_until}</p>
-                        </div>
-                    </div>
-                    <div className="confirmation-modal__breakdown">
+                <Tabs initiallyActiveTab={initiallyActiveTab()}>
+                    <Tabs.TabList>
+                        <Tabs.Tab>
+                            <CalculationRowPrice
+                                label="Markkinahintaindeksi"
+                                calculation={calculation.calculations.market_price_index}
+                            />
+                        </Tabs.Tab>
+                        <Tabs.Tab>
+                            <CalculationRowPrice
+                                label="Rakennushintaindeksi"
+                                calculation={calculation.calculations.construction_price_index}
+                            />
+                        </Tabs.Tab>
+                        <Tabs.Tab>
+                            <CalculationRowPrice
+                                label="Rajaneliöhinta"
+                                calculation={calculation.calculations.surface_area_price_ceiling}
+                            />
+                        </Tabs.Tab>
+                    </Tabs.TabList>
+                    <Tabs.TabPanel className="confirmation-modal__breakdown">
                         <BreakdownValue
                             label="Hankinta-arvo"
-                            value={highlightedIndex.calculation_variables.acquisition_price}
+                            value={calculation.calculations.market_price_index.calculation_variables.acquisition_price}
                         />
                         <BreakdownValue
                             label="+ Rakennusaikaiset lisä- ja muutostyöt"
-                            value={highlightedIndex.calculation_variables.additional_work_during_construction}
+                            value={
+                                calculation.calculations.market_price_index.calculation_variables
+                                    .additional_work_during_construction
+                            }
                         />
                         <BreakdownValue
                             label="= Perushinta"
-                            value={highlightedIndex.calculation_variables.basic_price}
+                            value={calculation.calculations.market_price_index.calculation_variables.basic_price}
                         />
                         <BreakdownValue
                             label="+ Indeksin muutos"
-                            value={highlightedIndex.calculation_variables.index_adjustment}
+                            value={calculation.calculations.market_price_index.calculation_variables.index_adjustment}
                         />
                         <BreakdownValue
                             label="+ Huoneistokohtaiset parannukset"
-                            value={highlightedIndex.calculation_variables.housing_company_improvements?.summary.value}
+                            value={
+                                calculation.calculations.market_price_index.calculation_variables
+                                    .housing_company_improvements?.summary.value
+                            }
                         />
                         <BreakdownValue
                             label="+ Osuus yhtiön parannuksista"
                             value={
-                                highlightedIndex.calculation_variables.housing_company_improvements?.summary
-                                    .value_for_apartment
+                                calculation.calculations.market_price_index.calculation_variables
+                                    .housing_company_improvements?.summary.value_for_apartment
                             }
                         />
                         <BreakdownValue
                             label="= Osakkeiden velaton hinta"
-                            value={highlightedIndex.calculation_variables.debt_free_price}
+                            value={calculation.calculations.market_price_index.calculation_variables.debt_free_price}
                         />
                         <BreakdownValue
                             label="+ Huoneistokohtaiset vähennykset"
-                            value={highlightedIndex.calculation_variables.debt_free_price_m2}
+                            value={calculation.calculations.market_price_index.calculation_variables.debt_free_price_m2}
                         />
                         <BreakdownValue
-                            label={`- Osuus yhtiön lainoista ${calculation.calculations.construction_price_index.calculation_variables.calculation_date}`}
-                            value={highlightedIndex.calculation_variables.apartment_share_of_housing_company_loans}
+                            label={`- Osuus yhtiön lainoista (${calculation.calculations.construction_price_index.calculation_variables.calculation_date})`}
+                            value={
+                                calculation.calculations.market_price_index.calculation_variables
+                                    .apartment_share_of_housing_company_loans
+                            }
                         />
                         <BreakdownValue
                             label="= Enimmäismyyntihinta"
-                            value={highlightedIndex.maximum_price}
+                            value={calculation.calculations.market_price_index.maximum_price}
                         />
                         <BreakdownValue
                             label="Velaton hinta euroa/m²"
-                            value={highlightedIndex.calculation_variables.debt_free_price_m2}
+                            value={calculation.calculations.market_price_index.calculation_variables.debt_free_price_m2}
                         />
-                    </div>
+                    </Tabs.TabPanel>
+                    <Tabs.TabPanel className="confirmation-modal__breakdown">
+                        <BreakdownValue
+                            label="Hankinta-arvo"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .acquisition_price
+                            }
+                        />
+                        <BreakdownValue
+                            label="+ Rakennusaikaiset lisä- ja muutostyöt"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .additional_work_during_construction
+                            }
+                        />
+                        <BreakdownValue
+                            label="= Perushinta"
+                            value={calculation.calculations.construction_price_index.calculation_variables.basic_price}
+                        />
+                        <BreakdownValue
+                            label="+ Indeksin muutos"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables.index_adjustment
+                            }
+                        />
+                        <BreakdownValue
+                            label="+ Huoneistokohtaiset parannukset"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .housing_company_improvements?.summary.value
+                            }
+                        />
+                        <BreakdownValue
+                            label="+ Osuus yhtiön parannuksista"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .housing_company_improvements?.summary.value_for_apartment
+                            }
+                        />
+                        <BreakdownValue
+                            label="= Osakkeiden velaton hinta"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables.debt_free_price
+                            }
+                        />
+                        <BreakdownValue
+                            label="+ Huoneistokohtaiset vähennykset"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .debt_free_price_m2
+                            }
+                        />
+                        <BreakdownValue
+                            label={`- Osuus yhtiön lainoista (${calculation.calculations.construction_price_index.calculation_variables.calculation_date})`}
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .apartment_share_of_housing_company_loans
+                            }
+                        />
+                        <BreakdownValue
+                            label="= Enimmäismyyntihinta"
+                            value={calculation.calculations.construction_price_index.maximum_price}
+                        />
+                        <BreakdownValue
+                            label="Velaton hinta euroa/m²"
+                            value={
+                                calculation.calculations.construction_price_index.calculation_variables
+                                    .debt_free_price_m2
+                            }
+                        />
+                    </Tabs.TabPanel>
+                    <Tabs.TabPanel className="confirmation-modal__breakdown">
+                        <BreakdownValue
+                            label="Asunnon pinta-ala"
+                            value={
+                                calculation.calculations.surface_area_price_ceiling.calculation_variables.surface_area
+                            }
+                            unit="m²"
+                        />
+                        <BreakdownValue
+                            label={`* Rajaneliöhinta (${calculation.calculations.surface_area_price_ceiling.calculation_variables.calculation_date})`}
+                            value={
+                                calculation.calculations.surface_area_price_ceiling.calculation_variables
+                                    .calculation_date_value
+                            }
+                        />
+                        <BreakdownValue
+                            label="= Enimmäishinta"
+                            value={calculation.calculations.surface_area_price_ceiling.maximum_price}
+                        />
+                    </Tabs.TabPanel>
+                </Tabs>
+                <div className="valid-until">
+                    <BreakdownValue
+                        label="Laskelman voimassaoloaika"
+                        value={calculation.valid_until}
+                        unit=""
+                    />
                 </div>
             </Dialog.Content>
             <Dialog.ActionButtons className="align-content-right">
