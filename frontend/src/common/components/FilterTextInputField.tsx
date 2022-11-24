@@ -7,6 +7,8 @@ interface FilterTextInputFieldProps {
     filterFieldName: string;
     filterParams: {string: string | number};
     setFilterParams: (object) => void;
+    minLength?: number;
+    maxLength?: number;
 }
 
 export default function FilterTextInputField({
@@ -14,8 +16,9 @@ export default function FilterTextInputField({
     filterFieldName,
     filterParams,
     setFilterParams,
+    minLength = 3,
+    maxLength,
 }: FilterTextInputFieldProps): JSX.Element {
-    const MIN_LENGTH = 3;
     const [isInvalid, setIsInvalid] = useState(false);
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,18 +26,18 @@ export default function FilterTextInputField({
         const filters = {...filterParams};
 
         // Update filter value or clear it when field is cleared or value is too short
-        if (filters[filterFieldName] && (!value || value.length < MIN_LENGTH)) {
+        if (filters[filterFieldName] && (!value || value.length < minLength)) {
             delete filters[filterFieldName];
             setFilterParams(filters);
             return;
-        } else if (e.target.value.length >= MIN_LENGTH) {
+        } else if (e.target.value.length >= minLength) {
             filters[filterFieldName] = e.target.value;
             setFilterParams(filters);
         }
     };
 
     const handleOnBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value.length && e.target.value.length < MIN_LENGTH) {
+        if (e.target.value.length && e.target.value.length < minLength) {
             setIsInvalid(true);
         }
     };
@@ -47,6 +50,7 @@ export default function FilterTextInputField({
             onBlur={handleOnBlur}
             onFocus={() => setIsInvalid(false)}
             invalid={isInvalid}
+            maxLength={maxLength}
         />
     );
 }
