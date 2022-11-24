@@ -147,16 +147,18 @@
     .row
       border-bottom: 1px solid #CCC
       margin-bottom: 1rem
+      justify-content: space-between
+
+      > div
+        @include flexbox()
 
       .detail-field-
         &label
           padding-top: 0.25rem
-          margin-right: 0.5rem
+          margin-right: 1rem
 
         &value
           font-size: $fontsize-heading-m
-          margin-right: $spacing-layout-m
-          flex-grow: 1
           margin-bottom: 1rem
 
     .columns

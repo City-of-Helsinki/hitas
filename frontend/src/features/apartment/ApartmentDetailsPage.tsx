@@ -284,18 +284,24 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         <Tabs.TabPanel>
                             <div className="company-details__tab basic-details">
                                 <div className="row">
-                                    <DetailField
-                                        label="Kauppakirjahinta"
-                                        value={formatMoney(data.prices.purchase_price)}
-                                    />
-                                    <DetailField
-                                        label="Hankinta-arvo"
-                                        value={formatMoney(data.prices.acquisition_price)}
-                                    />
-                                    <DetailField
-                                        label="Valmistumispäivä"
-                                        value={formatDate(data.completion_date)}
-                                    />
+                                    <div>
+                                        <DetailField
+                                            label="Kauppakirjahinta"
+                                            value={formatMoney(data.prices.purchase_price)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <DetailField
+                                            label="Hankinta-arvo"
+                                            value={formatMoney(data.prices.acquisition_price)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <DetailField
+                                            label="Valmistumispäivä"
+                                            value={formatDate(data.completion_date)}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="columns">
                                     <div className="column">
