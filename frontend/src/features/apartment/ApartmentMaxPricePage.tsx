@@ -259,7 +259,7 @@ const MaximumPriceModalContent = ({
                 </Tabs>
                 <div className="valid-until">
                     <BreakdownValue
-                        label="Laskelman voimassaoloaika"
+                        label="Vahvistettavan laskelman voimassaoloaika"
                         value={calculation.valid_until}
                         unit=""
                     />
