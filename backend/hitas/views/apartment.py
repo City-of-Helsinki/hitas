@@ -209,8 +209,7 @@ class PricesSerializer(serializers.Serializer):
                 "json_version",
             )
             .filter(confirmed_at__isnull=False)
-            .order_by("-confirmed_at")
-            .order_by("-maximum_price")  # migrated calculations have the same datestamp
+            .order_by("-confirmed_at", "-maximum_price")  # migrated calculations have the same datestamp
             .first()
         )
 

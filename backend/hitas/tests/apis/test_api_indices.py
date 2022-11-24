@@ -261,6 +261,29 @@ def test__api__indices__update__too_many_decimal_points(api_client: HitasAPIClie
     }
 
 
+@pytest.mark.parametrize("index,factory", zip(indices, factories))
+@pytest.mark.django_db
+def test__api__indices__update__zero_value(api_client: HitasAPIClient, index, factory):
+    factory.create(month=datetime.date(2022, 1, 1), value=123)
+
+    response = api_client.put(
+        reverse(f"hitas:{index}-detail", kwargs={"month": "2022-01"}), data={"value": 0}, format="json"
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "value",
+                "message": "Ensure this value is greater than or equal to 1.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Delete
 
 
