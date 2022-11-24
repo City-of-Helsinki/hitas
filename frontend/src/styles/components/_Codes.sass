@@ -27,15 +27,13 @@
     grid-column: 2
 
   .filters
-    padding: 0 2rem 0 0
-    grid-row: 1
-    grid-column: 1
+    padding: 0
+    width: 100%
+    @include flexbox()
+    gap: $spacing-m
 
-    .index-actions
-      @include flexbox()
-      justify-content: space-between
-      >:only-child
-        margin: 0 auto
+    > div
+      flex-grow: 1
 
   .listing
     background-color: $codes-background-color

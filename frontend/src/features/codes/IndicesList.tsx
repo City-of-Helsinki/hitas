@@ -4,7 +4,7 @@ import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FormInputField, ListPageNumbers, PageCounter, QueryStateHandler, SaveButton} from "../../common/components";
+import {FilterTextInputField, FormInputField, QueryStateHandler, SaveButton} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -54,10 +54,6 @@ const IndexListItem = ({month, value, editFn}: {month: string; value: number; ed
 const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     return (
         <div className="results">
-            <PageCounter
-                currentPage={currentPage}
-                totalPages={data.page.total_pages}
-            />
             <div className="list-headers">
                 <div className="list-header month">Kuukausi</div>
                 <div className="list-header value">Arvo</div>
@@ -76,10 +72,11 @@ const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     );
 };
 
-const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDialogOpen, indexType}) => {
+const IndexResultList = ({currentPage, setFormData, setCreateDialogOpen, indexType, filterParams}) => {
     const {data, error, isLoading} = useGetIndicesQuery({
         indexType: indexType.label,
         params: {
+            ...filterParams,
             page: currentPage,
             limit: 12,
         },
@@ -103,11 +100,6 @@ const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDia
                     }}
                     currentPage={currentPage}
                 />
-                <ListPageNumbers
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    pageInfo={data?.page}
-                />
             </QueryStateHandler>
         </div>
     );
@@ -121,6 +113,7 @@ const initialSaveData: IIndex = {
 };
 
 const IndicesList = (): JSX.Element => {
+    const [filterParams, setFilterParams] = useState({string: ""});
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useImmer(initialSaveData);
@@ -147,13 +140,21 @@ const IndicesList = (): JSX.Element => {
                         label: getIndexTypeName(indexTypes[0].label),
                     }}
                 />
+                <FilterTextInputField
+                    label="Vuosi"
+                    filterFieldName="year"
+                    filterParams={filterParams}
+                    setFilterParams={setFilterParams}
+                    minLength={4}
+                    maxLength={4}
+                />
             </div>
             <IndexResultList
                 currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
                 setCreateDialogOpen={setIsModalOpen}
+                filterParams={filterParams}
             />
             <div className="index-actions">
                 <Button

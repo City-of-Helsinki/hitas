@@ -459,5 +459,6 @@ export interface IIndexQuery {
     params: {
         page: number;
         limit: number;
+        year: string;
     };
 }
