@@ -109,9 +109,13 @@ REST_FRAMEWORK = {
 if DEBUG:
     # Enable session authentication for browseable API renderer
     REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "hitas.types.HitasJSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ]
 else:
     # Disable browseable API renderer if DEBUG is not set
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",)
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("hitas.types.HitasJSONRenderer",)
 
 TEMPLATES = [
     {

@@ -3,11 +3,11 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Optional
 
 
-def roundup(v: Decimal) -> Optional[float]:
+def roundup(v: Decimal) -> Optional[Decimal]:
     if v is None:
         return None
 
-    return float(v.quantize(Decimal(".00"), ROUND_HALF_UP))
+    return v.quantize(Decimal(".00"), ROUND_HALF_UP)
 
 
 class NoneSum:

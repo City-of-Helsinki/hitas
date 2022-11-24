@@ -108,7 +108,6 @@ class IndexCalc:
 class DepreciationCalc:
     total_months: Optional[int]
     calculation_date: datetime.date
-    percentage: Optional[Decimal]
 
 
 @dataclass
