@@ -12,8 +12,83 @@
     > div
       flex-grow: 1
 
-.confirmation-modal__calculation-row
-  p
-    margin-top: $spacing-xs
-    margin-bottom: $spacing-m
-    font-size: $fontsize-body-l
+#maximum-price-confirmation-modal
+  width: auto !important
+
+  [class*="Tabs-module_tabs"]
+    @include flexbox()
+    gap: 50px
+
+  [class*="Tabs-module_scrollButton"]
+    display: none
+
+  [class*="Tabs-module_tablist"]
+    overflow: visible
+    ul
+      @include flexbox()
+      flex-flow: column nowrap
+      width: auto !important
+      overflow: visible
+      li
+        position: relative
+        height: calc(50px + #{$spacing-xs * 2})
+        padding: $spacing-xs
+        margin-bottom: $spacing-layout-s
+        cursor: pointer
+        background-color: var(--border-color)
+        outline: 0 !important
+        --border-color: transparent
+        &:focus span:after
+          border: none !important
+        span
+          height: 50px
+          padding-left: 0
+          padding-right: 0
+          justify-content: flex-start
+          border-width: 0 !important
+          &:before
+            display: block
+            content: ""
+            width: 0
+            height: 0
+            position: absolute
+            top: -10px
+            right: -49px
+            background-color: transparent
+            border-top: calc(25px + #{$spacing-xs}) solid transparent
+            border-bottom: calc(25px + #{$spacing-xs}) solid transparent
+            border-left: calc(25px + #{$spacing-xs}) solid var(--border-color)
+        label
+          cursor: pointer
+        p
+          margin-top: $spacing-xs
+          margin-bottom: $spacing-m
+          font-size: $fontsize-body-l
+        &[class*="active"]
+          --border-color: #{$color-engel-medium-light}
+        &:not([class*="active"]):hover
+          --border-color: #{$color-engel-light}
+        .confirmation-modal__calculation-row
+          height: 50px
+          &--maximum
+            font-weight: bold
+            p
+              margin-top: 0.25rem
+              font-size: $fontsize-heading-l
+  .valid-until
+    margin-top: $spacing-layout-m
+
+.confirmation-modal__breakdown
+  flex-grow: 1
+  margin-top: $spacing-xs
+  min-height: 466px
+  &-row
+    @include flexbox()
+    justify-content: space-between
+    label
+      min-width: 300px
+    p
+      min-width: 100px
+      margin: 0 0 $spacing-m
+      text-align: right
+      font-weight: bold
