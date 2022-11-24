@@ -8,7 +8,6 @@ import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
 import NavigateBackButton from "./NavigateBackButton";
 import Notifications from "./Notifications";
-import PageCounter from "./PageCounter";
 import QueryStateHandler from "./QueryStateHandler";
 import RemoveButton from "./RemoveButton";
 import SaveButton from "./SaveButton";
@@ -27,7 +26,6 @@ export {
     ListPageNumbers,
     NavigateBackButton,
     Notifications,
-    PageCounter,
     QueryStateHandler,
     RemoveButton,
     SaveButton,

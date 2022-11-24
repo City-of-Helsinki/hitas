@@ -4,14 +4,7 @@ import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {
-    FilterTextInputField,
-    FormInputField,
-    ListPageNumbers,
-    PageCounter,
-    QueryStateHandler,
-    SaveButton,
-} from "../../common/components";
+import {FilterTextInputField, FormInputField, QueryStateHandler, SaveButton} from "../../common/components";
 import {IIndex} from "../../common/models";
 import {hitasToast} from "../../common/utils";
 
@@ -61,10 +54,6 @@ const IndexListItem = ({month, value, editFn}: {month: string; value: number; ed
 const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     return (
         <div className="results">
-            <PageCounter
-                currentPage={currentPage}
-                totalPages={data.page.total_pages}
-            />
             <div className="list-headers">
                 <div className="list-header month">Kuukausi</div>
                 <div className="list-header value">Arvo</div>
@@ -83,7 +72,7 @@ const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     );
 };
 
-const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDialogOpen, indexType, filterParams}) => {
+const IndexResultList = ({currentPage, setFormData, setCreateDialogOpen, indexType, filterParams}) => {
     const {data, error, isLoading} = useGetIndicesQuery({
         indexType: indexType.label,
         params: {
@@ -110,11 +99,6 @@ const IndexResultList = ({currentPage, setCurrentPage, setFormData, setCreateDia
                         setCreateDialogOpen(true);
                     }}
                     currentPage={currentPage}
-                />
-                <ListPageNumbers
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    pageInfo={data?.page}
                 />
             </QueryStateHandler>
         </div>
@@ -167,7 +151,6 @@ const IndicesList = (): JSX.Element => {
             </div>
             <IndexResultList
                 currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
                 setCreateDialogOpen={setIsModalOpen}
