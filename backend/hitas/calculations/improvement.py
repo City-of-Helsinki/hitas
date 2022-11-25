@@ -20,6 +20,10 @@ class ImprovementData:
     completion_date_index: Optional[Decimal] = None
     # Depreciation percentage for this improvement. Not needed for all the calculations.
     deprecation_percentage: Optional[Decimal] = None
+    # When this improvement is apartment improvement constructed before 2011 then it's
+    # possible to mark the improvement as "additional work before construction" which
+    # is treated with it's own rules.
+    treat_as_additional_work: bool = False
 
 
 class Excess(Enum):
@@ -152,6 +156,100 @@ def calculate_single_housing_company_improvement_after_2010(
             total_surface_area=total_surface_area, apartment_surface_area=apartment_surface_area
         ),
     )
+
+
+def calculate_apartment_improvements_pre_2011(
+    improvements: List[ImprovementData],
+    calculation_date: datetime.date,
+    calculation_date_index: Decimal,
+    total_surface_area: Decimal,
+    apartment_surface_area: Decimal,
+) -> ImprovementsResult:
+    def calc_fn(improvement):
+        return calculate_single_apartment_improvement_pre_2011(
+            improvement,
+            calculation_date=calculation_date,
+            calculation_date_index=calculation_date_index,
+            apartment_surface_area=apartment_surface_area,
+        )
+
+    return calculate_multiple_improvements(
+        improvements, calc_fn, total_surface_area, excess_per_square_meter=Excess.BEFORE_2010_APARTMENT
+    )
+
+
+def calculate_single_apartment_improvement_pre_2011(
+    improvement: ImprovementData,
+    calculation_date: datetime.date,
+    calculation_date_index: Decimal,
+    apartment_surface_area: Decimal,
+) -> ImprovementCalculationResult:
+    if improvement.treat_as_additional_work:
+        return calculate_improvement(
+            improvement,
+            excess=None,
+            depreciation=None,
+            index_check=IndexCalc(
+                calculation_date_index=calculation_date_index, completion_date_index=improvement.completion_date_index
+            ),
+            apartment_share=None,
+        )
+    else:
+        return calculate_improvement(
+            improvement,
+            excess=ExcessCalc(
+                excess_per_square_meter=Excess.BEFORE_2010_APARTMENT, square_meters=apartment_surface_area
+            ),
+            depreciation=DepreciationCalc(total_months=10 * 12, calculation_date=calculation_date),
+            index_check=None,
+            apartment_share=None,
+        )
+
+
+def calculate_housing_company_improvements_pre_2011(
+    improvements: List[ImprovementData],
+    calculation_date: datetime.date,
+    calculation_date_index: Decimal,
+    total_surface_area: Decimal,
+    apartment_surface_area: Decimal,
+) -> ImprovementsResult:
+    def calc_fn(improvement):
+        return calculate_single_housing_company_improvement_pre_2011(
+            improvement,
+            calculation_date=calculation_date,
+            calculation_date_index=calculation_date_index,
+            total_surface_area=total_surface_area,
+            apartment_surface_area=apartment_surface_area,
+        )
+
+    return calculate_multiple_improvements(
+        improvements, calc_fn, total_surface_area, excess_per_square_meter=Excess.BEFORE_2010_HOUSING_COMPANY
+    )
+
+
+def calculate_single_housing_company_improvement_pre_2011(
+    improvement: ImprovementData,
+    calculation_date: datetime.date,
+    calculation_date_index: Decimal,
+    total_surface_area: Decimal,
+    apartment_surface_area: Decimal,
+) -> ImprovementCalculationResult:
+    if improvement.completion_date < datetime.date(2010, 1, 1):
+        return calculate_improvement(
+            improvement,
+            excess=ExcessCalc(
+                excess_per_square_meter=Excess.BEFORE_2010_HOUSING_COMPANY, square_meters=total_surface_area
+            ),
+            depreciation=DepreciationCalc(total_months=15 * 12, calculation_date=calculation_date),
+            index_check=None,
+            apartment_share=ApartmentShare(
+                total_surface_area=total_surface_area, apartment_surface_area=apartment_surface_area
+            ),
+        )
+    else:
+        return calculate_single_housing_company_improvement_after_2010(
+            improvement, calculation_date_index, total_surface_area, apartment_surface_area
+        )
 
 
 def calculate_improvement(

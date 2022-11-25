@@ -20,13 +20,15 @@ from hitas.tests.factories import (
 )
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
+    ConstructionPriceIndexFactory,
     MarketPriceIndex2005Equal100Factory,
+    MarketPriceIndexFactory,
     SurfaceAreaPriceCeilingFactory,
 )
 
 
 @pytest.mark.django_db
-def test__api__apartment_max_price__construction_price_index(api_client: HitasAPIClient):
+def test__api__apartment_max_price__construction_price_index__2011_onwards(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=80350,
         primary_loan_amount=119150,
@@ -93,6 +95,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 "calculation_variables": {
                     "acquisition_price": 199500.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 199500.0,
                     "index_adjustment": 26401.46,
                     "apartment_improvements": None,
@@ -138,6 +141,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
                 "calculation_variables": {
                     "acquisition_price": 199500.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 199500.0,
                     "index_adjustment": 25189.99,
                     "apartment_improvements": None,
@@ -239,7 +243,7 @@ def test__api__apartment_max_price__construction_price_index(api_client: HitasAP
 
 
 @pytest.mark.django_db
-def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClient):
+def test__api__apartment_max_price__market_price_index__2011_onwards(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=139706,
         primary_loan_amount=80955,
@@ -302,6 +306,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                 "calculation_variables": {
                     "acquisition_price": 220661.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 220661.0,
                     "index_adjustment": 40916.09,
                     "apartment_improvements": None,
@@ -347,6 +352,7 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
                 "calculation_variables": {
                     "acquisition_price": 220661.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 220661.0,
                     "index_adjustment": 56410.68,
                     "apartment_improvements": None,
@@ -427,6 +433,236 @@ def test__api__apartment_max_price__market_price_index(api_client: HitasAPIClien
 
 
 @pytest.mark.django_db
+def test__api__apartment_max_price__market_price_index__before_2011(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        debt_free_purchase_price=104693.0,
+        primary_loan_amount=18480.0,
+        interest_during_construction=3455.0,
+        additional_work_during_construction=4307.0,
+        completion_date=datetime.date(2003, 5, 9),
+        surface_area=54.5,
+        share_number_start=1729,
+        share_number_end=1888,
+    )
+    # Create another apartment with rest of the surface area
+    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=3336)
+
+    mpi_hc_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=0, completion_date=datetime.date(2003, 5, 1)
+    )
+    mpi_hc_improvement2: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=1587, completion_date=datetime.date(2004, 10, 1)
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
+    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
+
+    # Create necessary apartment's completion date indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=244.9)
+    MarketPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=263.60)
+
+    # Create necessary calculation date indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2022, 9, 1), value=364.40)
+    MarketPriceIndexFactory.create(month=datetime.date(2022, 9, 1), value=583.3)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 9, 1), value=4872)
+
+    # Create necessary improvement's completion date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2004, 10, 1), value=238.5)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2004, 10, 1), value=291.1)
+
+    data = {
+        "calculation_date": "2022-09-07",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2022-09-05",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    response_json = response.json()
+    assert_id(response_json.pop("id"))
+    assert_created(response_json.pop("created_at"))
+
+    assert response_json == {
+        "confirmed_at": None,
+        "calculation_date": "2022-09-07",
+        "maximum_price": 289735.91,
+        "valid_until": "2022-12-07",
+        "index": "market_price_index",
+        "calculations": {
+            "construction_price_index": {
+                "calculation_variables": {
+                    "acquisition_price": 123173.0,
+                    "additional_work_during_construction": None,
+                    "interest_during_construction": 3455.0,
+                    "basic_price": 0.0,
+                    "index_adjustment": 0.0,
+                    "apartment_improvements": None,
+                    "housing_company_improvements": {
+                        "items": [],
+                        "summary": {
+                            "value": 0.0,
+                            "value_added": 0.0,
+                            "excess": {
+                                "surface_area": 54.5,
+                                "value_per_square_meter": 0.0,
+                                "total": 0.0,
+                            },
+                            "depreciation": 0.0,
+                            "value_for_housing_company": 0.0,
+                            "value_for_apartment": 0.0,
+                        },
+                    },
+                    "debt_free_price": 0.0,
+                    "debt_free_price_m2": 0.0,
+                    "apartment_share_of_housing_company_loans": 0.0,
+                    "apartment_share_of_housing_company_loans_date": "2022-09-05",
+                    "completion_date": "2003-05-09",
+                    "completion_date_index": 244.9,
+                    "calculation_date": "2022-09-07",
+                    "calculation_date_index": 364.4,
+                },
+                "maximum_price": 0.0,
+                "valid_until": "2022-12-07",
+                "maximum": False,
+            },
+            "market_price_index": {
+                "calculation_variables": {
+                    "acquisition_price": 123173.0,
+                    "additional_work_during_construction": None,
+                    "interest_during_construction": 3455.0,
+                    "basic_price": 126628.0,
+                    "index_adjustment": 153577.28,
+                    "apartment_improvements": {
+                        "items": [
+                            {
+                                "name": "Rakennusaikaiset muutos- ja lisätyöt",
+                                "value": 4307.0,
+                                "completion_date": "2003-05",
+                                "value_added": 4307.0,
+                                "depreciation": None,
+                                "value_for_housing_company": None,
+                                "value_for_apartment": 9530.63,
+                            }
+                        ],
+                        "summary": {
+                            "value": 4307.0,
+                            "value_added": 4307.0,
+                            "excess": {
+                                "surface_area": 3390.5,
+                                "total": 339050.0,
+                                "value_per_square_meter": 100.0,
+                            },
+                            "depreciation": None,
+                            "value_for_housing_company": None,
+                            "value_for_apartment": 9530.63,
+                        },
+                    },
+                    "housing_company_improvements": {
+                        "items": [
+                            {
+                                "name": mpi_hc_improvement.name,
+                                "value": 0.0,
+                                "completion_date": "2003-05",
+                                "value_added": 0.0,
+                                "depreciation": {
+                                    "amount": 0.0,
+                                    "time": {
+                                        "years": 19,
+                                        "months": 4,
+                                    },
+                                },
+                                "value_for_housing_company": 0.0,
+                                "value_for_apartment": 0.0,
+                            },
+                            {
+                                "name": mpi_hc_improvement2.name,
+                                "value": 1587.0,
+                                "completion_date": "2004-10",
+                                "value_added": 0.0,
+                                "depreciation": {
+                                    "amount": 0.0,
+                                    "time": {
+                                        "years": 17,
+                                        "months": 11,
+                                    },
+                                },
+                                "value_for_housing_company": 0.0,
+                                "value_for_apartment": 0.0,
+                            },
+                        ],
+                        "summary": {
+                            "value": 1587.0,
+                            "value_added": 0.0,
+                            "excess": {
+                                "surface_area": 3390.5,
+                                "value_per_square_meter": 150.0,
+                                "total": 508_575.0,
+                            },
+                            "depreciation": 0.0,
+                            "value_for_housing_company": 0.0,
+                            "value_for_apartment": 0.0,
+                        },
+                    },
+                    "debt_free_price": 289735.91,
+                    "debt_free_price_m2": 5316.26,
+                    "apartment_share_of_housing_company_loans": 0.0,
+                    "apartment_share_of_housing_company_loans_date": "2022-09-05",
+                    "completion_date": "2003-05-09",
+                    "completion_date_index": 263.6,
+                    "calculation_date": "2022-09-07",
+                    "calculation_date_index": 583.3,
+                },
+                "maximum_price": 289735.91,
+                "valid_until": "2022-12-07",
+                "maximum": True,
+            },
+            "surface_area_price_ceiling": {
+                "maximum_price": 265524.0,
+                "valid_until": "2022-11-30",
+                "maximum": False,
+                "calculation_variables": {
+                    "calculation_date": "2022-09-07",
+                    "calculation_date_value": 4872.0,
+                    "surface_area": 54.5,
+                },
+            },
+        },
+        "apartment": {
+            "shares": {"start": 1729, "end": 1888, "total": 160},
+            "rooms": a.rooms,
+            "type": a.apartment_type.value,
+            "surface_area": 54.5,
+            "address": {
+                "street_address": a.street_address,
+                "floor": a.floor,
+                "stair": a.stair,
+                "apartment_number": a.apartment_number,
+                "postal_code": a.postal_code.value,
+                "city": a.postal_code.city,
+            },
+            "ownerships": [
+                {"percentage": 50.0, "name": o1.owner.name},
+                {"percentage": 50.0, "name": o2.owner.name},
+            ],
+        },
+        "housing_company": {
+            "official_name": a.housing_company.official_name,
+            "archive_id": a.housing_company.id,
+            "property_manager": {
+                "name": a.housing_company.property_manager.name,
+                "street_address": a.housing_company.property_manager.street_address,
+            },
+        },
+        "additional_info": "Example",
+    }
+
+
+@pytest.mark.django_db
 def test__api__apartment_max_price__surface_area_price_ceiling(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=107753,
@@ -477,6 +713,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                 "calculation_variables": {
                     "acquisition_price": 169583.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 169583.0,
                     "index_adjustment": 48577.7,
                     "apartment_improvements": None,
@@ -512,6 +749,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                 "calculation_variables": {
                     "acquisition_price": 169583.0,
                     "additional_work_during_construction": 0.0,
+                    "interest_during_construction": None,
                     "basic_price": 169583.0,
                     "index_adjustment": 62626.6,
                     "apartment_improvements": None,

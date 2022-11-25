@@ -52,7 +52,8 @@ class IndexCalculation:
     @dataclass
     class CalculationVars:
         acquisition_price: Decimal
-        additional_work_during_construction: Decimal
+        additional_work_during_construction: Optional[Decimal]
+        interest_during_construction: Optional[Decimal]
         basic_price: Decimal
         index_adjustment: Decimal
         apartment_improvements: Optional[MaxPriceImprovements]
