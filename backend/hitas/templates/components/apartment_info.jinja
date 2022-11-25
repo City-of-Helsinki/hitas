@@ -1,0 +1,26 @@
+{% macro apartment_info(apartment) %}
+    <table>
+        <tr>
+            <td class="first-column"><b>Huoneisto:</b></td>
+            <td>{{ apartment.street_address }} {{ apartment.stair }} {{ apartment.apartment_number }}, {{ apartment.postal_code }} {{ apartment.city|upper }}</td>
+        </tr>
+        <tr>
+            <td class="first-column"><b>Taloyhtiö:</b></td>
+            <td>{{ apartment.housing_company.id }} - {{ apartment.housing_company.official_name }}</td>
+        </tr>
+        <tr>
+            <td class="first-column"><b>Isännöitsijä:</b></td>
+            <td>{{ apartment.housing_company.property_manager.name }}, {{ apartment.housing_company.property_manager.street_address }}</td>
+        </tr>
+    </table>
+    <table>
+        {% for ownership in apartment.ownerships.all() %}
+            <tr>
+                <td class="first-column">{% if loop.index == 1 %}<b>Omistaja ja omistusosuus (%):</b>{% endif %}</td>
+                <td>{{ ownership.owner.name }}</td>
+                <td>{{ ownership.percentage }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+{% endmacro %}
