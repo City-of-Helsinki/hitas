@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from hitas.calculations.max_price import surface_area_price_ceiling_validity
+from hitas.calculations.max_prices.rules import surface_area_price_ceiling_validity
 
 
 @pytest.mark.parametrize(

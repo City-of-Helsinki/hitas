@@ -12,7 +12,7 @@ from rest_framework.serializers import Serializer
 from rest_framework.viewsets import ViewSet
 
 from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
-from hitas.calculations.max_price import create_max_price_calculation
+from hitas.calculations.max_prices import create_max_price_calculation
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
