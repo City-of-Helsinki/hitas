@@ -126,9 +126,11 @@
     {% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
         {% set calculation = maximum_price_calculation.json.calculations.market_price_index %}
         {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}
+        {% set index_name_short = "mark.hintaindeksi" %}
     {% else %}
         {% set calculation = maximum_price_calculation.json.calculations.construction_price_index %}
         {% set index_name = "RAKENNUSKUSTANNUSINDEKSILLÄ" %}
+        {% set index_name_short = "rak.kust.indeksi" %}
     {% endif %}
 
     <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
@@ -183,7 +185,7 @@
             <td class="text-right">{{ calculation.calculation_variables.apartment_improvements }}</td>
         </tr>
         <tr>
-            <td><b>ja sen rak.kust.indeksi:</b></td>
+            <td><b>ja sen {{ index_name_short }}:</b></td>
             <td>{{ calculation.calculation_variables.completion_date_index|intcomma }}</td>
             <td><b>+ Osuus yhtiön parannuksista</b></td>
             <td class="text-right">{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</td>
@@ -195,7 +197,7 @@
             <td class="text-right">{{ calculation.calculation_variables.debt_free_price|intcomma }}</td>
         </tr>
         <tr>
-            <td><b>ja sen rak.kust.indeksi:</b></td>
+            <td><b>ja sen {{ index_name_short }}:</b></td>
             <td>{{ calculation.calculation_variables.completion_date_index|intcomma }}</td>
             <td><b>- osuus yhtiön lainoista {{ calculation.calculation_variables.apartment_share_of_housing_company_loans_date|format_date }}</b></td>
             <td class="text-right">{{ calculation.calculation_variables.apartment_share_of_housing_company_loans|intcomma }}</td>
