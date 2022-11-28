@@ -37,6 +37,15 @@
             margin-right: 250px;
             margin-bottom: 30px;
         }
+        p.bordered-header {
+            text-align: center;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-top: 5px;
+            padding-bottom: -5px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
 
         .text-right {
             text-align: right;
@@ -57,10 +66,22 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
-    {% set apartment = maximum_price_calculation.apartment %}
-    {% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
+{# Init variables #}
+{% set apartment = maximum_price_calculation.apartment %}
+{% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
+{% set is_surface_area_maximum = maximum_price_calculation.json.calculations.surface_area_price_ceiling.maximum %}
+{% set sapc_calculation = maximum_price_calculation.json.calculations.surface_area_price_ceiling %}
+{% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
+    {% set index_calculation = maximum_price_calculation.json.calculations.market_price_index %}
+    {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}
+    {% set index_name_short = "mark.hintaindeksi" %}
+{% else %}
+    {% set index_calculation = maximum_price_calculation.json.calculations.construction_price_index %}
+    {% set index_name = "RAKENNUSKUSTANNUSINDEKSILLÄ" %}
+    {% set index_name_short = "rak.kust.indeksi" %}
+{% endif %}
 
+{% block content %}
     <h3>Helsingin kaupunki</h3>
     <h3>
         {{ apartment.street_address }} {{ apartment.stair }} {{ apartment.apartment_number }}
@@ -97,9 +118,12 @@
     <br>
 
     <p class="plain-text">
-        Huoneiston vahvistettu enimmäismyyntihinta on
-        {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma }})
-        euroa. Enimmäismyyntihinta on voimassa kolme kuukautta laskelman päiväyksestä.
+        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma }}) euroa.
+        {% if is_surface_area_maximum %}
+            Enimmäismyyntihinta on vahvistettu rajahinnan perusteella ja laskelma on voimassa {{ maximum_price_calculation.valid_until|format_date }} asti.
+        {% else %}
+            Enimmäismyyntihinta on voimassa kolme kuukautta laskelman päiväyksestä.
+        {% endif %}
     </p>
     <p class="plain-text">Jos huoneiston osuus yhtiön lainoista on muuttunut ilmoitetusta määrästä, tulee kaupantekohetkellä huoneistolle kuuluva osuus ottaa huomioon siten, ettei enimmäishintalaskelmassa (liite 1) mainittu osakkeiden velaton hinta ylity.</p>
     <p class="plain-text">Enimmäishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi julkaistaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1. 11.</p>
@@ -123,22 +147,41 @@
     <pdf:nexttemplate name="template_attachment_1" />
     <pdf:nextpage />
 
-    {% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
-        {% set calculation = maximum_price_calculation.json.calculations.market_price_index %}
-        {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}
-        {% set index_name_short = "mark.hintaindeksi" %}
-    {% else %}
-        {% set calculation = maximum_price_calculation.json.calculations.construction_price_index %}
-        {% set index_name = "RAKENNUSKUSTANNUSINDEKSILLÄ" %}
-        {% set index_name_short = "rak.kust.indeksi" %}
+    {# Rajaneliöhinta #}
+    {% if is_surface_area_maximum %}
+        <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>RAJAHINNALLA</h2>
+
+        {{ apartment_info(apartment) }}
+        {{ calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) }}
+
+        <br>
+        <p>
+            Huoneiston laskennallinen enimmäisneliöhinta alittaa voimassa olevan rajahinnan {{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m², jolloin enimmäishinta lasketaan rajahinnan perusteella.
+            <br>
+            <b>Mahdollisia yhtiö- ja huoneistokohtaisten parannusten kustannuksia ei voi lisätä rajahinnan mukaiseen enimmäishintaan.</b>
+        </p>
+        <br>
+        <br>
+        {{ sapc_calculation_details_table(sapc_calculation) }}
+        <br>
+        <p>Laskelma on voimassa {{ sapc_calculation.valid_until|format_date }} asti.</p>
+
+        <pdf:nexttemplate name="template_attachment_2" />
+        <pdf:nextpage />
     {% endif %}
 
+
+    {# Markkinahinta- / Rakennuskustanniksindeksi #}
     <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
 
     {{ apartment_info(apartment) }}
-    {{ calculation_details_table(apartment, maximum_price_calculation, calculation) }}
+    {{ calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, none) }}
 
+    {% if is_surface_area_maximum %}
+        <p class="bordered-header"><b>Huoneiston laskennallinen enimmäisneliöhinta, {{ index_calculation.calculation_variables.debt_free_price_m2|intcomma }} euroa/m², alittaa voimassa olevan rajahinnan {{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m², jolloin enimmäishinta lasketaan rajahinnan perusteella.</b></p>
+    {% endif %}
 
+    {# Parannukset #}
     {% if is_pre_2011 %}
         <pdf:nexttemplate name="template_attachment_2" />
         <pdf:nextpage />
@@ -146,76 +189,125 @@
         <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
         <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
 
-        {{ improvements_table(calculation) }}
+        {{ improvements_table(index_calculation) }}
     {% endif %}
 
 {% endblock %}
 
 
-{% macro calculation_details_table(apartment, maximum_price_calculation, calculation) %}
+{% macro sapc_calculation_details_table(sapc_calculation) %}
     <table>
         <tr>
-            <td style="width: 200px"><b>Huoneluku:</b></td>
-            <td style="width: 150px">{{ apartment.rooms }} {{ apartment.apartment_type.value }}</td>
-            <td style="width: 350px"><b>Hankinta-arvo</b></td>
-            <td style="width: 100px" class="text-right">{{ calculation.calculation_variables.acquisition_price|intcomma }}</td>
+            <td style="width: 262px;">Velaton enimmäishinta</td>
+            <td style="width: 110px;" class="text-right">{{ sapc_calculation.calculation_variables.surface_area|intcomma }}m²</td>
+            <td style="width: 30px" class="text-right">×</td>
+            <td style="width: 110px;" class="text-right">{{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m²</td>
+            <td style="width: 30px" class="text-right">=</td>
+            <td style="width: 140px;" class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
+        </tr>
+        <tr>
+            <td>— osuus yhtiön lainoista <i>*TODO*</i></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right"><i>*TODO*</i> euroa</td>
+        </tr>
+        <tr style="border-top: 1px solid black; padding-top: 4px;">
+            <td>Enimmäismyyntihinta kaupanteossa</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
+        </tr>
+    </table>
+{% endmacro %}
+
+
+{% macro calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) %}
+    <table>
+        <tr>
+            <td style="width: 180px;"><b>Huoneluku:</b></td>
+            <td style="width: 150px;">{{ apartment.rooms }} {{ apartment.apartment_type.value }}</td>
+            {% if not sapc_calculation %}
+                <td style="width: 300px;"><b>Hankinta-arvo</b></td>
+                <td style="width: 80px;" class="text-right">{{ index_calculation.calculation_variables.acquisition_price|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>Pinta-ala m²:</b></td>
             <td>{{ maximum_price_calculation.json.apartment.surface_area|intcomma }}</td>
-            <td><b>+ Rakennusaik. lisä- ja muutostyöt</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.additional_work_during_construction|intcomma }}</td>
+            {% if not sapc_calculation %}
+                <td><b>+ Rakennusaik. lisä- ja muutostyöt</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.additional_work_during_construction|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>Osakenumerot:</b></td>
             <td>{{ maximum_price_calculation.json.apartment.shares.start }} - {{ maximum_price_calculation.json.apartment.shares.end }}</td>
-            <td><b>= Perushinta</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.basic_price|intcomma }}</td>
+            {% if not sapc_calculation %}
+                <td><b>= Perushinta</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.basic_price|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>Osakelkm:</b></td>
             <td>{{ maximum_price_calculation.json.apartment.shares.total }}</td>
-            <td><b>+ Indeksin muutos</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.index_adjustment|intcomma }}</td>
+            {% if not sapc_calculation %}
+                <td><b>+ Indeksin muutos</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.index_adjustment|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>Valmistumispäivä:</b></td>
-            <td>{{ calculation.calculation_variables.completion_date|format_date }}</td>
-            <td><b>+ Huoneistokohtaiset parannukset</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.apartment_improvements }}</td>
+            <td>{{ index_calculation.calculation_variables.completion_date|format_date }}</td>
+            {% if not sapc_calculation %}
+                <td><b>+ Huoneistokohtaiset parannukset</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.apartment_improvements|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>ja sen {{ index_name_short }}:</b></td>
-            <td>{{ calculation.calculation_variables.completion_date_index|intcomma }}</td>
-            <td><b>+ Osuus yhtiön parannuksista</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</td>
+            <td>{{ index_calculation.calculation_variables.completion_date_index|intcomma }}</td>
+            {% if not sapc_calculation %}
+                <td><b>+ Osuus yhtiön parannuksista</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>Jälleenlaskentapäivä:</b></td>
-            <td>{{ calculation.calculation_variables.calculation_date|format_date }}</td>
-            <td><b>= Osakkeiden velaton hinta</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.debt_free_price|intcomma }}</td>
+            <td>{{ index_calculation.calculation_variables.calculation_date|format_date }}</td>
+            {% if not sapc_calculation %}
+                <td><b>= Osakkeiden velaton hinta</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.debt_free_price|intcomma }}</td>
+            {% endif %}
         </tr>
         <tr>
             <td><b>ja sen {{ index_name_short }}:</b></td>
-            <td>{{ calculation.calculation_variables.completion_date_index|intcomma }}</td>
-            <td><b>- osuus yhtiön lainoista {{ calculation.calculation_variables.apartment_share_of_housing_company_loans_date|format_date }}</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.apartment_share_of_housing_company_loans|intcomma }}</td>
+            <td>{{ index_calculation.calculation_variables.completion_date_index|intcomma }}</td>
+            {% if not sapc_calculation %}
+                <td><b>- osuus yhtiön lainoista {{ index_calculation.calculation_variables.apartment_share_of_housing_company_loans_date|format_date }}</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.apartment_share_of_housing_company_loans|intcomma }}</td>
+            {% endif %}
         </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td><b>= Enimmäismyyntihinta</b></td>
-            <td class="text-right">{{ calculation.maximum_price|intcomma }}</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td><b>Velaton hinta euroa/m² (*)<br>* Lasketaan osakkeiden velattomasta hinnasta</b></td>
-            <td class="text-right">{{ calculation.calculation_variables.debt_free_price_m2|intcomma }}</td>
-        </tr>
+        {% if not sapc_calculation %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td><b>= Enimmäismyyntihinta</b></td>
+                <td class="text-right">{{ index_calculation.maximum_price|intcomma }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><b>Velaton hinta euroa/m² (*)<br>* Lasketaan osakkeiden velattomasta hinnasta</b></td>
+                <td class="text-right">{{ index_calculation.calculation_variables.debt_free_price_m2|intcomma }}</td>
+            </tr>
+        {% endif %}
     </table>
 {% endmacro %}
+
 
 {% macro improvements_table(calculation) %}
     {# Table max width is 682px #}
