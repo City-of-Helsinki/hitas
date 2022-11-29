@@ -1,6 +1,7 @@
 {% extends "components/base.jinja" %}
 {% from "components/apartment_info.jinja" import apartment_info %}
 {% from "components/calculation_details_table.jinja" import calculation_details_table %}
+{% from "components/improvements_table.jinja" import apartment_improvements_table, housing_company_improvements_table_pre_2011, housing_company_improvements_table_post_2011 %}
 
 {% block style %}
     <style>
@@ -60,6 +61,13 @@
 
         .improvement-column {
             text-align: center;
+            vertical-align: bottom;
+        }
+
+        .improvements-table {
+            font-size: 8pt;
+        }
+        table.improvements-table tr td:first-child {
             vertical-align: bottom;
         }
     </style>
@@ -183,16 +191,25 @@
     {% endif %}
 
     {# Parannukset #}
-    {% if is_pre_2011 %}
+    {% if index_calculation.calculation_variables.housing_company_improvements or index_calculation.calculation_variables.apartment_improvements %}
         <pdf:nexttemplate name="template_attachment_2" />
         <pdf:nextpage />
 
         <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
-        <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
 
-        {{ improvements_table(index_calculation) }}
+        {% if index_calculation.calculation_variables.apartment_improvements %}
+            {{ apartment_improvements_table(index_calculation) }}
+            <br>
+        {% endif %}
+
+        {% if index_calculation.calculation_variables.housing_company_improvements %}
+            {% if is_pre_2011 %}
+                {{ housing_company_improvements_table_pre_2011(index_calculation) }}
+            {% else %}
+                {{ housing_company_improvements_table_post_2011(index_calculation) }}
+            {% endif %}
+        {% endif %}
     {% endif %}
-
 {% endblock %}
 
 
@@ -223,50 +240,4 @@
             <td class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
         </tr>
     </table>
-{% endmacro %}
-
-
-{% macro improvements_table(calculation) %}
-    {# Table max width is 682px #}
-    <table style="font-size: 8pt">
-        <tr style="border-bottom: 1px solid black;">
-            <td class="improvement-cell" style="width: 172px;"><b>Parannus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 60px;"><b>Arvo</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Valmistunut</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Arvoa korot-<br>tava osuus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 70px;"><b>Poistoaika</b></td>
-            <td class="improvement-cell improvement-column" style="width: 60px;"><b>Poiston määrä</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty yhtiö</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty huoneisto</b></td>
-        </tr>
-        {% for improvement in calculation.calculation_variables.housing_company_improvements["items"] %}
-            <tr style="border-bottom: 1px solid black; padding-top: 2px;">
-                <td class="improvement-cell">{{ improvement.name }}</td>
-                <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
-                <td class="improvement-cell text-right">{{ improvement.value_added|intcomma }}</td>
-                <td class="improvement-cell text-right">TODO</td>
-                <td class="improvement-cell text-right">{{ improvement.depreciation|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.value_for_housing_company|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.value_for_apartment|intcomma }}</td>
-            </tr>
-        {% endfor %}
-        <tr style="padding-top: 2px;">
-            <td class="improvement-cell"><b>Parannukset yhteensä</b></td>
-            <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value|intcomma }}</b></td>
-            <td></td>
-            <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_added|intcomma }}</b></td>
-            <td></td>
-            <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.depreciation|intcomma }}</b></td>
-            <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_housing_company|intcomma }}</b></td>
-            <td class="improvement-cell text-right"><b>{{ calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</b></td>
-        </tr>
-    </table>
-
-    <br>
-
-    <p>
-        {% set excess = calculation.calculation_variables.housing_company_improvements.summary.excess %}
-        Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa. Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
-    </p>
 {% endmacro %}

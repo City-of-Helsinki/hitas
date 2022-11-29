@@ -66,7 +66,7 @@ class ImprovementCalculationResult:
 @dataclass
 class ImprovementCalculationSummary:
     @dataclass
-    class ExcessSummary:
+    class ExcessSummary:  # 'Omavastuu'
         surface_area: Decimal
         value_per_square_meter: Decimal
 
