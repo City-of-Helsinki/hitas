@@ -113,7 +113,7 @@ const initialSaveData: IIndex = {
 };
 
 const IndicesList = (): JSX.Element => {
-    const [filterParams, setFilterParams] = useState({string: ""});
+    const [filterParams, setFilterParams] = useState({});
     const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
     const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useImmer(initialSaveData);

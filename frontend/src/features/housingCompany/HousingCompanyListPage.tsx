@@ -115,7 +115,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
 };
 
 const HousingCompanyListPage = (): JSX.Element => {
-    const [filterParams, setFilterParams] = useState({string: ""});
+    const [filterParams, setFilterParams] = useState({});
 
     return (
         <div className="view--housing-company-list">

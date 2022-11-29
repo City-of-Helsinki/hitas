@@ -7,7 +7,7 @@ interface FilterIntegerFieldProps {
     minLength: number;
     maxLength: number;
     filterFieldName: string;
-    filterParams: {string: string | number};
+    filterParams: object;
     setFilterParams: (object) => void;
 }
 
