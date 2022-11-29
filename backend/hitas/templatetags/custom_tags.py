@@ -1,6 +1,7 @@
+import itertools
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Union
+from typing import Any, Union
 
 import django_jinja.library
 from django.contrib.humanize.templatetags.humanize import intcomma as humanize_intcomma
@@ -34,3 +35,13 @@ def is_date_pre_2011(value: Union[str, datetime.date]) -> bool:
     if type(value) == str:
         value = datetime.strptime(value, "%Y-%m-%d")
     return value < date(2011, 1, 1)
+
+
+@django_jinja.library.filter
+def value_or_blank(value: Any) -> str:
+    return value or ""
+
+
+@django_jinja.library.global_function
+def zip_lists(*args):
+    return itertools.zip_longest(*args)

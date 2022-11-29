@@ -1,5 +1,6 @@
 {% extends "components/base.jinja" %}
 {% from "components/apartment_info.jinja" import apartment_info %}
+{% from "components/calculation_details_table.jinja" import calculation_details_table %}
 
 {% block style %}
     <style>
@@ -221,90 +222,6 @@
             <td></td>
             <td class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
         </tr>
-    </table>
-{% endmacro %}
-
-
-{% macro calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) %}
-    <table>
-        <tr>
-            <td style="width: 180px;"><b>Huoneluku:</b></td>
-            <td style="width: 150px;">{{ apartment.rooms }} {{ apartment.apartment_type.value }}</td>
-            {% if not sapc_calculation %}
-                <td style="width: 300px;"><b>Hankinta-arvo</b></td>
-                <td style="width: 80px;" class="text-right">{{ index_calculation.calculation_variables.acquisition_price|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>Pinta-ala m²:</b></td>
-            <td>{{ maximum_price_calculation.json.apartment.surface_area|intcomma }}</td>
-            {% if not sapc_calculation %}
-                <td><b>+ Rakennusaik. lisä- ja muutostyöt</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.additional_work_during_construction|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>Osakenumerot:</b></td>
-            <td>{{ maximum_price_calculation.json.apartment.shares.start }} - {{ maximum_price_calculation.json.apartment.shares.end }}</td>
-            {% if not sapc_calculation %}
-                <td><b>= Perushinta</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.basic_price|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>Osakelkm:</b></td>
-            <td>{{ maximum_price_calculation.json.apartment.shares.total }}</td>
-            {% if not sapc_calculation %}
-                <td><b>+ Indeksin muutos</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.index_adjustment|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>Valmistumispäivä:</b></td>
-            <td>{{ index_calculation.calculation_variables.completion_date|format_date }}</td>
-            {% if not sapc_calculation %}
-                <td><b>+ Huoneistokohtaiset parannukset</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.apartment_improvements|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>ja sen {{ index_name_short }}:</b></td>
-            <td>{{ index_calculation.calculation_variables.completion_date_index|intcomma }}</td>
-            {% if not sapc_calculation %}
-                <td><b>+ Osuus yhtiön parannuksista</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>Jälleenlaskentapäivä:</b></td>
-            <td>{{ index_calculation.calculation_variables.calculation_date|format_date }}</td>
-            {% if not sapc_calculation %}
-                <td><b>= Osakkeiden velaton hinta</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.debt_free_price|intcomma }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td><b>ja sen {{ index_name_short }}:</b></td>
-            <td>{{ index_calculation.calculation_variables.completion_date_index|intcomma }}</td>
-            {% if not sapc_calculation %}
-                <td><b>- osuus yhtiön lainoista {{ index_calculation.calculation_variables.apartment_share_of_housing_company_loans_date|format_date }}</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.apartment_share_of_housing_company_loans|intcomma }}</td>
-            {% endif %}
-        </tr>
-        {% if not sapc_calculation %}
-            <tr>
-                <td></td>
-                <td></td>
-                <td><b>= Enimmäismyyntihinta</b></td>
-                <td class="text-right">{{ index_calculation.maximum_price|intcomma }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td><b>Velaton hinta euroa/m² (*)<br>* Lasketaan osakkeiden velattomasta hinnasta</b></td>
-                <td class="text-right">{{ index_calculation.calculation_variables.debt_free_price_m2|intcomma }}</td>
-            </tr>
-        {% endif %}
     </table>
 {% endmacro %}
 
