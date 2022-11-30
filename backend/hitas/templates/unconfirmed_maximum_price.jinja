@@ -52,7 +52,7 @@
         </tr>
         <tr>
             <td>Huoneiston ensimmäinen kaupantekoajankohta</td>
-            <td>{{ apartment.first_purchase_date|format_date }}</td>
+            <td>{{ apartment.prices.first_purchase_date|format_date }}</td>
         </tr>
         {% if prices.surface_area_price_ceiling.maximum %}
             <tr>
