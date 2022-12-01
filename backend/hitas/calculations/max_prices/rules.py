@@ -44,15 +44,20 @@ class CalculatorRules:
 
     @staticmethod
     def calculate_surface_area_price_ceiling(
-        apartment: Apartment, calculation_date: datetime.date
+        apartment: Apartment,
+        apartment_share_of_housing_company_loans: Decimal,
+        apartment_share_of_housing_company_loans_date: datetime.date,
+        calculation_date: datetime.date,
     ) -> SurfaceAreaPriceCeilingCalculation:
         return SurfaceAreaPriceCeilingCalculation(
-            maximum_price=apartment.surface_area_price_ceiling,
+            maximum_price=apartment.surface_area_price_ceiling - apartment_share_of_housing_company_loans,
             valid_until=surface_area_price_ceiling_validity(calculation_date),
             calculation_variables=SurfaceAreaPriceCeilingCalculation.CalculationVars(
                 calculation_date=calculation_date,
                 calculation_date_value=apartment.surface_area_price_ceiling_m2,
                 surface_area=apartment.surface_area,
+                apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
+                apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
             ),
         )
 
