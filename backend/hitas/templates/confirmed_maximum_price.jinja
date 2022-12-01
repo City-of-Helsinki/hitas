@@ -224,12 +224,12 @@
             <td style="width: 140px;" class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
         </tr>
         <tr>
-            <td>— osuus yhtiön lainoista <i>*TODO*</i></td>
+            <td>— osuus yhtiön lainoista {{ sapc_calculation.calculation_variables.apartment_share_of_housing_company_loans_date|format_date }}</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td class="text-right"><i>*TODO*</i> euroa</td>
+            <td class="text-right">{{ sapc_calculation.calculation_variables.apartment_share_of_housing_company_loans|intcomma }} euroa</td>
         </tr>
         <tr style="border-top: 1px solid black; padding-top: 4px;">
             <td>Enimmäismyyntihinta kaupanteossa</td>
