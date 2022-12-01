@@ -52,14 +52,12 @@
     <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
-            <td class="improvement-cell" style="width: 172px;"><b>Parannus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 60px;"><b>Arvo</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Valmistunut</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Arvoa korot-<br>tava osuus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 70px;"><b>Poistoaika</b></td>
-            <td class="improvement-cell improvement-column" style="width: 60px;"><b>Poiston määrä</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty yhtiö</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty huoneisto</b></td>
+            <td class="improvement-cell" style="width: 252px;"><b>Parannus</b></td>
+            <td class="improvement-cell improvement-column" style="width: 70px;"><b>Arvo</b></td>
+            <td class="improvement-cell improvement-column" style="width: 90px;"><b>Valmistunut</b></td>
+            <td class="improvement-cell improvement-column" style="width: 90px;"><b>Arvoa korot-<br>tava osuus</b></td>
+            <td class="improvement-cell improvement-column" style="width: 90px;"><b>Hyväksytty<br>yhtiö</b></td>
+            <td class="improvement-cell improvement-column" style="width: 90px;"><b>Hyväksytty<br>huoneisto</b></td>
         </tr>
         {% set improvements = index_calculation.calculation_variables.housing_company_improvements %}
         {% for improvement in improvements["items"] %}
@@ -68,8 +66,6 @@
                 <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_added|intcomma }}</td>
-                <td class="improvement-cell text-right">TODO</td>
-                <td class="improvement-cell text-right">{{ improvement.depreciation }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_for_housing_company|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_for_apartment|intcomma }}</td>
             </tr>
@@ -79,8 +75,6 @@
             <td class="improvement-cell text-right"><b>{{ index_calculation.calculation_variables.housing_company_improvements.summary.value|intcomma }}</b></td>
             <td></td>
             <td class="improvement-cell text-right"><b>{{ index_calculation.calculation_variables.housing_company_improvements.summary.value_added|intcomma }}</b></td>
-            <td></td>
-            <td class="improvement-cell text-right"><b>{{ index_calculation.calculation_variables.housing_company_improvements.summary.depreciation }}</b></td>
             <td class="improvement-cell text-right"><b>{{ index_calculation.calculation_variables.housing_company_improvements.summary.value_for_housing_company|intcomma }}</b></td>
             <td class="improvement-cell text-right"><b>{{ index_calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment|intcomma }}</b></td>
         </tr>
