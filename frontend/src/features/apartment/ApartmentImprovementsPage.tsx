@@ -26,7 +26,7 @@ const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWrit
     return {
         ...ap,
         shares: ap.shares || {start: null, end: null},
-        building: ap.links.building.id,
+        building: {id: ap.links.building.id},
         address: {
             ...ap.address,
             street_address: ap.links.building.street_address,

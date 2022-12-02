@@ -266,7 +266,7 @@ export interface IApartmentWritable {
     address: Omit<IApartmentAddress, "apartment_number"> & {apartment_number: number | null};
     prices: Omit<IApartmentPrices, "maximum_prices" | "acquisition_price">;
     completion_date?: string | null;
-    building: string;
+    building: {id: string};
     ownerships: IOwnership[];
     notes: string;
     improvements: {
