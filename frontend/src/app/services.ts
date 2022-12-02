@@ -180,7 +180,6 @@ const detailApi = hitasApi.injectEndpoints({
         getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
             query: (params: IApartmentQuery) => ({
                 url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
-                params: params,
             }),
             providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}],
         }),

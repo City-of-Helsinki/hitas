@@ -23,7 +23,7 @@
     <table>
         {% for ownership in apartment.ownerships %}
         <tr>
-            <td>Omistaja ja omistusosuus (%)</td>
+            <td>{% if loop.index == 1 %}Omistaja ja omistusosuus (%){% endif %}</td>
             <td>{{ ownership.owner.name}}</td>
             <td>{{ ownership.percentage }}</td>
         </tr>

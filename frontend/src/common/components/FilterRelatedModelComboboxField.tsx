@@ -7,7 +7,7 @@ interface FilterRelatedModelComboboxFieldProps {
     queryFunction;
     labelField: string;
     filterFieldName: string;
-    filterParams: {string: string | number};
+    filterParams: object;
     setFilterParams: (object) => void;
 }
 

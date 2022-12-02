@@ -1,9 +1,243 @@
 {% extends "components/base.jinja" %}
+{% from "components/apartment_info.jinja" import apartment_info %}
+{% from "components/calculation_details_table.jinja" import calculation_details_table %}
+{% from "components/improvements_table.jinja" import apartment_improvements_table, housing_company_improvements_table_pre_2011, housing_company_improvements_table_post_2011 %}
+
+{% block style %}
+    <style>
+        .first-column {
+            width: 210px;
+        }
+
+        .plain-text {
+            margin-left: 150px;
+        }
+
+        .bordered-header {
+            border-style: solid;
+            border-color: black;
+            border-left: 2px;
+            border-top: 2px;
+            border-right: 4px;
+            border-bottom: 4px;
+        }
+
+        h2.bordered-header {
+            text-align: center;
+            padding-top: 10px;
+            padding-bottom: -5px;
+            margin-left: 125px;
+            margin-right: 125px;
+            margin-bottom: 50px;
+        }
+
+        h3.bordered-header {
+            text-align: left;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: -5px;
+            margin-right: 250px;
+            margin-bottom: 30px;
+        }
+        p.bordered-header {
+            text-align: center;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-top: 5px;
+            padding-bottom: -5px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .text-right {
+            text-align: right;
+            vertical-align: top;
+        }
+
+        .improvement-cell {
+            padding-right: 2px;
+            padding-top: 3px;
+        }
+
+        .improvement-column {
+            text-align: right;
+            vertical-align: bottom;
+        }
+
+        .improvements-table {
+            font-size: 8pt;
+        }
+        table.improvements-table tr td:first-child {
+            vertical-align: bottom;
+        }
+    </style>
+{% endblock %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{# Init variables #}
+{% set apartment = maximum_price_calculation.apartment %}
+{% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
+{% set is_surface_area_maximum = maximum_price_calculation.json.calculations.surface_area_price_ceiling.maximum %}
+{% set sapc_calculation = maximum_price_calculation.json.calculations.surface_area_price_ceiling %}
+{% if maximum_price_calculation.json.calculations.market_price_index.maximum_price > maximum_price_calculation.json.calculations.construction_price_index.maximum_price %}
+    {% set index_calculation = maximum_price_calculation.json.calculations.market_price_index %}
+    {% set index_name = "MARKKINAHINTAINDEKSILLÄ" %}
+    {% set index_name_short = "mark.hintaindeksi" %}
+{% else %}
+    {% set index_calculation = maximum_price_calculation.json.calculations.construction_price_index %}
+    {% set index_name = "RAKENNUSKUSTANNUSINDEKSILLÄ" %}
+    {% set index_name_short = "rak.kust.indeksi" %}
+{% endif %}
+
 {% block content %}
+    <h3>Helsingin kaupunki</h3>
+    <h3>
+        {{ apartment.street_address }} {{ apartment.stair }} {{ apartment.apartment_number }}
+        <br>{{ apartment.postal_code }} {{ apartment.city|upper }}
+    </h3>
 
-<code>{{ maximum_price_calculation.json }}</code>
+    <br>
 
+    <h3>HITAS-HUONEISTON ENIMMÄISHINTALASKELMA</h3>
+    <table>
+        <tr>
+            <td class="first-column"><b>Asunto-osakeyhtiö</b></td>
+            <td>{{ apartment.housing_company.official_name }}</td>
+        </tr>
+        <tr>
+            <td class="first-column"><b>Huoneiston osoite</b></td>
+            <td>{{ apartment.street_address }} {{ apartment.stair }} {{ apartment.apartment_number }}, {{ apartment.postal_code }} {{ apartment.city|upper }}</td>
+        </tr>
+        <tr>
+            <td class="first-column"><b>Osakenumerot</b></td>
+            <td>{{ apartment.share_number_start }} - {{ apartment.share_number_end }}</td>
+        </tr>
+    </table>
+    <table>
+        {% for ownership in apartment.ownerships.all() %}
+            <tr>
+                <td class="first-column">{% if loop.index == 1 %}<b>Omistaja ja omistusosuus (%)</b>{% endif %}</td>
+                <td>{{ ownership.owner.name }}</td>
+                <td>{{ ownership.percentage }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <p class="plain-text">
+        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma }}) euroa.
+        {% if is_surface_area_maximum %}
+            Enimmäismyyntihinta on vahvistettu rajahinnan perusteella ja laskelma on voimassa {{ maximum_price_calculation.valid_until|format_date }} asti.
+        {% else %}
+            Enimmäismyyntihinta on voimassa kolme kuukautta laskelman päiväyksestä.
+        {% endif %}
+    </p>
+    <p class="plain-text">Jos huoneiston osuus yhtiön lainoista on muuttunut ilmoitetusta määrästä, tulee kaupantekohetkellä huoneistolle kuuluva osuus ottaa huomioon siten, ettei enimmäishintalaskelmassa (liite 1) mainittu osakkeiden velaton hinta ylity.</p>
+    <p class="plain-text">Enimmäishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi julkaistaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1. 11.</p>
+    <p class="plain-text">Kaupungilla on yhtiöjärjestykseen perustuva oikeus lunastaa huoneiston hallintaan oikeuttavat osakkeet kaupan tapahduttua. Hitas-asunto voidaan myydä vain luonnolliselle henkilölle (ei yritykselle).</p>
+    <p class="plain-text">Enimmäishintalaskelma on tulostettu Hitas-rekisteristä ja perustuu huoneiston ja yhtiön tietoihin.</p>
+    <p class="plain-text">Lisätiedot: Maija Meikäläinen, suunnittelija, puhelin 310 00000</p>
+
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <table>
+        <tr>
+            <td style="width: 150px; vertical-align: top;">TIEDOKSI</td>
+            <td>{{ apartment.housing_company.official_name }}<br>{{ apartment.housing_company.property_manager.name }}
+            </td>
+        </tr>
+    </table>
+
+    <pdf:nexttemplate name="template_attachment_1" />
+    <pdf:nextpage />
+
+    {# Rajaneliöhinta #}
+    {% if is_surface_area_maximum %}
+        <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>RAJAHINNALLA</h2>
+
+        {{ apartment_info(apartment) }}
+        {{ calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) }}
+
+        <br>
+        <p>
+            Huoneiston laskennallinen enimmäisneliöhinta alittaa voimassa olevan rajahinnan {{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m², jolloin enimmäishinta lasketaan rajahinnan perusteella.
+            <br>
+            <b>Mahdollisia yhtiö- ja huoneistokohtaisten parannusten kustannuksia ei voi lisätä rajahinnan mukaiseen enimmäishintaan.</b>
+        </p>
+        <br>
+        <br>
+        {{ sapc_calculation_details_table(sapc_calculation) }}
+        <br>
+        <p>Laskelma on voimassa {{ sapc_calculation.valid_until|format_date }} asti.</p>
+
+        <pdf:nexttemplate name="template_attachment_2" />
+        <pdf:nextpage />
+    {% endif %}
+
+
+    {# Markkinahinta- / Rakennuskustanniksindeksi #}
+    <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
+
+    {{ apartment_info(apartment) }}
+    {{ calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, none) }}
+
+    {% if is_surface_area_maximum %}
+        <p class="bordered-header"><b>Huoneiston laskennallinen enimmäisneliöhinta, {{ index_calculation.calculation_variables.debt_free_price_m2|intcomma }} euroa/m², alittaa voimassa olevan rajahinnan {{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m², jolloin enimmäishinta lasketaan rajahinnan perusteella.</b></p>
+    {% endif %}
+
+    {# Parannukset #}
+    {% if index_calculation.calculation_variables.housing_company_improvements or index_calculation.calculation_variables.apartment_improvements %}
+        <pdf:nexttemplate name="template_attachment_2" />
+        <pdf:nextpage />
+
+        <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
+
+        {% if index_calculation.calculation_variables.apartment_improvements %}
+            {{ apartment_improvements_table(index_calculation) }}
+            <br>
+        {% endif %}
+
+        {% if index_calculation.calculation_variables.housing_company_improvements %}
+            {% if is_pre_2011 %}
+                {{ housing_company_improvements_table_pre_2011(index_calculation) }}
+            {% else %}
+                {{ housing_company_improvements_table_post_2011(index_calculation) }}
+            {% endif %}
+        {% endif %}
+    {% endif %}
 {% endblock %}
+
+
+{% macro sapc_calculation_details_table(sapc_calculation) %}
+    <table>
+        <tr>
+            <td style="width: 262px;">Velaton enimmäishinta</td>
+            <td style="width: 110px;" class="text-right">{{ sapc_calculation.calculation_variables.surface_area|intcomma }}m²</td>
+            <td style="width: 30px" class="text-right">×</td>
+            <td style="width: 110px;" class="text-right">{{ sapc_calculation.calculation_variables.calculation_date_value|intcomma }} euroa/m²</td>
+            <td style="width: 30px" class="text-right">=</td>
+            <td style="width: 140px;" class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
+        </tr>
+        <tr>
+            <td>— osuus yhtiön lainoista <i>*TODO*</i></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right"><i>*TODO*</i> euroa</td>
+        </tr>
+        <tr style="border-top: 1px solid black; padding-top: 4px;">
+            <td>Enimmäismyyntihinta kaupanteossa</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
+        </tr>
+    </table>
+{% endmacro %}
