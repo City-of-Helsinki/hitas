@@ -252,6 +252,13 @@ const MaximumPriceModalContent = ({
                             }
                         />
                         <BreakdownValue
+                            label={`- Osuus yhtiön lainoista (${calculation.calculations.construction_price_index.calculation_variables.calculation_date})`}
+                            value={
+                                calculation.calculations.market_price_index.calculation_variables
+                                    .apartment_share_of_housing_company_loans
+                            }
+                        />
+                        <BreakdownValue
                             label="= Enimmäishinta"
                             value={calculation.calculations.surface_area_price_ceiling.maximum_price}
                         />

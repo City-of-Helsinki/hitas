@@ -80,6 +80,8 @@ class SurfaceAreaPriceCeilingCalculation:
         calculation_date: datetime.date
         calculation_date_value: Decimal
         surface_area: Decimal
+        apartment_share_of_housing_company_loans: Decimal
+        apartment_share_of_housing_company_loans_date: datetime.date
 
     maximum_price: Decimal
     valid_until: datetime.date

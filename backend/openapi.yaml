@@ -3594,6 +3594,8 @@ components:
                     - calculation_date
                     - calculation_date_value
                     - surface_area
+                    - apartment_share_of_housing_company_loans
+                    - apartment_share_of_housing_company_loans_date
                   properties:
                     calculation_date:
                       description: Maximum price calculation date.
@@ -3610,6 +3612,17 @@ components:
                       type: number
                       minimum: 0
                       example: 30.0
+                    apartment_share_of_housing_company_loans:
+                      description: |-
+                        How much the apartment's share of the housing company loans.
+                      type: number
+                      minimum: 0
+                      example: 2500.07
+                    apartment_share_of_housing_company_loans_date:
+                      description: Date for the apartment share of housing company loan
+                      type: string
+                      format: date
+                      example: "2022-07-28"
                 maximum_price:
                   description: Maximum price for this index
                   type: number
