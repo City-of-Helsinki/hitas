@@ -3150,10 +3150,16 @@ components:
           readOnly: true
           $ref: '#/components/schemas/ApartmentLinks'
         building:
-          description: Building ID this apartment is associated with
-          type: string
+          description: Building this apartment is associated with
+          type: object
+          additionalProperties: false
           writeOnly: true
-          example: dc1072975bab4ba69f64814f021c6785
+          properties:
+            id:
+              writeOnly: true
+              description: Building ID this apartment is associated with
+              type: string
+              example: dc1072975bab4ba69f64814f021c6785
         notes:
           description: Apartment notes
           type: string
