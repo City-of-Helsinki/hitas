@@ -8,7 +8,7 @@ from hitas.tests.factories.apartment import create_apartment_max_price_calculati
 
 
 @pytest.mark.django_db
-def test__api__apartment_max_price__retrieve(api_client: HitasAPIClient):
+def test__api__apartment_max_price_pdf__retrieve(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation()
 
     response = api_client.post(
@@ -25,7 +25,7 @@ def test__api__apartment_max_price__retrieve(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPIClient):
+def test__api__apartment_max_price_pdf__retrieve__unconfirmed(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(confirmed_at=None)
 
     response = api_client.post(
@@ -41,7 +41,7 @@ def test__api__apartment_max_price__retrieve__unconfirmed(api_client: HitasAPICl
 
 
 @pytest.mark.django_db
-def test__api__apartment_max_price__retrieve__migrated(api_client: HitasAPIClient):
+def test__api__apartment_max_price_pdf__retrieve__migrated(api_client: HitasAPIClient):
     mpc: ApartmentMaximumPriceCalculation = create_apartment_max_price_calculation(json=None, json_version=None)
 
     response = api_client.post(
