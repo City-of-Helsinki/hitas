@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Fieldset, IconCrossCircle, IconPlus, TextInput} from "hds-react";
+import {Button, Fieldset, IconAlertCircleFill, IconCrossCircle, IconPlus, TextInput} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -185,6 +185,12 @@ const ApartmentCreatePage = () => {
         setFormOwnershipsList((draft) => {
             draft.splice(index, 1);
         });
+    };
+    const getOwnershipPercentageError = (error) => {
+        if (error && error?.data?.fields && error.data.fields.filter((e) => e.field === "ownerships.percentage")) {
+            return error.data.fields.filter((e) => e.field === "ownerships.percentage")[0].message;
+        }
+        return "";
     };
 
     // Handle remove flow
@@ -501,6 +507,12 @@ const ApartmentCreatePage = () => {
                         ) : (
                             <div>Ei omistajuuksia</div>
                         )}
+                        {getOwnershipPercentageError(error) && (
+                            <>
+                                <IconAlertCircleFill className="error-text" />
+                                <span className="error-text">{getOwnershipPercentageError(error)}</span>
+                            </>
+                        )}
                     </ul>
                     <Button
                         onClick={handleAddOwnershipLine}
@@ -529,7 +541,7 @@ const ApartmentCreatePage = () => {
                 {isEditPage && (
                     <RemoveButton
                         onClick={() => setIsRemoveModalVisible(true)}
-                        isLoading={isLoading}
+                        isLoading={isRemoving}
                     />
                 )}
                 <SaveButton
