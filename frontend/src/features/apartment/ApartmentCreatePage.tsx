@@ -87,7 +87,7 @@ const ApartmentCreatePage = () => {
         state === null || state?.apartment === undefined
             ? {
                   state: "free",
-                  type: {id: ""},
+                  type: null,
                   surface_area: null,
                   rooms: null,
                   shares: {
@@ -187,7 +187,11 @@ const ApartmentCreatePage = () => {
         });
     };
     const getOwnershipPercentageError = (error) => {
-        if (error && error?.data?.fields && error.data.fields.filter((e) => e.field === "ownerships.percentage")) {
+        if (
+            error &&
+            error?.data?.fields &&
+            error.data.fields.filter((e) => e.field === "ownerships.percentage").length
+        ) {
             return error.data.fields.filter((e) => e.field === "ownerships.percentage")[0].message;
         }
         return "";
@@ -316,7 +320,6 @@ const ApartmentCreatePage = () => {
                             queryFunction={useGetApartmentTypesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
-                            required
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
