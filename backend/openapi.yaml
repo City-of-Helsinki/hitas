@@ -1073,6 +1073,285 @@ paths:
               schema:
                 additionalProperties: false
                 $ref: '#/components/schemas/ApartmentMaximumPrice'
+              examples:
+                Apartment completed 2011-01 onwards:
+                  value:
+                    additional_info: This is an example additional info string
+                    apartment:
+                      address:
+                        apartment_number: 1
+                        city: Oulu
+                        floor: '1'
+                        postal_code: '90100'
+                        stair: A
+                        street_address: Example street
+                      ownerships:
+                      - name: Erkki Esimerkki
+                        percentage: 50.0
+                      - name: Eija Esimerkki
+                        percentage: 50.0
+                      rooms: 2
+                      shares:
+                        end: 150
+                        start: 1
+                        total: 150
+                      surface_area: 30.0
+                      type: h+kk
+                    calculation_date: '2022-07-05'
+                    calculations:
+                      construction_price_index:
+                        maximum_price: 223558.72
+                        valid_until: "2022-10-05"
+                        maximum: true
+                        calculation_variables:
+                          acquisition_price: 199500.0
+                          additional_work_during_construction: 0.0
+                          basic_price: 199500.0
+                          index_adjustment: 26401.46
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 150000.0
+                                completion_date: "2020-05-21"
+                                value_added: 20040.0
+                                value_for_housing_company: 22707.86
+                                value_for_apartment: 157.26
+                            summary:
+                              value: 150000.0
+                              value_added: 20040.0
+                              excess:
+                                surface_area: 4332.0
+                                value_per_square_meter: 30.0
+                                total: 129960.0
+                              value_for_housing_company: 22707.86
+                              value_for_apartment: 157.26
+                          debt_free_price: 226058.72
+                          debt_free_price_m2: 7535.29
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                          completion_date: "2019-11-27"
+                          completion_date_index: 129.29
+                          calculation_date: "2022-07-05"
+                          calculation_date_index: 146.4
+                      market_price_index:
+                        maximum_price: 222343.46
+                        valid_until: "2022-10-05"
+                        maximum: false
+                        calculation_variables:
+                          acquisition_price: 199500.0
+                          additional_work_during_construction: 0.0
+                          basic_price: 199500.0
+                          index_adjustment: 25189.99
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 150000.0
+                                completion_date: "2020-05-21"
+                                value_added: 20040.0
+                                value_for_housing_company: 22161.19
+                                value_for_apartment: 153.47
+                            summary:
+                              value: 150000.0
+                              value_added: 20040.0
+                              excess:
+                                surface_area: 4332.0
+                                value_per_square_meter: 30.0
+                                total: 129960.0
+                              value_for_housing_company: 22161.19
+                              value_for_apartment: 153.47
+                          debt_free_price: 224843.46
+                          debt_free_price_m2: 7494.78
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                          completion_date: "2019-11-27"
+                          completion_date_index: 167.9
+                          calculation_date: "2022-07-05"
+                          calculation_date_index: 189.1
+                      surface_area_price_ceiling:
+                        maximum_price: 143570.0
+                        valid_until: "2022-08-31"
+                        maximum: false
+                        calculation_variables:
+                          calculation_date: "2022-07-05"
+                          calculation_date_value: 4869.0
+                          surface_area: 30.0
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                    confirmed_at: null
+                    created_at: '2022-12-05T08:13:25.380594Z'
+                    housing_company:
+                      archive_id: 124
+                      official_name: Example housing company Oy
+                      property_manager:
+                        name: Example property manager Oy
+                        street_address: Example street address 123 B 9 90100 Oulu
+                    id: bd8ba72c19764af0a3edffa11260a9eb
+                    index: construction_price_index
+                    maximum_price: 223558.72
+                    new_hitas: true
+                    valid_until: '2022-10-05'
+                Apartment completed before 2011-01:
+                  value:
+                    additional_info: This is an example additional info string
+                    apartment:
+                      address:
+                        apartment_number: 1
+                        city: Oulu
+                        floor: '1'
+                        postal_code: '90100'
+                        stair: A
+                        street_address: Example street
+                      ownerships:
+                      - name: Erkki Esimerkki
+                        percentage: 50.0
+                      - name: Eija Esimerkki
+                        percentage: 50.0
+                      rooms: 2
+                      shares:
+                        end: 1888
+                        start: 1729
+                        total: 160
+                      surface_area: 54.5
+                      type: "h+kk"
+                    calculation_date: '2022-09-07'
+                    calculations:
+                      construction_price_index:
+                        calculation_variables:
+                          housing_company_acquisition_price: 170_886.35
+                          housing_company_assets: 170_886.35
+                          apartment_share_of_housing_company_assets: 170886.35
+                          interest_during_construction: 3455.0
+                          apartment_improvements:
+                            items:
+                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                                value: 4307.0
+                                calculation_date_index: 364.4
+                                completion_date: "2003-05-09"
+                                completion_date_index: 244.9
+                                index_adjusted: 6408.62
+                                depreciation:
+                                  amount: 0.0
+                                  percentage: 0.0
+                                  time:
+                                    years: 19
+                                    months: 3
+                                value_for_apartment: 6408.62
+                            summary:
+                              value: 4307.0
+                              index_adjusted: 6408.62
+                              depreciation: 0.0
+                              value_for_apartment: 6408.62
+                          housing_company_improvements:
+                            items: []
+                            summary:
+                              value: 0.0
+                              value_for_apartment: 0.0
+                          debt_free_price: 180749.97
+                          debt_free_price_m2: 3316.51
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                          completion_date: "2003-05-09"
+                          completion_date_index: 244.9
+                          calculation_date: "2022-09-07"
+                          calculation_date_index: 364.4
+                        maximum_price: 180749.97
+                        valid_until: "2022-12-07"
+                        maximum: false
+                      market_price_index:
+                        calculation_variables:
+                          acquisition_price: 123173.0
+                          interest_during_construction: 3455.0
+                          basic_price: 126628.0
+                          index_adjustment: 153577.28
+                          apartment_improvements:
+                            items:
+                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                                value: 4307.0
+                                completion_date: "2003-05-09"
+                                value_without_excess: 4307.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 19
+                                    months: 3
+                                accepted_value: 9530.63
+                            summary:
+                              value: 4307.0
+                              value_without_excess: 4307.0
+                              depreciation: 0.0
+                              excess:
+                                surface_area: 54.5
+                                total: 5450.0
+                                value_per_square_meter: 100.0
+                              accepted_value: 9530.63
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 0.0
+                                completion_date: "2003-05-01"
+                                value_without_excess: 0.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 19
+                                    months: 4
+                                accepted_value_for_housing_company: 0.0
+                                accepted_value: 0.0
+                              - name: Another test improvement
+                                value: 1587.0
+                                completion_date: "2004-10-01"
+                                value_without_excess: 0.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 17
+                                    months: 11
+                                accepted_value_for_housing_company: 0.0
+                                accepted_value: 0.0
+                            summary:
+                              value: 1587.0
+                              value_without_excess: 0.0
+                              excess:
+                                surface_area: 3390.5
+                                value_per_square_meter: 150.0
+                                total: 508_575.0
+                              depreciation: 0.0
+                              accepted_value_for_housing_company: 0.0
+                              accepted_value: 0.0
+                          debt_free_price: 289735.91
+                          debt_free_price_m2: 5316.26
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                          completion_date: "2003-05-09"
+                          completion_date_index: 263.6
+                          calculation_date: "2022-09-07"
+                          calculation_date_index: 583.3
+                        maximum_price: 289735.91
+                        valid_until: "2022-12-07"
+                        maximum: true
+                      surface_area_price_ceiling:
+                        maximum_price: 265524.0
+                        valid_until: "2022-11-30"
+                        maximum: false
+                        calculation_variables:
+                          calculation_date: "2022-09-07"
+                          calculation_date_value: 4872.0
+                          surface_area: 54.5
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                    confirmed_at: null
+                    created_at: '2022-12-05T08:23:28.109872Z'
+                    housing_company:
+                      archive_id: 1
+                      official_name: foo
+                      property_manager:
+                        name: foo
+                        street_address: foo
+                    id: 95b342b0dfac42b5a2165c641488cc55
+                    index: market_price_index
+                    maximum_price: 289735.91
+                    new_hitas: false
+                    valid_until: '2022-12-07'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
