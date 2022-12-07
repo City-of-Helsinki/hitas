@@ -122,7 +122,7 @@ const HousingCompanyImprovementsPage = () => {
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
             hitasToast("Parannukset tallennettu onnistuneesti!");
-            navigate(`/housing-companies/${data.id}`);
+            navigate(-1); // get the user back to where they opened this view
         } else if (error) {
             hitasToast("Virhe tallentaessa parannuksia!", "error");
         }
