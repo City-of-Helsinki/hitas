@@ -1,7 +1,9 @@
 import datetime
+from decimal import Decimal
 
 import pytest
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
 from hitas.calculations.helpers import months_between_dates
 from hitas.calculations.max_prices.rules import surface_area_price_ceiling_validity
 
@@ -101,3 +103,19 @@ def test__surface_area_price_ceiling_validity(date: datetime.date, expected: dat
 )
 def test__months_between_dates(first: datetime.date, second: datetime.date, expected: int):
     assert months_between_dates(first, second) == expected
+
+
+@pytest.mark.parametrize(
+    "months, expected",
+    [
+        (0, Decimal(1)),
+        (6 * 12, Decimal(1)),
+        (6 * 12 + 1, Decimal("0.9998")),
+        (10 * 12 + 4, Decimal("0.9892")),
+        (494, Decimal("0.7434")),  # Last hard-coded value
+        (495, Decimal("0.7427")),
+        (496, Decimal("0.7420")),
+    ],
+)
+def test__depreciation_multiplier(months: int, expected: int):
+    assert depreciation_multiplier(months) == expected
