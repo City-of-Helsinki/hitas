@@ -28,7 +28,7 @@ django-jinja = "^2.10.2"
 num2words = "^0.5.12"
 
 [tool.poetry.dev-dependencies]
-autoflake = "^1.4"
+autoflake = "^2.0"
 black = "^22.3.0"
 factory-boy = "^3.2.1"
 flake8 = "^6.0.0"
@@ -37,7 +37,7 @@ pytest = "^7.1.2"
 pytest-cov = "4.0.0"
 pytest-django = "^4.5.2"
 ipython = "^8.4.0"
-openapi-core = "0.16.1"
+openapi-core = "^0.16"
 testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
 django-debug-toolbar = "^3.6.0"
 flake8-print = "^5.0.0"
