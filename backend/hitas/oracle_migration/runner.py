@@ -458,7 +458,7 @@ def create_apartments(
                 housing_company_construction_loan_rate=Decimal(
                     converted_data.created_housing_companies_by_oracle_id[apartment["company_id"]].interest_rate
                 ),
-                apartment_completion_date=apartment["completion_date"].date(),
+                apartment_completion_date=apartment["completion_date"],
                 apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
                 apartment_loans_during_construction=Decimal(apartment["loans_during_construction"]),
                 payments=fetch_payments(connection, apartment["id"]),
