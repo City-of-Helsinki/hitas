@@ -5668,7 +5668,7 @@ components:
             status: 400
             reason: Bad Request
             error: bad_request
-            details: Some fields failed validation
+            message: Some fields failed validation
             fields:
               - field: name
                 message: Length exceeds maximum length of 50
@@ -5708,7 +5708,7 @@ components:
           schema:
             $ref: '#/components/schemas/NotAcceptableError'
           example:
-            status: 405
+            status: 406
             reason: Not Acceptable
             error: not_acceptable
             message: Only 'application/json' Content-Type is supported.
