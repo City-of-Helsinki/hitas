@@ -86,7 +86,7 @@ def calculate_max_price(
     )
 
     # Select calculator
-    if apartment.completion_date >= datetime.date(2011, 1, 1):
+    if apartment.completion_date >= datetime.date(2011, 1, 1) and apartment.notes != "FIXME: old rules":
         max_price_calculator = Rules2011Onwards()
     else:
         max_price_calculator = RulesPre2011()
