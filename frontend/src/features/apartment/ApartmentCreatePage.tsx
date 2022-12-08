@@ -50,7 +50,7 @@ const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWrit
         ...ap,
         shares: ap.shares || {start: null, end: null},
         ownerships: [], // Stored in a separate state, not needed here
-        building: ap.links.building.id,
+        building: {id: ap.links.building.id},
         address: {
             ...ap.address,
             street_address: ap.links.building.street_address,
@@ -114,7 +114,7 @@ const ApartmentCreatePage = () => {
                           additional_work: null,
                       },
                   },
-                  building: (buildingOptions.length === 1 && buildingOptions[0].value) || "",
+                  building: {id: (buildingOptions.length === 1 && buildingOptions[0].value) || ""},
                   ownerships: [],
                   improvements: {
                       market_price_index: [],
@@ -134,7 +134,7 @@ const ApartmentCreatePage = () => {
             // Copy street_address from selected building
             address: {
                 ...formData.address,
-                street_address: buildingOptions.find((option) => option.value === formData.building)?.label || "",
+                street_address: buildingOptions.find((option) => option.value === formData.building.id)?.label || "",
             },
 
             // Clean away ownership items that don't have an owner selected
@@ -252,7 +252,7 @@ const ApartmentCreatePage = () => {
                             placeholder={formData.address.street_address}
                             defaultValue={{
                                 label: formData.address.street_address || "",
-                                value: formData.building || "",
+                                value: formData.building.id || "",
                             }}
                             options={buildingOptions || []}
                             required

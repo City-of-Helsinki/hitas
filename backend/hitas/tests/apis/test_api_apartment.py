@@ -734,7 +734,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
                 {"value": 3456.7, "name": "test-market-price-1", "completion_date": "1998-05"},
             ],
         },
-        "building": building.uuid.hex,
+        "building": {"id": building.uuid.hex},
         "notes": "Lorem ipsum",
     }
     return data
@@ -1068,8 +1068,15 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             ],
         ),
         ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be null."}]),
-        ({"building": ""}, [{"field": "building", "message": "This field is mandatory and cannot be blank."}]),
-        ({"building": "foo"}, [{"field": "building", "message": "Object does not exist with given id 'foo'."}]),
+        ({"building": "foo"}, [{"field": "building", "message": "Invalid data. Expected a dictionary, but got str."}]),
+        (
+            {"building": {"id": ""}},
+            [{"field": "building.id", "message": "This field is mandatory and cannot be blank."}],
+        ),
+        (
+            {"building": {"id": "foo"}},
+            [{"field": "building.id", "message": "Object does not exist with given id 'foo'."}],
+        ),
         ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be null."}]),
         (
             {
@@ -1378,9 +1385,9 @@ def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, inval
 @pytest.mark.django_db
 def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClient):
     b1: Building = BuildingFactory.create()
-    b2: Building = BuildingFactory.create()
+    b2: Building = BuildingFactory.create()  # Building is in a different housing company
     data = get_apartment_create_data(b1)
-    data["building"] = b2.uuid.hex
+    data["building"]["id"] = b2.uuid.hex
 
     response = api_client.post(
         reverse(
@@ -1439,7 +1446,7 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
             },
         },
         "notes": "Test Notes",
-        "building": ap.building.uuid.hex,
+        "building": {"id": ap.building.uuid.hex},
         "ownerships": [],
         "completion_date": None,
         "improvements": {
@@ -1557,7 +1564,7 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
     del data["address"]["city"]
     del data["links"]
     data["ownerships"] = owner_data
-    data["building"] = b.uuid.hex
+    data["building"] = {"id": b.uuid.hex}
 
     response = api_client.put(
         reverse(

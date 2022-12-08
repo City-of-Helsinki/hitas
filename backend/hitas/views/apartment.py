@@ -40,7 +40,7 @@ from hitas.views.utils import (
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
-from hitas.views.utils.serializers import YearMonthSerializer
+from hitas.views.utils.serializers import ReadOnlySerializer, YearMonthSerializer
 
 
 class MarketPriceImprovementSerializer(serializers.ModelSerializer):
@@ -341,6 +341,16 @@ class ApartmentImprovementSerializer(serializers.Serializer):
     )
 
 
+class ReadOnlyBuildingSerializer(ReadOnlySerializer):
+    id = UUIDRelatedField(queryset=Building.objects, source="uuid", write_only=True)
+
+    def get_model_class(self):
+        return Building
+
+    class Meta:
+        fields = ["id"]
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState, required=False, allow_null=True)
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type")
@@ -352,7 +362,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     prices = PricesSerializer(source="*", required=False, allow_null=True)
     ownerships = OwnershipSerializer(many=True)
     links = serializers.SerializerMethodField()
-    building = UUIDRelatedField(queryset=Building.objects.all(), write_only=True)
+    building = ReadOnlyBuildingSerializer(write_only=True)
     improvements = ApartmentImprovementSerializer(source="*")
 
     @staticmethod
