@@ -742,6 +742,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
 
 def get_minimal_apartment_data(data):
     return {
+        "type": None,
         "state": None,
         "surface_area": None,
         "shares": None,
@@ -889,12 +890,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "shares": None,
             "state": None,
             "surface_area": None,
-            "type": {
-                "code": ap.apartment_type.legacy_code_number,
-                "description": ap.apartment_type.description,
-                "id": ap.apartment_type.uuid.hex,
-                "value": ap.apartment_type.value,
-            },
+            "type": None,
         }
 
 
@@ -912,15 +908,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             ],
         ),
         (
-            {"type": None},
-            [{"field": "type", "message": "This field is mandatory and cannot be null."}],
-        ),
-        (
             {"type": {}},
-            [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
-        ),
-        (
-            {"type": {"id": None}},
             [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
         ),
         (

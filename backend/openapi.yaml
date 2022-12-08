@@ -3297,7 +3297,6 @@ components:
       required:
         - id
         - state
-        - type
         - surface_area
         - address
         - completion_date
@@ -3315,6 +3314,7 @@ components:
           description: Apartment type
           type: string
           example: h+k
+          nullable: true
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
@@ -3350,7 +3350,6 @@ components:
       required:
         - id
         - state
-        - type
         - surface_area
         - shares
         - address
@@ -3370,7 +3369,8 @@ components:
           nullable: true
           $ref: '#/components/schemas/ApartmentState'
         type:
-          $ref: '#/components/schemas/ReadOnlyCode'
+          nullable: true
+          $ref: '#/components/schemas/NullableReadOnlyCode'
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
@@ -5224,6 +5224,39 @@ components:
         id:
           description: ID of this code
           type: string
+          example: 21d25cc973d8450f8f89937b9eba0a04
+        value:
+          description: Value for this code
+          type: string
+          readOnly: true
+          example: luhtitalo
+        description:
+          description: Description of this code
+          type: string
+          nullable: true
+          readOnly: true
+          example: This building type is for luhtitalo
+        code:
+          description: Code number
+          type: string
+          readOnly: true
+          example: 001
+
+    NullableReadOnlyCode:
+      description: Hitas codebook entry
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+        - id
+        - value
+        - description
+        - code
+      properties:
+        id:
+          description: ID of this code
+          type: string
+          nullable: true
           example: 21d25cc973d8450f8f89937b9eba0a04
         value:
           description: Value for this code
