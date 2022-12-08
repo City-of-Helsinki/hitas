@@ -92,6 +92,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         "calculation_date": "2022-07-05",
         "valid_until": "2022-10-05",
         "index": "construction_price_index",
+        "new_hitas": True,
         "calculations": {
             "construction_price_index": {
                 "maximum_price": 223558.72,
@@ -302,6 +303,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         "maximum_price": 275924.91,
         "valid_until": "2022-10-05",
         "index": "market_price_index",
+        "new_hitas": True,
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {
@@ -493,6 +495,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         "maximum_price": 289735.91,
         "valid_until": "2022-12-07",
         "index": "market_price_index",
+        "new_hitas": False,
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {
@@ -778,6 +781,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         "maximum_price": 386683.32,
         "valid_until": "2023-02-21",
         "index": "market_price_index",
+        "new_hitas": False,
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {
@@ -1008,6 +1012,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         "maximum_price": 236292.0,
         "valid_until": "2022-11-30",
         "index": "surface_area_price_ceiling",
+        "new_hitas": True,
         "calculations": {
             "construction_price_index": {
                 "calculation_variables": {

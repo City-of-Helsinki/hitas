@@ -4115,6 +4115,7 @@ components:
         - calculation_date
         - maximum_price
         - index
+        - new_hitas
         - created_at
         - valid_until
         - calculations
@@ -4163,6 +4164,10 @@ components:
             - construction_price_index
             - market_price_index
             - surface_area_price_ceiling
+        new_hitas:
+          description: Was new Hitas ruleset used for the calculations
+          type: boolean
+          example: true
         calculations:
           description: Calculations for each index
           type: object
