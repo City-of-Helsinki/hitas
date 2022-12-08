@@ -4,14 +4,20 @@ from typing import List
 
 from dateutil.relativedelta import relativedelta
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
 from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
-from hitas.calculations.improvement import (
-    ImprovementData,
-    calculate_apartment_improvements_pre_2011,
-    calculate_housing_company_improvements_pre_2011,
+from hitas.calculations.helpers import months_between_dates
+from hitas.calculations.improvements.common import ImprovementData
+from hitas.calculations.improvements.rules_pre_2011_cpi import (
+    calculate_apartment_improvements_pre_2011_construction_price_index,
+    calculate_housing_company_improvements_pre_2011_construction_price_index,
 )
-from hitas.calculations.max_prices.rules import CalculatorRules, improvement_result_to_obj
-from hitas.calculations.max_prices.types import IndexCalculation, MaxPriceImprovements
+from hitas.calculations.improvements.rules_pre_2011_mpi import (
+    calculate_apartment_improvements_pre_2011_market_price_index,
+    calculate_housing_company_improvements_pre_2011_market_price_index,
+)
+from hitas.calculations.max_prices.rules import CalculatorRules
+from hitas.calculations.max_prices.types import IndexCalculation
 from hitas.models import Apartment
 
 
@@ -36,35 +42,92 @@ class RulesPre2011(CalculatorRules):
         housing_company_improvements: List,
         calculation_date: datetime.date,
     ) -> IndexCalculation:
-        # FIXME: implement
+        housing_company_index_adjusted_acquisition_price = (
+            apartment.completion_date_realized_housing_company_acquisition_price
+            * apartment.calculation_date_cpi
+            * depreciation_multiplier(months_between_dates(apartment.completion_date, calculation_date))
+        ) / apartment.completion_date_cpi
+
+        hc_improvements_result = calculate_housing_company_improvements_pre_2011_construction_price_index(
+            [
+                ImprovementData(
+                    name=i.name,
+                    value=i.value,
+                    completion_date=i.completion_date,
+                    completion_date_index=i.completion_date_index,
+                )
+                for i in housing_company_improvements
+            ],
+            completion_date_acquisition_price=apartment.completion_date_realized_housing_company_acquisition_price,
+            total_acquisition_price=apartment.realized_housing_company_acquisition_price,
+        )
+
+        housing_company_assets = (
+            housing_company_index_adjusted_acquisition_price + hc_improvements_result.summary.value_for_apartment
+        )
+
+        # Apartment share share
+        apartment_share_of_housing_company_assets = (
+            housing_company_assets
+            * apartment.acquisition_price
+            / apartment.completion_date_realized_housing_company_acquisition_price
+        )
+
+        # Apartment improvements
+        apartment_improvements_list = [
+            ImprovementData(
+                name=i.name,
+                value=i.value,
+                completion_date=i.completion_date,
+                completion_date_index=i.completion_date_index,
+                depreciation_percentage=i.depreciation_percentage.value,
+            )
+            for i in apartment_improvements
+        ]
+        if apartment.additional_work_during_construction:
+            # Add `additional_work_during_construction` as an improvement as it's treated as an improvement
+            # with pre 2011 rules
+            apartment_improvements_list.append(
+                ImprovementData(
+                    name="Rakennusaikaiset muutos- ja lisätyöt",
+                    value=apartment.additional_work_during_construction,
+                    completion_date=apartment.completion_date,
+                    completion_date_index=apartment.completion_date_cpi,
+                    treat_as_additional_work=True,
+                )
+            )
+        apartment_improvements_result = calculate_apartment_improvements_pre_2011_construction_price_index(
+            apartment_improvements_list,
+            calculation_date=calculation_date,
+            calculation_date_index=apartment.calculation_date_cpi,
+        )
+
+        # Debt free shares price
+        debt_free_shares_price = (
+            apartment_share_of_housing_company_assets
+            + apartment.interest_during_construction
+            + apartment_improvements_result.summary.value_for_apartment
+        )
+
+        # Final maximum price
+        max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
+
+        if max_price <= 0:
+            raise InvalidCalculationResultException()
+
         return IndexCalculation(
-            maximum_price=Decimal(0),
+            maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
-            calculation_variables=IndexCalculation.CalculationVars(
-                acquisition_price=apartment.acquisition_price,
-                additional_work_during_construction=None,
+            calculation_variables=IndexCalculation.CalculationVarsConstructionPriceIndexBefore2011(
+                housing_company_acquisition_price=housing_company_index_adjusted_acquisition_price,
+                housing_company_assets=housing_company_assets,
+                apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
                 interest_during_construction=apartment.interest_during_construction,
-                basic_price=Decimal(0),
-                index_adjustment=Decimal(0),
-                apartment_improvements=None,
-                housing_company_improvements=MaxPriceImprovements(
-                    items=[],
-                    summary=MaxPriceImprovements.Summary(
-                        depreciation=Decimal(0),
-                        excess=MaxPriceImprovements.Summary.Excess(
-                            surface_area=apartment.surface_area,
-                            value_per_square_meter=Decimal(0),
-                            total=Decimal(0),
-                        ),
-                        value=Decimal(0),
-                        value_added=Decimal(0),
-                        value_for_apartment=Decimal(0),
-                        value_for_housing_company=Decimal(0),
-                    ),
-                ),
-                debt_free_price=Decimal(0),
-                debt_free_price_m2=Decimal(0),
-                apartment_share_of_housing_company_loans=Decimal(0),
+                apartment_improvements=apartment_improvements_result,
+                housing_company_improvements=hc_improvements_result,
+                debt_free_price=debt_free_shares_price,
+                debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
+                apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
                 completion_date=apartment.completion_date,
                 completion_date_index=apartment.completion_date_cpi,
@@ -113,16 +176,15 @@ class RulesPre2011(CalculatorRules):
                     treat_as_additional_work=True,
                 )
             )
-        apartment_improvements_result = calculate_apartment_improvements_pre_2011(
+        apartment_improvements_result = calculate_apartment_improvements_pre_2011_market_price_index(
             apartment_improvements_list,
             calculation_date=calculation_date,
             calculation_date_index=apartment.calculation_date_mpi,
-            total_surface_area=total_surface_area,
             apartment_surface_area=apartment.surface_area,
         )
 
         # Housing company improvements
-        hc_improvements_result = calculate_housing_company_improvements_pre_2011(
+        hc_improvements_result = calculate_housing_company_improvements_pre_2011_market_price_index(
             [
                 ImprovementData(
                     name=i.name,
@@ -142,8 +204,8 @@ class RulesPre2011(CalculatorRules):
         debt_free_shares_price = (
             basic_price
             + index_adjustment
-            + apartment_improvements_result.summary.improvement_value_for_apartment
-            + hc_improvements_result.summary.improvement_value_for_apartment
+            + apartment_improvements_result.summary.accepted_value
+            + hc_improvements_result.summary.accepted_value
         )
 
         # Final maximum price
@@ -155,14 +217,13 @@ class RulesPre2011(CalculatorRules):
         return IndexCalculation(
             maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
-            calculation_variables=IndexCalculation.CalculationVars(
+            calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
                 acquisition_price=apartment.acquisition_price,
-                additional_work_during_construction=None,
                 interest_during_construction=apartment.interest_during_construction,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
-                apartment_improvements=improvement_result_to_obj(apartment_improvements_result),
-                housing_company_improvements=improvement_result_to_obj(hc_improvements_result),
+                apartment_improvements=apartment_improvements_result,
+                housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,

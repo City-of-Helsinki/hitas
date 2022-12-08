@@ -158,6 +158,8 @@ class HitasAnonymizedText(HitasAnonymized):
 
 
 class HitasAnonymizedMonthAndDay(HitasAnonymized):
+    impl = types.Date
+
     def fake(self, value):
         beginning_of_year = value.replace(day=1, month=1)
         beginning_of_next_year = beginning_of_year.replace(year=beginning_of_year.year + 1)
@@ -165,6 +167,8 @@ class HitasAnonymizedMonthAndDay(HitasAnonymized):
 
 
 class HitasAnonymizedDay(HitasAnonymized):
+    impl = types.Date
+
     def fake(self, value):
         beginning_of_month = value.replace(day=1)
         beginning_of_next_month = value + relativedelta(months=1)

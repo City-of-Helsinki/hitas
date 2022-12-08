@@ -63,7 +63,7 @@ def create_max_price_calculation(
 
 
 def calculate_max_price(
-    apartment,
+    apartment: Apartment,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
@@ -86,10 +86,12 @@ def calculate_max_price(
     )
 
     # Select calculator
-    if apartment.completion_date >= datetime.date(2011, 1, 1):
+    if apartment.completion_date >= datetime.date(2011, 1, 1) and apartment.notes != "FIXME: old rules":
         max_price_calculator = Rules2011Onwards()
+        new_hitas_rules = True
     else:
         max_price_calculator = RulesPre2011()
+        new_hitas_rules = False
 
     #
     # Check we found the necessary indices
@@ -157,6 +159,7 @@ def calculate_max_price(
         "valid_until": valid_until,
         "maximum_price": max_price,
         "index": max_index,
+        "new_hitas": new_hitas_rules,
         "calculations": {
             "construction_price_index": dataclasses.asdict(construction_price_index),
             "market_price_index": dataclasses.asdict(market_price_index),
@@ -363,6 +366,25 @@ WHERE a.id = hitas_apartment.id
     SELECT value
     FROM hitas_surfaceareapriceceiling
     WHERE month = DATE_TRUNC('month', %s)
+""",
+                "realized_housing_company_acquisition_price": """
+    SELECT
+        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
+    FROM hitas_apartment AS a
+        LEFT JOIN hitas_building AS b ON a.building_id = b.id
+        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
+        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
+        WHERE hc.id = hitas_housingcompany.id
+""",
+                "completion_date_realized_housing_company_acquisition_price": """
+    SELECT
+        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
+    FROM hitas_apartment AS a
+        LEFT JOIN hitas_building AS b ON a.building_id = b.id
+        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
+        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
+        WHERE hc.id = hitas_housingcompany.id
+            AND a.completion_date = hitas_apartment.completion_date
 """,
             },
             select_params=[calculation_date] * 6,

@@ -1073,6 +1073,285 @@ paths:
               schema:
                 additionalProperties: false
                 $ref: '#/components/schemas/ApartmentMaximumPrice'
+              examples:
+                Apartment completed 2011-01 onwards:
+                  value:
+                    additional_info: This is an example additional info string
+                    apartment:
+                      address:
+                        apartment_number: 1
+                        city: Oulu
+                        floor: '1'
+                        postal_code: '90100'
+                        stair: A
+                        street_address: Example street
+                      ownerships:
+                      - name: Erkki Esimerkki
+                        percentage: 50.0
+                      - name: Eija Esimerkki
+                        percentage: 50.0
+                      rooms: 2
+                      shares:
+                        end: 150
+                        start: 1
+                        total: 150
+                      surface_area: 30.0
+                      type: h+kk
+                    calculation_date: '2022-07-05'
+                    calculations:
+                      construction_price_index:
+                        maximum_price: 223558.72
+                        valid_until: "2022-10-05"
+                        maximum: true
+                        calculation_variables:
+                          acquisition_price: 199500.0
+                          additional_work_during_construction: 0.0
+                          basic_price: 199500.0
+                          index_adjustment: 26401.46
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 150000.0
+                                completion_date: "2020-05-21"
+                                value_added: 20040.0
+                                value_for_housing_company: 22707.86
+                                value_for_apartment: 157.26
+                            summary:
+                              value: 150000.0
+                              value_added: 20040.0
+                              excess:
+                                surface_area: 4332.0
+                                value_per_square_meter: 30.0
+                                total: 129960.0
+                              value_for_housing_company: 22707.86
+                              value_for_apartment: 157.26
+                          debt_free_price: 226058.72
+                          debt_free_price_m2: 7535.29
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                          completion_date: "2019-11-27"
+                          completion_date_index: 129.29
+                          calculation_date: "2022-07-05"
+                          calculation_date_index: 146.4
+                      market_price_index:
+                        maximum_price: 222343.46
+                        valid_until: "2022-10-05"
+                        maximum: false
+                        calculation_variables:
+                          acquisition_price: 199500.0
+                          additional_work_during_construction: 0.0
+                          basic_price: 199500.0
+                          index_adjustment: 25189.99
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 150000.0
+                                completion_date: "2020-05-21"
+                                value_added: 20040.0
+                                value_for_housing_company: 22161.19
+                                value_for_apartment: 153.47
+                            summary:
+                              value: 150000.0
+                              value_added: 20040.0
+                              excess:
+                                surface_area: 4332.0
+                                value_per_square_meter: 30.0
+                                total: 129960.0
+                              value_for_housing_company: 22161.19
+                              value_for_apartment: 153.47
+                          debt_free_price: 224843.46
+                          debt_free_price_m2: 7494.78
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                          completion_date: "2019-11-27"
+                          completion_date_index: 167.9
+                          calculation_date: "2022-07-05"
+                          calculation_date_index: 189.1
+                      surface_area_price_ceiling:
+                        maximum_price: 143570.0
+                        valid_until: "2022-08-31"
+                        maximum: false
+                        calculation_variables:
+                          calculation_date: "2022-07-05"
+                          calculation_date_value: 4869.0
+                          surface_area: 30.0
+                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans_date: "2022-07-28"
+                    confirmed_at: null
+                    created_at: '2022-12-05T08:13:25.380594Z'
+                    housing_company:
+                      archive_id: 124
+                      official_name: Example housing company Oy
+                      property_manager:
+                        name: Example property manager Oy
+                        street_address: Example street address 123 B 9 90100 Oulu
+                    id: bd8ba72c19764af0a3edffa11260a9eb
+                    index: construction_price_index
+                    maximum_price: 223558.72
+                    new_hitas: true
+                    valid_until: '2022-10-05'
+                Apartment completed before 2011-01:
+                  value:
+                    additional_info: This is an example additional info string
+                    apartment:
+                      address:
+                        apartment_number: 1
+                        city: Oulu
+                        floor: '1'
+                        postal_code: '90100'
+                        stair: A
+                        street_address: Example street
+                      ownerships:
+                      - name: Erkki Esimerkki
+                        percentage: 50.0
+                      - name: Eija Esimerkki
+                        percentage: 50.0
+                      rooms: 2
+                      shares:
+                        end: 1888
+                        start: 1729
+                        total: 160
+                      surface_area: 54.5
+                      type: "h+kk"
+                    calculation_date: '2022-09-07'
+                    calculations:
+                      construction_price_index:
+                        calculation_variables:
+                          housing_company_acquisition_price: 170_886.35
+                          housing_company_assets: 170_886.35
+                          apartment_share_of_housing_company_assets: 170886.35
+                          interest_during_construction: 3455.0
+                          apartment_improvements:
+                            items:
+                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                                value: 4307.0
+                                calculation_date_index: 364.4
+                                completion_date: "2003-05-09"
+                                completion_date_index: 244.9
+                                index_adjusted: 6408.62
+                                depreciation:
+                                  amount: 0.0
+                                  percentage: 0.0
+                                  time:
+                                    years: 19
+                                    months: 3
+                                value_for_apartment: 6408.62
+                            summary:
+                              value: 4307.0
+                              index_adjusted: 6408.62
+                              depreciation: 0.0
+                              value_for_apartment: 6408.62
+                          housing_company_improvements:
+                            items: []
+                            summary:
+                              value: 0.0
+                              value_for_apartment: 0.0
+                          debt_free_price: 180749.97
+                          debt_free_price_m2: 3316.51
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                          completion_date: "2003-05-09"
+                          completion_date_index: 244.9
+                          calculation_date: "2022-09-07"
+                          calculation_date_index: 364.4
+                        maximum_price: 180749.97
+                        valid_until: "2022-12-07"
+                        maximum: false
+                      market_price_index:
+                        calculation_variables:
+                          acquisition_price: 123173.0
+                          interest_during_construction: 3455.0
+                          basic_price: 126628.0
+                          index_adjustment: 153577.28
+                          apartment_improvements:
+                            items:
+                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                                value: 4307.0
+                                completion_date: "2003-05-09"
+                                value_without_excess: 4307.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 19
+                                    months: 3
+                                accepted_value: 9530.63
+                            summary:
+                              value: 4307.0
+                              value_without_excess: 4307.0
+                              depreciation: 0.0
+                              excess:
+                                surface_area: 54.5
+                                total: 5450.0
+                                value_per_square_meter: 100.0
+                              accepted_value: 9530.63
+                          housing_company_improvements:
+                            items:
+                              - name: Test improvement
+                                value: 0.0
+                                completion_date: "2003-05-01"
+                                value_without_excess: 0.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 19
+                                    months: 4
+                                accepted_value_for_housing_company: 0.0
+                                accepted_value: 0.0
+                              - name: Another test improvement
+                                value: 1587.0
+                                completion_date: "2004-10-01"
+                                value_without_excess: 0.0
+                                depreciation:
+                                  amount: 0.0
+                                  time:
+                                    years: 17
+                                    months: 11
+                                accepted_value_for_housing_company: 0.0
+                                accepted_value: 0.0
+                            summary:
+                              value: 1587.0
+                              value_without_excess: 0.0
+                              excess:
+                                surface_area: 3390.5
+                                value_per_square_meter: 150.0
+                                total: 508_575.0
+                              depreciation: 0.0
+                              accepted_value_for_housing_company: 0.0
+                              accepted_value: 0.0
+                          debt_free_price: 289735.91
+                          debt_free_price_m2: 5316.26
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                          completion_date: "2003-05-09"
+                          completion_date_index: 263.6
+                          calculation_date: "2022-09-07"
+                          calculation_date_index: 583.3
+                        maximum_price: 289735.91
+                        valid_until: "2022-12-07"
+                        maximum: true
+                      surface_area_price_ceiling:
+                        maximum_price: 265524.0
+                        valid_until: "2022-11-30"
+                        maximum: false
+                        calculation_variables:
+                          calculation_date: "2022-09-07"
+                          calculation_date_value: 4872.0
+                          surface_area: 54.5
+                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans_date: "2022-09-05"
+                    confirmed_at: null
+                    created_at: '2022-12-05T08:23:28.109872Z'
+                    housing_company:
+                      archive_id: 1
+                      official_name: foo
+                      property_manager:
+                        name: foo
+                        street_address: foo
+                    id: 95b342b0dfac42b5a2165c641488cc55
+                    index: market_price_index
+                    maximum_price: 289735.91
+                    new_hitas: false
+                    valid_until: '2022-12-07'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -3246,7 +3525,10 @@ components:
         - valid_until
       properties:
         calculation_variables:
-          $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVars'
+          oneOf:
+            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVars2011Onwards'
+            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011MarketPriceIndex'
+            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011ConstructionPriceIndex'
         maximum_price:
           description: Maximum price for this index
           type: number
@@ -3262,16 +3544,14 @@ components:
           type: boolean
           example: true
 
-    ApartmentMaximumPriceCalculationVars:
+    ApartmentMaximumPriceCalculationVars2011Onwards:
       description: Variables used for apartment's maximum price calculations
       type: object
       required:
         - acquisition_price
         - additional_work_during_construction
         - basic_price
-        - interest_during_construction
         - index_adjustment
-        - apartment_improvements
         - housing_company_improvements
         - debt_free_price
         - debt_free_price_m2
@@ -3300,13 +3580,6 @@ components:
           type: number
           minimum: 0
           example: 199500.21
-        interest_during_construction:
-          description: |-
-            TBD
-          type: number
-          nullable: true
-          minimum: 0
-          example: 1802.88
         index_adjustment:
           description: |-
             Value increase of the apartment based on the index. Calculated by dividing the
@@ -3315,11 +3588,8 @@ components:
           type: number
           minimum: 0
           example: 26401.54
-        apartment_improvements:
-          nullable: true
-          $ref: '#/components/schemas/ApartmentMaximumPriceImprovements'
         housing_company_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceImprovements'
+          $ref: '#/components/schemas/ApartmentMaximumPriceImprovements2011Onwards'
         debt_free_price:
           description: |-
             Sum of basic price, index adjustment, apartment improvements and housing company
@@ -3365,11 +3635,191 @@ components:
           minimum: 0
           example: 146.4
 
-    ApartmentMaximumPriceImprovements:
+    ApartmentMaximumPriceCalculationVarsBefore2011MarketPriceIndex:
+      description: Variables used for apartment's maximum price calculations
+      type: object
+      required:
+        - acquisition_price
+        - basic_price
+        - interest_during_construction
+        - index_adjustment
+        - apartment_improvements
+        - housing_company_improvements
+        - debt_free_price
+        - debt_free_price_m2
+        - apartment_share_of_housing_company_loans
+        - apartment_share_of_housing_company_loans_date
+        - completion_date
+        - completion_date_index
+        - calculation_date
+        - calculation_date_index
+      properties:
+        acquisition_price:
+          description: Apartment's acquisition price
+          type: number
+          minimum: 0
+          example: 199500.03
+        basic_price:
+          description: |-
+            Basic price is sum of the apartment's acquisition price and the apartment's
+            additional work during construction.
+          type: number
+          minimum: 0
+          example: 199500.21
+        interest_during_construction:
+          description: Amount of interest accumulated during construction of the apartment
+          type: number
+          minimum: 0
+          example: 1802.88
+        index_adjustment:
+          description: |-
+            Value increase of the apartment based on the index. Calculated by dividing the
+            calculation date index value with the apartment's completion date's index value
+            and multiplying the result with the apartment's basic price.
+          type: number
+          minimum: 0
+          example: 26401.54
+        apartment_improvements:
+          $ref: '#/components/schemas/ApartmentMaximumPriceMarketPriceIndexApartmentImprovements'
+        housing_company_improvements:
+          $ref: '#/components/schemas/ApartmentMaximumPriceMarketPriceIndexHousingCompanyImprovements'
+        debt_free_price:
+          description: |-
+            Sum of basic price, index adjustment, apartment improvements and housing company
+            improvements.
+          type: number
+          minimum: 0
+          example: 226058.97
+        debt_free_price_m2:
+          description: |-
+            Debt free price divided by the apartment's surface area.
+          type: number
+          minimum: 0
+          example: 7535.57
+        apartment_share_of_housing_company_loans:
+          description: |-
+            How much the apartment's share of the housing company loans.
+          type: number
+          minimum: 0
+          example: 2500.07
+        apartment_share_of_housing_company_loans_date:
+          description: Date for the apartment share of housing company loan
+          type: string
+          format: date
+          example: "2022-07-28"
+        completion_date:
+          description: The date the apartment was completed.
+          type: string
+          format: date
+          example: "2019-11-27"
+        completion_date_index:
+          description: The index value on the apartment's completion date.
+          type: number
+          minimum: 0
+          example: 129.29
+        calculation_date:
+          description: Maximum price calculation date.
+          type: string
+          format: date
+          example: "2022-07-05"
+        calculation_date_index:
+          description: The index value on the calculation date.
+          type: number
+          minimum: 0
+          example: 146.4
+
+    ApartmentMaximumPriceCalculationVarsBefore2011ConstructionPriceIndex:
+      description: Variables used for apartment's maximum price calculations
+      type: object
+      required:
+        - housing_company_acquisition_price
+        - housing_company_assets
+        - apartment_share_of_housing_company_assets
+        - interest_during_construction
+        - apartment_improvements
+        - housing_company_improvements
+        - debt_free_price
+        - debt_free_price_m2
+        - apartment_share_of_housing_company_loans
+        - apartment_share_of_housing_company_loans_date
+        - completion_date
+        - completion_date_index
+        - calculation_date
+        - calculation_date_index
+      properties:
+        housing_company_acquisition_price:
+          description: Housing company's realized acquisition price
+          type: number
+          minimum: 0
+          example: 199500.03
+        housing_company_assets:
+          description: Housing company's assets (realized acquisition price and improvements)
+          type: number
+          minimum: 0
+          example: 199500.03
+        apartment_share_of_housing_company_assets:
+          description: This apartment's share of housing company's assets
+          type: number
+          minimum: 0
+          example: 199500.03
+        interest_during_construction:
+          description: Apartment's interest during construction
+          type: number
+          minimum: 0
+          example: 1802.88
+        apartment_improvements:
+          $ref: '#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexApartmentImprovements'
+        housing_company_improvements:
+          $ref: '#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexHousingCompanyImprovements'
+        debt_free_price:
+          description: |-
+            Sum of basic price, index adjustment, apartment improvements and housing company
+            improvements.
+          type: number
+          minimum: 0
+          example: 226058.97
+        debt_free_price_m2:
+          description: |-
+            Debt free price divided by the apartment's surface area.
+          type: number
+          minimum: 0
+          example: 7535.57
+        apartment_share_of_housing_company_loans:
+          description: |-
+            How much the apartment's share of the housing company loans.
+          type: number
+          minimum: 0
+          example: 2500.07
+        apartment_share_of_housing_company_loans_date:
+          description: Date for the apartment share of housing company loan
+          type: string
+          format: date
+          example: "2022-07-28"
+        completion_date:
+          description: The date the apartment was completed.
+          type: string
+          format: date
+          example: "2019-11-27"
+        completion_date_index:
+          description: The index value on the apartment's completion date.
+          type: number
+          minimum: 0
+          example: 129.29
+        calculation_date:
+          description: Maximum price calculation date.
+          type: string
+          format: date
+          example: "2022-07-05"
+        calculation_date_index:
+          description: The index value on the calculation date.
+          type: number
+          minimum: 0
+          example: 146.4
+
+    ApartmentMaximumPriceImprovements2011Onwards:
       description: Improvement information used in the calculation
       type: object
       additionalProperties: false
-      nullable: true
       required:
         - items
         - summary
@@ -3385,7 +3835,6 @@ components:
               - name
               - value
               - completion_date
-              - depreciation
               - value_for_housing_company
               - value_for_apartment
             properties:
@@ -3399,49 +3848,18 @@ components:
                 minimum: 0
                 example: 13359.93
               completion_date:
-                $ref: '#/components/schemas/YearMonth'
+                description: Original value of this improvement
+                type: string
+                format: date
+                example: 2022-07-05
               value_added:
                 description: Improvement value minus the excess
                 type: number
                 minimum: 0
                 example: 20040.00
-              depreciation:
-                description: Improvement depreciation
-                type: object
-                additionalProperties: false
-                nullable: true
-                required:
-                  - amount
-                  - time
-                properties:
-                  amount:
-                    description: Amount the value has reduced based on the depreciation calculation.
-                    type: number
-                    minimum: 0
-                    example: 3965.69
-                  time:
-                    description: Amount of time in months the improvement has depreciated
-                    type: object
-                    additionalProperties: false
-                    required:
-                      - years
-                      - months
-                    properties:
-                      years:
-                        description: How many years (in addition to months) this improvement has depreciated
-                        type: integer
-                        minimum: 0
-                        example: 13
-                      months:
-                        description: How many months (in addition to years) this improvement has depreciated
-                        type: integer
-                        minimum: 0
-                        maximum: 11
-                        example: 7
               value_for_housing_company:
                 description: Housing company's share of the improvement's value (adjusted to index)
                 type: number
-                nullable: true
                 minimum: 0
                 example: 22707.86
               value_for_apartment:
@@ -3457,7 +3875,6 @@ components:
             - value
             - value_added
             - excess
-            - depreciation
             - value_for_housing_company
             - value_for_apartment
           properties:
@@ -3495,20 +3912,474 @@ components:
                   type: number
                   minimum: 0
                   example: 129960.0
-            depreciation:
-              description: Sum of improvement value minus the excess
-              type: number
-              nullable: true
-              minimum: 0
-              example: 0.0
             value_for_housing_company:
               description: Sum of housing company's share of the improvement's value (adjusted to index)
               type: number
-              nullable: true
               minimum: 0
               example: 22707.86
             value_for_apartment:
               description: Sum of apartment share of the improvement's value (adjusted to index)
+              type: number
+              minimum: 0
+              example: 157.0
+
+    ApartmentMaximumPriceConstructionPriceIndexHousingCompanyImprovements:
+      description: Improvement information used in the calculation
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - summary
+      properties:
+        items:
+          description: List of improvements
+          type: array
+          items:
+            description: Single improvement
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - value
+              - value_for_apartment
+            properties:
+              name:
+                description: Name of this improvement
+                type: string
+                example: Liittyminen HTV-verkkoon
+              value:
+                description: Original value of this improvement
+                type: number
+                minimum: 0
+                example: 13359.93
+              value_for_apartment:
+                description: Housing company improvement's value for this apartment
+                type: number
+                minimum: 0
+                example: 20040.00
+        summary:
+          description: Summary data across all improvements
+          type: object
+          additionalProperties: false
+          required:
+            - value
+            - value_for_apartment
+          properties:
+            value:
+              description: Sum of improvement values
+              type: number
+              minimum: 0
+              example: 13359.85
+            value_for_apartment:
+              description: Sum of all housing company improvement's values for this apartment
+              type: number
+              minimum: 0
+              example: 157.0
+
+    ApartmentMaximumPriceMarketPriceIndexHousingCompanyImprovements:
+      description: Improvement information used in the calculation
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - summary
+      properties:
+        items:
+          description: List of improvements
+          type: array
+          items:
+            description: Single improvement
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - value
+              - completion_date
+              - value_without_excess
+              - depreciation
+              - accepted_value_for_housing_company
+              - accepted_value
+            properties:
+              name:
+                description: Name of this improvement
+                type: string
+                example: Liittyminen HTV-verkkoon
+              value:
+                description: Original value of this improvement
+                type: number
+                minimum: 0
+                example: 13359.93
+              completion_date:
+                description: Completion date of this improvement
+                type: string
+                format: date
+                example: 2016-12-04
+              value_without_excess:
+                description: Improvement value minus the excess
+                type: number
+                minimum: 0
+                example: 20040.00
+              depreciation:
+                description: Improvement depreciation
+                type: object
+                additionalProperties: false
+                required:
+                  - amount
+                  - time
+                properties:
+                  amount:
+                    description: Amount the value has reduced based on the depreciation calculation.
+                    type: number
+                    minimum: 0
+                    example: 3965.69
+                  time:
+                    description: Amount of time in months the improvement has depreciated
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - years
+                      - months
+                    properties:
+                      years:
+                        description: How many years (in addition to months) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        example: 13
+                      months:
+                        description: How many months (in addition to years) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        maximum: 11
+                        example: 7
+              accepted_value_for_housing_company:
+                description: Accepted value for the whole housing company
+                type: number
+                minimum: 0
+                example: 157.26
+              accepted_value:
+                description: Apartment's share of housing company's accepted value
+                type: number
+                minimum: 0
+                example: 157.26
+        summary:
+          description: Summary data across all improvements
+          type: object
+          additionalProperties: false
+          required:
+            - value
+            - value_without_excess
+            - excess
+            - depreciation
+            - accepted_value_for_housing_company
+            - accepted_value
+          properties:
+            value:
+              description: Sum of improvement values
+              type: number
+              minimum: 0
+              example: 13359.85
+            value_without_excess:
+              description: Sum of improvement value added
+              type: number
+              minimum: 0
+              example: 13359.00
+            excess:
+              description: Excess information
+              type: object
+              additionalProperties: false
+              required:
+                - surface_area
+                - value_per_square_meter
+                - total
+              properties:
+                surface_area:
+                  description: Apartment's surface area
+                  type: number
+                  minimum: 0
+                  example: 4332.0
+                value_per_square_meter:
+                  description: Excess value per square meter
+                  type: number
+                  minimum: 0
+                  example: 30.0
+                total:
+                  description: Excess value per square meter multiplied by apartment's surface area
+                  type: number
+                  minimum: 0
+                  example: 129960.0
+            depreciation:
+              description: Sum of improvement value minus the excess
+              type: number
+              minimum: 0
+              example: 0.0
+            accepted_value_for_housing_company:
+              description: Sum of all accepted values for the whole housing company
+              type: number
+              minimum: 0
+              example: 15700.0
+            accepted_value:
+              description: Sum of apartment share of the improvement's value (adjusted to index)
+              type: number
+              minimum: 0
+              example: 1570.0
+
+    ApartmentMaximumPriceMarketPriceIndexApartmentImprovements:
+      description: Improvement information used in the calculation
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - summary
+      properties:
+        items:
+          description: List of improvements
+          type: array
+          items:
+            description: Single improvement
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - value
+              - completion_date
+              - value_without_excess
+              - depreciation
+              - accepted_value
+            properties:
+              name:
+                description: Name of this improvement
+                type: string
+                example: Liittyminen HTV-verkkoon
+              value:
+                description: Original value of this improvement
+                type: number
+                minimum: 0
+                example: 13359.93
+              completion_date:
+                description: Completion date of this improvement
+                type: string
+                format: date
+                example: 2016-12-04
+              value_without_excess:
+                description: Improvement value minus the excess
+                type: number
+                minimum: 0
+                example: 20040.00
+              depreciation:
+                description: Improvement depreciation
+                type: object
+                additionalProperties: false
+                required:
+                  - amount
+                  - time
+                properties:
+                  amount:
+                    description: Amount the value has reduced based on the depreciation calculation.
+                    type: number
+                    minimum: 0
+                    example: 3965.69
+                  time:
+                    description: Amount of time in months the improvement has depreciated
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - years
+                      - months
+                    properties:
+                      years:
+                        description: How many years (in addition to months) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        example: 13
+                      months:
+                        description: How many months (in addition to years) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        maximum: 11
+                        example: 7
+              accepted_value:
+                description: Final accepted value for the apartment. Original value with excess and depreciation reduced
+                type: number
+                minimum: 0
+                example: 157.26
+        summary:
+          description: Summary data across all improvements
+          type: object
+          additionalProperties: false
+          required:
+            - value
+            - value_without_excess
+            - excess
+            - depreciation
+            - accepted_value
+          properties:
+            value:
+              description: Sum of improvement values
+              type: number
+              minimum: 0
+              example: 13359.85
+            value_without_excess:
+              description: Sum of improvement value added
+              type: number
+              minimum: 0
+              example: 13359.00
+            excess:
+              description: Excess information
+              type: object
+              additionalProperties: false
+              required:
+                - surface_area
+                - value_per_square_meter
+                - total
+              properties:
+                surface_area:
+                  description: Apartment's surface area
+                  type: number
+                  minimum: 0
+                  example: 4332.0
+                value_per_square_meter:
+                  description: Excess value per square meter
+                  type: number
+                  minimum: 0
+                  example: 30.0
+                total:
+                  description: Excess value per square meter multiplied by apartment's surface area
+                  type: number
+                  minimum: 0
+                  example: 129960.0
+            depreciation:
+              description: Sum of improvement value minus the excess
+              type: number
+              minimum: 0
+              example: 0.0
+            accepted_value:
+              description: Sum of apartment share of the improvement's value
+              type: number
+              minimum: 0
+              example: 157.0
+
+    ApartmentMaximumPriceConstructionPriceIndexApartmentImprovements:
+      description: Improvement information used in the calculation
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - summary
+      properties:
+        items:
+          description: List of improvements
+          type: array
+          items:
+            description: Single improvement
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - value
+              - completion_date
+              - completion_date_index
+              - calculation_date_index
+              - depreciation
+              - index_adjusted
+              - value_for_apartment
+            properties:
+              name:
+                description: Name of this improvement
+                type: string
+                example: Liittyminen HTV-verkkoon
+              value:
+                description: Original value of this improvement
+                type: number
+                minimum: 0
+                example: 13359.93
+              completion_date:
+                description: Completion date of this improvement
+                type: string
+                format: date
+                example: 2016-12-04
+              completion_date_index:
+                description: Completion date of this improvement
+                type: number
+                example: 157.1
+              calculation_date_index:
+                description: Completion date of this improvement
+                type: number
+                example: 196.42
+              depreciation:
+                description: Improvement depreciation
+                type: object
+                additionalProperties: false
+                required:
+                  - amount
+                  - percentage
+                  - time
+                properties:
+                  amount:
+                    description: Amount the value has reduced based on the depreciation calculation.
+                    type: number
+                    minimum: 0
+                    example: 3965.69
+                  percentage:
+                    description: This improvement's depreciation percentage
+                    type: number
+                    minimum: 0
+                    example: 6.0
+                  time:
+                    description: Amount of time in months the improvement has depreciated
+                    type: object
+                    additionalProperties: false
+                    required:
+                      - years
+                      - months
+                    properties:
+                      years:
+                        description: How many years (in addition to months) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        example: 13
+                      months:
+                        description: How many months (in addition to years) this improvement has depreciated
+                        type: integer
+                        minimum: 0
+                        maximum: 11
+                        example: 7
+              index_adjusted:
+                description: Index adjusted value of this improvement
+                type: number
+                minimum: 0
+                example: 20040.00
+              value_for_apartment:
+                description: Final value for this improvement (index adjusted value minus the depreciation)
+                type: number
+                minimum: 0
+                example: 157.26
+        summary:
+          description: Summary data across all improvements
+          type: object
+          additionalProperties: false
+          required:
+            - value
+            - depreciation
+            - index_adjusted
+            - value_for_apartment
+          properties:
+            value:
+              description: Sum of improvement values
+              type: number
+              minimum: 0
+              example: 13359.85
+            depreciation:
+              description: Sum of improvement value minus the excess
+              type: number
+              minimum: 0
+              example: 0.0
+            index_adjusted:
+              description: Sum of all index adjusted values
+              type: number
+              minimum: 0
+              example: 0.0
+            value_for_apartment:
+              description: Sum of all values for apartments
               type: number
               minimum: 0
               example: 157.0
@@ -3523,6 +4394,7 @@ components:
         - calculation_date
         - maximum_price
         - index
+        - new_hitas
         - created_at
         - valid_until
         - calculations
@@ -3571,6 +4443,10 @@ components:
             - construction_price_index
             - market_price_index
             - surface_area_price_ceiling
+        new_hitas:
+          description: Was new Hitas ruleset used for the calculations
+          type: boolean
+          example: true
         calculations:
           description: Calculations for each index
           type: object
@@ -4792,7 +5668,7 @@ components:
             status: 400
             reason: Bad Request
             error: bad_request
-            details: Some fields failed validation
+            message: Some fields failed validation
             fields:
               - field: name
                 message: Length exceeds maximum length of 50
@@ -4832,7 +5708,7 @@ components:
           schema:
             $ref: '#/components/schemas/NotAcceptableError'
           example:
-            status: 405
+            status: 406
             reason: Not Acceptable
             error: not_acceptable
             message: Only 'application/json' Content-Type is supported.
