@@ -378,7 +378,8 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                                 formData={formData}
                                 setFormData={setFormData}
                                 error={error}
-                                maxDate={new Date()}
+                                maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
+                                tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
                             />
                             <FormInputField
                                 inputType="date"
@@ -388,6 +389,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                                 setFormData={setFormData}
                                 error={error}
                                 maxDate={new Date()}
+                                tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
                             />
                         </div>
                         <FormInputField
