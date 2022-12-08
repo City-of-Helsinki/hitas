@@ -185,6 +185,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                 "calculation_variables": {
                     "calculation_date": "2022-07-05",
                     "calculation_date_value": 4869.0,
+                    "debt_free_price": 146070.0,
                     "surface_area": 30.0,
                     "apartment_share_of_housing_company_loans": 2500.0,
                     "apartment_share_of_housing_company_loans_date": "2022-07-28",
@@ -396,6 +397,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
                 "calculation_variables": {
                     "calculation_date": "2022-07-05",
                     "calculation_date_value": 4869.0,
+                    "debt_free_price": 233712,
                     "surface_area": 48.0,
                     "apartment_share_of_housing_company_loans": 2500.0,
                     "apartment_share_of_housing_company_loans_date": "2022-07-28",
@@ -651,6 +653,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                 "calculation_variables": {
                     "calculation_date": "2022-09-07",
                     "calculation_date_value": 4872.0,
+                    "debt_free_price": 265524,
                     "surface_area": 54.5,
                     "apartment_share_of_housing_company_loans": 0.0,
                     "apartment_share_of_housing_company_loans_date": "2022-09-05",
@@ -929,6 +932,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                 "calculation_variables": {
                     "calculation_date": "2022-11-21",
                     "calculation_date_value": 4733.0,
+                    "debt_free_price": 215352.0,
                     "surface_area": 45.5,
                     "apartment_share_of_housing_company_loans": 3000.0,
                     "apartment_share_of_housing_company_loans_date": "2022-11-20",
@@ -1087,6 +1091,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                 "calculation_variables": {
                     "calculation_date": "2022-09-29",
                     "calculation_date_value": 4872.0,
+                    "debt_free_price": 236292,
                     "surface_area": 48.5,
                     "apartment_share_of_housing_company_loans": 0,
                     "apartment_share_of_housing_company_loans_date": "2022-10-01",

@@ -74,6 +74,7 @@ class SurfaceAreaPriceCeilingCalculation:
     class CalculationVars:
         calculation_date: datetime.date
         calculation_date_value: Decimal
+        debt_free_price: Decimal
         surface_area: Decimal
         apartment_share_of_housing_company_loans: Decimal
         apartment_share_of_housing_company_loans_date: datetime.date
