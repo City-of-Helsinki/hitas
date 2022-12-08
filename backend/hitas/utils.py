@@ -2,6 +2,7 @@ import datetime
 import operator
 from typing import Any, Optional
 
+from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 
 
@@ -26,7 +27,7 @@ class BearerAuthentication(TokenAuthentication):
 
 
 def this_month() -> datetime.date:
-    return monthify(datetime.date.today())
+    return monthify(timezone.now().today().date())
 
 
 def monthify(date: datetime.date) -> datetime.date:
