@@ -63,7 +63,7 @@ def create_max_price_calculation(
 
 
 def calculate_max_price(
-    apartment,
+    apartment: Apartment,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: Decimal,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
@@ -363,6 +363,25 @@ WHERE a.id = hitas_apartment.id
     SELECT value
     FROM hitas_surfaceareapriceceiling
     WHERE month = DATE_TRUNC('month', %s)
+""",
+                "realized_housing_company_acquisition_price": """
+    SELECT
+        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
+    FROM hitas_apartment AS a
+        LEFT JOIN hitas_building AS b ON a.building_id = b.id
+        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
+        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
+        WHERE hc.id = hitas_housingcompany.id
+""",
+                "completion_date_realized_housing_company_acquisition_price": """
+    SELECT
+        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
+    FROM hitas_apartment AS a
+        LEFT JOIN hitas_building AS b ON a.building_id = b.id
+        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
+        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
+        WHERE hc.id = hitas_housingcompany.id
+            AND a.completion_date = hitas_apartment.completion_date
 """,
             },
             select_params=[calculation_date] * 6,

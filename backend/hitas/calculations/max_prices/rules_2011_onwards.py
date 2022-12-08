@@ -5,8 +5,9 @@ from typing import List
 from dateutil.relativedelta import relativedelta
 
 from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
-from hitas.calculations.improvement import ImprovementData, calculate_housing_company_improvements_after_2010
-from hitas.calculations.max_prices.rules import CalculatorRules, improvement_result_to_obj
+from hitas.calculations.improvements.common import ImprovementData
+from hitas.calculations.improvements.rules_2011_onwards import calculate_housing_company_improvements_2011_onwards
+from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
 from hitas.models import Apartment
 
@@ -84,7 +85,7 @@ class Rules2011Onwards(CalculatorRules):
         index_adjustment = ((calculation_date_index / completion_date_index) * basic_price) - basic_price
 
         # housing company improvements
-        hc_improvements_result = calculate_housing_company_improvements_after_2010(
+        hc_improvements_result = calculate_housing_company_improvements_2011_onwards(
             [
                 ImprovementData(
                     name=i.name,
@@ -100,9 +101,7 @@ class Rules2011Onwards(CalculatorRules):
         )
 
         # debt free shares price
-        debt_free_shares_price = (
-            basic_price + index_adjustment + hc_improvements_result.summary.improvement_value_for_apartment
-        )
+        debt_free_shares_price = basic_price + index_adjustment + hc_improvements_result.summary.value_for_apartment
 
         # maximum price
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
@@ -113,14 +112,12 @@ class Rules2011Onwards(CalculatorRules):
         return IndexCalculation(
             maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
-            calculation_variables=IndexCalculation.CalculationVars(
+            calculation_variables=IndexCalculation.CalculationVars2011Onwards(
                 acquisition_price=apartment.acquisition_price,
                 additional_work_during_construction=apartment.additional_work_during_construction,
-                interest_during_construction=None,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
-                apartment_improvements=None,
-                housing_company_improvements=improvement_result_to_obj(hc_improvements_result),
+                housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,

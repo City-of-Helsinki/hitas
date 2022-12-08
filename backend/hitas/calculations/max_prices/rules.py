@@ -4,14 +4,8 @@ from typing import List
 
 from dateutil.relativedelta import relativedelta
 
-from hitas.calculations.improvement import ImprovementCalculationResult, ImprovementsResult
-from hitas.calculations.max_prices.types import (
-    IndexCalculation,
-    MaxPriceImprovements,
-    SurfaceAreaPriceCeilingCalculation,
-)
+from hitas.calculations.max_prices.types import IndexCalculation, SurfaceAreaPriceCeilingCalculation
 from hitas.models import Apartment
-from hitas.types import Month
 
 
 class CalculatorRules:
@@ -60,44 +54,6 @@ class CalculatorRules:
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
             ),
         )
-
-
-def improvement_to_obj(result: ImprovementCalculationResult) -> MaxPriceImprovements.Improvement:
-    return MaxPriceImprovements.Improvement(
-        name=result.name,
-        value=result.value,
-        completion_date=Month(result.completion_date),
-        value_added=result.value_added,
-        depreciation=MaxPriceImprovements.Improvement.Depreciation(
-            amount=result.depreciation.amount,
-            time=MaxPriceImprovements.Improvement.Depreciation.DepreciationTime(
-                years=int(result.depreciation.time_months / 12),
-                months=result.depreciation.time_months % 12,
-            ),
-        )
-        if result.depreciation
-        else None,
-        value_for_housing_company=result.improvement_value_for_housing_company,
-        value_for_apartment=result.improvement_value_for_apartment,
-    )
-
-
-def improvement_result_to_obj(result: ImprovementsResult) -> MaxPriceImprovements:
-    return MaxPriceImprovements(
-        items=list(map(improvement_to_obj, result.items)),
-        summary=MaxPriceImprovements.Summary(
-            value=result.summary.value,
-            value_added=result.summary.value_added,
-            excess=MaxPriceImprovements.Summary.Excess(
-                surface_area=result.summary.excess.surface_area,
-                value_per_square_meter=result.summary.excess.value_per_square_meter,
-                total=result.summary.excess.total,
-            ),
-            depreciation=result.summary.depreciation,
-            value_for_housing_company=result.summary.improvement_value_for_housing_company,
-            value_for_apartment=result.summary.improvement_value_for_apartment,
-        ),
-    )
 
 
 def surface_area_price_ceiling_validity(date: datetime.date) -> datetime.date:
