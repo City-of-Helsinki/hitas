@@ -141,3 +141,18 @@ class HitasAPIClient(APIClient):
         )
 
         return response
+
+
+def parametrize_invalid_foreign_key(field, nullable=False):
+    parameters = [
+        ({field: "foo"}, [{"field": field, "message": "Invalid data. Expected a dictionary, but got str."}]),
+        ({field: {}}, [{"field": f"{field}.id", "message": "This field is mandatory and cannot be null."}]),
+        ({field: {"id": None}}, [{"field": f"{field}.id", "message": "This field is mandatory and cannot be null."}]),
+        ({field: {"id": ""}}, [{"field": f"{field}.id", "message": "This field is mandatory and cannot be blank."}]),
+        ({field: {"id": "foo"}}, [{"field": f"{field}.id", "message": "Object does not exist with given id 'foo'."}]),
+    ]
+    if not nullable:
+        parameters.append(
+            ({field: None}, [{"field": field, "message": "This field is mandatory and cannot be null."}]),
+        )
+    return parameters
