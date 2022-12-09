@@ -16,6 +16,7 @@ from hitas.calculations.max_prices import create_max_price_calculation
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
+from hitas.views.utils import HitasDecimalField
 
 
 class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
@@ -156,16 +157,11 @@ class ConfirmSerializer(Serializer):
 
 class CreateCalculationSerializer(Serializer):
     calculation_date = fields.DateField(required=False, allow_null=True)
-    apartment_share_of_housing_company_loans = fields.DecimalField(
-        min_value=0, decimal_places=2, max_digits=15, allow_null=True, required=False
-    )
+    apartment_share_of_housing_company_loans = HitasDecimalField(allow_null=True, required=False)
     apartment_share_of_housing_company_loans_date = fields.DateField(required=False, allow_null=True)
     additional_info = fields.CharField(required=False, allow_null=True, allow_blank=True)
 
     def validate_calculation_date(self, date):
-        return self._validate_not_in_future(date)
-
-    def validate_apartment_share_of_housing_company_loans_date(self, date):
         return self._validate_not_in_future(date)
 
     @staticmethod

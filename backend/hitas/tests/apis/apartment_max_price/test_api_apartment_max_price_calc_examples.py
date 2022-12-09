@@ -995,7 +995,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     data = {
         "calculation_date": "2022-09-29",
         "apartment_share_of_housing_company_loans": 0,
-        "apartment_share_of_housing_company_loans_date": "2022-10-01",
+        "apartment_share_of_housing_company_loans_date": "2099-10-01",  # Date in the future
         "additional_info": "Example",
     }
 
@@ -1041,7 +1041,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "debt_free_price": 218160.7,
                     "debt_free_price_m2": 4498.16,
                     "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2022-10-01",
+                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
                     "completion_date": "2012-01-13",
                     "completion_date_index": 115.9,
                     "calculation_date": "2022-09-29",
@@ -1074,7 +1074,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "debt_free_price": 232209.6,
                     "debt_free_price_m2": 4787.83,
                     "apartment_share_of_housing_company_loans": 0.0,
-                    "apartment_share_of_housing_company_loans_date": "2022-10-01",
+                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
                     "completion_date": "2012-01-13",
                     "completion_date_index": 138.1,
                     "calculation_date": "2022-09-29",
@@ -1094,7 +1094,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
                     "debt_free_price": 236292,
                     "surface_area": 48.5,
                     "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2022-10-01",
+                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
                 },
             },
         },
