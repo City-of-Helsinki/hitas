@@ -23,7 +23,7 @@ from hitas.models import (
     PropertyManager,
     RealEstate,
 )
-from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentFactory,
     BuildingFactory,
@@ -555,100 +555,50 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
 
 
 @pytest.mark.parametrize(
-    "invalid_data,field",
+    "invalid_data,fields",
     [
-        ({"business_id": "#"}, {"field": "business_id", "message": "'#' is not a valid business id."}),
-        ({"business_id": "123"}, {"field": "business_id", "message": "'123' is not a valid business id."}),
-        ({"name": None}, {"field": "name", "message": "This field is mandatory and cannot be null."}),
-        ({"name": 0}, {"field": "name", "message": "Invalid data. Expected a dictionary, but got int."}),
-        ({"state": None}, {"field": "state", "message": "This field is mandatory and cannot be null."}),
+        *parametrize_invalid_foreign_key("financing_method"),
+        *parametrize_invalid_foreign_key("building_type"),
+        *parametrize_invalid_foreign_key("developer"),
+        *parametrize_invalid_foreign_key("property_manager", nullable=True),
+        ({"business_id": "#"}, [{"field": "business_id", "message": "'#' is not a valid business id."}]),
+        ({"business_id": "123"}, [{"field": "business_id", "message": "'123' is not a valid business id."}]),
+        ({"name": None}, [{"field": "name", "message": "This field is mandatory and cannot be null."}]),
+        ({"name": 0}, [{"field": "name", "message": "Invalid data. Expected a dictionary, but got int."}]),
+        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be null."}]),
         (
             {"state": "invalid_state"},
-            {
-                "field": "state",
-                "message": (
-                    "Unsupported value 'invalid_state'. Supported values are:"
-                    " ['not_ready', 'lt_30_years', 'gt_30_years_not_free', 'gt_30_years_free', "
-                    "'gt_30_years_plot_department_notification', 'half_hitas', 'ready_no_statistics']."
-                ),
-            },
+            [
+                {
+                    "field": "state",
+                    "message": (
+                        "Unsupported value 'invalid_state'. Supported values are:"
+                        " ['not_ready', 'lt_30_years', 'gt_30_years_not_free', 'gt_30_years_free', "
+                        "'gt_30_years_plot_department_notification', 'half_hitas', 'ready_no_statistics']."
+                    ),
+                }
+            ],
         ),
-        ({"address": None}, {"field": "address", "message": "This field is mandatory and cannot be null."}),
-        ({"address": 123}, {"field": "address", "message": "Invalid data. Expected a dictionary, but got int."}),
-        (
-            {"financing_method": None},
-            {"field": "financing_method", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"financing_method": "foo"},
-            {"field": "financing_method", "message": "Invalid data. Expected a dictionary, but got str."},
-        ),
-        (
-            {"financing_method": {}},
-            {"field": "financing_method.id", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"financing_method": {"id": "foo"}},
-            {"field": "financing_method.id", "message": "Object does not exist with given id 'foo'."},
-        ),
-        (
-            {"building_type": None},
-            {"field": "building_type", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"building_type": 123},
-            {"field": "building_type", "message": "Invalid data. Expected a dictionary, but got int."},
-        ),
-        (
-            {"building_type": {}},
-            {"field": "building_type.id", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"building_type": {"id": "foo"}},
-            {"field": "building_type.id", "message": "Object does not exist with given id 'foo'."},
-        ),
-        ({"developer": None}, {"field": "developer", "message": "This field is mandatory and cannot be null."}),
-        ({"developer": 123}, {"field": "developer", "message": "Invalid data. Expected a dictionary, but got int."}),
-        (
-            {"developer": {"id": "foo"}},
-            {"field": "developer.id", "message": "Object does not exist with given id 'foo'."},
-        ),
-        (
-            {"property_manager": 123},
-            {"field": "property_manager", "message": "Invalid data. Expected a dictionary, but got int."},
-        ),
-        (
-            {"property_manager": {}},
-            {"field": "property_manager.id", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"property_manager": {"id": None}},
-            {"field": "property_manager.id", "message": "This field is mandatory and cannot be null."},
-        ),
-        (
-            {"property_manager": {"id": ""}},
-            {"field": "property_manager.id", "message": "This field is mandatory and cannot be blank."},
-        ),
-        (
-            {"property_manager": {"id": "foo"}},
-            {"field": "property_manager.id", "message": "Object does not exist with given id 'foo'."},
-        ),
+        ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be null."}]),
+        ({"address": 123}, [{"field": "address", "message": "Invalid data. Expected a dictionary, but got int."}]),
         (
             {"acquisition_price": None},
-            {"field": "acquisition_price", "message": "This field is mandatory and cannot be null."},
+            [{"field": "acquisition_price", "message": "This field is mandatory and cannot be null."}],
         ),
-        ({"primary_loan": "foo"}, {"field": "primary_loan", "message": "A valid number is required."}),
-        ({"improvements": None}, {"field": "improvements", "message": "This field is mandatory and cannot be null."}),
+        ({"primary_loan": "foo"}, [{"field": "primary_loan", "message": "A valid number is required."}]),
+        ({"improvements": None}, [{"field": "improvements", "message": "This field is mandatory and cannot be null."}]),
         (
             {"improvements": {"market_price_index": None, "construction_price_index": []}},
-            {"field": "improvements.market_price_index", "message": "This field is mandatory and cannot be null."},
+            [{"field": "improvements.market_price_index", "message": "This field is mandatory and cannot be null."}],
         ),
         (
             {"improvements": {"market_price_index": [], "construction_price_index": None}},
-            {
-                "field": "improvements.construction_price_index",
-                "message": "This field is mandatory and cannot be null.",
-            },
+            [
+                {
+                    "field": "improvements.construction_price_index",
+                    "message": "This field is mandatory and cannot be null.",
+                }
+            ],
         ),
         (
             {
@@ -663,10 +613,12 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
                     "construction_price_index": [],
                 }
             },
-            {
-                "field": "improvements.market_price_index.completion_date",
-                "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
-            },
+            [
+                {
+                    "field": "improvements.market_price_index.completion_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                }
+            ],
         ),
         (
             {
@@ -681,10 +633,12 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
                     "construction_price_index": [],
                 }
             },
-            {
-                "field": "improvements.market_price_index.value",
-                "message": "Ensure this value is greater than or equal to 0.",
-            },
+            [
+                {
+                    "field": "improvements.market_price_index.value",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
         ),
         (
             {
@@ -699,10 +653,12 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
                     ],
                 }
             },
-            {
-                "field": "improvements.construction_price_index.completion_date",
-                "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
-            },
+            [
+                {
+                    "field": "improvements.construction_price_index.completion_date",
+                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                }
+            ],
         ),
         (
             {
@@ -717,19 +673,21 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
                     ],
                 }
             },
-            {
-                "field": "improvements.construction_price_index.value",
-                "message": "Ensure this value is greater than or equal to 0.",
-            },
+            [
+                {
+                    "field": "improvements.construction_price_index.value",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
         ),
         (
             {"notes": None},
-            {"field": "notes", "message": "This field is mandatory and cannot be null."},
+            [{"field": "notes", "message": "This field is mandatory and cannot be null."}],
         ),
     ],
 )
 @pytest.mark.django_db
-def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient, invalid_data, field):
+def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
     data = get_housing_company_create_data()
     data.update(invalid_data)
 
@@ -739,7 +697,7 @@ def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient,
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
         "error": "bad_request",
-        "fields": [field],
+        "fields": fields,
         "message": "Bad request",
         "reason": "Bad Request",
         "status": 400,

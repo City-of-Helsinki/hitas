@@ -18,7 +18,7 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
-from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
@@ -897,7 +897,12 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
 @pytest.mark.parametrize(
     "invalid_data,fields",
     [
-        ({"state": ""}, [{"field": "state", "message": "This field is mandatory and cannot be blank."}]),
+        *parametrize_invalid_foreign_key("type", nullable=True),
+        *parametrize_invalid_foreign_key("building"),
+        (
+            {"state": ""},
+            [{"field": "state", "message": "This field is mandatory and cannot be blank."}],
+        ),
         (
             {"state": "invalid_state"},
             [
@@ -908,18 +913,9 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             ],
         ),
         (
-            {"type": {}},
-            [{"field": "type.id", "message": "This field is mandatory and cannot be null."}],
+            {"surface_area": "foo"},
+            [{"field": "surface_area", "message": "A valid number is required."}],
         ),
-        (
-            {"type": {"id": ""}},
-            [{"field": "type.id", "message": "This field is mandatory and cannot be blank."}],
-        ),
-        (
-            {"type": {"id": "foo"}},
-            [{"field": "type.id", "message": "Object does not exist with given id 'foo'."}],
-        ),
-        ({"surface_area": "foo"}, [{"field": "surface_area", "message": "A valid number is required."}]),
         (
             {"surface_area": -1},
             [{"field": "surface_area", "message": "Ensure this value is greater than or equal to 0."}],
@@ -1054,16 +1050,6 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     "message": "Ensure this value is greater than or equal to 0.",
                 }
             ],
-        ),
-        ({"building": None}, [{"field": "building", "message": "This field is mandatory and cannot be null."}]),
-        ({"building": "foo"}, [{"field": "building", "message": "Invalid data. Expected a dictionary, but got str."}]),
-        (
-            {"building": {"id": ""}},
-            [{"field": "building.id", "message": "This field is mandatory and cannot be blank."}],
-        ),
-        (
-            {"building": {"id": "foo"}},
-            [{"field": "building.id", "message": "Object does not exist with given id 'foo'."}],
         ),
         ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be null."}]),
         (
