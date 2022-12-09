@@ -115,7 +115,7 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
         depreciation_amount = value_without_excess
     else:
         # Calculate the depreciation amount
-        depreciation_amount = Decimal(value_without_excess) / (10 * 12) * depreciation_time_months
+        depreciation_amount = value_without_excess / (10 * 12) * depreciation_time_months
 
     depreciation_result = ApartmentImprovementCalculationResult.Depreciation(
         time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(depreciation_time_months),
@@ -279,7 +279,7 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
             depreciation_amount = value_without_excess
         else:
             # Calculate the depreciation amount
-            depreciation_amount = Decimal(value_without_excess) / (15 * 12) * depreciation_time_months
+            depreciation_amount = value_without_excess / (15 * 12) * depreciation_time_months
 
         depreciation_result = ApartmentImprovementCalculationResult.Depreciation(
             time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(depreciation_time_months),
