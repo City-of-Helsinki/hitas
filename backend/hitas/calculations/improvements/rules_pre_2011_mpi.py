@@ -353,6 +353,7 @@ def calculate_multiple_housing_company_improvements(
         summary_value += result.value
         summary_value_without_excess += result.value_without_excess
         summary_depreciation += result.depreciation.amount
+        summary_accepted_value_for_housing_company += result.accepted_value_for_housing_company
         summary_accepted_value += result.accepted_value
 
         results.append(result)
