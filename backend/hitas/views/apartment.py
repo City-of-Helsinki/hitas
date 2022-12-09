@@ -353,7 +353,7 @@ class ReadOnlyBuildingSerializer(ReadOnlySerializer):
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState, required=False, allow_null=True)
-    type = ReadOnlyApartmentTypeSerializer(source="apartment_type")
+    type = ReadOnlyApartmentTypeSerializer(source="apartment_type", required=False, allow_null=True)
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
     surface_area = HitasDecimalField(required=False, allow_null=True)

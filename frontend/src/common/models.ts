@@ -256,7 +256,7 @@ export interface IApartmentDetails {
 export interface IApartmentWritable {
     readonly id?: string;
     state: ApartmentState | null;
-    type: {id: string};
+    type: {id: string} | null;
     surface_area: number | null;
     rooms: number | null;
     shares: {

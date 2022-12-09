@@ -32,7 +32,7 @@ class Apartment(ExternalHitasModel):
     building = models.ForeignKey("Building", on_delete=models.CASCADE, related_name="apartments")
 
     state = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
-    apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments")
+    apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments", null=True)
     surface_area = HitasModelDecimalField(null=True, help_text=_("Measured in m^2"))
     # 'Huoneiden määrä'
     rooms = models.IntegerField(null=True, validators=[MinValueValidator(1)])
