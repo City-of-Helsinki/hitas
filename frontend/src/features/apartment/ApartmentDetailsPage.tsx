@@ -180,7 +180,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     unconfirmedPrice={unconfirmedPrices.market_price_index}
                 />
                 <UnconfirmedPriceRow
-                    label="Rakennushintaindeksi"
+                    label="Rakennuskustannusindeksi"
                     unconfirmedPrice={unconfirmedPrices.construction_price_index}
                 />
                 <UnconfirmedPriceRow

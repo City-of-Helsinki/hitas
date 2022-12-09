@@ -96,7 +96,7 @@ const MaximumPriceModalContent = ({
                         </Tabs.Tab>
                         <Tabs.Tab>
                             <CalculationRowPrice
-                                label="Rakennushintaindeksi"
+                                label="Rakennuskustannusindeksi"
                                 calculation={calculation.calculations.construction_price_index}
                             />
                         </Tabs.Tab>
