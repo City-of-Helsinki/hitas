@@ -49,6 +49,7 @@ class CalculatorRules:
             calculation_variables=SurfaceAreaPriceCeilingCalculation.CalculationVars(
                 calculation_date=calculation_date,
                 calculation_date_value=apartment.surface_area_price_ceiling_m2,
+                debt_free_price=apartment.surface_area_price_ceiling,
                 surface_area=apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,

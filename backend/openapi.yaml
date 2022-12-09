@@ -4489,6 +4489,11 @@ components:
                       type: number
                       minimum: 0
                       example: 129.29
+                    debt_free_price:
+                      description: Value of the apartment without removing the housing company loans.
+                      type: number
+                      minimum: 0
+                      example: 226058.97
                     surface_area:
                       description: Apartment's surface area
                       type: number
