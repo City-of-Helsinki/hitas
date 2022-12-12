@@ -279,60 +279,196 @@ export interface IApartmentWritable {
 
 // //  Maximum Price Fields
 
-export interface ICalculation {
+interface IIndexCalculation {
     maximum_price: number;
     valid_until: string;
     maximum: boolean;
+    calculation_variables;
 }
 
-export interface IIndexCalculationVariables {
-    calculation_variables: {
+// Used in both MPI and RKI before and after 2011
+interface ICommonCalculationVars {
+    debt_free_price: number;
+    debt_free_price_m2: number;
+    apartment_share_of_housing_company_loans: number;
+    apartment_share_of_housing_company_loans_date: string;
+    completion_date: string;
+    completion_date_index: number;
+    calculation_date: string;
+    calculation_date_index: number;
+}
+
+interface ICalculationVars2011Onwards {
+    acquisition_price: number;
+    additional_work_during_construction: number;
+    basic_price: number;
+    index_adjustment: number;
+    housing_company_improvements: {
+        items: {
+            name: string;
+            value: number;
+            value_added: number;
+            completion_date: string;
+            value_for_apartment: number;
+            value_for_housing_company: number;
+        }[];
+        summary: {
+            value: number;
+            value_added: number;
+            excess: {
+                total: number;
+                surface_area: number;
+                value_per_square_meter: number;
+            };
+            value_for_housing_company: number;
+            value_for_apartment: number;
+        };
+    };
+}
+
+export type IIndexCalculation2011Onwards = IIndexCalculation & {
+    calculation_variables: ICommonCalculationVars & ICalculationVars2011Onwards;
+};
+
+export type IIndexCalculationMarketPriceIndexBefore2011 = IIndexCalculation & {
+    calculation_variables: ICommonCalculationVars & {
         acquisition_price: number;
-        additional_work_during_construction: number;
+        interest_during_construction: number;
         basic_price: number;
         index_adjustment: number;
-        apartment_improvements: number;
+        apartment_improvements: {
+            items: {
+                name: string;
+                value: number;
+                depreciation: {
+                    time: {
+                        years: number;
+                        months: number;
+                    };
+                    amount: number;
+                };
+                accepted_value: number;
+                completion_date: string;
+                value_without_excess: number;
+            }[];
+            summary: {
+                value: number;
+                excess: {
+                    total: number;
+                    surface_area: number;
+                    value_per_square_meter: number;
+                };
+                depreciation: number;
+                accepted_value: number;
+                value_without_excess: number;
+            };
+        };
         housing_company_improvements: {
+            items: {
+                name: string;
+                value: number;
+                depreciation: {
+                    time: {
+                        years: number;
+                        months: number;
+                    };
+                    amount: number;
+                };
+                accepted_value: number;
+                completion_date: string;
+                value_without_excess: number;
+                accepted_value_for_housing_company: number;
+            }[];
+            summary: {
+                value: number;
+                excess: {
+                    total: number;
+                    surface_area: number;
+                    value_per_square_meter: number;
+                };
+                depreciation: number;
+                accepted_value: number;
+                value_without_excess: number;
+                accepted_value_for_housing_company: number;
+            };
+        };
+    };
+};
+
+export type IIndexCalculationConstructionPriceIndexBefore2011 = IIndexCalculation & {
+    calculation_variables: ICommonCalculationVars & {
+        interest_during_construction: number;
+        housing_company_acquisition_price: number;
+        housing_company_assets: number;
+        apartment_share_of_housing_company_assets: number;
+        apartment_improvements: {
+            items: {
+                name: string;
+                value: number;
+                depreciation: {
+                    time: {
+                        years: number;
+                        months: number;
+                    };
+                    amount: number;
+                    percentage: number;
+                };
+                index_adjusted: number;
+                completion_date: string;
+                value_for_apartment: number;
+                completion_date_index: number;
+                calculation_date_index: number;
+            }[];
+            summary: {
+                value: number;
+                depreciation: number;
+                index_adjusted: number;
+                value_for_apartment: number;
+            };
+        };
+        housing_company_improvements: {
+            items: {
+                name: string;
+                value: number;
+                value_for_apartment: number;
+            }[];
             summary: {
                 value: number;
                 value_for_apartment: number;
             };
         };
-        debt_free_price: number;
-        debt_free_price_m2: number;
-        apartment_share_of_housing_company_loans: number;
-        completion_date: string;
-        completion_date_index: number;
-        calculation_date: string;
-        calculation_date_index: number;
     };
-}
+};
+
+export type SurfaceAreaPriceCeilingCalculation = {
+    calculation_variables: {
+        calculation_date: string;
+        calculation_date_value: number;
+        debt_free_price: number;
+        surface_area: number;
+        apartment_share_of_housing_company_loans: number;
+        apartment_share_of_housing_company_loans_date: string;
+    };
+} & IIndexCalculation;
 
 // // Maximum Price Models
 
-export interface IApartmentMaximumPrice {
+export type IApartmentMaximumPrice = {
     readonly id: string;
+    index: "market_price_index" | "construction_price_index" | "surface_area_price_ceiling";
+    maximum_price: number;
     created_at: string;
     confirmed_at: string | null;
-    maximum_price: number;
     calculation_date: string;
     valid_until: string;
-    index: string;
-    calculations: {
-        construction_price_index: ICalculation & IIndexCalculationVariables;
-        market_price_index: ICalculation & IIndexCalculationVariables;
-        surface_area_price_ceiling: ICalculation & {
-            calculation_variables: {
-                calculation_date: string;
-                calculation_date_value: number;
-                surface_area: number;
-            };
-        };
-    };
+    additional_info: string;
     apartment: {
         address: IApartmentAddress;
         type: string;
-        ownerships: IOwnership[];
+        ownerships: {
+            name: string;
+            percentage: number;
+        }[];
         rooms: number | null;
         shares: IApartmentShares;
         surface_area: number;
@@ -344,6 +480,24 @@ export interface IApartmentMaximumPrice {
             name: string;
             street_address: string;
         };
+    };
+} & (IApartmentMaximumPricePre2011 | IApartmentMaximumPrice2011Onwards);
+
+interface IApartmentMaximumPrice2011Onwards {
+    new_hitas: true;
+    calculations: {
+        construction_price_index: IIndexCalculation2011Onwards;
+        market_price_index: IIndexCalculation2011Onwards;
+        surface_area_price_ceiling: SurfaceAreaPriceCeilingCalculation;
+    };
+}
+
+interface IApartmentMaximumPricePre2011 {
+    new_hitas: false;
+    calculations: {
+        construction_price_index: IIndexCalculationConstructionPriceIndexBefore2011;
+        market_price_index: IIndexCalculationMarketPriceIndexBefore2011;
+        surface_area_price_ceiling: SurfaceAreaPriceCeilingCalculation;
     };
 }
 
