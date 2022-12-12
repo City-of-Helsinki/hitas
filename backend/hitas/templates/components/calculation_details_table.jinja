@@ -1,7 +1,6 @@
 {# refs. https://www.hel.fi/static/kanslia/Julkaisut/2021/Hitas/Liite_Hitas-j%C3%A4rjestelm%C3%A4n_tavoitteiden_toteutumista_koskeva_selvitys.pdf last page#}
 
 {% macro calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) %}
-    {% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
     {% set vars = index_calculation.calculation_variables %}
 
     {% set table_left = [
@@ -24,7 +23,7 @@
             ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
         ] %} {% endif %}
 
-        {% if is_pre_2011 %} {% set table_right = table_right + [
+        {% if maximum_price_calculation.json.new_hitas %}{% set table_right = table_right + [
             ["+ Rakennusaikaiset korot (TODO %)", vars.interest_during_construction|intcomma],
         ] %} {% endif %}
 
@@ -33,7 +32,7 @@
             ["+ Indeksin muutos", vars.index_adjustment|intcomma],
         ] %}
 
-        {% if is_pre_2011 %} {% set table_right = table_right + [
+        {% if maximum_price_calculation.new_hitas %} {% set table_right = table_right + [
             [ "+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma ],
         ] %} {% endif %}
 
