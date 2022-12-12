@@ -19,6 +19,7 @@ from hitas.tests.factories import (
     ApartmentFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
+    OldHitasFinancingMethodFactory,
     OwnershipFactory,
 )
 from hitas.tests.factories.indices import (
@@ -442,6 +443,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         surface_area=54.5,
         share_number_start=1729,
         share_number_end=1888,
+        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(

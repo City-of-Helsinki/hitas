@@ -48,14 +48,14 @@ class BuildingTypeFactory(AbstractCodeFactory):
     )
 
 
-class FinancingMethodFactory(AbstractCodeFactory):
+class OldHitasFinancingMethodFactory(AbstractCodeFactory):
     class Meta:
         model = FinancingMethod
         django_get_or_create = ("value",)
 
     value = fuzzy.FuzzyChoice(
         [
-            "tuntematon",
+            "Tuntematon",
             "vapaarahoitteinen, Hitas I",
             "vapaarahoitteinen, Hitas II",
             "HK valtion laina, Hitas I",
@@ -71,12 +71,24 @@ class FinancingMethodFactory(AbstractCodeFactory):
             "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
             "Pitkä korkotukilaina osaomistus Hitas I",
             "Omaksi lunastettava vuokra-asunto, Hitas I",
-            "Uusi Hitas I (vapaarahoitteinen)",
-            "Uusi Hitas II (vapaarahoitteinen)",
             "Uusi Hitas I (vanhat säännöt)",
             "Uusi Hitas II (vanhat säännöt)",
             "Vuokratalo Hitas II",
             "Vuokratalo Hitas I",
+        ]
+    )
+
+
+class NewHitasFinancingMethodFactory(AbstractCodeFactory):
+    class Meta:
+        model = FinancingMethod
+        django_get_or_create = ("value",)
+
+    value = fuzzy.FuzzyChoice(
+        [
+            "Tuntematon",
+            "Uusi Hitas I (vapaarahoitteinen)",
+            "Uusi Hitas II (vapaarahoitteinen)",
         ]
     )
 

@@ -29,11 +29,11 @@ from hitas.tests.factories import (
     BuildingFactory,
     BuildingTypeFactory,
     DeveloperFactory,
-    FinancingMethodFactory,
     HitasPostalCodeFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyFactory,
     HousingCompanyMarketPriceImprovementFactory,
+    OldHitasFinancingMethodFactory,
     OwnershipFactory,
     PropertyManagerFactory,
     RealEstateFactory,
@@ -408,7 +408,7 @@ def test__api__housing_company__read__not_found(api_client: HitasAPIClient, inva
 
 def get_housing_company_create_data() -> dict[str, Any]:
     developer: Developer = DeveloperFactory.create()
-    financing_method: FinancingMethod = FinancingMethodFactory.create()
+    financing_method: FinancingMethod = OldHitasFinancingMethodFactory.create()
     building_type: BuildingType = BuildingTypeFactory.create()
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()
@@ -712,7 +712,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     ApartmentFactory.create(building__real_estate__housing_company=hc)
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
-    financing_method: FinancingMethod = FinancingMethodFactory.create()
+    financing_method: FinancingMethod = OldHitasFinancingMethodFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {

@@ -14,6 +14,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
 from hitas.tests.factories._base import AbstractImprovementFactory
+from hitas.tests.factories.codes import OldHitasFinancingMethodFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     MarketPriceIndex2005Equal100Factory,
@@ -34,7 +35,7 @@ class ApartmentFactory(DjangoModelFactory):
     share_number_start = factory.Sequence(lambda n: n * 50 + 1)
     share_number_end = factory.LazyAttribute(lambda self: (self.share_number_start + 50))
     street_address = factory.Faker("street_address")
-    completion_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    completion_date = fuzzy.FuzzyDate(date(2011, 1, 1))
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = factory.Faker("numerify", text="%")
     stair = factory.Faker("bothify", text="?")  # Random letter
@@ -70,6 +71,9 @@ def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> Apa
         kwargs["apartment__completion_date"] = FuzzyDate(date(2011, 1, 1), date(2015, 1, 1)).fuzz()
     if "calculation_date" not in kwargs:
         kwargs["calculation_date"] = FuzzyDate(date(2015, 1, 1)).fuzz()
+
+    if kwargs["calculation_date"] < date(2011, 1, 1):
+        kwargs["apartment__building__real_estate__housing_company__financing_method"] = OldHitasFinancingMethodFactory()
 
     # Create indices for `calculate_max_price`
     if create_indices:

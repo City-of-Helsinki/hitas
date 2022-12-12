@@ -9,7 +9,8 @@ from hitas.tests.factories.codes import (
     ApartmentTypeFactory,
     BuildingTypeFactory,
     DeveloperFactory,
-    FinancingMethodFactory,
+    NewHitasFinancingMethodFactory,
+    OldHitasFinancingMethodFactory,
 )
 from hitas.tests.factories.housing_company import (
     BuildingFactory,
