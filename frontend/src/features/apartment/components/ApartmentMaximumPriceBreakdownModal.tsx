@@ -28,10 +28,10 @@ const BreakdownTabButton = ({label, calculation}) => {
     );
 };
 
-const BreakdownValue = ({label, value, unit = "€"}: {label: string; value?: number | string; unit?: string}) => (
+const BreakdownValue = ({label, value, unit = "€"}: {label: string; value: number; unit?: string}) => (
     <div className="confirmation-modal__breakdown-row">
         <label>{label}</label>
-        <p>{`${(value && value.toString()) || "0"} ${unit}`}</p>
+        <p>{unit.includes("€") ? formatMoney(value).replace("€", unit) : `${value} ${unit}`}</p>
     </div>
 );
 
@@ -77,6 +77,7 @@ const Breakdown2011Onwards = ({calculation}: {calculation: IIndexCalculation2011
             <BreakdownValue
                 label="Velaton hinta euroa/m²"
                 value={calculation.calculation_variables.debt_free_price_m2}
+                unit="€/m²"
             />
         </>
     );
@@ -126,6 +127,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
             <BreakdownValue
                 label="Velaton hinta euroa/m²"
                 value={calculation.calculation_variables.debt_free_price_m2}
+                unit="€/m²"
             />
         </>
     );
@@ -179,6 +181,7 @@ const ConstructionPricePre2011Breakdown = ({
             <BreakdownValue
                 label="Velaton hinta euroa/m²"
                 value={calculation.calculation_variables.debt_free_price_m2}
+                unit="€/m²"
             />
         </>
     );
@@ -307,11 +310,10 @@ const MaximumPriceModalContent = ({
             <Dialog.Content>
                 <MaximumPriceBreakdownTabs calculation={calculation} />
                 <div className="valid-until">
-                    <BreakdownValue
-                        label="Vahvistettavan laskelman voimassaoloaika"
-                        value={calculation.valid_until}
-                        unit=""
-                    />
+                    <div className="confirmation-modal__breakdown-row">
+                        <label>Vahvistettavan laskelman voimassaoloaika</label>
+                        <p>{calculation.valid_until}</p>
+                    </div>
                 </div>
             </Dialog.Content>
 
