@@ -706,7 +706,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         surface_area=45.5,
         share_number_start=19717,
         share_number_end=20188,
-        notes="FIXME: old rules",
+        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(

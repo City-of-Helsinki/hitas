@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from hitas.calculations.max_prices.rules_2011_onwards import Rules2011Onwards
 from hitas.calculations.max_prices.rules_pre_2011 import RulesPre2011
+from hitas.financing_types import is_before_2011
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -86,7 +87,9 @@ def calculate_max_price(
     )
 
     # Select calculator
-    if apartment.completion_date >= datetime.date(2011, 1, 1) and apartment.notes != "FIXME: old rules":
+    if apartment.completion_date >= datetime.date(2011, 1, 1) and not is_before_2011(
+        apartment.housing_company.financing_method
+    ):
         max_price_calculator = Rules2011Onwards()
         new_hitas_rules = True
     else:
