@@ -694,9 +694,6 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__construction_price_index__pre_2011(api_client: HitasAPIClient):
-    # Housing company's total debt free purchase price is 37_272_600
-    # 2012-06-28 completed total is 16_727_570
-
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=52738.0,
         primary_loan_amount=123192.0,
