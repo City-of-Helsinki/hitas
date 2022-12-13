@@ -35,6 +35,10 @@ class BuildingType(AbstractCode):
 
 # Rahoitusmuoto
 class FinancingMethod(AbstractCode):
+    include_in_statistics = models.BooleanField(default=True)
+    old_hitas_ruleset = models.BooleanField(default=False)
+    half_hitas = models.BooleanField(default=False)
+
     class Meta(AbstractCode.Meta):
         verbose_name = _("Financing method")
         verbose_name_plural = _("Financing methods")

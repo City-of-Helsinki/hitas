@@ -2759,13 +2759,16 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
-      "value": "tuntematon",
+      "value": "Tuntematon",
       "description": "",
       "in_use": true,
       "order": 1,
       "legacy_code_number": "000",
       "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": false,
+      "half_hitas": false
     }
   },
   {
@@ -2775,13 +2778,16 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
-      "value": "vapaarahoitteinen, Hitas I",
+      "value": "Vapaarahoitteinen, Hitas I",
       "description": "",
       "in_use": true,
       "order": 2,
       "legacy_code_number": "101",
       "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2791,13 +2797,16 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
-      "value": "vapaarahoitteinen, Hitas II",
+      "value": "Vapaarahoitteinen, Hitas II",
       "description": "",
       "in_use": true,
       "order": 3,
       "legacy_code_number": "102",
       "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2813,7 +2822,10 @@
       "order": 4,
       "legacy_code_number": "211",
       "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2829,7 +2841,10 @@
       "order": 5,
       "legacy_code_number": "212",
       "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2845,7 +2860,10 @@
       "order": 6,
       "legacy_code_number": "221",
       "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2861,7 +2879,10 @@
       "order": 7,
       "legacy_code_number": "222",
       "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2877,7 +2898,10 @@
       "order": 8,
       "legacy_code_number": "311",
       "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2893,7 +2917,10 @@
       "order": 9,
       "legacy_code_number": "312",
       "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2909,7 +2936,10 @@
       "order": 10,
       "legacy_code_number": "321",
       "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2925,7 +2955,10 @@
       "order": 11,
       "legacy_code_number": "322",
       "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2941,7 +2974,10 @@
       "order": 12,
       "legacy_code_number": "411",
       "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2957,7 +2993,10 @@
       "order": 13,
       "legacy_code_number": "412",
       "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2973,7 +3012,10 @@
       "order": 14,
       "legacy_code_number": "511",
       "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -2989,7 +3031,10 @@
       "order": 15,
       "legacy_code_number": "611",
       "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -3005,7 +3050,10 @@
       "order": 16,
       "legacy_code_number": "711",
       "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -3021,7 +3069,10 @@
       "order": 0,
       "legacy_code_number": "811",
       "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": false,
+      "half_hitas": false
     }
   },
   {
@@ -3037,7 +3088,10 @@
       "order": 0,
       "legacy_code_number": "812",
       "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": false,
+      "half_hitas": false
     }
   },
   {
@@ -3053,7 +3107,10 @@
       "order": 19,
       "legacy_code_number": "821",
       "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -3069,7 +3126,10 @@
       "order": 20,
       "legacy_code_number": "822",
       "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": true,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -3085,7 +3145,10 @@
       "order": 21,
       "legacy_code_number": "911",
       "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": false,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {
@@ -3101,7 +3164,10 @@
       "order": 22,
       "legacy_code_number": "912",
       "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
+      "legacy_end_date": null,
+      "include_in_statistics": false,
+      "old_hitas_ruleset": true,
+      "half_hitas": false
     }
   },
   {

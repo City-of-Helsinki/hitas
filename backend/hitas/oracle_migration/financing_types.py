@@ -1,5 +1,3 @@
-from hitas.models import FinancingMethod
-
 # +----------------------------------------------+--------------+----------------------+------------+
 # | Name                                         | 2011 onwards | Skip from statistics | Half-Hitas |
 # +----------------------------------------------+--------------+----------------------+------------+
@@ -34,21 +32,21 @@ from hitas.models import FinancingMethod
 # +----------------------------------------------+--------------+----------------------+------------+
 
 
-def is_before_2011(financing_method: FinancingMethod):
-    return not is_2011_onwards(financing_method)
+def financing_method_is_before_2011(financing_method: str):
+    return not financing_method_is_2011_onwards(financing_method)
 
 
-def is_2011_onwards(financing_method: FinancingMethod):
-    return financing_method.value in [
+def financing_method_is_2011_onwards(financing_method: str):
+    return financing_method in [
         "Tuntematon",
         "Uusi Hitas I (vapaarahoitteinen)",
         "Uusi Hitas II (vapaarahoitteinen)",
     ]
 
 
-def include_in_statistics(financing_method: FinancingMethod):
-    return not financing_method.value.endswith("Ei Hitas") and not financing_method.value.startswith("Vuokratalo")
+def financing_method_include_in_statistics(financing_method: str):
+    return not financing_method.endswith("Ei Hitas") and not financing_method.startswith("Vuokratalo")
 
 
-def is_half_hitas(financing_method: FinancingMethod):
-    return financing_method.value.startswith("PUOLIHITAS")
+def financing_method_is_half_hitas(financing_method: str):
+    return financing_method.startswith("PUOLIHITAS")

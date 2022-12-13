@@ -77,6 +77,9 @@ class OldHitasFinancingMethodFactory(AbstractCodeFactory):
             "Vuokratalo Hitas I",
         ]
     )
+    include_in_statistics = factory.Faker("boolean")
+    old_hitas_ruleset = True
+    half_hitas = False
 
 
 class NewHitasFinancingMethodFactory(AbstractCodeFactory):
@@ -91,6 +94,9 @@ class NewHitasFinancingMethodFactory(AbstractCodeFactory):
             "Uusi Hitas II (vapaarahoitteinen)",
         ]
     )
+    include_in_statistics = True
+    old_hitas_ruleset = False
+    half_hitas = False
 
 
 class DeveloperFactory(AbstractCodeFactory):
