@@ -841,6 +841,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                                 "name": cpi_hc_improvement.name,
                                 "value": 1_000_000.00,
                                 "value_for_apartment": 448_790.0,
+                                "completion_date": "2018-02-01",
                             },
                         ],
                         "summary": {

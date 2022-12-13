@@ -181,6 +181,8 @@ class HousingCompanyImprovementCalculationResult:
     name: str
     # Original value for the improvement
     value: Decimal
+    # Date the improvement was completed on
+    completion_date: datetime.date
     # Improvement share of a housing company's improvement value
     value_for_apartment: Decimal
 
@@ -228,6 +230,7 @@ def calculate_single_housing_company_improvement_pre_2011_construction_price_ind
         name=improvement.name,
         value=improvement.value,
         value_for_apartment=value,
+        completion_date=improvement.completion_date,
     )
 
 

@@ -3942,6 +3942,7 @@ components:
               - name
               - value
               - value_for_apartment
+              - completion_date
             properties:
               name:
                 description: Name of this improvement
@@ -3957,6 +3958,10 @@ components:
                 type: number
                 minimum: 0
                 example: 20040.00
+              completion_date:
+                description: Date that the improvement was completed on
+                type: string
+                format: date
         summary:
           description: Summary data across all improvements
           type: object
