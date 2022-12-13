@@ -21,7 +21,7 @@ format:
 
 dump:
 	./manage.py dumpdata users authtoken hitas > initial.json
-	cat initial.json | jq > initial-formatted.json
+	cat initial.json | jq '.|=sort_by(.model, .pk)' > initial-formatted.json
 	mv initial-formatted.json initial.json
 
 
