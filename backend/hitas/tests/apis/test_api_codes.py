@@ -10,7 +10,7 @@ from hitas.tests.apis.helpers import HitasAPIClient
 _code_parameters = (
     "url_basename,model,factory",
     [
-        ("financing-method", FinancingMethod, factories.FinancingMethodFactory),
+        ("financing-method", FinancingMethod, factories.OldHitasFinancingMethodFactory),
         ("building-type", BuildingType, factories.BuildingTypeFactory),
         ("developer", Developer, factories.DeveloperFactory),
         ("apartment-type", ApartmentType, factories.ApartmentTypeFactory),

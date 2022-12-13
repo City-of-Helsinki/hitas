@@ -19,6 +19,7 @@ from hitas.tests.factories import (
     ApartmentFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
+    OldHitasFinancingMethodFactory,
     OwnershipFactory,
 )
 from hitas.tests.factories.indices import (
@@ -442,6 +443,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         surface_area=54.5,
         share_number_start=1729,
         share_number_end=1888,
+        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
@@ -692,9 +694,6 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__construction_price_index__pre_2011(api_client: HitasAPIClient):
-    # Housing company's total debt free purchase price is 37_272_600
-    # 2012-06-28 completed total is 16_727_570
-
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=52738.0,
         primary_loan_amount=123192.0,
@@ -704,7 +703,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         surface_area=45.5,
         share_number_start=19717,
         share_number_end=20188,
-        notes="FIXME: old rules",
+        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(

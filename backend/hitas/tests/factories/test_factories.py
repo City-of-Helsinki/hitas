@@ -12,7 +12,7 @@ from hitas.tests import factories
         factories.BuildingFactory,
         factories.BuildingTypeFactory,
         factories.DeveloperFactory,
-        factories.FinancingMethodFactory,
+        factories.OldHitasFinancingMethodFactory,
         factories.HousingCompanyFactory,
         factories.OwnershipFactory,
         factories.OwnerFactory,

@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Callable, Dict, List, Optional, Type, TypeVar
@@ -49,6 +50,11 @@ from hitas.models import (
 from hitas.models.apartment import DepreciationPercentage
 from hitas.models.indices import AbstractIndex
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
+from hitas.oracle_migration.financing_types import (
+    financing_method_include_in_statistics,
+    financing_method_is_before_2011,
+    financing_method_is_half_hitas,
+)
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
@@ -739,6 +745,16 @@ def format_financing_method(fm: FinancingMethod) -> None:
     # Don't capitalize all - there's some that would suffer from it
     if fm.value[0].islower():
         fm.value = fm.value[0].upper() + fm.value[1:]
+
+    # If the name is in format '<Name> (<ID>)', strip the ID part out of the name
+    # Example: 'Vapaarahoitteinen, Ei Hitas (100)'
+    name_contains_id = re.match(r"(.*) \(\d{3}\)$", fm.value)
+    if name_contains_id:
+        fm.value = name_contains_id.group(1)
+
+    fm.include_in_statistics = financing_method_include_in_statistics(fm.value)
+    fm.half_hitas = financing_method_is_half_hitas(fm.value)
+    fm.old_hitas_ruleset = financing_method_is_before_2011(fm.value)
 
 
 def housing_company_state_from(code: str) -> HousingCompanyState:
