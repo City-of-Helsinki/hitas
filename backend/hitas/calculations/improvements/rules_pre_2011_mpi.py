@@ -160,9 +160,7 @@ def calculate_additional_work(
         value=improvement.value,
         value_without_excess=improvement.value,
         depreciation=ApartmentImprovementCalculationResult.Depreciation(
-            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
-                months_between_dates(improvement.completion_date, calculation_date)
-            ),
+            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime(years=0, months=0),
             amount=Decimal(0),
         ),
         accepted_value=accepted,
@@ -282,7 +280,9 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
             depreciation_amount = value_without_excess / (15 * 12) * depreciation_time_months
 
         depreciation_result = ApartmentImprovementCalculationResult.Depreciation(
-            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(depreciation_time_months),
+            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
+                depreciation_time_months if depreciation_amount > 0 else 0
+            ),
             amount=depreciation_amount,
         )
 
@@ -322,9 +322,7 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
             completion_date=result.completion_date,
             value_without_excess=result.value_added,
             depreciation=ApartmentImprovementCalculationResult.Depreciation(
-                time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
-                    months_between_dates(improvement.completion_date, calculation_date)
-                ),
+                time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime(years=0, months=0),
                 amount=Decimal(0),
             ),
             accepted_value=result.value_for_apartment,

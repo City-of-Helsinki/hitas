@@ -114,7 +114,9 @@ def calculate_single_apartment_improvement_pre_2011_construction_price_index(
     )
 
     depreciation_result = ApartmentImprovementCalculationResult.Depreciation(
-        time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(depreciation_time_months),
+        time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
+            depreciation_time_months if improvement.depreciation_percentage > 0 else 0
+        ),
         amount=depreciation_amount,
         percentage=improvement.depreciation_percentage,
     )
@@ -279,9 +281,7 @@ def calculate_additional_work(
         completion_date_index=improvement.completion_date_index,
         index_adjusted=accepted,
         depreciation=ApartmentImprovementCalculationResult.Depreciation(
-            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
-                months_between_dates(improvement.completion_date, calculation_date)
-            ),
+            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime(years=0, months=0),
             amount=Decimal(0),
             percentage=Decimal(0),
         ),

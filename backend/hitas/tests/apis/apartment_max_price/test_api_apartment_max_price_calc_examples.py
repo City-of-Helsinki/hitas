@@ -520,8 +520,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                                     "amount": 0.0,
                                     "percentage": 0.0,
                                     "time": {
-                                        "years": 19,
-                                        "months": 3,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "value_for_apartment": 6408.62,
@@ -570,8 +570,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                                 "depreciation": {
                                     "amount": 0.0,
                                     "time": {
-                                        "years": 19,
-                                        "months": 3,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "accepted_value": 9530.63,
@@ -599,8 +599,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                                 "depreciation": {
                                     "amount": 0.0,
                                     "time": {
-                                        "years": 19,
-                                        "months": 4,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "accepted_value_for_housing_company": 0.0,
@@ -614,8 +614,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                                 "depreciation": {
                                     "amount": 0.0,
                                     "time": {
-                                        "years": 17,
-                                        "months": 11,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "accepted_value_for_housing_company": 0.0,
@@ -821,8 +821,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                                     "amount": 0.0,
                                     "percentage": 0.0,
                                     "time": {
-                                        "years": 10,
-                                        "months": 4,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "value_for_apartment": 3078.35,
@@ -877,8 +877,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                                 "depreciation": {
                                     "amount": 0.0,
                                     "time": {
-                                        "years": 10,
-                                        "months": 4,
+                                        "years": 0,
+                                        "months": 0,
                                     },
                                 },
                                 "accepted_value": 5378.41,
@@ -964,6 +964,132 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             },
         },
         "additional_info": "Example",
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        debt_free_purchase_price=100000,
+        primary_loan_amount=0,
+        interest_during_construction=0,
+        additional_work_during_construction=0,
+        completion_date=datetime.date(2003, 5, 9),
+        surface_area=10,
+        share_number_start=100,
+        share_number_end=200,
+        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+    )
+    # Create necessary apartment's completion date indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=100)
+    MarketPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=100)
+
+    # Create necessary calculation date indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2003, 6, 1), value=200)
+    MarketPriceIndexFactory.create(month=datetime.date(2003, 6, 1), value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2003, 6, 1), value=200)
+
+    data = {
+        "calculation_date": "2003-06-01",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2003-06-01",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    response_json = response.json()
+    assert_id(response_json.pop("id"))
+    assert_created(response_json.pop("created_at"))
+
+    assert response_json["calculations"]["construction_price_index"] == {
+        "calculation_variables": {
+            "housing_company_acquisition_price": 200000.0,
+            "housing_company_assets": 200000.0,
+            "apartment_share_of_housing_company_assets": 200000.0,
+            "interest_during_construction": 0.0,
+            "apartment_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "index_adjusted": 0.0,
+                    "depreciation": 0.0,
+                    "value_for_apartment": 0.0,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_for_apartment": 0.0,
+                },
+            },
+            "debt_free_price": 200000.0,
+            "debt_free_price_m2": 20000.0,
+            "apartment_share_of_housing_company_loans": 0.0,
+            "apartment_share_of_housing_company_loans_date": "2003-06-01",
+            "completion_date": "2003-05-09",
+            "completion_date_index": 100.0,
+            "calculation_date": "2003-06-01",
+            "calculation_date_index": 200.0,
+        },
+        "maximum_price": 200000.0,
+        "valid_until": "2003-09-01",
+        "maximum": True,
+    }
+
+    assert response_json["calculations"]["market_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 100000.0,
+            "interest_during_construction": 0.0,
+            "basic_price": 100000.0,
+            "index_adjustment": 100000.0,
+            "apartment_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_without_excess": 0.0,
+                    "depreciation": 0.0,
+                    "excess": {
+                        "surface_area": 10.0,
+                        "total": 1000.0,
+                        "value_per_square_meter": 100.0,
+                    },
+                    "accepted_value": 0.0,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_without_excess": 0.0,
+                    "excess": {
+                        "surface_area": 10.0,
+                        "value_per_square_meter": 150.0,
+                        "total": 1500.0,
+                    },
+                    "depreciation": 0.0,
+                    "accepted_value_for_housing_company": 0.0,
+                    "accepted_value": 0.0,
+                },
+            },
+            "debt_free_price": 200000.0,
+            "debt_free_price_m2": 20000.0,
+            "apartment_share_of_housing_company_loans": 0.0,
+            "apartment_share_of_housing_company_loans_date": "2003-06-01",
+            "completion_date": "2003-05-09",
+            "completion_date_index": 100.0,
+            "calculation_date": "2003-06-01",
+            "calculation_date_index": 200.0,
+        },
+        "maximum_price": 200000.0,
+        "valid_until": "2003-09-01",
+        "maximum": True,
     }
 
 

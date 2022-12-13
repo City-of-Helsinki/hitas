@@ -225,7 +225,7 @@ def test_calculate_single_housing_company_improvement_before_2011_market_price_i
     assert result.depreciation is not None
     assert result.depreciation.amount == 0  # (100 * 150_000 * 25 * 0.1) / (50 * 12)
     assert result.depreciation.time is not None
-    assert result.depreciation.time.years == 2
+    assert result.depreciation.time.years == 0
     assert result.depreciation.time.months == 0
     assert roundup(result.accepted_value_for_housing_company) == 367500  # 147_000 * 100.0 / 40.0
     assert roundup(result.accepted_value) == 73500  # 367_500 / 100 * 20
@@ -258,7 +258,7 @@ def test_calculate_housing_company_improvements_before_2011_market_price_index__
     assert result.items[0].depreciation is not None
     assert result.items[0].depreciation.amount == 0  # (100 * 150_000 * 25 * 0.1) / (50 * 12)
     assert result.items[0].depreciation.time is not None
-    assert result.items[0].depreciation.time.years == 2
+    assert result.items[0].depreciation.time.years == 0
     assert result.items[0].depreciation.time.months == 0
     assert roundup(result.items[0].accepted_value_for_housing_company) == 367500  # 147_000 * 100.0 / 40.0
     assert roundup(result.items[0].accepted_value) == 73500  # 367_500 / 100 * 20
