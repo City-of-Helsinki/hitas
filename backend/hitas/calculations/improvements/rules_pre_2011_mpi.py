@@ -94,7 +94,7 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
     apartment_surface_area: Decimal,
 ) -> ApartmentImprovementCalculationResult:
     if improvement.treat_as_additional_work:
-        return calculate_additional_work(improvement, calculation_date, calculation_date_index)
+        return calculate_additional_work(improvement, calculation_date_index)
 
     #
     # Calculate the excess
@@ -142,7 +142,6 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
 
 def calculate_additional_work(
     improvement: ImprovementData,
-    calculation_date: datetime.date,
     calculation_date_index: Decimal,
 ) -> ApartmentImprovementCalculationResult:
     if improvement.completion_date_index is None or calculation_date_index is None:

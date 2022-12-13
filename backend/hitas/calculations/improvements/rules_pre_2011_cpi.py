@@ -88,7 +88,7 @@ def calculate_single_apartment_improvement_pre_2011_construction_price_index(
     calculation_date_index: Decimal,
 ) -> ApartmentImprovementCalculationResult:
     if improvement.treat_as_additional_work:
-        return calculate_additional_work(improvement, calculation_date, calculation_date_index)
+        return calculate_additional_work(improvement, calculation_date_index)
 
     if improvement.completion_date_index is None or calculation_date_index is None:
         raise IndexMissingException()
@@ -261,7 +261,6 @@ def calculate_multiple_housing_company_improvements(
 
 def calculate_additional_work(
     improvement: ImprovementData,
-    calculation_date: datetime.date,
     calculation_date_index: Decimal,
 ):
     if improvement.completion_date_index is None or calculation_date_index is None:
