@@ -1,7 +1,7 @@
 {% extends "components/base.jinja" %}
 {% from "components/apartment_info.jinja" import apartment_info %}
 {% from "components/calculation_details_table.jinja" import calculation_details_table %}
-{% from "components/improvements_table.jinja" import apartment_improvements_table, housing_company_improvements_table_pre_2011, housing_company_improvements_table_post_2011 %}
+{% from "components/improvements_table.jinja" import apartment_improvements_table_mpi, apartment_improvements_table_cpi, housing_company_improvements_table_pre_2011_mpi, housing_company_improvements_table_pre_2011_cpi, housing_company_improvements_table_post_2011 %}
 
 {% block style %}
     <style>
@@ -196,16 +196,17 @@
 
         <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
 
-        {% if index_calculation.calculation_variables.apartment_improvements %}
-            {{ apartment_improvements_table(index_calculation) }}
-            <br>
-        {% endif %}
-
-        {% if index_calculation.calculation_variables.housing_company_improvements %}
-                {{ housing_company_improvements_table_post_2011(index_calculation) }}
-            {% if maximum_price_calculation.json.new_hitas %}
+        {% if maximum_price_calculation.json.new_hitas %}
+            {% if index_calculation.calculation_variables.housing_company_improvements %}
+                {{ housing_company_improvements_table_post_2011(index_calculation.calculation_variables.housing_company_improvements) }}
+            {% endif %}
+        {% else %}
+            {% if index_name_short == "mark.hintaindeksi" %}
+                {{ apartment_improvements_table_mpi(index_calculation.calculation_variables.apartment_improvements) }}
+                {{ housing_company_improvements_table_pre_2011_mpi(index_calculation.calculation_variables.housing_company_improvements) }}
             {% else %}
-                {{ housing_company_improvements_table_pre_2011(index_calculation) }}
+                {{ apartment_improvements_table_cpi(index_calculation.calculation_variables.apartment_improvements) }}
+                {{ housing_company_improvements_table_pre_2011_cpi(index_calculation.calculation_variables.housing_company_improvements) }}
             {% endif %}
         {% endif %}
     {% endif %}
