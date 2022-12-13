@@ -1,761 +1,5 @@
 [
   {
-    "model": "users.user",
-    "pk": "03b1f7c5-b47d-44ab-99cf-457e4231012f",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "mark_greer",
-      "first_name": "Mark",
-      "last_name": "Greer",
-      "email": "mark.greer@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:58.123Z",
-      "uuid": "7c050820-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "0686f49f-5d1b-4537-86a6-d339293a6e85",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "gary_preston",
-      "first_name": "Gary",
-      "last_name": "Preston",
-      "email": "gary.preston@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:27.881Z",
-      "uuid": "1ccee532-1242-11ed-8fe9-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
-    "fields": {
-      "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
-      "last_login": "2022-10-12T17:08:22.619Z",
-      "is_superuser": true,
-      "username": "hitas",
-      "first_name": "",
-      "last_name": "",
-      "email": "hitas@example.com",
-      "is_staff": true,
-      "is_active": true,
-      "date_joined": "2022-06-10T12:54:47.561Z",
-      "uuid": "149689de-eca8-11ec-91f7-57e0ef3ccf79",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "12ea2b92-fd6b-495f-be69-51c0f03fc36d",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "amber_allen",
-      "first_name": "Amber",
-      "last_name": "Allen",
-      "email": "amber.allen@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:58.980Z",
-      "uuid": "7c87eb6e-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "148b6f39-db14-4e6e-8009-5a66e5b56ad7",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "frank_harris",
-      "first_name": "Frank",
-      "last_name": "Harris",
-      "email": "frank.harris@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:25.533Z",
-      "uuid": "10167164-1244-11ed-80fa-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "1c6ac4a3-65b9-4da6-871a-2326ce949e2f",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "james_burch",
-      "first_name": "James",
-      "last_name": "Burch",
-      "email": "james.burch@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:38.113Z",
-      "uuid": "17960512-1244-11ed-95a3-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "23d7d86f-8223-4840-9e2f-26fb346f355e",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "latoya_williams",
-      "first_name": "Latoya",
-      "last_name": "Williams",
-      "email": "latoya.williams@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:27.437Z",
-      "uuid": "1138efa4-1244-11ed-8c33-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "270946fb-c69f-4c92-b45c-d3d8ed0f28a0",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "kevin_davis",
-      "first_name": "Kevin",
-      "last_name": "Davis",
-      "email": "kevin.davis@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:24.123Z",
-      "uuid": "1a918a72-1242-11ed-96e5-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "30361d41-2062-4aa5-9fc4-3db3ca49af4b",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "allen_sosa",
-      "first_name": "Allen",
-      "last_name": "Sosa",
-      "email": "allen.sosa@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:03.069Z",
-      "uuid": "7ef7d63e-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "3b78650c-23fc-45e4-be12-60466d1631ac",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "christopher_berg",
-      "first_name": "Christopher",
-      "last_name": "Berg",
-      "email": "christopher.berg@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:13.729Z",
-      "uuid": "5093c836-1244-11ed-b5d9-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "4c2dc115-27fa-4e55-af64-a5fdca0ee868",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "christina_johnson",
-      "first_name": "Christina",
-      "last_name": "Johnson",
-      "email": "christina.johnson@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:00.867Z",
-      "uuid": "7da7c5e6-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "4c99c6a0-763d-447c-8e64-961ce058b730",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "dustin_martin",
-      "first_name": "Dustin",
-      "last_name": "Martin",
-      "email": "dustin.martin@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:59.858Z",
-      "uuid": "7d0de390-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "563c260e-2dd8-47c8-bfaf-e79486f25065",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "cory_fox",
-      "first_name": "Cory",
-      "last_name": "Fox",
-      "email": "cory.fox@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:23.366Z",
-      "uuid": "0ecbc444-1244-11ed-870c-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "5aa75278-48af-4284-8eb9-0268183220a8",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "kristin_coleman",
-      "first_name": "Kristin",
-      "last_name": "Coleman",
-      "email": "kristin.coleman@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:57.180Z",
-      "uuid": "7b752480-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "653be9ed-d099-40f3-9e1d-0fea7badcdb2",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "nicole_gallagher",
-      "first_name": "Nicole",
-      "last_name": "Gallagher",
-      "email": "nicole.gallagher@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:55.602Z",
-      "uuid": "7a846d2e-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "69f9cf07-8391-452e-ba38-e7754fc671a4",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "jeffrey_mooney",
-      "first_name": "Jeffrey",
-      "last_name": "Mooney",
-      "email": "jeffrey.mooney@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:32.758Z",
-      "uuid": "1464e098-1244-11ed-b962-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "7204549a-62ae-4991-bc99-0fbc5f245300",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "christina_williamson",
-      "first_name": "Christina",
-      "last_name": "Williamson",
-      "email": "christina.williamson@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:16.021Z",
-      "uuid": "15bd42e8-1242-11ed-9729-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "722efa11-90b3-448b-b978-45fef5539c28",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "michaela_larson",
-      "first_name": "Michaela",
-      "last_name": "Larson",
-      "email": "michaela.larson@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:11.623Z",
-      "uuid": "4f528278-1244-11ed-9431-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "75ddf48a-27da-41b0-bd2f-0546682a1441",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "darlene_reed",
-      "first_name": "Darlene",
-      "last_name": "Reed",
-      "email": "darlene.reed@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:01.721Z",
-      "uuid": "7e2a097a-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "7c804293-f0c0-4435-b591-f92775ae7942",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "christie_bauer",
-      "first_name": "Christie",
-      "last_name": "Bauer",
-      "email": "christie.bauer@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:15.799Z",
-      "uuid": "51cfbff2-1244-11ed-bba9-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "8a5ca0f1-4fd7-4c3c-98e0-e5cbeded33fd",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "timothy_hawkins",
-      "first_name": "Timothy",
-      "last_name": "Hawkins",
-      "email": "timothy.hawkins@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:56.719Z",
-      "uuid": "7b2ee7b8-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "956646ae-49e5-4d0c-b142-dc1c3269984e",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "rachel_forbes",
-      "first_name": "Rachel",
-      "last_name": "Forbes",
-      "email": "rachel.forbes@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:26.087Z",
-      "uuid": "1bbd3a72-1242-11ed-8e1a-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "9972b540-832f-4282-8619-a5d886c2b984",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "robert_barker",
-      "first_name": "Robert",
-      "last_name": "Barker",
-      "email": "robert.barker@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:03:46.223Z",
-      "uuid": "03fa583e-1242-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "9e2715e8-a793-426d-9322-c5df9ce053c0",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "angela_weber",
-      "first_name": "Angela",
-      "last_name": "Weber",
-      "email": "angela.weber@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:20.223Z",
-      "uuid": "183e7064-1242-11ed-8c53-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "acfd9a8c-c608-48e7-a883-cda6d3891867",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "tom_chang",
-      "first_name": "Tom",
-      "last_name": "Chang",
-      "email": "tom.chang@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:19.819Z",
-      "uuid": "543518d2-1244-11ed-a42d-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "af296e7b-c152-42f8-a46c-e182bb72cddc",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "judy_reynolds",
-      "first_name": "Judy",
-      "last_name": "Reynolds",
-      "email": "judy.reynolds@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:05.963Z",
-      "uuid": "5cee1030-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "b3ce65df-3707-4d83-a605-a0c886ff53f7",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "jerry_silva",
-      "first_name": "Jerry",
-      "last_name": "Silva",
-      "email": "jerry.silva@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:22:01.725Z",
-      "uuid": "90f2bbee-1244-11ed-9cb4-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "c63ead5f-25fb-4af0-bc7e-62aa14b3e7e0",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "eric_martinez",
-      "first_name": "Eric",
-      "last_name": "Martinez",
-      "email": "eric.martinez@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:05.379Z",
-      "uuid": "4b99bcbe-1244-11ed-95a3-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "c64f240b-12eb-4ccb-bdc7-15c430e7cfc0",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "russell_cortez",
-      "first_name": "Russell",
-      "last_name": "Cortez",
-      "email": "russell.cortez@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:20:09.468Z",
-      "uuid": "4e09af72-1244-11ed-99ce-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "cde8f277-cc1a-4fcf-8394-9a37f080bb7e",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "stacy_saunders",
-      "first_name": "Stacy",
-      "last_name": "Saunders",
-      "email": "stacy.saunders@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:18:15.153Z",
-      "uuid": "09e68388-1244-11ed-a0bd-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "d137e7c0-97a0-4ead-90a0-65a8e4af2607",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "joseph_glover",
-      "first_name": "Joseph",
-      "last_name": "Glover",
-      "email": "joseph.glover@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:52.480Z",
-      "uuid": "78a81078-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "d531747f-d4c0-474e-b0f5-fc41c131751c",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "kelly_cooke",
-      "first_name": "Kelly",
-      "last_name": "Cooke",
-      "email": "kelly.cooke@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:02.129Z",
-      "uuid": "7e6865ee-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "dd272dcc-f6d4-42f2-a9b9-8f3548c865dd",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "tammie_cain",
-      "first_name": "Tammie",
-      "last_name": "Cain",
-      "email": "tammie.cain@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T08:59:58.560Z",
-      "uuid": "7c47d614-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "e024c728-0a0e-4747-8bd2-a63fc75d31ca",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "kristy_short",
-      "first_name": "Kristy",
-      "last_name": "Short",
-      "email": "kristy.short@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:01.310Z",
-      "uuid": "7deb5d7e-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "e1ea99c4-db12-44a2-b8e8-240424725418",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "andrew_whitehead",
-      "first_name": "Andrew",
-      "last_name": "Whitehead",
-      "email": "andrew.whitehead@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:04:00.180Z",
-      "uuid": "0c4bff60-1242-11ed-9b5d-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
-    "model": "users.user",
-    "pk": "f6a864d8-51cb-4917-81f4-611c48622282",
-    "fields": {
-      "password": "",
-      "last_login": null,
-      "is_superuser": false,
-      "username": "tracy_valdez",
-      "first_name": "Tracy",
-      "last_name": "Valdez",
-      "email": "tracy.valdez@example.com",
-      "is_staff": false,
-      "is_active": true,
-      "date_joined": "2022-08-02T09:00:00.377Z",
-      "uuid": "7d5d0d58-1241-11ed-b434-acde48001122",
-      "department_name": null,
-      "groups": [],
-      "user_permissions": [],
-      "ad_groups": []
-    }
-  },
-  {
     "model": "authtoken.token",
     "pk": "52bf0606e0a0075c990fecc0afa555e5dae56404",
     "fields": {
@@ -782,15 +26,15 @@
       "apartment_number": 1,
       "floor": "1",
       "stair": "A",
-      "debt_free_purchase_price": 11000,
-      "primary_loan_amount": 44000,
+      "debt_free_purchase_price": "11000.00",
+      "primary_loan_amount": "44000.00",
       "purchase_price": "22000.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 55000,
-      "interest_during_construction": 66000,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "55000.00",
+      "interest_during_construction": "66000.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": null
     }
   },
@@ -813,15 +57,15 @@
       "apartment_number": 68,
       "floor": "4",
       "stair": "z",
-      "debt_free_purchase_price": 19817680,
-      "primary_loan_amount": 15222953,
+      "debt_free_purchase_price": "19817680.00",
+      "primary_loan_amount": "15222953.00",
       "purchase_price": "14353544.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 17863409,
-      "interest_during_construction": 1600059,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "17863409.00",
+      "interest_during_construction": "1600059.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Nulla eos maiores illo reprehenderit. Sunt ducimus laborum nulla eveniet laboriosam.\nIpsa molestias aspernatur non occaecati."
     }
   },
@@ -844,15 +88,15 @@
       "apartment_number": 2,
       "floor": "5",
       "stair": "W",
-      "debt_free_purchase_price": 11584201,
-      "primary_loan_amount": 18304503,
+      "debt_free_purchase_price": "11584201.00",
+      "primary_loan_amount": "18304503.00",
       "purchase_price": "10198118.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 12426834,
-      "interest_during_construction": 1142622,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "12426834.00",
+      "interest_during_construction": "1142622.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Voluptatem veritatis sit dolorem. Earum sint quidem quos voluptate cumque numquam. Esse architecto dolorum sit.\nRerum incidunt velit quis quibusdam."
     }
   },
@@ -875,15 +119,15 @@
       "apartment_number": 95,
       "floor": "2",
       "stair": "Q",
-      "debt_free_purchase_price": 10807807,
-      "primary_loan_amount": 16844104,
+      "debt_free_purchase_price": "10807807.00",
+      "primary_loan_amount": "16844104.00",
       "purchase_price": "16806534.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 14996460,
-      "interest_during_construction": 1114073,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "14996460.00",
+      "interest_during_construction": "1114073.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Quos magnam quaerat provident asperiores praesentium provident. Illo quasi commodi. Consequatur nobis corporis mollitia."
     }
   },
@@ -906,15 +150,15 @@
       "apartment_number": 39,
       "floor": "6",
       "stair": "q",
-      "debt_free_purchase_price": 15818308,
-      "primary_loan_amount": 14639110,
+      "debt_free_purchase_price": "15818308.00",
+      "primary_loan_amount": "14639110.00",
       "purchase_price": "19167654.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 16386070,
-      "interest_during_construction": 1552263,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "16386070.00",
+      "interest_during_construction": "1552263.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Fugit omnis modi voluptatibus ut. Sequi quaerat quasi omnis labore expedita repudiandae. Excepturi aperiam voluptatum animi quod quae."
     }
   },
@@ -937,15 +181,15 @@
       "apartment_number": 87,
       "floor": "9",
       "stair": "o",
-      "debt_free_purchase_price": 194932,
-      "primary_loan_amount": 120237,
+      "debt_free_purchase_price": "194932.00",
+      "primary_loan_amount": "120237.00",
       "purchase_price": "101511.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 147004,
-      "interest_during_construction": 12997,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "147004.00",
+      "interest_during_construction": "12997.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Necessitatibus quidem quisquam expedita laboriosam. Minus explicabo voluptates exercitationem beatae."
     }
   },
@@ -968,15 +212,15 @@
       "apartment_number": 88,
       "floor": "9",
       "stair": "A",
-      "debt_free_purchase_price": 166968,
-      "primary_loan_amount": 150795,
+      "debt_free_purchase_price": "166968.00",
+      "primary_loan_amount": "150795.00",
       "purchase_price": "119595.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 110982,
-      "interest_during_construction": 17174,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "110982.00",
+      "interest_during_construction": "17174.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Eum quos praesentium cupiditate odio odit quibusdam. Fuga placeat ipsum quasi. Blanditiis praesentium odio sit id adipisci minima pariatur."
     }
   },
@@ -999,16 +243,185 @@
       "apartment_number": 53,
       "floor": "8",
       "stair": "P",
-      "debt_free_purchase_price": 106031,
-      "primary_loan_amount": 102128,
+      "debt_free_purchase_price": "106031.00",
+      "primary_loan_amount": "102128.00",
       "purchase_price": "185278.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": 0,
-      "loans_during_construction": 131965,
-      "interest_during_construction": 16209,
-      "debt_free_purchase_price_during_construction": 0,
+      "additional_work_during_construction": "0.00",
+      "loans_during_construction": "131965.00",
+      "interest_during_construction": "16209.00",
+      "debt_free_purchase_price_during_construction": "0.00",
       "notes": "At occaecati explicabo iste fuga magni. Occaecati tenetur a itaque animi quo odit totam. Quod maxime magni optio.\nOdio animi consequatur. Eligendi ut maxime laborum quae minus."
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Itaque unde aliquam soluta recusandae dolor nesciunt quas.",
+      "completion_date": "2018-02-19",
+      "value": "77530.00",
+      "apartment": 1,
+      "depreciation_percentage": "2.5"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Deleniti ipsum quaerat rerum incidunt ipsum enim.",
+      "completion_date": "2017-10-09",
+      "value": "72257.00",
+      "apartment": 2,
+      "depreciation_percentage": "10.0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Natus magnam quisquam at incidunt eius.",
+      "completion_date": "2021-08-15",
+      "value": "538.00",
+      "apartment": 3,
+      "depreciation_percentage": "0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Repudiandae ipsum rerum aut totam illum ipsa.",
+      "completion_date": "2013-05-12",
+      "value": "50329.00",
+      "apartment": 3,
+      "depreciation_percentage": "10.0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Reiciendis excepturi quas vero numquam mollitia.",
+      "completion_date": "2010-01-18",
+      "value": "25015.00",
+      "apartment": 4,
+      "depreciation_percentage": "2.5"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Aperiam tempora quidem beatae explicabo.",
+      "completion_date": "2016-10-21",
+      "value": "27619.00",
+      "apartment": 4,
+      "depreciation_percentage": "0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Esse laudantium nihil.",
+      "completion_date": "2022-04-07",
+      "value": "78333.00",
+      "apartment": 5,
+      "depreciation_percentage": "2.5"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Fuga magni ad est neque doloribus.",
+      "completion_date": "2019-09-07",
+      "value": "46216.00",
+      "apartment": 5,
+      "depreciation_percentage": "2.5"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nihil aut voluptates cupiditate iusto cum provident.",
+      "completion_date": "2016-04-06",
+      "value": "88502.00",
+      "apartment": 5,
+      "depreciation_percentage": "10.0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Eligendi repudiandae occaecati fuga.",
+      "completion_date": "2014-02-25",
+      "value": "61869.00",
+      "apartment": 6,
+      "depreciation_percentage": "0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Consequuntur rem neque ad explicabo nulla repellat.",
+      "completion_date": "2019-04-26",
+      "value": "36020.00",
+      "apartment": 7,
+      "depreciation_percentage": "0"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Modi sapiente officiis dignissimos ab quam tempore suscipit.",
+      "completion_date": "2018-06-20",
+      "value": "83829.00",
+      "apartment": 8,
+      "depreciation_percentage": "2.5"
+    }
+  },
+  {
+    "model": "hitas.apartmentconstructionpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nisi nihil nihil dicta autem tenetur ex architecto.",
+      "completion_date": "2013-01-12",
+      "value": "25753.00",
+      "apartment": 8,
+      "depreciation_percentage": "0"
     }
   },
   {
@@ -1019,7 +432,7 @@
       "deleted_by_cascade": false,
       "name": "Officiis architecto numquam maxime.",
       "completion_date": "2011-03-08",
-      "value": 20697,
+      "value": "20697.00",
       "apartment": 1
     }
   },
@@ -1031,7 +444,7 @@
       "deleted_by_cascade": false,
       "name": "Consectetur architecto ipsa quas debitis.",
       "completion_date": "2011-12-03",
-      "value": 65252,
+      "value": "65252.00",
       "apartment": 2
     }
   },
@@ -1043,7 +456,7 @@
       "deleted_by_cascade": false,
       "name": "Ab quibusdam soluta laudantium eveniet inventore fugiat.",
       "completion_date": "2011-09-19",
-      "value": 15030,
+      "value": "15030.00",
       "apartment": 2
     }
   },
@@ -1055,7 +468,7 @@
       "deleted_by_cascade": false,
       "name": "Dolor fugiat dolores quo quae.",
       "completion_date": "2014-07-24",
-      "value": 7568,
+      "value": "7568.00",
       "apartment": 3
     }
   },
@@ -1067,7 +480,7 @@
       "deleted_by_cascade": false,
       "name": "Fugit ratione distinctio voluptate iste facilis similique.",
       "completion_date": "2016-08-30",
-      "value": 6599,
+      "value": "6599.00",
       "apartment": 4
     }
   },
@@ -1079,7 +492,7 @@
       "deleted_by_cascade": false,
       "name": "Ab explicabo debitis adipisci unde facilis.",
       "completion_date": "2017-11-25",
-      "value": 34980,
+      "value": "34980.00",
       "apartment": 5
     }
   },
@@ -1091,7 +504,7 @@
       "deleted_by_cascade": false,
       "name": "Dolorum ratione unde.",
       "completion_date": "2012-07-28",
-      "value": 11651,
+      "value": "11651.00",
       "apartment": 6
     }
   },
@@ -1103,7 +516,7 @@
       "deleted_by_cascade": false,
       "name": "Sequi neque ut velit sint libero nihil.",
       "completion_date": "2012-10-20",
-      "value": 85990,
+      "value": "85990.00",
       "apartment": 6
     }
   },
@@ -1115,7 +528,7 @@
       "deleted_by_cascade": false,
       "name": "Incidunt asperiores repellat quisquam quibusdam.",
       "completion_date": "2020-11-07",
-      "value": 96998,
+      "value": "96998.00",
       "apartment": 6
     }
   },
@@ -1127,7 +540,7 @@
       "deleted_by_cascade": false,
       "name": "Illum recusandae ducimus libero quas sed.",
       "completion_date": "2012-07-21",
-      "value": 75447,
+      "value": "75447.00",
       "apartment": 7
     }
   },
@@ -1139,7 +552,7 @@
       "deleted_by_cascade": false,
       "name": "Consequatur natus culpa molestiae voluptate distinctio.",
       "completion_date": "2020-06-13",
-      "value": 10604,
+      "value": "10604.00",
       "apartment": 7
     }
   },
@@ -1151,7 +564,7 @@
       "deleted_by_cascade": false,
       "name": "Nemo magni mollitia sint numquam quas unde.",
       "completion_date": "2015-01-28",
-      "value": 62621,
+      "value": "62621.00",
       "apartment": 8
     }
   },
@@ -1163,7 +576,7 @@
       "deleted_by_cascade": false,
       "name": "Enim perspiciatis sequi dolorum ab.",
       "completion_date": "2019-03-12",
-      "value": 22659,
+      "value": "22659.00",
       "apartment": 8
     }
   },
@@ -1175,945 +588,8 @@
       "deleted_by_cascade": false,
       "name": "Commodi repudiandae recusandae nam.",
       "completion_date": "2016-02-07",
-      "value": 51857,
+      "value": "51857.00",
       "apartment": 8
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Itaque unde aliquam soluta recusandae dolor nesciunt quas.",
-      "completion_date": "2018-02-19",
-      "value": 77530,
-      "apartment": 1,
-      "depreciation_percentage": 2.5
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Deleniti ipsum quaerat rerum incidunt ipsum enim.",
-      "completion_date": "2017-10-09",
-      "value": 72257,
-      "apartment": 2,
-      "depreciation_percentage": 10
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Natus magnam quisquam at incidunt eius.",
-      "completion_date": "2021-08-15",
-      "value": 538,
-      "apartment": 3,
-      "depreciation_percentage": 0
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Repudiandae ipsum rerum aut totam illum ipsa.",
-      "completion_date": "2013-05-12",
-      "value": 50329,
-      "apartment": 3,
-      "depreciation_percentage": 10
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Reiciendis excepturi quas vero numquam mollitia.",
-      "completion_date": "2010-01-18",
-      "value": 25015,
-      "apartment": 4,
-      "depreciation_percentage": 2.5
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Aperiam tempora quidem beatae explicabo.",
-      "completion_date": "2016-10-21",
-      "value": 27619,
-      "apartment": 4,
-      "depreciation_percentage": 0
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Esse laudantium nihil.",
-      "completion_date": "2022-04-07",
-      "value": 78333,
-      "apartment": 5,
-      "depreciation_percentage": 2.5
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Fuga magni ad est neque doloribus.",
-      "completion_date": "2019-09-07",
-      "value": 46216,
-      "apartment": 5,
-      "depreciation_percentage": 2.5
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Nihil aut voluptates cupiditate iusto cum provident.",
-      "completion_date": "2016-04-06",
-      "value": 88502,
-      "apartment": 5,
-      "depreciation_percentage": 10
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 10,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Eligendi repudiandae occaecati fuga.",
-      "completion_date": "2014-02-25",
-      "value": 61869,
-      "apartment": 6,
-      "depreciation_percentage": 0
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 11,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Consequuntur rem neque ad explicabo nulla repellat.",
-      "completion_date": "2019-04-26",
-      "value": 36020,
-      "apartment": 7,
-      "depreciation_percentage": 0
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 12,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Modi sapiente officiis dignissimos ab quam tempore suscipit.",
-      "completion_date": "2018-06-20",
-      "value": 83829,
-      "apartment": 8,
-      "depreciation_percentage": 2.5
-    }
-  },
-  {
-    "model": "hitas.apartmentconstructionpriceimprovement",
-    "pk": 13,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "name": "Nisi nihil nihil dicta autem tenetur ex architecto.",
-      "completion_date": "2013-01-12",
-      "value": 25753,
-      "apartment": 8,
-      "depreciation_percentage": 0
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
-      "real_estate": 1,
-      "street_address": "Fakestreet 123",
-      "building_identifier": "100012345A"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "be48cc00-3f0c-4419-a584-0c363feb0249",
-      "real_estate": 2,
-      "street_address": "Berganpolku 048",
-      "building_identifier": "195041644r"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "0f3561d9-f389-4f0a-a64a-38d4f2e90358",
-      "real_estate": 3,
-      "street_address": "Porebulevardi 00",
-      "building_identifier": "180078596y"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e35d0081-29cf-4208-bd10-d7608fe852c6",
-      "real_estate": 4,
-      "street_address": "Aidasmäentie 1",
-      "building_identifier": "181193052R"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "22c9f4ce-2953-4d24-97fc-c58ec69d1a37",
-      "real_estate": 5,
-      "street_address": "Berganpolku 7",
-      "building_identifier": "169214244O"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "dcd112ff-9e3d-4852-b359-a0f336acb6ae",
-      "real_estate": 6,
-      "street_address": "Urheilukuja 0",
-      "building_identifier": "163576403P"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "12ebf093-a10d-43c1-8075-df552bd6595d",
-      "real_estate": 7,
-      "street_address": "Winqvistinkuja 0",
-      "building_identifier": "150076293A"
-    }
-  },
-  {
-    "model": "hitas.building",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4c7f8a59-3e90-4500-8eeb-482dc35e5f16",
-      "real_estate": 8,
-      "street_address": "Kimalaispolku 382",
-      "building_identifier": "106343642p"
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "114211d1-db03-4389-ab6d-49683c8282e1",
-      "value": "tuntematon",
-      "description": "",
-      "in_use": true,
-      "order": 1,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2022-06-10T12:53:10.149Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "f3a77a46-9fc3-4b45-ba6d-baeebacd8a33",
-      "value": "kerrostalo",
-      "description": "",
-      "in_use": true,
-      "order": 2,
-      "legacy_code_number": "002",
-      "legacy_start_date": "2022-06-10T12:53:10.150Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "84e5d67b-6090-4d16-bfc2-7a686e0ee515",
-      "value": "rivitalo",
-      "description": "",
-      "in_use": true,
-      "order": 3,
-      "legacy_code_number": "003",
-      "legacy_start_date": "2022-06-10T12:53:10.150Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e7d21da9-f4c6-485a-ab93-17f2767dda57",
-      "value": "paritalo",
-      "description": "",
-      "in_use": true,
-      "order": 4,
-      "legacy_code_number": "004",
-      "legacy_start_date": "2022-06-10T12:53:10.151Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "d46238ac-9ec8-44ee-b1c3-0f1f43ed9e37",
-      "value": "pienkerrostalo",
-      "description": "",
-      "in_use": true,
-      "order": 5,
-      "legacy_code_number": "005",
-      "legacy_start_date": "2022-06-10T12:53:10.151Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "1e0e6d39-e885-48cb-9dfb-e444fbf9c481",
-      "value": "luhtitalo",
-      "description": "",
-      "in_use": true,
-      "order": 6,
-      "legacy_code_number": "006",
-      "legacy_start_date": "2022-06-10T12:53:10.151Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "976a10f2-fc95-4de7-a2c9-95db2938de94",
-      "value": "omakotitalo",
-      "description": "",
-      "in_use": true,
-      "order": 7,
-      "legacy_code_number": "007",
-      "legacy_start_date": "2022-06-10T12:53:10.152Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "742e10d3-f65e-470f-8dfb-0c9216a6eff7",
-      "value": "rivitalo/kerrostalo",
-      "description": "",
-      "in_use": true,
-      "order": 8,
-      "legacy_code_number": "008",
-      "legacy_start_date": "2022-06-10T12:53:10.152Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "62a1f517-9d19-42da-9a56-5ccabb54138b",
-      "value": "kerrostalo/rivitalo",
-      "description": "",
-      "in_use": true,
-      "order": 9,
-      "legacy_code_number": "009",
-      "legacy_start_date": "2022-06-10T12:53:10.152Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 10,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "8e1b3fd6-49eb-495b-a092-eac3b8a2dcc5",
-      "value": "pientalo",
-      "description": "",
-      "in_use": true,
-      "order": 10,
-      "legacy_code_number": "010",
-      "legacy_start_date": "2022-06-10T12:53:10.153Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 11,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "6bb1eff5-2da0-4a51-abe9-ee7dfe0fccfc",
-      "value": "erillistalo",
-      "description": "",
-      "in_use": true,
-      "order": 11,
-      "legacy_code_number": "011",
-      "legacy_start_date": "2022-06-10T12:53:10.153Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.buildingtype",
-    "pk": 12,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "a2d0ed67-f16d-4870-9293-f111785300b1",
-      "value": "rivitalo/erillistalo",
-      "description": "",
-      "in_use": true,
-      "order": 12,
-      "legacy_code_number": "012",
-      "legacy_start_date": "2022-06-10T12:53:10.153Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
-      "value": "tuntematon",
-      "description": "",
-      "in_use": true,
-      "order": 1,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
-      "value": "vapaarahoitteinen, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 2,
-      "legacy_code_number": "101",
-      "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
-      "value": "vapaarahoitteinen, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 3,
-      "legacy_code_number": "102",
-      "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4a9446cf-54cd-4e94-9e26-a44a6fe29ec2",
-      "value": "HK valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 4,
-      "legacy_code_number": "211",
-      "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "6cbfaa4b-b81f-4ee2-9800-fcd3c109a0ac",
-      "value": "HK valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 5,
-      "legacy_code_number": "212",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "b1d6c359-fbf9-4b7a-a5d6-caf189835ead",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 6,
-      "legacy_code_number": "221",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "36ecc9af-f5ff-455a-b89f-60f2557a53aa",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 7,
-      "legacy_code_number": "222",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4739ad1c-01d1-4a32-889b-b19f1f8c6a33",
-      "value": "HK valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 8,
-      "legacy_code_number": "311",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "1781fdb8-cff3-4c3b-9af0-1cc4ae3c3d36",
-      "value": "HK valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 9,
-      "legacy_code_number": "312",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 10,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "c05bab17-3153-4bc1-91b6-2354e582fcc8",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 10,
-      "legacy_code_number": "321",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 11,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "b60c3d06-f3a9-4cec-9c1e-0bd41de324ba",
-      "value": "RA valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 11,
-      "legacy_code_number": "322",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 12,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "64467849-4239-4a62-983e-5ac66a8153a4",
-      "value": "Korkotuki, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 12,
-      "legacy_code_number": "411",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 13,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "485d8561-ad32-4d2b-a384-29f8a28c04a7",
-      "value": "Korkotuki, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 13,
-      "legacy_code_number": "412",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 14,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "0b957ecb-1ead-4ad1-ae29-e6515fed3077",
-      "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 14,
-      "legacy_code_number": "511",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 15,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4e3943a6-d097-439e-bd68-3ae8d9a072f6",
-      "value": "Pitkä korkotukilaina osaomistus Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 15,
-      "legacy_code_number": "611",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 16,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "6f6ab506-79a0-45f7-a752-65d1a1848dbb",
-      "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 16,
-      "legacy_code_number": "711",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 17,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e062e181-24b9-48fb-a51a-bceec2a37d34",
-      "value": "Uusi Hitas I (vapaarahoitteinen)",
-      "description": "",
-      "in_use": true,
-      "order": 0,
-      "legacy_code_number": "811",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 18,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "793f4bad-0b63-41a7-a6df-1e3dc0337f07",
-      "value": "Uusi Hitas II (vapaarahoitteinen)",
-      "description": "",
-      "in_use": true,
-      "order": 0,
-      "legacy_code_number": "812",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 19,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "2913209c-9724-4f8e-82e5-f5a44e9bdfb4",
-      "value": "Uusi Hitas I (vanhat säännöt)",
-      "description": "",
-      "in_use": true,
-      "order": 19,
-      "legacy_code_number": "821",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 20,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "de4dfac0-ca52-46bf-bb8c-394d78a52db7",
-      "value": "Uusi Hitas II (vanhat säännöt)",
-      "description": "",
-      "in_use": true,
-      "order": 20,
-      "legacy_code_number": "822",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 21,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "a42bd1a4-ddee-4fca-aa36-461b61742f4c",
-      "value": "Vuokratalo Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 21,
-      "legacy_code_number": "911",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 22,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "3b36f759-4fa8-40f5-a477-574a936374bf",
-      "value": "Vuokratalo Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 22,
-      "legacy_code_number": "912",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "06224336-de27-4d87-853a-fb950ba5ecc8",
-      "value": "Helsingin Sato Oy",
-      "description": "",
-      "in_use": true,
-      "order": 8,
-      "legacy_code_number": "007",
-      "legacy_start_date": "2022-06-13T10:46:59Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "06d93a73-c212-4aa9-a536-83076d1b7fbf",
-      "value": "As Oy Taipale",
-      "description": "Laborum corporis hic nihil explicabo repellendus hic.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2020-08-27T19:44:51.832Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "d7cec43d-cb93-45d8-9c6d-634a813aed53",
-      "value": "As Oy Simola",
-      "description": "Error beatae maiores numquam tempore.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2016-07-28T08:36:19.285Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "84981cf4-ab1b-48b6-94ce-1775a513a53b",
-      "value": "As Oy Laaksonen",
-      "description": "Quam nam perferendis assumenda nemo.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2020-07-22T21:00:43.600Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "eff7cca5-a630-4714-8406-4793bd7e65d6",
-      "value": "As Oy Koistinen",
-      "description": "Maiores amet repudiandae facilis laboriosam voluptas iure.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2021-11-05T17:54:49.048Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 10,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "1d2ef714-85d7-44fe-969e-97c89847abcc",
-      "value": "As Oy Heikkinen",
-      "description": "Totam repudiandae dolore officiis.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2011-07-22T20:44:11.907Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 11,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "a6fb426e-7406-4a0d-bc1e-bbf7dfc663d6",
-      "value": "As Oy Leppänen",
-      "description": "Explicabo eveniet consectetur fugit dignissimos provident provident.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2016-11-07T12:08:37.817Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.developer",
-    "pk": 12,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e4401fa6-3135-40eb-b54f-13bca4fca5f1",
-      "value": "As Oy Nyman",
-      "description": "Minus accusantium perferendis maiores maiores provident itaque.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2012-01-02T23:46:09.515Z",
-      "legacy_end_date": null
     }
   },
   {
@@ -3861,820 +2337,771 @@
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 1,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "dccd2cbc-9826-4f28-b097-da8209441bbf",
-      "official_name": "Asunto Oy Helsingin Rumpupolun palvelutalo",
-      "display_name": "Helsingin Rumpupolun palvelutalo",
-      "state": "gt_30_years_not_free",
-      "business_id": "1234567-8",
+      "uuid": "78bc86e7-dbc4-449d-9ef0-fa43011dd151",
+      "real_estate": 1,
       "street_address": "Fakestreet 123",
-      "postal_code": 1,
-      "building_type": 2,
-      "financing_method": 2,
-      "property_manager": 2,
-      "developer": 5,
-      "acquisition_price": "123456.78",
-      "primary_loan": "100000.00",
-      "sales_price_catalogue_confirmation_date": null,
-      "notification_date": null,
-      "notes": "",
-      "last_modified_datetime": "2022-06-20T10:00:50.506Z",
-      "last_modified_by": "09a0a600-a62d-44bd-b9ef-ab446eeccb28"
+      "building_identifier": "100012345A"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 2,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "7938b3fd-2b77-4139-b0b7-f410758e09c6",
-      "official_name": "As Oy Karjalainen",
-      "display_name": "Karjalainen",
-      "state": "not_ready",
-      "business_id": "9683437-5",
-      "street_address": "Yrttimaanpolku 020",
-      "postal_code": 6,
-      "building_type": 9,
-      "financing_method": 15,
-      "property_manager": 3,
-      "developer": 6,
-      "acquisition_price": "83571907.65",
-      "primary_loan": "81539947.63",
-      "sales_price_catalogue_confirmation_date": "2015-07-25",
-      "notification_date": "2013-08-10",
-      "notes": "Accusamus voluptatibus nemo cum quas. Impedit blanditiis voluptatibus voluptates quae id aspernatur fugiat. Eveniet velit corrupti voluptate natus aperiam.",
-      "last_modified_datetime": "2022-08-02T09:20:05.397Z",
-      "last_modified_by": "c63ead5f-25fb-4af0-bc7e-62aa14b3e7e0"
+      "uuid": "be48cc00-3f0c-4419-a584-0c363feb0249",
+      "real_estate": 2,
+      "street_address": "Berganpolku 048",
+      "building_identifier": "195041644r"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 3,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "01c9168e-637b-4ce0-9478-02e9b417d15a",
-      "official_name": "As Oy Jokela",
-      "display_name": "Jokela",
-      "state": "not_ready",
-      "business_id": "1423269-7",
-      "street_address": "Biologinkuja 3",
-      "postal_code": 12,
-      "building_type": 5,
-      "financing_method": 2,
-      "property_manager": 4,
-      "developer": 7,
-      "acquisition_price": "99749992.47",
-      "primary_loan": "81692780.51",
-      "sales_price_catalogue_confirmation_date": "2011-03-06",
-      "notification_date": "2021-01-15",
-      "notes": "Expedita nihil deleniti nam deleniti dolores. Quae perferendis accusamus libero necessitatibus. Voluptatum maiores quam.\nNecessitatibus molestias iure illum quibusdam.",
-      "last_modified_datetime": "2022-08-02T09:20:09.471Z",
-      "last_modified_by": "c64f240b-12eb-4ccb-bdc7-15c430e7cfc0"
+      "uuid": "0f3561d9-f389-4f0a-a64a-38d4f2e90358",
+      "real_estate": 3,
+      "street_address": "Porebulevardi 00",
+      "building_identifier": "180078596y"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 4,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "9e6e79f6-8ec6-45aa-922f-675950698511",
-      "official_name": "As Oy Venäläinen",
-      "display_name": "Venäläinen",
-      "state": "not_ready",
-      "business_id": "9397579-7",
-      "street_address": "Iltaruskonkatu 3",
-      "postal_code": 4,
-      "building_type": 12,
-      "financing_method": 1,
-      "property_manager": 5,
-      "developer": 8,
-      "acquisition_price": "15973741.78",
-      "primary_loan": "41801722.70",
-      "sales_price_catalogue_confirmation_date": "2018-01-18",
-      "notification_date": "2011-09-11",
-      "notes": "Deserunt et dolorem dolores aliquam libero. Eaque minus adipisci.\nAliquid quibusdam ratione voluptas facere eveniet sunt. Accusantium excepturi quos quos. Magnam rerum repellendus sequi qui.",
-      "last_modified_datetime": "2022-08-02T09:20:11.628Z",
-      "last_modified_by": "722efa11-90b3-448b-b978-45fef5539c28"
+      "uuid": "e35d0081-29cf-4208-bd10-d7608fe852c6",
+      "real_estate": 4,
+      "street_address": "Aidasmäentie 1",
+      "building_identifier": "181193052R"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 5,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "d766a637-751d-4c58-913c-caabf5f10b6c",
-      "official_name": "As Oy Lassila",
-      "display_name": "Lassila",
-      "state": "not_ready",
-      "business_id": "5567725-4",
-      "street_address": "Tuomarinkylänkatu 071",
-      "postal_code": 23,
-      "building_type": 5,
-      "financing_method": 3,
-      "property_manager": 6,
-      "developer": 9,
-      "acquisition_price": "38918640.09",
-      "primary_loan": "84597715.33",
-      "sales_price_catalogue_confirmation_date": "2016-08-01",
-      "notification_date": "2012-12-31",
-      "notes": "Esse nulla porro deleniti placeat molestiae eaque. Quidem possimus dolorum et corporis minus mollitia maiores.",
-      "last_modified_datetime": "2022-08-02T09:20:13.748Z",
-      "last_modified_by": "3b78650c-23fc-45e4-be12-60466d1631ac"
+      "uuid": "22c9f4ce-2953-4d24-97fc-c58ec69d1a37",
+      "real_estate": 5,
+      "street_address": "Berganpolku 7",
+      "building_identifier": "169214244O"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 6,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "ba40eec8-1e76-449a-9ab1-1b47753194b5",
-      "official_name": "As Oy Salminen",
-      "display_name": "Salminen",
-      "state": "not_ready",
-      "business_id": "5848149-2",
-      "street_address": "Fastbölenpolku 8",
-      "postal_code": 28,
-      "building_type": 1,
-      "financing_method": 20,
-      "property_manager": 7,
-      "developer": 10,
-      "acquisition_price": "83575476.54",
-      "primary_loan": "79065595.04",
-      "sales_price_catalogue_confirmation_date": "2018-01-08",
-      "notification_date": "2018-07-25",
-      "notes": "Sint consectetur repudiandae quas sed reprehenderit ipsam ex.\nDoloribus numquam aut tenetur dolore. Veritatis consectetur molestias odit dolorum aut rem quasi.",
-      "last_modified_datetime": "2022-08-02T09:20:15.802Z",
-      "last_modified_by": "7c804293-f0c0-4435-b591-f92775ae7942"
+      "uuid": "dcd112ff-9e3d-4852-b359-a0f336acb6ae",
+      "real_estate": 6,
+      "street_address": "Urheilukuja 0",
+      "building_identifier": "163576403P"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 7,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "d45e0c74-8ad2-480f-964c-3209d0dc9c1b",
-      "official_name": "As Oy Räsänen",
-      "display_name": "Räsänen",
-      "state": "not_ready",
-      "business_id": "7637525-5",
-      "street_address": "Salavakatu 0",
-      "postal_code": 4,
-      "building_type": 3,
-      "financing_method": 12,
-      "property_manager": 8,
-      "developer": 11,
-      "acquisition_price": "46511857.20",
-      "primary_loan": "89218508.81",
-      "sales_price_catalogue_confirmation_date": "2012-11-29",
-      "notification_date": "2010-02-14",
-      "notes": "Fugiat neque laudantium necessitatibus ratione aperiam doloribus. Nemo dolores odio nobis consequatur autem. Omnis eligendi cum sed.\nCommodi numquam eius suscipit asperiores.",
-      "last_modified_datetime": "2022-08-02T09:20:19.821Z",
-      "last_modified_by": "acfd9a8c-c608-48e7-a883-cda6d3891867"
+      "uuid": "12ebf093-a10d-43c1-8075-df552bd6595d",
+      "real_estate": 7,
+      "street_address": "Winqvistinkuja 0",
+      "building_identifier": "150076293A"
     }
   },
   {
-    "model": "hitas.housingcompany",
+    "model": "hitas.building",
     "pk": 8,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "2980ec08-6887-4297-820c-4150f9146620",
-      "official_name": "As Oy Virtanen",
-      "display_name": "Virtanen",
-      "state": "not_ready",
-      "business_id": "3258335-1",
-      "street_address": "Vaakalinnunpolku 446",
-      "postal_code": 6,
-      "building_type": 9,
-      "financing_method": 15,
-      "property_manager": 9,
-      "developer": 12,
-      "acquisition_price": "70361556.09",
-      "primary_loan": "38404029.03",
-      "sales_price_catalogue_confirmation_date": "2015-05-01",
-      "notification_date": "2010-07-19",
-      "notes": "Quos harum similique totam omnis quasi quo. Hic eos earum nam dolorem adipisci.\nQuisquam necessitatibus ducimus architecto maxime. Officiis expedita accusamus pariatur sunt molestias.",
-      "last_modified_datetime": "2022-08-02T09:22:01.728Z",
-      "last_modified_by": "b3ce65df-3707-4d83-a605-a0c886ff53f7"
+      "uuid": "4c7f8a59-3e90-4500-8eeb-482dc35e5f16",
+      "real_estate": 8,
+      "street_address": "Kimalaispolku 382",
+      "building_identifier": "106343642p"
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 1,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Rem inventore aperiam odio voluptate quidem.",
-      "completion_date": "2015-10-28",
-      "value": 16124,
-      "housing_company": 1
+      "uuid": "114211d1-db03-4389-ab6d-49683c8282e1",
+      "value": "tuntematon",
+      "description": "",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "001",
+      "legacy_start_date": "2022-06-10T12:53:10.149Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 2,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Dignissimos dolores temporibus facilis.",
-      "completion_date": "2017-09-22",
-      "value": 8767,
-      "housing_company": 1
+      "uuid": "f3a77a46-9fc3-4b45-ba6d-baeebacd8a33",
+      "value": "kerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "002",
+      "legacy_start_date": "2022-06-10T12:53:10.150Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 3,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Ipsam explicabo praesentium ducimus quas ab repellendus.",
-      "completion_date": "2017-12-15",
-      "value": 87670,
-      "housing_company": 2
+      "uuid": "84e5d67b-6090-4d16-bfc2-7a686e0ee515",
+      "value": "rivitalo",
+      "description": "",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "003",
+      "legacy_start_date": "2022-06-10T12:53:10.150Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 4,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Nulla quia quam iusto quos at quia.",
-      "completion_date": "2020-07-19",
-      "value": 90306,
-      "housing_company": 3
+      "uuid": "e7d21da9-f4c6-485a-ab93-17f2767dda57",
+      "value": "paritalo",
+      "description": "",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "004",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 5,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Suscipit laudantium nesciunt.",
-      "completion_date": "2015-02-22",
-      "value": 91049,
-      "housing_company": 4
+      "uuid": "d46238ac-9ec8-44ee-b1c3-0f1f43ed9e37",
+      "value": "pienkerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 5,
+      "legacy_code_number": "005",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 6,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Labore odio in.",
-      "completion_date": "2020-12-30",
-      "value": 52437,
-      "housing_company": 5
+      "uuid": "1e0e6d39-e885-48cb-9dfb-e444fbf9c481",
+      "value": "luhtitalo",
+      "description": "",
+      "in_use": true,
+      "order": 6,
+      "legacy_code_number": "006",
+      "legacy_start_date": "2022-06-10T12:53:10.151Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 7,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Quo ipsam animi voluptatem necessitatibus minus perspiciatis reprehenderit.",
-      "completion_date": "2015-07-28",
-      "value": 83605,
-      "housing_company": 5
+      "uuid": "976a10f2-fc95-4de7-a2c9-95db2938de94",
+      "value": "omakotitalo",
+      "description": "",
+      "in_use": true,
+      "order": 7,
+      "legacy_code_number": "007",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 8,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Quo error eveniet quis esse illo doloremque.",
-      "completion_date": "2016-05-09",
-      "value": 78534,
-      "housing_company": 6
+      "uuid": "742e10d3-f65e-470f-8dfb-0c9216a6eff7",
+      "value": "rivitalo/kerrostalo",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "008",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 9,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Praesentium praesentium est illo minus ad.",
-      "completion_date": "2011-03-22",
-      "value": 11299,
-      "housing_company": 7
+      "uuid": "62a1f517-9d19-42da-9a56-5ccabb54138b",
+      "value": "kerrostalo/rivitalo",
+      "description": "",
+      "in_use": true,
+      "order": 9,
+      "legacy_code_number": "009",
+      "legacy_start_date": "2022-06-10T12:53:10.152Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 10,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Cum quia amet deserunt voluptate.",
-      "completion_date": "2014-09-25",
-      "value": 99019,
-      "housing_company": 7
+      "uuid": "8e1b3fd6-49eb-495b-a092-eac3b8a2dcc5",
+      "value": "pientalo",
+      "description": "",
+      "in_use": true,
+      "order": 10,
+      "legacy_code_number": "010",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 11,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Ab neque adipisci.",
-      "completion_date": "2016-06-12",
-      "value": 26177,
-      "housing_company": 7
+      "uuid": "6bb1eff5-2da0-4a51-abe9-ee7dfe0fccfc",
+      "value": "erillistalo",
+      "description": "",
+      "in_use": true,
+      "order": 11,
+      "legacy_code_number": "011",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
+    "model": "hitas.buildingtype",
     "pk": 12,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Iure libero et reiciendis eius.",
-      "completion_date": "2020-10-01",
-      "value": 52257,
-      "housing_company": 8
+      "uuid": "a2d0ed67-f16d-4870-9293-f111785300b1",
+      "value": "rivitalo/erillistalo",
+      "description": "",
+      "in_use": true,
+      "order": 12,
+      "legacy_code_number": "012",
+      "legacy_start_date": "2022-06-10T12:53:10.153Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanymarketpriceimprovement",
-    "pk": 13,
+    "model": "hitas.developer",
+    "pk": 5,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Inventore reiciendis cumque illum ratione aspernatur corrupti.",
-      "completion_date": "2018-01-09",
-      "value": 25121,
-      "housing_company": 8
+      "uuid": "06224336-de27-4d87-853a-fb950ba5ecc8",
+      "value": "Helsingin Sato Oy",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "007",
+      "legacy_start_date": "2022-06-13T10:46:59Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.developer",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "06d93a73-c212-4aa9-a536-83076d1b7fbf",
+      "value": "As Oy Taipale",
+      "description": "Laborum corporis hic nihil explicabo repellendus hic.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "001",
+      "legacy_start_date": "2020-08-27T19:44:51.832Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "d7cec43d-cb93-45d8-9c6d-634a813aed53",
+      "value": "As Oy Simola",
+      "description": "Error beatae maiores numquam tempore.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2016-07-28T08:36:19.285Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "84981cf4-ab1b-48b6-94ce-1775a513a53b",
+      "value": "As Oy Laaksonen",
+      "description": "Quam nam perferendis assumenda nemo.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2020-07-22T21:00:43.600Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "eff7cca5-a630-4714-8406-4793bd7e65d6",
+      "value": "As Oy Koistinen",
+      "description": "Maiores amet repudiandae facilis laboriosam voluptas iure.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2021-11-05T17:54:49.048Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "1d2ef714-85d7-44fe-969e-97c89847abcc",
+      "value": "As Oy Heikkinen",
+      "description": "Totam repudiandae dolore officiis.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2011-07-22T20:44:11.907Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "a6fb426e-7406-4a0d-bc1e-bbf7dfc663d6",
+      "value": "As Oy Leppänen",
+      "description": "Explicabo eveniet consectetur fugit dignissimos provident provident.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2016-11-07T12:08:37.817Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.developer",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "e4401fa6-3135-40eb-b54f-13bca4fca5f1",
+      "value": "As Oy Nyman",
+      "description": "Minus accusantium perferendis maiores maiores provident itaque.",
+      "in_use": true,
+      "order": null,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2012-01-02T23:46:09.515Z",
+      "legacy_end_date": null
+    }
+  },
+  {
+    "model": "hitas.financingmethod",
     "pk": 1,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Sed tempora deserunt illo possimus autem.",
-      "completion_date": "2016-12-03",
-      "value": 40169,
-      "housing_company": 1
+      "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
+      "value": "tuntematon",
+      "description": "",
+      "in_use": true,
+      "order": 1,
+      "legacy_code_number": "000",
+      "legacy_start_date": "2022-06-10T12:53:10.136Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 2,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Laborum vel veritatis dicta.",
-      "completion_date": "2020-12-04",
-      "value": 70524,
-      "housing_company": 2
+      "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
+      "value": "vapaarahoitteinen, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 2,
+      "legacy_code_number": "101",
+      "legacy_start_date": "2022-06-10T12:53:10.136Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 3,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Aspernatur quae consequatur.",
-      "completion_date": "2011-10-16",
-      "value": 53407,
-      "housing_company": 2
+      "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
+      "value": "vapaarahoitteinen, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 3,
+      "legacy_code_number": "102",
+      "legacy_start_date": "2022-06-10T12:53:10.137Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 4,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Minima cumque corporis voluptate.",
-      "completion_date": "2010-03-24",
-      "value": 63325,
-      "housing_company": 3
+      "uuid": "4a9446cf-54cd-4e94-9e26-a44a6fe29ec2",
+      "value": "HK valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 4,
+      "legacy_code_number": "211",
+      "legacy_start_date": "2022-06-10T12:53:10.137Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 5,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Quidem velit harum nemo.",
-      "completion_date": "2012-01-25",
-      "value": 51857,
-      "housing_company": 3
+      "uuid": "6cbfaa4b-b81f-4ee2-9800-fcd3c109a0ac",
+      "value": "HK valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 5,
+      "legacy_code_number": "212",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 6,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Magni quod repudiandae enim nisi enim reprehenderit.",
-      "completion_date": "2015-04-04",
-      "value": 14141,
-      "housing_company": 3
+      "uuid": "b1d6c359-fbf9-4b7a-a5d6-caf189835ead",
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 6,
+      "legacy_code_number": "221",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 7,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Accusamus consequuntur quae veritatis veniam.",
-      "completion_date": "2018-12-26",
-      "value": 44041,
-      "housing_company": 4
+      "uuid": "36ecc9af-f5ff-455a-b89f-60f2557a53aa",
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 7,
+      "legacy_code_number": "222",
+      "legacy_start_date": "2022-06-10T12:53:10.138Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 8,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Alias ipsa sapiente fugit error doloribus.",
-      "completion_date": "2010-04-04",
-      "value": 46697,
-      "housing_company": 4
+      "uuid": "4739ad1c-01d1-4a32-889b-b19f1f8c6a33",
+      "value": "HK valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 8,
+      "legacy_code_number": "311",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 9,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Ratione earum eos ipsum vero alias.",
-      "completion_date": "2019-02-13",
-      "value": 84297,
-      "housing_company": 5
+      "uuid": "1781fdb8-cff3-4c3b-9af0-1cc4ae3c3d36",
+      "value": "HK valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 9,
+      "legacy_code_number": "312",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 10,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Sequi vitae corporis accusamus voluptatibus quidem.",
-      "completion_date": "2019-11-01",
-      "value": 11154,
-      "housing_company": 5
+      "uuid": "c05bab17-3153-4bc1-91b6-2354e582fcc8",
+      "value": "RA valtion laina, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 10,
+      "legacy_code_number": "321",
+      "legacy_start_date": "2022-06-10T12:53:10.139Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 11,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Nobis accusamus sint sunt labore illo vel.",
-      "completion_date": "2010-09-10",
-      "value": 39848,
-      "housing_company": 6
+      "uuid": "b60c3d06-f3a9-4cec-9c1e-0bd41de324ba",
+      "value": "RA valtion laina, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 11,
+      "legacy_code_number": "322",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 12,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Pariatur ipsam qui labore ratione sapiente consequuntur.",
-      "completion_date": "2022-04-05",
-      "value": 14035,
-      "housing_company": 6
+      "uuid": "64467849-4239-4a62-983e-5ac66a8153a4",
+      "value": "Korkotuki, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 12,
+      "legacy_code_number": "411",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 13,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Porro autem voluptatum atque officiis suscipit facere.",
-      "completion_date": "2021-12-08",
-      "value": 674,
-      "housing_company": 6
+      "uuid": "485d8561-ad32-4d2b-a384-29f8a28c04a7",
+      "value": "Korkotuki, Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 13,
+      "legacy_code_number": "412",
+      "legacy_start_date": "2022-06-10T12:53:10.140Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 14,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Totam nisi ex odit delectus asperiores.",
-      "completion_date": "2017-04-18",
-      "value": 25325,
-      "housing_company": 7
+      "uuid": "0b957ecb-1ead-4ad1-ae29-e6515fed3077",
+      "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 14,
+      "legacy_code_number": "511",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 15,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Sunt architecto nihil quae.",
-      "completion_date": "2010-09-26",
-      "value": 15071,
-      "housing_company": 7
+      "uuid": "4e3943a6-d097-439e-bd68-3ae8d9a072f6",
+      "value": "Pitkä korkotukilaina osaomistus Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 15,
+      "legacy_code_number": "611",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 16,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Dicta occaecati similique numquam.",
-      "completion_date": "2016-04-27",
-      "value": 96890,
-      "housing_company": 7
+      "uuid": "6f6ab506-79a0-45f7-a752-65d1a1848dbb",
+      "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 16,
+      "legacy_code_number": "711",
+      "legacy_start_date": "2022-06-10T12:53:10.141Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 17,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Vitae est provident.",
-      "completion_date": "2022-07-08",
-      "value": 38122,
-      "housing_company": 8
+      "uuid": "e062e181-24b9-48fb-a51a-bceec2a37d34",
+      "value": "Uusi Hitas I (vapaarahoitteinen)",
+      "description": "",
+      "in_use": true,
+      "order": 0,
+      "legacy_code_number": "811",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 18,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Tenetur veniam non.",
-      "completion_date": "2021-07-15",
-      "value": 91070,
-      "housing_company": 8
+      "uuid": "793f4bad-0b63-41a7-a6df-1e3dc0337f07",
+      "value": "Uusi Hitas II (vapaarahoitteinen)",
+      "description": "",
+      "in_use": true,
+      "order": 0,
+      "legacy_code_number": "812",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "model": "hitas.financingmethod",
     "pk": 19,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "name": "Ducimus illo eum voluptate.",
-      "completion_date": "2021-01-02",
-      "value": 5867,
-      "housing_company": 8
+      "uuid": "2913209c-9724-4f8e-82e5-f5a44e9bdfb4",
+      "value": "Uusi Hitas I (vanhat säännöt)",
+      "description": "",
+      "in_use": true,
+      "order": 19,
+      "legacy_code_number": "821",
+      "legacy_start_date": "2022-06-10T12:53:10.142Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.owner",
-    "pk": 1,
+    "model": "hitas.financingmethod",
+    "pk": 20,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
-      "name": "Matti Meikäläinen",
-      "identifier": "010199-123A",
-      "email": "matti@hitas.fi"
+      "uuid": "de4dfac0-ca52-46bf-bb8c-394d78a52db7",
+      "value": "Uusi Hitas II (vanhat säännöt)",
+      "description": "",
+      "in_use": true,
+      "order": 20,
+      "legacy_code_number": "822",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.owner",
-    "pk": 2,
+    "model": "hitas.financingmethod",
+    "pk": 21,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
-      "name": "Kerttu Kuusisto",
-      "identifier": "050462-494C",
-      "email": "juhanisaari@example.com"
+      "uuid": "a42bd1a4-ddee-4fca-aa36-461b61742f4c",
+      "value": "Vuokratalo Hitas II",
+      "description": "",
+      "in_use": true,
+      "order": 21,
+      "legacy_code_number": "911",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
     }
   },
   {
-    "model": "hitas.owner",
-    "pk": 3,
+    "model": "hitas.financingmethod",
+    "pk": 22,
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
-      "name": "Juhani Kujala",
-      "identifier": "300505A522H",
-      "email": "kaarinalehto@example.com"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
-      "name": "Kerttu Asikainen",
-      "identifier": "151124-088K",
-      "email": "mattigustafsson@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
-      "name": "Jaakko Virtanen",
-      "identifier": "230919-757D",
-      "email": "emiliaseppanen@example.net"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
-      "name": "Marjaana Myllymäki",
-      "identifier": "160339-233A",
-      "email": "artturiihimaki@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
-      "name": "Seppo Lahtinen",
-      "identifier": "211283-058H",
-      "email": "ensio55@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
-      "name": "Riitta Ojanen",
-      "identifier": "160288-587K",
-      "email": "onurmi@example.org"
-    }
-  },
-  {
-    "model": "hitas.owner",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
-      "name": "Katariina Virna",
-      "identifier": "111269-222X",
-      "email": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 1,
-      "owner": 1,
-      "percentage": "100.00",
-      "start_date": "2022-01-01",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 2,
-      "owner": 2,
-      "percentage": "100.00",
-      "start_date": "2010-12-03",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 3,
-      "owner": 3,
-      "percentage": "100.00",
-      "start_date": "2021-08-27",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 4,
-      "owner": 4,
-      "percentage": "50.00",
-      "start_date": "2021-07-31",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 5,
-      "owner": 5,
-      "percentage": "100.00",
-      "start_date": "2018-09-08",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 6,
-      "owner": 6,
-      "percentage": "100.00",
-      "start_date": "2010-05-24",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 7,
-      "owner": 7,
-      "percentage": "100.00",
-      "start_date": "2018-11-12",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 8,
-      "owner": 8,
-      "percentage": "100.00",
-      "start_date": "2016-08-13",
-      "end_date": null
-    }
-  },
-  {
-    "model": "hitas.ownership",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 4,
-      "owner": 9,
-      "percentage": "50.00",
-      "start_date": "2021-07-31",
-      "end_date": null
+      "uuid": "3b36f759-4fa8-40f5-a477-574a936374bf",
+      "value": "Vuokratalo Hitas I",
+      "description": "",
+      "in_use": true,
+      "order": 22,
+      "legacy_code_number": "912",
+      "legacy_start_date": "2022-06-10T12:53:10.143Z",
+      "legacy_end_date": null
     }
   },
   {
@@ -5158,6 +3585,823 @@
     }
   },
   {
+    "model": "hitas.housingcompany",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "dccd2cbc-9826-4f28-b097-da8209441bbf",
+      "official_name": "Asunto Oy Helsingin Rumpupolun palvelutalo",
+      "display_name": "Helsingin Rumpupolun palvelutalo",
+      "state": "gt_30_years_not_free",
+      "business_id": "1234567-8",
+      "street_address": "Fakestreet 123",
+      "postal_code": 1,
+      "building_type": 2,
+      "financing_method": 2,
+      "property_manager": 2,
+      "developer": 5,
+      "acquisition_price": "123456.78",
+      "primary_loan": "100000.00",
+      "sales_price_catalogue_confirmation_date": null,
+      "notification_date": null,
+      "notes": "",
+      "last_modified_datetime": "2022-06-20T10:00:50.506Z",
+      "last_modified_by": "09a0a600-a62d-44bd-b9ef-ab446eeccb28"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "7938b3fd-2b77-4139-b0b7-f410758e09c6",
+      "official_name": "As Oy Karjalainen",
+      "display_name": "Karjalainen",
+      "state": "not_ready",
+      "business_id": "9683437-5",
+      "street_address": "Yrttimaanpolku 020",
+      "postal_code": 6,
+      "building_type": 9,
+      "financing_method": 15,
+      "property_manager": 3,
+      "developer": 6,
+      "acquisition_price": "83571907.65",
+      "primary_loan": "81539947.63",
+      "sales_price_catalogue_confirmation_date": "2015-07-25",
+      "notification_date": "2013-08-10",
+      "notes": "Accusamus voluptatibus nemo cum quas. Impedit blanditiis voluptatibus voluptates quae id aspernatur fugiat. Eveniet velit corrupti voluptate natus aperiam.",
+      "last_modified_datetime": "2022-08-02T09:20:05.397Z",
+      "last_modified_by": "c63ead5f-25fb-4af0-bc7e-62aa14b3e7e0"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "01c9168e-637b-4ce0-9478-02e9b417d15a",
+      "official_name": "As Oy Jokela",
+      "display_name": "Jokela",
+      "state": "not_ready",
+      "business_id": "1423269-7",
+      "street_address": "Biologinkuja 3",
+      "postal_code": 12,
+      "building_type": 5,
+      "financing_method": 2,
+      "property_manager": 4,
+      "developer": 7,
+      "acquisition_price": "99749992.47",
+      "primary_loan": "81692780.51",
+      "sales_price_catalogue_confirmation_date": "2011-03-06",
+      "notification_date": "2021-01-15",
+      "notes": "Expedita nihil deleniti nam deleniti dolores. Quae perferendis accusamus libero necessitatibus. Voluptatum maiores quam.\nNecessitatibus molestias iure illum quibusdam.",
+      "last_modified_datetime": "2022-08-02T09:20:09.471Z",
+      "last_modified_by": "c64f240b-12eb-4ccb-bdc7-15c430e7cfc0"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "9e6e79f6-8ec6-45aa-922f-675950698511",
+      "official_name": "As Oy Venäläinen",
+      "display_name": "Venäläinen",
+      "state": "not_ready",
+      "business_id": "9397579-7",
+      "street_address": "Iltaruskonkatu 3",
+      "postal_code": 4,
+      "building_type": 12,
+      "financing_method": 1,
+      "property_manager": 5,
+      "developer": 8,
+      "acquisition_price": "15973741.78",
+      "primary_loan": "41801722.70",
+      "sales_price_catalogue_confirmation_date": "2018-01-18",
+      "notification_date": "2011-09-11",
+      "notes": "Deserunt et dolorem dolores aliquam libero. Eaque minus adipisci.\nAliquid quibusdam ratione voluptas facere eveniet sunt. Accusantium excepturi quos quos. Magnam rerum repellendus sequi qui.",
+      "last_modified_datetime": "2022-08-02T09:20:11.628Z",
+      "last_modified_by": "722efa11-90b3-448b-b978-45fef5539c28"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "d766a637-751d-4c58-913c-caabf5f10b6c",
+      "official_name": "As Oy Lassila",
+      "display_name": "Lassila",
+      "state": "not_ready",
+      "business_id": "5567725-4",
+      "street_address": "Tuomarinkylänkatu 071",
+      "postal_code": 23,
+      "building_type": 5,
+      "financing_method": 3,
+      "property_manager": 6,
+      "developer": 9,
+      "acquisition_price": "38918640.09",
+      "primary_loan": "84597715.33",
+      "sales_price_catalogue_confirmation_date": "2016-08-01",
+      "notification_date": "2012-12-31",
+      "notes": "Esse nulla porro deleniti placeat molestiae eaque. Quidem possimus dolorum et corporis minus mollitia maiores.",
+      "last_modified_datetime": "2022-08-02T09:20:13.748Z",
+      "last_modified_by": "3b78650c-23fc-45e4-be12-60466d1631ac"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "ba40eec8-1e76-449a-9ab1-1b47753194b5",
+      "official_name": "As Oy Salminen",
+      "display_name": "Salminen",
+      "state": "not_ready",
+      "business_id": "5848149-2",
+      "street_address": "Fastbölenpolku 8",
+      "postal_code": 28,
+      "building_type": 1,
+      "financing_method": 20,
+      "property_manager": 7,
+      "developer": 10,
+      "acquisition_price": "83575476.54",
+      "primary_loan": "79065595.04",
+      "sales_price_catalogue_confirmation_date": "2018-01-08",
+      "notification_date": "2018-07-25",
+      "notes": "Sint consectetur repudiandae quas sed reprehenderit ipsam ex.\nDoloribus numquam aut tenetur dolore. Veritatis consectetur molestias odit dolorum aut rem quasi.",
+      "last_modified_datetime": "2022-08-02T09:20:15.802Z",
+      "last_modified_by": "7c804293-f0c0-4435-b591-f92775ae7942"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "d45e0c74-8ad2-480f-964c-3209d0dc9c1b",
+      "official_name": "As Oy Räsänen",
+      "display_name": "Räsänen",
+      "state": "not_ready",
+      "business_id": "7637525-5",
+      "street_address": "Salavakatu 0",
+      "postal_code": 4,
+      "building_type": 3,
+      "financing_method": 12,
+      "property_manager": 8,
+      "developer": 11,
+      "acquisition_price": "46511857.20",
+      "primary_loan": "89218508.81",
+      "sales_price_catalogue_confirmation_date": "2012-11-29",
+      "notification_date": "2010-02-14",
+      "notes": "Fugiat neque laudantium necessitatibus ratione aperiam doloribus. Nemo dolores odio nobis consequatur autem. Omnis eligendi cum sed.\nCommodi numquam eius suscipit asperiores.",
+      "last_modified_datetime": "2022-08-02T09:20:19.821Z",
+      "last_modified_by": "acfd9a8c-c608-48e7-a883-cda6d3891867"
+    }
+  },
+  {
+    "model": "hitas.housingcompany",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "2980ec08-6887-4297-820c-4150f9146620",
+      "official_name": "As Oy Virtanen",
+      "display_name": "Virtanen",
+      "state": "not_ready",
+      "business_id": "3258335-1",
+      "street_address": "Vaakalinnunpolku 446",
+      "postal_code": 6,
+      "building_type": 9,
+      "financing_method": 15,
+      "property_manager": 9,
+      "developer": 12,
+      "acquisition_price": "70361556.09",
+      "primary_loan": "38404029.03",
+      "sales_price_catalogue_confirmation_date": "2015-05-01",
+      "notification_date": "2010-07-19",
+      "notes": "Quos harum similique totam omnis quasi quo. Hic eos earum nam dolorem adipisci.\nQuisquam necessitatibus ducimus architecto maxime. Officiis expedita accusamus pariatur sunt molestias.",
+      "last_modified_datetime": "2022-08-02T09:22:01.728Z",
+      "last_modified_by": "b3ce65df-3707-4d83-a605-a0c886ff53f7"
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sed tempora deserunt illo possimus autem.",
+      "completion_date": "2016-12-03",
+      "value": "40169.00",
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Laborum vel veritatis dicta.",
+      "completion_date": "2020-12-04",
+      "value": "70524.00",
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Aspernatur quae consequatur.",
+      "completion_date": "2011-10-16",
+      "value": "53407.00",
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Minima cumque corporis voluptate.",
+      "completion_date": "2010-03-24",
+      "value": "63325.00",
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quidem velit harum nemo.",
+      "completion_date": "2012-01-25",
+      "value": "51857.00",
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Magni quod repudiandae enim nisi enim reprehenderit.",
+      "completion_date": "2015-04-04",
+      "value": "14141.00",
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Accusamus consequuntur quae veritatis veniam.",
+      "completion_date": "2018-12-26",
+      "value": "44041.00",
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Alias ipsa sapiente fugit error doloribus.",
+      "completion_date": "2010-04-04",
+      "value": "46697.00",
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ratione earum eos ipsum vero alias.",
+      "completion_date": "2019-02-13",
+      "value": "84297.00",
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sequi vitae corporis accusamus voluptatibus quidem.",
+      "completion_date": "2019-11-01",
+      "value": "11154.00",
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nobis accusamus sint sunt labore illo vel.",
+      "completion_date": "2010-09-10",
+      "value": "39848.00",
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Pariatur ipsam qui labore ratione sapiente consequuntur.",
+      "completion_date": "2022-04-05",
+      "value": "14035.00",
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Porro autem voluptatum atque officiis suscipit facere.",
+      "completion_date": "2021-12-08",
+      "value": "674.00",
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 14,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Totam nisi ex odit delectus asperiores.",
+      "completion_date": "2017-04-18",
+      "value": "25325.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 15,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Sunt architecto nihil quae.",
+      "completion_date": "2010-09-26",
+      "value": "15071.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 16,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dicta occaecati similique numquam.",
+      "completion_date": "2016-04-27",
+      "value": "96890.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 17,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Vitae est provident.",
+      "completion_date": "2022-07-08",
+      "value": "38122.00",
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 18,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Tenetur veniam non.",
+      "completion_date": "2021-07-15",
+      "value": "91070.00",
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanyconstructionpriceimprovement",
+    "pk": 19,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ducimus illo eum voluptate.",
+      "completion_date": "2021-01-02",
+      "value": "5867.00",
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Rem inventore aperiam odio voluptate quidem.",
+      "completion_date": "2015-10-28",
+      "value": "16124.00",
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Dignissimos dolores temporibus facilis.",
+      "completion_date": "2017-09-22",
+      "value": "8767.00",
+      "housing_company": 1
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ipsam explicabo praesentium ducimus quas ab repellendus.",
+      "completion_date": "2017-12-15",
+      "value": "87670.00",
+      "housing_company": 2
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Nulla quia quam iusto quos at quia.",
+      "completion_date": "2020-07-19",
+      "value": "90306.00",
+      "housing_company": 3
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Suscipit laudantium nesciunt.",
+      "completion_date": "2015-02-22",
+      "value": "91049.00",
+      "housing_company": 4
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Labore odio in.",
+      "completion_date": "2020-12-30",
+      "value": "52437.00",
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quo ipsam animi voluptatem necessitatibus minus perspiciatis reprehenderit.",
+      "completion_date": "2015-07-28",
+      "value": "83605.00",
+      "housing_company": 5
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Quo error eveniet quis esse illo doloremque.",
+      "completion_date": "2016-05-09",
+      "value": "78534.00",
+      "housing_company": 6
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Praesentium praesentium est illo minus ad.",
+      "completion_date": "2011-03-22",
+      "value": "11299.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 10,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Cum quia amet deserunt voluptate.",
+      "completion_date": "2014-09-25",
+      "value": "99019.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 11,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Ab neque adipisci.",
+      "completion_date": "2016-06-12",
+      "value": "26177.00",
+      "housing_company": 7
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 12,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Iure libero et reiciendis eius.",
+      "completion_date": "2020-10-01",
+      "value": "52257.00",
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.housingcompanymarketpriceimprovement",
+    "pk": 13,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "name": "Inventore reiciendis cumque illum ratione aspernatur corrupti.",
+      "completion_date": "2018-01-09",
+      "value": "25121.00",
+      "housing_company": 8
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
+      "name": "Matti Meikäläinen",
+      "identifier": "010199-123A",
+      "email": "matti@hitas.fi"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
+      "name": "Kerttu Kuusisto",
+      "identifier": "050462-494C",
+      "email": "juhanisaari@example.com"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
+      "name": "Juhani Kujala",
+      "identifier": "300505A522H",
+      "email": "kaarinalehto@example.com"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
+      "name": "Kerttu Asikainen",
+      "identifier": "151124-088K",
+      "email": "mattigustafsson@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
+      "name": "Jaakko Virtanen",
+      "identifier": "230919-757D",
+      "email": "emiliaseppanen@example.net"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
+      "name": "Marjaana Myllymäki",
+      "identifier": "160339-233A",
+      "email": "artturiihimaki@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
+      "name": "Seppo Lahtinen",
+      "identifier": "211283-058H",
+      "email": "ensio55@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
+      "name": "Riitta Ojanen",
+      "identifier": "160288-587K",
+      "email": "onurmi@example.org"
+    }
+  },
+  {
+    "model": "hitas.owner",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
+      "name": "Katariina Virna",
+      "identifier": "111269-222X",
+      "email": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 1,
+      "owner": 1,
+      "percentage": "100.00",
+      "start_date": "2022-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 2,
+      "owner": 2,
+      "percentage": "100.00",
+      "start_date": "2010-12-03",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 3,
+      "owner": 3,
+      "percentage": "100.00",
+      "start_date": "2021-08-27",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 4,
+      "owner": 4,
+      "percentage": "50.00",
+      "start_date": "2021-07-31",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 5,
+      "owner": 5,
+      "percentage": "100.00",
+      "start_date": "2018-09-08",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 6,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 6,
+      "owner": 6,
+      "percentage": "100.00",
+      "start_date": "2010-05-24",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 7,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 7,
+      "owner": 7,
+      "percentage": "100.00",
+      "start_date": "2018-11-12",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 8,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 8,
+      "owner": 8,
+      "percentage": "100.00",
+      "start_date": "2016-08-13",
+      "end_date": null
+    }
+  },
+  {
+    "model": "hitas.ownership",
+    "pk": 9,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 4,
+      "owner": 9,
+      "percentage": "50.00",
+      "start_date": "2021-07-31",
+      "end_date": null
+    }
+  },
+  {
     "model": "hitas.propertymanager",
     "pk": 2,
     "fields": {
@@ -5363,6 +4607,762 @@
       "housing_company": 8,
       "property_identifier": "8440-9485-1889-1839",
       "street_address": "Fabianinbulevardi 461"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "03b1f7c5-b47d-44ab-99cf-457e4231012f",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "mark_greer",
+      "first_name": "Mark",
+      "last_name": "Greer",
+      "email": "mark.greer@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:58.123Z",
+      "uuid": "7c050820-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "0686f49f-5d1b-4537-86a6-d339293a6e85",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "gary_preston",
+      "first_name": "Gary",
+      "last_name": "Preston",
+      "email": "gary.preston@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:27.881Z",
+      "uuid": "1ccee532-1242-11ed-8fe9-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
+    "fields": {
+      "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
+      "last_login": "2022-10-12T17:08:22.619Z",
+      "is_superuser": true,
+      "username": "hitas",
+      "first_name": "",
+      "last_name": "",
+      "email": "hitas@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2022-06-10T12:54:47.561Z",
+      "uuid": "149689de-eca8-11ec-91f7-57e0ef3ccf79",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "12ea2b92-fd6b-495f-be69-51c0f03fc36d",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "amber_allen",
+      "first_name": "Amber",
+      "last_name": "Allen",
+      "email": "amber.allen@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:58.980Z",
+      "uuid": "7c87eb6e-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "148b6f39-db14-4e6e-8009-5a66e5b56ad7",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "frank_harris",
+      "first_name": "Frank",
+      "last_name": "Harris",
+      "email": "frank.harris@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:25.533Z",
+      "uuid": "10167164-1244-11ed-80fa-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "1c6ac4a3-65b9-4da6-871a-2326ce949e2f",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "james_burch",
+      "first_name": "James",
+      "last_name": "Burch",
+      "email": "james.burch@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:38.113Z",
+      "uuid": "17960512-1244-11ed-95a3-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "23d7d86f-8223-4840-9e2f-26fb346f355e",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "latoya_williams",
+      "first_name": "Latoya",
+      "last_name": "Williams",
+      "email": "latoya.williams@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:27.437Z",
+      "uuid": "1138efa4-1244-11ed-8c33-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "270946fb-c69f-4c92-b45c-d3d8ed0f28a0",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "kevin_davis",
+      "first_name": "Kevin",
+      "last_name": "Davis",
+      "email": "kevin.davis@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:24.123Z",
+      "uuid": "1a918a72-1242-11ed-96e5-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "30361d41-2062-4aa5-9fc4-3db3ca49af4b",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "allen_sosa",
+      "first_name": "Allen",
+      "last_name": "Sosa",
+      "email": "allen.sosa@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:03.069Z",
+      "uuid": "7ef7d63e-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "3b78650c-23fc-45e4-be12-60466d1631ac",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "christopher_berg",
+      "first_name": "Christopher",
+      "last_name": "Berg",
+      "email": "christopher.berg@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:13.729Z",
+      "uuid": "5093c836-1244-11ed-b5d9-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "4c2dc115-27fa-4e55-af64-a5fdca0ee868",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "christina_johnson",
+      "first_name": "Christina",
+      "last_name": "Johnson",
+      "email": "christina.johnson@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:00.867Z",
+      "uuid": "7da7c5e6-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "4c99c6a0-763d-447c-8e64-961ce058b730",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "dustin_martin",
+      "first_name": "Dustin",
+      "last_name": "Martin",
+      "email": "dustin.martin@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:59.858Z",
+      "uuid": "7d0de390-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "563c260e-2dd8-47c8-bfaf-e79486f25065",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "cory_fox",
+      "first_name": "Cory",
+      "last_name": "Fox",
+      "email": "cory.fox@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:23.366Z",
+      "uuid": "0ecbc444-1244-11ed-870c-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "5aa75278-48af-4284-8eb9-0268183220a8",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "kristin_coleman",
+      "first_name": "Kristin",
+      "last_name": "Coleman",
+      "email": "kristin.coleman@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:57.180Z",
+      "uuid": "7b752480-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "653be9ed-d099-40f3-9e1d-0fea7badcdb2",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "nicole_gallagher",
+      "first_name": "Nicole",
+      "last_name": "Gallagher",
+      "email": "nicole.gallagher@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:55.602Z",
+      "uuid": "7a846d2e-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "69f9cf07-8391-452e-ba38-e7754fc671a4",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "jeffrey_mooney",
+      "first_name": "Jeffrey",
+      "last_name": "Mooney",
+      "email": "jeffrey.mooney@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:32.758Z",
+      "uuid": "1464e098-1244-11ed-b962-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "7204549a-62ae-4991-bc99-0fbc5f245300",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "christina_williamson",
+      "first_name": "Christina",
+      "last_name": "Williamson",
+      "email": "christina.williamson@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:16.021Z",
+      "uuid": "15bd42e8-1242-11ed-9729-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "722efa11-90b3-448b-b978-45fef5539c28",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "michaela_larson",
+      "first_name": "Michaela",
+      "last_name": "Larson",
+      "email": "michaela.larson@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:11.623Z",
+      "uuid": "4f528278-1244-11ed-9431-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "75ddf48a-27da-41b0-bd2f-0546682a1441",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "darlene_reed",
+      "first_name": "Darlene",
+      "last_name": "Reed",
+      "email": "darlene.reed@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:01.721Z",
+      "uuid": "7e2a097a-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "7c804293-f0c0-4435-b591-f92775ae7942",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "christie_bauer",
+      "first_name": "Christie",
+      "last_name": "Bauer",
+      "email": "christie.bauer@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:15.799Z",
+      "uuid": "51cfbff2-1244-11ed-bba9-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "8a5ca0f1-4fd7-4c3c-98e0-e5cbeded33fd",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "timothy_hawkins",
+      "first_name": "Timothy",
+      "last_name": "Hawkins",
+      "email": "timothy.hawkins@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:56.719Z",
+      "uuid": "7b2ee7b8-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "956646ae-49e5-4d0c-b142-dc1c3269984e",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "rachel_forbes",
+      "first_name": "Rachel",
+      "last_name": "Forbes",
+      "email": "rachel.forbes@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:26.087Z",
+      "uuid": "1bbd3a72-1242-11ed-8e1a-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "9972b540-832f-4282-8619-a5d886c2b984",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "robert_barker",
+      "first_name": "Robert",
+      "last_name": "Barker",
+      "email": "robert.barker@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:03:46.223Z",
+      "uuid": "03fa583e-1242-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "9e2715e8-a793-426d-9322-c5df9ce053c0",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "angela_weber",
+      "first_name": "Angela",
+      "last_name": "Weber",
+      "email": "angela.weber@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:20.223Z",
+      "uuid": "183e7064-1242-11ed-8c53-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "acfd9a8c-c608-48e7-a883-cda6d3891867",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "tom_chang",
+      "first_name": "Tom",
+      "last_name": "Chang",
+      "email": "tom.chang@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:19.819Z",
+      "uuid": "543518d2-1244-11ed-a42d-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "af296e7b-c152-42f8-a46c-e182bb72cddc",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "judy_reynolds",
+      "first_name": "Judy",
+      "last_name": "Reynolds",
+      "email": "judy.reynolds@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:05.963Z",
+      "uuid": "5cee1030-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "b3ce65df-3707-4d83-a605-a0c886ff53f7",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "jerry_silva",
+      "first_name": "Jerry",
+      "last_name": "Silva",
+      "email": "jerry.silva@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:22:01.725Z",
+      "uuid": "90f2bbee-1244-11ed-9cb4-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "c63ead5f-25fb-4af0-bc7e-62aa14b3e7e0",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "eric_martinez",
+      "first_name": "Eric",
+      "last_name": "Martinez",
+      "email": "eric.martinez@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:05.379Z",
+      "uuid": "4b99bcbe-1244-11ed-95a3-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "c64f240b-12eb-4ccb-bdc7-15c430e7cfc0",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "russell_cortez",
+      "first_name": "Russell",
+      "last_name": "Cortez",
+      "email": "russell.cortez@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:20:09.468Z",
+      "uuid": "4e09af72-1244-11ed-99ce-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "cde8f277-cc1a-4fcf-8394-9a37f080bb7e",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "stacy_saunders",
+      "first_name": "Stacy",
+      "last_name": "Saunders",
+      "email": "stacy.saunders@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:18:15.153Z",
+      "uuid": "09e68388-1244-11ed-a0bd-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "d137e7c0-97a0-4ead-90a0-65a8e4af2607",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "joseph_glover",
+      "first_name": "Joseph",
+      "last_name": "Glover",
+      "email": "joseph.glover@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:52.480Z",
+      "uuid": "78a81078-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "d531747f-d4c0-474e-b0f5-fc41c131751c",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "kelly_cooke",
+      "first_name": "Kelly",
+      "last_name": "Cooke",
+      "email": "kelly.cooke@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:02.129Z",
+      "uuid": "7e6865ee-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "dd272dcc-f6d4-42f2-a9b9-8f3548c865dd",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "tammie_cain",
+      "first_name": "Tammie",
+      "last_name": "Cain",
+      "email": "tammie.cain@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T08:59:58.560Z",
+      "uuid": "7c47d614-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "e024c728-0a0e-4747-8bd2-a63fc75d31ca",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "kristy_short",
+      "first_name": "Kristy",
+      "last_name": "Short",
+      "email": "kristy.short@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:01.310Z",
+      "uuid": "7deb5d7e-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "e1ea99c4-db12-44a2-b8e8-240424725418",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "andrew_whitehead",
+      "first_name": "Andrew",
+      "last_name": "Whitehead",
+      "email": "andrew.whitehead@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:04:00.180Z",
+      "uuid": "0c4bff60-1242-11ed-9b5d-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": "f6a864d8-51cb-4917-81f4-611c48622282",
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "tracy_valdez",
+      "first_name": "Tracy",
+      "last_name": "Valdez",
+      "email": "tracy.valdez@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2022-08-02T09:00:00.377Z",
+      "uuid": "7d5d0d58-1241-11ed-b434-acde48001122",
+      "department_name": null,
+      "groups": [],
+      "user_permissions": [],
+      "ad_groups": []
     }
   }
 ]
