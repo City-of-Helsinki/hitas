@@ -3,10 +3,10 @@ from django.core.exceptions import ValidationError
 
 from hitas.models.utils import (
     check_business_id,
+    check_social_security_number,
     validate_building_id,
     validate_business_id,
     validate_property_id,
-    validate_social_security_number,
 )
 
 
@@ -99,8 +99,8 @@ def test__validate__building_id__invalid(building_id):
         "120875+2376",
     ],
 )
-def test__validate__social_security_number(social_security_number):
-    assert validate_social_security_number(social_security_number)
+def test__check_social_security_number(social_security_number):
+    assert check_social_security_number(social_security_number)
 
 
 @pytest.mark.parametrize(
@@ -117,8 +117,8 @@ def test__validate__social_security_number(social_security_number):
         "010101-000S",  # Invalid check digit
     ],
 )
-def test__validate__social_security_number__invalid(social_security_number):
-    assert not validate_social_security_number(social_security_number)
+def test__check_social_security_number__invalid(social_security_number):
+    assert not check_social_security_number(social_security_number)
 
 
 @pytest.mark.parametrize(

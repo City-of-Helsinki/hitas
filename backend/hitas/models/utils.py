@@ -94,7 +94,7 @@ _SSN_CHECK_DIGITS = [
 # fmt: on
 
 
-def validate_social_security_number(value: str) -> bool:
+def check_social_security_number(value: str) -> bool:
     if value is None:
         return False
 

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
-from hitas.models.utils import validate_social_security_number
+from hitas.models.utils import check_social_security_number
 
 
 class Owner(ExternalHitasModel):
@@ -12,7 +12,7 @@ class Owner(ExternalHitasModel):
     email = models.EmailField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.valid_ssn = validate_social_security_number(self.identifier)
+        self.valid_ssn = check_social_security_number(self.identifier)
         super().save(*args, **kwargs)
 
     class Meta:
