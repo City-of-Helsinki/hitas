@@ -588,18 +588,39 @@ def create_apartment_improvements(
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
+    @dataclass(frozen=True)
+    class OwnershipKey:
+        identifier: str
+        name: str
+
     count = 0
     bulk_owners = []
     bulk_ownerships = []
 
+    already_created = {}
+
     for ownership in connection.execute(
         select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
     ).fetchall():
+        skip_append = False
         new_owner = Owner()
         new_owner.name = ownership["name"]
         new_owner.identifier = ownership["social_security_number"]
         new_owner.valid_ssn = validate_social_security_number(new_owner.identifier)
-        bulk_owners.append(new_owner)
+
+        # Check if this owner has been already added. If it is, do not create a new one but combine them into one.
+        # Only do this when the owner has a valid ssn
+        if new_owner.valid_ssn:
+            key = OwnershipKey(new_owner.identifier, new_owner.name)
+            if key not in already_created:
+                already_created[key] = new_owner
+            else:
+                new_owner = already_created[key]
+                skip_append = True
+
+        if not skip_append:
+            bulk_owners.append(new_owner)
+            count += 1
 
         new = Ownership()
         new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
@@ -609,7 +630,6 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         new.end_date = None
 
         bulk_ownerships.append(new)
-        count += 1
 
         if len(bulk_owners) == BULK_INSERT_THRESHOLD:
             Owner.objects.bulk_create(bulk_owners)
