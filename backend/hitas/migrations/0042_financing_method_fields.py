@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-from hitas.oracle_migration.runner import format_financing_method
+from hitas.oracle_migration.financing_types import format_financing_method
 
 
 def migrate_financing_methods(apps, schema_editor):

@@ -1,3 +1,7 @@
+import re
+
+from hitas.models import FinancingMethod
+
 # +----------------------------------------------+--------------+----------------------+------------+
 # | Name                                         | 2011 onwards | Skip from statistics | Half-Hitas |
 # +----------------------------------------------+--------------+----------------------+------------+
@@ -50,3 +54,20 @@ def financing_method_include_in_statistics(financing_method: str):
 
 def financing_method_is_half_hitas(financing_method: str):
     return financing_method.startswith("PUOLIHITAS")
+
+
+def format_financing_method(fm: FinancingMethod) -> None:
+    # Only capitalize those with first letter lowercased
+    # Don't capitalize all - there's some that would suffer from it
+    if fm.value[0].islower():
+        fm.value = fm.value[0].upper() + fm.value[1:]
+
+    # If the name is in format '<Name> (<ID>)', strip the ID part out of the name
+    # Example: 'Vapaarahoitteinen, Ei Hitas (100)'
+    name_contains_id = re.match(r"(.*) \(\d{3}\)$", fm.value)
+    if name_contains_id:
+        fm.value = name_contains_id.group(1)
+
+    fm.include_in_statistics = financing_method_include_in_statistics(fm.value)
+    fm.half_hitas = financing_method_is_half_hitas(fm.value)
+    fm.old_hitas_ruleset = financing_method_is_before_2011(fm.value)
