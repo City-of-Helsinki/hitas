@@ -128,13 +128,6 @@ const MaximumPriceModalContent = ({
                             value={calculation.calculations.market_price_index.calculation_variables.index_adjustment}
                         />
                         <BreakdownValue
-                            label="+ Huoneistokohtaiset parannukset"
-                            value={
-                                calculation.calculations.market_price_index.calculation_variables
-                                    .housing_company_improvements?.summary.value
-                            }
-                        />
-                        <BreakdownValue
                             label="+ Osuus yhtiön parannuksista"
                             value={
                                 calculation.calculations.market_price_index.calculation_variables
