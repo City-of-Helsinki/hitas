@@ -3023,7 +3023,7 @@ components:
           type: string
           nullable: true
           pattern: '^$|^\d{7}-\d$'
-          example: 1234567-8
+          example: 1234567-1
         state:
           $ref: '#/components/schemas/HousingCompanyState'
         address:

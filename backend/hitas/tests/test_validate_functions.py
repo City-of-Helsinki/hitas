@@ -2,22 +2,12 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from hitas.models.utils import (
+    check_business_id,
     validate_building_id,
     validate_business_id,
     validate_property_id,
     validate_social_security_number,
 )
-
-
-@pytest.mark.parametrize("business_id", ["1234567-1"])
-def test__validate__business_id__valid(business_id):
-    validate_business_id(business_id)
-
-
-@pytest.mark.parametrize("business_id", ["", "1", "12345678", "a1234567-8", "1234567-8a"])
-def test__validate__business_id__invalid(business_id):
-    with pytest.raises(ValidationError):
-        validate_business_id(business_id)
 
 
 @pytest.mark.parametrize(
@@ -129,3 +119,68 @@ def test__validate__social_security_number(social_security_number):
 )
 def test__validate__social_security_number__invalid(social_security_number):
     assert not validate_social_security_number(social_security_number)
+
+
+@pytest.mark.parametrize(
+    "business_id",
+    [
+        None,
+        "0201256-6",
+        "8005317-9",
+        "6688521-9",
+        "7343514-4",
+        "3807511-2",
+        "1106012-1",
+        "0000000-0",
+    ],
+)
+def test__validate__business_id(business_id: str):
+    validate_business_id(business_id)
+
+
+@pytest.mark.parametrize(
+    "business_id",
+    [
+        "",
+        "A",
+        "00000000-0",  # Too long
+        "0000000-00",  # Too long
+        "0000030-1",  # checksum is 1
+        "0201256-7",  # Invalid check digit
+    ],
+)
+def test__validate__business_id__invalid(business_id: str):
+    with pytest.raises(ValidationError):
+        validate_business_id(business_id)
+
+
+@pytest.mark.parametrize(
+    "business_id",
+    [
+        "0201256-6",
+        "8005317-9",
+        "6688521-9",
+        "7343514-4",
+        "3807511-2",
+        "1106012-1",
+        "0000000-0",
+    ],
+)
+def test__check__business_id(business_id: str):
+    assert check_business_id(business_id)
+
+
+@pytest.mark.parametrize(
+    "business_id",
+    [
+        None,
+        "",
+        "A",
+        "00000000-0",  # Too long
+        "0000000-00",  # Too long
+        "0000030-1",  # checksum is 1
+        "0201256-7",  # Invalid check digit
+    ],
+)
+def test__check__business_id__invalid(business_id: str):
+    assert not check_business_id(business_id)

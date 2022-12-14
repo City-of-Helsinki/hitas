@@ -420,7 +420,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
             "street_address": "test-street-address-1",
         },
         "building_type": {"id": building_type.uuid.hex},
-        "business_id": "1234567-8",
+        "business_id": "1234567-1",
         "developer": {"id": developer.uuid.hex},
         "financing_method": {"id": financing_method.uuid.hex},
         "name": {

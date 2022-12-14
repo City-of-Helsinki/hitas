@@ -18,19 +18,47 @@ def validate_property_id(value: str) -> None:
 
 
 def validate_business_id(value: str) -> None:
+    # Don't raise on None
     if value is None:
         return
 
-    # Example valid value: '1234567-8'
+    result = check_business_id(value)
+
+    if not result:
+        raise ValidationError("'%(value)s' is not a valid business id.", params={"value": value})
+
+
+def check_business_id(value: str) -> bool:
+    if value is None:
+        return False
+
+    # Example valid value: '1234567-1'
     match = re.search(r"^(\d{7})-(\d)$", value)
-
     if match is None:
-        raise ValidationError(
-            _("'%(value)s' is not a valid business id."),
-            params={"value": value},
-        )
+        return False
 
-    # TODO: verify business id with the check digit
+    seqnum = match.group(1)
+    check_digit = int(match.group(2))
+
+    # Calculate checksum
+    checksum = (
+        int(seqnum[0]) * 7
+        + int(seqnum[1]) * 9
+        + int(seqnum[2]) * 10
+        + int(seqnum[3]) * 5
+        + int(seqnum[4]) * 8
+        + int(seqnum[5]) * 4
+        + int(seqnum[6]) * 2
+    ) % 11
+
+    match checksum:
+        case 0:
+            return check_digit == 0
+        case 1:
+            # 1 is not a valid checksum
+            return False
+        case _:
+            return (11 - checksum) == check_digit
 
 
 def validate_building_id(value: Optional[str]) -> None:

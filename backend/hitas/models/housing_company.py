@@ -40,7 +40,7 @@ class HousingCompany(ExternalHitasModel):
     state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
     # Business ID / 'y-tunnus'
     business_id = models.CharField(
-        max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-8"), null=True
+        max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-1"), null=True
     )
 
     street_address = models.CharField(max_length=1024)
