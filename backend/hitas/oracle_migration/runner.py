@@ -48,7 +48,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import DepreciationPercentage
 from hitas.models.indices import AbstractIndex
-from hitas.models.utils import check_social_security_number
+from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.financing_types import format_financing_method
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
@@ -606,11 +606,13 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         new_owner = Owner()
         new_owner.name = ownership["name"]
         new_owner.identifier = ownership["social_security_number"]
-        new_owner.valid_ssn = check_social_security_number(new_owner.identifier)
+        new_owner.valid_identifier = check_social_security_number(new_owner.identifier) or check_business_id(
+            new_owner.identifier
+        )
 
         # Check if this owner has been already added. If it is, do not create a new one but combine them into one.
-        # Only do this when the owner has a valid ssn
-        if new_owner.valid_ssn:
+        # Only do this when the owner has a valid social security number or a valid business id
+        if new_owner.valid_identifier:
             key = OwnershipKey(new_owner.identifier, new_owner.name)
             if key not in already_created:
                 already_created[key] = new_owner

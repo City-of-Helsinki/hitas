@@ -166,7 +166,7 @@ def test__validate__business_id__invalid(business_id: str):
         "0000000-0",
     ],
 )
-def test__check__business_id(business_id: str):
+def test__check_business_id(business_id: str):
     assert check_business_id(business_id)
 
 
@@ -182,5 +182,5 @@ def test__check__business_id(business_id: str):
         "0201256-7",  # Invalid check digit
     ],
 )
-def test__check__business_id__invalid(business_id: str):
+def test__check_business_id__invalid(business_id: str):
     assert not check_business_id(business_id)

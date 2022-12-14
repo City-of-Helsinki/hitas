@@ -179,7 +179,7 @@ def test__api__owner__update(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__owner__update__valid_ssn_to_invalid(api_client: HitasAPIClient):
+def test__api__owner__update__valid_identifier_to_invalid(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create()
     data = {
         "name": "Matti Meikäläinen",
@@ -195,7 +195,7 @@ def test__api__owner__update__valid_ssn_to_invalid(api_client: HitasAPIClient):
         "fields": [
             {
                 "field": "identifier",
-                "message": "Previous social security number was valid. Cannot update to an invalid one.",
+                "message": "Previous identifier was valid. Cannot update to an invalid one.",
             }
         ],
         "message": "Bad request",
@@ -205,7 +205,7 @@ def test__api__owner__update__valid_ssn_to_invalid(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__owner__update__invalid_ssn_to_invalid(api_client: HitasAPIClient):
+def test__api__owner__update__invalid_identifier_to_invalid(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create(identifier="foo")
     data = {
         "name": "Matti Meikäläinen",

@@ -41,16 +41,7 @@ def check_business_id(value: str) -> bool:
     check_digit = int(match.group(2))
 
     # Calculate checksum
-    checksum = (
-        int(seqnum[0]) * 7
-        + int(seqnum[1]) * 9
-        + int(seqnum[2]) * 10
-        + int(seqnum[3]) * 5
-        + int(seqnum[4]) * 8
-        + int(seqnum[5]) * 4
-        + int(seqnum[6]) * 2
-    ) % 11
-
+    checksum = _business_id_checksum(seqnum)
     match checksum:
         case 0:
             return check_digit == 0
@@ -59,6 +50,18 @@ def check_business_id(value: str) -> bool:
             return False
         case _:
             return (11 - checksum) == check_digit
+
+
+def _business_id_checksum(seqnum: str) -> int:
+    return (
+        int(seqnum[0]) * 7
+        + int(seqnum[1]) * 9
+        + int(seqnum[2]) * 10
+        + int(seqnum[3]) * 5
+        + int(seqnum[4]) * 8
+        + int(seqnum[5]) * 4
+        + int(seqnum[6]) * 2
+    ) % 11
 
 
 def validate_building_id(value: Optional[str]) -> None:

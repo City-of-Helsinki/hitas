@@ -3,14 +3,18 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from hitas.models import Owner, Ownership
-from hitas.models.utils import check_social_security_number
+from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
 class OwnerSerializer(HitasModelSerializer):
     def validate_identifier(self, value):
-        if self.instance and self.instance.valid_ssn and not check_social_security_number(value):
-            raise ValidationError("Previous social security number was valid. Cannot update to an invalid one.")
+        if (
+            self.instance
+            and self.instance.valid_identifier
+            and (not check_social_security_number(value) and not check_business_id(value))
+        ):
+            raise ValidationError("Previous identifier was valid. Cannot update to an invalid one.")
 
         return value
 
