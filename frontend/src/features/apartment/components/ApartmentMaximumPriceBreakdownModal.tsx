@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 
-import {Button, Dialog, Tabs} from "hds-react";
+import {Button, Dialog, Table, Tabs} from "hds-react";
 import {useNavigate} from "react-router-dom";
 
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
@@ -14,6 +14,17 @@ import {
     SurfaceAreaPriceCeilingCalculation,
 } from "../../../common/models";
 import {formatDate, formatMoney, hitasToast} from "../../../common/utils";
+
+const tableTheme = {
+    "--header-background-color": "var(--color-black-80)",
+};
+
+const getDepreciation = (depreciation) => {
+    console.log(depreciation);
+    if (depreciation === null) return 0;
+    else if (depreciation?.amount !== undefined) return depreciation.amount;
+    else return depreciation;
+};
 
 const BreakdownTabButton = ({label, calculation}) => {
     return (
@@ -34,6 +45,31 @@ const BreakdownValue = ({label, value, unit = "€"}: {label: string; value: num
         <p>{unit.includes("€") ? formatMoney(value).replace("€", unit) : `${value} ${unit}`}</p>
     </div>
 );
+
+const ImprovementsTable = ({heading, cols, improvements}) => {
+    if (!improvements.items.length) return null;
+
+    const getImprovements = (improvements): object[] => {
+        if (improvements.items.length === 1) return improvements.items;
+        return [...improvements.items, {...improvements.summary, name: "Parannukset yhteensä"}];
+    };
+
+    return (
+        <>
+            <h3>{heading}</h3>
+            <Table
+                cols={cols}
+                rows={getImprovements(improvements)}
+                indexKey="name"
+                renderIndexCol={true}
+                theme={tableTheme}
+                zebra
+                dense
+                verticalLines
+            />
+        </>
+    );
+};
 
 const Breakdown2011Onwards = ({calculation}: {calculation: IIndexCalculation2011Onwards}) => {
     return (
@@ -129,6 +165,37 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 value={calculation.calculation_variables.debt_free_price_m2}
                 unit="€/m²"
             />
+            <ImprovementsTable
+                heading="Huoneistokohtaiset parannukset"
+                cols={[
+                    {key: "name", headerName: "name"},
+                    {key: "value", headerName: "Arvo"},
+                    {key: "value_without_excess", headerName: "Arvoa korottava osuus"},
+                    {
+                        key: "depreciation",
+                        headerName: "Poiston määrä",
+                        transform: (obj) => getDepreciation(obj.depreciation),
+                    },
+                    {key: "accepted_value", headerName: "Hyväksytty"},
+                ]}
+                improvements={calculation.calculation_variables.apartment_improvements}
+            />
+            <ImprovementsTable
+                heading="Huoneiston osuus yhtiön parannuksista"
+                cols={[
+                    {key: "name", headerName: "name"},
+                    {key: "value", headerName: "Arvo"},
+                    {key: "value_without_excess", headerName: "Arvoa korottava osuus"},
+                    {
+                        key: "depreciation",
+                        headerName: "Poisto",
+                        transform: (obj) => getDepreciation(obj.depreciation),
+                    },
+                    {key: "accepted_value", headerName: "Hyväksytty asunto"},
+                    {key: "accepted_value_for_housing_company", headerName: "Hyväksytty yhtiö"},
+                ]}
+                improvements={calculation.calculation_variables.housing_company_improvements}
+            />
         </>
     );
 };
@@ -182,6 +249,30 @@ const ConstructionPricePre2011Breakdown = ({
                 label="Velaton hinta euroa/m²"
                 value={calculation.calculation_variables.debt_free_price_m2}
                 unit="€/m²"
+            />
+            <ImprovementsTable
+                heading="Huoneistokohtaiset parannukset"
+                cols={[
+                    {key: "name", headerName: "name"},
+                    {key: "value", headerName: "Alkup. arvo"},
+                    {key: "index_adjusted", headerName: "Ind. tark. arvo"},
+                    {
+                        key: "depreciation",
+                        headerName: "Poisto",
+                        transform: (obj) => getDepreciation(obj.depreciation),
+                    },
+                    {key: "value_for_apartment", headerName: "Hyväksytty"},
+                ]}
+                improvements={calculation.calculation_variables.apartment_improvements}
+            />
+            <ImprovementsTable
+                heading="Huoneiston osuus yhtiön parannuksista"
+                cols={[
+                    {key: "name", headerName: "name"},
+                    {key: "value", headerName: "Arvo koko yhtiössä"},
+                    {key: "value_for_apartment", headerName: "Vaiheen arvo"},
+                ]}
+                improvements={calculation.calculation_variables.housing_company_improvements}
             />
         </>
     );
