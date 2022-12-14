@@ -178,6 +178,52 @@ def test__api__owner__update(api_client: HitasAPIClient):
     assert response.json() == get_response.json()
 
 
+@pytest.mark.django_db
+def test__api__owner__update__valid_ssn_to_invalid(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    data = {
+        "name": "Matti Meikäläinen",
+        "identifier": "foo",
+        "email": "test@example.com",
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "identifier",
+                "message": "Previous social security number was valid. Cannot update to an invalid one.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    } == response.json()
+
+
+@pytest.mark.django_db
+def test__api__owner__update__invalid_ssn_to_invalid(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create(identifier="foo")
+    data = {
+        "name": "Matti Meikäläinen",
+        "identifier": "foobar",
+        "email": "test@example.com",
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": data["name"],
+        "identifier": data["identifier"],
+        "email": data["email"],
+    }
+
+
 # Delete tests
 
 
