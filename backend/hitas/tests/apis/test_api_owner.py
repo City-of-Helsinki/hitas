@@ -130,19 +130,26 @@ def test__api__owner__create(api_client: HitasAPIClient, minimal_data: bool):
 
 
 @pytest.mark.parametrize(
-    "invalid_data",
+    "invalid_data,field",
     [
-        {"email": "foo"},
+        ({"email": "foo"}, {"field": "email", "message": "Enter a valid email address."}),
     ],
 )
 @pytest.mark.django_db
-def test__api__owner__create__invalid_data(api_client: HitasAPIClient, invalid_data):
+def test__api__owner__create__invalid_data(api_client: HitasAPIClient, invalid_data, field):
     data = get_owner_create_data()
     data.update(invalid_data)
 
     url = reverse("hitas:owner-list")
     response = api_client.post(url, data=data, format="json", openapi_validate_request=False)
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert {
+        "error": "bad_request",
+        "fields": [field],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    } == response.json()
 
 
 # Update tests
