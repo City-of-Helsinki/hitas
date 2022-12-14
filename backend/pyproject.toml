@@ -27,7 +27,7 @@ xhtml2pdf = "^0.2.8"
 django-jinja = "^2.10.2"
 num2words = "^0.5.12"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 autoflake = "^2.0"
 black = "^22.3.0"
 factory-boy = "^3.2.1"
