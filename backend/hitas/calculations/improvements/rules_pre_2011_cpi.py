@@ -88,7 +88,7 @@ def calculate_single_apartment_improvement_pre_2011_construction_price_index(
     calculation_date_index: Decimal,
 ) -> ApartmentImprovementCalculationResult:
     if improvement.treat_as_additional_work:
-        return calculate_additional_work(improvement, calculation_date, calculation_date_index)
+        return calculate_additional_work(improvement, calculation_date_index)
 
     if improvement.completion_date_index is None or calculation_date_index is None:
         raise IndexMissingException()
@@ -114,7 +114,9 @@ def calculate_single_apartment_improvement_pre_2011_construction_price_index(
     )
 
     depreciation_result = ApartmentImprovementCalculationResult.Depreciation(
-        time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(depreciation_time_months),
+        time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
+            depreciation_time_months if improvement.depreciation_percentage > 0 else 0
+        ),
         amount=depreciation_amount,
         percentage=improvement.depreciation_percentage,
     )
@@ -179,6 +181,8 @@ class HousingCompanyImprovementCalculationResult:
     name: str
     # Original value for the improvement
     value: Decimal
+    # Date the improvement was completed on
+    completion_date: datetime.date
     # Improvement share of a housing company's improvement value
     value_for_apartment: Decimal
 
@@ -226,6 +230,7 @@ def calculate_single_housing_company_improvement_pre_2011_construction_price_ind
         name=improvement.name,
         value=improvement.value,
         value_for_apartment=value,
+        completion_date=improvement.completion_date,
     )
 
 
@@ -259,7 +264,6 @@ def calculate_multiple_housing_company_improvements(
 
 def calculate_additional_work(
     improvement: ImprovementData,
-    calculation_date: datetime.date,
     calculation_date_index: Decimal,
 ):
     if improvement.completion_date_index is None or calculation_date_index is None:
@@ -279,9 +283,7 @@ def calculate_additional_work(
         completion_date_index=improvement.completion_date_index,
         index_adjusted=accepted,
         depreciation=ApartmentImprovementCalculationResult.Depreciation(
-            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(
-                months_between_dates(improvement.completion_date, calculation_date)
-            ),
+            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime(years=0, months=0),
             amount=Decimal(0),
             percentage=Decimal(0),
         ),

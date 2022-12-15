@@ -1,7 +1,6 @@
 {# refs. https://www.hel.fi/static/kanslia/Julkaisut/2021/Hitas/Liite_Hitas-j%C3%A4rjestelm%C3%A4n_tavoitteiden_toteutumista_koskeva_selvitys.pdf last page#}
 
 {% macro calculation_details_table(apartment, maximum_price_calculation, index_calculation, index_name_short, sapc_calculation) %}
-    {% set is_pre_2011 = apartment.completion_date|is_date_pre_2011 %}
     {% set vars = index_calculation.calculation_variables %}
 
     {% set table_left = [
@@ -16,35 +15,56 @@
     ] %}
 
     {% if not sapc_calculation %}
-        {% set table_right = [
-            ["Hankinta-arvo", vars.acquisition_price|intcomma],
-        ] %}
+        {% if maximum_price_calculation.json.new_hitas %}
+            {% set table_right = [
+                ["Hankinta-arvo", vars.acquisition_price|intcomma],
+            ] %}
 
-        {% if vars.additional_work_during_construction is not none %} {% set table_right = table_right + [
-            ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
-        ] %} {% endif %}
+            {% if vars.additional_work_during_construction is not none %} {% set table_right = table_right + [
+                ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
+            ] %} {% endif %}
 
-        {% if is_pre_2011 %} {% set table_right = table_right + [
-            ["+ Rakennusaikaiset korot (TODO %)", vars.interest_during_construction|intcomma],
-        ] %} {% endif %}
-
-        {% set table_right = table_right + [
-            ["= Perushinta", vars.basic_price|intcomma],
-            ["+ Indeksin muutos", vars.index_adjustment|intcomma],
-        ] %}
-
-        {% if is_pre_2011 %} {% set table_right = table_right + [
-            [ "+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma ],
-        ] %} {% endif %}
-
-        {% set table_right = table_right + [
-            ["+ Osuus yhtiön parannuksista", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
-            ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
-            ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans|intcomma],
-            ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
-            ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
-            ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
-        ] %}
+            {% set table_right = table_right + [
+                ["= Perushinta", vars.basic_price|intcomma],
+                ["+ Indeksin muutos", vars.index_adjustment|intcomma],
+                ["+ Osuus yhtiön parannuksista", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
+                ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
+                ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans|intcomma],
+                ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
+                ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
+                ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
+            ] %}
+        {% else %}
+            {% if index_name_short == "mark.hintaindeksi" %}
+                {% set table_right = [
+                    ["Hankinta-arvo", vars.acquisition_price|intcomma],
+                    ["+ Rakennusaikaiset korot (TODO %)", vars.interest_during_construction|intcomma],
+                    ["= Perushinta", vars.basic_price|intcomma],
+                    ["+ Indeksin muutos", vars.index_adjustment|intcomma],
+                    ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.accepted_value|intcomma],
+                    ["+ Osuus yhtiön parannuksista", vars.housing_company_improvements.summary.accepted_value|intcomma],
+                    ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
+                    ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans|intcomma],
+                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
+                    ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
+                    ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
+                ] %}
+            {% else %}
+                {% set table_right = [
+                    ["Yhtiön tarkistettu hankinta-arvo", vars.housing_company_acquisition_price|intcomma],
+                    ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value|intcomma],
+                    ["= Yhtiön varat yhteensä", vars.housing_company_assets|intcomma],
+                    ["Osakkeiden osuus", vars.apartment_share_of_housing_company_assets|intcomma],
+                    ["+ Rakennusaikaiset korot (TODO %)", vars.interest_during_construction|intcomma],
+                    ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma],
+                    ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
+                    ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans|intcomma],
+                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
+                    ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
+                    ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
+                ] %}
+            {% endif %}
+        {% endif %}
     {% endif %}
 
     <table>
@@ -52,6 +72,7 @@
         <tr>
             <td style="width: 180px;"><b>{{ row[0][0]|value_or_blank }}</b></td>
             <td style="width: 150px;">{{ row[0][1]|value_or_blank }}</td>
+            {# No right column for Surface Area Price Ceiling #}
             {% if not sapc_calculation %}
                 <td style="width: 300px;"><b>{{ row[1][0]|value_or_blank }}</b></td>
                 <td style="width: 80px;" class="text-right">{{ row[1][1]|value_or_blank }}</td>
