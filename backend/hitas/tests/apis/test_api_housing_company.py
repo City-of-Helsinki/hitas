@@ -231,7 +231,8 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
             primary_loan_amount=None,
             additional_work_during_construction=None,
             loans_during_construction=None,
-            interest_during_construction=None,
+            interest_during_construction_6=None,
+            interest_during_construction_14=None,
             debt_free_purchase_price_during_construction=None,
         )
 

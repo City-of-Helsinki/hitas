@@ -4930,10 +4930,23 @@ components:
               example: 9805
             interest:
               description: Interest during construction
-              type: number
-              minimum: 0
+              type: object
+              additionalProperties: false
               nullable: true
-              example: 3618
+              required:
+                - rate_6
+                - rate_14
+              properties:
+                rate_6:
+                  type: number
+                  minimum: 0
+                  nullable: true
+                  example: 3618
+                rate_14:
+                  type: number
+                  minimum: 0
+                  nullable: true
+                  example: 4209
             debt_free_purchase_price:
               description: TBD
               type: number

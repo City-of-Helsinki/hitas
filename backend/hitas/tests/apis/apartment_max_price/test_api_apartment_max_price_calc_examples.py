@@ -437,7 +437,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=104693.0,
         primary_loan_amount=18480.0,
-        interest_during_construction=3455.0,
+        interest_during_construction_6=3455.0,
+        interest_during_construction_14=4000.0,
         additional_work_during_construction=4307.0,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=54.5,
@@ -506,7 +507,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                     "housing_company_acquisition_price": 170_886.35,
                     "housing_company_assets": 170_886.35,
                     "apartment_share_of_housing_company_assets": 170886.35,
-                    "interest_during_construction": 3455.0,
+                    "interest_during_construction": 4000.0,
                     "apartment_improvements": {
                         "items": [
                             {
@@ -541,8 +542,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                             "value_for_apartment": 0.0,
                         },
                     },
-                    "debt_free_price": 180749.97,
-                    "debt_free_price_m2": 3316.51,
+                    "debt_free_price": 181294.97,
+                    "debt_free_price_m2": 3326.51,
                     "apartment_share_of_housing_company_loans": 0.0,
                     "apartment_share_of_housing_company_loans_date": "2022-09-05",
                     "completion_date": "2003-05-09",
@@ -550,7 +551,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                     "calculation_date": "2022-09-07",
                     "calculation_date_index": 364.4,
                 },
-                "maximum_price": 180749.97,
+                "maximum_price": 181294.97,
                 "valid_until": "2022-12-07",
                 "maximum": False,
             },
@@ -697,7 +698,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=52738.0,
         primary_loan_amount=123192.0,
-        interest_during_construction=2703.0,
+        interest_during_construction_6=2703.0,
+        interest_during_construction_14=3233.0,
         additional_work_during_construction=2500.0,
         completion_date=datetime.date(2012, 6, 28),
         surface_area=45.5,
@@ -973,7 +975,8 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=100000,
         primary_loan_amount=0,
-        interest_during_construction=0,
+        interest_during_construction_6=0,
+        interest_during_construction_14=0,
         additional_work_during_construction=0,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=10,

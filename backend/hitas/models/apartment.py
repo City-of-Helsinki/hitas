@@ -64,8 +64,10 @@ class Apartment(ExternalHitasModel):
     additional_work_during_construction = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset lainat'
     loans_during_construction = HitasModelDecimalField(null=True)
-    # 'Rakennusaikaiset korot'
-    interest_during_construction = HitasModelDecimalField(null=True)
+    # 'Rakennusaikaiset korot 6%'
+    interest_during_construction_6 = HitasModelDecimalField(null=True)
+    # 'Rakennusaikaiset korot 14%'
+    interest_during_construction_14 = HitasModelDecimalField(null=True)
     # 'Luovutushinta (RA)'
     debt_free_purchase_price_during_construction = HitasModelDecimalField(null=True)
 

@@ -456,17 +456,21 @@ def create_apartments(
         new.loans_during_construction = apartment["loans_during_construction"]
 
         if apartment["completion_date"]:
-            construction_time_interest = total_construction_time_interest(
-                housing_company_construction_loan_rate=Decimal(
-                    converted_data.created_housing_companies_by_oracle_id[apartment["company_id"]].interest_rate
-                ),
+            new.interest_during_construction_6 = total_construction_time_interest(
+                loan_rate=Decimal(6.0),
                 apartment_completion_date=apartment["completion_date"],
                 apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
                 apartment_loans_during_construction=Decimal(apartment["loans_during_construction"]),
                 payments=fetch_payments(connection, apartment["id"]),
             )
 
-            new.interest_during_construction = construction_time_interest
+            new.interest_during_construction_14 = total_construction_time_interest(
+                loan_rate=Decimal(14.0),
+                apartment_completion_date=apartment["completion_date"],
+                apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
+                apartment_loans_during_construction=Decimal(apartment["loans_during_construction"]),
+                payments=fetch_payments(connection, apartment["id"]),
+            )
 
         new.debt_free_purchase_price_during_construction = apartment["debt_free_purchase_price_during_construction"]
         new.completion_date = apartment["completion_date"]

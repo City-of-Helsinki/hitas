@@ -11,7 +11,7 @@ class Payment:
 
 
 def total_construction_time_interest(
-    housing_company_construction_loan_rate: Decimal,
+    loan_rate: Decimal,
     apartment_completion_date: datetime.date,
     apartment_transfer_price: Decimal,
     apartment_loans_during_construction: Decimal,
@@ -27,8 +27,7 @@ def total_construction_time_interest(
                     instalment=payment.percentage,
                     transfer_price=apartment_transfer_price,
                     construction_time_loan=apartment_loans_during_construction,
-                    # Loan rate is 6 unless housing company's loan rate is lower than that
-                    loan_rate=housing_company_construction_loan_rate.min(6),
+                    loan_rate=loan_rate,
                 ).quantize(Decimal("1"), ROUND_HALF_UP)
             ),
             payments,

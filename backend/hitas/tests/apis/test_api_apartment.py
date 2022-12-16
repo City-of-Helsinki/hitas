@@ -273,7 +273,10 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "latest_purchase_date": ap.latest_purchase_date.strftime("%Y-%m-%d"),
             "construction": {
                 "loans": float(ap.loans_during_construction),
-                "interest": float(ap.interest_during_construction),
+                "interest": {
+                    "rate_6": float(ap.interest_during_construction_6),
+                    "rate_14": float(ap.interest_during_construction_14),
+                },
                 "debt_free_purchase_price": float(ap.debt_free_purchase_price_during_construction),
                 "additional_work": float(ap.additional_work_during_construction),
             },
@@ -696,7 +699,10 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
             "latest_purchase_date": "2020-05-05",
             "construction": {
                 "loans": 123.1,
-                "interest": 234.2,
+                "interest": {
+                    "rate_6": 234.2,
+                    "rate_14": 345.3,
+                },
                 "debt_free_purchase_price": 345.3,
                 "additional_work": 456.4,
             },
@@ -1031,7 +1037,60 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
         ),
         (
             {"prices": {"construction": {"interest": -1}}},
-            [{"field": "prices.construction.interest", "message": "Ensure this value is greater than or equal to 0."}],
+            [{"field": "prices.construction.interest", "message": "Invalid data. Expected a dictionary, but got int."}],
+        ),
+        (
+            {"prices": {"construction": {"interest": {"rate_6": -1, "rate_14": 1}}}},
+            [
+                {
+                    "field": "prices.construction.interest.rate_6",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
+        ),
+        (
+            {"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": -1}}}},
+            [
+                {
+                    "field": "prices.construction.interest.rate_14",
+                    "message": "Ensure this value is greater than or equal to 0.",
+                }
+            ],
+        ),
+        (
+            {"prices": {"construction": {"interest": {"rate_6": None, "rate_14": 1}}}},
+            [
+                {
+                    "field": "prices.construction.interest.rate_6",
+                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                },
+                {
+                    "field": "prices.construction.interest.rate_14",
+                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                },
+            ],
+        ),
+        (
+            {"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": None}}}},
+            [
+                {
+                    "field": "prices.construction.interest.rate_6",
+                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                },
+                {
+                    "field": "prices.construction.interest.rate_14",
+                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                },
+            ],
+        ),
+        (
+            {"prices": {"construction": {"interest": {"rate_6": 100, "rate_14": 10}}}},
+            [
+                {
+                    "field": "prices.construction.interest.rate_6",
+                    "message": "'rate_6' must not be greater than 'rate_14'.",
+                },
+            ],
         ),
         (
             {"prices": {"construction": {"debt_free_purchase_price": -1}}},
@@ -1414,7 +1473,10 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
             "latest_purchase_date": "2010-08-01",
             "construction": {
                 "loans": 44444,
-                "interest": 55555,
+                "interest": {
+                    "rate_6": 55555,
+                    "rate_14": 88888,
+                },
                 "debt_free_purchase_price": 66666,
                 "additional_work": 77777,
             },
@@ -1455,7 +1517,8 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert str(ap.first_purchase_date) == data["prices"]["first_purchase_date"]
     assert str(ap.latest_purchase_date) == data["prices"]["latest_purchase_date"]
     assert ap.loans_during_construction == data["prices"]["construction"]["loans"]
-    assert ap.interest_during_construction == data["prices"]["construction"]["interest"]
+    assert ap.interest_during_construction_6 == data["prices"]["construction"]["interest"]["rate_6"]
+    assert ap.interest_during_construction_14 == data["prices"]["construction"]["interest"]["rate_14"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
     assert ap.notes == data["notes"]
