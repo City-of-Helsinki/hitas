@@ -17,7 +17,6 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 {data.name.display}
                 <EditButton state={{housingCompany: data}} />
             </Heading>
-
             <div className="company-status">
                 <StatusLabel>Vapautunut 1.6.2022 ({data.state})</StatusLabel>
             </div>
@@ -157,15 +156,12 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="list-wrapper list-wrapper--real-estates">
                         <Heading type="list">
                             <span>Kiinteistöt</span>
-                            <Link to="real-estates">
-                                <Button
-                                    theme="black"
-                                    size="small"
-                                >
-                                    <IconPlus />
-                                </Button>
-                            </Link>
+                            <EditButton
+                                pathname="real-estates"
+                                state={{housingCompany: data}}
+                            />
                         </Heading>
+
                         <ul className="detail-list__list">
                             {data.real_estates.map((realEstate) => (
                                 <li
@@ -181,14 +177,10 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     <div className="list-wrapper list-wrapper--buildings">
                         <Heading type="list">
                             <span>Rakennukset</span>
-                            <Link to="buildings">
-                                <Button
-                                    theme="black"
-                                    size="small"
-                                >
-                                    <IconPlus />
-                                </Button>
-                            </Link>
+                            <EditButton
+                                pathname="buildings"
+                                state={{housingCompany: data}}
+                            />
                         </Heading>
                         <ul className="detail-list__list">
                             {data.real_estates.flatMap((realEstate) => {

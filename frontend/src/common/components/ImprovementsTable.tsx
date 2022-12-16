@@ -18,7 +18,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
     return (
         <div className="list__wrapper list-wrapper--upgrades">
             <Heading type="list">
-                {title}
+                <span>{title}</span>
                 {editableType !== undefined && (
                     <EditButton
                         state={{[editableType]: data}}

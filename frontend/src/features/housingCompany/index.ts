@@ -1,15 +1,15 @@
-import BuildingCreatePage from "./BuildingCreatePage";
+import HousingCompanyBuildingsPage from "./HousingCompanyBuildingsPage";
 import HousingCompanyCreatePage from "./HousingCompanyCreatePage";
 import HousingCompanyDetailsPage from "./HousingCompanyDetailsPage";
 import HousingCompanyImprovementsPage from "./HousingCompanyImprovementsPage";
 import HousingCompanyListPage from "./HousingCompanyListPage";
-import RealEstateCreatePage from "./RealEstateCreatePage";
+import HousingCompanyRealEstatesPage from "./HousingCompanyRealEstatesPage";
 
 export {
     HousingCompanyCreatePage,
     HousingCompanyDetailsPage,
     HousingCompanyListPage,
-    BuildingCreatePage,
-    RealEstateCreatePage,
+    HousingCompanyBuildingsPage,
+    HousingCompanyRealEstatesPage,
     HousingCompanyImprovementsPage,
 };

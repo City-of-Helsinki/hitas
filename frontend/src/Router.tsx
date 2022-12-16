@@ -16,12 +16,12 @@ import {
 } from "./features/apartment";
 import {Codes} from "./features/codes";
 import {
-    BuildingCreatePage,
+    HousingCompanyBuildingsPage,
     HousingCompanyCreatePage,
     HousingCompanyDetailsPage,
     HousingCompanyImprovementsPage,
     HousingCompanyListPage,
-    RealEstateCreatePage,
+    HousingCompanyRealEstatesPage,
 } from "./features/housingCompany";
 
 export default function Router() {
@@ -59,11 +59,11 @@ export default function Router() {
                         />
                         <Route
                             path="real-estates"
-                            element={<RealEstateCreatePage />}
+                            element={<HousingCompanyRealEstatesPage />}
                         />
                         <Route
                             path="buildings"
-                            element={<BuildingCreatePage />}
+                            element={<HousingCompanyBuildingsPage />}
                         />
                         <Route path="apartments">
                             <Route
