@@ -4916,6 +4916,11 @@ components:
           description: Single apartment construction price information
           type: object
           additionalProperties: false
+          required:
+            - loans
+            - interest
+            - debt_free_purchase_price
+            - additional_work
           properties:
             loans:
               description: Loans during construction
