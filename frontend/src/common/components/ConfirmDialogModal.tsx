@@ -8,10 +8,10 @@ import {Link} from "react-router-dom";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface ConfirmDialogModalProps {
-    data;
+    data?;
     modalText: string;
     successText: string;
-    error: FetchBaseQueryError | SerializedError | undefined;
+    error?: FetchBaseQueryError | SerializedError | undefined;
     linkURL?: string;
     linkText?: string;
     buttonText?: string;

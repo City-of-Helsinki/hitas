@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -6,7 +6,7 @@ import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveHousingCompanyMutation} from "../../app/services";
-import {FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
+import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
 import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
@@ -38,9 +38,10 @@ const ImprovementRemoveLineButton = ({onClick}) => {
 const HousingCompanyImprovementsPage = () => {
     const navigate = useNavigate();
     const {state}: {state: {housingCompany: IHousingCompanyDetails}} = useLocation();
-
     const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
-
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+    const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
+    const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
     const housingCompanyData: IHousingCompanyWritable = state.housingCompany;
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
         housingCompanyData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
@@ -82,11 +83,13 @@ const HousingCompanyImprovementsPage = () => {
             dotted(draft[index], fieldPath, value);
         });
     };
-    const handleRemoveMarketImprovementLine = (index) => {
-        if (!marketIndexImprovements[index].saved || window.confirm("Haluatko poistaa tallennetun parannuksen?")) {
+    const handleConfirmedRemoveMarketImprovementLine = () => {
+        if (marketIndexToRemove) {
             setMarketIndexImprovements((draft) => {
-                draft.splice(index, 1);
+                draft.splice(marketIndexToRemove, 1);
             });
+            setIsConfirmVisible(false);
+            setMarketIndexToRemove(null);
         }
     };
 
@@ -107,16 +110,22 @@ const HousingCompanyImprovementsPage = () => {
             dotted(draft[index], fieldPath, value);
         });
     };
-    const handleRemoveConstructionImprovementLine = (index) => {
-        if (
-            !constructionIndexImprovements[index].saved ||
-            window.confirm("Haluatko poistaa tallennetun parannuksen?")
-        ) {
+    const handleConfirmedRemoveConstructionImprovementLine = () => {
+        if (constructionIndexToRemove) {
             setConstructionIndexImprovements((draft) => {
-                draft.splice(index, 1);
+                draft.splice(constructionIndexToRemove, 1);
             });
+            setIsConfirmVisible(false);
+            setConstructionIndexToRemove(null);
         }
     };
+
+    // Handle confirm remove modal
+    useEffect(() => {
+        if (marketIndexToRemove !== null || constructionIndexToRemove !== null) {
+            setIsConfirmVisible(true);
+        }
+    }, [marketIndexToRemove, constructionIndexToRemove, setIsConfirmVisible]);
 
     // Handle saving flow when editing
     useEffect(() => {
@@ -192,9 +201,7 @@ const HousingCompanyImprovementsPage = () => {
                                             error={error}
                                             required
                                         />
-                                        <ImprovementRemoveLineButton
-                                            onClick={() => handleRemoveMarketImprovementLine(index)}
-                                        />
+                                        <ImprovementRemoveLineButton onClick={() => setMarketIndexToRemove(index)} />
                                     </li>
                                 ))}
                             </>
@@ -264,7 +271,7 @@ const HousingCompanyImprovementsPage = () => {
                                             required
                                         />
                                         <ImprovementRemoveLineButton
-                                            onClick={() => handleRemoveConstructionImprovementLine(index)}
+                                            onClick={() => setConstructionIndexToRemove(index)}
                                         />
                                     </li>
                                 ))}
@@ -285,6 +292,20 @@ const HousingCompanyImprovementsPage = () => {
                     isLoading={isLoading}
                 />
             </div>
+            <ConfirmDialogModal
+                isLoading={false}
+                modalText="Haluatko varmasti poistaa parannuksen?"
+                buttonText="Poista"
+                successText="Parannus poistettu"
+                isVisible={isConfirmVisible}
+                setIsVisible={setIsConfirmVisible}
+                confirmAction={
+                    marketIndexToRemove === null
+                        ? handleConfirmedRemoveConstructionImprovementLine
+                        : handleConfirmedRemoveMarketImprovementLine
+                }
+                cancelAction={() => setIsConfirmVisible(false)}
+            />
         </div>
     );
 };
