@@ -209,6 +209,19 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
+        removeRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
+            query: ({id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates/${housingCompanyId}`,
+                method: "DELETE",
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {
+                    type: "HousingCompany",
+                    id: arg.housingCompanyId,
+                },
+            ],
+        }),
         createBuilding: builder.mutation<
             IBuilding,
             {data: IBuildingWritable; housingCompanyId: string; realEstateId: string}
@@ -220,6 +233,19 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
+        }),
+        removeBuilding: builder.mutation<IBuilding, {id: string; housingCompanyId: string; realEstateId: string}>({
+            query: ({id, housingCompanyId, realEstateId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings/${id}`,
+                method: "DELETE",
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {
+                    type: "HousingCompany",
+                    id: arg.housingCompanyId,
+                },
+            ],
         }),
         saveApartment: builder.mutation<
             IApartmentDetails,
@@ -318,7 +344,9 @@ export const {useGetHousingCompanyDetailQuery, useGetApartmentDetailQuery} = det
 export const {
     useSaveHousingCompanyMutation,
     useCreateRealEstateMutation,
+    useRemoveRealEstateMutation,
     useCreateBuildingMutation,
+    useRemoveBuildingMutation,
     useSaveApartmentMutation,
     useRemoveApartmentMutation,
     useCreateOwnerMutation,
