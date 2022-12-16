@@ -48,6 +48,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import DepreciationPercentage
 from hitas.models.indices import AbstractIndex
+from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.financing_types import format_financing_method
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
@@ -587,17 +588,41 @@ def create_apartment_improvements(
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
+    @dataclass(frozen=True)
+    class OwnershipKey:
+        identifier: str
+        name: str
+
     count = 0
     bulk_owners = []
     bulk_ownerships = []
 
+    already_created = {}
+
     for ownership in connection.execute(
         select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
     ).fetchall():
+        skip_append = False
         new_owner = Owner()
         new_owner.name = ownership["name"]
         new_owner.identifier = ownership["social_security_number"]
-        bulk_owners.append(new_owner)
+        new_owner.valid_identifier = check_social_security_number(new_owner.identifier) or check_business_id(
+            new_owner.identifier
+        )
+
+        # Check if this owner has been already added. If it is, do not create a new one but combine them into one.
+        # Only do this when the owner has a valid social security number or a valid business id
+        if new_owner.valid_identifier:
+            key = OwnershipKey(new_owner.identifier, new_owner.name)
+            if key not in already_created:
+                already_created[key] = new_owner
+            else:
+                new_owner = already_created[key]
+                skip_append = True
+
+        if not skip_append:
+            bulk_owners.append(new_owner)
+            count += 1
 
         new = Ownership()
         new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
@@ -607,7 +632,6 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         new.end_date = None
 
         bulk_ownerships.append(new)
-        count += 1
 
         if len(bulk_owners) == BULK_INSERT_THRESHOLD:
             Owner.objects.bulk_create(bulk_owners)
