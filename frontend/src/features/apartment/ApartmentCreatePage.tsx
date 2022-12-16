@@ -109,7 +109,10 @@ const ApartmentCreatePage = () => {
                       latest_purchase_date: null,
                       construction: {
                           loans: null,
-                          interest: null,
+                          interest: {
+                              rate_6: null,
+                              rate_14: null,
+                          },
                           debt_free_purchase_price: null,
                           additional_work: null,
                       },
@@ -399,8 +402,17 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
-                            label="Rakennusaikaiset korot"
-                            fieldPath="prices.construction.interest"
+                            label="Rakennusaikaiset korot (6 %)"
+                            fieldPath="prices.construction.interest.rate_6"
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                        />
+                        <FormInputField
+                            inputType="number"
+                            unit="€"
+                            label="Rakennusaikaiset korot (14 %)"
+                            fieldPath="prices.construction.interest.rate_14"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
