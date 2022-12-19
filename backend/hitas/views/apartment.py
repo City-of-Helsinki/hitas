@@ -160,6 +160,55 @@ class SharesSerializer(serializers.Serializer):
             return super().validate_empty_values(data)
 
 
+class ConstructionPricesInterest(serializers.Serializer):
+    rate_6 = HitasDecimalField(
+        source="interest_during_construction_6",
+        required=False,
+        allow_null=True,
+    )
+    rate_14 = HitasDecimalField(
+        source="interest_during_construction_14",
+        required=False,
+        allow_null=True,
+    )
+
+    def validate(self, data):
+        rate_6, rate_14 = data["interest_during_construction_6"], data["interest_during_construction_14"]
+
+        if rate_6 is None and rate_14 is None:
+            return data
+        if rate_6 is None or rate_14 is None:
+            err_msg = "Both 'rate_6' and 'rate_14' must be given or be 'null'."
+            raise ValidationError({"rate_6": err_msg, "rate_14": err_msg})
+        if rate_6 > rate_14:
+            raise ValidationError({"rate_6": "'rate_6' must not be greater than 'rate_14'."})
+
+        return data
+
+    def run_validation(self, data=empty):
+        value = super().run_validation(data)
+
+        if value is None:
+            value = {
+                "interest_during_construction_6": None,
+                "interest_during_construction_14": None,
+            }
+
+        return value
+
+    def to_representation(self, instance):
+        if instance.interest_during_construction_6 is None:
+            return None
+
+        return super().to_representation(instance)
+
+    def validate_empty_values(self, data):
+        if data is None:
+            return True, None
+        else:
+            return super().validate_empty_values(data)
+
+
 class ConstructionPrices(serializers.Serializer):
     loans = HitasDecimalField(source="loans_during_construction", required=False, allow_null=True)
     additional_work = HitasDecimalField(
@@ -167,11 +216,7 @@ class ConstructionPrices(serializers.Serializer):
         required=False,
         allow_null=True,
     )
-    interest = HitasDecimalField(
-        source="interest_during_construction",
-        required=False,
-        allow_null=True,
-    )
+    interest = ConstructionPricesInterest(source="*", required=False, allow_null=True)
     debt_free_purchase_price = HitasDecimalField(
         source="debt_free_purchase_price_during_construction",
         required=False,
@@ -547,7 +592,8 @@ class ApartmentViewSet(HitasModelViewSet):
                 "latest_purchase_date",
                 "additional_work_during_construction",
                 "loans_during_construction",
-                "interest_during_construction",
+                "interest_during_construction_6",
+                "interest_during_construction_14",
                 "debt_free_purchase_price_during_construction",
                 "notes",
                 "completion_date",

@@ -193,7 +193,10 @@ interface IApartmentPrices {
     construction: {
         loans: number | null;
         additional_work: number | null;
-        interest: number | null;
+        interest: {
+            rate_6: number | null;
+            rate_14: number | null;
+        } | null;
         debt_free_purchase_price: number | null;
     };
 

@@ -102,10 +102,17 @@ class RulesPre2011(CalculatorRules):
             calculation_date_index=apartment.calculation_date_cpi,
         )
 
+        # Interest during construction
+        interest_during_construction = (
+            apartment.interest_during_construction_14
+            if apartment.completion_date < datetime.date(2005, 1, 1)
+            else apartment.interest_during_construction_6
+        )
+
         # Debt free shares price
         debt_free_shares_price = (
             apartment_share_of_housing_company_assets
-            + apartment.interest_during_construction
+            + interest_during_construction
             + apartment_improvements_result.summary.value_for_apartment
         )
 
@@ -122,7 +129,7 @@ class RulesPre2011(CalculatorRules):
                 housing_company_acquisition_price=housing_company_index_adjusted_acquisition_price,
                 housing_company_assets=housing_company_assets,
                 apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
-                interest_during_construction=apartment.interest_during_construction,
+                interest_during_construction=interest_during_construction,
                 apartment_improvements=apartment_improvements_result,
                 housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
@@ -149,7 +156,7 @@ class RulesPre2011(CalculatorRules):
         # Start calculations
 
         # Basic price
-        basic_price = apartment.acquisition_price + apartment.interest_during_construction
+        basic_price = apartment.acquisition_price + apartment.interest_during_construction_6
 
         # Index adjustment
         index_adjustment = (apartment.calculation_date_mpi / apartment.completion_date_mpi) * basic_price - basic_price
@@ -219,7 +226,7 @@ class RulesPre2011(CalculatorRules):
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
                 acquisition_price=apartment.acquisition_price,
-                interest_during_construction=apartment.interest_during_construction,
+                interest_during_construction=apartment.interest_during_construction_6,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,

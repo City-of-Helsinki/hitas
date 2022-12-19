@@ -31,8 +31,7 @@ def test_interest_days(payment_date: datetime.date, completion_date: datetime.da
 def test_total_interest():
     assert (
         total_construction_time_interest(
-            # loan_rate = 6 as given 10 is higher than that
-            housing_company_construction_loan_rate=Decimal(10),
+            loan_rate=Decimal(6.0),
             apartment_completion_date=datetime.date(2022, 1, 1),
             apartment_transfer_price=Decimal(100000),
             apartment_loans_during_construction=Decimal(20000),
@@ -47,8 +46,7 @@ def test_total_interest():
 
     assert (
         total_construction_time_interest(
-            # loan_rate = 6 as given 14 is higher than that
-            housing_company_construction_loan_rate=Decimal(14),
+            loan_rate=Decimal(14.0),
             apartment_completion_date=datetime.date(1995, 2, 24),
             apartment_transfer_price=Decimal(48211.0),
             apartment_loans_during_construction=Decimal(0.0),
@@ -67,12 +65,12 @@ def test_total_interest():
                 Payment(date=datetime.date(1995, 2, 10), percentage=Decimal(5)),
             ],
         )
-        #   (339 * 0.15 * 48211 * 0.06 / 360 = 408.59 = 409)
-        # + (295 * 0.20 * 48211 * 0.06 / 360 = 474.07 = 474)
-        # + (249 * 0.20 * 48211 * 0.06 / 360 = 400.15 = 400)
-        # + (189 * 0.20 * 48211 * 0.06 / 360 = 303.73 = 304)
-        # + (130 * 0.20 * 48211 * 0.06 / 360 = 208.91 = 209)
-        # + ( 14 * 0.05 * 48211 * 0.06 / 360 =   5.62 = 6)
-        # = 1802
-        == Decimal("1802")
+        #   (339 * 0.15 * 48211 * 0.14 / 360 =  953.37 =  953)
+        # + (295 * 0.20 * 48211 * 0.14 / 360 = 1106.17 = 1106)
+        # + (249 * 0.20 * 48211 * 0.14 / 360 =  933.69 =  934)
+        # + (189 * 0.20 * 48211 * 0.14 / 360 =  708.70 =  709)
+        # + (130 * 0.20 * 48211 * 0.14 / 360 =  487.46 =  487)
+        # + ( 14 * 0.05 * 48211 * 0.14 / 360 =   13.12 =   13)
+        # = 4202
+        == Decimal("4202")
     )

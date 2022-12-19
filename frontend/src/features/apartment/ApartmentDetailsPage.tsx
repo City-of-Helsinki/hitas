@@ -364,8 +364,12 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             value={formatMoney(data.prices.construction.loans)}
                                         />
                                         <DetailField
-                                            label="Rakennusaikaiset korot"
-                                            value={formatMoney(data.prices.construction.interest)}
+                                            label="Rakennusaikaiset korot (6 %)"
+                                            value={data.prices.construction.interest ? formatMoney(data.prices.construction.interest.rate_6) : 0}
+                                        />
+                                        <DetailField
+                                            label="Rakennusaikaiset korot (14 %)"
+                                            value={data.prices.construction.interest ? formatMoney(data.prices.construction.interest.rate_14) : 0}
                                         />
                                         <DetailField
                                             label="Luovutushinta (RA)"
