@@ -43,13 +43,17 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-#### `yarn eslint-check`
-
-Checks for possibly conflicting rules between eslint and prettier
-
-#### `yarn run prettier-format`
+#### `yarn prettier-check` | `yarn prettier-format`
 
 Checks (and when possible, fixes) prettier linting of the relevant files in the entire project
+
+#### `yarn eslint-check` | `yarn eslint-format`
+
+Checks eslint (and when possible, fixes) issues in the entire project
+
+#### `yarn eslint-check-conflicts`
+
+Checks for possibly conflicting rules between eslint and prettier
 
 ### Miscellaneous
 

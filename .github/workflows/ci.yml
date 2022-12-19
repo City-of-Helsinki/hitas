@@ -38,6 +38,31 @@ jobs:
     - name: "Checkout code"
       uses: actions/checkout@v3
 
+    # Frontend
+    - name: Frontend - Set Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+
+    - name: Frontend - Install dependencies
+      uses: borales/actions-yarn@v4
+      with:
+        dir: 'frontend'
+        cmd: install
+
+    - name: Frontend - Check for ESLint issues
+      uses: borales/actions-yarn@v4
+      with:
+        dir: 'frontend'
+        cmd: eslint-check
+
+    - name: Frontend - Check for Prettier issues
+      uses: borales/actions-yarn@v4
+      with:
+        dir: 'frontend'
+        cmd: prettier-check
+
+    # Backend
     - name: "Set up Python 3.10"
       uses: actions/setup-python@v4
       with:
@@ -52,7 +77,7 @@ jobs:
       env:
         POETRY_VIRTUALENVS_CREATE: 0
 
-    - name: "Check code style"
+    - name: "Check backend code style"
       run: >
         cd backend
         && black --check --diff .

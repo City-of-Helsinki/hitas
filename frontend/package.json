@@ -36,9 +36,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "eslint-check": "eslint-config-prettier src/index.tsx",
+    "eslint-check": "eslint src",
     "eslint-fix": "eslint src --fix",
-    "prettier-format": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --write"
+    "prettier-check": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --check",
+    "prettier-fix": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --write",
+    "eslint-check-conflicts": "eslint-config-prettier src/index.tsx"
   },
   "browserslist": {
     "production": [
