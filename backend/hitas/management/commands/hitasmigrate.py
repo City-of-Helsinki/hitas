@@ -1,5 +1,7 @@
 import os
+import sys
 
+import cx_Oracle
 from django.core.management.base import BaseCommand, CommandParser
 
 from hitas.models import MigrationDone
@@ -25,8 +27,24 @@ class Command(BaseCommand):
             help="Oracle database password (default 'oracle')."
             " Can be also set with 'HITAS_ORACLE_PASSWORD' environment variable.",
         )
+        # MacOS only:
+        # Before you can run the migration, you will need to install oracle instantclient:
+        # https://cx-oracle.readthedocs.io/en/latest/user_guide/installation.html#scripted-installation
+        parser.add_argument(
+            "--oracle-instantclient-path",
+            default="Downloads/instantclient_19_8",
+            help="Oracle instantclient location, MacOS only (default: 'Downloads/instantclient_19_8').",
+        )
 
     def handle(self, *args, **options) -> None:
+        if sys.platform.startswith("darwin"):  # MacOS
+            try:
+                lib_dir = os.path.join(os.environ.get("HOME"), options["oracle_instantclient_path"])
+                cx_Oracle.init_oracle_client(lib_dir=lib_dir)
+            except Exception as err:
+                print(err)
+                return
+
         try:
             oracle_pw = os.environ["HITAS_ORACLE_PASSWORD"]
         except KeyError:
