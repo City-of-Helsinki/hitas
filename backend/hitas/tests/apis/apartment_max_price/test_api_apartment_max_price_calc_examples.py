@@ -970,13 +970,14 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     }
 
 
+@pytest.mark.parametrize("interest_during_construction", [0, None])
 @pytest.mark.django_db
-def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasAPIClient):
+def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasAPIClient, interest_during_construction):
     a: Apartment = ApartmentFactory.create(
         debt_free_purchase_price=100000,
         primary_loan_amount=0,
-        interest_during_construction_6=0,
-        interest_during_construction_14=0,
+        interest_during_construction_6=interest_during_construction,
+        interest_during_construction_14=interest_during_construction,
         additional_work_during_construction=0,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=10,

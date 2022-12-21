@@ -107,7 +107,7 @@ class RulesPre2011(CalculatorRules):
             apartment.interest_during_construction_14
             if apartment.completion_date < datetime.date(2005, 1, 1)
             else apartment.interest_during_construction_6
-        )
+        ) or 0
 
         # Debt free shares price
         debt_free_shares_price = (
@@ -156,7 +156,7 @@ class RulesPre2011(CalculatorRules):
         # Start calculations
 
         # Basic price
-        basic_price = apartment.acquisition_price + apartment.interest_during_construction_6
+        basic_price = apartment.acquisition_price + (apartment.interest_during_construction_6 or 0)
 
         # Index adjustment
         index_adjustment = (apartment.calculation_date_mpi / apartment.completion_date_mpi) * basic_price - basic_price
@@ -226,7 +226,7 @@ class RulesPre2011(CalculatorRules):
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
                 acquisition_price=apartment.acquisition_price,
-                interest_during_construction=apartment.interest_during_construction_6,
+                interest_during_construction=apartment.interest_during_construction_6 or 0,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,
