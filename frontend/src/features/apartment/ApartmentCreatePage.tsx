@@ -55,6 +55,16 @@ const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWrit
             ...ap.address,
             street_address: ap.links.building.street_address,
         },
+        prices: {
+            ...ap.prices,
+            construction: {
+                ...ap.prices.construction,
+                interest: ap.prices.construction.interest || {
+                    rate_6: null,
+                    rate_14: null,
+                },
+            },
+        },
     };
 };
 
