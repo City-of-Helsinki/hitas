@@ -103,11 +103,12 @@ class RulesPre2011(CalculatorRules):
         )
 
         # Interest during construction
-        interest_during_construction = (
-            apartment.interest_during_construction_14
-            if apartment.completion_date < datetime.date(2005, 1, 1)
-            else apartment.interest_during_construction_6
-        ) or 0
+        if apartment.completion_date < datetime.date(2005, 1, 1):
+            interest_during_construction = apartment.interest_during_construction_14 or 0
+            interest_during_construction_percentage = 14
+        else:
+            interest_during_construction = apartment.interest_during_construction_6 or 0
+            interest_during_construction_percentage = 6
 
         # Debt free shares price
         debt_free_shares_price = (
@@ -130,6 +131,7 @@ class RulesPre2011(CalculatorRules):
                 housing_company_assets=housing_company_assets,
                 apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
                 interest_during_construction=interest_during_construction,
+                interest_during_construction_percentage=interest_during_construction_percentage,
                 apartment_improvements=apartment_improvements_result,
                 housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
@@ -227,6 +229,7 @@ class RulesPre2011(CalculatorRules):
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
                 acquisition_price=apartment.acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
+                interest_during_construction_percentage=6,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,

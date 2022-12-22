@@ -508,6 +508,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                     "housing_company_assets": 170_886.35,
                     "apartment_share_of_housing_company_assets": 170886.35,
                     "interest_during_construction": 4000.0,
+                    "interest_during_construction_percentage": 14,
                     "apartment_improvements": {
                         "items": [
                             {
@@ -559,6 +560,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                 "calculation_variables": {
                     "acquisition_price": 123173.0,
                     "interest_during_construction": 3455.0,
+                    "interest_during_construction_percentage": 6,
                     "basic_price": 126628.0,
                     "index_adjustment": 153577.28,
                     "apartment_improvements": {
@@ -793,6 +795,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                     "housing_company_assets": 20_823_677.55,
                     "apartment_share_of_housing_company_assets": 219010.27,
                     "interest_during_construction": 2703.0,
+                    "interest_during_construction_percentage": 6,
                     "apartment_improvements": {
                         "items": [
                             {
@@ -868,6 +871,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                 "calculation_variables": {
                     "acquisition_price": 175_930.0,
                     "interest_during_construction": 2703.0,
+                    "interest_during_construction_percentage": 6,
                     "basic_price": 178_633.0,
                     "index_adjustment": 205_671.91,
                     "apartment_improvements": {
@@ -1018,6 +1022,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
             "housing_company_assets": 200000.0,
             "apartment_share_of_housing_company_assets": 200000.0,
             "interest_during_construction": 0.0,
+            "interest_during_construction_percentage": 14,
             "apartment_improvements": {
                 "items": [],
                 "summary": {
@@ -1052,6 +1057,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
         "calculation_variables": {
             "acquisition_price": 100000.0,
             "interest_during_construction": 0.0,
+            "interest_during_construction_percentage": 6,
             "basic_price": 100000.0,
             "index_adjustment": 100000.0,
             "apartment_improvements": {
