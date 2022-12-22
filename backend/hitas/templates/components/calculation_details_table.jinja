@@ -38,7 +38,7 @@
             {% if index_name_short == "mark.hintaindeksi" %}
                 {% set table_right = [
                     ["Hankinta-arvo", vars.acquisition_price|intcomma],
-                    ["+ Rakennusaikaiset korot (6 %)", vars.interest_during_construction|intcomma],
+                    ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
                     ["= Perushinta", vars.basic_price|intcomma],
                     ["+ Indeksin muutos", vars.index_adjustment|intcomma],
                     ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.accepted_value|intcomma],
@@ -55,7 +55,7 @@
                     ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value|intcomma],
                     ["= Yhtiön varat yhteensä", vars.housing_company_assets|intcomma],
                     ["Osakkeiden osuus", vars.apartment_share_of_housing_company_assets|intcomma],
-                    ["+ Rakennusaikaiset korot (TODO %)", vars.interest_during_construction|intcomma],
+                    ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
                     ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma],
                     ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
                     ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans|intcomma],
