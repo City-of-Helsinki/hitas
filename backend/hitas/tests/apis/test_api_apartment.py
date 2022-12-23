@@ -472,6 +472,7 @@ def _test_max_prices(
     create_completion_indices: bool,
     create_current_indices: bool,
     null_values: bool = False,
+    old_hitas_ruleset: bool = False,
 ):
     # Setup test
     completion_date = datetime.date(2010, 12, 1) if pre_2011 else datetime.date(2011, 1, 1)
@@ -484,6 +485,8 @@ def _test_max_prices(
         primary_loan_amount=15000 if not null_values else None,
         additional_work_during_construction=5000 if not null_values else None,
         surface_area=50 if not null_values else None,
+        interest_during_construction_6=1000,
+        interest_during_construction_14=2000,
     )
 
     if create_completion_indices:
@@ -496,6 +499,10 @@ def _test_max_prices(
         mpi_factory.create(month=now, value=250)
         SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
 
+    if old_hitas_ruleset:
+        ap.housing_company.financing_method.old_hitas_ruleset = old_hitas_ruleset
+        ap.housing_company.financing_method.save()
+
     # Validate apartment details has correct data returned
     response = api_client.get(
         reverse(
@@ -506,16 +513,28 @@ def _test_max_prices(
 
     values = {
         "construction_price_index": {
-            "value": 150000 if create_current_indices and create_completion_indices and not null_values else None,
+            "value": (
+                153000  # (80000 + 15000 + 5000 + 2000) * 150 / 100
+                if old_hitas_ruleset
+                else 150000  # (80000 + 15000 + 5000) * 150 / 100
+                if create_current_indices and create_completion_indices and not null_values
+                else None
+            ),
             "maximum": create_current_indices and create_completion_indices and not null_values,
         },
         "market_price_index": {
-            "value": 125000 if create_current_indices and create_completion_indices and not null_values else None,
+            "value": (
+                126250  # (80000 + 15000 + 5000 + 1000) * 250 / 200
+                if old_hitas_ruleset
+                else 125000  # (80000 + 15000 + 5000) * 250 / 200
+                if create_current_indices and create_completion_indices and not null_values
+                else None
+            ),
             "maximum": False,
         },
         "surface_area_price_ceiling": {
             "value": 150000 if create_current_indices and not null_values else None,
-            "maximum": create_current_indices and not null_values,
+            "maximum": create_current_indices and not null_values and not old_hitas_ruleset,
         },
     }
 
@@ -564,6 +583,17 @@ def test__api__apartment__retrieve__2011_onwards__indices_missing(api_client: Hi
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__indices_set(api_client: HitasAPIClient):
     _test_max_prices(api_client, pre_2011=True, create_completion_indices=True, create_current_indices=True)
+
+
+@pytest.mark.django_db
+def test__api__apartment__retrieve__pre_2011__old_hitas_ruleset(api_client: HitasAPIClient):
+    _test_max_prices(
+        api_client,
+        pre_2011=True,
+        create_completion_indices=True,
+        create_current_indices=True,
+        old_hitas_ruleset=True,
+    )
 
 
 @pytest.mark.django_db

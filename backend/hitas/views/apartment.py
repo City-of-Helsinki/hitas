@@ -5,8 +5,8 @@ from http import HTTPStatus
 from typing import Any, Dict, Optional, Union
 
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch
-from django.db.models.expressions import RawSQL, Subquery, OuterRef, F
+from django.db.models import Prefetch, Q
+from django.db.models.expressions import RawSQL, Subquery, OuterRef, F, Case, When, Value
 from django.db.models.functions import TruncMonth, Now, NullIf
 from django.http import HttpResponse
 from django.urls import reverse
@@ -578,8 +578,39 @@ class ApartmentViewSet(HitasModelViewSet):
             output_field=HitasModelDecimalField(),
         )
 
+        interest: Union[Case, Value] = Value(0, output_field=HitasModelDecimalField())
+        if issubclass(table, MarketPriceIndex):
+            interest = Case(
+                When(
+                    condition=(
+                        Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True)
+                        & Q(interest_during_construction_6__isnull=False)
+                    ),
+                    then=F("interest_during_construction_6"),
+                ),
+                default=0,
+                output_field=HitasModelDecimalField(),
+            )
+        elif issubclass(table, ConstructionPriceIndex):
+            interest = Case(
+                When(
+                    condition=(
+                        Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True)
+                        & Q(interest_during_construction_14__isnull=False)
+                    ),
+                    then=F("interest_during_construction_14"),
+                ),
+                default=0,
+                output_field=HitasModelDecimalField(),
+            )
+
         return RoundWithPrecision(
-            (F("debt_free_purchase_price") + F("primary_loan_amount") + F("additional_work_during_construction"))
+            (
+                F("debt_free_purchase_price")
+                + F("primary_loan_amount")
+                + F("additional_work_during_construction")
+                + interest
+            )
             * current_value
             / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors
             precision=2,
