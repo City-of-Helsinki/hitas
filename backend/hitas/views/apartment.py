@@ -6,6 +6,8 @@ from typing import Any, Dict, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
+from django.db.models.expressions import RawSQL, Subquery, OuterRef, F
+from django.db.models.functions import TruncMonth, Now, NullIf
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -25,9 +27,14 @@ from hitas.models import (
     Owner,
     Ownership,
     SurfaceAreaPriceCeiling,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
 )
+from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
-from hitas.utils import this_month
+from hitas.utils import this_month, RoundWithPrecision
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -553,23 +560,42 @@ class ApartmentViewSet(HitasModelViewSet):
     model_class = Apartment
 
     @staticmethod
-    def select_index(table: str, pre2011: bool):
-        comparison = "<" if pre2011 else ">="
+    def select_index(
+        table: Union[
+            type[MarketPriceIndex],
+            type[MarketPriceIndex2005Equal100],
+            type[ConstructionPriceIndex],
+            type[ConstructionPriceIndex2005Equal100],
+        ],
+    ) -> RoundWithPrecision:
+        original_value = Subquery(
+            table.objects.filter(month=OuterRef("completion_date")).values("value"),
+            output_field=HitasModelDecimalField(),
+        )
 
-        return f"""
-    SELECT
-        ROUND(
-            (
-                a.debt_free_purchase_price + a.primary_loan_amount + a.additional_work_during_construction
-            ) * current_{table}.value / NULLIF(original_{table}.value, 0), 2
-        ) AS max_price_{table}
-    FROM hitas_apartment AS a
-    LEFT JOIN hitas_{table} AS original_{table} ON
-        a.completion_date {comparison} '2011-01-01' AND original_{table}.month = DATE_TRUNC('month', a.completion_date)
-    LEFT JOIN hitas_{table} AS current_{table} ON
-        a.completion_date {comparison} '2011-01-01' AND current_{table}.month = DATE_TRUNC('month', NOW())
-    WHERE a.id = hitas_apartment.id
-"""
+        current_value = Subquery(
+            table.objects.filter(month=TruncMonth(Now())).values("value"),
+            output_field=HitasModelDecimalField(),
+        )
+
+        return RoundWithPrecision(
+            (F("debt_free_purchase_price") + F("primary_loan_amount") + F("additional_work_during_construction"))
+            * current_value
+            / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors
+            precision=2,
+        )
+
+    @staticmethod
+    def select_sapc() -> RoundWithPrecision:
+        current_value = Subquery(
+            SurfaceAreaPriceCeiling.objects.filter(month=TruncMonth(Now())).values("value"),
+            output_field=HitasModelDecimalField(),
+        )
+
+        return RoundWithPrecision(
+            F("surface_area") * current_value,
+            precision=2,
+        )
 
     def get_detail_queryset(self):
         return (
@@ -609,20 +635,12 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
             )
-            .extra(
-                select={
-                    "cpi": self.select_index("constructionpriceindex", pre2011=True),
-                    "cpi_2005_100": self.select_index("constructionpriceindex2005equal100", pre2011=False),
-                    "mpi": self.select_index("marketpriceindex", pre2011=True),
-                    "mpi_2005_100": self.select_index("marketpriceindex2005equal100", pre2011=False),
-                    "sapc": """
-    SELECT ROUND(a.surface_area * sapc.value, 2)
-    FROM hitas_apartment AS a
-    LEFT JOIN hitas_surfaceareapriceceiling AS sapc
-        ON sapc.month = DATE_TRUNC('month', NOW())
-    WHERE a.id = hitas_apartment.id
-""",
-                }
+            .annotate(
+                cpi=self.select_index(ConstructionPriceIndex),
+                cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),
+                mpi=self.select_index(MarketPriceIndex),
+                mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100),
+                sapc=self.select_sapc(),
             )
         )
 
@@ -659,6 +677,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "apartment_type",
                 "building__real_estate__housing_company",
                 "building__real_estate__housing_company__postal_code",
+                # "building__real_estate__housing_company__financing_method",
             )
             .only(
                 "uuid",
@@ -676,6 +695,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__display_name",
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
+                # "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
             .order_by("id")
         )

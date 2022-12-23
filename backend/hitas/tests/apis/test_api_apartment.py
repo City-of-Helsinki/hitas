@@ -354,7 +354,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "name": cpi.name,
                     "value": float(cpi.value),
                     "completion_date": cpi.completion_date.strftime("%Y-%m"),
-                    "depreciation_percentage": cpi.depreciation_percentage.value,
+                    "depreciation_percentage": float(cpi.depreciation_percentage.value),
                 },
             ],
             "market_price_index": [
