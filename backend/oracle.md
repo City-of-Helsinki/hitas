@@ -2,8 +2,12 @@
 
 ## Run Oracle in docker
 
-    mkdir oracle-data
-    docker run -d -p 8085:8080 -p 1521:1521 -v "$(pwd)/oracle-data:/u01/app/oracle" quay.io/maksymbilenko/oracle-12c
+> The [Docker Compose](../docker-compose.yml) file can do this or you
+
+```shell
+mkdir oracle-data
+docker run -d -p 8085:8080 -p 1521:1521 -v "$(pwd)/oracle-data:/u01/app/oracle" quay.io/maksymbilenko/oracle-12c
+```
 
 ## Download the latest database dump
 
@@ -11,7 +15,9 @@ It can be found from the Hitas remote desktop machine or ask around for it :)
 
 ## Load the dump
 
-    cp <hitas.dmp> oracle-data/admin/xe/dpdump/EXPDAT01.DMP
+```shell
+cp <hitas.dmp> oracle-data/admin/xe/dpdump/EXPDAT01.DMP
+```
 
 ## Install Oracle SQL Developer
 
@@ -22,7 +28,7 @@ Download it [here](https://www.oracle.com/database/sqldeveloper/).
 Press `Create a Connection Manually`
 Fill the following information:
 
-```
+```text
 Name: Oracle
 Username: system
 Password: oracle
@@ -32,22 +38,27 @@ Press `Connect`.
 
 ## Run the following SQL command
 
-    alter system set DB_CREATE_FILE_DEST='/u01/app/oracle/oradata/xe';
+```oracle
+alter system set DB_CREATE_FILE_DEST='/u01/app/oracle/oradata/xe';
+```
 
 ## Start Data Pump Import Wizard
 
-1. Open DBA view
-   1. `View` -> `DBA`
-2. Select `Data Pump` from DBA view
-3. Right click on `Data Pump` and select `Data Pump Import Wizard`
+1. Open DBA view `View` -> `DBA`
+2. Add the created connection to the DBA view with the `+` sign
+3. Right-click on the `Data Pump` folder and select `Data Pump Import Wizard`
 4. Set `Type of import` to `Full`
 5. Click `Next` four times and then `Finish`.
 
 Import will not successfully finish. That's fine for now.
 
-## Open SQL query editor 
+## Modify table datatypes for import
 
-```
+Open a SQL Worksheet and run the following commands.
+
+> Note: Highlight the commands to run all of them.
+
+```oracle
 alter table HIDAS.HITASLUOVHINTAIND modify C_OMNIMI2 VARCHAR2(120 Byte);
 alter table HIDAS.HITEHIND modify C_OMNIMI1 VARCHAR2(120 Byte);
 alter table HIDAS.HITEHIND modify C_OMNIMI2 VARCHAR2(120 Byte);
@@ -96,11 +107,12 @@ alter table HIDAS.OKOODISTO modify C_SELITE VARCHAR2(120 Byte);
 ## Read import logs
 
 Log files are available in `oracle-data/admin/xe/dpdump/IMPORT-<datestamp>.LOG`
+If imports were successful, there should be no errors in the log.
 
 ## Check database
 
 1. Select `Oracle Connections` from left menu
-2. Select the dataase you created (`Oracle` )
+2. Select the database you created (`Oracle`)
 3. Expand `Other Users`
 4. Expand `HIDAS`
 5. Before running queries run the command `ALTER SESSION SET CURRENT_SCHEMA = HIDAS;`
