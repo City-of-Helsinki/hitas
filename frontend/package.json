@@ -15,7 +15,8 @@
     "hds-design-tokens": "^2.3.0",
     "hds-react": "^2.3.0",
     "immer": "^9.0.15",
-    "minimatch": "^5.1.0",
+    "loader-utils": "^3.2.1",
+    "minimatch": "^5.1.1",
     "path": "^0.12.7",
     "postcss-loader": "^7.0.0",
     "react": "^18.1.0",
@@ -26,7 +27,7 @@
     "react-router-dom": "^6.3.0",
     "sass": "^1.52.3",
     "typescript": "^4.4.2",
-    "use-immer": "^0.7.0",
+    "use-immer": "^0.8.1",
     "uuid": "^9.0.0",
     "web-vitals": "^3.0.3"
   },
@@ -35,9 +36,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "eslint-check": "eslint-config-prettier src/index.tsx",
+    "eslint-check": "eslint src",
     "eslint-fix": "eslint src --fix",
-    "prettier-format": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --write"
+    "prettier-check": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --check",
+    "prettier-fix": "prettier --config .prettierrc.json 'src/**/*.{ts,tsx}' --write",
+    "eslint-check-conflicts": "eslint-config-prettier src/index.tsx"
   },
   "browserslist": {
     "production": [
@@ -52,7 +55,7 @@
     ]
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "eslint": ">=5.16.0",
