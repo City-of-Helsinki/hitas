@@ -52,12 +52,14 @@ class IndexCalculation:
         housing_company_assets: Decimal
         apartment_share_of_housing_company_assets: Decimal
         interest_during_construction: Decimal
+        interest_during_construction_percentage: int
         apartment_improvements: MaxPriceImprovements
 
     @dataclass
     class CalculationVarsMarketPriceIndexBefore2011(CommonCalculationVars):
         acquisition_price: Decimal
         interest_during_construction: Decimal
+        interest_during_construction_percentage: int
         basic_price: Decimal
         index_adjustment: Decimal
         apartment_improvements: MaxPriceImprovements

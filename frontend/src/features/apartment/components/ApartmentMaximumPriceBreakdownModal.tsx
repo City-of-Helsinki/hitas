@@ -20,7 +20,6 @@ const tableTheme = {
 };
 
 const getDepreciation = (depreciation) => {
-    console.log(depreciation);
     if (depreciation === null) return 0;
     else if (depreciation?.amount !== undefined) return depreciation.amount;
     else return depreciation;
@@ -127,7 +126,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 value={calculation.calculation_variables.acquisition_price}
             />
             <BreakdownValue
-                label="+ Rakennusaikaiset korot (TODO %)"
+                label={`+ Rakennusaikaiset korot (${calculation.calculation_variables.interest_during_construction_percentage}%)`}
                 value={calculation.calculation_variables.interest_during_construction}
             />
             <BreakdownValue
@@ -224,7 +223,7 @@ const ConstructionPricePre2011Breakdown = ({
                 value={calculation.calculation_variables.apartment_share_of_housing_company_assets}
             />
             <BreakdownValue
-                label="+ Rakennusaikaiset korot (TODO %)"
+                label={`+ Rakennusaikaiset korot (${calculation.calculation_variables.interest_during_construction_percentage}%)`}
                 value={calculation.calculation_variables.interest_during_construction}
             />
             <BreakdownValue
