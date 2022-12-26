@@ -155,7 +155,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
-                        <h2 className="detail-list__heading">
+                        <Heading type="list">
                             <span>Kiinteistöt</span>
                             <Link to="real-estates">
                                 <Button
@@ -165,7 +165,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     <IconPlus />
                                 </Button>
                             </Link>
-                        </h2>
+                        </Heading>
                         <ul className="detail-list__list">
                             {data.real_estates.map((realEstate) => (
                                 <li
@@ -179,7 +179,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                         </ul>
                     </div>
                     <div className="list-wrapper list-wrapper--buildings">
-                        <h2 className="detail-list__heading">
+                        <Heading type="list">
                             <span>Rakennukset</span>
                             <Link to="buildings">
                                 <Button
@@ -189,7 +189,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     <IconPlus />
                                 </Button>
                             </Link>
-                        </h2>
+                        </Heading>
                         <ul className="detail-list__list">
                             {data.real_estates.flatMap((realEstate) => {
                                 return realEstate.buildings.map((building) => (
@@ -206,7 +206,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     </div>
                 </div>
                 <div className="list-wrapper list-wrapper--apartments">
-                    <h2>
+                    <Heading type="list">
                         <span>Asunnot</span>
                         <Link to="apartments/create">
                             <Button
@@ -217,7 +217,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                 Lisää asunto
                             </Button>
                         </Link>
-                    </h2>
+                    </Heading>
                     <div className="listing">
                         <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                     </div>

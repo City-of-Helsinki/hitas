@@ -2,7 +2,7 @@ import React from "react";
 
 import {IApartmentDetails, IHousingCompanyDetails} from "../models";
 import {formatMoney} from "../utils";
-import {EditButton} from "./index";
+import {EditButton, Heading} from "./index";
 
 interface ImprovementsTableProps {
     data: IApartmentDetails | IHousingCompanyDetails;
@@ -17,7 +17,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
 
     return (
         <div className="list__wrapper list-wrapper--upgrades">
-            <h2 className="detail-list__heading">
+            <Heading type="list">
                 {title}
                 {editableType !== undefined && (
                     <EditButton
@@ -26,7 +26,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                         className="pull-right"
                     />
                 )}
-            </h2>
+            </Heading>
             <ul className="detail-list__list">
                 {data.improvements.market_price_index.length || data.improvements.construction_price_index.length ? (
                     <>
