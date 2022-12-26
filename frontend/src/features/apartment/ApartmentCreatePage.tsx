@@ -15,6 +15,7 @@ import {
 import {
     ConfirmDialogModal,
     FormInputField,
+    Heading,
     NavigateBackButton,
     RemoveButton,
     SaveButton,
@@ -241,12 +242,12 @@ const ApartmentCreatePage = () => {
 
     return (
         <div className="view--create view--set-apartment">
-            <h1 className="main-heading">
+            <Heading>
                 {state?.apartment
                     ? `${state.apartment.address.street_address} - ${state.apartment.address.stair}
                     ${state.apartment.address.apartment_number}`
                     : "Uusi asunto"}
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
                     <TextInput

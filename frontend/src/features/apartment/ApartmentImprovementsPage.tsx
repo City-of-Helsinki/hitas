@@ -6,7 +6,7 @@ import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveApartmentMutation} from "../../app/services";
-import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
+import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,
@@ -176,10 +176,10 @@ const ApartmentImprovementsPage = () => {
 
     return (
         <div className="view--create view--create-improvements">
-            <h1 className="main-heading">
+            <Heading>
                 {apartmentData.address.street_address} - {apartmentData.address.stair}
                 {apartmentData.address.apartment_number} Parannukset
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
                     <ul className="improvements-list">

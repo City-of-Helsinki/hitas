@@ -10,7 +10,13 @@ import {
     useGetHousingCompanyDetailQuery,
     useSaveApartmentMaximumPriceMutation,
 } from "../../app/services";
-import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
+import {
+    FormInputField,
+    Heading,
+    ImprovementsTable,
+    NavigateBackButton,
+    QueryStateHandler,
+} from "../../common/components";
 import {
     IApartmentDetails,
     IApartmentMaximumPrice,
@@ -81,12 +87,12 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
 
     return (
         <div className="view--set-apartment">
-            <h1 className="main-heading">
+            <Heading>
                 <div>
                     {apartment.address.street_address} - {apartment.address.stair}
                     {apartment.address.apartment_number} ({apartment.links.housing_company.display_name})
                 </div>
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>

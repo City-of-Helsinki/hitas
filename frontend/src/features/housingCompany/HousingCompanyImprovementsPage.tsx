@@ -6,7 +6,7 @@ import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useSaveHousingCompanyMutation} from "../../app/services";
-import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
+import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
 import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
 import {dotted, hitasToast} from "../../common/utils";
 
@@ -145,7 +145,7 @@ const HousingCompanyImprovementsPage = () => {
 
     return (
         <div className="view--create view--create-improvements">
-            <h1 className="main-heading">{housingCompanyData.name.display} Parannukset</h1>
+            <Heading>{housingCompanyData.name.display} Parannukset</Heading>
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
                     <ul className="improvements-list">

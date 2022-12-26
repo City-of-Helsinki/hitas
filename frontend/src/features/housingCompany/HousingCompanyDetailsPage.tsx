@@ -4,7 +4,7 @@ import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import {IHousingCompanyDetails} from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
@@ -13,10 +13,10 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
     const params = useParams() as {readonly housingCompanyId: string};
     return (
         <>
-            <h1 className="main-heading">
+            <Heading>
                 {data.name.display}
                 <EditButton state={{housingCompany: data}} />
-            </h1>
+            </Heading>
 
             <div className="company-status">
                 <StatusLabel>Vapautunut 1.6.2022 ({data.state})</StatusLabel>

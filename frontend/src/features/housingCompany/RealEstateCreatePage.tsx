@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateRealEstateMutation} from "../../app/services";
-import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import {FormInputField, Heading, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {IRealEstate} from "../../common/models";
 
 const RealEstateCreatePage = (): JSX.Element => {
@@ -26,9 +26,9 @@ const RealEstateCreatePage = (): JSX.Element => {
 
     return (
         <div className="view--create view--create-real-estate">
-            <h1 className="main-heading">
+            <Heading>
                 <span>Uusi kiinteistö</span>
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
                     <div className="row">

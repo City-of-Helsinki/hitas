@@ -3,14 +3,18 @@
 body
   font-family: $font-default
 
-.main-heading
+[class^="heading--"]
   width: 100%
   display: flex
   justify-content: space-between
+  align-items: center
   font-size: $fontsize-heading-xl
   line-height: $lineheight-l
   border-bottom: 1px solid #ccc
   margin: 0 0 32px
+
+  a, span
+    display: flex
 
   .company &
     margin-bottom: 16px

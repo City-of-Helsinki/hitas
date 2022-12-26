@@ -4,7 +4,13 @@ import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
-import {FilterIntegerField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import {
+    FilterIntegerField,
+    FilterTextInputField,
+    Heading,
+    ListPageNumbers,
+    QueryStateHandler,
+} from "../../common/components";
 import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/models";
 
 interface ApartmentListItemProps {
@@ -187,7 +193,7 @@ const ApartmentListPage = (): JSX.Element => {
 
     return (
         <div className="view--apartments-listing">
-            <h1 className="main-heading">Kaikki kohteet</h1>
+            <Heading>Kaikki kohteet</Heading>
             <div className="listing">
                 <SearchInput
                     className="search"
