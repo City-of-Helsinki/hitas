@@ -18,24 +18,25 @@
       "state": "reserved",
       "apartment_type": 100,
       "surface_area": "60.00",
-      "rooms": null,
+      "rooms": 3,
       "share_number_start": 1,
       "share_number_end": 49,
       "completion_date": "2014-06-02",
-      "street_address": "Matinkatu 22",
+      "street_address": "Fakestreet 123",
       "apartment_number": 1,
       "floor": "1",
       "stair": "A",
       "debt_free_purchase_price": "11000.00",
       "primary_loan_amount": "44000.00",
       "purchase_price": "22000.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
-      "additional_work_during_construction": "0.00",
+      "first_purchase_date": "2014-06-02",
+      "latest_purchase_date": "2015-06-02",
+      "additional_work_during_construction": "33442.00",
       "loans_during_construction": "55000.00",
-      "interest_during_construction": "66000.00",
-      "debt_free_purchase_price_during_construction": "0.00",
-      "notes": null
+      "interest_during_construction_6": "2222.00",
+      "interest_during_construction_14": "3333.00",
+      "debt_free_purchase_price_during_construction": "22333.00",
+      "notes": ""
     }
   },
   {
@@ -46,26 +47,27 @@
       "deleted_by_cascade": false,
       "uuid": "a65fdf9f-87c8-4c4d-88cf-4116d82b07ed",
       "building": 2,
-      "state": "free",
-      "apartment_type": 128,
+      "state": "sold",
+      "apartment_type": 29,
       "surface_area": "43.67",
       "rooms": null,
       "share_number_start": 50,
       "share_number_end": 100,
       "completion_date": "2014-06-02",
-      "street_address": "Bengalinkuja 4",
+      "street_address": "Berganpolku 048",
       "apartment_number": 68,
       "floor": "4",
-      "stair": "z",
-      "debt_free_purchase_price": "19817680.00",
+      "stair": "Z",
+      "debt_free_purchase_price": "198680.00",
       "primary_loan_amount": "15222953.00",
-      "purchase_price": "14353544.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
-      "additional_work_during_construction": "0.00",
-      "loans_during_construction": "17863409.00",
-      "interest_during_construction": "1600059.00",
-      "debt_free_purchase_price_during_construction": "0.00",
+      "purchase_price": "143535.00",
+      "first_purchase_date": "2022-12-06",
+      "latest_purchase_date": "2022-12-15",
+      "additional_work_during_construction": "3000.00",
+      "loans_during_construction": "167725.00",
+      "interest_during_construction_6": "4444.00",
+      "interest_during_construction_14": "5555.00",
+      "debt_free_purchase_price_during_construction": "198000.00",
       "notes": "Nulla eos maiores illo reprehenderit. Sunt ducimus laborum nulla eveniet laboriosam.\nIpsa molestias aspernatur non occaecati."
     }
   },
@@ -78,13 +80,13 @@
       "uuid": "231c4898-3918-4cad-9c6b-63d99fa1de62",
       "building": 3,
       "state": "free",
-      "apartment_type": 129,
+      "apartment_type": 30,
       "surface_area": "13.40",
-      "rooms": null,
+      "rooms": 2,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
-      "street_address": "Iltatähdenkatu 7",
+      "street_address": "Porebulevardi 00",
       "apartment_number": 2,
       "floor": "5",
       "stair": "W",
@@ -93,10 +95,11 @@
       "purchase_price": "10198118.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": "0.00",
+      "additional_work_during_construction": "22.00",
       "loans_during_construction": "12426834.00",
-      "interest_during_construction": "1142622.00",
-      "debt_free_purchase_price_during_construction": "0.00",
+      "interest_during_construction_6": "12311.00",
+      "interest_during_construction_14": "45411.00",
+      "debt_free_purchase_price_during_construction": "12333.00",
       "notes": "Voluptatem veritatis sit dolorem. Earum sint quidem quos voluptate cumque numquam. Esse architecto dolorum sit.\nRerum incidunt velit quis quibusdam."
     }
   },
@@ -109,24 +112,25 @@
       "uuid": "c8ded105-4a5d-4fbf-82c2-3ecfbc986744",
       "building": 4,
       "state": "sold",
-      "apartment_type": 129,
+      "apartment_type": 31,
       "surface_area": "97.35",
-      "rooms": null,
+      "rooms": 3,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
-      "street_address": "Lautamiehenbulevardi 04",
+      "street_address": "Aidasmäentie 1",
       "apartment_number": 95,
       "floor": "2",
       "stair": "Q",
-      "debt_free_purchase_price": "10807807.00",
+      "debt_free_purchase_price": "1080780.00",
       "primary_loan_amount": "16844104.00",
-      "purchase_price": "16806534.00",
+      "purchase_price": "1680653.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
       "additional_work_during_construction": "0.00",
-      "loans_during_construction": "14996460.00",
-      "interest_during_construction": "1114073.00",
+      "loans_during_construction": "1499646.00",
+      "interest_during_construction_6": "0.00",
+      "interest_during_construction_14": "0.00",
       "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Quos magnam quaerat provident asperiores praesentium provident. Illo quasi commodi. Consequatur nobis corporis mollitia."
     }
@@ -140,25 +144,26 @@
       "uuid": "8488cfbf-11d7-4fed-9eae-9077ef3b50bc",
       "building": 5,
       "state": "sold",
-      "apartment_type": 130,
+      "apartment_type": 79,
       "surface_area": "11.72",
-      "rooms": null,
+      "rooms": 4,
       "share_number_start": 1,
       "share_number_end": 500,
       "completion_date": "2014-06-02",
-      "street_address": "Ylipalonpolku 7",
+      "street_address": "Berganpolku 7",
       "apartment_number": 39,
       "floor": "6",
-      "stair": "q",
-      "debt_free_purchase_price": "15818308.00",
+      "stair": "C",
+      "debt_free_purchase_price": "158183.00",
       "primary_loan_amount": "14639110.00",
-      "purchase_price": "19167654.00",
+      "purchase_price": "191676.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": "0.00",
-      "loans_during_construction": "16386070.00",
-      "interest_during_construction": "1552263.00",
-      "debt_free_purchase_price_during_construction": "0.00",
+      "additional_work_during_construction": "22223.00",
+      "loans_during_construction": "163860.00",
+      "interest_during_construction_6": "223.00",
+      "interest_during_construction_14": "333.00",
+      "debt_free_purchase_price_during_construction": "169999.00",
       "notes": "Fugit omnis modi voluptatibus ut. Sequi quaerat quasi omnis labore expedita repudiandae. Excepturi aperiam voluptatum animi quod quae."
     }
   },
@@ -171,16 +176,16 @@
       "uuid": "c03a059a-f54a-458c-84e9-e09351a531cb",
       "building": 6,
       "state": "sold",
-      "apartment_type": 129,
+      "apartment_type": 26,
       "surface_area": "16.01",
-      "rooms": null,
+      "rooms": 3,
       "share_number_start": 1,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
-      "street_address": "Iltatähdenbulevardi 909",
+      "street_address": "Urheilukuja 0",
       "apartment_number": 87,
       "floor": "9",
-      "stair": "o",
+      "stair": "M",
       "debt_free_purchase_price": "194932.00",
       "primary_loan_amount": "120237.00",
       "purchase_price": "101511.00",
@@ -188,8 +193,9 @@
       "latest_purchase_date": null,
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "147004.00",
-      "interest_during_construction": "12997.00",
-      "debt_free_purchase_price_during_construction": "0.00",
+      "interest_during_construction_6": null,
+      "interest_during_construction_14": null,
+      "debt_free_purchase_price_during_construction": "190000.00",
       "notes": "Necessitatibus quidem quisquam expedita laboriosam. Minus explicabo voluptates exercitationem beatae."
     }
   },
@@ -202,13 +208,13 @@
       "uuid": "7b237e63-2233-4c94-a566-e9724eed3626",
       "building": 7,
       "state": "sold",
-      "apartment_type": 129,
+      "apartment_type": 24,
       "surface_area": "14.36",
-      "rooms": null,
+      "rooms": 4,
       "share_number_start": 1001,
       "share_number_end": 1500,
       "completion_date": "2014-06-02",
-      "street_address": "Fabianinbulevardi 565",
+      "street_address": "Winqvistinkuja 0",
       "apartment_number": 88,
       "floor": "9",
       "stair": "A",
@@ -217,10 +223,11 @@
       "purchase_price": "119595.00",
       "first_purchase_date": null,
       "latest_purchase_date": null,
-      "additional_work_during_construction": "0.00",
+      "additional_work_during_construction": "1233.00",
       "loans_during_construction": "110982.00",
-      "interest_during_construction": "17174.00",
-      "debt_free_purchase_price_during_construction": "0.00",
+      "interest_during_construction_6": null,
+      "interest_during_construction_14": null,
+      "debt_free_purchase_price_during_construction": "166968.00",
       "notes": "Eum quos praesentium cupiditate odio odit quibusdam. Fuga placeat ipsum quasi. Blanditiis praesentium odio sit id adipisci minima pariatur."
     }
   },
@@ -233,13 +240,13 @@
       "uuid": "71e9f7d2-4911-44bf-8ab6-71b40462df48",
       "building": 8,
       "state": "sold",
-      "apartment_type": 129,
+      "apartment_type": 22,
       "surface_area": "40.91",
-      "rooms": null,
+      "rooms": 2,
       "share_number_start": 30,
       "share_number_end": 50,
       "completion_date": "2014-06-02",
-      "street_address": "Yrjöntie 703",
+      "street_address": "Kimalaispolku 382",
       "apartment_number": 53,
       "floor": "8",
       "stair": "P",
@@ -250,7 +257,8 @@
       "latest_purchase_date": null,
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "131965.00",
-      "interest_during_construction": "16209.00",
+      "interest_during_construction_6": null,
+      "interest_during_construction_14": null,
       "debt_free_purchase_price_during_construction": "0.00",
       "notes": "At occaecati explicabo iste fuga magni. Occaecati tenetur a itaque animi quo odit totam. Quod maxime magni optio.\nOdio animi consequatur. Eligendi ut maxime laborum quae minus."
     }
@@ -262,7 +270,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Itaque unde aliquam soluta recusandae dolor nesciunt quas.",
-      "completion_date": "2018-02-19",
+      "completion_date": "2018-02-01",
       "value": "77530.00",
       "apartment": 1,
       "depreciation_percentage": "2.5"
@@ -275,7 +283,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Deleniti ipsum quaerat rerum incidunt ipsum enim.",
-      "completion_date": "2017-10-09",
+      "completion_date": "2017-10-01",
       "value": "72257.00",
       "apartment": 2,
       "depreciation_percentage": "10.0"
@@ -288,7 +296,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Natus magnam quisquam at incidunt eius.",
-      "completion_date": "2021-08-15",
+      "completion_date": "2021-08-01",
       "value": "538.00",
       "apartment": 3,
       "depreciation_percentage": "0"
@@ -301,7 +309,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Repudiandae ipsum rerum aut totam illum ipsa.",
-      "completion_date": "2013-05-12",
+      "completion_date": "2013-05-01",
       "value": "50329.00",
       "apartment": 3,
       "depreciation_percentage": "10.0"
@@ -314,7 +322,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Reiciendis excepturi quas vero numquam mollitia.",
-      "completion_date": "2010-01-18",
+      "completion_date": "2010-01-01",
       "value": "25015.00",
       "apartment": 4,
       "depreciation_percentage": "2.5"
@@ -327,7 +335,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Aperiam tempora quidem beatae explicabo.",
-      "completion_date": "2016-10-21",
+      "completion_date": "2016-10-01",
       "value": "27619.00",
       "apartment": 4,
       "depreciation_percentage": "0"
@@ -340,7 +348,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Esse laudantium nihil.",
-      "completion_date": "2022-04-07",
+      "completion_date": "2022-04-01",
       "value": "78333.00",
       "apartment": 5,
       "depreciation_percentage": "2.5"
@@ -353,7 +361,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Fuga magni ad est neque doloribus.",
-      "completion_date": "2019-09-07",
+      "completion_date": "2019-09-01",
       "value": "46216.00",
       "apartment": 5,
       "depreciation_percentage": "2.5"
@@ -366,7 +374,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Nihil aut voluptates cupiditate iusto cum provident.",
-      "completion_date": "2016-04-06",
+      "completion_date": "2016-04-01",
       "value": "88502.00",
       "apartment": 5,
       "depreciation_percentage": "10.0"
@@ -379,7 +387,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Eligendi repudiandae occaecati fuga.",
-      "completion_date": "2014-02-25",
+      "completion_date": "2014-02-01",
       "value": "61869.00",
       "apartment": 6,
       "depreciation_percentage": "0"
@@ -392,7 +400,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Consequuntur rem neque ad explicabo nulla repellat.",
-      "completion_date": "2019-04-26",
+      "completion_date": "2019-04-01",
       "value": "36020.00",
       "apartment": 7,
       "depreciation_percentage": "0"
@@ -405,7 +413,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Modi sapiente officiis dignissimos ab quam tempore suscipit.",
-      "completion_date": "2018-06-20",
+      "completion_date": "2018-06-01",
       "value": "83829.00",
       "apartment": 8,
       "depreciation_percentage": "2.5"
@@ -418,7 +426,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Nisi nihil nihil dicta autem tenetur ex architecto.",
-      "completion_date": "2013-01-12",
+      "completion_date": "2013-01-01",
       "value": "25753.00",
       "apartment": 8,
       "depreciation_percentage": "0"
@@ -431,7 +439,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Officiis architecto numquam maxime.",
-      "completion_date": "2011-03-08",
+      "completion_date": "2011-03-01",
       "value": "20697.00",
       "apartment": 1
     }
@@ -443,7 +451,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Consectetur architecto ipsa quas debitis.",
-      "completion_date": "2011-12-03",
+      "completion_date": "2011-12-01",
       "value": "65252.00",
       "apartment": 2
     }
@@ -455,7 +463,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Ab quibusdam soluta laudantium eveniet inventore fugiat.",
-      "completion_date": "2011-09-19",
+      "completion_date": "2011-09-01",
       "value": "15030.00",
       "apartment": 2
     }
@@ -467,7 +475,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Dolor fugiat dolores quo quae.",
-      "completion_date": "2014-07-24",
+      "completion_date": "2014-07-01",
       "value": "7568.00",
       "apartment": 3
     }
@@ -479,7 +487,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Fugit ratione distinctio voluptate iste facilis similique.",
-      "completion_date": "2016-08-30",
+      "completion_date": "2016-08-01",
       "value": "6599.00",
       "apartment": 4
     }
@@ -491,7 +499,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Ab explicabo debitis adipisci unde facilis.",
-      "completion_date": "2017-11-25",
+      "completion_date": "2017-11-01",
       "value": "34980.00",
       "apartment": 5
     }
@@ -503,7 +511,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Dolorum ratione unde.",
-      "completion_date": "2012-07-28",
+      "completion_date": "2012-07-01",
       "value": "11651.00",
       "apartment": 6
     }
@@ -515,7 +523,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Sequi neque ut velit sint libero nihil.",
-      "completion_date": "2012-10-20",
+      "completion_date": "2012-10-01",
       "value": "85990.00",
       "apartment": 6
     }
@@ -527,7 +535,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Incidunt asperiores repellat quisquam quibusdam.",
-      "completion_date": "2020-11-07",
+      "completion_date": "2020-11-01",
       "value": "96998.00",
       "apartment": 6
     }
@@ -539,7 +547,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Illum recusandae ducimus libero quas sed.",
-      "completion_date": "2012-07-21",
+      "completion_date": "2012-07-01",
       "value": "75447.00",
       "apartment": 7
     }
@@ -551,7 +559,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Consequatur natus culpa molestiae voluptate distinctio.",
-      "completion_date": "2020-06-13",
+      "completion_date": "2020-06-01",
       "value": "10604.00",
       "apartment": 7
     }
@@ -563,7 +571,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Nemo magni mollitia sint numquam quas unde.",
-      "completion_date": "2015-01-28",
+      "completion_date": "2015-01-01",
       "value": "62621.00",
       "apartment": 8
     }
@@ -575,7 +583,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Enim perspiciatis sequi dolorum ab.",
-      "completion_date": "2019-03-12",
+      "completion_date": "2019-03-01",
       "value": "22659.00",
       "apartment": 8
     }
@@ -587,7 +595,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "name": "Commodi repudiandae recusandae nam.",
-      "completion_date": "2016-02-07",
+      "completion_date": "2016-02-01",
       "value": "51857.00",
       "apartment": 8
     }
@@ -2285,54 +2293,6 @@
       "order": null,
       "legacy_code_number": "114",
       "legacy_start_date": "2022-07-26T10:10:38.084Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.apartmenttype",
-    "pk": 128,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "a299b34a-5e9c-4bd4-81c7-312b83f536ed",
-      "value": "1h",
-      "description": "Laborum corporis hic nihil explicabo repellendus hic.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "001",
-      "legacy_start_date": "2013-11-24T15:08:14.707Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.apartmenttype",
-    "pk": 129,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "898c192e-f765-4026-8dd3-b1acf67b6cab",
-      "value": "2mh+tupak+s",
-      "description": "Error beatae maiores numquam tempore.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2014-01-27T00:40:42.777Z",
-      "legacy_end_date": null
-    }
-  },
-  {
-    "model": "hitas.apartmenttype",
-    "pk": 130,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "86d2e1c2-be80-4b6d-af40-f05a1dc99696",
-      "value": "2h+kk+s",
-      "description": "Maiores amet repudiandae facilis laboriosam voluptas iure.",
-      "in_use": true,
-      "order": null,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2016-11-23T11:17:01.105Z",
       "legacy_end_date": null
     }
   },
@@ -4251,6 +4211,7 @@
       "uuid": "ca9a96d8-1b8c-465d-a0d8-2791c41003a0",
       "name": "Matti Meikäläinen",
       "identifier": "010199-123A",
+      "valid_identifier": false,
       "email": "matti@hitas.fi"
     }
   },
@@ -4263,6 +4224,7 @@
       "uuid": "25226463-6ae4-4bf9-8e0d-38f550e7b9e8",
       "name": "Kerttu Kuusisto",
       "identifier": "050462-494C",
+      "valid_identifier": false,
       "email": "juhanisaari@example.com"
     }
   },
@@ -4275,6 +4237,7 @@
       "uuid": "4b573f08-9426-4ad4-866d-77fe55fdf77a",
       "name": "Juhani Kujala",
       "identifier": "300505A522H",
+      "valid_identifier": false,
       "email": "kaarinalehto@example.com"
     }
   },
@@ -4287,6 +4250,7 @@
       "uuid": "7df34cb6-b7f7-4627-8c4e-1b3f3f2ca4a7",
       "name": "Kerttu Asikainen",
       "identifier": "151124-088K",
+      "valid_identifier": false,
       "email": "mattigustafsson@example.org"
     }
   },
@@ -4299,6 +4263,7 @@
       "uuid": "b5a6d975-e6ab-4208-a852-72b9613eabc7",
       "name": "Jaakko Virtanen",
       "identifier": "230919-757D",
+      "valid_identifier": false,
       "email": "emiliaseppanen@example.net"
     }
   },
@@ -4311,6 +4276,7 @@
       "uuid": "c4f0e0ea-ff65-4472-a852-5b7d5a6c465d",
       "name": "Marjaana Myllymäki",
       "identifier": "160339-233A",
+      "valid_identifier": false,
       "email": "artturiihimaki@example.org"
     }
   },
@@ -4323,6 +4289,7 @@
       "uuid": "e649550d-8049-483b-ae3a-a1d97a4bb3d3",
       "name": "Seppo Lahtinen",
       "identifier": "211283-058H",
+      "valid_identifier": false,
       "email": "ensio55@example.org"
     }
   },
@@ -4335,6 +4302,7 @@
       "uuid": "23332e48-cf08-417a-9121-7d2bfe113e0b",
       "name": "Riitta Ojanen",
       "identifier": "160288-587K",
+      "valid_identifier": false,
       "email": "onurmi@example.org"
     }
   },
@@ -4347,6 +4315,7 @@
       "uuid": "9d5fbaaf-54fb-4a1b-89df-4b939dce0e4c",
       "name": "Katariina Virna",
       "identifier": "111269-222X",
+      "valid_identifier": false,
       "email": null
     }
   },
@@ -4722,7 +4691,7 @@
     "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
     "fields": {
       "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
-      "last_login": "2022-10-12T17:08:22.619Z",
+      "last_login": "2022-12-27T09:10:04.543Z",
       "is_superuser": true,
       "username": "hitas",
       "first_name": "",
