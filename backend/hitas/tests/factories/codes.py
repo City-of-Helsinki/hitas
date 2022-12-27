@@ -115,15 +115,12 @@ class ApartmentTypeFactory(AbstractCodeFactory):
     value = fuzzy.FuzzyChoice(
         [
             "tuntematon",
-            "1h",
-            "2h",
+            "h",
             "Alkovi+tupak+s",
-            "2h+kk+s",
-            "2h+k+s",
-            "3h+kk+s",
-            "2h+kk+s",
-            "2mh+tupak+s",
-            "Alkovi+tupak+s",
-            "2mh+tupak+s",
+            "h+k+s",
+            "h+kk+s",
+            "mh+tupak+s",
+            "h+k+khh+s+piha",
+            "h+k+työtila",
         ]
     )

@@ -16,6 +16,7 @@ Check the boxes for each DoD items that has been completed:
     - [ ] OpenAPI definitions have been updated
     - [ ] Database migrations will work in test environment
     - [ ] Oracle migration has been updated
+    - [ ] initial.json has been updated to work with migrations
 
 ## Test plan
 
