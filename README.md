@@ -2,7 +2,7 @@
 
 ## Setting up the environment
 
-Run `docker-compose up --build --detach`
+Run `docker-compose up --build --detach` or `make up` if [Make] is installed.
 
 After that the environment is up with following accesses:
 
@@ -11,3 +11,6 @@ After that the environment is up with following accesses:
 * Access Django admin from [localhost:8080/admin](http://localhost:8080/admin). Default username/password `hitas`/`hitas`
 - Access OpenAPI documentation from [localhost:8090](http://localhost:8090)
 - Access PostgreSQL from [hitas:hitas@localhost:5432/hitas](postgres://hitas:hitas@localhost:5432/hitas)
+
+
+[Make]: https://www.gnu.org/software/make/

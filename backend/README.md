@@ -11,7 +11,7 @@
 
 1. Clone this repository
 2. Enter the backend directory `cd hitas/backend`
-3. Start the app by running `make`
+3. Start the app by running `make docker-build`
 4. Access Django admin from [localhost:8080/admin](http://localhost:8080/admin). Default username `hitas`/`hitas`
 
 
@@ -43,4 +43,4 @@
 ## API definitions
 
 * It's possible to take a look into `openapi.yaml`
-* After running `make` Swagger editor is running in [localhost:8090](localhost:8090)
+* After running `make docker-build` Swagger editor is running in [localhost:8090](localhost:8090)
