@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, Union
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Q
 from django.db.models.expressions import RawSQL, Subquery, OuterRef, F, Case, When, Value
-from django.db.models.functions import TruncMonth, Now, NullIf
+from django.db.models.functions import TruncMonth, Now, NullIf, Coalesce
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -582,25 +582,24 @@ class ApartmentViewSet(HitasModelViewSet):
         if issubclass(table, MarketPriceIndex):
             interest = Case(
                 When(
-                    condition=(
-                        Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True)
-                        & Q(interest_during_construction_6__isnull=False)
-                    ),
-                    then=F("interest_during_construction_6"),
+                    condition=Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True),
+                    then=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
                 ),
                 default=0,
                 output_field=HitasModelDecimalField(),
             )
         elif issubclass(table, ConstructionPriceIndex):
             interest = Case(
+                # Check for exceptions where old ruleset is not used
                 When(
-                    condition=(
-                        Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True)
-                        & Q(interest_during_construction_14__isnull=False)
-                    ),
-                    then=F("interest_during_construction_14"),
+                    condition=Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=False),
+                    then=0,
                 ),
-                default=0,
+                When(
+                    condition=Q(completion_date__lt=datetime.date(2005, 1, 1)),
+                    then=Coalesce(F("interest_during_construction_14"), 0, output_field=HitasModelDecimalField()),
+                ),
+                default=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
                 output_field=HitasModelDecimalField(),
             )
 
@@ -665,6 +664,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__display_name",
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
+                "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
             .annotate(
                 cpi=self.select_index(ConstructionPriceIndex),
@@ -708,7 +708,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "apartment_type",
                 "building__real_estate__housing_company",
                 "building__real_estate__housing_company__postal_code",
-                # "building__real_estate__housing_company__financing_method",
+                "building__real_estate__housing_company__financing_method",
             )
             .only(
                 "uuid",
@@ -726,7 +726,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__display_name",
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
-                # "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
+                "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
             .order_by("id")
         )
