@@ -209,7 +209,7 @@ def run(
                 converted_data.apartments_by_oracle_id.update(created_apartments)
 
             total_real_estates = sum(
-                map(lambda hc: len(hc.real_estates), converted_data.created_housing_companies_by_oracle_id.values())
+                len(hc.real_estates) for hc in converted_data.created_housing_companies_by_oracle_id.values()
             )
 
             print(f"Loaded {total_real_estates} real estates.")
@@ -328,19 +328,12 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
     return housing_companies_by_id
 
 
-def create_housing_company_improvements(
-    connection: Connection, converted_data: ConvertedData
-) -> dict[int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]]:
-    created: dict[
-        int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]
-    ] = {}
-
+def create_housing_company_improvements(connection: Connection, converted_data: ConvertedData):
+    count = 0
     bulk_cpi = []
     bulk_mpi = []
 
     for company_oracle_id, v in converted_data.created_housing_companies_by_oracle_id.items():
-        created[v.value.id] = ([], [])
-
         #
         # Construction price index
         #
@@ -365,7 +358,7 @@ def create_housing_company_improvements(
                     value=cpi_improvement["value"],
                 )
                 bulk_cpi.append(new)
-                created[v.value.id][0].append(new)
+                count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
@@ -395,7 +388,7 @@ def create_housing_company_improvements(
                     value=mpi_improvement["value"],
                 )
                 bulk_mpi.append(new)
-                created[v.value.id][1].append(new)
+                count += 1
 
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
@@ -406,10 +399,8 @@ def create_housing_company_improvements(
     if bulk_mpi:
         HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} housing company improvements.")
+    print(f"Loaded {count} housing company improvements.")
     print()
-
-    return created
 
 
 def create_real_estates_and_buildings(
@@ -516,17 +507,13 @@ def create_apartments(
     return apartments_by_id
 
 
-def create_apartment_improvements(
-    connection: Connection, converted_data: ConvertedData
-) -> dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]]:
-    created: dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]] = {}
+def create_apartment_improvements(connection: Connection, converted_data: ConvertedData) -> None:
 
+    count = 0
     bulk_cpi = []
     bulk_mpi = []
 
     for apartment_oracle_id, v in converted_data.apartments_by_oracle_id.items():
-        created[v.id] = ([], [])
-
         #
         # Construction price index calculations
         #
@@ -554,7 +541,7 @@ def create_apartment_improvements(
                     ),
                 )
                 bulk_cpi.append(new)
-                created[v.id][0].append(new)
+                count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
@@ -584,7 +571,7 @@ def create_apartment_improvements(
                     value=mpi_improvement["value"],
                 )
                 bulk_mpi.append(new)
-                created[v.id][1].append(new)
+                count += 1
 
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
@@ -595,10 +582,8 @@ def create_apartment_improvements(
     if bulk_mpi:
         ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} apartment improvements.")
+    print(f"Loaded {count} apartment improvements.")
     print()
-
-    return created
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
