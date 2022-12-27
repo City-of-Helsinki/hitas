@@ -114,7 +114,7 @@ const ApartmentImprovementsPage = () => {
         });
     };
     const handleConfirmedRemoveMarketImprovementLine = () => {
-        if (marketIndexToRemove) {
+        if (marketIndexToRemove !== null) {
             setMarketIndexImprovements((draft) => {
                 draft.splice(marketIndexToRemove, 1);
             });
@@ -142,7 +142,7 @@ const ApartmentImprovementsPage = () => {
         });
     };
     const handleConfirmedRemoveConstructionImprovementLine = () => {
-        if (constructionIndexToRemove) {
+        if (constructionIndexToRemove !== null) {
             setConstructionIndexImprovements((draft) => {
                 draft.splice(constructionIndexToRemove, 1);
             });
