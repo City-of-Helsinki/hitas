@@ -3,7 +3,7 @@
 {# Pre-2011 Constructin Price Index #}
 
 {% macro apartment_improvements_table_cpi(improvements) %}
-{% if improvements %}
+{% if improvements["items"] %}
     <h3 class="bordered-header">HUONEISTOKOHTAISET PARANNUKSET</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
@@ -48,7 +48,7 @@
 {% endmacro %}
 
 {% macro housing_company_improvements_table_pre_2011_cpi(improvements) %}
-{% if improvements %}
+{% if improvements["items"] %}
     <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
@@ -78,7 +78,7 @@
 {# Pre-2011 Market Price Index #}
 
 {% macro apartment_improvements_table_mpi(improvements) %}
-{% if improvements %}
+{% if improvements["items"] %}
     <h3 class="bordered-header">HUONEISTOKOHTAISET PARANNUKSET</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
@@ -124,7 +124,7 @@
 {% endmacro %}
 
 {% macro housing_company_improvements_table_pre_2011_mpi(improvements) %}
-{% if improvements %}
+{% if improvements["items"] %}
     <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
@@ -174,7 +174,7 @@
 {# 2011 Onwards #}
 
 {% macro housing_company_improvements_table_post_2011(improvements) %}
-{% if improvements %}
+{% if improvements["items"] %}
     <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
