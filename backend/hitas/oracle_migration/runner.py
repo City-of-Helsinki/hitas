@@ -495,7 +495,7 @@ def create_apartments(
 
 
 def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
-    match value:
+    match value:  # noqa: E999
         case "000":
             return DepreciationPercentage.ZERO
         case "001":

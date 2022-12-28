@@ -6,15 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0033_max_to_maximum'),
+        ("hitas", "0033_max_to_maximum"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MigrationDone',
+            name="MigrationDone",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('when', models.DateTimeField(auto_now=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("when", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

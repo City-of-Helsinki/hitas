@@ -6,25 +6,25 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0032_apartmentmaxpricecalculation'),
+        ("hitas", "0032_apartmentmaxpricecalculation"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='ApartmentMaxPriceCalculation',
-            new_name='ApartmentMaximumPriceCalculation',
+            old_name="ApartmentMaxPriceCalculation",
+            new_name="ApartmentMaximumPriceCalculation",
         ),
         migrations.RenameModel(
-            old_name='MaxPriceIndex',
-            new_name='MaximumPriceIndex',
+            old_name="MaxPriceIndex",
+            new_name="MaximumPriceIndex",
         ),
         migrations.AlterModelOptions(
-            name='maximumpriceindex',
-            options={'verbose_name': 'Maximum price index', 'verbose_name_plural': 'Maximum price indices'},
+            name="maximumpriceindex",
+            options={"verbose_name": "Maximum price index", "verbose_name_plural": "Maximum price indices"},
         ),
         migrations.RenameField(
-            model_name='apartmentmaximumpricecalculation',
-            old_name='max_price',
-            new_name='maximum_price',
+            model_name="apartmentmaximumpricecalculation",
+            old_name="max_price",
+            new_name="maximum_price",
         ),
     ]

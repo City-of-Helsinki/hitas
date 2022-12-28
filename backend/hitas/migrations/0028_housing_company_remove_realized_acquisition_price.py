@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0027_surfaceareapriceceiling'),
+        ("hitas", "0027_surfaceareapriceceiling"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='housingcompany',
-            name='realized_acquisition_price_positive',
+            model_name="housingcompany",
+            name="realized_acquisition_price_positive",
         ),
         migrations.RemoveField(
-            model_name='housingcompany',
-            name='realized_acquisition_price',
+            model_name="housingcompany",
+            name="realized_acquisition_price",
         ),
     ]

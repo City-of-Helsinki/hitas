@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0035_apartment_max_price_calc_json_optional'),
+        ("hitas", "0035_apartment_max_price_calc_json_optional"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apartmentmaximumpricecalculation',
-            name='json_version',
-            field=models.SmallIntegerField(default=2, null=True, validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="apartmentmaximumpricecalculation",
+            name="json_version",
+            field=models.SmallIntegerField(
+                default=2, null=True, validators=[django.core.validators.MinValueValidator(1)]
+            ),
         ),
     ]

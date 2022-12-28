@@ -6,7 +6,7 @@ from hitas.oracle_migration.financing_types import format_financing_method
 
 
 def migrate_financing_methods(apps, schema_editor):
-    FinancingMethod = apps.get_model('hitas', 'FinancingMethod')
+    FinancingMethod = apps.get_model("hitas", "FinancingMethod")
 
     for fm in FinancingMethod.objects.all():
         format_financing_method(fm)
@@ -16,23 +16,23 @@ def migrate_financing_methods(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0041_apartment_type_nullable'),
+        ("hitas", "0041_apartment_type_nullable"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='financingmethod',
-            name='half_hitas',
+            model_name="financingmethod",
+            name="half_hitas",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='financingmethod',
-            name='include_in_statistics',
+            model_name="financingmethod",
+            name="include_in_statistics",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='financingmethod',
-            name='old_hitas_ruleset',
+            model_name="financingmethod",
+            name="old_hitas_ruleset",
             field=models.BooleanField(default=False),
         ),
         migrations.RunPython(migrate_financing_methods, reverse_code=migrations.RunPython.noop),

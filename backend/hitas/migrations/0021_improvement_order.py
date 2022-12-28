@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0020_improvements'),
+        ("hitas", "0020_improvements"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='apartmentconstructionpriceimprovement',
-            options={'ordering': ['completion_date', 'id']},
+            name="apartmentconstructionpriceimprovement",
+            options={"ordering": ["completion_date", "id"]},
         ),
         migrations.AlterModelOptions(
-            name='apartmentmarketpriceimprovement',
-            options={'ordering': ['completion_date', 'id']},
+            name="apartmentmarketpriceimprovement",
+            options={"ordering": ["completion_date", "id"]},
         ),
         migrations.AlterModelOptions(
-            name='housingcompanyconstructionpriceimprovement',
-            options={'ordering': ['completion_date', 'id']},
+            name="housingcompanyconstructionpriceimprovement",
+            options={"ordering": ["completion_date", "id"]},
         ),
         migrations.AlterModelOptions(
-            name='housingcompanymarketpriceimprovement',
-            options={'ordering': ['completion_date', 'id']},
+            name="housingcompanymarketpriceimprovement",
+            options={"ordering": ["completion_date", "id"]},
         ),
     ]

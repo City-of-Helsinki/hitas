@@ -6,52 +6,52 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0010_share_number_gte_1'),
+        ("hitas", "0010_share_number_gte_1"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='apartment',
-            name='acquisition_price',
+            model_name="apartment",
+            name="acquisition_price",
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='additional_work_during_construction',
+            model_name="apartment",
+            name="additional_work_during_construction",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='debt_free_purchase_price_during_construction',
+            model_name="apartment",
+            name="debt_free_purchase_price_during_construction",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='first_purchase_date',
+            model_name="apartment",
+            name="first_purchase_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='second_purchase_date',
+            model_name="apartment",
+            name="second_purchase_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='apartment',
-            name='debt_free_purchase_price',
+            model_name="apartment",
+            name="debt_free_purchase_price",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='apartment',
-            name='interest_during_construction',
+            model_name="apartment",
+            name="interest_during_construction",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='apartment',
-            name='loans_during_construction',
+            model_name="apartment",
+            name="loans_during_construction",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='apartment',
-            name='primary_loan_amount',
+            model_name="apartment",
+            name="primary_loan_amount",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

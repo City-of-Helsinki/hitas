@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0037_amounts_to_decimal'),
+        ("hitas", "0037_amounts_to_decimal"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apartmentmaximumpricecalculation',
-            name='json_version',
-            field=models.SmallIntegerField(default=3, null=True, validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="apartmentmaximumpricecalculation",
+            name="json_version",
+            field=models.SmallIntegerField(
+                default=3, null=True, validators=[django.core.validators.MinValueValidator(1)]
+            ),
         ),
     ]

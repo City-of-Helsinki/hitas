@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0001_initial'),
+        ("hitas", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apartment',
-            name='share_number_start',
+            model_name="apartment",
+            name="share_number_start",
             field=models.PositiveIntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
         ),
     ]
