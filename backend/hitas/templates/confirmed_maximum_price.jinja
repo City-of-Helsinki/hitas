@@ -190,16 +190,18 @@
     {% endif %}
 
     {# Parannukset #}
-    {% if index_calculation.calculation_variables.housing_company_improvements or index_calculation.calculation_variables.apartment_improvements %}
+    {% if index_calculation.calculation_variables.housing_company_improvements["items"]
+        or (
+            not maximum_price_calculation.json.new_hitas
+            and index_calculation.calculation_variables.apartment_improvements["items"]
+        )%}
         <pdf:nexttemplate name="template_attachment_2" />
         <pdf:nextpage />
 
         <h2 class="bordered-header">ENIMMÄISHINTALASKELMA<br>{{ index_name }}</h2>
 
         {% if maximum_price_calculation.json.new_hitas %}
-            {% if index_calculation.calculation_variables.housing_company_improvements %}
-                {{ housing_company_improvements_table_post_2011(index_calculation.calculation_variables.housing_company_improvements) }}
-            {% endif %}
+            {{ housing_company_improvements_table_post_2011(index_calculation.calculation_variables.housing_company_improvements) }}
         {% else %}
             {% if index_name_short == "mark.hintaindeksi" %}
                 {{ apartment_improvements_table_mpi(index_calculation.calculation_variables.apartment_improvements) }}
