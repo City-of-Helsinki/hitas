@@ -48,9 +48,14 @@ faker = "15.3.4"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
-norecursedirs = "node_modules"
 addopts = "--nomigrations"
-filterwarnings = ["ignore::DeprecationWarning:openapi_core*"]
+filterwarnings = [
+    "ignore::DeprecationWarning:openapi_core*",
+]
+norecursedirs = [
+    "node_modules",
+    ".cache",
+]
 
 [tool.black]
 line_length = 120
