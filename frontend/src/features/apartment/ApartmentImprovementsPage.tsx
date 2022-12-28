@@ -221,6 +221,7 @@ const ApartmentImprovementsPage = () => {
                                         <div className="input-wrap--value">
                                             <FormInputField
                                                 inputType="number"
+                                                fractionDigits={2}
                                                 label=""
                                                 fieldPath="value"
                                                 formData={marketIndexImprovements[index]}
@@ -293,6 +294,7 @@ const ApartmentImprovementsPage = () => {
                                             />
                                             <FormInputField
                                                 inputType="number"
+                                                fractionDigits={2}
                                                 label=""
                                                 fieldPath="value"
                                                 formData={constructionIndexImprovements[index]}
