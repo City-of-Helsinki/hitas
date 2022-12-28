@@ -19,7 +19,12 @@
     ],
     "rules": {
         "no-console": 1, // 1 = warning
-        "prettier/prettier": 2, // 2 = error
+        "prettier/prettier": [
+          2, // 2 = error
+          {
+            "endOfLine": "auto"
+          }
+        ],
         "comma-dangle": 0,
         "require-jsdoc": 0,
         "max-len": [0, 120, 2],
