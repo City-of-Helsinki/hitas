@@ -57,3 +57,10 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
 Git will now automatically look for the file when using `git blame`, no additional setup needed.
+
+## Pre-commit hooks
+
+* Pre-commit hooks are available for use in a local environment. They can be installed with
+  `poetry run pre-commit install` and updated with `poetry run pre-commit autoupdate`.
+* To skip running hooks during a commit, add a `--no-verify` flag to `git commit`.
+* To run pre-commit on all files, use `poetry run pre-commit run --all-files`
