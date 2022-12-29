@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -8,13 +10,22 @@ from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSeriali
 
 
 class OwnerSerializer(HitasModelSerializer):
-    def validate_identifier(self, value):
-        if (
-            self.instance
-            and self.instance.valid_identifier
-            and (not check_social_security_number(value) and not check_business_id(value))
-        ):
-            raise ValidationError("Previous identifier was valid. Cannot update to an invalid one.")
+    def validate_identifier(self, value: str) -> str:
+        self.instance: Optional[Owner]
+        if self.instance is not None:  # update
+            if value != self.instance.identifier:
+                if (
+                    self.instance.valid_identifier
+                    and not check_social_security_number(value)
+                    and not check_business_id(value)
+                ):
+                    raise ValidationError("Previous identifier was valid. Cannot update to an invalid one.")
+
+                if Owner.objects.filter(identifier=value).exists():
+                    raise ValidationError("An owner with this identifier already exists.")
+
+        elif Owner.objects.filter(identifier=value).exists():  # create
+            raise ValidationError("An owner with this identifier already exists.")
 
         return value
 
