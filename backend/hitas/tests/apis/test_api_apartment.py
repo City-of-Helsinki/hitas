@@ -40,7 +40,6 @@ from hitas.tests.factories.indices import (
 )
 from hitas.views.apartment import ApartmentDetailSerializer
 
-
 PRE_2005_DATE = datetime.date(2004, 12, 1)
 PRE_2011_DATE = datetime.date(2010, 12, 1)
 POST_2011_DATE = datetime.date(2011, 1, 1)

@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Q
-from django.db.models.expressions import RawSQL, Subquery, OuterRef, F, Case, When, Value
-from django.db.models.functions import TruncMonth, Now, NullIf, Coalesce
+from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
+from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -23,18 +23,18 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMaximumPriceCalculation,
     Building,
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
     HousingCompany,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
     Owner,
     Ownership,
     SurfaceAreaPriceCeiling,
-    MarketPriceIndex,
-    MarketPriceIndex2005Equal100,
-    ConstructionPriceIndex,
-    ConstructionPriceIndex2005Equal100,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
-from hitas.utils import this_month, RoundWithPrecision
+from hitas.utils import RoundWithPrecision, this_month
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
