@@ -1,6 +1,6 @@
 import itertools
 from datetime import datetime
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Union
 
 import django_jinja.library
@@ -19,10 +19,10 @@ def format_date(value: Union[str, datetime]) -> str:
 
 
 @django_jinja.library.filter
-def intcomma(value) -> str:
+def intcomma(value, decimals=2) -> str:
     if not value:
         return "0"
-    return humanize_intcomma(Decimal(str(value)).normalize())
+    return humanize_intcomma(Decimal(str(value)).quantize(Decimal("1." + "0" * decimals), ROUND_HALF_UP))
 
 
 @django_jinja.library.filter

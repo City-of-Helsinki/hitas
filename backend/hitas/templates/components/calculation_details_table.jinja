@@ -30,7 +30,7 @@
                 ["+ Osuus yhtiön parannuksista", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
                 ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
                 ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans],
-                ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
+                ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma(0)],
                 ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
                 ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
             ] %}
@@ -59,7 +59,7 @@
                     ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma],
                     ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
                     ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans],
-                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
+                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma(0)],
                     ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
                     ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
                 ] %}

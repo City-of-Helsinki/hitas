@@ -126,7 +126,7 @@
     <br>
 
     <p class="plain-text">
-        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma }}) euroa.
+        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma(0) }}) euroa.
         {% if is_surface_area_maximum %}
             Enimmäismyyntihinta on vahvistettu rajahinnan perusteella ja laskelma on voimassa {{ maximum_price_calculation.valid_until|format_date }} asti.
         {% else %}
@@ -239,7 +239,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td class="text-right">{{ sapc_calculation.maximum_price|intcomma }} euroa</td>
+            <td class="text-right">{{ sapc_calculation.maximum_price|intcomma(0) }} euroa</td>
         </tr>
     </table>
 {% endmacro %}
