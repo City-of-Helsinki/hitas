@@ -16,7 +16,7 @@ class CalculatorRules:
         self,
         apartment: Apartment,
         total_surface_area: Decimal,
-        apartment_share_of_housing_company_loans: Decimal,
+        apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
         apartment_improvements: List,
         housing_company_improvements: List,
@@ -28,7 +28,7 @@ class CalculatorRules:
         self,
         apartment: Apartment,
         total_surface_area: Decimal,
-        apartment_share_of_housing_company_loans: Decimal,
+        apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
         apartment_improvements: List,
         housing_company_improvements: List,
@@ -39,7 +39,7 @@ class CalculatorRules:
     @staticmethod
     def calculate_surface_area_price_ceiling(
         apartment: Apartment,
-        apartment_share_of_housing_company_loans: Decimal,
+        apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
         calculation_date: datetime.date,
     ) -> SurfaceAreaPriceCeilingCalculation:

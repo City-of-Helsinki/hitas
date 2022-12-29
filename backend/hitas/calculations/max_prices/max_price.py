@@ -1,7 +1,6 @@
 import dataclasses
 import datetime
 import uuid
-from decimal import Decimal
 from typing import Any, Dict, Optional
 
 from django.db.models import Prefetch, Sum
@@ -25,7 +24,7 @@ def create_max_price_calculation(
     housing_company_uuid: str,
     apartment_uuid: str,
     calculation_date: Optional[datetime.date],
-    apartment_share_of_housing_company_loans: Decimal,
+    apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
     additional_info: Optional[str],
 ) -> Dict[str, Any]:
@@ -65,7 +64,7 @@ def create_max_price_calculation(
 def calculate_max_price(
     apartment: Apartment,
     calculation_date: Optional[datetime.date],
-    apartment_share_of_housing_company_loans: Decimal,
+    apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
     additional_info: str = "",
 ) -> Dict[str, Any]:

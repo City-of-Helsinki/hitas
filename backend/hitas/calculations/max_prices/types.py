@@ -32,7 +32,7 @@ class IndexCalculation:
         housing_company_improvements: MaxPriceImprovements
         debt_free_price: Decimal
         debt_free_price_m2: Decimal
-        apartment_share_of_housing_company_loans: Decimal
+        apartment_share_of_housing_company_loans: int
         apartment_share_of_housing_company_loans_date: datetime.date
         completion_date: datetime.date
         completion_date_index: Decimal
@@ -78,7 +78,7 @@ class SurfaceAreaPriceCeilingCalculation:
         calculation_date_value: Decimal
         debt_free_price: Decimal
         surface_area: Decimal
-        apartment_share_of_housing_company_loans: Decimal
+        apartment_share_of_housing_company_loans: int
         apartment_share_of_housing_company_loans_date: datetime.date
 
     maximum_price: Decimal
