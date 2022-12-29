@@ -30,8 +30,8 @@ def test__api__postal_codes__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__postal_code__list(api_client: HitasAPIClient):
-    pc1 = factories.HitasPostalCodeFactory.create()
-    pc2 = factories.HitasPostalCodeFactory.create()
+    pc1 = factories.HitasPostalCodeFactory.create(value="00100")
+    pc2 = factories.HitasPostalCodeFactory.create(value="00101")
 
     response = api_client.get(reverse("hitas:postal-code-list"))
     assert response.status_code == status.HTTP_200_OK, response.json()
