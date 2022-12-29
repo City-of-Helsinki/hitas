@@ -153,7 +153,7 @@ def test__api__owner__create__invalid_data(api_client: HitasAPIClient, invalid_d
 
 
 @pytest.mark.django_db
-def test__api__owner__create__existing_identifier(api_client: HitasAPIClient):
+def test__api__owner__create__existing_valid_identifier(api_client: HitasAPIClient):
     data = get_owner_create_data()
     OwnerFactory.create(identifier=data["identifier"])
 
@@ -172,6 +172,36 @@ def test__api__owner__create__existing_identifier(api_client: HitasAPIClient):
         "reason": "Bad Request",
         "status": 400,
     } == response.json()
+
+
+@pytest.mark.django_db
+def test__api__owner__create__existing_invalid_identifier(api_client: HitasAPIClient):
+    data = get_owner_create_data()
+    data["identifier"] = "foo"
+    owner: Owner = OwnerFactory.create(identifier=data["identifier"])
+
+    url = reverse("hitas:owner-list")
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": Owner.objects.exclude(id=owner.id).first().uuid.hex})
+    get_response = api_client.get(url)
+    assert response.json() == get_response.json()
+
+
+@pytest.mark.django_db
+def test__api__owner__create__null_identifier(api_client: HitasAPIClient):
+    data = get_owner_create_data()
+    data["identifier"] = None
+    owner: Owner = OwnerFactory.create(identifier=data["identifier"])
+
+    url = reverse("hitas:owner-list")
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": Owner.objects.exclude(id=owner.id).first().uuid.hex})
+    get_response = api_client.get(url)
+    assert response.json() == get_response.json()
 
 
 # Update tests
@@ -206,6 +236,32 @@ def test__api__owner__update__valid_identifier_to_invalid(api_client: HitasAPICl
     data = {
         "name": "Matti Meikäläinen",
         "identifier": "foo",
+        "email": "test@example.com",
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "identifier",
+                "message": "Previous identifier was valid. Cannot update to an invalid one.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    } == response.json()
+
+
+@pytest.mark.django_db
+def test__api__owner__update__valid_identifier_to_null(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    data = {
+        "name": "Matti Meikäläinen",
+        "identifier": None,
         "email": "test@example.com",
     }
 
@@ -294,6 +350,26 @@ def test__api__owner__update__invalid_identifier_to_invalid(api_client: HitasAPI
 
 
 @pytest.mark.django_db
+def test__api__owner__update__invalid_identifier_to_null(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create(identifier="foo")
+    data = {
+        "name": "Matti Meikäläinen",
+        "identifier": None,
+        "email": "test@example.com",
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": data["name"],
+        "identifier": data["identifier"],
+        "email": data["email"],
+    }
+
+
+@pytest.mark.django_db
 def test__api__owner__update__invalid_identifier_to_self(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create(identifier="foo")
     data = {
@@ -325,18 +401,12 @@ def test__api__owner__update__invalid_identifier_to_existing_invalid(api_client:
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner_1.uuid.hex})
     response = api_client.put(url, data=data, format="json")
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.status_code == status.HTTP_200_OK, response.json()
     assert {
-        "error": "bad_request",
-        "fields": [
-            {
-                "field": "identifier",
-                "message": "An owner with this identifier already exists.",
-            }
-        ],
-        "message": "Bad request",
-        "reason": "Bad Request",
-        "status": 400,
+        "id": owner_1.uuid.hex,
+        "name": data["name"],
+        "identifier": data["identifier"],
+        "email": data["email"],
     } == response.json()
 
 

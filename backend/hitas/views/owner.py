@@ -10,21 +10,18 @@ from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSeriali
 
 
 class OwnerSerializer(HitasModelSerializer):
-    def validate_identifier(self, value: str) -> str:
+    def validate_identifier(self, value: Optional[str]) -> str:
         self.instance: Optional[Owner]
+        valid_identifier = check_social_security_number(value) or check_business_id(value)
         if self.instance is not None:  # update
             if value != self.instance.identifier:
-                if (
-                    self.instance.valid_identifier
-                    and not check_social_security_number(value)
-                    and not check_business_id(value)
-                ):
+                if self.instance.valid_identifier and not valid_identifier:
                     raise ValidationError("Previous identifier was valid. Cannot update to an invalid one.")
 
-                if Owner.objects.filter(identifier=value).exists():
+                if valid_identifier and Owner.objects.filter(identifier=value).exists():
                     raise ValidationError("An owner with this identifier already exists.")
 
-        elif Owner.objects.filter(identifier=value).exists():  # create
+        elif valid_identifier and Owner.objects.filter(identifier=value).exists():  # create
             raise ValidationError("An owner with this identifier already exists.")
 
         return value
