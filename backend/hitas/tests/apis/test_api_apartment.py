@@ -494,6 +494,7 @@ def _test_max_prices(
         surface_area=50 if not null_values else None,
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
+        building__real_estate__housing_company__financing_method__old_hitas_ruleset=old_hitas_ruleset,
     )
 
     if create_completion_indices:
@@ -505,10 +506,6 @@ def _test_max_prices(
         cpi_factory.create(month=now, value=150)
         mpi_factory.create(month=now, value=250)
         SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
-
-    if old_hitas_ruleset:
-        ap.housing_company.financing_method.old_hitas_ruleset = old_hitas_ruleset
-        ap.housing_company.financing_method.save()
 
     # Validate apartment details has correct data returned
     response = api_client.get(
