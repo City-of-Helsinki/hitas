@@ -54,7 +54,7 @@ const ImprovementsTable = ({heading, cols, improvements}) => {
     };
 
     return (
-        <>
+        <div className="maximumPriceImprovementsTable">
             <h3>{heading}</h3>
             <Table
                 cols={cols}
@@ -66,7 +66,7 @@ const ImprovementsTable = ({heading, cols, improvements}) => {
                 dense
                 verticalLines
             />
-        </>
+        </div>
     );
 };
 
