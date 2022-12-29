@@ -20,7 +20,7 @@
         {% for improvement in improvements["items"] %}
             <tr>
                 <td class="improvement-cell">{{ improvement.name }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                <td class="improvement-cell text-right">{{ improvement.completion_date|format_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.completion_date_index|intcomma }}/{{ improvement.calculation_date_index|intcomma }}</td>
                 <td class="improvement-cell text-right"> {% if improvement.depreciation is not none %}{{ improvement.depreciation.percentage|intcomma }}{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right"> {% if improvement.depreciation is not none %}{{ improvement.depreciation.time.years }} v {{ improvement.depreciation.time.months }} kk{% else %}-{% endif %}</td>
@@ -60,7 +60,7 @@
         {% for improvement in improvements["items"] %}
             <tr style="padding-top: 2px;">
                 <td class="improvement-cell">{{ improvement.name }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                <td class="improvement-cell text-right">{{ improvement.completion_date|format_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_for_apartment|intcomma }}</td>
             </tr>
@@ -94,7 +94,7 @@
             <tr>
                 <td class="improvement-cell">{{ improvement.name }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                <td class="improvement-cell text-right">{{ improvement.completion_date|format_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_without_excess|intcomma }}</td>
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.time.years }} v {{ improvement.depreciation.time.months }} kk{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.amount|intcomma }}{% else %}-{% endif %}</td>
@@ -141,7 +141,7 @@
             <tr style="padding-top: 2px;">
                 <td class="improvement-cell">{{ improvement.name }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                <td class="improvement-cell text-right">{{ improvement.completion_date|format_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_without_excess|intcomma }}</td>
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.time.years }} v {{ improvement.depreciation.time.months }} kk{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.amount|intcomma }}{% else %}-{% endif %}</td>
@@ -189,7 +189,7 @@
             <tr style="padding-top: 2px;">
                 <td class="improvement-cell">{{ improvement.name }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value|intcomma }}</td>
-                <td class="improvement-cell text-right">{{ improvement.completion_date }}</td>
+                <td class="improvement-cell text-right">{{ improvement.completion_date|format_date }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_added|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_for_housing_company|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.value_for_apartment|intcomma }}</td>
