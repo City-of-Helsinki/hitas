@@ -569,7 +569,7 @@ class ApartmentViewSet(HitasModelViewSet):
         ],
     ) -> RoundWithPrecision:
         original_value = Subquery(
-            table.objects.filter(month=OuterRef("completion_date")).values("value"),
+            table.objects.filter(month=OuterRef("completion_month")).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
@@ -667,6 +667,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
             .annotate(
+                completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
                 cpi=self.select_index(ConstructionPriceIndex),
                 cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),
                 mpi=self.select_index(MarketPriceIndex),
