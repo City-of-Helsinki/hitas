@@ -31,10 +31,17 @@ function formatOwner(owner: IOwner): string {
     return `${owner.name} (${owner.identifier})`;
 }
 
-function formatMoney(value: number | null): string {
+function formatMoney(value: number | null, forceDecimals = false): string {
     if (value === null) return "-";
 
-    return new Intl.NumberFormat("fi-FI", {style: "currency", currency: "EUR", minimumFractionDigits: 0}).format(value);
+    const formatOptions = {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: value === 0 ? 0 : 2,
+        maximumFractionDigits: value === 0 ? 0 : 2,
+        trailingZeroDisplay: forceDecimals ? "auto" : "stripIfInteger", // Strip decimals if they are all zero
+    };
+    return new Intl.NumberFormat("fi-FI", formatOptions).format(value);
 }
 
 function formatDate(value: string | null): string {
