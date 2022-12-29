@@ -28,27 +28,23 @@ django-jinja = "^2.10.2"
 num2words = "^0.5.12"
 
 [tool.poetry.group.dev.dependencies]
-autoflake = "^2.0"
-black = "^22.3.0"
-factory-boy = "^3.2.1"
-flake8 = "^6.0.0"
-isort = "^5.10.1"
 pytest = "^7.1.2"
-pytest-cov = "4.0.0"
+pytest-cov = "^4.0.0"
 pytest-django = "^4.5.2"
+factory-boy = "^3.2.1"
 ipython = "^8.4.0"
 openapi-core = "^0.16"
 testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
 django-debug-toolbar = "^3.6.0"
-flake8-print = "^5.0.0"
+pre-commit = "^2.21.0"
 
 [tool.poetry.group.migration]
 optional = true
 
 [tool.poetry.group.migration.dependencies]
-sqlalchemy = "^1.4.45"
-psycopg2-binary = "^2.9.5"
-faker = "^15.3.4"
+sqlalchemy = "1.4.45"
+psycopg2-binary = "2.9.5"
+faker = "15.3.4"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
@@ -57,11 +53,62 @@ addopts = "--nomigrations"
 filterwarnings = ["ignore::DeprecationWarning:openapi_core*"]
 
 [tool.black]
-extend-exclude = "migrations"
 line_length = 120
+target-version = ["py310"]
+extend-exclude = "migrations"
 
-[tool.isort]
-profile = "black"
-skip_glob = ["*/migrations/*"]
-line_length=120
-atomic = true
+[tool.coverage.run]
+omit = [
+    "*tests*",
+    "*__init__.py",
+    "*/migrations/*",
+    "*/venv/*",
+    "config/*",
+    "manage.py",
+]
+
+[tool.ruff]
+fix = true
+target-version = "py310"
+line-length = 120
+extend-exclude = [
+    "tests/*",
+    "migrations/**",
+]
+select = [
+    "F",  # pyflakes
+    "E",  # pycodestyle errors
+    "I",  # isort
+    "S",  # flake8-bandit
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+    "T",  # flake8-print
+    "W",  # pycodestyle warnings
+]
+ignore = [
+    "TID252",  # Relative imports allowed
+    "S101",  # Asserts are allowed
+    "B904",  # Allow raise without from clause
+    "B905",  # Allow zip without explicit strict parameter
+    "C417",  # map(...) is fine
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # Unused imports allowed
+"hitas/management/commands/hitasmigrate.py" = ["T201"]  # print allowed
+"hitas/management/commands/token.py" = ["T201"]  # print allowed
+"hitas/oracle_migration/runner.py" = ["T201"]  # print allowed
+
+[tool.ruff.isort]
+known-third-party = [
+    "django",
+    "rest_framework",
+]
+
+[tool.ruff.mccabe]
+max-complexity = 19
+
+[tool.bandit]
+exclude_dirs = [
+    "tests/*",
+]

@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0006_floor_to_string'),
+        ("hitas", "0006_floor_to_string"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='building',
-            name='completion_date',
+            model_name="building",
+            name="completion_date",
         ),
         migrations.AddField(
-            model_name='apartment',
-            name='completion_date',
+            model_name="apartment",
+            name="completion_date",
             field=models.DateField(null=True),
         ),
     ]

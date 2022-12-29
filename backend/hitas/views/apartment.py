@@ -62,7 +62,7 @@ class DepreciationPercentageField(serializers.ChoiceField):
         super().__init__(choices=DepreciationPercentage.choices(), **kwargs)
 
     def to_representation(self, percentage: DepreciationPercentage):
-        match percentage:
+        match percentage:  # noqa: E999
             case DepreciationPercentage.TEN:
                 return 10.0
             case DepreciationPercentage.TWO_AND_HALF:

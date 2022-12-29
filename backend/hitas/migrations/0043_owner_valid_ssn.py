@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0042_financing_method_fields'),
+        ("hitas", "0042_financing_method_fields"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='owner',
-            name='valid_ssn',
+            model_name="owner",
+            name="valid_ssn",
             field=models.BooleanField(default=False),
         ),
     ]

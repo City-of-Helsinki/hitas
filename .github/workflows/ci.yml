@@ -77,12 +77,11 @@ jobs:
       env:
         POETRY_VIRTUALENVS_CREATE: 0
 
-    - name: "Check backend code style"
+    - name: "Run pre-commit on backend"
       run: >
         cd backend
-        && black --check --diff .
-        && flake8 .
-        && isort --check-only --diff .
+        && pre-commit install
+        && pre-commit run --all-files
 
     - name: "Run tests"
       env:

@@ -1,7 +1,0 @@
-[run]
-omit =  *tests*
-        *__init__.py
-    	*/migrations/*
-    	*/venv/*
-        config/*
-        manage.py

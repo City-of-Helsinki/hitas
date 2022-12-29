@@ -2,24 +2,27 @@
 
 import django.core.validators
 from django.db import migrations, models
+
 import hitas.types
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0039_indices_min_value'),
+        ("hitas", "0039_indices_min_value"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apartmentmaximumpricecalculation',
-            name='json',
+            model_name="apartmentmaximumpricecalculation",
+            name="json",
             field=models.JSONField(encoder=hitas.types.HitasEncoder, null=True),
         ),
         migrations.AlterField(
-            model_name='apartmentmaximumpricecalculation',
-            name='json_version',
-            field=models.SmallIntegerField(default=4, null=True, validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="apartmentmaximumpricecalculation",
+            name="json_version",
+            field=models.SmallIntegerField(
+                default=4, null=True, validators=[django.core.validators.MinValueValidator(1)]
+            ),
         ),
     ]

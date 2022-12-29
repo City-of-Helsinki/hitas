@@ -42,7 +42,7 @@ def check_business_id(value: str) -> bool:
 
     # Calculate checksum
     checksum = _business_id_checksum(seqnum)
-    match checksum:
+    match checksum:  # noqa: E999
         case 0:
             return check_digit == 0
         case 1:

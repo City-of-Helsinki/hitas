@@ -22,7 +22,7 @@ class IdentifierProvider(BaseProvider):
         while True:
             seqnum = str(self.random_number(digits=7, fix_len=True))
             checksum = _business_id_checksum(seqnum)
-            match checksum:
+            match checksum:  # noqa: E999
                 case 0:
                     return seqnum + "-0"
                 case 1:

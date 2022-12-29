@@ -6,11 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0016_apartment_hitas_apartment_share_number_both_set'),
+        ("hitas", "0016_apartment_hitas_apartment_share_number_both_set"),
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             UPDATE hitas_housingcompany
                 SET display_name=display_name || '-migration-' || id
                 WHERE id in (
@@ -18,8 +19,10 @@ class Migration(migrations.Migration):
                         SELECT display_name FROM hitas_housingcompany GROUP BY display_name HAVING COUNT(*) > 1
                     )
                 );
-        """),
-        migrations.RunSQL("""
+        """
+        ),
+        migrations.RunSQL(
+            """
             UPDATE hitas_housingcompany
                 SET official_name=official_name || '-migration-' || id
                 WHERE id in (
@@ -27,5 +30,6 @@ class Migration(migrations.Migration):
                         SELECT official_name FROM hitas_housingcompany GROUP BY official_name HAVING COUNT(*) > 1
                     )
                 );
-        """),
+        """
+        ),
     ]

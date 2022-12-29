@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0029_rename_indices'),
+        ("hitas", "0029_rename_indices"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='apartment',
-            name='rooms',
+            model_name="apartment",
+            name="rooms",
             field=models.IntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
         ),
     ]

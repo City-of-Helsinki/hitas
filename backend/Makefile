@@ -16,7 +16,7 @@ define helptext
  docker-build                       Build docker container stack.
  docker-build-backend-only          Build backend container only.
  tests                              Run tests.
- format                             Format code.
+ format                             Format code with pre-commit.
  dump                               Create a database dump with the current schema.
  hitasmigrate                       Migrate oracle database.
 
@@ -42,10 +42,7 @@ tests:
 	pytest --cov
 
 format:
-	autoflake --recursive --in-place --remove-all-unused-imports --ignore-init-module-imports .
-	isort .
-	black .
-	flake8 .
+	pre-commit run --all-files
 
 dump:
 	./manage.py dumpdata users authtoken hitas > initial.json

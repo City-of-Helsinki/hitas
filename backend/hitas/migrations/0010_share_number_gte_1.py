@@ -7,18 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hitas', '0009_rename_owner_ownership'),
+        ("hitas", "0009_rename_owner_ownership"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apartment',
-            name='share_number_end',
+            model_name="apartment",
+            name="share_number_end",
             field=models.IntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
         ),
         migrations.AlterField(
-            model_name='apartment',
-            name='share_number_start',
+            model_name="apartment",
+            name="share_number_start",
             field=models.IntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
         ),
     ]
