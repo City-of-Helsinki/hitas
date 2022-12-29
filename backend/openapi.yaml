@@ -1006,9 +1006,9 @@ paths:
                 apartment_share_of_housing_company_loans:
                   description: |-
                     How much the apartment's share of the housing company loans are on the calculation date
-                  type: number
+                  type: integer
                   minimum: 0
-                  example: 2500.00
+                  example: 2500
                 apartment_share_of_housing_company_loans_date:
                   description: Date for `apartment_share_of_housing_company_loans`
                   type: string
@@ -1127,7 +1127,7 @@ paths:
                               value_for_apartment: 157.26
                           debt_free_price: 226058.72
                           debt_free_price_m2: 7535.29
-                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans: 2500
                           apartment_share_of_housing_company_loans_date: "2022-07-28"
                           completion_date: "2019-11-27"
                           completion_date_index: 129.29
@@ -1161,7 +1161,7 @@ paths:
                               value_for_apartment: 153.47
                           debt_free_price: 224843.46
                           debt_free_price_m2: 7494.78
-                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans: 2500
                           apartment_share_of_housing_company_loans_date: "2022-07-28"
                           completion_date: "2019-11-27"
                           completion_date_index: 167.9
@@ -1175,7 +1175,7 @@ paths:
                           calculation_date: "2022-07-05"
                           calculation_date_value: 4869.0
                           surface_area: 30.0
-                          apartment_share_of_housing_company_loans: 2500.0
+                          apartment_share_of_housing_company_loans: 2500
                           apartment_share_of_housing_company_loans_date: "2022-07-28"
                     confirmed_at: null
                     created_at: '2022-12-05T08:13:25.380594Z'
@@ -1248,7 +1248,7 @@ paths:
                               value_for_apartment: 0.0
                           debt_free_price: 180749.97
                           debt_free_price_m2: 3316.51
-                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans: 0
                           apartment_share_of_housing_company_loans_date: "2022-09-05"
                           completion_date: "2003-05-09"
                           completion_date_index: 244.9
@@ -1320,7 +1320,7 @@ paths:
                               accepted_value: 0.0
                           debt_free_price: 289735.91
                           debt_free_price_m2: 5316.26
-                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans: 0
                           apartment_share_of_housing_company_loans_date: "2022-09-05"
                           completion_date: "2003-05-09"
                           completion_date_index: 263.6
@@ -1337,7 +1337,7 @@ paths:
                           calculation_date: "2022-09-07"
                           calculation_date_value: 4872.0
                           surface_area: 54.5
-                          apartment_share_of_housing_company_loans: 0.0
+                          apartment_share_of_housing_company_loans: 0
                           apartment_share_of_housing_company_loans_date: "2022-09-05"
                     confirmed_at: null
                     created_at: '2022-12-05T08:23:28.109872Z'
@@ -3606,9 +3606,9 @@ components:
         apartment_share_of_housing_company_loans:
           description: |-
             How much the apartment's share of the housing company loans.
-          type: number
+          type: integer
           minimum: 0
-          example: 2500.07
+          example: 2500
         apartment_share_of_housing_company_loans_date:
           description: Date for the apartment share of housing company loan
           type: string
@@ -3699,9 +3699,9 @@ components:
         apartment_share_of_housing_company_loans:
           description: |-
             How much the apartment's share of the housing company loans.
-          type: number
+          type: integer
           minimum: 0
-          example: 2500.07
+          example: 2500
         apartment_share_of_housing_company_loans_date:
           description: Date for the apartment share of housing company loan
           type: string
@@ -3787,9 +3787,9 @@ components:
         apartment_share_of_housing_company_loans:
           description: |-
             How much the apartment's share of the housing company loans.
-          type: number
+          type: integer
           minimum: 0
-          example: 2500.07
+          example: 2500
         apartment_share_of_housing_company_loans_date:
           description: Date for the apartment share of housing company loan
           type: string
@@ -4507,9 +4507,9 @@ components:
                     apartment_share_of_housing_company_loans:
                       description: |-
                         How much the apartment's share of the housing company loans.
-                      type: number
+                      type: integer
                       minimum: 0
-                      example: 2500.07
+                      example: 2500
                     apartment_share_of_housing_company_loans_date:
                       description: Date for the apartment share of housing company loan
                       type: string
