@@ -37,7 +37,6 @@ export default function QueryStateHandler({
             </p>
         );
     }
-    console.log(error);
     return error ? (
         errorComponent
     ) : isLoading ? (
