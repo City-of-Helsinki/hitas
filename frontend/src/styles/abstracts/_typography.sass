@@ -3,21 +3,33 @@
 body
   font-family: $font-default
 
-.main-heading
+[class^="heading--"]
   width: 100%
   display: flex
   justify-content: space-between
+  align-items: center
   font-size: $fontsize-heading-xl
   line-height: $lineheight-l
   border-bottom: 1px solid #ccc
   margin: 0 0 32px
 
+  a, span
+    display: flex
+
+  button
+    font-size: $fontsize-body-l
+
   .company &
     margin-bottom: 16px
 
-h1, h2, h3
-  button
-    font-size: $fontsize-body-l
+.query-handler-error
+  font-size: 2rem
+  font-weight: 700
+  .query-error-message
+    color: var(--color-error)
+    font-family: monospace
+    font-size: $fontsize-body-m
+    font-weight: normal
 
 .list-wrapper
   h2

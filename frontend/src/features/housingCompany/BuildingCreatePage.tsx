@@ -5,7 +5,7 @@ import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {useCreateBuildingMutation, useGetHousingCompanyDetailQuery} from "../../app/services";
-import {FormInputField, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import {FormInputField, Heading, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {IBuildingWritable} from "../../common/models";
 
 const blankForm: IBuildingWritable = {
@@ -47,9 +47,9 @@ const BuildingCreatePage = (): JSX.Element => {
 
     return (
         <div className="view--create view--create-company">
-            <h1 className="main-heading">
+            <Heading>
                 <span>Uusi rakennus</span>
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
                     <div className="row">

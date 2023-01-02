@@ -12,7 +12,7 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
-import {FormInputField, SaveButton, SaveDialogModal} from "../../common/components";
+import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     HousingCompanyStates,
     ICode,
@@ -111,9 +111,9 @@ const HousingCompanyCreatePage = (): JSX.Element => {
 
     return (
         <div className="view--create view--create-company">
-            <h1 className="main-heading">
+            <Heading>
                 <span>{state?.housingCompany ? state?.housingCompany.name.official : "Uusi yhtiö"}</span>
-            </h1>
+            </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
                     <div className="row">

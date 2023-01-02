@@ -4,6 +4,7 @@ import EditButton from "./EditButton";
 import FilterComboboxField from "./FilterComboboxField";
 import FilterIntegerField from "./FilterIntegerField";
 import FilterTextInputField from "./FilterTextInputField";
+import Heading from "./Heading";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
 import NavigateBackButton from "./NavigateBackButton";
@@ -15,6 +16,7 @@ import SaveDialogModal from "./SaveDialogModal";
 import FormInputField from "./formInputField/FormInputField";
 
 export {
+    Heading,
     ConfirmDialogModal,
     DetailField,
     EditButton,

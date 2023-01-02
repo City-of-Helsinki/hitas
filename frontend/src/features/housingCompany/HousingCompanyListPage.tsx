@@ -4,7 +4,13 @@ import {Button, IconPlus, IconSearch} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {FilterIntegerField, FilterTextInputField, ListPageNumbers, QueryStateHandler} from "../../common/components";
+import {
+    FilterIntegerField,
+    FilterTextInputField,
+    Heading,
+    ListPageNumbers,
+    QueryStateHandler,
+} from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
 import {formatAddress, formatDate} from "../../common/utils";
@@ -119,7 +125,7 @@ const HousingCompanyListPage = (): JSX.Element => {
 
     return (
         <div className="view--housing-company-list">
-            <h1 className="main-heading">
+            <Heading>
                 <span>Kaikki kohteet</span>
                 <Link to="create">
                     <Button
@@ -129,7 +135,7 @@ const HousingCompanyListPage = (): JSX.Element => {
                         Lisää uusi yhtiö
                     </Button>
                 </Link>
-            </h1>
+            </Heading>
             <div className="listing">
                 <div className="search">
                     <FilterTextInputField

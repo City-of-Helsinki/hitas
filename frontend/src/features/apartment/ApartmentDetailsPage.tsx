@@ -9,7 +9,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, EditButton, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConfirmedMaximumPrice,
@@ -250,14 +250,14 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
 
     return (
         <>
-            <h1 className="main-heading">
+            <Heading type="main">
                 <Link to={`/housing-companies/${data.links.housing_company.id}`}>
                     <span className="name">{data.links.housing_company.display_name}</span>
                     <span className="address">{formatAddress(data.address)}</span>
                     <StatusLabel>{data.state}</StatusLabel>
                 </Link>
                 <EditButton state={{apartment: data}} />
-            </h1>
+            </Heading>
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {data.address.stair}

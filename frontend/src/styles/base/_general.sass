@@ -15,6 +15,29 @@ ul, ol
   list-style-type: none
   padding-left: 0
 
+.spinner
+  &-wrap
+    @include flexbox()
+    height: 100%
+    justify-content: center
+    align-items: center
+    [class*="LoadingSpinner-module_loadingSpinner"]
+      opacity: 0.8
+      --spinner-color: var(--color-white)
+      .results &
+        --spinner-size: 12rem
+        --spinner-thickness: 1.4rem
+
+.query-handler-error
+  display: flex
+  flex-flow: column
+  height: 100%
+  align-items: center
+  justify-content: center
+  margin: 0
+  .query-error-message
+    margin-top: 0.5rem
+
 .row
   @include flexbox()
   @include flex-flow(row nowrap)
