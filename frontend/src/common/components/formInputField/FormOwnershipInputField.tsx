@@ -5,7 +5,7 @@ import {useImmer} from "use-immer";
 
 import {useCreateOwnerMutation} from "../../../app/services";
 import {IOwner} from "../../models";
-import {hitasToast} from "../../utils";
+import {hitasToast, validateSocialSecurityNumber} from "../../utils";
 import QueryStateHandler from "../QueryStateHandler";
 import SaveButton from "../SaveButton";
 import FormInputField, {CommonFormInputFieldProps} from "./FormInputField";
@@ -43,6 +43,7 @@ const CreateNewOwner = ({formData, setFormData, error, isLoading, cancelAction, 
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
+                            validator={validateSocialSecurityNumber}
                             required
                         />
                         <FormInputField
