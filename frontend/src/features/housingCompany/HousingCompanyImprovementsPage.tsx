@@ -184,6 +184,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="number"
+                                            fractionDigits={2}
                                             label=""
                                             fieldPath="value"
                                             formData={marketIndexImprovements[index]}
@@ -250,6 +251,7 @@ const HousingCompanyImprovementsPage = () => {
                                         />
                                         <FormInputField
                                             inputType="number"
+                                            fractionDigits={2}
                                             label=""
                                             fieldPath="value"
                                             formData={constructionIndexImprovements[index]}

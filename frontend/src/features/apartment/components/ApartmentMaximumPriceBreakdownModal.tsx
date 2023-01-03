@@ -41,7 +41,7 @@ const BreakdownTabButton = ({label, calculation}) => {
 const BreakdownValue = ({label, value, unit = "€"}: {label: string; value: number; unit?: string}) => (
     <div className="confirmation-modal__breakdown-row">
         <label>{label}</label>
-        <p>{unit.includes("€") ? formatMoney(value).replace("€", unit) : `${value} ${unit}`}</p>
+        <p>{unit.includes("€") ? formatMoney(value, true).replace("€", unit) : `${value} ${unit}`}</p>
     </div>
 );
 
@@ -54,7 +54,7 @@ const ImprovementsTable = ({heading, cols, improvements}) => {
     };
 
     return (
-        <>
+        <div className="maximumPriceImprovementsTable">
             <h3>{heading}</h3>
             <Table
                 cols={cols}
@@ -66,7 +66,7 @@ const ImprovementsTable = ({heading, cols, improvements}) => {
                 dense
                 verticalLines
             />
-        </>
+        </div>
     );
 };
 
@@ -168,14 +168,22 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 heading="Huoneistokohtaiset parannukset"
                 cols={[
                     {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo"},
-                    {key: "value_without_excess", headerName: "Arvoa korottava osuus"},
+                    {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
+                    {
+                        key: "value_without_excess",
+                        headerName: "Arvoa korottava osuus",
+                        transform: (obj) => formatMoney(obj.value_without_excess, true),
+                    },
                     {
                         key: "depreciation",
                         headerName: "Poiston määrä",
-                        transform: (obj) => getDepreciation(obj.depreciation),
+                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
                     },
-                    {key: "accepted_value", headerName: "Hyväksytty"},
+                    {
+                        key: "accepted_value",
+                        headerName: "Hyväksytty",
+                        transform: (obj) => formatMoney(obj.accepted_value, true),
+                    },
                 ]}
                 improvements={calculation.calculation_variables.apartment_improvements}
             />
@@ -183,15 +191,27 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 heading="Huoneiston osuus yhtiön parannuksista"
                 cols={[
                     {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo"},
-                    {key: "value_without_excess", headerName: "Arvoa korottava osuus"},
+                    {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
+                    {
+                        key: "value_without_excess",
+                        headerName: "Arvoa korottava osuus",
+                        transform: (obj) => formatMoney(obj.value_without_excess, true),
+                    },
                     {
                         key: "depreciation",
                         headerName: "Poisto",
-                        transform: (obj) => getDepreciation(obj.depreciation),
+                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
                     },
-                    {key: "accepted_value", headerName: "Hyväksytty asunto"},
-                    {key: "accepted_value_for_housing_company", headerName: "Hyväksytty yhtiö"},
+                    {
+                        key: "accepted_value",
+                        headerName: "Hyväksytty asunto",
+                        transform: (obj) => formatMoney(obj.accepted_value, true),
+                    },
+                    {
+                        key: "accepted_value_for_housing_company",
+                        headerName: "Hyväksytty yhtiö",
+                        transform: (obj) => formatMoney(obj.accepted_value_for_housing_company, true),
+                    },
                 ]}
                 improvements={calculation.calculation_variables.housing_company_improvements}
             />
@@ -253,14 +273,26 @@ const ConstructionPricePre2011Breakdown = ({
                 heading="Huoneistokohtaiset parannukset"
                 cols={[
                     {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Alkup. arvo"},
-                    {key: "index_adjusted", headerName: "Ind. tark. arvo"},
+                    {
+                        key: "value",
+                        headerName: "Alkup. arvo",
+                        transform: (obj) => formatMoney(obj.value, true),
+                    },
+                    {
+                        key: "index_adjusted",
+                        headerName: "Ind. tark. arvo",
+                        transform: (obj) => formatMoney(obj.index_adjusted, true),
+                    },
                     {
                         key: "depreciation",
                         headerName: "Poisto",
-                        transform: (obj) => getDepreciation(obj.depreciation),
+                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
                     },
-                    {key: "value_for_apartment", headerName: "Hyväksytty"},
+                    {
+                        key: "value_for_apartment",
+                        headerName: "Hyväksytty",
+                        transform: (obj) => formatMoney(obj.value_for_apartment, true),
+                    },
                 ]}
                 improvements={calculation.calculation_variables.apartment_improvements}
             />
@@ -268,8 +300,12 @@ const ConstructionPricePre2011Breakdown = ({
                 heading="Huoneiston osuus yhtiön parannuksista"
                 cols={[
                     {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo koko yhtiössä"},
-                    {key: "value_for_apartment", headerName: "Vaiheen arvo"},
+                    {key: "value", headerName: "Arvo koko yhtiössä", transform: (obj) => formatMoney(obj.value, true)},
+                    {
+                        key: "value_for_apartment",
+                        headerName: "Vaiheen arvo",
+                        transform: (obj) => formatMoney(obj.value_for_apartment, true),
+                    },
                 ]}
                 improvements={calculation.calculation_variables.housing_company_improvements}
             />
@@ -402,7 +438,7 @@ const MaximumPriceModalContent = ({
                 <div className="valid-until">
                     <div className="confirmation-modal__breakdown-row">
                         <label>Vahvistettavan laskelman voimassaoloaika</label>
-                        <p>{calculation.valid_until}</p>
+                        <p>{formatDate(calculation.valid_until)}</p>
                     </div>
                 </div>
             </Dialog.Content>
