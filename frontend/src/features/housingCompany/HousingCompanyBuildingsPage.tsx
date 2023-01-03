@@ -29,9 +29,11 @@ const blankForm: IBuildingWritable = {
 const HousingCompanyBuildingsPage = (): JSX.Element => {
     const params = useParams() as {readonly housingCompanyId: string};
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
+    const [idsToRemove, setIdsToRemove] = useState<{building?: string | null; realEstate?: string | null}>({
+        building: null,
+        realEstate: null,
+    });
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [buildingIdToRemove, setBuildingIdToRemove] = useState<string | null>();
-    const [realEstateIdToRemove, setRealEstateIdToRemove] = useState<string | null>();
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
     const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
@@ -60,12 +62,11 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
 
     const handleConfirmedRemove = () => {
         removeBuilding({
-            id: buildingIdToRemove as string,
+            id: idsToRemove.building as string,
             housingCompanyId: params.housingCompanyId as string,
-            realEstateId: realEstateIdToRemove as string,
+            realEstateId: idsToRemove.realEstate as string,
         }).then(() => {
-            setBuildingIdToRemove(null);
-            setRealEstateIdToRemove(null);
+            setIdsToRemove({building: null, realEstate: null});
             setIsConfirmModalVisible(false);
         });
     };
@@ -96,8 +97,7 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                                         <span className="remove-icon">
                                             <IconCrossCircle
                                                 onClick={() => {
-                                                    setBuildingIdToRemove(building.id);
-                                                    setRealEstateIdToRemove(realEstate.id);
+                                                    setIdsToRemove({building: building.id, realEstate: realEstate.id});
                                                     setIsConfirmModalVisible(true);
                                                 }}
                                             />
@@ -110,7 +110,6 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                         ""
                     )
                 )}
-            <div className="" />
             <h2>Uusi rakennus</h2>
             <div className="field-sets">
                 <Fieldset heading="">

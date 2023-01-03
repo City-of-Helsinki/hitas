@@ -23,7 +23,7 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
     const params = useParams();
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [idToRemove, setIdToRemove] = useState<string | null>();
+    const [realEstateToRemove, setRealEstateToRemove] = useState<string | null>();
     const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId as string
     );
@@ -42,8 +42,7 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
         setIsEndModalVisible(true);
     };
     const handleConfirmedRemove = () => {
-        console.log(idToRemove);
-        removeRealEstate({id: idToRemove as string, housingCompanyId: params.housingCompanyId as string});
+        removeRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string});
     };
 
     return (
@@ -66,7 +65,7 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
                                         if (realEstate.buildings.length) {
                                             hitasToast("Kiinteistö ei ole tyhjä!", "error");
                                         } else {
-                                            setIdToRemove(realEstate.id);
+                                            setRealEstateToRemove(realEstate.id);
                                             setIsConfirmModalVisible(true);
                                         }
                                     }}
