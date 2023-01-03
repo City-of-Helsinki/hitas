@@ -58,13 +58,13 @@ function validateBusinessId(value: string): boolean {
 function validateSocialSecurityNumber(value: string): boolean {
     if (value === null) return false;
     if (!value.match(/^(\d{6})([A-FYXWVU+-])(\d{3})([\dA-Z])$/)) {
-        console.log("Regex match error: " + value);
         return false;
     }
     // Validate date
+    const centuryChar = value.split("")[6];
+    if (centuryChar === undefined) return false;
     let century;
-    console.log(value.split("")[6]);
-    switch (value.split("")[6]) {
+    switch (centuryChar) {
         case "A" || "B" || "C" || "D" || "E" || "F":
             century = "20";
             break;
@@ -73,8 +73,6 @@ function validateSocialSecurityNumber(value: string): boolean {
             break;
         case "+":
             century = "18";
-            break;
-        default:
             break;
     }
     const dateValue = value.substring(0, 4);

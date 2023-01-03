@@ -19,7 +19,15 @@ interface FormOwnershipInputFieldProps extends CommonFormInputFieldProps {
     placeholder?: string;
 }
 
-const CreateNewOwner = ({formData, setFormData, error, isLoading, cancelAction, confirmAction}) => {
+const CreateNewOwner = ({
+    formData,
+    setFormData,
+    error,
+    isLoading,
+    cancelAction,
+    confirmAction,
+    isInvalidSSNAllowed,
+}) => {
     return (
         <>
             <Dialog.Content>
@@ -54,6 +62,17 @@ const CreateNewOwner = ({formData, setFormData, error, isLoading, cancelAction, 
                             setFormData={setFormData}
                             error={error}
                         />
+                        <p
+                            className="error-message"
+                            style={{
+                                display:
+                                    !validateSocialSecurityNumber(formData.identifier) && isInvalidSSNAllowed
+                                        ? ""
+                                        : "none",
+                            }}
+                        >
+                            "{formData.identifier}" ei ole oikea sosiaaliturvatunnus. Tallennetaanko silti?
+                        </p>
                     </>
                 )}
             </Dialog.Content>
@@ -91,6 +110,7 @@ export default function FormOwnershipInputField({
 }: FormOwnershipInputFieldProps): JSX.Element {
     const MIN_LENGTH = 2;
     const [isAddingNew, setIsAddingNew] = useState(false);
+    const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [internalFilterValue, setInternalFilterValue] = useState("");
     const [displayedValue, setDisplayedValue] = useState(placeholder);
@@ -104,8 +124,11 @@ export default function FormOwnershipInputField({
         email: "",
     });
     const [createOwner, {data: createData, error: createError, isLoading: isCreating}] = useCreateOwnerMutation();
+
     const openModal = () => setIsModalVisible(true);
+
     const closeModal = () => setIsModalVisible(false);
+
     const clearFieldValue = () => {
         setDisplayedValue("");
         setFieldValue("");
@@ -120,8 +143,11 @@ export default function FormOwnershipInputField({
             closeModal();
         }
     };
+
     const handleCreateOwnerButton = () => {
-        createOwner({data: formData});
+        if (validateSocialSecurityNumber(formData.identifier as string) || isInvalidSSNAllowed)
+            createOwner({data: formData});
+        else setIsInvalidSSNAllowed(true);
     };
 
     const dialogTheme = {
@@ -140,6 +166,10 @@ export default function FormOwnershipInputField({
             transform: getRelatedModelLabel,
         },
     ];
+
+    useEffect(() => {
+        setIsInvalidSSNAllowed(false);
+    }, [formData.identifier, setIsInvalidSSNAllowed]);
 
     useEffect(() => {
         if (!isCreating && !createError && createData) {
@@ -182,8 +212,12 @@ export default function FormOwnershipInputField({
                         setFormData={setFormData}
                         error={createError}
                         isLoading={isCreating}
-                        cancelAction={() => setIsAddingNew(false)}
+                        cancelAction={() => {
+                            setIsInvalidSSNAllowed(false);
+                            setIsAddingNew(false);
+                        }}
                         confirmAction={handleCreateOwnerButton}
+                        isInvalidSSNAllowed={isInvalidSSNAllowed}
                     />
                 ) : (
                     <>
