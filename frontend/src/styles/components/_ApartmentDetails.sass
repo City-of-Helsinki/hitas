@@ -14,10 +14,12 @@
     a
       display: inherit
       align-items: center
+      &:hover > span:not([class*="status-label"])
+        text-decoration: underline
 
     a > span
-      display: inline-block
-      margin-right: $spacing-layout-s
+        display: inline-block
+        margin-right: $spacing-layout-s
 
     .address
       font-weight: 400

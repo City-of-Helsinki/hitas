@@ -253,6 +253,12 @@
   width: 50%
 
 .detail-list
+  &__heading
+    @include flexbox()
+    flex-flow: row nowrap
+    width: 100%
+    justify-content: space-between
+    align-items: center
   &__list
     background-color: $color-engel-medium-light
     padding: $spacing-layout-s
