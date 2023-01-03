@@ -4094,21 +4094,33 @@ components:
               additionalProperties: false
               required:
                 - surface_area
-                - value_per_square_meter
-                - total
+                - value_per_square_meter_before_2010
+                - value_per_square_meter_after_2010
+                - total_before_2010
+                - total_after_2010
               properties:
                 surface_area:
                   description: Apartment's surface area
                   type: number
                   minimum: 0
                   example: 4332.0
-                value_per_square_meter:
-                  description: Excess value per square meter
+                value_per_square_meter_before_2010:
+                  description: Excess value per square meter before 2010
+                  type: number
+                  minimum: 0
+                  example: 150.0
+                value_per_square_meter_after_2010:
+                  description: Excess value per square meter on or after 2010
                   type: number
                   minimum: 0
                   example: 30.0
-                total:
-                  description: Excess value per square meter multiplied by apartment's surface area
+                total_before_2010:
+                  description: Excess value before 2010 per square meter multiplied by apartment's surface area
+                  type: number
+                  minimum: 0
+                  example: 649800.0
+                total_after_2010:
+                  description: Excess value on or after 2010 per square meter multiplied by apartment's surface area
                   type: number
                   minimum: 0
                   example: 129960.0

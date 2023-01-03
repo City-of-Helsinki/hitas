@@ -114,10 +114,14 @@
 
     {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <p>
-            * Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa<br>
-            * Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta
-        </p>
+        <ul style='margin: 0;'>
+          <li style="line-height: 1rem; margin: 1rem 0 0;">
+            Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.
+          </li>
+          <li style="line-height: 1rem; margin: 0;">
+             Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.
+          </li>
+        </ul>
     {% endif %}
     <br>
 {% endif %}
@@ -162,11 +166,20 @@
     </table>
     {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <p>
-            * Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa<br>
-            * Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta
-            <br>*TODO* omavastuu saattaa olla 30€/m² tai 150€/m²
-        </p>
+        <ul style='margin: 0;'>
+          <li style="line-height: 1rem; margin: 1rem 0 0;">
+            Ennen 1.1.2010 valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_before_2010|intcomma }} euroa/m² = {{ excess.total_before_2010|intcomma }} euroa.
+          </li>
+          <li style="line-height: 1rem; margin: 0;">
+            Poistoaika on 15 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.
+          </li>
+          <li style="line-height: 1rem; margin: 0.5rem 0 0;">
+            01.01.2010 jälkeen valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_after_2010|intcomma }} euroa/m² = {{ excess.total_after_2010|intcomma }} euroa.
+          </li>
+          <li style="line-height: 1rem; margin: 0;">
+            Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
+          </li>
+        </ul>
     {% endif %}
 {% endif %}
 {% endmacro %}
@@ -206,7 +219,14 @@
     </table>
     {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <p>Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa. Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.</p>
+        <ul style='margin: 0;'>
+          <li style="line-height: 1rem; margin: 1rem 0 0;">
+            Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.
+          </li>
+          <li style="line-height: 1rem; margin: 0;">
+            Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
+          </li>
+        </ul>
     {% endif %}
 {% endif %}
 {% endmacro %}

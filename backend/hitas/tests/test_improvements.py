@@ -268,8 +268,10 @@ def test_calculate_housing_company_improvements_before_2011_market_price_index__
     assert result.summary.value == 300_000
     assert result.summary.excess is not None
     assert result.summary.excess.surface_area == 100
-    assert result.summary.excess.value_per_square_meter == 150
-    assert result.summary.excess.total == 15_000
+    assert result.summary.excess.value_per_square_meter_before_2010 == 150
+    assert result.summary.excess.value_per_square_meter_after_2010 == 30
+    assert result.summary.excess.total_before_2010 == 15_000
+    assert result.summary.excess.total_after_2010 == 3_000
     assert result.summary.value_without_excess == 294_000
     assert result.summary.depreciation == 0
     assert result.summary.accepted_value_for_housing_company == 735_000
@@ -344,8 +346,10 @@ def test_calculate_housing_company_improvements_before_2011_market_price_index__
     assert result.summary.value == 300_000
     assert result.summary.excess is not None
     assert result.summary.excess.surface_area == 100
-    assert result.summary.excess.value_per_square_meter == 150
-    assert result.summary.excess.total == 15_000
+    assert result.summary.excess.value_per_square_meter_before_2010 == 150
+    assert result.summary.excess.value_per_square_meter_after_2010 == 30
+    assert result.summary.excess.total_before_2010 == 15_000
+    assert result.summary.excess.total_after_2010 == 3_000
     assert result.summary.value_without_excess == 270_000
     assert result.summary.depreciation == 234_000
     assert result.summary.accepted_value_for_housing_company == 36_000

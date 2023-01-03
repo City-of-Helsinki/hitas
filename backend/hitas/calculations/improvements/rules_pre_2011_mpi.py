@@ -219,6 +219,19 @@ class HousingCompanyImprovementCalculationResult(ApartmentImprovementCalculation
 
 @dataclass
 class HousingCompanyImprovementCalculationSummary(ApartmentImprovementCalculationSummary):
+    @dataclass
+    class ExcessSummary:
+        # Apartment's surface area
+        surface_area: Decimal
+        # Excess amount per square meter before 2010/01/01
+        value_per_square_meter_before_2010: Decimal
+        # Excess amount per square meter on or after 2010/01/01
+        value_per_square_meter_after_2010: Decimal
+        # Total excess amount before 2010 (surface area * value per square meter)
+        total_before_2010: Decimal
+        # Total excess amount on or after 2010 (surface area * value per square meter)
+        total_after_2010: Decimal
+
     # Final accepted value for the whole housing company
     accepted_value_for_housing_company: Decimal
 
@@ -360,10 +373,12 @@ def calculate_multiple_housing_company_improvements(
         value=summary_value,
         value_without_excess=summary_value_without_excess,
         depreciation=summary_depreciation,
-        excess=ApartmentImprovementCalculationSummary.ExcessSummary(
+        excess=HousingCompanyImprovementCalculationSummary.ExcessSummary(
             surface_area=housing_company_surface_area,
-            value_per_square_meter=Excess.BEFORE_2010_HOUSING_COMPANY.value,
-            total=housing_company_surface_area * Excess.BEFORE_2010_HOUSING_COMPANY.value,
+            value_per_square_meter_before_2010=Excess.BEFORE_2010_HOUSING_COMPANY.value,
+            value_per_square_meter_after_2010=Excess.AFTER_2010_HOUSING_COMPANY.value,
+            total_before_2010=housing_company_surface_area * Excess.BEFORE_2010_HOUSING_COMPANY.value,
+            total_after_2010=housing_company_surface_area * Excess.AFTER_2010_HOUSING_COMPANY.value,
         ),
         accepted_value=summary_accepted_value,
         accepted_value_for_housing_company=summary_accepted_value_for_housing_company,
