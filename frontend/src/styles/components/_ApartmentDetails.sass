@@ -3,7 +3,7 @@
 .view--apartment-details
 
   .heading--main
-    flex-flow: row
+    @include flex-flow(row)
     height: 75px
     padding: $spacing-layout-s
     background: var(--color-engel)
@@ -11,8 +11,8 @@
     border: 0
 
     a
+      @include align-items(center)
       display: inherit
-      align-items: center
       &:hover > span:not([class*="status-label"])
         text-decoration: underline
 
@@ -27,8 +27,8 @@
       background-color: var(--color-engel-light)
 
   .apartment-stats
-    display: flex
-    align-items: center
+    @include flexbox()
+    @include align-items(center)
     margin-top: 0
     font-weight: 400
     padding-bottom: 1rem
@@ -37,10 +37,10 @@
     span
 
       &:not(:last-child):after
-        display: inline-flex
+        @include inline-flex()
+        @include justify-content(center)
         width: $spacing-layout-m
         content: "|"
-        justify-content: center
 
     &--number
       padding: $spacing-xs $spacing-s
@@ -59,7 +59,7 @@
 
     [class^="Card-module_card"]
       @include flexbox()
-      flex-flow: column
+      @include flex-flow(column)
       background: $color-engel-medium-light
       width: 48%
       position: relative
@@ -77,14 +77,14 @@
 
       .unconfirmed-prices
         @include flexbox()
-        flex-flow: column
+        @include flex-flow(column)
         // width: 70%
 
         .price
           @include flexbox()
-          flex-flow: row nowrap
-          justify-content: space-between
-          flex-grow: 1
+          @include flex-flow(row nowrap)
+          @include justify-content(space-between)
+          @include flex-grow(1)
           font-size: $fontsize-body-s
           font-weight: normal
 
@@ -141,31 +141,31 @@
     margin: $spacing-l 0
 
   .company-details__tab
+    @include flex-flow(column nowrap)
     background: $color-black-5
-    flex-flow: column nowrap
     padding-top: 0
     padding-bottom: 4rem
 
     .row
+      @include justify-content(space-between)
       border-bottom: 1px solid #CCC
       margin-bottom: 1rem
-      justify-content: space-between
 
       > div
         @include flexbox()
 
-      .detail-field-
-        &label
+      .detail-field
+        &-label
           padding-top: 0.25rem
           margin-right: 1rem
 
-        &value
+        &-value
           font-size: $fontsize-heading-m
           margin-bottom: 1rem
 
     .columns
       @include flexbox()
-      flex-flow: row
+      @include flex-flow(row)
 
       .column
         border: 0

@@ -1,13 +1,14 @@
-@use 'hds-design-tokens' as *
+@use '~hds-design-tokens' as *
+@use '../utils/mixins' as *
 
 body
   font-family: $font-default
 
 [class^="heading--"]
   width: 100%
-  display: flex
-  justify-content: space-between
-  align-items: center
+  @include flexbox()
+  @include justify-content(space-between)
+  @include align-items(center)
   font-size: $fontsize-heading-xl
   line-height: $lineheight-l
   border-bottom: 1px solid #ccc
@@ -33,9 +34,9 @@ body
 
 .list-wrapper
   h2
+    @include flexbox()
+    @include justify-content(space-between)
     width: 100%
-    display: flex
-    justify-content: space-between
 
     button
       margin-top: -7px

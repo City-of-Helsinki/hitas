@@ -17,11 +17,11 @@
       background-color: white
 
     &__tab
+      @include flexbox()
+      @include flex-flow(row nowrap)
       background: white
       margin: $spacing-layout-s
       padding: $spacing-layout-s
-      @include flexbox()
-      @include flex-flow(row nowrap)
 
       .column
         width: 50%

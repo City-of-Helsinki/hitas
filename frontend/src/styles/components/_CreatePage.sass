@@ -1,28 +1,28 @@
 @use '../imports' as *
 
 .view--create
-  position: relative
-  margin-bottom: $spacing-layout-2-xl
   @include flexbox()
   @include flex-flow(column)
+  position: relative
+  margin-bottom: $spacing-layout-2-xl
 
   .field-sets
-    display: flex
+    @include flexbox()
     width: 100%
     gap: 1em
     background-color: $color-engel-medium-light
     padding: 1em
 
     fieldset
-      display: flex
-      flex-flow: column nowrap
+      @include flexbox()
+      @include flex-flow(column nowrap)
+      @include flex-grow(1)
       gap: 1em
       width: 50%
-      flex-grow: 1
 
       > .row
-        display: flex
-        justify-content: space-between
+        @include flexbox()
+        @include justify-content(space-between)
         gap: inherit
 
         > div:not(:first-child:last-child)
@@ -54,7 +54,7 @@
         transform: translateY(-4px)
 
   [class*="input-field"]
-    flex-grow: 1
+    @include flex-grow(1)
 
   .input-field--ownership
       margin-bottom: 10px
@@ -63,8 +63,8 @@
     height: auto
 
   .ownership-item
+    @include flexbox()
     position: relative
-    display: flex
     gap: 1em
 
     label
@@ -77,7 +77,7 @@
         padding-top: 25px
 
     .owner
-      flex-grow: 1
+      @include flex-grow(1)
 
       label
         left: 0
@@ -97,24 +97,24 @@
         fill: $color-black-50
 
   .shares-fields
-    display: flex
-    flex-flow: row nowrap
-    justify-content: space-between
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    @include justify-content(space-between)
 
   .building-identifier-field
+    @include flex-grow(0)
     width: 200px
-    flex-grow: 0
 
   .ownership-headings
     @include flexbox()
+    @include justify-content(space-between)
     width: 100%
-    justify-content: space-between
     margin-bottom: 1em
 
   .buttons
     @include flexbox()
+    @include justify-content(center)
     width: 100%
-    justify-content: center
     padding: $spacing-layout-s
     gap: $spacing-layout-s
 
@@ -124,8 +124,8 @@
 .view--create-improvements
 
   .field-sets
+    @include flex-direction(column)
     padding-top: $spacing-layout-s
-    flex-direction: column
     gap: $spacing-layout-m
     background: white
     legend
