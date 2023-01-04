@@ -55,9 +55,83 @@ function validateBusinessId(value: string): boolean {
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
+function validateSocialSecurityNumber(value: string): boolean {
+    if (value === null) return false;
+    if (!value.match(/^(\d{6})([A-FYXWVU+-])(\d{3})([\dA-Z])$/)) {
+        return false;
+    }
+    // Validate date
+    const centuryChar = value.split("")[6];
+    if (centuryChar === undefined) return false;
+    let century;
+    switch (centuryChar) {
+        case "A" || "B" || "C" || "D" || "E" || "F":
+            century = "20";
+            break;
+        case "-" || "Y" || "X" || "W" || "V" || "U":
+            century = "19";
+            break;
+        case "+":
+            century = "18";
+            break;
+    }
+    const dateValue = value.substring(0, 4);
+    const yearString = century + value.substring(4, 6);
+    const dateString = `${yearString}-${dateValue.substring(3, 4)}-${dateValue.substring(0, 2)}`;
+    if (isNaN(Date.parse(dateString))) return false;
+    // validate individual number
+    const idNumber = Number(value.substring(7, 10));
+    if (idNumber < 2 || idNumber > 899) return false;
+    // validate checkDigit
+    const checkDigit = value.substring(10, 11);
+    const checkDigits = [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "H",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "P",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+    ];
+    return checkDigits[Number(value.substring(0, 6) + idNumber) % 31] === checkDigit;
+}
+
 // Toast hook with easier Notification typing
 function hitasToast(message: string, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
     toast(message, {...opts, className: type});
 }
 
-export {dotted, formatAddress, formatOwner, formatMoney, formatDate, validateBusinessId, hitasToast};
+export {
+    dotted,
+    formatAddress,
+    formatOwner,
+    formatMoney,
+    formatDate,
+    validateBusinessId,
+    validateSocialSecurityNumber,
+    hitasToast,
+};

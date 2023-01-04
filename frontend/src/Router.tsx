@@ -5,8 +5,6 @@ import {Navigate, Route, Routes} from "react-router-dom";
 
 import App from "./app/App";
 import {store} from "./app/store";
-import Documents from "./features/Documents";
-import Reports from "./features/Reports";
 import {
     ApartmentCreatePage,
     ApartmentDetailsPage,
@@ -15,6 +13,7 @@ import {
     ApartmentMaxPricePage,
 } from "./features/apartment";
 import {Codes} from "./features/codes";
+import Documents from "./features/documents/Documents";
 import {
     HousingCompanyBuildingsPage,
     HousingCompanyCreatePage,
@@ -23,6 +22,7 @@ import {
     HousingCompanyListPage,
     HousingCompanyRealEstatesPage,
 } from "./features/housingCompany";
+import Reports from "./features/reports/Reports";
 
 export default function Router() {
     return (
