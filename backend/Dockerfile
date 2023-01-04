@@ -23,7 +23,8 @@ RUN apt-get update && \
         libpq5 \
         gettext \
         mime-support \
-        libpcre3 libpcre3-dev
+        libpcre3 libpcre3-dev \
+        postgresql
 
 #
 # Build virtualenv
