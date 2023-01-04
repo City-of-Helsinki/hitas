@@ -114,14 +114,20 @@
 
     {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <ul style='margin: 0;'>
-          <li style="line-height: 1rem; margin: 1rem 0 0;">
-            Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.
-          </li>
-          <li style="line-height: 1rem; margin: 0;">
-             Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.
-          </li>
-        </ul>
+      <table style="line-height: 1rem">
+        <tr style="padding-top: 0.5rem;">
+          <td style="width: 10px;"></td>
+          <td style="width: auto;"></td>
+        </tr>
+        <tr style="padding-top: 0.5rem;">
+          <td>&#x2022;</td>
+          <td>Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.</td>
+        </tr>
+        <tr>
+          <td>&nbsp</td>
+          <td>Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.</td>
+        </tr>
+      </table>
     {% endif %}
     <br>
 {% endif %}
@@ -129,6 +135,7 @@
 
 {% macro housing_company_improvements_table_pre_2011_mpi(improvements) %}
 {% if improvements["items"] %}
+    {% set excess = improvements.summary.excess %}
     <h3 class="bordered-header">HUONEISTON OSUUS YHTIÖN PARANNUKSISTA</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
@@ -140,6 +147,9 @@
             <td class="improvement-cell improvement-column" style="width: 60px;"><b>Poiston määrä</b></td>
             <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty yhtiö</b></td>
             <td class="improvement-cell improvement-column" style="width: 80px;"><b>Hyväksytty huoneisto</b></td>
+            {% if excess and excess.value_per_square_meter_before_2010 is not none and excess.value_per_square_meter_after_2010 is not none %}
+              <td class="improvement-cell improvement-column" style="width: 15px;">&nbsp</td>
+            {% endif %}
         </tr>
         {% for improvement in improvements["items"] %}
             <tr style="padding-top: 2px;">
@@ -151,6 +161,15 @@
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.amount|intcomma }}{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right">{{ improvement.accepted_value_for_housing_company|intcomma }}</td>
                 <td class="improvement-cell text-right">{{ improvement.accepted_value|intcomma }}</td>
+                {% if excess and excess.value_per_square_meter_before_2010 is not none and excess.value_per_square_meter_after_2010 is not none %}
+                <td class="improvement-cell text-right">
+                  {% if improvement.completion_date|date_before("2010-01-01") or excess.value_per_square_meter_before_2010 is none %}
+                    <small>1</small>
+                  {% else %}
+                    <small>2</small>
+                  {% endif %}
+                </td>
+                {% endif %}
             </tr>
         {% endfor %}
         <tr style="border-top: 1px solid gray; padding-top: 2px;">
@@ -162,24 +181,38 @@
             <td class="improvement-cell text-right"><b>{{ improvements.summary.depreciation.amount|intcomma }}</b></td>
             <td class="improvement-cell text-right"><b>{{ improvements.summary.accepted_value_for_housing_company|intcomma }}</b></td>
             <td class="improvement-cell text-right"><b>{{ improvements.summary.accepted_value|intcomma }}</b></td>
+            {% if excess and excess.value_per_square_meter_before_2010 is not none and excess.value_per_square_meter_after_2010 is not none %}
+              <td class="improvement-cell text-right">&nbsp</td>
+            {% endif %}
         </tr>
     </table>
-    {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <ul style='margin: 0;'>
-          <li style="line-height: 1rem; margin: 1rem 0 0;">
-            Ennen 1.1.2010 valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_before_2010|intcomma }} euroa/m² = {{ excess.total_before_2010|intcomma }} euroa.
-          </li>
-          <li style="line-height: 1rem; margin: 0;">
-            Poistoaika on 15 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.
-          </li>
-          <li style="line-height: 1rem; margin: 0.5rem 0 0;">
-            01.01.2010 jälkeen valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_after_2010|intcomma }} euroa/m² = {{ excess.total_after_2010|intcomma }} euroa.
-          </li>
-          <li style="line-height: 1rem; margin: 0;">
-            Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
-          </li>
-        </ul>
+      <table style="line-height: 1rem">
+        <tr style="padding-top: 0.5rem;">
+          <td style="width: 10px;"></td>
+          <td style="width: auto;"></td>
+        </tr>
+        {% if excess.value_per_square_meter_before_2010 is not none %}
+        <tr style="padding-top: 0.5rem;">
+          <td>{% if excess.value_per_square_meter_after_2010 is none %}&#x2022;{% else %}<small>1</small>{% endif %}</td>
+          <td>Ennen 1.1.2010 valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_before_2010|intcomma }} euroa/m² = {{ excess.total_before_2010|intcomma }} euroa.</td>
+        </tr>
+        <tr>
+          <td>&nbsp</td>
+          <td>Poistoaika on 15 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.</td>
+        </tr>
+        {% endif %}
+        {% if excess.value_per_square_meter_after_2010 is not none %}
+        <tr style="padding-top: 0.5rem;">
+          <td>{% if excess.value_per_square_meter_before_2010 is none %}&#x2022;{% else %}<small>2</small>{% endif %}</td>
+          <td>01.01.2010 jälkeen valmistuneen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter_after_2010|intcomma }} euroa/m² = {{ excess.total_after_2010|intcomma }} euroa.</td>
+        </tr>
+        <tr>
+          <td>&nbsp</td>
+          <td>Poistoaika on 15 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.</td>
+        </tr>
+        {% endif %}
+      </table>
     {% endif %}
 {% endif %}
 {% endmacro %}
@@ -219,14 +252,20 @@
     </table>
     {% set excess = improvements.summary.excess %}
     {% if excess %}
-        <ul style='margin: 0;'>
-          <li style="line-height: 1rem; margin: 1rem 0 0;">
-            Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.
-          </li>
-          <li style="line-height: 1rem; margin: 0;">
-            Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.
-          </li>
-        </ul>
+      <table style="line-height: 1rem">
+        <tr style="padding-top: 0.5rem;">
+          <td style="width: 10px;"></td>
+          <td style="width: auto;"></td>
+        </tr>
+        <tr style="padding-top: 0.5rem;">
+          <td>&#x2022;</td>
+          <td>Parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.</td>
+        </tr>
+        <tr>
+          <td>&nbsp</td>
+          <td>Arvoa korottavaan osuuteen tehdään indeksitarkistus ilman poistoja.</td>
+        </tr>
+      </table>
     {% endif %}
 {% endif %}
 {% endmacro %}

@@ -4105,24 +4105,28 @@ components:
                   minimum: 0
                   example: 4332.0
                 value_per_square_meter_before_2010:
-                  description: Excess value per square meter before 2010
+                  description: Excess value per square meter before 2010, null if not used
                   type: number
                   minimum: 0
+                  nullable: true
                   example: 150.0
                 value_per_square_meter_after_2010:
-                  description: Excess value per square meter on or after 2010
+                  description: Excess value per square meter on or after 2010, null if not used
                   type: number
                   minimum: 0
+                  nullable: true
                   example: 30.0
                 total_before_2010:
-                  description: Excess value before 2010 per square meter multiplied by apartment's surface area
+                  description: Excess value before 2010 per square meter multiplied by apartment's surface area, null if not used
                   type: number
                   minimum: 0
+                  nullable: true
                   example: 649800.0
                 total_after_2010:
-                  description: Excess value on or after 2010 per square meter multiplied by apartment's surface area
+                  description: Excess value on or after 2010 per square meter multiplied by apartment's surface area, null if not used
                   type: number
                   minimum: 0
+                  nullable: true
                   example: 129960.0
             depreciation:
               description: Sum of improvement value minus the excess
