@@ -1,17 +1,17 @@
 @use '../imports' as *
 
 .App
-  display: flex
-  flex-flow: column nowrap
-  align-items: center
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  @include align-items(center)
   min-height: 100vh
 
 .main-content
   @include flexbox()
   @include flex-flow(column nowrap)
+  @include flex-grow(2)
   width: 100%
   margin: 0 auto $spacing-layout-xl
-  flex-grow: 2
 
 header
   margin-bottom: $spacing-xs
@@ -36,7 +36,7 @@ header
 
   &__page-counter
     @include flexbox()
-    justify-content: center
+    @include justify-content(center)
     font-weight: bold
   &-list
     background: white
@@ -51,9 +51,9 @@ header
         border-bottom: 1px solid #ccc
 
     &__item
-      cursor: pointer
       @include flexbox()
-      justify-content: space-between
+      @include justify-content(space-between)
+      cursor: pointer
       padding: $spacing-layout-xs
 
       &:hover
@@ -63,9 +63,9 @@ header
         border-bottom: 1px solid #ccc
 
       .name, .address, .date, .number, .state, .details > div
-        @include flexbox
-        flex-flow: column nowrap
-        justify-content: center
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include justify-content(center)
 
       .name
         width: 35%
@@ -86,7 +86,7 @@ header
         width: 15%
 
       &--apartment
-        display: flex
+        @include flexbox()
         height: 100px
         grid-template-columns: 90px auto
         grid-template-rows: auto auto
@@ -99,11 +99,11 @@ header
           line-height: 1.25
 
         .details
-          width: 75%
-          font-size: $fontsize-body-l
           @include flex-grow(1)
           @include flexbox()
           @include flex-wrap(wrap)
+          width: 75%
+          font-size: $fontsize-body-l
 
           .housing-company, .address
             width: 45%
@@ -116,7 +116,7 @@ header
             margin: -0.3em 0 0.3em
 
           .ownership, .area
-            flex-grow: 1
+            @include flex-grow(1)
 
           .ownership
             color: $color-black-60
@@ -126,13 +126,11 @@ header
             font-size: $fontsize-body-m
             line-height: 1
             width: 40%
-            //margin: 0 15% 0.25rem 0
             white-space: nowrap
             overflow: hidden
             text-overflow: ellipsis
             scrollbar-width: none
             scrollbar-color: transparent transparent
-        //$color-black-30 $color-black-10
 
         &:hover .details .ownership
           overflow-x: auto
@@ -157,8 +155,8 @@ header
           width: 45%
 
         .state
-          display: flex
-          align-items: flex-end
+          @include flexbox()
+          @include align-items(flex-end)
           width: 15%
 .list
 
@@ -167,13 +165,13 @@ header
     margin: 0 0 $spacing-layout-l
 
   &-headers
-    display: flex
-    justify-content: space-between
+    @include flexbox()
+    @include justify-content(space-between)
     margin-bottom: $spacing-xs
     padding: 0 $spacing-layout-xs
 
   &-header
-    display: flex
+    @include flexbox()
 
     &.name
       width: 35%
@@ -219,11 +217,11 @@ header
     background-color: white
 
   &__tab
+    @include flexbox()
+    @include flex-flow(row nowrap)
     background: white
     margin: $spacing-layout-s
     padding: $spacing-layout-s
-    @include flexbox()
-    @include flex-flow(row nowrap)
 
     .column
       width: 50%
@@ -262,17 +260,17 @@ header
 .detail-list
   &__heading
     @include flexbox()
-    flex-flow: row nowrap
+    @include flex-flow(row nowrap)
+    @include justify-content(space-between)
+    @include align-items(center)
     width: 100%
-    justify-content: space-between
-    align-items: center
   &__list
     background-color: $color-engel-medium-light
     padding: $spacing-layout-s
 
     li
       @include flexbox()
-      justify-content: space-between
+      @include justify-content(space-between)
 
     &-headers
       padding: 0 $spacing-layout-s $spacing-s
@@ -282,8 +280,8 @@ header
       background-color: white
       padding: $spacing-layout-s
       > *
-        display: flex
-        align-items: center
+        @include flexbox()
+        @include align-items(center)
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 

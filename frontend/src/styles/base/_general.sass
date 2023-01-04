@@ -18,9 +18,9 @@ ul, ol
 .spinner
   &-wrap
     @include flexbox()
+    @include justify-content(center)
+    @include align-items(center)
     height: 100%
-    justify-content: center
-    align-items: center
     [class*="LoadingSpinner-module_loadingSpinner"]
       opacity: 0.8
       --spinner-color: var(--color-white)
@@ -29,11 +29,11 @@ ul, ol
         --spinner-thickness: 1.4rem
 
 .query-handler-error
-  display: flex
-  flex-flow: column
+  @include flexbox()
+  @include flex-flow(column)
+  @include align-items(center)
+  @include justify-content(center)
   height: 100%
-  align-items: center
-  justify-content: center
   margin: 0
   .query-error-message
     margin-top: 0.5rem
@@ -45,9 +45,9 @@ ul, ol
     margin-top: $spacing-layout-m
     margin-bottom: $spacing-layout-s
 .row--buttons, [class*="DialogActionButtons"]
+    @include align-items(center)
+    @include justify-content(space-between)
     width: 100%
-    align-items: center
-    justify-content: space-between
     >*:only-child
       margin-left: auto
       margin-right: auto
@@ -57,9 +57,9 @@ ul, ol
   align-content: center
 
 .align-content-right
-  display: flex
-  flex-direction: row
-  justify-content: right
+  @include flexbox()
+  @include flex-flow(row)
+  @include justify-content(right)
   gap: 10px
 
 .error-text
