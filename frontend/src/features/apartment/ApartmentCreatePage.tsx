@@ -413,7 +413,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
-                            label="Rakennusaikaiset korot (6 %)"
+                            label="Rak.aik. korko MH"
                             fieldPath="prices.construction.interest.rate_6"
                             formData={formData}
                             setFormData={setFormData}
@@ -422,7 +422,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
-                            label="Rakennusaikaiset korot (14 %)"
+                            label="Rak.aik. korko RK"
                             fieldPath="prices.construction.interest.rate_14"
                             formData={formData}
                             setFormData={setFormData}
