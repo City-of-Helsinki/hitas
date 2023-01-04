@@ -67,15 +67,17 @@ header
         flex-flow: column nowrap
         justify-content: center
 
+      .name
+        width: 35%
 
-      .name, .address, .date
-        width: 32%
+      .address
+        width: 50%
 
       .name, .address
-        margin-right: 2%
+        padding-right: $spacing-layout-2-xs
 
       .date
-        text-align: right
+        width: 15%
 
       .area
         width: 15%
@@ -93,11 +95,11 @@ header
           font-size: $fontsize-heading-l
           letter-spacing: -1px
           text-transform: uppercase
-          width: calc(90px)
+          width: 10%
           line-height: 1.25
 
         .details
-          width: calc(100% - 1.5rem - 90px)
+          width: 75%
           font-size: $fontsize-body-l
           @include flex-grow(1)
           @include flexbox()
@@ -157,9 +159,7 @@ header
         .state
           display: flex
           align-items: flex-end
-          width: 12%
-          text-align: right
-
+          width: 15%
 .list
 
   &-amount
@@ -167,23 +167,27 @@ header
     margin: 0 0 $spacing-layout-l
 
   &-headers
-    margin: 0 $spacing-layout-xs $spacing-xs
+    display: flex
+    justify-content: space-between
+    margin-bottom: $spacing-xs
+    padding: 0 $spacing-layout-xs
 
   &-header
-    display: inline-block
+    display: flex
 
     &.name
-      width: 34%
+      width: 35%
+      padding-right: $spacing-layout-2-xs
 
     &.address
-      width: 49%
+      width: 50%
+      padding-right: $spacing-layout-2-xs
 
       .apartments &
         width: 40%
 
     &.date
-      width: 17%
-      text-align: right
+      width: 15%
 
     &.area
       width: 14%
@@ -270,16 +274,16 @@ header
       @include flexbox()
       justify-content: space-between
 
-      .list-wrapper--upgrades & > *
-        width: 25%
-
     &-headers
       padding: 0 $spacing-layout-s $spacing-s
+      font-weight: bold
 
     &-item
       background-color: white
       padding: $spacing-layout-s
-
+      > *
+        display: flex
+        align-items: center
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
