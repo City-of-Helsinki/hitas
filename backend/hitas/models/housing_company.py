@@ -28,7 +28,7 @@ class HousingCompanyState(Enum):
         READY_NO_STATISTICS = _("Ready, no statistics")
 
 
-# Taloyhtiö
+# Taloyhtiö / "Osakeyhtiö"
 class HousingCompany(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 

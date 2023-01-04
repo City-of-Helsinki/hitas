@@ -1534,6 +1534,123 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
     }
 
 
+@pytest.mark.parametrize(
+    [
+        "start_1",
+        "end_1",
+        "start_2",
+        "end_2",
+        "fields",
+    ],
+    [
+        [
+            1,  # start_1
+            20,  # end_1
+            100,  # start_2
+            120,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Share 20 has already been taken by foo 1."},
+                {"field": "shares.end", "message": "Share 100 has already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            21,  # end_1
+            99,  # start_2
+            120,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo 1."},
+                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo 1."},
+                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            30,  # start_1
+            40,  # end_1
+            80,  # start_2
+            90,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo 1."},
+                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo 1."},
+                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            2,  # end_1
+            10,  # start_2
+            110,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            2,  # end_1
+            20,  # start_2
+            100,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+            ],
+        ],
+    ],
+    ids=[
+        "Single overlapping, start and end are inclusive in both ends",
+        "Multiple overlapping, partially outside range from both ends",
+        "Multiple overlapping, inside new range from both ends",
+        "Multiple overlapping, over new range from both ends",
+        "Multiple overlapping, same range",
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment__create__overlapping_shares(
+    api_client: HitasAPIClient,
+    start_1: int,
+    end_1: int,
+    start_2: int,
+    end_2: int,
+    fields: list[dict[str, Any]],
+):
+    b1: Building = BuildingFactory.create()
+    ApartmentFactory.create(
+        building=b1,
+        street_address="foo",
+        apartment_number=1,
+        share_number_start=start_1,
+        share_number_end=end_1,
+    )
+    ApartmentFactory.create(
+        building=b1,
+        street_address="bar",
+        apartment_number=2,
+        share_number_start=start_2,
+        share_number_end=end_2,
+    )
+
+    data = get_apartment_create_data(b1)
+
+    response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b1.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Update tests
 
 
@@ -1717,6 +1834,142 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
         )
     )
     assert response.json() == get_response.json()
+
+
+@pytest.mark.parametrize(
+    [
+        "start_1",
+        "end_1",
+        "start_2",
+        "end_2",
+        "fields",
+    ],
+    [
+        [
+            1,  # start_1
+            20,  # end_1
+            100,  # start_2
+            120,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Share 20 has already been taken by foo 1."},
+                {"field": "shares.end", "message": "Share 100 has already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            21,  # end_1
+            99,  # start_2
+            120,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo 1."},
+                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo 1."},
+                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            30,  # start_1
+            40,  # end_1
+            80,  # start_2
+            90,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo 1."},
+                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo 1."},
+                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            2,  # end_1
+            10,  # start_2
+            110,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+            ],
+        ],
+        [
+            1,  # start_1
+            2,  # end_1
+            20,  # start_2
+            100,  # end_2
+            [  # fields
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+            ],
+        ],
+    ],
+    ids=[
+        "Single overlapping, start and end are inclusive in both ends",
+        "Multiple overlapping, partially outside range from both ends",
+        "Multiple overlapping, inside new range from both ends",
+        "Multiple overlapping, over new range from both ends",
+        "Multiple overlapping, same range",
+    ],
+)
+@pytest.mark.django_db
+def test__api__apartment__update__overlapping_shares(
+    api_client: HitasAPIClient,
+    start_1: int,
+    end_1: int,
+    start_2: int,
+    end_2: int,
+    fields: list[dict[str, Any]],
+):
+    building_1: Building = BuildingFactory.create()
+    ApartmentFactory.create(
+        building=building_1,
+        street_address="foo",
+        apartment_number=1,
+        share_number_start=start_1,
+        share_number_end=end_1,
+    )
+    ApartmentFactory.create(
+        building=building_1,
+        street_address="bar",
+        apartment_number=2,
+        share_number_start=start_2,
+        share_number_end=end_2,
+    )
+    apartment_1: Apartment = ApartmentFactory.create(
+        building=building_1,
+        street_address="baz",
+        apartment_number=3,
+        share_number_start=200,
+        share_number_end=300,
+    )
+
+    data = ApartmentDetailSerializer(apartment_1).data
+    del data["id"]
+    del data["type"]["value"]
+    del data["type"]["description"]
+    del data["type"]["code"]
+    del data["shares"]["total"]
+    del data["address"]["postal_code"]
+    del data["address"]["city"]
+    del data["links"]
+    data["ownerships"] = []
+    data["building"] = {"id": building_1.uuid.hex}
+    data["shares"]["start"] = 20
+    data["shares"]["end"] = 100
+
+    response = api_client.put(
+        reverse(
+            "hitas:apartment-detail",
+            args=[building_1.real_estate.housing_company.uuid.hex, apartment_1.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 # Delete tests
