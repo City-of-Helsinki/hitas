@@ -40,7 +40,7 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                 <div className="list-headers">
                     <div className="list-header name">Yhtiö</div>
                     <div className="list-header address">Osoite</div>
-                    <div className="list-header date">Valmiustila, pvm</div>
+                    <div className="list-header date">Valmistunut</div>
                 </div>
                 <ul className="results-list">
                     {data.contents.map((item: IHousingCompany) => (
