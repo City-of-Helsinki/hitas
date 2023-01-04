@@ -3,7 +3,6 @@ from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Table
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
     HitasAnonymizedName,
-    HitasAnonymizedText,
     HitasBoolean,
     HitasDuration,
     HitasYearMonth,
@@ -172,7 +171,7 @@ company_construction_price_indices = Table(
     ),
     Column("D_LASKPVM", Date, key="calculation_date", nullable=False),
     Column("C_VALMPVM", HitasYearMonth, key="completion_date", nullable=False),
-    Column("C_YHTPAR", HitasAnonymizedText(100), key="name", nullable=False),
+    Column("C_YHTPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_HYVARVO", Float, nullable=False),
     Column("C_MUUTTAJA", String(10), nullable=False),
@@ -194,7 +193,7 @@ apartment_construction_price_indices = Table(
         "C_POISTOPROS", String(12), key="depreciation_percentage", nullable=False
     ),  # Always '0000', '0001', '0002' == 0%, 2.5%, 10%
     Column("C_POISTOAIKA", HitasDuration, key="depreciation_period", nullable=False),
-    Column("C_HUOPAR", HitasAnonymizedText(100), key="name", nullable=False),
+    Column("C_HUOPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_RAKIARVO", Float, nullable=False),  # Indeksin tarkistus arvo
     Column("N_POISTOARVO", Float, nullable=False),  # Poisto
@@ -262,7 +261,7 @@ company_market_price_indices = Table(
     Column("C_POISTOVUODET", String(12), nullable=False),  # Always '000', '001', '002', '003', '010'
     Column("C_OMAVASTUU", String(12), nullable=False),  # Always 'K', 'E', '005', '011'
     Column("C_POISTOAIKA", HitasDuration, key="depreciation_period", nullable=False),
-    Column("C_YHTPAR", HitasAnonymizedText(100), key="name", nullable=False),
+    Column("C_YHTPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_ARVOLISAYS", Float, nullable=False),
     Column("N_POISTOARVO", Float, nullable=False),
@@ -284,7 +283,7 @@ apartment_market_price_indices = Table(
     Column("C_POISTOVUODET", String(12), nullable=False),  # Always '000' or '002'
     Column("C_OMAVASTUU", String(12), nullable=False),  # Always '000' or '004'.
     Column("C_POISTOAIKA", HitasDuration, key="depreciation_period", nullable=False),
-    Column("C_HUOPAR", HitasAnonymizedText(100), key="name", nullable=False),
+    Column("C_HUOPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_ARVOLISAYS", Float, nullable=False),  # Arvon lisäys
     Column("N_POISTOARVO", Float, nullable=False),  # Poisto
