@@ -56,6 +56,34 @@
     @include flexbox()
     gap: 4%
 
+    .row--buttons
+      @include justify-content(space-evenly)
+      margin: $spacing-layout-xs auto
+
+    ul
+      margin: 0
+      padding: 0
+      a:hover
+        text-decoration: underline
+        svg
+          transform: scale(1.25)
+      .unresolved a:hover
+        color: $color-black
+      .resolved a:hover
+        color: $color-black-50
+      h3
+        margin-bottom: 0
+      svg
+        position: relative
+        top: 4px
+        margin: 0px 10px 0 5px
+      .unresolved
+        color: $color-black-60
+      .resolved
+        color: $color-black-30
+        text-decoration: line-through
+
+
     [class^="Card-module_card"]
       @include flexbox()
       @include flex-flow(column)

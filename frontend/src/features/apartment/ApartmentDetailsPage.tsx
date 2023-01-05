@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Card, Dialog, IconDownload, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -20,57 +20,54 @@ import {
 } from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-interface SalesConditionProps {
-    name: string;
-    address: string;
-    url?: string;
-    isConfirmed: boolean;
-}
-const SalesCondition = ({name, address, url, isConfirmed}: SalesConditionProps): JSX.Element => (
-    <div className="sales-condition">
-        <div className="icon-container">
-            {isConfirmed ? (
-                <IconLock
-                    size="m"
-                    aria-hidden="true"
-                />
-            ) : (
-                <IconLockOpen
-                    size="m"
-                    aria-hidden="true"
-                />
-            )}
-        </div>
-        <div>
-            <p>{name}</p>
-            <p>{address}</p>
-            <p className="link">
-                {url === undefined || null ? (
-                    <span>Katso asunto vanhasta rekisteristä!</span>
-                ) : (
-                    <Link to={url}>Katso myytävä asunto</Link>
-                )}
-            </p>
-        </div>
-    </div>
-);
-
 const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}) => {
     return (
         <Card>
-            <label className="card-heading">Vahvistettu myyntiehto</label>
-            <SalesCondition
-                name="Arabian unelma (valm.2015)"
-                address="Arabiankatu 5 C 2, 00440"
-                url={`/housing-companies/${apartment.links.housing_company.id}`}
-                isConfirmed={true}
-            />
-            <label className="card-heading">Vahvistamaton myyntiehto</label>
-            <SalesCondition
-                name="Keimolan Ylpeys (valm.2015)"
-                address="Kierretie 5 D 5"
-                isConfirmed={false}
-            />
+            <div className="row row--buttons">
+                <Button
+                    theme="black"
+                    iconLeft={<IconGlyphEuro />}
+                >
+                    Luo kauppa
+                </Button>
+                <Button
+                    theme="black"
+                    iconLeft={<IconLock />}
+                >
+                    Tee myyntiehto
+                </Button>
+            </div>
+            <label className="card-heading">Myyntiehdot</label>
+            <ul>
+                <li>
+                    <h3>Daniel Demola (010101-101A)</h3>
+                    <ul>
+                        <li className="unresolved">
+                            <Link to="#">
+                                <IconLock />
+                                Jokukatu 4, 00500
+                            </Link>
+                        </li>
+                        <li className="resolved">
+                            <Link to="#">
+                                <IconLockOpen />
+                                Umpikuja 0, 00404 - (myyty 3.1.2023)
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h3>Erkki Esimerkki (101099-666B)</h3>
+                    <ul>
+                        <li className="unresolved">
+                            <Link to="#">
+                                <IconLock />
+                                Peruskatu 1, 00820
+                            </Link>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </Card>
     );
 };
