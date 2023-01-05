@@ -138,10 +138,6 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 value={calculation.calculation_variables.index_adjustment}
             />
             <BreakdownValue
-                label="+ Huoneistokohtaiset parannukset"
-                value={calculation.calculation_variables.apartment_improvements.summary.accepted_value}
-            />
-            <BreakdownValue
                 label="+ Osuus yhtiön parannuksista"
                 value={calculation.calculation_variables.housing_company_improvements.summary.accepted_value}
             />
@@ -245,10 +241,6 @@ const ConstructionPricePre2011Breakdown = ({
             <BreakdownValue
                 label={`+ Rakennusaikaiset korot (${calculation.calculation_variables.interest_during_construction_percentage}%)`}
                 value={calculation.calculation_variables.interest_during_construction}
-            />
-            <BreakdownValue
-                label="+ Huoneistokohtaiset parannukset"
-                value={calculation.calculation_variables.apartment_improvements.summary.value_for_apartment}
             />
             <BreakdownValue
                 label="= Osakkeiden velaton hinta"
