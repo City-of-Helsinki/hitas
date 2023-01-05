@@ -280,6 +280,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                             "street_address": hc1_re1_bu1.street_address,
                         },
                         "building_identifier": hc1_re1_bu1.building_identifier,
+                        "apartment_count": 2,
                     },
                     {
                         "id": hc1_re1_bu2.uuid.hex,
@@ -289,6 +290,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                             "street_address": hc1_re1_bu2.street_address,
                         },
                         "building_identifier": hc1_re1_bu2.building_identifier,
+                        "apartment_count": 1,
                     },
                 ],
             },
@@ -309,6 +311,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                             "street_address": hc1_re2_bu1.street_address,
                         },
                         "building_identifier": hc1_re2_bu1.building_identifier,
+                        "apartment_count": 0,
                     }
                 ],
             },

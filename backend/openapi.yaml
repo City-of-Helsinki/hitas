@@ -3270,6 +3270,11 @@ components:
           pattern: '^$|^1\d{8}[A-Za-z0-9]$|^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$'
           nullable: true
           example: 100012345A
+        apartment_count:
+          description: How many apartments are in this building
+          type: integer
+          minimum: 0
+          example: 4
 
     MinimalHousingCompany:
       description: Housing company identifier

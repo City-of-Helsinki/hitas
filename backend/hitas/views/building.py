@@ -1,5 +1,7 @@
+from typing import Optional
 from uuid import UUID
 
+from django.db.models import Count
 from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound
@@ -17,6 +19,14 @@ class BuildingHitasAddressSerializer(serializers.Serializer):
 class BuildingSerializer(HitasModelSerializer):
     address = BuildingHitasAddressSerializer(source="*")
     building_identifier = ValueOrNullField(required=False, allow_null=True)
+    apartment_count = serializers.SerializerMethodField()
+
+    def get_apartment_count(self, instance: Building) -> int:
+        apartment_count: Optional[int] = getattr(instance, "apartment_count", None)
+        if apartment_count is not None:
+            return apartment_count
+
+        return instance.apartments.count()
 
     def validate_building_identifier(self, value):
         if value == "":
@@ -31,8 +41,8 @@ class BuildingSerializer(HitasModelSerializer):
         try:
             real_estate_uuid = UUID(hex=self.context["view"].kwargs.get("real_estate_uuid"))
             real_estate_id = RealEstate.objects.only("id").get(uuid=real_estate_uuid).id
-        except (RealEstate.DoesNotExist, ValueError):
-            raise HitasModelNotFound(model=RealEstate)
+        except (RealEstate.DoesNotExist, ValueError) as error:
+            raise HitasModelNotFound(model=RealEstate) from error
 
         validated_data["real_estate_id"] = real_estate_id
         return validated_data
@@ -42,6 +52,7 @@ class BuildingSerializer(HitasModelSerializer):
         fields = [
             "id",
             "address",
+            "apartment_count",
             "building_identifier",
         ]
 
@@ -57,6 +68,9 @@ class BuildingViewSet(HitasModelViewSet):
         return (
             Building.objects.filter(real_estate__id=re_id)
             .select_related("real_estate__housing_company__postal_code")
+            .annotate(
+                apartment_count=Count("apartments"),
+            )
             .only(
                 "uuid",
                 "street_address",

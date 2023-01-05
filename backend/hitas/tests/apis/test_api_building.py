@@ -64,6 +64,7 @@ def test__api__building__list(api_client: HitasAPIClient):
                 "street_address": bu1.street_address,
             },
             "building_identifier": bu1.building_identifier,
+            "apartment_count": 0,
         },
         {
             "id": bu2.uuid.hex,
@@ -73,6 +74,7 @@ def test__api__building__list(api_client: HitasAPIClient):
                 "street_address": bu2.street_address,
             },
             "building_identifier": bu2.building_identifier,
+            "apartment_count": 0,
         },
     ]
     assert response.json()["page"] == {
@@ -123,6 +125,7 @@ def test__api__building__retrieve(api_client: HitasAPIClient):
             "street_address": bu1.street_address,
         },
         "building_identifier": bu1.building_identifier,
+        "apartment_count": 0,
     }
 
 
@@ -315,6 +318,7 @@ def test__api__building__update(api_client: HitasAPIClient):
             "street_address": data["address"]["street_address"],
         },
         "building_identifier": data["building_identifier"],
+        "apartment_count": 0,
     }
 
     get_response = api_client.get(url)
