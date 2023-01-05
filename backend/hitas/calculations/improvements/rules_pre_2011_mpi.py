@@ -1,7 +1,7 @@
 import datetime
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 from hitas.calculations.exceptions import IndexMissingException
 from hitas.calculations.helpers import months_between_dates
@@ -219,6 +219,19 @@ class HousingCompanyImprovementCalculationResult(ApartmentImprovementCalculation
 
 @dataclass
 class HousingCompanyImprovementCalculationSummary(ApartmentImprovementCalculationSummary):
+    @dataclass
+    class ExcessSummary:
+        # Apartment's surface area
+        surface_area: Decimal
+        # Excess amount per square meter before 2010/01/01, null if not used
+        value_per_square_meter_before_2010: Optional[Decimal]
+        # Excess amount per square meter on or after 2010/01/01, null if not used
+        value_per_square_meter_after_2010: Optional[Decimal]
+        # Total excess amount before 2010 (surface area * value per square meter), null if not used
+        total_before_2010: Optional[Decimal]
+        # Total excess amount on or after 2010 (surface area * value per square meter), null if not used
+        total_after_2010: Optional[Decimal]
+
     # Final accepted value for the whole housing company
     accepted_value_for_housing_company: Decimal
 
@@ -236,7 +249,7 @@ def calculate_housing_company_improvements_pre_2011_market_price_index(
     total_surface_area: Decimal,
     apartment_surface_area: Decimal,
 ) -> HousingCompanyImprovementsResult:
-    def calc_fn(improvement):
+    def calc_fn(improvement: ImprovementData) -> HousingCompanyImprovementCalculationResult:
         return calculate_single_housing_company_improvement_pre_2011_market_price_index(
             improvement,
             calculation_date=calculation_date,
@@ -330,7 +343,7 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
 
 
 def calculate_multiple_housing_company_improvements(
-    improvements,
+    improvements: List[ImprovementData],
     calc_fn: Callable[[ImprovementData], HousingCompanyImprovementCalculationResult],
     housing_company_surface_area: Decimal,
 ) -> HousingCompanyImprovementsResult:
@@ -341,6 +354,9 @@ def calculate_multiple_housing_company_improvements(
     summary_depreciation = Decimal(0)
     summary_accepted_value = Decimal(0)
     summary_accepted_value_for_housing_company = Decimal(0)
+
+    has_improvements_before_2010: bool = False
+    has_improvements_after_2010: bool = False
 
     # Calculate result for each improvement and calculate the summary
     for improvement in improvements:
@@ -353,6 +369,11 @@ def calculate_multiple_housing_company_improvements(
         summary_accepted_value_for_housing_company += result.accepted_value_for_housing_company
         summary_accepted_value += result.accepted_value
 
+        if result.completion_date >= datetime.date(2010, 1, 1):
+            has_improvements_after_2010 = True
+        else:
+            has_improvements_before_2010 = True
+
         results.append(result)
 
     # Generate summary report
@@ -360,10 +381,24 @@ def calculate_multiple_housing_company_improvements(
         value=summary_value,
         value_without_excess=summary_value_without_excess,
         depreciation=summary_depreciation,
-        excess=ApartmentImprovementCalculationSummary.ExcessSummary(
+        excess=HousingCompanyImprovementCalculationSummary.ExcessSummary(
             surface_area=housing_company_surface_area,
-            value_per_square_meter=Excess.BEFORE_2010_HOUSING_COMPANY.value,
-            total=housing_company_surface_area * Excess.BEFORE_2010_HOUSING_COMPANY.value,
+            value_per_square_meter_before_2010=(
+                Excess.BEFORE_2010_HOUSING_COMPANY.value if has_improvements_before_2010 else None
+            ),
+            value_per_square_meter_after_2010=(
+                Excess.AFTER_2010_HOUSING_COMPANY.value if has_improvements_after_2010 else None
+            ),
+            total_before_2010=(
+                housing_company_surface_area * Excess.BEFORE_2010_HOUSING_COMPANY.value
+                if has_improvements_before_2010
+                else None
+            ),
+            total_after_2010=(
+                housing_company_surface_area * Excess.AFTER_2010_HOUSING_COMPANY.value
+                if has_improvements_after_2010
+                else None
+            ),
         ),
         accepted_value=summary_accepted_value,
         accepted_value_for_housing_company=summary_accepted_value_for_housing_company,

@@ -1,5 +1,5 @@
 import itertools
-from datetime import datetime
+from datetime import date, datetime
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Union
 
@@ -23,6 +23,14 @@ def intcomma(value, decimals=2) -> str:
     if not value:
         return "0"
     return humanize_intcomma(Decimal(str(value)).quantize(Decimal("1." + "0" * decimals), ROUND_HALF_UP))
+
+
+@django_jinja.library.filter
+def date_before(value: Union[str, date], other: str) -> bool:
+    if isinstance(value, str):
+        value = date.fromisoformat(value)
+
+    return value < date.fromisoformat(other)
 
 
 @django_jinja.library.filter

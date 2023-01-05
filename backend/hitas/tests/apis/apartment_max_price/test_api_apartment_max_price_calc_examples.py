@@ -630,8 +630,10 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                             "value_without_excess": 0.0,
                             "excess": {
                                 "surface_area": 3390.5,
-                                "value_per_square_meter": 150.0,
-                                "total": 508_575.0,
+                                "value_per_square_meter_before_2010": 150.0,
+                                "value_per_square_meter_after_2010": None,
+                                "total_before_2010": 508575.0,
+                                "total_after_2010": None,
                             },
                             "depreciation": 0.0,
                             "accepted_value_for_housing_company": 0.0,
@@ -658,7 +660,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                 "calculation_variables": {
                     "calculation_date": "2022-09-07",
                     "calculation_date_value": 4872.0,
-                    "debt_free_price": 265524,
+                    "debt_free_price": 265524.0,
                     "surface_area": 54.5,
                     "apartment_share_of_housing_company_loans": 0,
                     "apartment_share_of_housing_company_loans_date": "2022-09-05",
@@ -910,8 +912,10 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                             "value_without_excess": 0.0,
                             "excess": {
                                 "surface_area": 10960.5,
-                                "value_per_square_meter": 150.0,
-                                "total": 1_644_075.0,
+                                "value_per_square_meter_before_2010": None,
+                                "value_per_square_meter_after_2010": None,
+                                "total_before_2010": None,
+                                "total_after_2010": None,
                             },
                             "depreciation": 0.0,
                             "accepted_value_for_housing_company": 0.0,
@@ -1021,7 +1025,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
             "housing_company_acquisition_price": 200000.0,
             "housing_company_assets": 200000.0,
             "apartment_share_of_housing_company_assets": 200000.0,
-            "interest_during_construction": 0.0,
+            "interest_during_construction": 0,
             "interest_during_construction_percentage": 14,
             "apartment_improvements": {
                 "items": [],
@@ -1056,7 +1060,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
     assert response_json["calculations"]["market_price_index"] == {
         "calculation_variables": {
             "acquisition_price": 100000.0,
-            "interest_during_construction": 0.0,
+            "interest_during_construction": 0,
             "interest_during_construction_percentage": 6,
             "basic_price": 100000.0,
             "index_adjustment": 100000.0,
@@ -1081,8 +1085,10 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
                     "value_without_excess": 0.0,
                     "excess": {
                         "surface_area": 10.0,
-                        "value_per_square_meter": 150.0,
-                        "total": 1500.0,
+                        "value_per_square_meter_before_2010": None,
+                        "value_per_square_meter_after_2010": None,
+                        "total_before_2010": None,
+                        "total_after_2010": None,
                     },
                     "depreciation": 0.0,
                     "accepted_value_for_housing_company": 0.0,
