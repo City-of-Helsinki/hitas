@@ -207,20 +207,20 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
-        }),
-        removeRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
-            query: ({id, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/real-estates/${housingCompanyId}`,
-                method: "DELETE",
-                headers: {"Content-type": "application/json; charset=UTF-8"},
-            }),
             invalidatesTags: (result, error, arg) => [
                 {
                     type: "HousingCompany",
                     id: arg.housingCompanyId,
                 },
             ],
+        }),
+        removeRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
+            query: ({id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/real-estates/${id}`,
+                method: "DELETE",
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
         createBuilding: builder.mutation<
             IBuilding,
@@ -240,12 +240,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 method: "DELETE",
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: arg.housingCompanyId,
-                },
-            ],
+            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
         saveApartment: builder.mutation<
             IApartmentDetails,
