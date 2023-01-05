@@ -11,7 +11,7 @@ from hitas.models.utils import validate_building_id
 class Building(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-    real_estate = models.ForeignKey("RealEstate", on_delete=models.CASCADE, related_name="buildings")
+    real_estate = models.ForeignKey("RealEstate", on_delete=models.PROTECT, related_name="buildings")
 
     street_address = models.CharField(max_length=1024)
 

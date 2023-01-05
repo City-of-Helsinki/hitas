@@ -358,7 +358,11 @@ def test__api__building__delete__with_references(api_client: HitasAPIClient):
         },
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "apartments_on_building",
+        "message": "Cannot delete a building with apartments.",
+        "reason": "Conflict",
+        "status": 409,
+    }

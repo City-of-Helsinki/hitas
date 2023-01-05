@@ -11,7 +11,7 @@ from hitas.models.utils import validate_property_id
 class RealEstate(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-    housing_company = models.ForeignKey("HousingCompany", on_delete=models.CASCADE, related_name="real_estates")
+    housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")
 
     # 'kiinteistötunnus'
     property_identifier = models.CharField(

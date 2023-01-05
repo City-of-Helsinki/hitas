@@ -1,9 +1,10 @@
 from uuid import UUID
 
+from django.db.models import Prefetch
 from rest_framework import serializers
 
-from hitas.exceptions import HitasModelNotFound
-from hitas.models import Building, HousingCompany, RealEstate
+from hitas.exceptions import HitasModelNotFound, ModelConflict
+from hitas.models import Apartment, Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
 
@@ -31,8 +32,8 @@ class BuildingSerializer(HitasModelSerializer):
         try:
             real_estate_uuid = UUID(hex=self.context["view"].kwargs.get("real_estate_uuid"))
             real_estate_id = RealEstate.objects.only("id").get(uuid=real_estate_uuid).id
-        except (RealEstate.DoesNotExist, ValueError):
-            raise HitasModelNotFound(model=RealEstate)
+        except (RealEstate.DoesNotExist, ValueError) as error:
+            raise HitasModelNotFound(model=RealEstate) from error
 
         validated_data["real_estate_id"] = real_estate_id
         return validated_data
@@ -50,12 +51,21 @@ class BuildingViewSet(HitasModelViewSet):
     serializer_class = BuildingSerializer
     model_class = Building
 
+    def perform_destroy(self, instance: Building) -> None:
+        if instance.apartments.exists():
+            raise ModelConflict("Cannot delete a building with apartments.", error_code="apartments_on_building")
+
+        super().perform_destroy(instance)
+
     def get_queryset(self):
         hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
         re_id = self._lookup_model_id_by_uuid(RealEstate, "real_estate_uuid", housing_company_id=hc_id)
 
         return (
             Building.objects.filter(real_estate__id=re_id)
+            .prefetch_related(
+                Prefetch("apartments", Apartment.objects.only("uuid")),
+            )
             .select_related("real_estate__housing_company__postal_code")
             .only(
                 "uuid",

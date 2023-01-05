@@ -268,7 +268,11 @@ def test__api__real_estate__delete__with_references(api_client: HitasAPIClient):
         "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": re.uuid.hex}
     )
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "buildings_on_real_estate",
+        "message": "Cannot delete a real estate with buildings.",
+        "reason": "Conflict",
+        "status": 409,
+    }
