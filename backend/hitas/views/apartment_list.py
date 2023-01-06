@@ -89,7 +89,7 @@ class ApartmentListViewSet(HitasModelMixin, mixins.ListModelMixin, viewsets.Gene
                 "building__real_estate__housing_company__postal_code__value",
                 "building__real_estate__housing_company__postal_code__city",
             )
-            .order_by("id")
+            .order_by("apartment_number", "id")
         )
 
     def get_filterset_class(self):

@@ -801,7 +801,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 "building__real_estate__housing_company__postal_code__city",
                 "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
-            .order_by("id")
+            .order_by("apartment_number", "id")
         )
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")

@@ -32,8 +32,8 @@ def test__api__apartment__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__list(api_client: HitasAPIClient):
-    ap1: Apartment = ApartmentFactory.create()
-    ap2: Apartment = ApartmentFactory.create()
+    ap1: Apartment = ApartmentFactory.create(apartment_number=1)
+    ap2: Apartment = ApartmentFactory.create(apartment_number=2)
     hc1: HousingCompany = ap1.housing_company
     hc2: HousingCompany = ap2.housing_company
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
