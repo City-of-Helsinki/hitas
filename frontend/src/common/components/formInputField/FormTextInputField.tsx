@@ -29,6 +29,7 @@ export default function FormTextInputField({
     }
 
     const inputProps = {
+        value: value,
         onChange: handleOnChange,
         required: required,
         ...rest,
