@@ -337,6 +337,7 @@ export type IIndexCalculationMarketPriceIndexBefore2011 = IIndexCalculation & {
     calculation_variables: ICommonCalculationVars & {
         acquisition_price: number;
         interest_during_construction: number;
+        additional_work_during_construction: number;
         basic_price: number;
         index_adjustment: number;
         apartment_improvements: {
@@ -404,6 +405,8 @@ export type IIndexCalculationConstructionPriceIndexBefore2011 = IIndexCalculatio
         housing_company_acquisition_price: number;
         housing_company_assets: number;
         apartment_share_of_housing_company_assets: number;
+        additional_work_during_construction: number;
+        index_adjusted_additional_work_during_construction: number;
         apartment_improvements: {
             items: {
                 name: string;

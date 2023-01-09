@@ -130,6 +130,10 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 value={calculation.calculation_variables.interest_during_construction}
             />
             <BreakdownValue
+                label="+ Rakennusaik. lisä- ja muutostyöt"
+                value={calculation.calculation_variables.additional_work_during_construction}
+            />
+            <BreakdownValue
                 label="= Perushinta"
                 value={calculation.calculation_variables.basic_price}
             />
@@ -245,6 +249,10 @@ const ConstructionPricePre2011Breakdown = ({
             <BreakdownValue
                 label={`+ Rakennusaikaiset korot (${calculation.calculation_variables.interest_during_construction_percentage}%)`}
                 value={calculation.calculation_variables.interest_during_construction}
+            />
+            <BreakdownValue
+                label="+ Tarkistettu rak.aik. lisä- ja muutostyöt"
+                value={calculation.calculation_variables.index_adjusted_additional_work_during_construction}
             />
             <BreakdownValue
                 label="+ Huoneistokohtaiset parannukset"
