@@ -536,6 +536,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "apartment_share_of_housing_company_assets": 170886.35,
             "interest_during_construction": 4000.0,
             "interest_during_construction_percentage": 14,
+            "additional_work_during_construction": 4307.0,
+            "index_adjusted_additional_work_during_construction": 6408.62,
             "apartment_improvements": {
                 "items": [],
                 "summary": {
@@ -570,8 +572,9 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "acquisition_price": 123173.0,
             "interest_during_construction": 3455.0,
             "interest_during_construction_percentage": 6,
-            "basic_price": 126628.0,
-            "index_adjustment": 153577.28,
+            "additional_work_during_construction": 4307.0,
+            "basic_price": 130935.0,
+            "index_adjustment": 158800.91,
             "apartment_improvements": {
                 "items": [],
                 "summary": {
@@ -790,6 +793,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "apartment_share_of_housing_company_assets": 219010.27,
             "interest_during_construction": 2703.0,
             "interest_during_construction_percentage": 6,
+            "additional_work_during_construction": 2500.0,
+            "index_adjusted_additional_work_during_construction": 3078.35,
             "apartment_improvements": {
                 "items": [
                     {
@@ -849,8 +854,9 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "acquisition_price": 175_930.0,
             "interest_during_construction": 2703.0,
             "interest_during_construction_percentage": 6,
-            "basic_price": 178_633.0,
-            "index_adjustment": 205_671.91,
+            "additional_work_during_construction": 2500.0,
+            "basic_price": 181_133.0,
+            "index_adjustment": 208_550.32,
             "apartment_improvements": {
                 "items": [],
                 "summary": {
@@ -960,6 +966,8 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
             "apartment_share_of_housing_company_assets": 200000.0,
             "interest_during_construction": 0,
             "interest_during_construction_percentage": 14,
+            "additional_work_during_construction": 0.0,
+            "index_adjusted_additional_work_during_construction": 0.0,
             "apartment_improvements": {
                 "items": [],
                 "summary": {
@@ -994,6 +1002,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
             "acquisition_price": 100000.0,
             "interest_during_construction": 0,
             "interest_during_construction_percentage": 6,
+            "additional_work_during_construction": 0.0,
             "basic_price": 100000.0,
             "index_adjustment": 100000.0,
             "apartment_improvements": {

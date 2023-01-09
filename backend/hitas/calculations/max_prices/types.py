@@ -53,6 +53,8 @@ class IndexCalculation:
         apartment_share_of_housing_company_assets: Decimal
         interest_during_construction: Decimal
         interest_during_construction_percentage: int
+        additional_work_during_construction: Decimal
+        index_adjusted_additional_work_during_construction: Decimal
         apartment_improvements: MaxPriceImprovements
 
     @dataclass
@@ -60,6 +62,7 @@ class IndexCalculation:
         acquisition_price: Decimal
         interest_during_construction: Decimal
         interest_during_construction_percentage: int
+        additional_work_during_construction: Decimal
         basic_price: Decimal
         index_adjustment: Decimal
         apartment_improvements: MaxPriceImprovements

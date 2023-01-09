@@ -98,11 +98,18 @@ class RulesPre2011(CalculatorRules):
             interest_during_construction = apartment.interest_during_construction_6 or 0
             interest_during_construction_percentage = 6
 
+        index_adjusted_additional_work_during_construction = (
+            apartment.additional_work_during_construction
+            * apartment.calculation_date_cpi
+            / apartment.completion_date_cpi
+        )
+
         # Debt free shares price
         debt_free_shares_price = (
             apartment_share_of_housing_company_assets
             + interest_during_construction
             + apartment_improvements_result.summary.value_for_apartment
+            + index_adjusted_additional_work_during_construction
         )
 
         # Final maximum price
@@ -120,6 +127,8 @@ class RulesPre2011(CalculatorRules):
                 apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
                 interest_during_construction=interest_during_construction,
                 interest_during_construction_percentage=interest_during_construction_percentage,
+                additional_work_during_construction=apartment.additional_work_during_construction,
+                index_adjusted_additional_work_during_construction=index_adjusted_additional_work_during_construction,
                 apartment_improvements=apartment_improvements_result,
                 housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
@@ -146,7 +155,11 @@ class RulesPre2011(CalculatorRules):
         # Start calculations
 
         # Basic price
-        basic_price = apartment.acquisition_price + (apartment.interest_during_construction_6 or 0)
+        basic_price = (
+            apartment.acquisition_price
+            + (apartment.interest_during_construction_6 or 0)
+            + apartment.additional_work_during_construction
+        )
 
         # Index adjustment
         index_adjustment = (apartment.calculation_date_mpi / apartment.completion_date_mpi) * basic_price - basic_price
@@ -206,6 +219,7 @@ class RulesPre2011(CalculatorRules):
                 acquisition_price=apartment.acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
                 interest_during_construction_percentage=6,
+                additional_work_during_construction=apartment.additional_work_during_construction,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,

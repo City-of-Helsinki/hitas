@@ -1227,9 +1227,11 @@ paths:
                           housing_company_assets: 170_886.35
                           apartment_share_of_housing_company_assets: 170886.35
                           interest_during_construction: 3455.0
+                          additional_work_during_construction: 0.0
+                          index_adjusted_additional_work_during_construction: 0.0
                           apartment_improvements:
                             items:
-                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                              - name: Ullakkohuoneen rakennus
                                 value: 4307.0
                                 calculation_date_index: 364.4
                                 completion_date: "2003-05-09"
@@ -1269,9 +1271,10 @@ paths:
                           interest_during_construction: 3455.0
                           basic_price: 126628.0
                           index_adjustment: 153577.28
+                          additional_work_during_construction: 0.0
                           apartment_improvements:
                             items:
-                              - name: Rakennusaikaiset muutos- ja lisätyöt
+                              - name: Ullakkohuoneen rakennus
                                 value: 4307.0
                                 completion_date: "2003-05-09"
                                 value_without_excess: 4307.0
@@ -3653,6 +3656,7 @@ components:
         - acquisition_price
         - basic_price
         - interest_during_construction
+        - additional_work_during_construction
         - index_adjustment
         - apartment_improvements
         - housing_company_improvements
@@ -3682,6 +3686,12 @@ components:
           type: number
           minimum: 0
           example: 1802.88
+        additional_work_during_construction:
+          description: Amount of apartment's additional work done during construction
+          type: number
+          nullable: true
+          minimum: 0
+          example: 0.0
         index_adjustment:
           description: |-
             Value increase of the apartment based on the index. Calculated by dividing the
@@ -3747,6 +3757,8 @@ components:
         - housing_company_assets
         - apartment_share_of_housing_company_assets
         - interest_during_construction
+        - additional_work_during_construction
+        - index_adjusted_additional_work_during_construction
         - apartment_improvements
         - housing_company_improvements
         - debt_free_price
@@ -3778,6 +3790,18 @@ components:
           type: number
           minimum: 0
           example: 1802.88
+        additional_work_during_construction:
+          description: Amount of apartment's additional work done during construction
+          type: number
+          nullable: true
+          minimum: 0
+          example: 0.0
+        index_adjusted_additional_work_during_construction:
+          description: Amount of apartment's additional work done during construction, after index adjustment
+          type: number
+          nullable: true
+          minimum: 0
+          example: 0.0
         apartment_improvements:
           $ref: '#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexApartmentImprovements'
         housing_company_improvements:
