@@ -232,7 +232,7 @@ const ConstructionPricePre2011Breakdown = ({
             />
             <BreakdownValue
                 label="+ Kiinteistön parannukset"
-                value={calculation.calculation_variables.housing_company_improvements.summary.value}
+                value={calculation.calculation_variables.housing_company_improvements.summary.value_for_apartment}
             />
             <BreakdownValue
                 label="= Yhtiön varat yhteensä"

@@ -52,7 +52,7 @@
             {% else %}
                 {% set table_right = [
                     ["Yhtiön tarkistettu hankinta-arvo", vars.housing_company_acquisition_price|intcomma],
-                    ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value|intcomma],
+                    ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
                     ["= Yhtiön varat yhteensä", vars.housing_company_assets|intcomma],
                     ["Osakkeiden osuus", vars.apartment_share_of_housing_company_assets|intcomma],
                     ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
