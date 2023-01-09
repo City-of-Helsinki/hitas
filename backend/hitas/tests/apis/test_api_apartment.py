@@ -1549,8 +1549,8 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
             100,  # start_2
             120,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Share 20 has already been taken by foo 1."},
-                {"field": "shares.end", "message": "Share 100 has already been taken by bar 2."},
+                {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
             ],
         ],
         [
@@ -1559,10 +1559,10 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
             99,  # start_2
             120,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo 1."},
-                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo 1."},
-                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
+                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1571,10 +1571,10 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
             80,  # start_2
             90,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo 1."},
-                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo 1."},
-                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
+                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1583,8 +1583,8 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
             10,  # start_2
             110,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1593,8 +1593,8 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
             20,  # start_2
             100,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
             ],
         ],
     ],
@@ -1619,6 +1619,7 @@ def test__api__apartment__create__overlapping_shares(
     ApartmentFactory.create(
         building=b1,
         street_address="foo",
+        stair="a",
         apartment_number=1,
         share_number_start=start_1,
         share_number_end=end_1,
@@ -1626,6 +1627,7 @@ def test__api__apartment__create__overlapping_shares(
     ApartmentFactory.create(
         building=b1,
         street_address="bar",
+        stair="b",
         apartment_number=2,
         share_number_start=start_2,
         share_number_end=end_2,
@@ -1851,8 +1853,8 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
             100,  # start_2
             120,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Share 20 has already been taken by foo 1."},
-                {"field": "shares.end", "message": "Share 100 has already been taken by bar 2."},
+                {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
             ],
         ],
         [
@@ -1861,10 +1863,10 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
             99,  # start_2
             120,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo 1."},
-                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo 1."},
-                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
+                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1873,10 +1875,10 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
             80,  # start_2
             90,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo 1."},
-                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo 1."},
-                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
+                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
+                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1885,8 +1887,8 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
             10,  # start_2
             110,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
             ],
         ],
         [
@@ -1895,8 +1897,8 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
             20,  # start_2
             100,  # end_2
             [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar 2."},
+                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
             ],
         ],
     ],
@@ -1921,6 +1923,7 @@ def test__api__apartment__update__overlapping_shares(
     ApartmentFactory.create(
         building=building_1,
         street_address="foo",
+        stair="a",
         apartment_number=1,
         share_number_start=start_1,
         share_number_end=end_1,
@@ -1928,6 +1931,7 @@ def test__api__apartment__update__overlapping_shares(
     ApartmentFactory.create(
         building=building_1,
         street_address="bar",
+        stair="b",
         apartment_number=2,
         share_number_start=start_2,
         share_number_end=end_2,
@@ -1935,6 +1939,7 @@ def test__api__apartment__update__overlapping_shares(
     apartment_1: Apartment = ApartmentFactory.create(
         building=building_1,
         street_address="baz",
+        stair="c",
         apartment_number=3,
         share_number_start=200,
         share_number_end=300,

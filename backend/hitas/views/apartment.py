@@ -142,6 +142,13 @@ class SharesSerializer(serializers.Serializer):
         if start > end:
             raise ValidationError({"start": "'shares.start' must not be greater than 'shares.end'."})
 
+        share_range_filter = (
+            Q(share_number_start__lte=start, share_number_end__gte=start)  # Overlapping start
+            | Q(share_number_start__lte=end, share_number_end__gte=end)  # Overlapping end
+            | Q(share_number_start__gte=start, share_number_end__lte=end)  # Fully inside range
+            | Q(share_number_start__lte=start, share_number_end__gte=end)  # Fully overlapping range
+        )
+
         apartment_filter = Q(building__real_estate__housing_company__uuid=F("_housing_company"))
         if self.parent.instance is not None:
             apartment_filter &= ~Q(uuid=self.parent.instance.uuid)
@@ -151,35 +158,33 @@ class SharesSerializer(serializers.Serializer):
         if isinstance(building_input, dict):
             building_id = building_input.get("id")
 
+        # If invalid building ID is given, break early as there is already
+        # an error on the way from the building_id validator.
         if not isinstance(building_id, str) or not valid_uuid(building_id):
             return data
 
-        apartments: Iterable[dict[str, Any]] = (
+        overlapping_apartments: Iterable[Apartment] = (
             Apartment.objects.annotate(
                 _housing_company=Subquery(
                     HousingCompany.objects.filter(real_estates__buildings__uuid=building_id).values("uuid"),
                 ),
             )
-            .filter(apartment_filter)
-            .only("street_address", "apartment_number", "share_number_start", "share_number_end")
-            .values("street_address", "apartment_number", "share_number_start", "share_number_end")
+            .filter(apartment_filter & share_range_filter)
+            .only("street_address", "stair", "apartment_number", "share_number_start", "share_number_end")
         )
 
-        if apartments:
-            self.check_share_ranges(start, end, apartments)
+        if overlapping_apartments:
+            self.check_share_ranges(start, end, overlapping_apartments)
 
         return data
 
     @staticmethod
-    def check_share_ranges(start: int, end: int, apartments: Iterable[dict[str, Any]]) -> None:
+    def check_share_ranges(start: int, end: int, apartments: Iterable[Apartment]) -> None:
         new_share_range = set(range(start, end + 1))
         share_ranges: dict[range, str] = {
-            range(
-                apartment["share_number_start"],
-                apartment["share_number_end"] + 1,
-            ): f"{apartment['street_address']} {apartment['apartment_number']}"
+            range(apartment.share_number_start, apartment.share_number_end + 1): apartment.address
             for apartment in apartments
-            if apartment["share_number_start"] is not None and apartment["share_number_start"] is not None
+            if apartment.share_number_start is not None and apartment.share_number_end is not None
         }
 
         errors: dict[str, list[str]] = {}
