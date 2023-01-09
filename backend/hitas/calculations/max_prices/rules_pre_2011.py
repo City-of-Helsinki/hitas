@@ -84,18 +84,6 @@ class RulesPre2011(CalculatorRules):
             )
             for i in apartment_improvements
         ]
-        if apartment.additional_work_during_construction:
-            # Add `additional_work_during_construction` as an improvement as it's treated as an improvement
-            # with pre 2011 rules
-            apartment_improvements_list.append(
-                ImprovementData(
-                    name="Rakennusaikaiset muutos- ja lisätyöt",
-                    value=apartment.additional_work_during_construction,
-                    completion_date=apartment.completion_date,
-                    completion_date_index=apartment.completion_date_cpi,
-                    treat_as_additional_work=True,
-                )
-            )
         apartment_improvements_result = calculate_apartment_improvements_pre_2011_construction_price_index(
             apartment_improvements_list,
             calculation_date=calculation_date,
@@ -173,18 +161,6 @@ class RulesPre2011(CalculatorRules):
             )
             for i in apartment_improvements
         ]
-        if apartment.additional_work_during_construction:
-            # Add `additional_work_during_construction` as an improvement as it's treated as an improvement
-            # with pre 2011 rules
-            apartment_improvements_list.append(
-                ImprovementData(
-                    name="Rakennusaikaiset muutos- ja lisätyöt",
-                    value=apartment.additional_work_during_construction,
-                    completion_date=apartment.completion_date,
-                    completion_date_index=apartment.completion_date_mpi,
-                    treat_as_additional_work=True,
-                )
-            )
         apartment_improvements_result = calculate_apartment_improvements_pre_2011_market_price_index(
             apartment_improvements_list,
             calculation_date=calculation_date,

@@ -17,10 +17,6 @@ class ImprovementData:
     completion_date_index: Optional[Decimal] = None
     # Depreciation percentage for this improvement. Not needed for all the calculations.
     depreciation_percentage: Optional[Decimal] = None
-    # When this improvement is apartment improvement constructed before 2011 then it's
-    # possible to mark the improvement as "additional work before construction" which
-    # is treated with its own rules.
-    treat_as_additional_work: bool = False
 
 
 class Excess(Enum):

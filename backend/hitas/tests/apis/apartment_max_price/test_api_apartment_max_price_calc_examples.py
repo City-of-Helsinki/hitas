@@ -537,30 +537,12 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "interest_during_construction": 4000.0,
             "interest_during_construction_percentage": 14,
             "apartment_improvements": {
-                "items": [
-                    {
-                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                        "value": 4307.0,
-                        "calculation_date_index": 364.4,
-                        "completion_date": "2003-05-09",
-                        "completion_date_index": 244.9,
-                        "index_adjusted": 6408.62,
-                        "depreciation": {
-                            "amount": 0.0,
-                            "percentage": 0.0,
-                            "time": {
-                                "years": 0,
-                                "months": 0,
-                            },
-                        },
-                        "value_for_apartment": 6408.62,
-                    }
-                ],
+                "items": [],
                 "summary": {
-                    "value": 4307.0,
-                    "index_adjusted": 6408.62,
+                    "value": 0.0,
+                    "index_adjusted": 0.0,
                     "depreciation": 0.0,
-                    "value_for_apartment": 6408.62,
+                    "value_for_apartment": 0.0,
                 },
             },
             "housing_company_improvements": {
@@ -591,32 +573,17 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "basic_price": 126628.0,
             "index_adjustment": 153577.28,
             "apartment_improvements": {
-                "items": [
-                    {
-                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                        "value": 4307.0,
-                        "completion_date": "2003-05-09",
-                        "value_without_excess": 4307.0,
-                        "depreciation": {
-                            "amount": 0.0,
-                            "time": {
-                                "years": 0,
-                                "months": 0,
-                            },
-                        },
-                        "accepted_value": 9530.63,
-                    }
-                ],
+                "items": [],
                 "summary": {
-                    "value": 4307.0,
-                    "value_without_excess": 4307.0,
+                    "value": 0.0,
+                    "value_without_excess": 0.0,
                     "depreciation": 0.0,
                     "excess": {
                         "surface_area": 54.5,
                         "total": 5450.0,
                         "value_per_square_meter": 100.0,
                     },
-                    "accepted_value": 9530.63,
+                    "accepted_value": 0.0,
                 },
             },
             "housing_company_improvements": {
@@ -841,30 +808,13 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                             },
                         },
                         "value_for_apartment": 13_110.75,
-                    },
-                    {
-                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                        "value": 2500.00,
-                        "calculation_date_index": 364.6,
-                        "completion_date": "2012-06-28",
-                        "completion_date_index": 296.1,
-                        "index_adjusted": 3078.35,
-                        "depreciation": {
-                            "amount": 0.0,
-                            "percentage": 0.0,
-                            "time": {
-                                "years": 0,
-                                "months": 0,
-                            },
-                        },
-                        "value_for_apartment": 3078.35,
-                    },
+                    }
                 ],
                 "summary": {
-                    "value": 17500.0,
-                    "index_adjusted": 20367.26,
+                    "value": 15_000.0,
+                    "index_adjusted": 17288.91,
                     "depreciation": 4178.15,
-                    "value_for_apartment": 16189.11,
+                    "value_for_apartment": 13110.75,
                 },
             },
             "housing_company_improvements": {
@@ -902,32 +852,17 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "basic_price": 178_633.0,
             "index_adjustment": 205_671.91,
             "apartment_improvements": {
-                "items": [
-                    {
-                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                        "value": 2500.00,
-                        "completion_date": "2012-06-28",
-                        "value_without_excess": 2500.0,
-                        "depreciation": {
-                            "amount": 0.0,
-                            "time": {
-                                "years": 0,
-                                "months": 0,
-                            },
-                        },
-                        "accepted_value": 5378.41,
-                    }
-                ],
+                "items": [],
                 "summary": {
-                    "value": 2500.0,
-                    "value_without_excess": 2500.0,
+                    "value": 0.0,
+                    "value_without_excess": 0.0,
                     "excess": {
                         "surface_area": 45.5,
                         "total": 4550.0,
                         "value_per_square_meter": 100.0,
                     },
                     "depreciation": 0.0,
-                    "accepted_value": 5378.41,
+                    "accepted_value": 0.0,
                 },
             },
             "housing_company_improvements": {

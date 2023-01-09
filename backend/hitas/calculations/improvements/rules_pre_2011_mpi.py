@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Callable, List, Optional
 
-from hitas.calculations.exceptions import IndexMissingException
 from hitas.calculations.helpers import months_between_dates
 from hitas.calculations.improvements.common import Excess, ImprovementData
 from hitas.calculations.improvements.rules_2011_onwards import calculate_single_housing_company_improvement_2011_onwards
@@ -93,9 +92,6 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
     calculation_date_index: Decimal,
     apartment_surface_area: Decimal,
 ) -> ApartmentImprovementCalculationResult:
-    if improvement.treat_as_additional_work:
-        return calculate_additional_work(improvement, calculation_date_index)
-
     #
     # Calculate the excess
     #
@@ -136,32 +132,6 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
         completion_date=improvement.completion_date,
         value_without_excess=value_without_excess,
         depreciation=depreciation_result,
-        accepted_value=accepted,
-    )
-
-
-def calculate_additional_work(
-    improvement: ImprovementData,
-    calculation_date_index: Decimal,
-) -> ApartmentImprovementCalculationResult:
-    if improvement.completion_date_index is None or calculation_date_index is None:
-        raise IndexMissingException()
-
-    # Calculate the accepted value with the index
-    accepted = improvement.value * calculation_date_index / improvement.completion_date_index
-
-    #
-    # Return the result
-    #
-    return ApartmentImprovementCalculationResult(
-        name=improvement.name,
-        completion_date=improvement.completion_date,
-        value=improvement.value,
-        value_without_excess=improvement.value,
-        depreciation=ApartmentImprovementCalculationResult.Depreciation(
-            time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime(years=0, months=0),
-            amount=Decimal(0),
-        ),
         accepted_value=accepted,
     )
 
