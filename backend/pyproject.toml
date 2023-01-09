@@ -15,7 +15,6 @@ django-filter = "^22.1"
 Markdown = "^3.3.7"
 djangorestframework = "^3.13.1"
 django-nested-inline = "^0.4.5"
-uWSGI = "^2.0.20"
 django-crum = "^0.7.9"
 django-health-check = "^3.16.5"
 drf-nested-routers = "^0.93.4"
@@ -26,6 +25,13 @@ python-dateutil = "^2.8.2"
 xhtml2pdf = "^0.2.8"
 django-jinja = "^2.10.2"
 num2words = "^0.5.12"
+
+[tool.poetry.dependencies.uWSGI]
+version = "^2.0.20"
+# Skip installation on Windows as uWSGI does not support it without Cygwin.
+# Windows users should use WSL for their local development virtualenv, but can
+# still create another virtualenv in Windows without uWSGI for pre-commit hooks.
+markers = "sys_platform != 'win32'"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.2"
