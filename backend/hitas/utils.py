@@ -1,5 +1,6 @@
 import datetime
 import operator
+import uuid
 from typing import Any, Optional
 
 from django.db.models import Value
@@ -55,3 +56,11 @@ def this_month() -> datetime.date:
 
 def monthify(date: datetime.date) -> datetime.date:
     return date.replace(day=1)
+
+
+def valid_uuid(value: str, version: int = 4) -> bool:
+    try:
+        uuid.UUID(value, version=version)
+        return True
+    except ValueError:
+        return False

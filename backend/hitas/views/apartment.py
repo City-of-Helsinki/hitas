@@ -2,7 +2,7 @@ import datetime
 import uuid
 from collections import OrderedDict
 from http import HTTPStatus
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, Iterable
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Q
@@ -34,7 +34,7 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
-from hitas.utils import RoundWithPrecision, this_month
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -44,6 +44,7 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
     ValueOrNullField,
+    UUIDField,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
@@ -141,7 +142,78 @@ class SharesSerializer(serializers.Serializer):
         if start > end:
             raise ValidationError({"start": "'shares.start' must not be greater than 'shares.end'."})
 
+        share_range_filter = (
+            Q(share_number_start__lte=start, share_number_end__gte=start)  # Overlapping start
+            | Q(share_number_start__lte=end, share_number_end__gte=end)  # Overlapping end
+            | Q(share_number_start__gte=start, share_number_end__lte=end)  # Fully inside range
+            | Q(share_number_start__lte=start, share_number_end__gte=end)  # Fully overlapping range
+        )
+
+        apartment_filter = Q(building__real_estate__housing_company__uuid=F("_housing_company"))
+        if self.parent.instance is not None:
+            apartment_filter &= ~Q(uuid=self.parent.instance.uuid)
+
+        building_id: Optional[str] = None
+        building_input = self.parent.initial_data["building"]
+        if isinstance(building_input, dict):
+            building_id = building_input.get("id")
+
+        # If invalid building ID is given, break early as there is already
+        # an error on the way from the building_id validator.
+        if not isinstance(building_id, str) or not valid_uuid(building_id):
+            return data
+
+        overlapping_apartments: Iterable[Apartment] = (
+            Apartment.objects.annotate(
+                _housing_company=Subquery(
+                    HousingCompany.objects.filter(real_estates__buildings__uuid=building_id).values("uuid"),
+                ),
+            )
+            .filter(apartment_filter & share_range_filter)
+            .only("street_address", "stair", "apartment_number", "share_number_start", "share_number_end")
+        )
+
+        if overlapping_apartments:
+            self.check_share_ranges(start, end, overlapping_apartments)
+
         return data
+
+    @staticmethod
+    def check_share_ranges(start: int, end: int, apartments: Iterable[Apartment]) -> None:
+        new_share_range = set(range(start, end + 1))
+        share_ranges: dict[range, str] = {
+            range(apartment.share_number_start, apartment.share_number_end + 1): apartment.address
+            for apartment in apartments
+            if apartment.share_number_start is not None and apartment.share_number_end is not None
+        }
+
+        errors: dict[str, list[str]] = {}
+        for share_range, address in share_ranges.items():
+            overlapping: set[int] = new_share_range.intersection(share_range)
+            if not overlapping:
+                continue
+
+            if len(overlapping) == 1:
+                share: int = next(iter(overlapping))
+                if share == start:
+                    errors.setdefault("start", [])
+                    errors["start"].append(f"Share {share} has already been taken by {address}.")
+                    continue
+
+                errors.setdefault("end", [])
+                errors["end"].append(f"Share {share} has already been taken by {address}.")
+                continue
+
+            sorted_shares: list[int] = sorted(overlapping)
+            first: int = sorted_shares[0]
+            last: int = sorted_shares[-1]
+            errors.setdefault("start", [])
+            errors.setdefault("end", [])
+            errors["start"].append(f"Shares {first}-{last} have already been taken by {address}.")
+            errors["end"].append(f"Shares {first}-{last} have already been taken by {address}.")
+
+        if errors:
+            raise ValidationError(errors)
 
     def run_validation(self, data=empty):
         value = super().run_validation(data)

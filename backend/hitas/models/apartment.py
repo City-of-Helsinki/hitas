@@ -37,6 +37,7 @@ class Apartment(ExternalHitasModel):
     # 'Huoneiden määrä'
     rooms = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
+    # 'Pienin ja suurin osakenumero'
     share_number_start = models.IntegerField(null=True, validators=[MinValueValidator(1)])
     share_number_end = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
