@@ -24,12 +24,14 @@ const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}
     return (
         <Card>
             <div className="row row--buttons">
-                <Button
-                    theme="black"
-                    iconLeft={<IconGlyphEuro />}
-                >
-                    Luo kauppa
-                </Button>
+                <Link to="new-sale">
+                    <Button
+                        theme="black"
+                        iconLeft={<IconGlyphEuro />}
+                    >
+                        Uusi kauppa
+                    </Button>
+                </Link>
                 <Button
                     theme="black"
                     iconLeft={<IconLock />}
