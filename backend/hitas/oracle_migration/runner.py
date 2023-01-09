@@ -1,14 +1,11 @@
-import datetime
 import logging
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional, Type, TypeVar
+from typing import Callable, Dict, List, TypeVar
 
-import pytz
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
-from django.db import models
 from django.db.models import Max
 from safedelete import HARD_DELETE
 from sqlalchemy import create_engine, desc
@@ -35,7 +32,6 @@ from hitas.models import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
     MaximumPriceIndex,
@@ -46,7 +42,6 @@ from hitas.models import (
     RealEstate,
     SurfaceAreaPriceCeiling,
 )
-from hitas.models.apartment import DepreciationPercentage
 from hitas.models.indices import AbstractIndex
 from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
@@ -70,9 +65,15 @@ from hitas.oracle_migration.oracle_schema import (
     real_estates,
     users,
 )
-from hitas.oracle_migration.types import str_to_year_month
-
-TZ = pytz.timezone("Europe/Helsinki")
+from hitas.oracle_migration.utils import (
+    combine_notes,
+    date_to_datetime,
+    format_building_type,
+    housing_company_state_from,
+    str_to_year_month,
+    turn_off_auto_now,
+    value_to_depreciation_percentage,
+)
 
 
 @dataclass
@@ -112,20 +113,6 @@ class ConvertedData:
 BULK_INSERT_THRESHOLD = 1000
 
 
-def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> None:
-    for code in codes:
-        index = model_class()
-
-        index.value = float(code["value"])
-        index.month = str_to_year_month(code["code_id"])
-
-        # Skip indices with '0' values
-        if index.value == 0:
-            continue
-
-        index.save()
-
-
 def run(
     oracle_host: str,
     oracle_port: str,
@@ -136,7 +123,6 @@ def run(
     truncate: bool,
     truncate_only: bool,
 ) -> None:
-
     if debug:
         logging.basicConfig()
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
@@ -245,7 +231,50 @@ def run(
     MigrationDone.objects.create()
 
 
-def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
+def do_truncate():
+    for model_class in [
+        Apartment,
+        ApartmentType,
+        Building,
+        RealEstate,
+        HousingCompany,
+        PropertyManager,
+        BuildingType,
+        Developer,
+        FinancingMethod,
+        Owner,
+        HitasPostalCode,
+    ]:
+        model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
+
+    for model_class in [
+        get_user_model(),
+        SurfaceAreaPriceCeiling,
+        ConstructionPriceIndex2005Equal100,
+        ConstructionPriceIndex,
+        MarketPriceIndex,
+        MarketPriceIndex2005Equal100,
+        ApartmentMaximumPriceCalculation,
+        MigrationDone,
+    ]:
+        model_class.objects.all().delete()
+
+
+def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> None:
+    for code in codes:
+        index = model_class()
+
+        index.value = float(code["value"])
+        index.month = str_to_year_month(code["code_id"])
+
+        # Skip indices with '0' values
+        if index.value == 0:
+            continue
+
+        index.save()
+
+
+def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> dict[int, CreatedHousingCompany]:
     housing_companies_by_id = {}
 
     for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
@@ -411,25 +440,18 @@ def create_real_estates_and_buildings(
     return created_real_estates
 
 
-def fetch_payments(connection: Connection, apartment_id: int):
-    retval = []
-    for payment in connection.execute(
-        select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
-    ).fetchall():
-        retval.append(
-            Payment(
-                date=payment.date,
-                percentage=Decimal(payment.percentage),
-            )
-        )
-    return retval
-
-
 def create_apartments(
     building: Building, connection: Connection, converted_data: ConvertedData
 ) -> Dict[int, Apartment]:
-    apartments_by_id = {}
+    def fetch_payments(connection: Connection, apartment_id: int):
+        retval = []
+        for payment in connection.execute(
+            select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
+        ).fetchall():
+            retval.append(Payment(date=payment.date, percentage=Decimal(payment.percentage)))
+        return retval
 
+    apartments_by_id = {}
     bulk_apartments = []
 
     for apartment in connection.execute(
@@ -494,18 +516,6 @@ def create_apartments(
     return apartments_by_id
 
 
-def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
-    match value:  # noqa: E999
-        case "000":
-            return DepreciationPercentage.ZERO
-        case "001":
-            return DepreciationPercentage.TWO_AND_HALF
-        case "002":
-            return DepreciationPercentage.TEN
-        case _:
-            raise ValueError(f"Invalid value '{value}'.")
-
-
 def create_apartment_improvements(
     connection: Connection, converted_data: ConvertedData
 ) -> dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]]:
@@ -518,7 +528,7 @@ def create_apartment_improvements(
         created[v.id] = ([], [])
 
         #
-        # Construction price index
+        # Construction price index calculations
         #
         construction_price_index = connection.execute(
             select(construction_price_indices)
@@ -551,7 +561,7 @@ def create_apartment_improvements(
             bulk_cpi = []
 
         #
-        # Market price index
+        # Market price index calculations
         #
         market_price_index = connection.execute(
             select(market_price_indices)
@@ -653,7 +663,6 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
 
 
 def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
-
     for mpc in (
         connection.execute(select(construction_price_indices)).fetchall()
         + connection.execute(select(market_price_indices)).fetchall()
@@ -696,41 +705,12 @@ def create_property_managers(connection: Connection) -> Dict[str, PropertyManage
     return property_managers_by_id
 
 
-def read_codebooks(
-    connection: Connection,
-) -> Dict[str, List[LegacyRow]]:
-    codebooks_by_id = {}
-    total_codes = 0
-
-    #
-    # Fetch all codebooks
-    #
-    for codebook in connection.execute(select(codebooks)).fetchall():
-        new_codes = []
-        codebooks_by_id[codebook["code_type"]] = new_codes
-
-        #
-        # Fetch all codes by codebook
-        #
-        for code in connection.execute(select(codes).where(codes.c.code_type == codebook["code_type"])).fetchall():
-            new_codes.append(code)
-            total_codes += 1
-
-    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.")
-    print()
-
-    return codebooks_by_id
-
-
-def create_users(
-    connection: Connection,
-) -> Dict[str, Dict[str, get_user_model()]]:
+def create_users(connection: Connection) -> Dict[str, Dict[str, get_user_model()]]:
     users_by_id = {}
 
     #
     # Fetch all enabled users
     #
-
     for user in connection.execute(select(users)).fetchall():  # noqa
         splitted_name = user["name"].split(" ", maxsplit=1)
         first_name, last_name = splitted_name[0].capitalize(), splitted_name[1].capitalize()
@@ -753,42 +733,6 @@ def create_users(
     return users_by_id
 
 
-def combine_notes(a: LegacyRow) -> str:
-    return "\n".join(
-        [note for note in [a["TEKSTI1"], a["TEKSTI2"], a["TEKSTI3"], a["TEKSTI4"], a["TEKSTI5"]] if note is not None]
-    )
-
-
-def format_building_type(bt: BuildingType) -> None:
-    bt.value = bt.value.capitalize()
-
-
-def housing_company_state_from(code: str) -> HousingCompanyState:
-    # These are hardcoded as the code number (C_KOODISTOID) and
-    # the name (C_NAME) are the only ones that can be used to
-    # identify these types
-    match code:
-        case "000":
-            return HousingCompanyState.NOT_READY
-        case "001":
-            return HousingCompanyState.LESS_THAN_30_YEARS
-        case "002":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
-        case "003":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_FREE
-        case "004":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION
-        case "005":
-            return HousingCompanyState.HALF_HITAS
-
-
-def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
-    if d is None:
-        return None
-
-    return TZ.localize(datetime.datetime.combine(d, datetime.datetime.min.time()))
-
-
 def create_unsaved_postal_codes(codes: List[LegacyRow]) -> Dict[str, HitasPostalCode]:
     retval = {}
 
@@ -802,6 +746,30 @@ def create_unsaved_postal_codes(codes: List[LegacyRow]) -> Dict[str, HitasPostal
         retval[postal_code.value] = postal_code
 
     return retval
+
+
+def read_codebooks(connection: Connection) -> Dict[str, List[LegacyRow]]:
+    codebooks_by_id = {}
+    total_codes = 0
+
+    #
+    # Fetch all codebooks
+    #
+    for codebook in connection.execute(select(codebooks)).fetchall():
+        new_codes = []
+        codebooks_by_id[codebook["code_type"]] = new_codes
+
+        #
+        # Fetch all codes by codebook
+        #
+        for code in connection.execute(select(codes).where(codes.c.code_type == codebook["code_type"])).fetchall():
+            new_codes.append(code)
+            total_codes += 1
+
+    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.")
+    print()
+
+    return codebooks_by_id
 
 
 T = TypeVar("T", bound=AbstractCode)
@@ -833,36 +801,3 @@ def create_codes(
         new.save()
 
     return retval
-
-
-def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
-    model._meta.get_field(field_name).auto_now = False
-
-
-def do_truncate():
-    for model_class in [
-        Apartment,
-        ApartmentType,
-        Building,
-        RealEstate,
-        HousingCompany,
-        PropertyManager,
-        BuildingType,
-        Developer,
-        FinancingMethod,
-        Owner,
-        HitasPostalCode,
-    ]:
-        model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
-
-    for model_class in [
-        get_user_model(),
-        SurfaceAreaPriceCeiling,
-        ConstructionPriceIndex2005Equal100,
-        ConstructionPriceIndex,
-        MarketPriceIndex,
-        MarketPriceIndex2005Equal100,
-        ApartmentMaximumPriceCalculation,
-        MigrationDone,
-    ]:
-        model_class.objects.all().delete()

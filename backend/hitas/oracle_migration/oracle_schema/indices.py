@@ -18,14 +18,7 @@ max_price_indices = Table(
     metadata_obj,
     Column("KG_EHIND", Integer, key="id", primary_key=True),
     Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False, index=True),
-    Column(
-        "KG_YTUNNUS",
-        Integer,
-        ForeignKey("HITYHTIO.id"),
-        key="company_id",
-        nullable=False,
-        index=True,
-    ),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False, index=True),
     Column("C_DIANRO", String(10)),
     Column("C_OMNIMI1", HitasAnonymizedName(50)),
     Column("C_OMNIMI2", HitasAnonymizedName(50)),
@@ -86,14 +79,7 @@ company_selling_price_indices = Table(
     metadata_obj,
     Column("KG_HLIYHTPAR", Integer, key="id", primary_key=True),
     Column("KG_EHIND", Integer, ForeignKey("HITEHIND.id"), key="max_price_index_id", nullable=False, index=True),
-    Column(
-        "KG_YTUNNUS",
-        Integer,
-        ForeignKey("HITYHTIO.id"),
-        key="company_id",
-        nullable=False,
-        index=True,
-    ),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False, index=True),
     Column("D_LASKPVM", Date, key="calculation_date", nullable=False),
     Column("N_HLILASKPVM", Float, key="calculation_date_index", nullable=False),
     Column("C_VALMPVM", HitasYearMonth, key="completion_date", nullable=False),
@@ -112,7 +98,7 @@ company_selling_price_indices = Table(
 )
 
 #
-# construction price index 'rakennuskustannusindeksi'
+# construction price index 'rakennuskustannusindeksi' calculations (confirmed or unconfirmed)
 #
 
 construction_price_indices = Table(
@@ -120,14 +106,7 @@ construction_price_indices = Table(
     metadata_obj,
     Column("KG_EHIND", Integer, key="id", primary_key=True),
     Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False, index=True),
-    Column(
-        "KG_YTUNNUS",
-        Integer,
-        ForeignKey("HITYHTIO.id"),
-        key="company_id",
-        nullable=False,
-        index=True,
-    ),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False, index=True),
     Column("C_DIANRO", String(10)),
     Column("C_OMNIMI1", HitasAnonymizedName(50)),
     Column("C_OMNIMI2", HitasAnonymizedName(50)),
@@ -225,7 +204,7 @@ apartment_construction_price_indices = Table(
 )
 
 #
-# market price index 'markkinahintaindeksi'
+# market price index 'markkinahintaindeksi' calculations (confirmed or unconfirmed)
 #
 
 market_price_indices = Table(
@@ -233,14 +212,7 @@ market_price_indices = Table(
     metadata_obj,
     Column("KG_EHIND", Integer, key="id", primary_key=True, index=True),
     Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False, index=True),
-    Column(
-        "KG_YTUNNUS",
-        Integer,
-        ForeignKey("HITYHTIO.id"),
-        key="company_id",
-        nullable=False,
-        index=True,
-    ),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False, index=True),
     Column("C_DIANRO", String(10)),
     Column("C_OMNIMI1", HitasAnonymizedName(50)),
     Column("C_OMNIMI2", HitasAnonymizedName(50)),
@@ -283,14 +255,7 @@ company_market_price_indices = Table(
     metadata_obj,
     Column("KG_MHYHTPAR", Integer, key="id", primary_key=True),
     Column("KG_EHIND", Integer, ForeignKey("HITMHIND.id"), key="max_price_index_id", nullable=False, index=True),
-    Column(
-        "KG_YTUNNUS",
-        Integer,
-        ForeignKey("HITYHTIO.id"),
-        key="company_id",
-        nullable=False,
-        index=True,
-    ),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False, index=True),
     Column("D_LASKPVM", Date, key="calculation_date", nullable=False),
     Column("C_VALMPVM", HitasYearMonth, key="completion_date", nullable=False),
     Column("C_POISTOKOODI", String(16), nullable=False),  # Always 'HITMHRAJAT' or 'HLIJAKOPER'

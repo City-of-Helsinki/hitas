@@ -1,10 +1,10 @@
-import datetime
 import random
 
 import sqlalchemy.types as types
 from dateutil.relativedelta import relativedelta
 
 from hitas.oracle_migration.globals import faker, should_anonymize
+from hitas.oracle_migration.utils import str_to_year_month
 
 
 class HitasBoolean(types.TypeDecorator):
@@ -35,10 +35,6 @@ class HitasYearMonth(types.TypeDecorator):
 
     def process_result_value(self, value, dialect):
         return str_to_year_month(value)
-
-
-def str_to_year_month(value: str) -> datetime.date:
-    return datetime.datetime.strptime(value, "%Y%m").date()
 
 
 class HitasDuration(types.TypeDecorator):
