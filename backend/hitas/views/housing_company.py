@@ -8,6 +8,7 @@ from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from hitas.exceptions import ModelConflict
 from hitas.models import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
@@ -247,6 +248,15 @@ class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
     model_class = HousingCompany
+
+    def perform_destroy(self, instance: HousingCompany) -> None:
+        if instance.real_estates.exists():
+            raise ModelConflict(
+                "Cannot delete a housing company with real estates.",
+                error_code="real_estates_on_housing_company",
+            )
+
+        super().perform_destroy(instance)
 
     def get_list_queryset(self):
         return (

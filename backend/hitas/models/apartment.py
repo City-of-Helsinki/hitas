@@ -29,7 +29,7 @@ class ApartmentState(Enum):
 class Apartment(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-    building = models.ForeignKey("Building", on_delete=models.CASCADE, related_name="apartments")
+    building = models.ForeignKey("Building", on_delete=models.PROTECT, related_name="apartments")
 
     state = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments", null=True)

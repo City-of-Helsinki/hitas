@@ -177,6 +177,19 @@ class InvalidPage(HitasException):
         )
 
 
+class ModelConflict(HitasException):
+    def __init__(self, message: str, *, error_code: str):
+        super().__init__(
+            status_code=409,
+            data={
+                "error": error_code,
+                "message": message,
+                "reason": "Conflict",
+                "status": 409,
+            },
+        )
+
+
 def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
     if isinstance(error, list):
         return _convert_field_errors_list(field_name, error)

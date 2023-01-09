@@ -939,10 +939,14 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
     url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
 
     response = api_client.delete(url)
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "real_estates_on_housing_company",
+        "message": "Cannot delete a housing company with real estates.",
+        "reason": "Conflict",
+        "status": 409,
+    }
 
 
 # Filter tests

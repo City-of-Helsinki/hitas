@@ -2,7 +2,7 @@ from uuid import UUID
 
 from rest_framework import serializers
 
-from hitas.exceptions import HitasModelNotFound
+from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import HousingCompany, RealEstate
 from hitas.views.building import BuildingSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
@@ -44,6 +44,15 @@ class RealEstateSerializer(HitasModelSerializer):
 class RealEstateViewSet(HitasModelViewSet):
     serializer_class = RealEstateSerializer
     model_class = RealEstate
+
+    def perform_destroy(self, instance: RealEstate) -> None:
+        if instance.buildings.exists():
+            raise ModelConflict(
+                "Cannot delete a real estate with buildings.",
+                error_code="buildings_on_real_estate",
+            )
+
+        super().perform_destroy(instance)
 
     def get_queryset(self):
         uuid = self._lookup_id_to_uuid(self.kwargs["housing_company_uuid"])

@@ -4,7 +4,7 @@ from uuid import UUID
 from django.db.models import Count
 from rest_framework import serializers
 
-from hitas.exceptions import HitasModelNotFound
+from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
@@ -60,6 +60,12 @@ class BuildingSerializer(HitasModelSerializer):
 class BuildingViewSet(HitasModelViewSet):
     serializer_class = BuildingSerializer
     model_class = Building
+
+    def perform_destroy(self, instance: Building) -> None:
+        if instance.apartments.exists():
+            raise ModelConflict("Cannot delete a building with apartments.", error_code="apartments_on_building")
+
+        super().perform_destroy(instance)
 
     def get_queryset(self):
         hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
