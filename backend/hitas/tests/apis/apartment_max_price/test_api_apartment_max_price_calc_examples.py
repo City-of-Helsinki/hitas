@@ -298,6 +298,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
     assert response_json == {
         "confirmed_at": None,
@@ -306,105 +307,6 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         "valid_until": "2022-10-05",
         "index": "market_price_index",
         "new_hitas": True,
-        "calculations": {
-            "construction_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 220661.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 220661.0,
-                    "index_adjustment": 40916.09,
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": cpi_improvement.name,
-                                "value": 150_000.0,
-                                "completion_date": "2020-05-21",
-                                "value_added": 68910.0,
-                                "value_for_housing_company": 78083.78,
-                                "value_for_apartment": 1386.62,
-                            }
-                        ],
-                        "summary": {
-                            "value": 150_000.0,
-                            "value_added": 68910.0,
-                            "excess": {
-                                "surface_area": 2703.0,
-                                "value_per_square_meter": 30.0,
-                                "total": 81090.0,
-                            },
-                            "value_for_housing_company": 78083.78,
-                            "value_for_apartment": 1386.62,
-                        },
-                    },
-                    "debt_free_price": 262963.7,
-                    "debt_free_price_m2": 5478.41,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                    "completion_date": "2014-08-27",
-                    "completion_date_index": 123.5,
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_index": 146.4,
-                },
-                "maximum_price": 260463.7,
-                "valid_until": "2022-10-05",
-                "maximum": False,
-            },
-            "market_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 220661.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 220661.0,
-                    "index_adjustment": 56410.68,
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": mpi_improvement.name,
-                                "value": 150_000.0,
-                                "completion_date": "2020-05-21",
-                                "value_added": 68910.0,
-                                "value_for_housing_company": 76203.98,
-                                "value_for_apartment": 1353.23,
-                            }
-                        ],
-                        "summary": {
-                            "value": 150_000.0,
-                            "value_added": 68910.0,
-                            "excess": {
-                                "surface_area": 2703.0,
-                                "value_per_square_meter": 30.0,
-                                "total": 81090.0,
-                            },
-                            "value_for_housing_company": 76203.98,
-                            "value_for_apartment": 1353.23,
-                        },
-                    },
-                    "debt_free_price": 278424.91,
-                    "debt_free_price_m2": 5800.52,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                    "completion_date": "2014-08-27",
-                    "completion_date_index": 150.6,
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_index": 189.1,
-                },
-                "maximum_price": 275924.91,
-                "valid_until": "2022-10-05",
-                "maximum": True,
-            },
-            "surface_area_price_ceiling": {
-                "maximum_price": 231_212.0,
-                "valid_until": "2022-08-31",
-                "maximum": False,
-                "calculation_variables": {
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_value": 4869.0,
-                    "debt_free_price": 233712,
-                    "surface_area": 48.0,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                },
-            },
-        },
         "apartment": {
             "shares": {"start": 1, "end": 142, "total": 142},
             "rooms": a.rooms,
@@ -429,6 +331,103 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
             },
         },
         "additional_info": "Example",
+    }
+    assert calculations["construction_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 220661.0,
+            "additional_work_during_construction": 0.0,
+            "basic_price": 220661.0,
+            "index_adjustment": 40916.09,
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": cpi_improvement.name,
+                        "value": 150_000.0,
+                        "completion_date": "2020-05-21",
+                        "value_added": 68910.0,
+                        "value_for_housing_company": 78083.78,
+                        "value_for_apartment": 1386.62,
+                    }
+                ],
+                "summary": {
+                    "value": 150_000.0,
+                    "value_added": 68910.0,
+                    "excess": {
+                        "surface_area": 2703.0,
+                        "value_per_square_meter": 30.0,
+                        "total": 81090.0,
+                    },
+                    "value_for_housing_company": 78083.78,
+                    "value_for_apartment": 1386.62,
+                },
+            },
+            "debt_free_price": 262963.7,
+            "debt_free_price_m2": 5478.41,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+            "completion_date": "2014-08-27",
+            "completion_date_index": 123.5,
+            "calculation_date": "2022-07-05",
+            "calculation_date_index": 146.4,
+        },
+        "maximum_price": 260463.7,
+        "valid_until": "2022-10-05",
+        "maximum": False,
+    }
+    assert calculations["market_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 220661.0,
+            "additional_work_during_construction": 0.0,
+            "basic_price": 220661.0,
+            "index_adjustment": 56410.68,
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": mpi_improvement.name,
+                        "value": 150_000.0,
+                        "completion_date": "2020-05-21",
+                        "value_added": 68910.0,
+                        "value_for_housing_company": 76203.98,
+                        "value_for_apartment": 1353.23,
+                    }
+                ],
+                "summary": {
+                    "value": 150_000.0,
+                    "value_added": 68910.0,
+                    "excess": {
+                        "surface_area": 2703.0,
+                        "value_per_square_meter": 30.0,
+                        "total": 81090.0,
+                    },
+                    "value_for_housing_company": 76203.98,
+                    "value_for_apartment": 1353.23,
+                },
+            },
+            "debt_free_price": 278424.91,
+            "debt_free_price_m2": 5800.52,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+            "completion_date": "2014-08-27",
+            "completion_date_index": 150.6,
+            "calculation_date": "2022-07-05",
+            "calculation_date_index": 189.1,
+        },
+        "maximum_price": 275924.91,
+        "valid_until": "2022-10-05",
+        "maximum": True,
+    }
+    assert calculations["surface_area_price_ceiling"] == {
+        "maximum_price": 231_212.0,
+        "valid_until": "2022-08-31",
+        "maximum": False,
+        "calculation_variables": {
+            "calculation_date": "2022-07-05",
+            "calculation_date_value": 4869.0,
+            "debt_free_price": 233712,
+            "surface_area": 48.0,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        },
     }
 
 
@@ -493,6 +492,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
     assert response_json == {
         "confirmed_at": None,
@@ -501,172 +501,6 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         "valid_until": "2022-12-07",
         "index": "market_price_index",
         "new_hitas": False,
-        "calculations": {
-            "construction_price_index": {
-                "calculation_variables": {
-                    "housing_company_acquisition_price": 170_886.35,
-                    "housing_company_assets": 170_886.35,
-                    "apartment_share_of_housing_company_assets": 170886.35,
-                    "interest_during_construction": 4000.0,
-                    "interest_during_construction_percentage": 14,
-                    "apartment_improvements": {
-                        "items": [
-                            {
-                                "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                                "value": 4307.0,
-                                "calculation_date_index": 364.4,
-                                "completion_date": "2003-05-09",
-                                "completion_date_index": 244.9,
-                                "index_adjusted": 6408.62,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "percentage": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "value_for_apartment": 6408.62,
-                            }
-                        ],
-                        "summary": {
-                            "value": 4307.0,
-                            "index_adjusted": 6408.62,
-                            "depreciation": 0.0,
-                            "value_for_apartment": 6408.62,
-                        },
-                    },
-                    "housing_company_improvements": {
-                        "items": [],
-                        "summary": {
-                            "value": 0.0,
-                            "value_for_apartment": 0.0,
-                        },
-                    },
-                    "debt_free_price": 181294.97,
-                    "debt_free_price_m2": 3326.51,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2022-09-05",
-                    "completion_date": "2003-05-09",
-                    "completion_date_index": 244.9,
-                    "calculation_date": "2022-09-07",
-                    "calculation_date_index": 364.4,
-                },
-                "maximum_price": 181294.97,
-                "valid_until": "2022-12-07",
-                "maximum": False,
-            },
-            "market_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 123173.0,
-                    "interest_during_construction": 3455.0,
-                    "interest_during_construction_percentage": 6,
-                    "basic_price": 126628.0,
-                    "index_adjustment": 153577.28,
-                    "apartment_improvements": {
-                        "items": [
-                            {
-                                "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                                "value": 4307.0,
-                                "completion_date": "2003-05-09",
-                                "value_without_excess": 4307.0,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "accepted_value": 9530.63,
-                            }
-                        ],
-                        "summary": {
-                            "value": 4307.0,
-                            "value_without_excess": 4307.0,
-                            "depreciation": 0.0,
-                            "excess": {
-                                "surface_area": 54.5,
-                                "total": 5450.0,
-                                "value_per_square_meter": 100.0,
-                            },
-                            "accepted_value": 9530.63,
-                        },
-                    },
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": mpi_hc_improvement.name,
-                                "value": 0.0,
-                                "completion_date": "2003-05-01",
-                                "value_without_excess": 0.0,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "accepted_value_for_housing_company": 0.0,
-                                "accepted_value": 0.0,
-                            },
-                            {
-                                "name": mpi_hc_improvement2.name,
-                                "value": 1587.0,
-                                "completion_date": "2004-10-01",
-                                "value_without_excess": 0.0,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "accepted_value_for_housing_company": 0.0,
-                                "accepted_value": 0.0,
-                            },
-                        ],
-                        "summary": {
-                            "value": 1587.0,
-                            "value_without_excess": 0.0,
-                            "excess": {
-                                "surface_area": 3390.5,
-                                "value_per_square_meter_before_2010": 150.0,
-                                "value_per_square_meter_after_2010": None,
-                                "total_before_2010": 508575.0,
-                                "total_after_2010": None,
-                            },
-                            "depreciation": 0.0,
-                            "accepted_value_for_housing_company": 0.0,
-                            "accepted_value": 0.0,
-                        },
-                    },
-                    "debt_free_price": 289735.91,
-                    "debt_free_price_m2": 5316.26,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2022-09-05",
-                    "completion_date": "2003-05-09",
-                    "completion_date_index": 263.6,
-                    "calculation_date": "2022-09-07",
-                    "calculation_date_index": 583.3,
-                },
-                "maximum_price": 289735.91,
-                "valid_until": "2022-12-07",
-                "maximum": True,
-            },
-            "surface_area_price_ceiling": {
-                "maximum_price": 265524.0,
-                "valid_until": "2022-11-30",
-                "maximum": False,
-                "calculation_variables": {
-                    "calculation_date": "2022-09-07",
-                    "calculation_date_value": 4872.0,
-                    "debt_free_price": 265524.0,
-                    "surface_area": 54.5,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2022-09-05",
-                },
-            },
-        },
         "apartment": {
             "shares": {"start": 1729, "end": 1888, "total": 160},
             "rooms": a.rooms,
@@ -694,6 +528,170 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             },
         },
         "additional_info": "Example",
+    }
+    assert calculations["construction_price_index"] == {
+        "calculation_variables": {
+            "housing_company_acquisition_price": 170_886.35,
+            "housing_company_assets": 170_886.35,
+            "apartment_share_of_housing_company_assets": 170886.35,
+            "interest_during_construction": 4000.0,
+            "interest_during_construction_percentage": 14,
+            "apartment_improvements": {
+                "items": [
+                    {
+                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
+                        "value": 4307.0,
+                        "calculation_date_index": 364.4,
+                        "completion_date": "2003-05-09",
+                        "completion_date_index": 244.9,
+                        "index_adjusted": 6408.62,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "percentage": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "value_for_apartment": 6408.62,
+                    }
+                ],
+                "summary": {
+                    "value": 4307.0,
+                    "index_adjusted": 6408.62,
+                    "depreciation": 0.0,
+                    "value_for_apartment": 6408.62,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_for_apartment": 0.0,
+                },
+            },
+            "debt_free_price": 181294.97,
+            "debt_free_price_m2": 3326.51,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2022-09-05",
+            "completion_date": "2003-05-09",
+            "completion_date_index": 244.9,
+            "calculation_date": "2022-09-07",
+            "calculation_date_index": 364.4,
+        },
+        "maximum_price": 181294.97,
+        "valid_until": "2022-12-07",
+        "maximum": False,
+    }
+    assert calculations["market_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 123173.0,
+            "interest_during_construction": 3455.0,
+            "interest_during_construction_percentage": 6,
+            "basic_price": 126628.0,
+            "index_adjustment": 153577.28,
+            "apartment_improvements": {
+                "items": [
+                    {
+                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
+                        "value": 4307.0,
+                        "completion_date": "2003-05-09",
+                        "value_without_excess": 4307.0,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "accepted_value": 9530.63,
+                    }
+                ],
+                "summary": {
+                    "value": 4307.0,
+                    "value_without_excess": 4307.0,
+                    "depreciation": 0.0,
+                    "excess": {
+                        "surface_area": 54.5,
+                        "total": 5450.0,
+                        "value_per_square_meter": 100.0,
+                    },
+                    "accepted_value": 9530.63,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": mpi_hc_improvement.name,
+                        "value": 0.0,
+                        "completion_date": "2003-05-01",
+                        "value_without_excess": 0.0,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "accepted_value_for_housing_company": 0.0,
+                        "accepted_value": 0.0,
+                    },
+                    {
+                        "name": mpi_hc_improvement2.name,
+                        "value": 1587.0,
+                        "completion_date": "2004-10-01",
+                        "value_without_excess": 0.0,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "accepted_value_for_housing_company": 0.0,
+                        "accepted_value": 0.0,
+                    },
+                ],
+                "summary": {
+                    "value": 1587.0,
+                    "value_without_excess": 0.0,
+                    "excess": {
+                        "surface_area": 3390.5,
+                        "value_per_square_meter_before_2010": 150.0,
+                        "value_per_square_meter_after_2010": None,
+                        "total_before_2010": 508575.0,
+                        "total_after_2010": None,
+                    },
+                    "depreciation": 0.0,
+                    "accepted_value_for_housing_company": 0.0,
+                    "accepted_value": 0.0,
+                },
+            },
+            "debt_free_price": 289735.91,
+            "debt_free_price_m2": 5316.26,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2022-09-05",
+            "completion_date": "2003-05-09",
+            "completion_date_index": 263.6,
+            "calculation_date": "2022-09-07",
+            "calculation_date_index": 583.3,
+        },
+        "maximum_price": 289735.91,
+        "valid_until": "2022-12-07",
+        "maximum": True,
+    }
+    assert calculations["surface_area_price_ceiling"] == {
+        "maximum_price": 265524.0,
+        "valid_until": "2022-11-30",
+        "maximum": False,
+        "calculation_variables": {
+            "calculation_date": "2022-09-07",
+            "calculation_date_value": 4872.0,
+            "debt_free_price": 265524.0,
+            "surface_area": 54.5,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2022-09-05",
+        },
     }
 
 
@@ -782,6 +780,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
     assert response_json == {
         "confirmed_at": None,
@@ -790,165 +789,6 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         "valid_until": "2023-02-21",
         "index": "market_price_index",
         "new_hitas": False,
-        "calculations": {
-            "construction_price_index": {
-                "calculation_variables": {
-                    "housing_company_acquisition_price": 20_374_887.55,
-                    "housing_company_assets": 20_823_677.55,
-                    "apartment_share_of_housing_company_assets": 219010.27,
-                    "interest_during_construction": 2703.0,
-                    "interest_during_construction_percentage": 6,
-                    "apartment_improvements": {
-                        "items": [
-                            {
-                                "name": cpi_improvement.name,
-                                "value": 15_000.0,
-                                "completion_date": "2020-06-01",
-                                "calculation_date_index": 364.6,
-                                "completion_date_index": 316.33,
-                                "index_adjusted": 17_288.91,
-                                "depreciation": {
-                                    "amount": 4178.15,
-                                    "percentage": 10.0,
-                                    "time": {
-                                        "years": 2,
-                                        "months": 5,
-                                    },
-                                },
-                                "value_for_apartment": 13_110.75,
-                            },
-                            {
-                                "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                                "value": 2500.00,
-                                "calculation_date_index": 364.6,
-                                "completion_date": "2012-06-28",
-                                "completion_date_index": 296.1,
-                                "index_adjusted": 3078.35,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "percentage": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "value_for_apartment": 3078.35,
-                            },
-                        ],
-                        "summary": {
-                            "value": 17500.0,
-                            "index_adjusted": 20367.26,
-                            "depreciation": 4178.15,
-                            "value_for_apartment": 16189.11,
-                        },
-                    },
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": cpi_hc_improvement.name,
-                                "value": 1_000_000.00,
-                                "value_for_apartment": 448_790.0,
-                                "completion_date": "2018-02-01",
-                            },
-                        ],
-                        "summary": {
-                            "value": 1_000_000.00,
-                            "value_for_apartment": 448_790.0,
-                        },
-                    },
-                    "debt_free_price": 237902.37,
-                    "debt_free_price_m2": 5228.62,
-                    "apartment_share_of_housing_company_loans": 3000,
-                    "apartment_share_of_housing_company_loans_date": "2022-11-20",
-                    "completion_date": "2012-06-28",
-                    "completion_date_index": 296.10,
-                    "calculation_date": "2022-11-21",
-                    "calculation_date_index": 364.6,
-                },
-                "maximum_price": 234902.37,
-                "valid_until": "2023-02-21",
-                "maximum": False,
-            },
-            "market_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 175_930.0,
-                    "interest_during_construction": 2703.0,
-                    "interest_during_construction_percentage": 6,
-                    "basic_price": 178_633.0,
-                    "index_adjustment": 205_671.91,
-                    "apartment_improvements": {
-                        "items": [
-                            {
-                                "name": "Rakennusaikaiset muutos- ja lisätyöt",
-                                "value": 2500.00,
-                                "completion_date": "2012-06-28",
-                                "value_without_excess": 2500.0,
-                                "depreciation": {
-                                    "amount": 0.0,
-                                    "time": {
-                                        "years": 0,
-                                        "months": 0,
-                                    },
-                                },
-                                "accepted_value": 5378.41,
-                            }
-                        ],
-                        "summary": {
-                            "value": 2500.0,
-                            "value_without_excess": 2500.0,
-                            "excess": {
-                                "surface_area": 45.5,
-                                "total": 4550.0,
-                                "value_per_square_meter": 100.0,
-                            },
-                            "depreciation": 0.0,
-                            "accepted_value": 5378.41,
-                        },
-                    },
-                    "housing_company_improvements": {
-                        "items": [],
-                        "summary": {
-                            "value": 0.0,
-                            "value_without_excess": 0.0,
-                            "excess": {
-                                "surface_area": 10960.5,
-                                "value_per_square_meter_before_2010": None,
-                                "value_per_square_meter_after_2010": None,
-                                "total_before_2010": None,
-                                "total_after_2010": None,
-                            },
-                            "depreciation": 0.0,
-                            "accepted_value_for_housing_company": 0.0,
-                            "accepted_value": 0.0,
-                        },
-                    },
-                    "debt_free_price": 389683.32,
-                    "debt_free_price_m2": 8564.47,
-                    "apartment_share_of_housing_company_loans": 3000,
-                    "apartment_share_of_housing_company_loans_date": "2022-11-20",
-                    "completion_date": "2012-06-28",
-                    "completion_date_index": 263.6,
-                    "calculation_date": "2022-11-21",
-                    "calculation_date_index": 567.1,
-                },
-                "maximum_price": 386683.32,
-                "valid_until": "2023-02-21",
-                "maximum": True,
-            },
-            "surface_area_price_ceiling": {
-                "maximum_price": 212352.0,
-                "valid_until": "2023-02-28",
-                "maximum": False,
-                "calculation_variables": {
-                    "calculation_date": "2022-11-21",
-                    "calculation_date_value": 4733.0,
-                    "debt_free_price": 215352.0,
-                    "surface_area": 45.5,
-                    "apartment_share_of_housing_company_loans": 3000,
-                    "apartment_share_of_housing_company_loans_date": "2022-11-20",
-                },
-            },
-        },
         "apartment": {
             "shares": {"start": 19717, "end": 20188, "total": 472},
             "rooms": a.rooms,
@@ -975,6 +815,163 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             },
         },
         "additional_info": "Example",
+    }
+    assert calculations["construction_price_index"] == {
+        "calculation_variables": {
+            "housing_company_acquisition_price": 20_374_887.55,
+            "housing_company_assets": 20_823_677.55,
+            "apartment_share_of_housing_company_assets": 219010.27,
+            "interest_during_construction": 2703.0,
+            "interest_during_construction_percentage": 6,
+            "apartment_improvements": {
+                "items": [
+                    {
+                        "name": cpi_improvement.name,
+                        "value": 15_000.0,
+                        "completion_date": "2020-06-01",
+                        "calculation_date_index": 364.6,
+                        "completion_date_index": 316.33,
+                        "index_adjusted": 17_288.91,
+                        "depreciation": {
+                            "amount": 4178.15,
+                            "percentage": 10.0,
+                            "time": {
+                                "years": 2,
+                                "months": 5,
+                            },
+                        },
+                        "value_for_apartment": 13_110.75,
+                    },
+                    {
+                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
+                        "value": 2500.00,
+                        "calculation_date_index": 364.6,
+                        "completion_date": "2012-06-28",
+                        "completion_date_index": 296.1,
+                        "index_adjusted": 3078.35,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "percentage": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "value_for_apartment": 3078.35,
+                    },
+                ],
+                "summary": {
+                    "value": 17500.0,
+                    "index_adjusted": 20367.26,
+                    "depreciation": 4178.15,
+                    "value_for_apartment": 16189.11,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": cpi_hc_improvement.name,
+                        "value": 1_000_000.00,
+                        "value_for_apartment": 448_790.0,
+                        "completion_date": "2018-02-01",
+                    },
+                ],
+                "summary": {
+                    "value": 1_000_000.00,
+                    "value_for_apartment": 448_790.0,
+                },
+            },
+            "debt_free_price": 237902.37,
+            "debt_free_price_m2": 5228.62,
+            "apartment_share_of_housing_company_loans": 3000,
+            "apartment_share_of_housing_company_loans_date": "2022-11-20",
+            "completion_date": "2012-06-28",
+            "completion_date_index": 296.10,
+            "calculation_date": "2022-11-21",
+            "calculation_date_index": 364.6,
+        },
+        "maximum_price": 234902.37,
+        "valid_until": "2023-02-21",
+        "maximum": False,
+    }
+    assert calculations["market_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 175_930.0,
+            "interest_during_construction": 2703.0,
+            "interest_during_construction_percentage": 6,
+            "basic_price": 178_633.0,
+            "index_adjustment": 205_671.91,
+            "apartment_improvements": {
+                "items": [
+                    {
+                        "name": "Rakennusaikaiset muutos- ja lisätyöt",
+                        "value": 2500.00,
+                        "completion_date": "2012-06-28",
+                        "value_without_excess": 2500.0,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "accepted_value": 5378.41,
+                    }
+                ],
+                "summary": {
+                    "value": 2500.0,
+                    "value_without_excess": 2500.0,
+                    "excess": {
+                        "surface_area": 45.5,
+                        "total": 4550.0,
+                        "value_per_square_meter": 100.0,
+                    },
+                    "depreciation": 0.0,
+                    "accepted_value": 5378.41,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_without_excess": 0.0,
+                    "excess": {
+                        "surface_area": 10960.5,
+                        "value_per_square_meter_before_2010": None,
+                        "value_per_square_meter_after_2010": None,
+                        "total_before_2010": None,
+                        "total_after_2010": None,
+                    },
+                    "depreciation": 0.0,
+                    "accepted_value_for_housing_company": 0.0,
+                    "accepted_value": 0.0,
+                },
+            },
+            "debt_free_price": 389683.32,
+            "debt_free_price_m2": 8564.47,
+            "apartment_share_of_housing_company_loans": 3000,
+            "apartment_share_of_housing_company_loans_date": "2022-11-20",
+            "completion_date": "2012-06-28",
+            "completion_date_index": 263.6,
+            "calculation_date": "2022-11-21",
+            "calculation_date_index": 567.1,
+        },
+        "maximum_price": 386683.32,
+        "valid_until": "2023-02-21",
+        "maximum": True,
+    }
+    assert calculations["surface_area_price_ceiling"] == {
+        "maximum_price": 212352.0,
+        "valid_until": "2023-02-28",
+        "maximum": False,
+        "calculation_variables": {
+            "calculation_date": "2022-11-21",
+            "calculation_date_value": 4733.0,
+            "debt_free_price": 215352.0,
+            "surface_area": 45.5,
+            "apartment_share_of_housing_company_loans": 3000,
+            "apartment_share_of_housing_company_loans_date": "2022-11-20",
+        },
     }
 
 
@@ -1019,8 +1016,9 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
-    assert response_json["calculations"]["construction_price_index"] == {
+    assert calculations["construction_price_index"] == {
         "calculation_variables": {
             "housing_company_acquisition_price": 200000.0,
             "housing_company_assets": 200000.0,
@@ -1056,8 +1054,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
         "valid_until": "2003-09-01",
         "maximum": True,
     }
-
-    assert response_json["calculations"]["market_price_index"] == {
+    assert calculations["market_price_index"] == {
         "calculation_variables": {
             "acquisition_price": 100000.0,
             "interest_during_construction": 0,
@@ -1151,6 +1148,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
     assert response_json == {
         "confirmed_at": None,
@@ -1159,87 +1157,6 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         "valid_until": "2022-11-30",
         "index": "surface_area_price_ceiling",
         "new_hitas": True,
-        "calculations": {
-            "construction_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 169583.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 169583.0,
-                    "index_adjustment": 48577.7,
-                    "housing_company_improvements": {
-                        "items": [],
-                        "summary": {
-                            "value": 0.0,
-                            "value_added": 0.0,
-                            "excess": {
-                                "surface_area": 2703.5,
-                                "value_per_square_meter": 30.0,
-                                "total": 81105.0,
-                            },
-                            "value_for_housing_company": 0.0,
-                            "value_for_apartment": 0.00,
-                        },
-                    },
-                    "debt_free_price": 218160.7,
-                    "debt_free_price_m2": 4498.16,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
-                    "completion_date": "2012-01-13",
-                    "completion_date_index": 115.9,
-                    "calculation_date": "2022-09-29",
-                    "calculation_date_index": 149.1,
-                },
-                "maximum_price": 218160.7,
-                "valid_until": "2022-12-29",
-                "maximum": False,
-            },
-            "market_price_index": {
-                "calculation_variables": {
-                    "acquisition_price": 169583.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 169583.0,
-                    "index_adjustment": 62626.6,
-                    "housing_company_improvements": {
-                        "items": [],
-                        "summary": {
-                            "value": 0.0,
-                            "value_added": 0.0,
-                            "excess": {
-                                "surface_area": 2703.5,
-                                "value_per_square_meter": 30.0,
-                                "total": 81105.0,
-                            },
-                            "value_for_housing_company": 0.0,
-                            "value_for_apartment": 0.0,
-                        },
-                    },
-                    "debt_free_price": 232209.6,
-                    "debt_free_price_m2": 4787.83,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
-                    "completion_date": "2012-01-13",
-                    "completion_date_index": 138.1,
-                    "calculation_date": "2022-09-29",
-                    "calculation_date_index": 189.1,
-                },
-                "maximum_price": 232209.6,
-                "valid_until": "2022-12-29",
-                "maximum": False,
-            },
-            "surface_area_price_ceiling": {
-                "maximum_price": 236292.0,
-                "valid_until": "2022-11-30",
-                "maximum": True,
-                "calculation_variables": {
-                    "calculation_date": "2022-09-29",
-                    "calculation_date_value": 4872.0,
-                    "debt_free_price": 236292,
-                    "surface_area": 48.5,
-                    "apartment_share_of_housing_company_loans": 0,
-                    "apartment_share_of_housing_company_loans_date": "2099-10-01",
-                },
-            },
-        },
         "apartment": {
             "shares": {"start": 504, "end": 601, "total": 98},
             "rooms": a.rooms,
@@ -1264,4 +1181,83 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
             },
         },
         "additional_info": "Example",
+    }
+    assert calculations["construction_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 169583.0,
+            "additional_work_during_construction": 0.0,
+            "basic_price": 169583.0,
+            "index_adjustment": 48577.7,
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_added": 0.0,
+                    "excess": {
+                        "surface_area": 2703.5,
+                        "value_per_square_meter": 30.0,
+                        "total": 81105.0,
+                    },
+                    "value_for_housing_company": 0.0,
+                    "value_for_apartment": 0.00,
+                },
+            },
+            "debt_free_price": 218160.7,
+            "debt_free_price_m2": 4498.16,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2099-10-01",
+            "completion_date": "2012-01-13",
+            "completion_date_index": 115.9,
+            "calculation_date": "2022-09-29",
+            "calculation_date_index": 149.1,
+        },
+        "maximum_price": 218160.7,
+        "valid_until": "2022-12-29",
+        "maximum": False,
+    }
+    assert calculations["market_price_index"] == {
+        "calculation_variables": {
+            "acquisition_price": 169583.0,
+            "additional_work_during_construction": 0.0,
+            "basic_price": 169583.0,
+            "index_adjustment": 62626.6,
+            "housing_company_improvements": {
+                "items": [],
+                "summary": {
+                    "value": 0.0,
+                    "value_added": 0.0,
+                    "excess": {
+                        "surface_area": 2703.5,
+                        "value_per_square_meter": 30.0,
+                        "total": 81105.0,
+                    },
+                    "value_for_housing_company": 0.0,
+                    "value_for_apartment": 0.0,
+                },
+            },
+            "debt_free_price": 232209.6,
+            "debt_free_price_m2": 4787.83,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2099-10-01",
+            "completion_date": "2012-01-13",
+            "completion_date_index": 138.1,
+            "calculation_date": "2022-09-29",
+            "calculation_date_index": 189.1,
+        },
+        "maximum_price": 232209.6,
+        "valid_until": "2022-12-29",
+        "maximum": False,
+    }
+    assert calculations["surface_area_price_ceiling"] == {
+        "maximum_price": 236292.0,
+        "valid_until": "2022-11-30",
+        "maximum": True,
+        "calculation_variables": {
+            "calculation_date": "2022-09-29",
+            "calculation_date_value": 4872.0,
+            "debt_free_price": 236292,
+            "surface_area": 48.5,
+            "apartment_share_of_housing_company_loans": 0,
+            "apartment_share_of_housing_company_loans_date": "2099-10-01",
+        },
     }
