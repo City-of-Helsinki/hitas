@@ -1,10 +1,9 @@
 from uuid import UUID
 
-from django.db.models import Prefetch
 from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound, ModelConflict
-from hitas.models import Apartment, Building, HousingCompany, RealEstate
+from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
 
@@ -63,9 +62,6 @@ class BuildingViewSet(HitasModelViewSet):
 
         return (
             Building.objects.filter(real_estate__id=re_id)
-            .prefetch_related(
-                Prefetch("apartments", Apartment.objects.only("uuid")),
-            )
             .select_related("real_estate__housing_company__postal_code")
             .only(
                 "uuid",
