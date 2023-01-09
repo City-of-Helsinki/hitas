@@ -841,8 +841,11 @@ def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
 
 def do_truncate():
     for model_class in [
-        HousingCompany,
+        Apartment,
         ApartmentType,
+        Building,
+        RealEstate,
+        HousingCompany,
         PropertyManager,
         BuildingType,
         Developer,
