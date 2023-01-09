@@ -43,6 +43,7 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
     };
     const handleConfirmedRemove = () => {
         removeRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string});
+        setIsConfirmModalVisible(false);
     };
 
     return (
