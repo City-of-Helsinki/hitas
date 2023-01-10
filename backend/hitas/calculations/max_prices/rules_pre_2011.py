@@ -84,18 +84,6 @@ class RulesPre2011(CalculatorRules):
             )
             for i in apartment_improvements
         ]
-        if apartment.additional_work_during_construction:
-            # Add `additional_work_during_construction` as an improvement as it's treated as an improvement
-            # with pre 2011 rules
-            apartment_improvements_list.append(
-                ImprovementData(
-                    name="Rakennusaikaiset muutos- ja lisätyöt",
-                    value=apartment.additional_work_during_construction,
-                    completion_date=apartment.completion_date,
-                    completion_date_index=apartment.completion_date_cpi,
-                    treat_as_additional_work=True,
-                )
-            )
         apartment_improvements_result = calculate_apartment_improvements_pre_2011_construction_price_index(
             apartment_improvements_list,
             calculation_date=calculation_date,
@@ -110,11 +98,18 @@ class RulesPre2011(CalculatorRules):
             interest_during_construction = apartment.interest_during_construction_6 or 0
             interest_during_construction_percentage = 6
 
+        index_adjusted_additional_work_during_construction = (
+            (apartment.additional_work_during_construction or 0)
+            * apartment.calculation_date_cpi
+            / apartment.completion_date_cpi
+        )
+
         # Debt free shares price
         debt_free_shares_price = (
             apartment_share_of_housing_company_assets
             + interest_during_construction
             + apartment_improvements_result.summary.value_for_apartment
+            + index_adjusted_additional_work_during_construction
         )
 
         # Final maximum price
@@ -132,6 +127,8 @@ class RulesPre2011(CalculatorRules):
                 apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
                 interest_during_construction=interest_during_construction,
                 interest_during_construction_percentage=interest_during_construction_percentage,
+                additional_work_during_construction=apartment.additional_work_during_construction or 0,
+                index_adjusted_additional_work_during_construction=index_adjusted_additional_work_during_construction,
                 apartment_improvements=apartment_improvements_result,
                 housing_company_improvements=hc_improvements_result,
                 debt_free_price=debt_free_shares_price,
@@ -158,7 +155,11 @@ class RulesPre2011(CalculatorRules):
         # Start calculations
 
         # Basic price
-        basic_price = apartment.acquisition_price + (apartment.interest_during_construction_6 or 0)
+        basic_price = (
+            apartment.acquisition_price
+            + (apartment.interest_during_construction_6 or 0)
+            + (apartment.additional_work_during_construction or 0)
+        )
 
         # Index adjustment
         index_adjustment = (apartment.calculation_date_mpi / apartment.completion_date_mpi) * basic_price - basic_price
@@ -173,18 +174,6 @@ class RulesPre2011(CalculatorRules):
             )
             for i in apartment_improvements
         ]
-        if apartment.additional_work_during_construction:
-            # Add `additional_work_during_construction` as an improvement as it's treated as an improvement
-            # with pre 2011 rules
-            apartment_improvements_list.append(
-                ImprovementData(
-                    name="Rakennusaikaiset muutos- ja lisätyöt",
-                    value=apartment.additional_work_during_construction,
-                    completion_date=apartment.completion_date,
-                    completion_date_index=apartment.completion_date_mpi,
-                    treat_as_additional_work=True,
-                )
-            )
         apartment_improvements_result = calculate_apartment_improvements_pre_2011_market_price_index(
             apartment_improvements_list,
             calculation_date=calculation_date,
@@ -230,6 +219,7 @@ class RulesPre2011(CalculatorRules):
                 acquisition_price=apartment.acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
                 interest_during_construction_percentage=6,
+                additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,

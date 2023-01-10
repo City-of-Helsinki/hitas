@@ -79,7 +79,7 @@ class Rules2011Onwards(CalculatorRules):
         # Start calculations
 
         # basic price
-        basic_price = apartment.acquisition_price + apartment.additional_work_during_construction
+        basic_price = apartment.acquisition_price + (apartment.additional_work_during_construction or 0)
 
         # index adjustment
         index_adjustment = ((calculation_date_index / completion_date_index) * basic_price) - basic_price
@@ -114,7 +114,7 @@ class Rules2011Onwards(CalculatorRules):
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVars2011Onwards(
                 acquisition_price=apartment.acquisition_price,
-                additional_work_during_construction=apartment.additional_work_during_construction,
+                additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 housing_company_improvements=hc_improvements_result,

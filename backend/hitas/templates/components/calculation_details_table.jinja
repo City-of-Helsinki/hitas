@@ -18,19 +18,13 @@
         {% if maximum_price_calculation.json.new_hitas %}
             {% set table_right = [
                 ["Hankinta-arvo", vars.acquisition_price|intcomma],
-            ] %}
-
-            {% if vars.additional_work_during_construction is not none %} {% set table_right = table_right + [
                 ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
-            ] %} {% endif %}
-
-            {% set table_right = table_right + [
                 ["= Perushinta", vars.basic_price|intcomma],
                 ["+ Indeksin muutos", vars.index_adjustment|intcomma],
                 ["+ Osuus yhtiön parannuksista", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
                 ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
                 ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans],
-                ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma(0)],
+                ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
                 ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
                 ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
             ] %}
@@ -39,6 +33,7 @@
                 {% set table_right = [
                     ["Hankinta-arvo", vars.acquisition_price|intcomma],
                     ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
+                    ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
                     ["= Perushinta", vars.basic_price|intcomma],
                     ["+ Indeksin muutos", vars.index_adjustment|intcomma],
                     ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.accepted_value|intcomma],
@@ -52,14 +47,15 @@
             {% else %}
                 {% set table_right = [
                     ["Yhtiön tarkistettu hankinta-arvo", vars.housing_company_acquisition_price|intcomma],
-                    ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value|intcomma],
+                    ["+ Kiinteistön parannukset", vars.housing_company_improvements.summary.value_for_apartment|intcomma],
                     ["= Yhtiön varat yhteensä", vars.housing_company_assets|intcomma],
                     ["Osakkeiden osuus", vars.apartment_share_of_housing_company_assets|intcomma],
                     ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
+                    ["+ Tarkistettu rak.aik. lisä- ja muutostyöt", vars.index_adjusted_additional_work_during_construction|intcomma],
                     ["+ Huoneistokohtaiset parannukset", vars.apartment_improvements.summary.value_for_apartment|intcomma],
                     ["= Osakkeiden velaton hinta", vars.debt_free_price|intcomma],
                     ["- osuus yhtiön lainoista "~vars.apartment_share_of_housing_company_loans_date|format_date, vars.apartment_share_of_housing_company_loans],
-                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma(0)],
+                    ["= Enimmäismyyntihinta", index_calculation.maximum_price|intcomma],
                     ["Velaton hinta euroa/m² (*)", vars.debt_free_price_m2|intcomma],
                     ["* Lasketaan osakkeiden velattomasta hinnasta", ""],
                 ] %}

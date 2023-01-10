@@ -53,7 +53,7 @@ const handleDownloadPDF = (response) => {
 
         const alink = document.createElement("a");
         alink.href = window.URL.createObjectURL(blob);
-        alink.download = `${filename}.pdf`;
+        alink.download = `${filename}`;
         alink.click();
     });
 };
