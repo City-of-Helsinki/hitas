@@ -1005,10 +1005,16 @@ paths:
                   description: |-
                     Date which is used for calculating the maximum price. This cannot be in the future.
                     This mainly affects which indices are used and the validity period.
-                  type: string
+                  anyOf:
+                    - type: string
+                      format: date
+                      example: 2022-07-05
+                      nullable: true
+                    - type: string
+                      maxLength: 0
+                      example: ""
+                      nullable: true
                   nullable: true
-                  format: date
-                  example: 2022-07-05
                 apartment_share_of_housing_company_loans:
                   description: |-
                     How much the apartment's share of the housing company loans are on the calculation date
@@ -1017,9 +1023,16 @@ paths:
                   example: 2500
                 apartment_share_of_housing_company_loans_date:
                   description: Date for `apartment_share_of_housing_company_loans`
-                  type: string
-                  format: date
-                  example: 2022-07-28
+                  anyOf:
+                    - type: string
+                      format: date
+                      example: 2022-07-05
+                      nullable: true
+                    - type: string
+                      maxLength: 0
+                      example: ""
+                      nullable: true
+                  nullable: true
                 additional_info:
                   description: Additional information to be displayed on the generated PDF
                   type: string

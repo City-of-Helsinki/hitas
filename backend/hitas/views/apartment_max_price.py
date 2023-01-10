@@ -154,10 +154,17 @@ class ConfirmSerializer(Serializer):
 
 
 class CreateCalculationSerializer(Serializer):
-    calculation_date = fields.DateField(required=False, allow_null=True)
-    apartment_share_of_housing_company_loans = fields.IntegerField(allow_null=True, required=False, min_value=0)
+    apartment_share_of_housing_company_loans = fields.IntegerField(required=False, allow_null=True, min_value=0)
     apartment_share_of_housing_company_loans_date = fields.DateField(required=False, allow_null=True)
+    calculation_date = fields.DateField(required=False, allow_null=True)
     additional_info = fields.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def to_internal_value(self, data):
+        if data.get("apartment_share_of_housing_company_loans_date") == "":
+            data["apartment_share_of_housing_company_loans_date"] = None
+        if data.get("calculation_date") == "":
+            data["calculation_date"] = None
+        return super().to_internal_value(data)
 
     def validate_calculation_date(self, date):
         return self._validate_not_in_future(date)
