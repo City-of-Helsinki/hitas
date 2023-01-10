@@ -169,3 +169,20 @@ def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
         "reason": "Conflict",
         "status": 409,
     }
+
+
+@pytest.mark.parametrize("date", ["", None])
+@pytest.mark.django_db
+def test__api__apartment_max_price__missing_date(api_client: HitasAPIClient, date):
+    a: Apartment = ApartmentFactory.create()
+    create_necessary_indices(completion_month=monthify(a.completion_date), calculation_month=this_month())
+
+    data = {
+        "apartment_share_of_housing_company_loans_date": date,
+        "calculation_date": date,
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
