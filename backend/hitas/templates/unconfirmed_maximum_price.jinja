@@ -54,20 +54,34 @@
             <td>Huoneiston ensimmäinen kaupantekoajankohta</td>
             <td>{{ apartment.prices.first_purchase_date|format_date }}</td>
         </tr>
+        <tr>
+            <td>Rakennuttajalta tilatut lisä- ja muutostyöt</td>
+            <td>{{ apartment.prices.construction.additional_work|intcomma }}</td>
+        </tr>
+        {% set cpi_bigger = prices.construction_price_index.value > prices.market_price_index.value %}
+        {% if old_hitas_ruleset %}
+        <tr>
+            <td>Rakennusaikaisen koron rahasumma</td>
+            {% if prices.construction_price_index.maximum or (prices.surface_area_price_ceiling.maximum and cpi_bigger) %}
+                {% if apartment.completion_date|date_before("2005-01-01") %}
+                <td>{{ apartment.prices.construction.interest.rate_14|intcomma }}</td>
+                {% else %}
+                <td>{{ apartment.prices.construction.interest.rate_6|intcomma }}</td>
+                {% endif %}
+            {% else %}
+                <td>{{ apartment.prices.construction.interest.rate_6|intcomma }}</td>
+            {% endif %}
+        </tr>
+        {% endif %}
         {% if prices.surface_area_price_ceiling.maximum %}
             <tr>
-            {% if prices.construction_price_index.value > prices.market_price_index.value %}
+            {% if cpi_bigger %}
                 <td>Hitas-huoneiston velaton enimmäishinta rakennuskustannusindeksillä laskettuna, euroa</td>
                 <td>{{ prices.construction_price_index.value|intcomma }}</td>
             {% else %}
                 <td>Hitas-huoneiston velaton enimmäishinta markkinahintaindeksillä laskettuna, euroa</td>
                 <td>{{ prices.market_price_index.value|intcomma }}</td>
             {% endif %}
-            </tr>
-        {% else %}
-            <tr>
-                <td>Rakennuttajalta tilatut lisä- ja muutostyöt</td>
-                <td>{{ apartment.prices.construction.additional_work|intcomma }}</td>
             </tr>
         {% endif %}
     </table>
@@ -82,11 +96,11 @@
 
     <b>Hitas-huoneistonne velaton enimmäishinta on
         {% if prices.construction_price_index.maximum %}
-            {{ prices.construction_price_index.value|intcomma }} euroa rakennuskustannusindeksillä laskettuna.
+            {{ prices.construction_price_index.value|intcomma(0) }} euroa rakennuskustannusindeksillä laskettuna.
         {% elif prices.market_price_index.maximum %}
-            {{ prices.market_price_index.value|intcomma }} euroa markkinahintaindeksillä laskettuna.
+            {{ prices.market_price_index.value|intcomma(0) }} euroa markkinahintaindeksillä laskettuna.
         {% else %}
-            {{ prices.surface_area_price_ceiling.value|intcomma }} euroa. Velaton enimmäishinta on laskettu voimassaolevan rajahinnan perusteella ({{ apartment.surface_area }} m² * {{ surface_area_price_ceiling }} euroa).
+            {{ prices.surface_area_price_ceiling.value|intcomma(0) }} euroa. Velaton enimmäishinta on laskettu voimassaolevan rajahinnan perusteella ({{ apartment.surface_area }} m² * {{ surface_area_price_ceiling }} euroa).
         {% endif %}
     </b>
 

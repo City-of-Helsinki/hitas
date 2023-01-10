@@ -831,6 +831,7 @@ class ApartmentViewSet(HitasModelViewSet):
             "apartment": apartment_data,
             "additional_info": request.data.get("additional_info", ""),
             "surface_area_price_ceiling": sapc.value,
+            "old_hitas_ruleset": apartment.building.real_estate.housing_company.financing_method.old_hitas_ruleset,
         }
         filename = f"Hinta-arvio {apartment.address}.pdf"
         return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
