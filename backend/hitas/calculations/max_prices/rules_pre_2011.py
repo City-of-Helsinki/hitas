@@ -99,7 +99,7 @@ class RulesPre2011(CalculatorRules):
             interest_during_construction_percentage = 6
 
         index_adjusted_additional_work_during_construction = (
-            apartment.additional_work_during_construction
+            (apartment.additional_work_during_construction or 0)
             * apartment.calculation_date_cpi
             / apartment.completion_date_cpi
         )
@@ -127,7 +127,7 @@ class RulesPre2011(CalculatorRules):
                 apartment_share_of_housing_company_assets=apartment_share_of_housing_company_assets,
                 interest_during_construction=interest_during_construction,
                 interest_during_construction_percentage=interest_during_construction_percentage,
-                additional_work_during_construction=apartment.additional_work_during_construction,
+                additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 index_adjusted_additional_work_during_construction=index_adjusted_additional_work_during_construction,
                 apartment_improvements=apartment_improvements_result,
                 housing_company_improvements=hc_improvements_result,
@@ -158,7 +158,7 @@ class RulesPre2011(CalculatorRules):
         basic_price = (
             apartment.acquisition_price
             + (apartment.interest_during_construction_6 or 0)
-            + apartment.additional_work_during_construction
+            + (apartment.additional_work_during_construction or 0)
         )
 
         # Index adjustment
@@ -219,7 +219,7 @@ class RulesPre2011(CalculatorRules):
                 acquisition_price=apartment.acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
                 interest_during_construction_percentage=6,
-                additional_work_during_construction=apartment.additional_work_during_construction,
+                additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,
                 apartment_improvements=apartment_improvements_result,

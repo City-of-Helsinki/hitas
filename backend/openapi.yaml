@@ -3584,7 +3584,6 @@ components:
         additional_work_during_construction:
           description: Amount of apartment's additional work done during construction
           type: number
-          nullable: true
           minimum: 0
           example: 0.0
         basic_price:
@@ -3689,7 +3688,6 @@ components:
         additional_work_during_construction:
           description: Amount of apartment's additional work done during construction
           type: number
-          nullable: true
           minimum: 0
           example: 0.0
         index_adjustment:
@@ -3793,13 +3791,11 @@ components:
         additional_work_during_construction:
           description: Amount of apartment's additional work done during construction
           type: number
-          nullable: true
           minimum: 0
           example: 0.0
         index_adjusted_additional_work_during_construction:
           description: Amount of apartment's additional work done during construction, after index adjustment
           type: number
-          nullable: true
           minimum: 0
           example: 0.0
         apartment_improvements:
