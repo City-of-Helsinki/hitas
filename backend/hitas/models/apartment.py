@@ -102,6 +102,10 @@ class Apartment(ExternalHitasModel):
         return self.share_number_end - self.share_number_start + 1
 
     @property
+    def old_hitas_ruleset(self) -> bool:
+        return self.housing_company.financing_method.old_hitas_ruleset
+
+    @property
     def address(self) -> str:
         return f"{self.street_address} {self.stair} {self.apartment_number}"
 
