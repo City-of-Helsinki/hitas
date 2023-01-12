@@ -13,6 +13,7 @@ from hitas.oracle_migration.oracle_schema.indices import (
     company_construction_price_indices,
     company_market_price_indices,
     construction_price_indices,
+    hitas_monitoring,
     market_price_indices,
 )
 from hitas.oracle_migration.oracle_schema.misc import additional_infos, users

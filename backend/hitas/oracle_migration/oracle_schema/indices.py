@@ -291,3 +291,37 @@ apartment_market_price_indices = Table(
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )
+
+# Table contains confirmed maximum price calculations.
+# When calculations are made, only the highest value calculation is transferred here.
+hitas_monitoring = Table(
+    "HITVALVO",
+    metadata_obj,
+    Column("KG_VTUNNUS", Integer, key="id", primary_key=True, nullable=False),
+    Column("KG_HTUNNUS", Integer, ForeignKey("HITHUONE.id"), key="apartment_id", nullable=False),
+    Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False),
+    Column(
+        "C_LASKNIMI", String(15), key="max_price_index_name", nullable=False
+    ),  # The type of calculation this is. Always one of [EI LASKELMAA, RAKINDEKSI, RAJAHINTA, HITINDEKSI, MHINDEKSI]
+    Column("D_LASKPVM", Date),
+    Column("KG_EHIND", Integer, key="max_price_index_id", nullable=False),  # Actually FK to max price calculation table
+    Column("D_ILMPVM", Date, nullable=False),
+    Column("C_MYYJA", String(250), nullable=False),
+    Column("N_EHINTA", Integer, nullable=False),
+    Column("N_KAUPHINTA", Integer, nullable=False),
+    Column("D_KAUPPVM", Date),
+    Column("C_OSTAJA1", String(120), nullable=False),
+    Column("C_OSTAJA2", String(120)),
+    Column("C_SOTU1", String(11)),
+    Column("C_SOTU2", String(11)),
+    Column("N_VEHINTA", Integer, nullable=False),
+    Column("N_YHTLAINA", Integer, nullable=False),
+    Column("N_EHINTAM2", Integer, nullable=False),
+    Column("C_VALVKOODI", String(16), nullable=False),
+    Column("C_VALVTILA", String(12), nullable=False),
+    Column("C_LISATIETO", String(1), nullable=False),
+    Column("C_LISATVIITE", String(10), nullable=False),
+    Column("C_MUUTTAJA", String(10), nullable=False),
+    Column("D_MUUTETTU", Date, nullable=False),
+    Column("C_SIIRRETTY", String(20)),
+)
