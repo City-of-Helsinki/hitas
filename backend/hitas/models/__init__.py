@@ -27,3 +27,4 @@ from hitas.models.ownership import Ownership
 from hitas.models.postal_code import HitasPostalCode
 from hitas.models.property_manager import PropertyManager
 from hitas.models.real_estate import RealEstate
+from hitas.models.sale import ApartmentSale

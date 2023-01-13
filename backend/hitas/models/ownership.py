@@ -1,21 +1,46 @@
+import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Iterable, Optional, TypedDict
 
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import HitasModel, HitasModelDecimalField
 
+if TYPE_CHECKING:
+    from hitas.models import Owner
 
+
+# 'Omistajuus'
 class Ownership(HitasModel):
-    apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="ownerships")
-    owner = models.ForeignKey("Owner", on_delete=models.PROTECT, related_name="ownerships")
+    apartment = models.ForeignKey(
+        "Apartment",
+        on_delete=models.CASCADE,
+        related_name="ownerships",
+        editable=False,
+    )
+    owner = models.ForeignKey(
+        "Owner",
+        on_delete=models.PROTECT,
+        related_name="ownerships",
+        editable=False,
+    )
+    sale = models.ForeignKey(
+        "ApartmentSale",
+        on_delete=models.SET_NULL,
+        related_name="ownerships",
+        default=None,
+        null=True,
+    )
 
     percentage = HitasModelDecimalField(
         validators=[
             MinValueValidator(Decimal("0")),
             MaxValueValidator(Decimal("100")),
-        ]
+        ],
+        editable=False,
     )
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
@@ -27,3 +52,37 @@ class Ownership(HitasModel):
 
     def __str__(self):
         return f"{self.owner}, {self.apartment}"
+
+
+class _OwnershipLike(TypedDict, total=False):
+    start_date: Optional[datetime.date]
+    end_date: Optional[datetime.date]
+
+
+class OwnershipLike(_OwnershipLike):
+    percentage: Decimal
+    owner: "Owner"
+
+
+def check_ownership_percentages(ownerships: Iterable[OwnershipLike]) -> None:
+    for ownership in ownerships:
+        percentage = ownership["percentage"]
+        if not 0 < percentage <= 100:
+            raise ValidationError(
+                {
+                    "percentage": (
+                        f"Ownership percentage greater than 0 and"
+                        f" less than or equal to 100. Given value was {percentage}."
+                    )
+                },
+            )
+    percentage_sum = sum(ownership["percentage"] for ownership in ownerships)
+    if percentage_sum != 100:
+        raise ValidationError(
+            {
+                "percentage": (
+                    f"Ownership percentage of all ownerships combined must be equal to 100. "
+                    f"Given sum was {percentage_sum}."
+                )
+            }
+        )

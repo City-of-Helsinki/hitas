@@ -40,8 +40,9 @@ def merge(
     delete_fn: Callable[[List[ExistingObject]], None],
 ) -> None:
     """
-    Merge function that tries to minimize database writes. Useful when there's a list of (sub)objects that do not have a
-    dedicated identifier (improvements, ownerships...).
+    Merge function that tries to minimize database writes.
+    Useful when there's a list of (sub)objects that do not have a dedicated identifier,
+    and they don't have relations to them (e.g. improvements).
 
      - First it tries to find existing objects so no writes to those objects happen
      - Secondly it tries to reuse old objects that should be removed (UPDATE)
