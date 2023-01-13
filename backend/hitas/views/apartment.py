@@ -609,7 +609,11 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
 
 class ApartmentListSerializer(ApartmentDetailSerializer):
-    type = serializers.CharField(source="apartment_type.value")
+    type = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_type(instance: Apartment) -> Optional[str]:
+        return getattr(getattr(instance, "apartment_type", None), "value", None)
 
     class Meta:
         model = Apartment
