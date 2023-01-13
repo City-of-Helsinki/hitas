@@ -22,6 +22,7 @@ from hitas.tests.factories.housing_company import (
 from hitas.tests.factories.owner import OwnerFactory, OwnershipFactory
 from hitas.tests.factories.postal_code import HitasPostalCodeFactory
 from hitas.tests.factories.property_manager import PropertyManagerFactory
+from hitas.tests.factories.sale import ApartmentSaleFactory
 from hitas.tests.factories.user import UserFactory
 
 # Force faker to always use finnish locale - otherwise we would either

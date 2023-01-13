@@ -20,6 +20,7 @@ from hitas.tests import factories
         factories.PropertyManagerFactory,
         factories.RealEstateFactory,
         factories.UserFactory,
+        factories.ApartmentSaleFactory,
     ],
 )
 def test__factory__simple_create(factory_class):

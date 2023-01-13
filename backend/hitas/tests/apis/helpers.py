@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, NamedTuple, Optional, TypedDict, TypeVar
 
 import yaml
 from django.conf import settings
@@ -156,3 +156,31 @@ def parametrize_invalid_foreign_key(field, nullable=False):
             ({field: None}, [{"field": field, "message": "This field is mandatory and cannot be null."}]),
         )
     return parameters
+
+
+T = TypeVar("T", bound=NamedTuple)
+
+
+class ParametrizeArgs(TypedDict):
+    argnames: list[str]
+    argvalues: list[T]
+    ids: list[str]
+
+
+class InvalidInput(NamedTuple):
+    invalid_data: dict[str, Any]
+    fields: list[dict[str, str]]
+
+
+def parametrize_helper(__tests: dict[str, T], /) -> ParametrizeArgs:
+    """Construct parametrize input while setting test IDs."""
+    assert __tests, "I need some tests, please!"
+    values = list(__tests.values())
+    try:
+        return ParametrizeArgs(
+            argnames=list(values[0].__class__.__annotations__),
+            argvalues=values,
+            ids=list(__tests),
+        )
+    except Exception as error:  # noqa
+        raise RuntimeError("Improper configuration. Did you use a NamedTuple for T?") from error

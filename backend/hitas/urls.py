@@ -55,6 +55,9 @@ apartment_router.register(r"apartments", views.ApartmentViewSet, basename="apart
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
 apartment_router.register(r"maximum-prices", views.ApartmentMaximumPriceViewSet, basename="maximum-price")
 
+# /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/sale
+apartment_router.register(r"sales", views.ApartmentSaleViewSet, basename="apartment-sale")
+
 app_name = "hitas"
 urlpatterns = [
     path("", include(router.urls)),
