@@ -21,6 +21,10 @@ env = environ.Env(
     MEDIA_URL=(str, "/media/"),
     CORS_ALLOWED_ORIGINS=(list, []),
     UWSGI_WARMUP=(bool, True),
+    SENTRY_DSN=(str, None),
+    SENTRY_ENVIRONMENT=(str, "unknown"),
+    SENTRY_SAMPLE_RATE=(float, 1.0),
+    SENTRY_TRACES_SAMPLE_RATE=(float, 0.1),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -181,3 +185,19 @@ TIME_ZONE = "Europe/Helsinki"
 USE_I18N = False
 USE_L10N = True
 USE_TZ = True
+
+
+if env("SENTRY_DSN"):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    from .utils import get_current_version
+
+    sentry_sdk.init(
+        dsn=env("SENTRY_DSN"),
+        release=get_current_version(),
+        environment=env("SENTRY_ENVIRONMENT"),
+        integrations=[DjangoIntegration()],
+        sample_rate=env("SENTRY_SAMPLE_RATE"),
+        traces_sample_rate=env("SENTRY_TRACES_SAMPLE_RATE"),
+    )
