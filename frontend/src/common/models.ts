@@ -123,6 +123,7 @@ export interface IBuilding {
     address: IAddress;
     completion_date: string | null;
     building_identifier: string | null;
+    apartment_count: number;
 }
 
 export interface IBuildingWritable {

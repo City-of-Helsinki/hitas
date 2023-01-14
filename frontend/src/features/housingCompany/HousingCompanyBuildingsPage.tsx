@@ -17,6 +17,7 @@ import {
     SaveDialogModal,
 } from "../../common/components";
 import {IBuildingWritable} from "../../common/models";
+import {hitasToast} from "../../common/utils";
 
 const blankForm: IBuildingWritable = {
     real_estate_id: null,
@@ -66,6 +67,7 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
             housingCompanyId: params.housingCompanyId as string,
             realEstateId: idsToRemove.realEstate as string,
         }).then(() => {
+            hitasToast("Rakennus poistettu onnistuneesti!", "success");
             setIdsToRemove({building: null, realEstate: null});
             setIsConfirmModalVisible(false);
         });
@@ -97,8 +99,13 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                                         <span className="remove-icon">
                                             <IconCrossCircle
                                                 onClick={() => {
-                                                    setIdsToRemove({building: building.id, realEstate: realEstate.id});
-                                                    setIsConfirmModalVisible(true);
+                                                    if (building.apartment_count === 0) {
+                                                        setIdsToRemove({
+                                                            building: building.id,
+                                                            realEstate: realEstate.id,
+                                                        });
+                                                        setIsConfirmModalVisible(true);
+                                                    } else hitasToast("Rakennus ei ole tyhjä!", "error");
                                                 }}
                                             />
                                         </span>

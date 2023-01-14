@@ -42,8 +42,13 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
         setIsEndModalVisible(true);
     };
     const handleConfirmedRemove = () => {
-        removeRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string});
-        setIsConfirmModalVisible(false);
+        removeRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string}).then(
+            () => {
+                setRealEstateToRemove(null);
+                setIsConfirmModalVisible(false);
+                hitasToast("Kiinteistö poistettu onnistuneesti!", "success");
+            }
+        );
     };
 
     return (
