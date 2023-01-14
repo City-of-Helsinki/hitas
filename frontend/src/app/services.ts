@@ -168,6 +168,19 @@ const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
+        getApartmentMaximumPrice: builder.query({
+            query: ({
+                housingCompanyId,
+                apartmentId,
+                priceId,
+            }: {
+                housingCompanyId: string;
+                apartmentId: string;
+                priceId: string;
+            }) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices/${priceId}`,
+            }),
+        }),
     }),
 });
 
@@ -332,6 +345,7 @@ export const {
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
     useGetFinancingMethodsQuery,
+    useGetApartmentMaximumPriceQuery,
 } = listApi;
 
 export const {useGetHousingCompanyDetailQuery, useGetApartmentDetailQuery} = detailApi;
