@@ -30,12 +30,23 @@ export default function FormNumberInputField({
     const bannedCharacters = ["e", "E", "+", "-"];
     if (fractionDigits === 0) bannedCharacters.push(".");
 
+    const handleWheel = (e) => {
+        if (document.activeElement === e.target) {
+            e.target.blur();
+            e.stopPropagation();
+            setTimeout(() => {
+                e.target.focus();
+            }, 0);
+        }
+    };
+
     return (
         <div className={`input-field input-field--number${required ? " input-field--required" : "foo"}`}>
             <NumberInput
                 value={value}
                 onChange={(e) => setFieldValue(toFixedDown(e.target.value))}
                 onKeyDown={(e) => bannedCharacters.includes(e.key) && e.preventDefault()}
+                onWheel={(e) => handleWheel(e)}
                 unit={unit || ""}
                 required={required}
                 {...rest}
