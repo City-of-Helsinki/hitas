@@ -20,10 +20,10 @@
     "rules": {
         "no-console": 1, // 1 = warning
         "prettier/prettier": [
-          2, // 2 = error
-          {
-            "endOfLine": "auto"
-          }
+            2, // 2 = error
+            {
+                "endOfLine": "auto"
+            }
         ],
         "comma-dangle": 0,
         "require-jsdoc": 0,
@@ -34,10 +34,10 @@
         "@typescript-eslint/naming-convention": [
             "error",
             {
-              "selector": "variable",
-              "types": ["boolean"],
-              "format": ["PascalCase"],
-              "prefix": ["is"]
+                "selector": "variable",
+                "types": ["boolean"],
+                "format": ["PascalCase"],
+                "prefix": ["is", "has"]
             }
         ]
     },
