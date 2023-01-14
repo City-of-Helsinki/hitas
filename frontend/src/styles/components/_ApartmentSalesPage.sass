@@ -1,0 +1,62 @@
+@use "../imports" as *
+
+.view--apartment-sales
+  .field-sets
+    display: grid
+    grid-template-columns: 60% 1fr
+    gap: 1em
+    fieldset
+      background-color: $color-engel-medium-light
+      padding: $spacing-s
+      width: 100%
+      grid-row: 1
+      .max-prices
+        padding-top: $spacing-s
+        .row--buttons
+          margin-bottom: 0
+        .row--max-prices
+          justify-content: space-between
+        p > span
+          font-weight: bold
+        .fieldset--max-prices__value span
+          font-weight: bold
+          font-size: $fontsize-body-xl
+    legend
+      display: flex
+      @include justify-content(space-between)
+    .row
+      gap: 1em
+      > div
+        width: 50%
+        position: relative
+      .error-message
+        height: 28px
+        line-height: 1
+        svg
+          position: absolute
+          right: 1rem
+          top: 2.25rem
+          transform: translateY(2px)
+    .input-field--invalid input
+      color: $color-error
+    [class*="Checkbox-module"]
+      margin-bottom: $spacing-xs
+    .ownerships-list
+      margin-top: 0
+      legend
+        margin-bottom: 0.25em
+    .ownership-item
+      @include flexbox()
+      position: relative
+      gap: 1em
+      .owner
+        @include flex-grow(1)
+      .percentage
+        width: 8ch
+      > div > [class*="icon_hds"]
+        margin-top: 10px
+        cursor: pointer
+  input
+    margin-bottom: 10px
+  .input-field--date button
+      transform: translateY(-5px)

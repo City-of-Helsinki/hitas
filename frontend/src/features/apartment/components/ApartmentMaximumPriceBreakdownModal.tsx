@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 
 import {Button, Dialog, Table, Tabs} from "hds-react";
+import {useLocation} from "react-router";
 import {useNavigate} from "react-router-dom";
 
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
@@ -419,6 +420,7 @@ const MaximumPriceModalContent = ({
     apartment: IApartmentDetails;
     setIsModalVisible;
 }) => {
+    const location = useLocation();
     const navigate = useNavigate();
     const [confirmMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
@@ -435,9 +437,10 @@ const MaximumPriceModalContent = ({
     useEffect(() => {
         if (!isLoading && !error && data && data.confirmed_at) {
             hitasToast("Enimmäishinta vahvistettu!");
-            navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
+            if (location.pathname.endsWith("sales")) setIsModalVisible(false);
+            else navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         }
-    }, [apartment, data, error, isLoading, navigate]);
+    }, [apartment, data, error, isLoading, navigate, location.pathname, setIsModalVisible]);
 
     return (
         <>

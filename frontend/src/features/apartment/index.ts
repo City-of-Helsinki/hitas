@@ -3,13 +3,15 @@ import ApartmentDetailsPage from "./ApartmentDetailsPage";
 import ApartmentImprovementsPage from "./ApartmentImprovementsPage";
 import ApartmentListPage from "./ApartmentListPage";
 import ApartmentMaxPricePage from "./ApartmentMaxPricePage";
-import ApartmentNewSalePage from "./ApartmentNewSalePage";
+import ApartmentSalesConditionsPage from "./ApartmentSalesConditionsPage";
+import ApartmentSalesPage from "./ApartmentSalesPage";
 
 export {
     ApartmentDetailsPage,
     ApartmentListPage,
     ApartmentCreatePage,
     ApartmentMaxPricePage,
-    ApartmentNewSalePage,
+    ApartmentSalesPage,
     ApartmentImprovementsPage,
+    ApartmentSalesConditionsPage,
 };

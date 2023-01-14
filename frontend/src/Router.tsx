@@ -11,7 +11,8 @@ import {
     ApartmentImprovementsPage,
     ApartmentListPage,
     ApartmentMaxPricePage,
-    ApartmentNewSalePage,
+    ApartmentSalesConditionsPage,
+    ApartmentSalesPage,
 } from "./features/apartment";
 import {Codes} from "./features/codes";
 import Documents from "./features/documents/Documents";
@@ -93,8 +94,12 @@ export default function Router() {
                                     element={<ApartmentMaxPricePage />}
                                 />
                                 <Route
-                                    path="new-sale"
-                                    element={<ApartmentNewSalePage />}
+                                    path="sales"
+                                    element={<ApartmentSalesPage />}
+                                />
+                                <Route
+                                    path="sales-conditions"
+                                    element={<ApartmentSalesConditionsPage />}
                                 />
                             </Route>
                         </Route>
