@@ -31,11 +31,13 @@ export default function FormNumberInputField({
     if (fractionDigits === 0) bannedCharacters.push(".");
 
     const handleWheel = (e) => {
-        e.target.blur();
-        e.stopPropagation();
-        setTimeout(() => {
-            e.target.focus();
-        }, 0);
+        if (document.activeElement === e.target) {
+            e.target.blur();
+            e.stopPropagation();
+            setTimeout(() => {
+                e.target.focus();
+            }, 0);
+        }
     };
 
     return (
