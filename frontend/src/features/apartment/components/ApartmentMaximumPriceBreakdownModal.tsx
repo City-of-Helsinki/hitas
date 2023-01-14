@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 
-import {Button, Dialog, Table, Tabs} from "hds-react";
+import {Accordion, Button, Dialog, Table, Tabs} from "hds-react";
 import {useLocation} from "react-router";
 import {useNavigate} from "react-router-dom";
 
@@ -169,57 +169,67 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 value={calculation.calculation_variables.debt_free_price_m2}
                 unit="€/m²"
             />
-            <ImprovementsTable
+            <Accordion
+                size="s"
                 heading="Huoneistokohtaiset parannukset"
-                cols={[
-                    {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
-                    {
-                        key: "value_without_excess",
-                        headerName: "Arvoa korottava osuus",
-                        transform: (obj) => formatMoney(obj.value_without_excess, true),
-                    },
-                    {
-                        key: "depreciation",
-                        headerName: "Poiston määrä",
-                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
-                    },
-                    {
-                        key: "accepted_value",
-                        headerName: "Hyväksytty",
-                        transform: (obj) => formatMoney(obj.accepted_value, true),
-                    },
-                ]}
-                improvements={calculation.calculation_variables.apartment_improvements}
-            />
-            <ImprovementsTable
+            >
+                <ImprovementsTable
+                    heading=""
+                    cols={[
+                        {key: "name", headerName: "name"},
+                        {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
+                        {
+                            key: "value_without_excess",
+                            headerName: "Arvoa korottava osuus",
+                            transform: (obj) => formatMoney(obj.value_without_excess, true),
+                        },
+                        {
+                            key: "depreciation",
+                            headerName: "Poiston määrä",
+                            transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
+                        },
+                        {
+                            key: "accepted_value",
+                            headerName: "Hyväksytty",
+                            transform: (obj) => formatMoney(obj.accepted_value, true),
+                        },
+                    ]}
+                    improvements={calculation.calculation_variables.apartment_improvements}
+                />
+            </Accordion>
+            <Accordion
+                size="s"
                 heading="Huoneiston osuus yhtiön parannuksista"
-                cols={[
-                    {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
-                    {
-                        key: "value_without_excess",
-                        headerName: "Arvoa korottava osuus",
-                        transform: (obj) => formatMoney(obj.value_without_excess, true),
-                    },
-                    {
-                        key: "depreciation",
-                        headerName: "Poisto",
-                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
-                    },
-                    {
-                        key: "accepted_value",
-                        headerName: "Hyväksytty asunto",
-                        transform: (obj) => formatMoney(obj.accepted_value, true),
-                    },
-                    {
-                        key: "accepted_value_for_housing_company",
-                        headerName: "Hyväksytty yhtiö",
-                        transform: (obj) => formatMoney(obj.accepted_value_for_housing_company, true),
-                    },
-                ]}
-                improvements={calculation.calculation_variables.housing_company_improvements}
-            />
+            >
+                <ImprovementsTable
+                    heading=""
+                    cols={[
+                        {key: "name", headerName: "name"},
+                        {key: "value", headerName: "Arvo", transform: (obj) => formatMoney(obj.value, true)},
+                        {
+                            key: "value_without_excess",
+                            headerName: "Arvoa korottava osuus",
+                            transform: (obj) => formatMoney(obj.value_without_excess, true),
+                        },
+                        {
+                            key: "depreciation",
+                            headerName: "Poisto",
+                            transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
+                        },
+                        {
+                            key: "accepted_value",
+                            headerName: "Hyväksytty asunto",
+                            transform: (obj) => formatMoney(obj.accepted_value, true),
+                        },
+                        {
+                            key: "accepted_value_for_housing_company",
+                            headerName: "Hyväksytty yhtiö",
+                            transform: (obj) => formatMoney(obj.accepted_value_for_housing_company, true),
+                        },
+                    ]}
+                    improvements={calculation.calculation_variables.housing_company_improvements}
+                />
+            </Accordion>
         </>
     );
 };
@@ -278,46 +288,60 @@ const ConstructionPricePre2011Breakdown = ({
                 value={calculation.calculation_variables.debt_free_price_m2}
                 unit="€/m²"
             />
-            <ImprovementsTable
+            <Accordion
+                size="s"
                 heading="Huoneistokohtaiset parannukset"
-                cols={[
-                    {key: "name", headerName: "name"},
-                    {
-                        key: "value",
-                        headerName: "Alkup. arvo",
-                        transform: (obj) => formatMoney(obj.value, true),
-                    },
-                    {
-                        key: "index_adjusted",
-                        headerName: "Ind. tark. arvo",
-                        transform: (obj) => formatMoney(obj.index_adjusted, true),
-                    },
-                    {
-                        key: "depreciation",
-                        headerName: "Poisto",
-                        transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
-                    },
-                    {
-                        key: "value_for_apartment",
-                        headerName: "Hyväksytty",
-                        transform: (obj) => formatMoney(obj.value_for_apartment, true),
-                    },
-                ]}
-                improvements={calculation.calculation_variables.apartment_improvements}
-            />
-            <ImprovementsTable
+            >
+                <ImprovementsTable
+                    heading=""
+                    cols={[
+                        {key: "name", headerName: "name"},
+                        {
+                            key: "value",
+                            headerName: "Alkup. arvo",
+                            transform: (obj) => formatMoney(obj.value, true),
+                        },
+                        {
+                            key: "index_adjusted",
+                            headerName: "Ind. tark. arvo",
+                            transform: (obj) => formatMoney(obj.index_adjusted, true),
+                        },
+                        {
+                            key: "depreciation",
+                            headerName: "Poisto",
+                            transform: (obj) => formatMoney(getDepreciation(obj.depreciation), true),
+                        },
+                        {
+                            key: "value_for_apartment",
+                            headerName: "Hyväksytty",
+                            transform: (obj) => formatMoney(obj.value_for_apartment, true),
+                        },
+                    ]}
+                    improvements={calculation.calculation_variables.apartment_improvements}
+                />
+            </Accordion>
+            <Accordion
+                size="s"
                 heading="Huoneiston osuus yhtiön parannuksista"
-                cols={[
-                    {key: "name", headerName: "name"},
-                    {key: "value", headerName: "Arvo koko yhtiössä", transform: (obj) => formatMoney(obj.value, true)},
-                    {
-                        key: "value_for_apartment",
-                        headerName: "Vaiheen arvo",
-                        transform: (obj) => formatMoney(obj.value_for_apartment, true),
-                    },
-                ]}
-                improvements={calculation.calculation_variables.housing_company_improvements}
-            />
+            >
+                <ImprovementsTable
+                    heading=""
+                    cols={[
+                        {key: "name", headerName: "name"},
+                        {
+                            key: "value",
+                            headerName: "Arvo koko yhtiössä",
+                            transform: (obj) => formatMoney(obj.value, true),
+                        },
+                        {
+                            key: "value_for_apartment",
+                            headerName: "Vaiheen arvo",
+                            transform: (obj) => formatMoney(obj.value_for_apartment, true),
+                        },
+                    ]}
+                    improvements={calculation.calculation_variables.housing_company_improvements}
+                />
+            </Accordion>
         </>
     );
 };
