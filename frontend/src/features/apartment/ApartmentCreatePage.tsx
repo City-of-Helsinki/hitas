@@ -330,7 +330,7 @@ const ApartmentCreatePage = () => {
                             inputType="relatedModel"
                             label="Asuntotyyppi"
                             fieldPath="type.id"
-                            placeholder={state?.apartment !== undefined ? state.apartment.type.value : ""}
+                            placeholder={state?.apartment.type !== null ? state?.apartment.type.value : ""}
                             queryFunction={useGetApartmentTypesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
