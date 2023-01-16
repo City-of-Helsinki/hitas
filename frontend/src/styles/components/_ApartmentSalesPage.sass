@@ -3,7 +3,7 @@
 .view--apartment-sales
   .field-sets
     display: grid
-    grid-template-columns: 60% 1fr
+    grid-template-columns: 55% 45%
     gap: 1em
     fieldset
       background-color: $color-engel-medium-light
@@ -38,6 +38,10 @@
           right: 1rem
           top: 2.25rem
           transform: translateY(2px)
+      &--prompt
+        flex-flow: column nowrap
+        p span
+          font-weight: bold
     .input-field--invalid input
       color: $color-error
     [class*="Checkbox-module"]
@@ -54,6 +58,8 @@
       gap: 1em
       .owner
         @include flex-grow(1)
+        button
+          transform: translateY(-5px)
       .percentage
         width: 8ch
       > div > [class*="icon_hds"]

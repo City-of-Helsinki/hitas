@@ -1,16 +1,7 @@
 import React, {useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {
-    Button,
-    Checkbox,
-    Dialog,
-    Fieldset,
-    IconAlertCircleFill,
-    IconCrossCircle,
-    IconPlus,
-    LoadingSpinner,
-} from "hds-react";
+import {Button, Checkbox, Dialog, Fieldset, IconAlertCircleFill, LoadingSpinner} from "hds-react";
 import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -18,12 +9,12 @@ import {v4 as uuidv4} from "uuid";
 import {
     useGetApartmentDetailQuery,
     useGetApartmentMaximumPriceQuery,
-    useGetOwnersQuery,
     useSaveApartmentMaximumPriceMutation,
 } from "../../app/services";
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
-import {IApartmentAddress, IApartmentDetails, IApartmentMaximumPrice, IOwner, IOwnership} from "../../common/models";
-import {dotted, formatAddress, formatDate, formatIndex, formatMoney, formatOwner} from "../../common/utils";
+import OwnershipsList from "../../common/components/OwnershipsList";
+import {IApartmentAddress, IApartmentDetails, IApartmentMaximumPrice, IOwnership} from "../../common/models";
+import {formatAddress, formatDate, formatIndex, formatMoney} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -49,9 +40,7 @@ const MaximumPriceModalError = ({error, setIsModalVisible}) => {
 
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const hasValidCalculation =
-        apartment.prices.maximum_prices.confirmed !== null &&
-        new Date() <= new Date(apartment.prices.maximum_prices.confirmed.valid.valid_until);
+    const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
     const initialFormData = {
         announcementDate: null,
         dealDate:
@@ -70,9 +59,11 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     };
     const [isExcludedFromStatistics, setIsExcludedFromStatistics] = useState(false);
     const [formData, setFormData] = useImmer(initialFormData);
-    const [formOwnershipsList, setFormOwnershipsList] = useImmer<(IOwnership & {key: string})[]>([]);
+    const [formOwnershipsList, setFormOwnershipsList] = useImmer<(IOwnership & {key: string})[]>(
+        apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : []
+    );
     const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
-    const {data: maxPriceQuery} = useGetApartmentMaximumPriceQuery({
+    const {data: maxPriceQuery, error: maxPriceError} = useGetApartmentMaximumPriceQuery({
         housingCompanyId: apartment.links.housing_company.id,
         apartmentId: apartment.id,
         priceId: apartment.prices.maximum_prices.confirmed?.id as string,
@@ -87,34 +78,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         index: data ? data.index : maxPriceQuery?.index,
     });
     const isTooHighPrice = Number(maxPrices.maxPrice) < Number(formData.price);
-    // Ownerships
-    const handleAddOwnershipLine = () => {
-        setFormOwnershipsList((draft) => {
-            draft.push({
-                key: uuidv4(),
-                owner: {id: ""} as IOwner,
-                percentage: 100,
-            });
-        });
-    };
-    const handleSetOwnershipLine = (index, fieldPath) => (value) => {
-        setFormOwnershipsList((draft) => dotted(draft[index], fieldPath, value));
-    };
-    const handleRemoveOwnershipLine = (index) => {
-        setFormOwnershipsList((draft) => {
-            draft.splice(index, 1);
-        });
-    };
-    const getOwnershipPercentageError = (error) => {
-        if (
-            error &&
-            error?.data?.fields &&
-            error.data.fields.filter((e) => e.field === "ownerships.percentage").length
-        ) {
-            return error.data.fields.filter((e) => e.field === "ownerships.percentage")[0].message;
-        }
-        return "";
-    };
     const onCheckboxChange = (event) => {
         setIsExcludedFromStatistics((previous) => !previous);
     };
@@ -141,7 +104,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         });
         setIsModalVisible(true);
     };
-
+    console.log(apartment, maxPriceQuery, maxPriceError);
     return (
         <>
             <div className="field-sets">
@@ -234,13 +197,11 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                             </div>
                         </div>
                     ) : (
-                        <div className="row row--buttons row--prompt">
+                        <div className="row row--prompt">
                             <p>
-                                Asunnosta ei ole vahvistettua enimmäishintalaskelmaa, tai se ei ole enää voimassa.
-                                <br />
-                                Syötä kauppakirjan päivämäärä sekä yhtiön lainaosuus, ja tee sitten uusi laskelma
-                                <br />
-                                saadaksesi asunnon enimmäishinnat kauppaa varten.
+                                Asunnosta ei ole vahvistettua enimmäishintalaskelmaa, tai se ei ole enää voimassa. Syötä{" "}
+                                <span>kauppakirjan päivämäärä</span> sekä <span>yhtiön lainaosuus</span>, ja tee sitten
+                                uusi enimmäishintalaskelma saadaksesi asunnon enimmäishinnat kauppaa varten.
                             </p>
                             <Button
                                 theme="black"
@@ -251,76 +212,12 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         </div>
                     )}
                 </Fieldset>
-                <Fieldset heading="Uudet omistajuudet">
-                    <ul className="ownerships-list">
-                        {formOwnershipsList.length ? (
-                            <>
-                                <li>
-                                    <legend className="ownership-headings">
-                                        <span>Omistaja</span>
-                                        <span>Omistajuusprosentti</span>
-                                    </legend>
-                                </li>
-                                {formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
-                                    <li
-                                        className="ownership-item"
-                                        key={`ownership-item-${ownership.key}`}
-                                    >
-                                        <div className="owner">
-                                            <FormInputField
-                                                inputType="ownership"
-                                                label=""
-                                                fieldPath="owner.id"
-                                                placeholder={ownership?.owner.name || ""}
-                                                queryFunction={useGetOwnersQuery}
-                                                relatedModelSearchField="name"
-                                                getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                                formData={formOwnershipsList[index]}
-                                                setterFunction={handleSetOwnershipLine(index, "owner.id")}
-                                                error={error}
-                                            />
-                                        </div>
-                                        <div className="percentage">
-                                            <FormInputField
-                                                inputType="number"
-                                                label=""
-                                                fieldPath="percentage"
-                                                fractionDigits={2}
-                                                placeholder={ownership.percentage.toString()}
-                                                formData={formOwnershipsList[index]}
-                                                setterFunction={handleSetOwnershipLine(index, "percentage")}
-                                                error={error}
-                                            />
-                                        </div>
-                                        <div className="icon--remove">
-                                            <IconCrossCircle
-                                                size="m"
-                                                onClick={() => handleRemoveOwnershipLine(index)}
-                                            />
-                                        </div>
-                                    </li>
-                                ))}
-                            </>
-                        ) : (
-                            <div style={{textAlign: "center"}}>- Ei omistajuuksia -</div>
-                        )}
-                        {getOwnershipPercentageError(error) && (
-                            <>
-                                <IconAlertCircleFill className="error-text" />
-                                <span className="error-text">{getOwnershipPercentageError(error)}</span>
-                            </>
-                        )}
-                    </ul>
-                    <div className="row row--buttons">
-                        <Button
-                            onClick={handleAddOwnershipLine}
-                            iconLeft={<IconPlus />}
-                            variant="secondary"
-                            theme="black"
-                        >
-                            Lisää omistajuus
-                        </Button>
-                    </div>
+                <Fieldset heading="Omistajuudet">
+                    <OwnershipsList
+                        formOwnershipsList={formOwnershipsList}
+                        setFormOwnershipsList={setFormOwnershipsList}
+                        apartment={data}
+                    />
                 </Fieldset>
             </div>
             <div className="row row--buttons">
