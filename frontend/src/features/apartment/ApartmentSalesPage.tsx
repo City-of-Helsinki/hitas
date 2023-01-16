@@ -251,56 +251,58 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         </div>
                     )}
                 </Fieldset>
-                <Fieldset heading="Uudet omistajat">
+                <Fieldset heading="Uudet omistajuudet">
                     <ul className="ownerships-list">
-                        <li>
-                            <legend className="ownership-headings">
-                                <span>Omistaja</span>
-                                <span>Omistajuusprosentti</span>
-                            </legend>
-                        </li>
                         {formOwnershipsList.length ? (
-                            formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
-                                <li
-                                    className="ownership-item"
-                                    key={`ownership-item-${ownership.key}`}
-                                >
-                                    <div className="owner">
-                                        <FormInputField
-                                            inputType="ownership"
-                                            label=""
-                                            fieldPath="owner.id"
-                                            placeholder={ownership?.owner.name || ""}
-                                            queryFunction={useGetOwnersQuery}
-                                            relatedModelSearchField="name"
-                                            getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "owner.id")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="percentage">
-                                        <FormInputField
-                                            inputType="number"
-                                            label=""
-                                            fieldPath="percentage"
-                                            fractionDigits={2}
-                                            placeholder={ownership.percentage.toString()}
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "percentage")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="icon--remove">
-                                        <IconCrossCircle
-                                            size="m"
-                                            onClick={() => handleRemoveOwnershipLine(index)}
-                                        />
-                                    </div>
+                            <>
+                                <li>
+                                    <legend className="ownership-headings">
+                                        <span>Omistaja</span>
+                                        <span>Omistajuusprosentti</span>
+                                    </legend>
                                 </li>
-                            ))
+                                {formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
+                                    <li
+                                        className="ownership-item"
+                                        key={`ownership-item-${ownership.key}`}
+                                    >
+                                        <div className="owner">
+                                            <FormInputField
+                                                inputType="ownership"
+                                                label=""
+                                                fieldPath="owner.id"
+                                                placeholder={ownership?.owner.name || ""}
+                                                queryFunction={useGetOwnersQuery}
+                                                relatedModelSearchField="name"
+                                                getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
+                                                formData={formOwnershipsList[index]}
+                                                setterFunction={handleSetOwnershipLine(index, "owner.id")}
+                                                error={error}
+                                            />
+                                        </div>
+                                        <div className="percentage">
+                                            <FormInputField
+                                                inputType="number"
+                                                label=""
+                                                fieldPath="percentage"
+                                                fractionDigits={2}
+                                                placeholder={ownership.percentage.toString()}
+                                                formData={formOwnershipsList[index]}
+                                                setterFunction={handleSetOwnershipLine(index, "percentage")}
+                                                error={error}
+                                            />
+                                        </div>
+                                        <div className="icon--remove">
+                                            <IconCrossCircle
+                                                size="m"
+                                                onClick={() => handleRemoveOwnershipLine(index)}
+                                            />
+                                        </div>
+                                    </li>
+                                ))}
+                            </>
                         ) : (
-                            <div>Ei omistajuuksia</div>
+                            <div style={{textAlign: "center"}}>- Ei omistajuuksia -</div>
                         )}
                         {getOwnershipPercentageError(error) && (
                             <>

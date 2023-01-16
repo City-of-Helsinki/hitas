@@ -1,6 +1,6 @@
 @use '../imports' as *
 
-.view--set-apartment
+.view--apartment-max-price
   .main-heading
     @include align-items(center)
     div
@@ -11,6 +11,11 @@
     gap: $spacing-layout-s
     > div
       @include flex-grow(1)
+    .input-field
+      margin-bottom: $spacing-layout-2-xs
+      &--textArea textarea
+        min-height: 245px
+        margin-bottom: 0
 
 #maximum-price-confirmation-modal
   width: auto !important
