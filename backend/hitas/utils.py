@@ -6,7 +6,6 @@ from typing import Any, Optional
 from django.db.models import Value
 from django.db.models.functions import Round
 from django.utils import timezone
-from rest_framework.authentication import TokenAuthentication
 
 
 class RoundWithPrecision(Round):
@@ -44,10 +43,6 @@ def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
         return operator.attrgetter(dotted_path)(obj)
     except AttributeError:
         return default
-
-
-class BearerAuthentication(TokenAuthentication):
-    keyword = "Bearer"
 
 
 def this_month() -> datetime.date:
