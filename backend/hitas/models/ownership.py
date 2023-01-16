@@ -49,6 +49,13 @@ class Ownership(HitasModel):
         verbose_name = _("Ownership")
         verbose_name_plural = _("Ownerships")
         ordering = ["id"]
+        constraints = [
+            models.UniqueConstraint(
+                name="%(app_label)s_%(class)s_single_ownership_for_apartment_per_owner",
+                fields=("apartment", "owner"),
+                condition=models.Q(deleted__isnull=True),
+            )
+        ]
 
     def __str__(self):
         return f"{self.owner}, {self.apartment}"
@@ -71,8 +78,8 @@ def check_ownership_percentages(ownerships: Iterable[OwnershipLike]) -> None:
             raise ValidationError(
                 {
                     "percentage": (
-                        f"Ownership percentage greater than 0 and"
-                        f" less than or equal to 100. Given value was {percentage}."
+                        f"Ownership percentage must be greater than 0 and less than or equal to 100. "
+                        f"Given value was {percentage}."
                     )
                 },
             )

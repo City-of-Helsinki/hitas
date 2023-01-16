@@ -5,8 +5,8 @@ from rest_framework import status
 from hitas.models import Apartment, ApartmentSale, Owner, Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, OwnerFactory, OwnershipFactory
+from hitas.views.apartment_sale import ApartmentSaleSerializer
 from hitas.views.ownership import OwnershipSerializer
-from hitas.views.sale import ApartmentSaleSerializer
 
 # List tests
 
@@ -298,8 +298,37 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
                     {
                         "field": "ownerships.percentage",
                         "message": (
-                            "Ownership percentage greater than 0 and less than or equal to 100. Given value was 150.00."
+                            "Ownership percentage must be greater than 0 and less than or equal to 100. "
+                            "Given value was 150.00."
                         ),
+                    },
+                ],
+            ),
+            "Multiple ownerships for the same owner": InvalidInput(
+                invalid_data={
+                    "ownerships": [
+                        {
+                            "owner": {
+                                "id": ...,
+                            },
+                            "percentage": 50.0,
+                            "start_date": "2022-01-01",
+                            "end_date": "2023-01-01",
+                        },
+                        {
+                            "owner": {
+                                "id": ...,
+                            },
+                            "percentage": 50.0,
+                            "start_date": "2022-01-01",
+                            "end_date": "2023-01-01",
+                        },
+                    ],
+                },
+                fields=[
+                    {
+                        "field": "ownerships",
+                        "message": "All ownerships must be for different owners.",
                     },
                 ],
             ),
@@ -491,12 +520,12 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
 
     # Set back Owner ID if set to ... on parametrize
     ownerships = data.get("ownerships", [{}])
-    for ownership in ownerships:
+    for index, ownership in enumerate(ownerships):
         owner_ = ownership.get("owner", {})
         if isinstance(owner_, dict):
             owner_id = owner_.get("id", None)
             if owner_id is ...:
-                data["ownerships"][0]["owner"]["id"] = owner.uuid.hex
+                data["ownerships"][index]["owner"]["id"] = owner.uuid.hex
 
     url_1 = reverse(
         "hitas:apartment-sale-list",

@@ -1,12 +1,11 @@
 from typing import Any
-from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 
-from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, ApartmentSale
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
+from hitas.utils import lookup_model_id_by_uuid
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
@@ -29,20 +28,18 @@ class ApartmentSaleSerializer(HitasModelSerializer):
         if not ownerships:
             raise ValidationError("Sale must have ownerships.")
 
+        if len(ownerships) != len({ownership["owner"] for ownership in ownerships}):
+            raise ValidationError("All ownerships must be for different owners.")
+
         check_ownership_percentages(ownerships)
         return ownerships
 
-    def get_apartment_id(self) -> int:
-        try:
-            apartment_uuid = UUID(hex=self.context["view"].kwargs.get("apartment_uuid"))
-            apartment_id = Apartment.objects.only("id").get(uuid=apartment_uuid).id
-        except (Apartment.DoesNotExist, ValueError) as error:
-            raise HitasModelNotFound(model=Apartment) from error
-        return apartment_id
-
     def create(self, validated_data: dict[str, Any]) -> ApartmentSale:
         ownership_data: list[OwnershipLike] = validated_data.pop("ownerships")
-        apartment_id = self.get_apartment_id()
+        apartment_id = lookup_model_id_by_uuid(
+            lookup_id=self.context["view"].kwargs.get("apartment_uuid"),
+            model_class=Apartment,
+        )
         validated_data["apartment_id"] = apartment_id
 
         instance: ApartmentSale = super().create(validated_data)
@@ -82,12 +79,4 @@ class ApartmentSaleViewSet(HitasModelViewSet):
                 "ownerships",
                 Ownership.objects.select_related("owner"),
             ),
-        ).only(
-            "id",
-            "uuid",
-            "notification_date",
-            "purchase_date",
-            "purchase_price",
-            "apartment_share_of_housing_company_loans",
-            "include_in_statistics",
         )

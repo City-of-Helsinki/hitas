@@ -34,7 +34,7 @@ from hitas.models import (
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -44,7 +44,6 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
     ValueOrNullField,
-    UUIDField,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
@@ -513,6 +512,10 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             return ownerships
 
         check_ownership_percentages(ownerships)
+
+        if len(ownerships) != len({ownership["owner"] for ownership in ownerships}):
+            raise ValidationError("All ownerships must be for different owners.")
+
         return ownerships
 
     def create(self, validated_data: dict[str, Any]):
@@ -539,11 +542,15 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         instance: Apartment = super().update(instance, validated_data)
 
-        # TODO: Ownerships should not be allowed to update from apartments in the future,
-        #  and should only change when a new sale is made. Requires frontend changes,
-        #  so keep this here for backwards compatibility for now.
-        instance.ownerships.all().delete()
-        Ownership.objects.bulk_create(objs=(Ownership(apartment=instance, **owner_data) for owner_data in ownerships))
+        new_ownerships = [Ownership(apartment=instance, **owner_data) for owner_data in ownerships]
+        current_filter = Q()
+        for new_ownership in new_ownerships:
+            current_filter |= Q(owner=new_ownership.owner) & Q(percentage=new_ownership.percentage)
+
+        # If given ownerships are not exactly the same as the previous ones, create new ownerships for all
+        if instance.ownerships.exclude(current_filter).exists():
+            instance.ownerships.all().delete()
+            Ownership.objects.bulk_create(objs=new_ownerships)
 
         # Improvements
         merge_model(
@@ -724,7 +731,7 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     def get_list_queryset(self):
-        hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
+        hc_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
 
         return (
             Apartment.objects.filter(building__real_estate__housing_company__id=hc_id)
