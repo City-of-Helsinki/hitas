@@ -241,7 +241,7 @@ const ApartmentCreatePage = () => {
     }, [isEditPage, navigate, pathname, state]);
 
     return (
-        <div className="view--create view--set-apartment">
+        <div className="view--create">
             <Heading>
                 {state?.apartment
                     ? `${state.apartment.address.street_address} - ${state.apartment.address.stair}

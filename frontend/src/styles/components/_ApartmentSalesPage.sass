@@ -21,9 +21,10 @@
         .fieldset--max-prices__value span
           font-weight: bold
           font-size: $fontsize-body-xl
-    legend
-      display: flex
-      @include justify-content(space-between)
+    legend[class*="hds"]
+      background-color: $color-engel-medium-light
+      padding: $spacing-s
+      margin-left: calc(var(--spacing-s) * -1)
     .row
       gap: 1em
       > div
@@ -44,6 +45,8 @@
     .ownerships-list
       margin-top: 0
       legend
+        @include flexbox()
+        @include justify-content(space-between)
         margin-bottom: 0.25em
     .ownership-item
       @include flexbox()
