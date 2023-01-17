@@ -1,6 +1,13 @@
 @use "../imports" as *
 
 .view--apartment-sales
+  .heading--main
+    line-height: 1.5
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
+    span
+      font-size: $fontsize-heading-s
   .field-sets
     display: grid
     grid-template-columns: 55% 45%

@@ -273,17 +273,11 @@ const ApartmentSalesPage = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                {isLoading ? (
-                    <></>
-                ) : (
-                    <>
-                        <Heading type="main">
-                            Uusi kauppa
-                            <span>({formatAddress(data?.address as IApartmentAddress)})</span>
-                        </Heading>
-                        <LoadedApartmentSalesPage apartment={data as IApartmentDetails} />
-                    </>
-                )}
+                <Heading type="main">
+                    Uusi kauppa
+                    <span>({data && formatAddress(data.address as IApartmentAddress)})</span>
+                </Heading>
+                <LoadedApartmentSalesPage apartment={data as IApartmentDetails} />
             </QueryStateHandler>
         </div>
     );
