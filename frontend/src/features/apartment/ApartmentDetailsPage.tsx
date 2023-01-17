@@ -264,8 +264,8 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                     {data.address.apartment_number}
                 </span>
                 <span>
-                    {data.rooms ? data.rooms : ""}
-                    {data.type ? data.type.value : ""}
+                    {data.rooms || ""}
+                    {data.type?.value || ""}
                 </span>
                 <span>{data.surface_area ? data.surface_area + "m²" : ""}</span>
                 <span>{data.address.floor ? data.address.floor + ".krs" : ""}</span>

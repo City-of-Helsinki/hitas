@@ -59,7 +59,7 @@ const ApartmentListItem = ({
                         <br />
                         {`${address.postal_code} ${address.city}`}
                     </div>
-                    <div className="area">{`${surfaceArea || ""}${surfaceArea ? "m²" : ""} ${
+                    <div className="area">{`${surfaceArea ? surfaceArea + "m²" : ""} ${
                         rooms || ""
                     } ${apartmentType}`}</div>
                 </div>
