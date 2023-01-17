@@ -1,6 +1,7 @@
 from hitas.views.apartment import ApartmentViewSet
 from hitas.views.apartment_list import ApartmentListViewSet
 from hitas.views.apartment_max_price import ApartmentMaximumPriceViewSet
+from hitas.views.apartment_sale import ApartmentSaleViewSet
 from hitas.views.building import BuildingViewSet
 from hitas.views.codes import ApartmentTypeViewSet, BuildingTypeViewSet, DeveloperViewSet, FinancingMethodViewSet
 from hitas.views.housing_company import HousingCompanyViewSet

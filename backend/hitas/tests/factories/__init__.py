@@ -5,6 +5,7 @@ from hitas.tests.factories.apartment import (
     ApartmentFactory,
     ApartmentMarketPriceImprovementFactory,
 )
+from hitas.tests.factories.apartment_sale import ApartmentSaleFactory
 from hitas.tests.factories.codes import (
     ApartmentTypeFactory,
     BuildingTypeFactory,

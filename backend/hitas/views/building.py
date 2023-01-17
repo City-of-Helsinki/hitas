@@ -7,6 +7,7 @@ from rest_framework import serializers
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
+from hitas.utils import lookup_model_id_by_uuid
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
 
 
@@ -68,8 +69,8 @@ class BuildingViewSet(HitasModelViewSet):
         super().perform_destroy(instance)
 
     def get_queryset(self):
-        hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
-        re_id = self._lookup_model_id_by_uuid(RealEstate, "real_estate_uuid", housing_company_id=hc_id)
+        hc_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
+        re_id = lookup_model_id_by_uuid(self.kwargs["real_estate_uuid"], RealEstate, housing_company_id=hc_id)
 
         return (
             Building.objects.filter(real_estate__id=re_id)

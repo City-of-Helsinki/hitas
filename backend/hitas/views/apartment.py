@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from collections import OrderedDict
 from http import HTTPStatus
 from typing import Any, Dict, Optional, Union, Iterable
 
@@ -34,7 +33,8 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid
+from hitas.models.ownership import check_ownership_percentages, OwnershipLike
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
@@ -44,7 +44,6 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
     ValueOrNullField,
-    UUIDField,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
@@ -493,7 +492,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def get_links(instance: Apartment):
         return create_links(instance)
 
-    def validate_building(self, building: Building):
+    def validate_building(self, building: Building) -> Building:
         if building is None:
             raise serializers.ValidationError(code="blank")
 
@@ -508,37 +507,19 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         return building
 
-    @staticmethod
-    def validate_ownerships(ownerships: OrderedDict):
+    def validate_ownerships(self, ownerships: list[OwnershipLike]) -> list[OwnershipLike]:
         if not ownerships:
             return ownerships
 
-        for owner in ownerships:
-            op = owner["percentage"]
-            if not 0 < op <= 100:
-                raise ValidationError(
-                    {
-                        "percentage": (
-                            "Ownership percentage greater than 0 and"
-                            f" less than or equal to 100. Given value was {op}."
-                        )
-                    },
-                )
+        check_ownership_percentages(ownerships)
 
-        if (sum_op := sum(o["percentage"] for o in ownerships)) != 100:
-            raise ValidationError(
-                {
-                    "percentage": (
-                        "Ownership percentage of all ownerships combined"
-                        f" must be equal to 100. Given sum was {sum_op}."
-                    )
-                }
-            )
+        if len(ownerships) != len({ownership["owner"] for ownership in ownerships}):
+            raise ValidationError("All ownerships must be for different owners.")
 
         return ownerships
 
     def create(self, validated_data: dict[str, Any]):
-        ownerships = validated_data.pop("ownerships")
+        ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
@@ -555,20 +536,21 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return instance
 
     def update(self, instance: Apartment, validated_data: dict[str, Any]):
-        ownerships = validated_data.pop("ownerships")
+        ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().update(instance, validated_data)
 
-        # Ownerships
-        merge_model(
-            model_class=Ownership,
-            existing_qs=instance.ownerships.all(),
-            wanted=ownerships,
-            create_defaults={"apartment": instance},
-            equal_fields=["owner", "start_date", "end_date", "percentage"],
-        )
+        new_ownerships = [Ownership(apartment=instance, **owner_data) for owner_data in ownerships]
+        current_filter = Q()
+        for new_ownership in new_ownerships:
+            current_filter |= Q(owner=new_ownership.owner) & Q(percentage=new_ownership.percentage)
+
+        # If given ownerships are not exactly the same as the previous ones, create new ownerships for all
+        if instance.ownerships.exclude(current_filter).exists():
+            instance.ownerships.all().delete()
+            Ownership.objects.bulk_create(objs=new_ownerships)
 
         # Improvements
         merge_model(
@@ -749,7 +731,7 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     def get_list_queryset(self):
-        hc_id = self._lookup_model_id_by_uuid(HousingCompany, "housing_company_uuid")
+        hc_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
 
         return (
             Apartment.objects.filter(building__real_estate__housing_company__id=hc_id)

@@ -1,8 +1,8 @@
 import os
 
 import environ
-import rest_framework.authentication
 from django.utils.translation import gettext_lazy as _
+from rest_framework.authentication import TokenAuthentication
 
 # Set up .env
 root = environ.Path(__file__) - 2
@@ -93,7 +93,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
 
 
-class BearerAuth(rest_framework.authentication.TokenAuthentication):
+class BearerAuthentication(TokenAuthentication):
     keyword = "Bearer"
 
 
@@ -102,7 +102,7 @@ REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
-    "DEFAULT_AUTHENTICATION_CLASSES": ["hitas.utils.BearerAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["config.settings.BearerAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 

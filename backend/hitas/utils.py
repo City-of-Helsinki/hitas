@@ -3,10 +3,12 @@ import operator
 import uuid
 from typing import Any, Optional
 
+from django.db import models
 from django.db.models import Value
 from django.db.models.functions import Round
 from django.utils import timezone
-from rest_framework.authentication import TokenAuthentication
+
+from hitas.exceptions import HitasModelNotFound
 
 
 class RoundWithPrecision(Round):
@@ -46,10 +48,6 @@ def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
         return default
 
 
-class BearerAuthentication(TokenAuthentication):
-    keyword = "Bearer"
-
-
 def this_month() -> datetime.date:
     return monthify(timezone.now().today().date())
 
@@ -64,3 +62,19 @@ def valid_uuid(value: str, version: int = 4) -> bool:
         return True
     except ValueError:
         return False
+
+
+def lookup_id_to_uuid(lookup_id: str, model_class: type[models.Model]) -> uuid.UUID:
+    try:
+        return uuid.UUID(hex=lookup_id)
+    except ValueError:
+        raise HitasModelNotFound(model=model_class)
+
+
+def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **kwargs) -> int:
+    uuid = lookup_id_to_uuid(lookup_id, model_class)
+
+    try:
+        return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
+    except model_class.DoesNotExist:
+        raise HitasModelNotFound(model=model_class)

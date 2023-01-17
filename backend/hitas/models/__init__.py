@@ -5,6 +5,7 @@ from hitas.models.apartment import (
     ApartmentMaximumPriceCalculation,
     ApartmentState,
 )
+from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.building import Building
 from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
 from hitas.models.housing_company import (

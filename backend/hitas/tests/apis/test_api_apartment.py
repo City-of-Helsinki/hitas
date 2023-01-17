@@ -1275,7 +1275,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             [
                 {
                     "field": "ownerships.percentage",
-                    "message": "Ownership percentage greater than 0 and less than"
+                    "message": "Ownership percentage must be greater than 0 and less than"
                     " or equal to 100. Given value was 0.00.",
                 }
             ],
