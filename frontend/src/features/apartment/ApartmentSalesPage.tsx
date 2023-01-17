@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Checkbox, Dialog, Fieldset, IconAlertCircleFill, LoadingSpinner} from "hds-react";
+import {Button, Checkbox, Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
 import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -42,20 +42,14 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     const [isModalVisible, setIsModalVisible] = useState(false);
     const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
     const initialFormData = {
-        announcementDate: null,
-        dealDate:
-            apartment.prices.maximum_prices.confirmed !== null
+        notificationDate: null,
+        apartmentSaleDate:
+            apartment.prices.maximum_prices.confirmed !== null && hasValidCalculation
                 ? apartment.prices.maximum_prices.confirmed.calculation_date
                 : null,
-        dateOfCount:
-            apartment.prices.maximum_prices.confirmed !== null
-                ? apartment.prices.maximum_prices.confirmed.calculation_date
-                : null,
-        price: null,
+        purchasePrice: null,
         apartment_share_of_housing_company_loans: hasValidCalculation ? apartment.prices.primary_loan_amount : null,
-        mortgageShare: null,
         isExcludedFromStatistics: false,
-        index: "",
     };
     const [isExcludedFromStatistics, setIsExcludedFromStatistics] = useState(false);
     const [formData, setFormData] = useImmer(initialFormData);
@@ -63,30 +57,30 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : []
     );
     const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
-    const {data: maxPriceQuery, error: maxPriceError} = useGetApartmentMaximumPriceQuery({
+    const {data: maxPriceQuery} = useGetApartmentMaximumPriceQuery({
         housingCompanyId: apartment.links.housing_company.id,
         apartmentId: apartment.id,
         priceId: apartment.prices.maximum_prices.confirmed?.id as string,
     });
     const [maxPrices, setMaxPrices] = useState({
-        maxPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
+        maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
         maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
             ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
             : 0,
-        debtFreeMaxPrice: apartment.prices.debt_free_purchase_price,
-        loanAmount: apartment.prices.primary_loan_amount,
+        debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
+        primaryLoanAmount: apartment.prices.primary_loan_amount,
         index: data ? data.index : maxPriceQuery?.index,
     });
-    const isTooHighPrice = Number(maxPrices.maxPrice) < Number(formData.price);
+    const isTooHighPrice = Number(maxPrices.maximumPrice) < Number(formData.purchasePrice);
     const onCheckboxChange = (event) => {
         setIsExcludedFromStatistics((previous) => !previous);
     };
     const handleCalculateButton = () => {
         saveMaximumPrice({
             data: {
-                calculation_date: formData.dealDate,
+                calculation_date: formData.apartmentSaleDate,
                 apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
-                apartment_share_of_housing_company_loans_date: formData.dealDate,
+                apartment_share_of_housing_company_loans_date: formData.apartmentSaleDate,
                 additional_info: "",
             },
             id: undefined,
@@ -94,17 +88,16 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             housingCompanyId: apartment.links.housing_company.id,
         });
         setMaxPrices({
-            maxPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
+            maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
             maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
                 ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
                 : 0,
-            debtFreeMaxPrice: apartment.prices.debt_free_purchase_price,
-            loanAmount: apartment.prices.primary_loan_amount,
+            debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
+            primaryLoanAmount: apartment.prices.primary_loan_amount,
             index: data ? data.index : maxPriceQuery?.index,
         });
         setIsModalVisible(true);
     };
-    console.log(apartment, maxPriceQuery, maxPriceError);
     return (
         <>
             <div className="field-sets">
@@ -113,7 +106,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         <FormInputField
                             inputType="date"
                             label="Ilmoituspäivämäärä"
-                            fieldPath="announcementDate"
+                            fieldPath="notificationDate"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -121,7 +114,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         <FormInputField
                             inputType="date"
                             label="Kauppakirjan päivämäärä"
-                            fieldPath="dealDate"
+                            fieldPath="apartmentSaleDate"
                             formData={formData}
                             setFormData={setFormData}
                             error={error}
@@ -134,7 +127,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 label="Kauppahinta"
                                 unit="€"
                                 fractionDigits={2}
-                                fieldPath="price"
+                                fieldPath="purchasePrice"
                                 formData={formData}
                                 setFormData={setFormData}
                                 error={error}
@@ -169,7 +162,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 <div className="fieldset--max-prices__value">
                                     <legend>Enimmäishinta (€)</legend>
                                     <span className={isTooHighPrice ? "error-text" : ""}>
-                                        {formatMoney(maxPrices.maxPrice as number)}
+                                        {formatMoney(maxPrices.maximumPrice as number)}
                                     </span>
                                 </div>
                                 <div className="fieldset--max-prices__value">
@@ -178,13 +171,16 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 </div>
                                 <div className="fieldset--max-prices__value">
                                     <legend>Velaton enimmäishinta (€)</legend>
-                                    <span>{formatMoney(maxPrices.debtFreeMaxPrice)}</span>
+                                    <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
                                 </div>
                             </div>
                             <div className="row row--buttons">
                                 <p>
-                                    Enimmäishinnat <span>{formatDate(formData.dateOfCount)}</span> tehdystä
-                                    enimmäishintalaskelmasta (peruste:
+                                    Enimmäishinnat
+                                    <span>
+                                        {formatDate(apartment.prices.maximum_prices.confirmed?.confirmed_at as string)}
+                                    </span>
+                                    vahvistetusta enimmäishintalaskelmasta (peruste:
                                     <span> {formatIndex(data ? data.index : maxPriceQuery?.index)}</span>).
                                 </p>
                                 <Button
@@ -226,7 +222,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                     onClick={() => {
                         return;
                     }}
-                    isLoading={false}
+                    isLoading={isLoading}
                 />
             </div>
             <Dialog
@@ -278,7 +274,7 @@ const ApartmentSalesPage = () => {
                 isLoading={isLoading}
             >
                 {isLoading ? (
-                    <LoadingSpinner />
+                    <></>
                 ) : (
                     <>
                         <Heading type="main">
