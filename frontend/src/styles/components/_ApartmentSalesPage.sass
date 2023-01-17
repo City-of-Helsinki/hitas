@@ -1,0 +1,78 @@
+@use "../imports" as *
+
+.view--apartment-sales
+  .heading--main
+    line-height: 1.5
+    overflow: hidden
+    white-space: nowrap
+    text-overflow: ellipsis
+    span
+      font-size: $fontsize-heading-s
+  .field-sets
+    display: grid
+    grid-template-columns: 55% 45%
+    gap: 1em
+    fieldset
+      background-color: $color-engel-medium-light
+      padding: $spacing-s
+      width: 100%
+      grid-row: 1
+      .max-prices
+        padding-top: $spacing-s
+        .row--buttons
+          margin-bottom: 0
+        .row--max-prices
+          justify-content: space-between
+        p > span
+          font-weight: bold
+        .fieldset--max-prices__value span
+          font-weight: bold
+          font-size: $fontsize-body-xl
+    legend[class*="hds"]
+      background-color: $color-engel-medium-light
+      padding: $spacing-s
+      margin-left: calc(var(--spacing-s) * -1)
+    .row
+      gap: 1em
+      > div
+        width: 50%
+        position: relative
+      .error-message
+        height: 28px
+        line-height: 1
+        svg
+          position: absolute
+          right: 1rem
+          top: 2.25rem
+          transform: translateY(2px)
+      &--prompt
+        flex-flow: column nowrap
+        p span
+          font-weight: bold
+    .input-field--invalid input
+      color: $color-error
+    [class*="Checkbox-module"]
+      margin-bottom: $spacing-xs
+    .ownerships-list
+      margin-top: 0
+      legend
+        @include flexbox()
+        @include justify-content(space-between)
+        margin-bottom: 0.25em
+    .ownership-item
+      @include flexbox()
+      position: relative
+      gap: 1em
+      .owner
+        @include flex-grow(1)
+        button
+          transform: translateY(-5px)
+      .percentage
+        width: 8ch
+      > div > [class*="icon_hds"]
+        margin-top: 10px
+        cursor: pointer
+  input
+    margin-bottom: 10px
+  .input-field--date button
+      transform: translateY(-5px)

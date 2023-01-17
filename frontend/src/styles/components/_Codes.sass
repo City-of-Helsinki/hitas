@@ -3,7 +3,7 @@
 .view--codes
   @include flexbox()
   @include flex-flow(column nowrap)
-  flex-grow: 1
+  @include flex-grow(1)
   [class^="Tabs-module"]
     [class*="tablistBar"]
       background-color: white
@@ -26,21 +26,19 @@
     height: 510px
 
   .filters
+    @include flexbox()
     padding: 0
     width: 100%
-    @include flexbox()
     gap: $spacing-m
 
     > div
-      flex-grow: 1
+      @include flex-grow(1)
 
   .listing
-    background-color: $codes-background-color
     @include flexbox()
     @include flex-flow(column nowrap)
+    background-color: $codes-background-color
     padding-right: $spacing-layout-2-xl
-
-
 
   .results-list
     border: 1px solid #888
@@ -50,13 +48,13 @@
     padding: $spacing-xs $spacing-m
     cursor: pointer
     &:after
+      @include opacity(0)
       display: block
       content: "Muokkaa"
       font-weight: 700
       position: absolute
       top: 0.75em
       right: calc(70px - 5rem)
-      opacity: 0
       overflow: hidden
       max-width: 10px
       transition: all 200ms
@@ -67,7 +65,7 @@
       &:after
         right: -5rem
         max-width: 70px
-        opacity: 0.2
+        @include opacity(0.2)
     &:nth-child(odd)
       background-color: $color-engel-light
       &:hover
@@ -80,23 +78,24 @@
     [class*="Select-module_"]
       text-transform: capitalize
     .listing
+      @include flex-grow(1)
+      @include justify-content(flex-start)
       grid-template-rows: auto
       grid-template-columns: 50% 50%
-      @include flex-grow(1)
-      justify-content: flex-start
 
     .list-headers, .results-list__item
       @include flexbox()
-      justify-content: space-between
+      @include justify-content(space-between)
       .index
         width: 70%
       .month
         width: 20%
       .value
+        @include justify-content(flex-end)
         width: 10%
         text-align: right
 
   .index-actions
-    padding-top: $spacing-layout-m
     @include flexbox()
-    justify-content: center
+    @include justify-content(center)
+    padding-top: $spacing-layout-m

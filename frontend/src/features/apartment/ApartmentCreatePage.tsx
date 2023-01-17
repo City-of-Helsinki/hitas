@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Fieldset, IconAlertCircleFill, IconCrossCircle, IconPlus, TextInput} from "hds-react";
+import {Fieldset, TextInput} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -8,7 +8,6 @@ import {v4 as uuidv4} from "uuid";
 import {
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
-    useGetOwnersQuery,
     useRemoveApartmentMutation,
     useSaveApartmentMutation,
 } from "../../app/services";
@@ -21,8 +20,9 @@ import {
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwner, IOwnership} from "../../common/models";
-import {dotted, formatOwner, hitasToast} from "../../common/utils";
+import OwnershipsList from "../../common/components/OwnershipsList";
+import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwnership} from "../../common/models";
+import {hitasToast} from "../../common/utils";
 
 interface IApartmentState {
     pathname: string;
@@ -180,37 +180,6 @@ const ApartmentCreatePage = () => {
         });
     };
 
-    // Ownerships
-    const handleAddOwnershipLine = () => {
-        setFormOwnershipsList((draft) => {
-            draft.push({
-                key: uuidv4(),
-                owner: {id: ""} as IOwner,
-                percentage: 100,
-            });
-        });
-    };
-    const handleSetOwnershipLine = (index, fieldPath) => (value) => {
-        setFormOwnershipsList((draft) => {
-            dotted(draft[index], fieldPath, value);
-        });
-    };
-    const handleRemoveOwnershipLine = (index) => {
-        setFormOwnershipsList((draft) => {
-            draft.splice(index, 1);
-        });
-    };
-    const getOwnershipPercentageError = (error) => {
-        if (
-            error &&
-            error?.data?.fields &&
-            error.data.fields.filter((e) => e.field === "ownerships.percentage").length
-        ) {
-            return error.data.fields.filter((e) => e.field === "ownerships.percentage")[0].message;
-        }
-        return "";
-    };
-
     // Handle remove flow
     useEffect(() => {
         if (isEditPage) {
@@ -241,7 +210,7 @@ const ApartmentCreatePage = () => {
     }, [isEditPage, navigate, pathname, state]);
 
     return (
-        <div className="view--create view--set-apartment">
+        <div className="view--create">
             <Heading>
                 {state?.apartment
                     ? `${state.apartment.address.street_address} - ${state.apartment.address.stair}
@@ -413,7 +382,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
-                            label="Rakennusaikaiset korot (6 %)"
+                            label="Rak.aik. korko (6%)"
                             fieldPath="prices.construction.interest.rate_6"
                             formData={formData}
                             setFormData={setFormData}
@@ -422,7 +391,7 @@ const ApartmentCreatePage = () => {
                         <FormInputField
                             inputType="number"
                             unit="€"
-                            label="Rakennusaikaiset korot (14 %)"
+                            label="Rak.aik. korko (14%)"
                             fieldPath="prices.construction.interest.rate_14"
                             formData={formData}
                             setFormData={setFormData}
@@ -483,71 +452,11 @@ const ApartmentCreatePage = () => {
             </div>
             <div className="field-sets">
                 <Fieldset heading="Omistajuudet">
-                    <ul className="ownerships-list">
-                        <li>
-                            <legend className="ownership-headings">
-                                <span>Omistaja</span>
-                                <span>Omistajuusprosentti</span>
-                            </legend>
-                        </li>
-                        {formOwnershipsList.length ? (
-                            formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
-                                <li
-                                    className="ownership-item"
-                                    key={`ownership-item-${ownership.key}`}
-                                >
-                                    <div className="owner">
-                                        <FormInputField
-                                            inputType="ownership"
-                                            label=""
-                                            fieldPath="owner.id"
-                                            placeholder={ownership?.owner.name || ""}
-                                            queryFunction={useGetOwnersQuery}
-                                            relatedModelSearchField="name"
-                                            getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "owner.id")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="percentage">
-                                        <FormInputField
-                                            inputType="number"
-                                            label=""
-                                            fieldPath="percentage"
-                                            fractionDigits={2}
-                                            placeholder={ownership.percentage.toString()}
-                                            formData={formOwnershipsList[index]}
-                                            setterFunction={handleSetOwnershipLine(index, "percentage")}
-                                            error={error}
-                                        />
-                                    </div>
-                                    <div className="icon--remove">
-                                        <IconCrossCircle
-                                            size="m"
-                                            onClick={() => handleRemoveOwnershipLine(index)}
-                                        />
-                                    </div>
-                                </li>
-                            ))
-                        ) : (
-                            <div>Ei omistajuuksia</div>
-                        )}
-                        {getOwnershipPercentageError(error) && (
-                            <>
-                                <IconAlertCircleFill className="error-text" />
-                                <span className="error-text">{getOwnershipPercentageError(error)}</span>
-                            </>
-                        )}
-                    </ul>
-                    <Button
-                        onClick={handleAddOwnershipLine}
-                        iconLeft={<IconPlus />}
-                        variant="secondary"
-                        theme="black"
-                    >
-                        Lisää omistajuus
-                    </Button>
+                    <OwnershipsList
+                        formOwnershipsList={formOwnershipsList}
+                        setFormOwnershipsList={setFormOwnershipsList}
+                        apartment={data}
+                    />
                 </Fieldset>
                 <Fieldset heading="">
                     <div className="row">

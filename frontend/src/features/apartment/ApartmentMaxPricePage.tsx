@@ -87,7 +87,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
     };
 
     return (
-        <div className="view--set-apartment">
+        <div className="view--apartment-max-price">
             <Heading>
                 <div>
                     {apartment.address.street_address} - {apartment.address.stair}

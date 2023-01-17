@@ -1,16 +1,21 @@
 @use '../imports' as *
 
-.view--set-apartment
+.view--apartment-max-price
   .main-heading
-    align-items: center
+    @include align-items(center)
     div
       height: 30px
 
   .row
-    justify-content: space-between
+    @include justify-content(space-between)
     gap: $spacing-layout-s
     > div
-      flex-grow: 1
+      @include flex-grow(1)
+    .input-field
+      margin-bottom: $spacing-layout-2-xs
+      &--textArea textarea
+        min-height: 245px
+        margin-bottom: 0
 
 #maximum-price-confirmation-modal
   width: auto !important
@@ -26,7 +31,7 @@
     overflow: visible
     ul
       @include flexbox()
-      flex-flow: column nowrap
+      @include flex-flow(column nowrap)
       width: auto !important
       overflow: visible
       li
@@ -41,10 +46,10 @@
         &:focus span:after
           border: none !important
         span
+          @include justify-content(flex-start)
           height: 50px
           padding-left: 0
           padding-right: 0
-          justify-content: flex-start
           border-width: 0 !important
           &:before
             display: block
@@ -79,12 +84,12 @@
     margin-top: $spacing-layout-m
 
 .confirmation-modal__breakdown
-  flex-grow: 1
+  @include flex-grow(1)
   margin-top: $spacing-xs
   min-height: 466px
   &-row
     @include flexbox()
-    justify-content: space-between
+    @include justify-content(space-between)
     label
       min-width: 300px
     p
@@ -92,6 +97,11 @@
       margin: 0 0 $spacing-m
       text-align: right
       font-weight: bold
+  [class*="Accordion"]
+    width: 1000px
+    padding-bottom: 0
+    button
+      display: none
 
 .maximumPriceImprovementsTable
   div

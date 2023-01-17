@@ -1,0 +1,15 @@
+@use '../imports' as *
+
+.list-wrapper--improvements
+  margin: $spacing-layout-m 0
+  .detail-list__list
+    .detail-list__list-headers, .detail-list__list-item
+      > div
+        width: 19%
+        &:first-child
+          width: 10%
+        &:nth-child(2)
+          width: 40%
+          padding-right: $spacing-xs
+        &:last-child
+          width: 12%

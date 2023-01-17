@@ -16,7 +16,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
     const isApartment = "links" in data;
 
     return (
-        <div className="list__wrapper list-wrapper--upgrades">
+        <div className="list__wrapper list-wrapper--improvements">
             <Heading type="list">
                 <span>{title}</span>
                 {editableType !== undefined && (
@@ -27,7 +27,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                     />
                 )}
             </Heading>
-            <ul className="detail-list__list">
+            <ul className="detail-list__list detail-list__list--improvements">
                 {data.improvements.market_price_index.length || data.improvements.construction_price_index.length ? (
                     <>
                         <li className="detail-list__list-headers">
@@ -39,10 +39,10 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                         </li>
                         {data.improvements.market_price_index.map((item, index) => (
                             <li
-                                className="detail-list__list-item"
+                                className="detail-list__list-item detail-list__list-item--mh"
                                 key={`market-item-${index}`}
                             >
-                                <div>Markkinahinta</div>
+                                <div>MH</div>
                                 <div>{item.name}</div>
                                 <div>{formatMoney(item.value)}</div>
                                 <div>{item.completion_date}</div>
@@ -51,10 +51,10 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                         ))}
                         {data.improvements.construction_price_index.map((item, index) => (
                             <li
-                                className="detail-list__list-item"
+                                className="detail-list__list-item detail-list__list-item--rk"
                                 key={`market-item-${index}`}
                             >
-                                <div>Rakennuskustannus</div>
+                                <div>RK</div>
                                 <div>{item.name}</div>
                                 <div>{formatMoney(item.value)}</div>
                                 <div>{item.completion_date}</div>

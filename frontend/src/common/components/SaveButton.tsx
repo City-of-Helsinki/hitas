@@ -4,10 +4,10 @@ import {Button, IconSaveDisketteFill} from "hds-react";
 
 interface SaveButtonProps {
     onClick: () => void;
-    isLoading: boolean;
+    isLoading?: boolean;
 }
 
-export default function SaveButton({onClick, isLoading}: SaveButtonProps): JSX.Element {
+export default function SaveButton({onClick, isLoading = false}: SaveButtonProps): JSX.Element {
     return (
         <Button
             iconLeft={<IconSaveDisketteFill />}
