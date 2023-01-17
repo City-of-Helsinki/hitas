@@ -279,6 +279,15 @@ export interface IApartmentWritable {
     };
 }
 
+export interface IApartmentSale {
+    ownerships: IOwnership[];
+    notification_date: string;
+    purchase_date: string;
+    purchase_price: number;
+    apartment_share_of_housing_company_loans: number;
+    include_in_statistics: boolean;
+}
+
 // Maximum Price
 
 // //  Maximum Price Fields

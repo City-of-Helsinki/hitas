@@ -6,6 +6,7 @@ import {
     IApartmentMaximumPrice,
     IApartmentMaximumPriceWritable,
     IApartmentQuery,
+    IApartmentSale,
     IApartmentWritable,
     IBuilding,
     IBuildingWritable,
@@ -330,6 +331,22 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
+        createSale: builder.mutation<
+            IApartmentSale,
+            {
+                data: IApartmentSale;
+                housingCompanyId: string;
+                apartmentId: string;
+            }
+        >({
+            query: ({data, housingCompanyId, apartmentId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales/`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: () => [{type: "Owner"}],
+        }),
     }),
 });
 
@@ -361,4 +378,5 @@ export const {
     useCreateOwnerMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
+    useCreateSaleMutation,
 } = mutationApi;
