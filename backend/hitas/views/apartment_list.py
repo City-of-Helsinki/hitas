@@ -1,3 +1,5 @@
+from typing import Optional
+
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import mixins, serializers, viewsets
 
@@ -34,12 +36,16 @@ class ApartmentFilterSet(HitasFilterSet):
 
 class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState)
-    type = serializers.CharField(source="apartment_type.value")
+    type = serializers.SerializerMethodField()
     address = ApartmentHitasAddressSerializer(source="*")
     surface_area = HitasDecimalField()
     completion_date = serializers.DateField(required=False, allow_null=True)
     ownerships = OwnershipSerializer(many=True, read_only=False)
     links = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_type(instance: Apartment) -> Optional[str]:
+        return getattr(getattr(instance, "apartment_type", None), "value", None)
 
     def get_links(self, instance: Apartment):
         return create_links(instance)

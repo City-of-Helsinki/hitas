@@ -210,6 +210,87 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment__list__minimal(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    b: Building = BuildingFactory.create(real_estate=re)
+    ap1: Apartment = ApartmentFactory.create(
+        building=b,
+        state=ApartmentState.FREE,
+        apartment_type=None,
+        surface_area=None,
+        rooms=None,
+        share_number_start=None,
+        share_number_end=None,
+        completion_date=None,
+        street_address="Fakestreet 1",
+        apartment_number=1,
+        floor=None,
+        stair="A",
+        debt_free_purchase_price=None,
+        primary_loan_amount=None,
+        purchase_price=None,
+        first_purchase_date=None,
+        latest_purchase_date=None,
+        additional_work_during_construction=None,
+        loans_during_construction=None,
+        interest_during_construction_6=None,
+        interest_during_construction_14=None,
+        debt_free_purchase_price_during_construction=None,
+        notes=None,
+    )
+
+    response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["contents"] == [
+        {
+            "id": ap1.uuid.hex,
+            "state": ap1.state.value,
+            "type": ap1.apartment_type,
+            "surface_area": ap1.surface_area,
+            "rooms": ap1.rooms,
+            "address": {
+                "street_address": ap1.street_address,
+                "postal_code": hc.postal_code.value,
+                "city": hc.postal_code.city,
+                "apartment_number": ap1.apartment_number,
+                "stair": ap1.stair,
+                "floor": ap1.floor,
+            },
+            "completion_date": ap1.completion_date,
+            "ownerships": [],
+            "links": {
+                "housing_company": {
+                    "id": hc.uuid.hex,
+                    "display_name": hc.display_name,
+                    "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
+                },
+                "real_estate": {
+                    "id": ap1.building.real_estate.uuid.hex,
+                    "link": (
+                        f"/api/v1/housing-companies/{hc.uuid.hex}" f"/real-estates/{ap1.building.real_estate.uuid.hex}"
+                    ),
+                },
+                "building": {
+                    "id": ap1.building.uuid.hex,
+                    "street_address": ap1.building.street_address,
+                    "link": (
+                        f"/api/v1/housing-companies/{hc.uuid.hex}"
+                        f"/real-estates/{ap1.building.real_estate.uuid.hex}"
+                        f"/buildings/{ap1.building.uuid.hex}"
+                    ),
+                },
+                "apartment": {
+                    "id": ap1.uuid.hex,
+                    "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
+                },
+            },
+        },
+    ]
+
+
 # Retrieve tests
 
 

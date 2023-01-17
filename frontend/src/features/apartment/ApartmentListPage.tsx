@@ -59,7 +59,9 @@ const ApartmentListItem = ({
                         <br />
                         {`${address.postal_code} ${address.city}`}
                     </div>
-                    <div className="area">{`${surfaceArea || ""} m² ${rooms || ""} ${apartmentType}`}</div>
+                    <div className="area">{`${surfaceArea ? surfaceArea + "m²" : ""} ${
+                        rooms || ""
+                    } ${apartmentType}`}</div>
                 </div>
                 <div className="state">
                     <StatusLabel>{state}</StatusLabel>
@@ -110,7 +112,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                         apartmentNumber={item.address.apartment_number}
                         stair={item.address.stair || ""}
                         ownerships={item.ownerships}
-                        apartmentType={item.type}
+                        apartmentType={item.type || ""}
                         rooms={item.rooms}
                         surfaceArea={item.surface_area}
                         address={item.address}

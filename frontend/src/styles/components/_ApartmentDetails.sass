@@ -37,7 +37,7 @@
 
     span
 
-      &:not(:last-child):after
+      &:not(:last-child):not(:empty):after
         display: inline-flex
         width: $spacing-layout-m
         content: "|"
