@@ -455,7 +455,6 @@ const ApartmentCreatePage = () => {
                     <OwnershipsList
                         formOwnershipsList={formOwnershipsList}
                         setFormOwnershipsList={setFormOwnershipsList}
-                        apartment={data}
                     />
                 </Fieldset>
                 <Fieldset heading="">

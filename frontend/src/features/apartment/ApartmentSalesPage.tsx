@@ -41,6 +41,7 @@ const MaximumPriceModalError = ({error, setIsModalVisible}) => {
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
+    const [hasNoOwnershipsError, setHasNoOwnershipsError] = useState(false);
     const initialFormData = {
         notificationDate: null,
         apartmentSaleDate:
@@ -97,6 +98,12 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             index: data ? data.index : maxPriceQuery?.index,
         });
         setIsModalVisible(true);
+    };
+    const handleSaveButton = () => {
+        if (formOwnershipsList.length < 1) {
+            hitasToast("Kaupalla täytyy olla ainakin yksi omistaja!", "error");
+            setHasNoOwnershipsError(true);
+        }
     };
     return (
         <>
@@ -208,20 +215,21 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         </div>
                     )}
                 </Fieldset>
-                <Fieldset heading="Omistajuudet">
+                <Fieldset
+                    className="ownerships-fieldset"
+                    heading="Omistajuudet *"
+                >
                     <OwnershipsList
                         formOwnershipsList={formOwnershipsList}
                         setFormOwnershipsList={setFormOwnershipsList}
-                        apartment={data}
+                        noOwnersError={hasNoOwnershipsError}
                     />
                 </Fieldset>
             </div>
             <div className="row row--buttons">
                 <NavigateBackButton />
                 <SaveButton
-                    onClick={() => {
-                        return;
-                    }}
+                    onClick={handleSaveButton}
                     isLoading={isLoading}
                 />
             </div>
