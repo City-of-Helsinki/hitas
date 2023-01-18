@@ -16,20 +16,20 @@ repos:
     -   id: black
 
 -   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.195
+    rev: v0.0.225
     hooks:
     -   id: ruff
         args: [
             "--fix",
+            "--force-exclude",
             ]
 
-# Should add this at some point
-#-   repo: https://github.com/pycqa/bandit
-#    rev: 1.7.4
-#    hooks:
-#    -   id: bandit
-#        args: [
-#            "-r",
-#            "-v",
-#            "-ll",
-#            ]
+-   repo: https://github.com/pycqa/bandit
+    rev: 1.7.4
+    hooks:
+    -   id: bandit
+        args: [
+            "-r",
+            "-v",
+            "-ll",
+            ]
