@@ -340,12 +340,16 @@ const mutationApi = hitasApi.injectEndpoints({
             }
         >({
             query: ({data, housingCompanyId, apartmentId}) => ({
-                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales/`,
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales`,
                 method: "POST",
                 body: data,
                 headers: {"Content-type": "application/json; charset=UTF-8"},
             }),
-            invalidatesTags: () => [{type: "Owner"}],
+            invalidatesTags: (result, error, arg) => [
+                {type: "Apartment", id: "LIST"},
+                {type: "Apartment", id: arg.apartmentId},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+            ],
         }),
     }),
 });
