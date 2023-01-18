@@ -71,7 +71,7 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
             "purchase_date": sale.purchase_date.isoformat(),
             "purchase_price": float(sale.purchase_price),
             "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-            "include_in_statistics": sale.include_in_statistics,
+            "exclude_in_statistics": sale.exclude_in_statistics,
         }
     ]
     assert response.json()["page"] == {
@@ -123,7 +123,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
         "purchase_date": sale.purchase_date.isoformat(),
         "purchase_price": float(sale.purchase_price),
         "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-        "include_in_statistics": sale.include_in_statistics,
+        "exclude_in_statistics": sale.exclude_in_statistics,
     }
 
 
@@ -150,7 +150,7 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "include_in_statistics": True,
+        "exclude_in_statistics": True,
     }
 
     url_1 = reverse(
@@ -213,7 +213,7 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "include_in_statistics": True,
+        "exclude_in_statistics": True,
     }
 
     url_1 = reverse(
@@ -368,11 +368,11 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
                     }
                 ],
             ),
-            "'Include in statistics' can't be null": InvalidInput(
-                invalid_data={"include_in_statistics": None},
+            "'Exclude in statistics' can't be null": InvalidInput(
+                invalid_data={"exclude_in_statistics": None},
                 fields=[
                     {
-                        "field": "include_in_statistics",
+                        "field": "exclude_in_statistics",
                         "message": "This field is mandatory and cannot be null.",
                     }
                 ],
@@ -514,7 +514,7 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "include_in_statistics": True,
+        "exclude_in_statistics": True,
     }
     data.update(invalid_data)
 
@@ -586,7 +586,7 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
         "purchase_date": sale.purchase_date.isoformat(),
         "purchase_price": float(sale.purchase_price),
         "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-        "include_in_statistics": sale.include_in_statistics,
+        "exclude_in_statistics": sale.exclude_in_statistics,
     }
 
 
@@ -629,11 +629,11 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
                     }
                 ],
             ),
-            "'Include in statistics' can't be null": InvalidInput(
-                invalid_data={"include_in_statistics": None},
+            "'Exclude in statistics' can't be null": InvalidInput(
+                invalid_data={"exclude_in_statistics": None},
                 fields=[
                     {
-                        "field": "include_in_statistics",
+                        "field": "exclude_in_statistics",
                         "message": "This field is mandatory and cannot be null.",
                     }
                 ],

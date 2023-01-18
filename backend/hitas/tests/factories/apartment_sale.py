@@ -18,7 +18,7 @@ class ApartmentSaleFactory(DjangoModelFactory):
     purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     purchase_price = fuzzy.FuzzyDecimal(100_000, 200_000)
     apartment_share_of_housing_company_loans = fuzzy.FuzzyDecimal(100_000, 200_000)
-    include_in_statistics = True
+    exclude_in_statistics = False
 
     @factory.post_generation
     def ownerships(self, create: bool, extracted: Optional[Iterable[Ownership]], **kwargs: Any) -> None:

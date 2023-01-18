@@ -20,7 +20,7 @@ class ApartmentSale(ExternalHitasModel):
     # "Yhtiölainaosuus"
     apartment_share_of_housing_company_loans = HitasModelDecimalField()
     # "Kirjataanko kauppa tilastoihin?"
-    include_in_statistics = models.BooleanField(default=True)
+    exclude_in_statistics = models.BooleanField(default=False)
 
     @property
     def total_price(self) -> Decimal:
