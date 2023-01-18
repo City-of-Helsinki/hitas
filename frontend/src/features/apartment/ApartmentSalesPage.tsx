@@ -214,6 +214,13 @@ const LoadedApartmentSalesPage = ({
                                 error={error}
                                 required
                             />
+                            <div className="error-message error-text">
+                                <span style={{display: isLoanValueChanged ? "block" : "none"}}>
+                                    Enimmäishintalaskelmassa{" "}
+                                    {maxPriceCalculation?.calculations.construction_price_index.calculation_variables
+                                        .apartment_share_of_housing_company_loans + " €"}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <Checkbox
@@ -222,6 +229,16 @@ const LoadedApartmentSalesPage = ({
                         checked={isExcludedFromStats}
                         onChange={(event) => onCheckboxChange(event)}
                     />
+                </Fieldset>
+                <Fieldset
+                    heading={`Enimmäishintalaskelma ${
+                        maxPriceCalculation
+                            ? `(vahvistettu ${formatDate(
+                                  apartment.prices.maximum_prices.confirmed?.confirmed_at as string
+                              )})`
+                            : ""
+                    } *`}
+                >
                     {maxPriceCalculation ? (
                         <div className="max-prices">
                             <div className="row row--max-prices">
@@ -243,24 +260,26 @@ const LoadedApartmentSalesPage = ({
                             <div className="row row--prompt">
                                 {isLoanValueChanged ? (
                                     <p>
-                                        <span>Yhtiön lainaosuus on muuttunut, ole hyvä ja tee uusi laskelma.</span>
+                                        <span>Osuus yhtiön lainoista</span> on muuttunut, ole hyvä ja
+                                        <span> tee uusi enimmäishintalaskelma</span>.
                                     </p>
                                 ) : (
                                     <p>
-                                        Enimmäishinnat{" "}
-                                        <span>
-                                            {formatDate(
-                                                apartment.prices.maximum_prices.confirmed?.confirmed_at as string
-                                            )}
-                                        </span>{" "}
-                                        vahvistetusta enimmäishintalaskelmasta (perustuen
+                                        Enimmäishinnoissa on käytetty
                                         <span>
                                             {` ${formatIndex(
                                                 maxPriceData ? maxPriceData.index : maxPriceCalculation.index
-                                            )}in`}
-                                        </span>
-                                        ).
-                                        <br />
+                                            )}ä`}
+                                        </span>{" "}
+                                        ja{" "}
+                                        <span>
+                                            {
+                                                maxPriceCalculation?.calculations[maxPriceCalculation.index]
+                                                    .calculation_variables.apartment_share_of_housing_company_loans
+                                            }
+                                            €
+                                        </span>{" "}
+                                        lainaosuutta.
                                     </p>
                                 )}
                                 <Button
