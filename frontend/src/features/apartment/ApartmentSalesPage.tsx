@@ -214,11 +214,6 @@ const LoadedApartmentSalesPage = ({
                                 error={error}
                                 required
                             />
-                            <div className="error-message error-text">
-                                <span style={{display: isLoanValueChanged ? "block" : "none"}}>
-                                    Lainaosuus muuttui, tee uusi laskelma!
-                                </span>
-                            </div>
                         </div>
                     </div>
                     <Checkbox
@@ -230,40 +225,44 @@ const LoadedApartmentSalesPage = ({
                     {maxPriceCalculation ? (
                         <div className="max-prices">
                             <div className="row row--max-prices">
-                                <div className="fieldset--max-prices__value">
+                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
                                     <legend>Enimmäishinta (€)</legend>
                                     <span className={isTooHighPrice ? "error-text" : ""}>
                                         {formatMoney(maxPrices.maximumPrice as number)}
                                     </span>
                                 </div>
-                                <div className="fieldset--max-prices__value">
+                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
                                     <legend>Enimmäishinta per m² (€)</legend>
                                     <span>{formatMoney(maxPrices.maxPricePerSquare)}</span>
                                 </div>
-                                <div className="fieldset--max-prices__value">
+                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
                                     <legend>Velaton enimmäishinta (€)</legend>
                                     <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
                                 </div>
                             </div>
-                            <div className="row row--buttons">
-                                <p>
-                                    Enimmäishinnat{" "}
-                                    <span>
-                                        {formatDate(apartment.prices.maximum_prices.confirmed?.confirmed_at as string)}
-                                    </span>{" "}
-                                    vahvistetusta enimmäishintalaskelmasta (peruste:
-                                    <span>
-                                        {" "}
-                                        {formatIndex(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}
-                                    </span>
-                                    ).
-                                    {isLoanValueChanged && (
+                            <div className="row row--prompt">
+                                {isLoanValueChanged ? (
+                                    <p>
+                                        <span>Yhtiön lainaosuus on muuttunut, ole hyvä ja tee uusi laskelma.</span>
+                                    </p>
+                                ) : (
+                                    <p>
+                                        Enimmäishinnat{" "}
                                         <span>
-                                            <br />
-                                            Lainaosuus eri kuin laskelmassa!
+                                            {formatDate(
+                                                apartment.prices.maximum_prices.confirmed?.confirmed_at as string
+                                            )}
+                                        </span>{" "}
+                                        vahvistetusta enimmäishintalaskelmasta (perustuen
+                                        <span>
+                                            {` ${formatIndex(
+                                                maxPriceData ? maxPriceData.index : maxPriceCalculation.index
+                                            )}in`}
                                         </span>
-                                    )}
-                                </p>
+                                        ).
+                                        <br />
+                                    </p>
+                                )}
                                 <Button
                                     theme="black"
                                     variant={isLoanValueChanged ? "primary" : "secondary"}

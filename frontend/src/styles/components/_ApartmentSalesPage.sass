@@ -28,9 +28,15 @@
           justify-content: space-between
         p > span
           font-weight: bold
-        .fieldset--max-prices__value span
-          font-weight: bold
-          font-size: $fontsize-body-xl
+        .fieldset--max-prices__value
+          span
+            font-weight: bold
+            font-size: $fontsize-body-xl
+          &.expired
+            color: $color-black-30
+          &.expired span
+            text-decoration: line-through
+            color: $color-black-30 !important
       &.ownerships-fieldset
         @include flexbox()
         @include flex-flow(column nowrap)
