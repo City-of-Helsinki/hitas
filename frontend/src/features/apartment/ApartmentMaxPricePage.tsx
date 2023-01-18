@@ -23,6 +23,7 @@ import {
     IApartmentMaximumPriceWritable,
     IHousingCompanyDetails,
 } from "../../common/models";
+import {today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -48,11 +49,10 @@ const MaximumPriceModalError = ({error, setIsModalVisible}) => {
 
 const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): JSX.Element => {
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const today = new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM format
     const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
         apartment_share_of_housing_company_loans: null,
-        apartment_share_of_housing_company_loans_date: today,
-        calculation_date: today,
+        apartment_share_of_housing_company_loans_date: today(),
+        calculation_date: today(),
         additional_info: "",
     });
     const {

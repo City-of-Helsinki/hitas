@@ -14,7 +14,7 @@ import {
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
 import {IApartmentAddress, IApartmentDetails, IApartmentMaximumPrice, IOwnership} from "../../common/models";
-import {formatAddress, formatDate, formatIndex, formatMoney} from "../../common/utils";
+import {formatAddress, formatDate, formatIndex, formatMoney, hitasToast, today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -43,12 +43,12 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
     const [hasNoOwnershipsError, setHasNoOwnershipsError] = useState(false);
     const initialFormData = {
-        notificationDate: null,
-        apartmentSaleDate:
+        notification_date: today(),
+        purchase_date:
             apartment.prices.maximum_prices.confirmed !== null && hasValidCalculation
                 ? apartment.prices.maximum_prices.confirmed.calculation_date
-                : null,
-        purchasePrice: null,
+                : "",
+        purchase_price: null,
         apartment_share_of_housing_company_loans: hasValidCalculation ? apartment.prices.primary_loan_amount : null,
         isExcludedFromStatistics: false,
     };

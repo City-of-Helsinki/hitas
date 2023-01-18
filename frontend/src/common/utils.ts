@@ -131,6 +131,8 @@ function validateSocialSecurityNumber(value: string): boolean {
     return checkDigits[Number(value.substring(0, 6) + idNumber) % 31] === checkDigit;
 }
 
+const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
+
 // Toast hook with easier Notification typing
 function hitasToast(message: string, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
     toast(message, {...opts, className: type});
@@ -146,4 +148,5 @@ export {
     validateBusinessId,
     validateSocialSecurityNumber,
     hitasToast,
+    today,
 };
