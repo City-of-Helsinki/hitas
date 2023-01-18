@@ -5762,7 +5762,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - include_in_statistics
+        - exclude_in_statistics
       properties:
         id:
           description: Apartment sale ID
@@ -5793,10 +5793,10 @@ components:
           type: number
           minimum: 0
           example: 51222
-        include_in_statistics:
-          description: Should sale be included in statistics?
+        exclude_in_statistics:
+          description: Should sale be excluded from statistics?
           type: boolean
-          example: true
+          example: false
 
     ApartmentSaleCreate:
       description: Apartment sale
@@ -5808,7 +5808,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - include_in_statistics
+        - exclude_in_statistics
       properties:
         ownerships:
           description: List of ownerships resulting from this sale
@@ -5835,10 +5835,10 @@ components:
           type: number
           minimum: 0
           example: 51222
-        include_in_statistics:
-          description: Should sale be included in statistics?
+        exclude_in_statistics:
+          description: Should sale be excluded from statistics?
           type: boolean
-          example: true
+          example: false
 
     ApartmentSaleUpdate:
       description: Apartment sale
@@ -5849,7 +5849,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - include_in_statistics
+        - exclude_in_statistics
       properties:
         notification_date:
           description: Sale notification date
@@ -5871,10 +5871,10 @@ components:
           type: number
           minimum: 0
           example: 51222
-        include_in_statistics:
-          description: Should sale be included in statistics?
+        exclude_in_statistics:
+          description: Should sale be excluded from statistics?
           type: boolean
-          example: true
+          example: false
 
     # Errors
 

@@ -65,7 +65,7 @@ class ApartmentSaleSerializer(HitasModelSerializer):
             "purchase_date",
             "purchase_price",
             "apartment_share_of_housing_company_loans",
-            "include_in_statistics",
+            "exclude_in_statistics",
         ]
 
 
