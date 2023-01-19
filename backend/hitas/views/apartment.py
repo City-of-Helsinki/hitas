@@ -3,6 +3,7 @@ import uuid
 from http import HTTPStatus
 from typing import Any, Dict, Optional, Union, Iterable
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Q
 from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
@@ -29,12 +30,15 @@ from hitas.models import (
     MarketPriceIndex2005Equal100,
     Ownership,
     SurfaceAreaPriceCeiling,
+    ConditionOfSale,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
+from hitas.models.condition_of_sale import condition_of_sale_queryset
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid, get_many_or_cached_prefetch
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
+from hitas.views.condition_of_sale import ConditionOfSaleSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasDecimalField,
@@ -487,6 +491,24 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     building = ReadOnlyBuildingSerializer(write_only=True)
     improvements = ApartmentImprovementSerializer(source="*")
 
+    conditions_of_sale = serializers.SerializerMethodField()
+
+    def get_conditions_of_sale(self, instance: Apartment) -> list[dict[str, Any]]:
+        conditions_of_sale: list[ConditionOfSale] = []
+
+        ownerships = get_many_or_cached_prefetch(instance, "ownerships", Ownership)
+
+        for ownership in ownerships:
+            conditions_of_sale_new = get_many_or_cached_prefetch(ownership, "conditions_of_sale_new", ConditionOfSale)
+            for cond in conditions_of_sale_new:
+                conditions_of_sale.append(cond)
+
+            conditions_of_sale_old = get_many_or_cached_prefetch(ownership, "conditions_of_sale_old", ConditionOfSale)
+            for cond in conditions_of_sale_old:
+                conditions_of_sale.append(cond)
+
+        return [ConditionOfSaleSerializer(condition_of_sale).data for condition_of_sale in conditions_of_sale]
+
     @staticmethod
     def get_links(instance: Apartment):
         return create_links(instance)
@@ -586,6 +608,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "notes",
             "building",
             "improvements",
+            "conditions_of_sale",
         ]
 
 
@@ -608,6 +631,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "completion_date",
             "ownerships",
             "links",
+            "conditions_of_sale",
         ]
 
 
@@ -754,6 +778,14 @@ class ApartmentViewSet(HitasModelViewSet):
                         "owner__identifier",
                         "owner__email",
                     ),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_new",
+                    condition_of_sale_queryset(),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_old",
+                    condition_of_sale_queryset(),
                 ),
                 Prefetch(
                     "market_price_improvements",

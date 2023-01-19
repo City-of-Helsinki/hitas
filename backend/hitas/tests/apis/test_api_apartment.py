@@ -12,6 +12,7 @@ from hitas.models import (
     ApartmentMaximumPriceCalculation,
     ApartmentType,
     Building,
+    ConditionOfSale,
     HousingCompany,
     Owner,
     Ownership,
@@ -25,6 +26,7 @@ from hitas.tests.factories import (
     ApartmentMarketPriceImprovementFactory,
     ApartmentTypeFactory,
     BuildingFactory,
+    ConditionOfSaleFactory,
     HousingCompanyFactory,
     OwnerFactory,
     OwnershipFactory,
@@ -80,6 +82,10 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
+    ap3: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    o3: Ownership = OwnershipFactory.create(apartment=ap3, owner=o2.owner, percentage=100)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=o3, old_ownership=o2)
+
     response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
 
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -102,6 +108,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "completion_date": str(ap1.completion_date),
                 "ownerships": [
                     {
+                        "id": o1.uuid.hex,
                         "owner": {
                             "id": o1.owner.uuid.hex,
                             "name": o1.owner.name,
@@ -113,6 +120,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "end_date": None,
                     },
                     {
+                        "id": o2.uuid.hex,
                         "owner": {
                             "id": o2.owner.uuid.hex,
                             "name": o2.owner.name,
@@ -151,6 +159,47 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
                     },
                 },
+                "conditions_of_sale": [
+                    {
+                        "id": cos.uuid.hex,
+                        "grace_period": str(cos.grace_period.value),
+                        "fulfilled": cos.fulfilled,
+                        "new_ownership": {
+                            "id": o3.uuid.hex,
+                            "percentage": float(o3.percentage),
+                            "apartment": {
+                                "id": ap3.uuid.hex,
+                                "street_address": ap3.street_address,
+                                "apartment_number": ap3.apartment_number,
+                                "floor": ap3.floor,
+                                "stair": ap3.stair,
+                            },
+                            "owner": {
+                                "id": o3.owner.uuid.hex,
+                                "name": o3.owner.name,
+                                "identifier": o3.owner.identifier,
+                                "email": o3.owner.email,
+                            },
+                        },
+                        "old_ownership": {
+                            "id": o2.uuid.hex,
+                            "percentage": float(o2.percentage),
+                            "apartment": {
+                                "id": ap1.uuid.hex,
+                                "street_address": ap1.street_address,
+                                "apartment_number": ap1.apartment_number,
+                                "floor": ap1.floor,
+                                "stair": ap1.stair,
+                            },
+                            "owner": {
+                                "id": o2.owner.uuid.hex,
+                                "name": o2.owner.name,
+                                "identifier": o2.owner.identifier,
+                                "email": o2.owner.email,
+                            },
+                        },
+                    }
+                ],
             },
             {
                 "id": ap2.uuid.hex,
@@ -195,6 +244,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap2.uuid.hex}",
                     },
                 },
+                "conditions_of_sale": [],
             },
         ],
         "page": {
@@ -287,8 +337,12 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
                     "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
                 },
             },
+            "conditions_of_sale": [],
         },
     ]
+
+
+# TODO: Test that old fulfilled conditions of sale won't show up
 
 
 # Retrieve tests
@@ -296,75 +350,79 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create(
+    ap1: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
         debt_free_purchase_price=80000.1,
         primary_loan_amount=15000.3,
         additional_work_during_construction=4999.9,
         surface_area=50.5,
     )
-    hc: HousingCompany = ap.housing_company
-    owner: Ownership = OwnershipFactory.create(apartment=ap)
-    cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
-    mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap)
-    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(apartment=ap)
+    hc: HousingCompany = ap1.housing_company
+    os1: Ownership = OwnershipFactory.create(apartment=ap1)
+    cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap1)
+    mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap1)
+    ampc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(apartment=ap1)
 
-    ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100.5)
-    MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200.5)
+    ConstructionPriceIndex2005Equal100Factory.create(month=ap1.completion_date, value=100.5)
+    MarketPriceIndex2005Equal100Factory.create(month=ap1.completion_date, value=200.5)
 
     now = datetime.date.today().replace(day=1)
     ConstructionPriceIndex2005Equal100Factory.create(month=now, value=150.5)
     MarketPriceIndex2005Equal100Factory.create(month=now, value=250.5)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000.5)
 
+    ap2: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    os2: Ownership = OwnershipFactory.create(apartment=ap2, owner=os1.owner, percentage=100)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=os2, old_ownership=os1)
+
     response = api_client.get(
         reverse(
             "hitas:apartment-detail",
-            args=[hc.uuid.hex, ap.uuid.hex],
+            args=[hc.uuid.hex, ap1.uuid.hex],
         )
     )
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
-        "id": ap.uuid.hex,
-        "state": ap.state.value,
+        "id": ap1.uuid.hex,
+        "state": ap1.state.value,
         "type": {
-            "id": ap.apartment_type.uuid.hex,
-            "value": ap.apartment_type.value,
-            "description": ap.apartment_type.description,
-            "code": ap.apartment_type.legacy_code_number,
+            "id": ap1.apartment_type.uuid.hex,
+            "value": ap1.apartment_type.value,
+            "description": ap1.apartment_type.description,
+            "code": ap1.apartment_type.legacy_code_number,
         },
-        "surface_area": float(ap.surface_area),
-        "rooms": ap.rooms,
+        "surface_area": float(ap1.surface_area),
+        "rooms": ap1.rooms,
         "shares": {
-            "start": ap.share_number_start,
-            "end": ap.share_number_end,
-            "total": ap.share_number_end - ap.share_number_start + 1,
+            "start": ap1.share_number_start,
+            "end": ap1.share_number_end,
+            "total": ap1.share_number_end - ap1.share_number_start + 1,
         },
         "address": {
-            "street_address": ap.street_address,
+            "street_address": ap1.street_address,
             "postal_code": hc.postal_code.value,
             "city": hc.postal_code.city,
-            "apartment_number": ap.apartment_number,
-            "floor": ap.floor,
-            "stair": ap.stair,
+            "apartment_number": ap1.apartment_number,
+            "floor": ap1.floor,
+            "stair": ap1.stair,
         },
-        "completion_date": str(ap.completion_date),
+        "completion_date": str(ap1.completion_date),
         "prices": {
-            "debt_free_purchase_price": float(ap.debt_free_purchase_price),
-            "primary_loan_amount": float(ap.primary_loan_amount),
-            "acquisition_price": round(float(ap.debt_free_purchase_price + ap.primary_loan_amount), 2),
-            "purchase_price": float(ap.purchase_price),
-            "first_purchase_date": ap.first_purchase_date.strftime("%Y-%m-%d"),
-            "latest_purchase_date": ap.latest_purchase_date.strftime("%Y-%m-%d"),
+            "debt_free_purchase_price": float(ap1.debt_free_purchase_price),
+            "primary_loan_amount": float(ap1.primary_loan_amount),
+            "acquisition_price": round(float(ap1.debt_free_purchase_price + ap1.primary_loan_amount), 2),
+            "purchase_price": float(ap1.purchase_price),
+            "first_purchase_date": ap1.first_purchase_date.strftime("%Y-%m-%d"),
+            "latest_purchase_date": ap1.latest_purchase_date.strftime("%Y-%m-%d"),
             "construction": {
-                "loans": float(ap.loans_during_construction),
+                "loans": float(ap1.loans_during_construction),
                 "interest": {
-                    "rate_6": float(ap.interest_during_construction_6),
-                    "rate_14": float(ap.interest_during_construction_14),
+                    "rate_6": float(ap1.interest_during_construction_6),
+                    "rate_14": float(ap1.interest_during_construction_14),
                 },
-                "debt_free_purchase_price": float(ap.debt_free_purchase_price_during_construction),
-                "additional_work": float(ap.additional_work_during_construction),
+                "debt_free_purchase_price": float(ap1.debt_free_purchase_price_during_construction),
+                "additional_work": float(ap1.additional_work_during_construction),
             },
             "maximum_prices": {
                 "confirmed": {
@@ -404,33 +462,34 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
             },
             "real_estate": {
-                "id": ap.building.real_estate.uuid.hex,
-                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/real-estates/{ap.building.real_estate.uuid.hex}",
+                "id": ap1.building.real_estate.uuid.hex,
+                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/real-estates/{ap1.building.real_estate.uuid.hex}",
             },
             "building": {
-                "id": ap.building.uuid.hex,
-                "street_address": ap.building.street_address,
+                "id": ap1.building.uuid.hex,
+                "street_address": ap1.building.street_address,
                 "link": (
                     f"/api/v1/housing-companies/{hc.uuid.hex}"
-                    f"/real-estates/{ap.building.real_estate.uuid.hex}"
-                    f"/buildings/{ap.building.uuid.hex}"
+                    f"/real-estates/{ap1.building.real_estate.uuid.hex}"
+                    f"/buildings/{ap1.building.uuid.hex}"
                 ),
             },
             "apartment": {
-                "id": ap.uuid.hex,
-                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap.uuid.hex}",
+                "id": ap1.uuid.hex,
+                "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
             },
         },
         "ownerships": [
             {
+                "id": os1.uuid.hex,
                 "owner": {
-                    "id": owner.owner.uuid.hex,
-                    "name": owner.owner.name,
-                    "identifier": owner.owner.identifier,
-                    "email": owner.owner.email,
+                    "id": os1.owner.uuid.hex,
+                    "name": os1.owner.name,
+                    "identifier": os1.owner.identifier,
+                    "email": os1.owner.email,
                 },
-                "percentage": float(owner.percentage),
-                "start_date": str(owner.start_date) if owner.start_date else None,
+                "percentage": float(os1.percentage),
+                "start_date": str(os1.start_date) if os1.start_date else None,
                 "end_date": None,
             },
         ],
@@ -451,7 +510,48 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 },
             ],
         },
-        "notes": ap.notes,
+        "notes": ap1.notes,
+        "conditions_of_sale": [
+            {
+                "id": cos.uuid.hex,
+                "grace_period": str(cos.grace_period.value),
+                "fulfilled": cos.fulfilled,
+                "new_ownership": {
+                    "id": os2.uuid.hex,
+                    "percentage": float(os2.percentage),
+                    "apartment": {
+                        "id": ap2.uuid.hex,
+                        "street_address": ap2.street_address,
+                        "apartment_number": ap2.apartment_number,
+                        "floor": ap2.floor,
+                        "stair": ap2.stair,
+                    },
+                    "owner": {
+                        "id": os2.owner.uuid.hex,
+                        "name": os2.owner.name,
+                        "identifier": os2.owner.identifier,
+                        "email": os2.owner.email,
+                    },
+                },
+                "old_ownership": {
+                    "id": os1.uuid.hex,
+                    "percentage": float(os1.percentage),
+                    "apartment": {
+                        "id": ap1.uuid.hex,
+                        "street_address": ap1.street_address,
+                        "apartment_number": ap1.apartment_number,
+                        "floor": ap1.floor,
+                        "stair": ap1.stair,
+                    },
+                    "owner": {
+                        "id": os1.owner.uuid.hex,
+                        "name": os1.owner.name,
+                        "identifier": os1.owner.identifier,
+                        "email": os1.owner.email,
+                    },
+                },
+            }
+        ],
     }
 
 
@@ -1072,6 +1172,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "state": None,
             "surface_area": None,
             "type": None,
+            "conditions_of_sale": [],
         }
 
 
@@ -1894,6 +1995,7 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
     del data["address"]["postal_code"]
     del data["address"]["city"]
     del data["links"]
+    del data["conditions_of_sale"]
     data["ownerships"] = owner_data
     data["building"] = {"id": b.uuid.hex}
 
@@ -2035,6 +2137,7 @@ def test__api__apartment__update__overlapping_shares(
     del data["address"]["postal_code"]
     del data["address"]["city"]
     del data["links"]
+    del data["conditions_of_sale"]
     data["ownerships"] = []
     data["building"] = {"id": building_1.uuid.hex}
     data["shares"]["start"] = 20

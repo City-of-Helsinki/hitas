@@ -1,7 +1,7 @@
 import datetime
 import operator
 import uuid
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 
 from django.db import models
 from django.db.models import Value
@@ -78,3 +78,17 @@ def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **k
         return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
     except model_class.DoesNotExist:
         raise HitasModelNotFound(model=model_class)
+
+
+TModel = TypeVar("TModel", bound=models.Model)
+
+
+def get_many_or_cached_prefetch(
+    instance: models.Model,
+    field_name: str,
+    related_model: type[TModel],  # noqa
+) -> models.QuerySet[TModel]:
+    if hasattr(instance, "_prefetched_objects_cache") and field_name in instance._prefetched_objects_cache:
+        return instance._prefetched_objects_cache[field_name]
+    else:
+        return getattr(instance, field_name).all()

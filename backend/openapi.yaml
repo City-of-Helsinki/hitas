@@ -1755,7 +1755,7 @@ paths:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/Apartment'
+                      $ref: '#/components/schemas/ApartmentList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1954,6 +1954,214 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # Condition of Sale
+
+  /api/v1/owners/{owner_id}/conditions-of-sale:
+    get:
+      description: List all conditions of sale belonging to this owner
+      operationId: list-conditions-of-sale
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully fetched list of conditions of sale
+          content:
+            application/json:
+              schema:
+                description: Single page of conditions of sale
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of apartments
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConditionOfSale'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Create new conditions of sale for an owner
+      operationId: create-conditions-of-sale
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object  # Empty request body
+      responses:
+        '201':
+          description: Successfully fetched list of sales
+          content:
+            application/json:
+              schema:
+                description: All created conditions of sale
+                type: object
+                additionalProperties: false
+                required:
+                  - created
+                properties:
+                  created:
+                    description: List of created conditions of sale
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConditionOfSale'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/owners/{owner_id}/conditions-of-sale/{condition_of_sale_id}:
+    get:
+      description: List a single condition of sale belonging to this owner
+      operationId: read-conditions-of-sale
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: condition_of_sale_id
+          required: true
+          in: path
+          description: Condition of Sale ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        '200':
+          description: Successfully read a condition of sale
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ConditionOfSale'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update a condition of sale for an owner
+      operationId: update-conditions-of-sale
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: condition_of_sale_id
+          required: true
+          in: path
+          description: Condition of Sale ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/ConditionOfSale'
+      responses:
+        '200':
+          description: Successfully updated a condition of sale
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ConditionOfSale'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a condition of sale for an owner
+      operationId: delete-condition-of-sale
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: condition_of_sale_id
+          required: true
+          in: path
+          description: Condition of Sale ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+      responses:
+        '204':
+          description: Condition of sale successfully removed.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -3567,6 +3775,65 @@ components:
         - completion_date
         - ownerships
         - links
+        - conditions_of_sale
+      properties:
+        id:
+          description: Apartment ID
+          type: string
+          example: b477389cb3514fb1b444052a39bfb65d
+        state:
+          nullable: true
+          $ref: '#/components/schemas/ApartmentState'
+        type:
+          description: Apartment type
+          type: string
+          example: h+k
+          nullable: true
+        surface_area:
+          description: Surface area of the apartment measured in square meters
+          type: number
+          nullable: true
+          minimum: 0
+          example: 67
+        rooms:
+          description: The amount of rooms in this apartment
+          type: number
+          nullable: true
+          minimum: 1
+          example: 4
+        address:
+          $ref: '#/components/schemas/ApartmentAddress'
+        completion_date:
+          description: Date that the apartment was completed on
+          type: string
+          format: date
+          nullable: true
+        ownerships:
+          description: List of apartment's ownerships
+          type: array
+          items:
+            $ref: '#/components/schemas/Ownership'
+        links:
+          readOnly: true
+          $ref: '#/components/schemas/ApartmentLinks'
+        conditions_of_sale:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionOfSale'
+
+    ApartmentList:
+      description: Single apartment
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - state
+        - surface_area
+        - address
+        - completion_date
+        - ownerships
+        - links
       properties:
         id:
           description: Apartment ID
@@ -3624,6 +3891,7 @@ components:
         - building
         - notes
         - improvements
+        - conditions_of_sale
       properties:
         id:
           description: Apartment ID
@@ -3778,6 +4046,11 @@ components:
                       - 0
                       - 2.5
                       - 10
+        conditions_of_sale:
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionOfSale'
 
     ApartmentMaximumPriceCalculation:
       description: Calculations for particular index
@@ -5281,11 +5554,17 @@ components:
       type: object
       additionalProperties: false
       required:
+        - id
         - owner
         - percentage
         - start_date
         - end_date
       properties:
+        id:
+          description: ID of this ownership
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
         owner:
           $ref: '#/components/schemas/ReadOnlyOwner'
         percentage:
@@ -5875,6 +6154,117 @@ components:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
+
+    ConditionOfSale:
+      description: Condition of sale between two ownerships
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - new_ownership
+        - old_ownership
+        - grace_period
+        - fulfilled
+      properties:
+        id:
+          description: ID of this condition of sale
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        new_ownership:
+          readOnly: true
+          $ref: '#/components/schemas/ConditionOfSaleOwnership'
+        old_ownership:
+          readOnly: true
+          $ref: '#/components/schemas/ConditionOfSaleOwnership'
+        grace_period:
+          $ref: '#/components/schemas/GracePeriod'
+        fulfilled:
+          description: When this condition of sale was fulfilled, null if not fulfilled yet
+          type: string
+          nullable: true
+          readOnly: true
+          format: date-time
+          example: 1985-12-10T00:00:00+00:00
+
+    ConditionOfSaleOwnership:
+      description: Ownership relating to a condition of sale
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - percentage
+        - apartment
+        - owner
+      properties:
+        id:
+          description: ID of this ownership
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        percentage:
+          description: Percentage that the owner owns of the apartment
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 100
+        apartment:
+          $ref: '#/components/schemas/ConditionOfSaleApartment'
+        owner:
+          $ref: '#/components/schemas/ReadOnlyOwner'
+
+    ConditionOfSaleApartment:
+      description: Minimal apartment address information
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - street_address
+        - apartment_number
+        - floor
+        - stair
+      properties:
+        id:
+          description: ID of this apartment
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        street_address:
+          description: Street address
+          type: string
+          example: Hannunkatu 24
+        apartment_number:
+          description: Apartment number
+          type: number
+          minimum: 0
+          example: 14
+        floor:
+          description: Apartment floor
+          type: string
+          maxLength: 50
+          nullable: true
+          example: "5"
+        stair:
+          description: Apartment stair
+          type: string
+          maxLength: 16
+          example: A
+
+    GracePeriod:
+      description: |-
+        Condition of Sale grace period.
+
+        Can have the following values:
+        - not_given
+        - three_months
+        - six_months
+      type: string
+      nullable: false
+      example: not_given
+      x-extensible-enum:
+        - not_given
+        - three_months
+        - six_months
 
     # Errors
 

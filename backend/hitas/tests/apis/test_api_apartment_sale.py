@@ -56,6 +56,7 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
             "id": sale.uuid.hex,
             "ownerships": [
                 {
+                    "id": ownership.uuid.hex,
                     "owner": {
                         "id": ownership.owner.uuid.hex,
                         "name": ownership.owner.name,
@@ -108,6 +109,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
         "id": sale.uuid.hex,
         "ownerships": [
             {
+                "id": ownership.uuid.hex,
                 "owner": {
                     "id": ownership.owner.uuid.hex,
                     "name": ownership.owner.name,
@@ -571,6 +573,7 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
         "id": sale.uuid.hex,
         "ownerships": [
             {
+                "id": ownership.uuid.hex,
                 "owner": {
                     "id": ownership.owner.uuid.hex,
                     "name": ownership.owner.name,

@@ -1,8 +1,10 @@
 import datetime
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
@@ -66,3 +68,53 @@ class ConditionOfSale(ExternalHitasModel):
 
     def __str__(self) -> str:
         return f"{self.new_ownership.owner}: {self.new_ownership.apartment} -> {self.old_ownership.apartment}"
+
+
+def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
+    return (
+        ConditionOfSale.all_objects.filter(
+            models.Q(deleted__isnull=True) | models.Q(deleted__lte=timezone.now() - relativedelta(months=3))
+        )
+        .select_related(
+            "new_ownership__owner",
+            "new_ownership__apartment",
+            "old_ownership__owner",
+            "old_ownership__apartment",
+        )
+        .only(
+            "id",
+            "uuid",
+            "grace_period",
+            "deleted",
+            "new_ownership__id",
+            "new_ownership__uuid",
+            "new_ownership__percentage",
+            "old_ownership__id",
+            "old_ownership__uuid",
+            "old_ownership__percentage",
+            # New ownership apartment
+            "new_ownership__apartment__id",
+            "new_ownership__apartment__uuid",
+            "new_ownership__apartment__street_address",
+            "new_ownership__apartment__apartment_number",
+            "new_ownership__apartment__floor",
+            "new_ownership__apartment__stair",
+            # Old ownership apartment
+            "old_ownership__apartment__id",
+            "old_ownership__apartment__uuid",
+            "old_ownership__apartment__street_address",
+            "old_ownership__apartment__apartment_number",
+            "old_ownership__apartment__floor",
+            "old_ownership__apartment__stair",
+            # New ownership owner
+            "new_ownership__owner__id",
+            "new_ownership__owner__uuid",
+            "new_ownership__owner__name",
+            "new_ownership__owner__identifier",
+            # Old ownership owner
+            "old_ownership__owner__id",
+            "old_ownership__owner__uuid",
+            "old_ownership__owner__name",
+            "old_ownership__owner__identifier",
+        )
+    )
