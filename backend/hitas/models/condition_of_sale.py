@@ -1,3 +1,6 @@
+import datetime
+from typing import Optional
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -48,6 +51,10 @@ class ConditionOfSale(ExternalHitasModel):
                 condition=models.Q(deleted__isnull=True),
             ),
         ]
+
+    @property
+    def fulfilled(self) -> Optional[datetime.datetime]:
+        return self.deleted  # noqa
 
     def save(self, keep_deleted=False, **kwargs) -> None:
         self.clean()
