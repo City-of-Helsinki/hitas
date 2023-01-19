@@ -1,20 +1,20 @@
 import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, Optional, TypedDict
+from typing import TYPE_CHECKING, Iterable, Optional, TypedDict, Union
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import HitasModel, HitasModelDecimalField
+from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 
 if TYPE_CHECKING:
     from hitas.models import Owner
 
 
 # 'Omistajuus'
-class Ownership(HitasModel):
+class Ownership(ExternalHitasModel):
     apartment = models.ForeignKey(
         "Apartment",
         on_delete=models.CASCADE,
@@ -71,9 +71,11 @@ class OwnershipLike(_OwnershipLike):
     owner: "Owner"
 
 
-def check_ownership_percentages(ownerships: Iterable[OwnershipLike]) -> None:
+def check_ownership_percentages(ownerships: Iterable[Union[Ownership, OwnershipLike]]) -> None:
+    percentage_sum = 0
     for ownership in ownerships:
-        percentage = ownership["percentage"]
+        percentage = ownership.percentage if isinstance(ownership, Ownership) else ownership["percentage"]
+        percentage_sum += percentage
         if not 0 < percentage <= 100:
             raise ValidationError(
                 {
@@ -83,7 +85,7 @@ def check_ownership_percentages(ownerships: Iterable[OwnershipLike]) -> None:
                     )
                 },
             )
-    percentage_sum = sum(ownership["percentage"] for ownership in ownerships)
+
     if percentage_sum != 100:
         raise ValidationError(
             {

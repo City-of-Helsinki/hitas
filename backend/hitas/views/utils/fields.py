@@ -50,8 +50,10 @@ class UUIDRelatedField(SlugRelatedField):
         queryset = self.get_queryset()
         try:
             return queryset.get(**{self.slug_field: UUID(hex=str(data))})
-        except (ObjectDoesNotExist, TypeError, ValueError):
-            raise serializers.ValidationError(f"Object does not exist with given id '{data}'.", code="invalid")
+        except (ObjectDoesNotExist, TypeError, ValueError) as error:
+            raise serializers.ValidationError(
+                f"Object does not exist with given id '{data}'.", code="invalid"
+            ) from error
 
 
 class HitasPostalCodeField(SlugRelatedField):
@@ -64,8 +66,8 @@ class HitasPostalCodeField(SlugRelatedField):
     def to_internal_value(self, data: str):
         try:
             return super().to_internal_value(data=data)
-        except ValueError:
-            raise HitasModelNotFound(model=HitasPostalCode)
+        except ValueError as error:
+            raise HitasModelNotFound(model=HitasPostalCode) from error
 
 
 class HitasEnumField(serializers.ChoiceField):
@@ -83,9 +85,9 @@ class HitasEnumField(serializers.ChoiceField):
 
         try:
             return self.enum_class(data)
-        except ValueError:
+        except ValueError as error:
             supported_values = [f"'{e.value}'" for e in self.enum_class]
 
             raise serializers.ValidationError(
                 f"Unsupported value '{data}'. Supported values are: [{', '.join(supported_values)}]."
-            )
+            ) from error

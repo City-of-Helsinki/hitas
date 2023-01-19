@@ -27,7 +27,6 @@ from hitas.models import (
     HousingCompany,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
-    Owner,
     Ownership,
     SurfaceAreaPriceCeiling,
 )
@@ -511,22 +510,20 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         if not ownerships:
             return ownerships
 
-        check_ownership_percentages(ownerships)
-
         if len(ownerships) != len({ownership["owner"] for ownership in ownerships}):
             raise ValidationError("All ownerships must be for different owners.")
 
+        check_ownership_percentages(ownerships)
         return ownerships
 
-    def create(self, validated_data: dict[str, Any]):
+    def create(self, validated_data: dict[str, Any]) -> Apartment:
         ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().create(validated_data)
 
-        for owner_data in ownerships:
-            Ownership.objects.create(apartment=instance, **owner_data)
+        Ownership.objects.bulk_create((Ownership(apartment=instance, **ownership) for ownership in ownerships))
 
         for improvement in mpi:
             ApartmentMarketPriceImprovement.objects.create(apartment=instance, **improvement)
@@ -535,20 +532,22 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         return instance
 
-    def update(self, instance: Apartment, validated_data: dict[str, Any]):
+    def update(self, instance: Apartment, validated_data: dict[str, Any]) -> Apartment:
         ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().update(instance, validated_data)
 
-        new_ownerships = [Ownership(apartment=instance, **owner_data) for owner_data in ownerships]
+        new_ownerships: list[Ownership] = []
         current_filter = Q()
-        for new_ownership in new_ownerships:
-            current_filter |= Q(owner=new_ownership.owner) & Q(percentage=new_ownership.percentage)
+        for ownership in ownerships:
+            new_ownerships.append(Ownership(apartment=instance, **ownership))
+            current_filter |= Q(owner=ownership["owner"]) & Q(percentage=ownership["percentage"])
 
-        # If given ownerships are not exactly the same as the previous ones, create new ownerships for all
-        if instance.ownerships.exclude(current_filter).exists():
+        # If given ownerships are not exactly the same as the previous ones,
+        # or there are no previous ownerships, create new ownerships
+        if instance.ownerships.exclude(current_filter).exists() or not instance.ownerships.exists():
             instance.ownerships.all().delete()
             Ownership.objects.bulk_create(objs=new_ownerships)
 
@@ -742,22 +741,36 @@ class ApartmentViewSet(HitasModelViewSet):
             .prefetch_related(
                 Prefetch(
                     "ownerships",
-                    Ownership.objects.only("apartment_id", "percentage", "start_date", "end_date", "owner_id"),
-                ),
-                Prefetch(
-                    "ownerships__owner",
-                    Owner.objects.only("uuid", "name", "identifier", "email"),
+                    Ownership.objects.select_related("owner").only(
+                        "id",
+                        "uuid",
+                        "apartment_id",
+                        "percentage",
+                        "start_date",
+                        "end_date",
+                        "owner__uuid",
+                        "owner__name",
+                        "owner__identifier",
+                        "owner__email",
+                    ),
                 ),
                 Prefetch(
                     "market_price_improvements",
                     ApartmentMarketPriceImprovement.objects.only(
-                        "name", "completion_date", "value", "apartment_id"
+                        "name",
+                        "completion_date",
+                        "value",
+                        "apartment_id",
                     ).order_by("completion_date", "id"),
                 ),
                 Prefetch(
                     "construction_price_improvements",
                     ApartmentConstructionPriceImprovement.objects.only(
-                        "name", "completion_date", "value", "apartment_id", "depreciation_percentage"
+                        "name",
+                        "completion_date",
+                        "value",
+                        "apartment_id",
+                        "depreciation_percentage",
                     ).order_by("completion_date", "id"),
                 ),
             )
@@ -777,9 +790,11 @@ class ApartmentViewSet(HitasModelViewSet):
                 "apartment_number",
                 "floor",
                 "stair",
+                "rooms",
                 "completion_date",
                 "apartment_type__value",
                 "building__uuid",
+                "building__street_address",
                 "building__real_estate__uuid",
                 "building__real_estate__housing_company__uuid",
                 "building__real_estate__housing_company__display_name",
