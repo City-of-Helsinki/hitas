@@ -50,9 +50,9 @@ pre-commit = "^2.21.0"
 optional = true
 
 [tool.poetry.group.migration.dependencies]
-sqlalchemy = "1.4.45"
+sqlalchemy = "^1.4"
 psycopg2-binary = "2.9.5"
-faker = "15.3.4"
+faker = "^16"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
