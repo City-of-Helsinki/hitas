@@ -30,7 +30,7 @@ export const HousingCompanyStates = [
     "half_hitas",
     "ready_no_statistics",
 ] as const;
-type IHousingCompanyState = typeof HousingCompanyStates[number];
+type IHousingCompanyState = (typeof HousingCompanyStates)[number];
 
 interface IHousingCompanyDetailsName {
     official: string;
@@ -210,7 +210,7 @@ interface IApartmentPrices {
 }
 
 export const ApartmentStates = ["free", "reserved", "sold"] as const;
-export type ApartmentState = typeof ApartmentStates[number];
+export type ApartmentState = (typeof ApartmentStates)[number];
 
 export type IApartmentConstructionPriceIndexImprovement = IImprovement & {
     depreciation_percentage: number; // 0.0 | 2.5 | 10.0
