@@ -246,6 +246,7 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
 
 class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
+    detail_serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
     model_class = HousingCompany
 

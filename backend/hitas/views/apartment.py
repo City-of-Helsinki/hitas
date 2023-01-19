@@ -613,6 +613,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
 
 class ApartmentViewSet(HitasModelViewSet):
     serializer_class = ApartmentDetailSerializer
+    detail_serializer_class = ApartmentDetailSerializer
     list_serializer_class = ApartmentListSerializer
     model_class = Apartment
 
