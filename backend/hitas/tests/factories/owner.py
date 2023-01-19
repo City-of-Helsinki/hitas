@@ -1,3 +1,5 @@
+from typing import Iterable, Optional, Any
+
 import factory
 from factory.django import DjangoModelFactory
 from faker import Faker
@@ -5,6 +7,7 @@ from faker.providers import BaseProvider
 
 from hitas.models import Owner, Ownership
 from hitas.models.utils import _business_id_checksum
+from hitas.tests.factories.condition_of_sale import ConditionOfSaleFactory
 
 faker = Faker(locale="fi_FI")
 
@@ -53,3 +56,12 @@ class OwnershipFactory(DjangoModelFactory):
     percentage = 100
     start_date = None
     end_date = None
+
+    @factory.post_generation
+    def conditions_of_sale(self, create: bool, extracted: Optional[Iterable[Ownership]], **kwargs: Any) -> None:
+        if not create:
+            return
+
+        if extracted:
+            for ownership in extracted:
+                ConditionOfSaleFactory.create(new_ownership=self, old_ownership=ownership, **kwargs)

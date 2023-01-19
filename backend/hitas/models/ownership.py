@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
 
@@ -15,6 +16,8 @@ if TYPE_CHECKING:
 
 # 'Omistajuus'
 class Ownership(ExternalHitasModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     apartment = models.ForeignKey(
         "Apartment",
         on_delete=models.CASCADE,
@@ -33,6 +36,12 @@ class Ownership(ExternalHitasModel):
         related_name="ownerships",
         default=None,
         null=True,
+    )
+    conditions_of_sale = models.ManyToManyField(
+        "self",
+        through="ConditionOfSale",
+        through_fields=("new_ownership", "old_ownership"),
+        symmetrical=False,
     )
 
     percentage = HitasModelDecimalField(

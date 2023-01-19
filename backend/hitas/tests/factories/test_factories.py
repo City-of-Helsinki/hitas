@@ -21,6 +21,7 @@ from hitas.tests import factories
         factories.RealEstateFactory,
         factories.UserFactory,
         factories.ApartmentSaleFactory,
+        factories.ConditionOfSaleFactory,
     ],
 )
 def test__factory__simple_create(factory_class):
