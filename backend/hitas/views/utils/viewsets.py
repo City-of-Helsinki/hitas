@@ -35,7 +35,7 @@ class HitasModelMixin:
         return self.get_detail_queryset()
 
     def get_partial_update_queryset(self):
-        return self.get_detail_queryset()
+        return self.get_update_queryset()
 
     def get_delete_queryset(self):
         return self.get_detail_queryset()
@@ -54,7 +54,9 @@ class HitasModelMixin:
         if self.action == "delete":
             return self.get_delete_queryset()
 
-        raise RuntimeError(f"Unknown action {self.action!r}")
+        if self.detail:
+            return self.get_detail_queryset()
+        return self.get_list_queryset()
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
@@ -90,6 +92,8 @@ class HitasModelMixin:
         if self.action == "partial_update":
             if self.partial_update_serializer_class is not None:
                 return self.partial_update_serializer_class
+            if self.update_serializer_class is not None:
+                return self.update_serializer_class
             if self.detail_serializer_class is not None:
                 return self.detail_serializer_class
 
