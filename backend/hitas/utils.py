@@ -5,6 +5,7 @@ from typing import Any, Optional, TypeVar
 
 from django.db import models
 from django.db.models import Value
+from django.db.models.base import ModelBase
 from django.db.models.functions import Round
 from django.utils import timezone
 
@@ -86,7 +87,8 @@ TModel = TypeVar("TModel", bound=models.Model)
 def get_many_or_cached_prefetch(
     instance: models.Model,
     field_name: str,
-    related_model: type[TModel],  # noqa
+    # Optional argument to provide return type hints
+    related_model: type[TModel] = ModelBase,  # noqa
 ) -> models.QuerySet[TModel]:
     if hasattr(instance, "_prefetched_objects_cache") and field_name in instance._prefetched_objects_cache:
         return instance._prefetched_objects_cache[field_name]
