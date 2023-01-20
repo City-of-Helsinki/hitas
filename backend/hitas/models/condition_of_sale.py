@@ -73,7 +73,7 @@ class ConditionOfSale(ExternalHitasModel):
 def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
     return (
         ConditionOfSale.all_objects.filter(
-            models.Q(deleted__isnull=True) | models.Q(deleted__lte=timezone.now() - relativedelta(months=3))
+            models.Q(deleted__isnull=True) | models.Q(deleted__gte=timezone.now() - relativedelta(months=3))
         )
         .select_related(
             "new_ownership__owner",
@@ -99,6 +99,7 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "new_ownership__apartment__apartment_number",
             "new_ownership__apartment__floor",
             "new_ownership__apartment__stair",
+            "new_ownership__apartment__completion_date",
             # Old ownership apartment
             "old_ownership__apartment__id",
             "old_ownership__apartment__uuid",
@@ -106,15 +107,18 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "old_ownership__apartment__apartment_number",
             "old_ownership__apartment__floor",
             "old_ownership__apartment__stair",
+            "old_ownership__apartment__completion_date",
             # New ownership owner
             "new_ownership__owner__id",
             "new_ownership__owner__uuid",
             "new_ownership__owner__name",
             "new_ownership__owner__identifier",
+            "new_ownership__owner__email",
             # Old ownership owner
             "old_ownership__owner__id",
             "old_ownership__owner__uuid",
             "old_ownership__owner__name",
             "old_ownership__owner__identifier",
+            "old_ownership__owner__email",
         )
     )
