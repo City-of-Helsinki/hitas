@@ -134,7 +134,7 @@ function validateSocialSecurityNumber(value: string): boolean {
 const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
 
 // Toast hook with easier Notification typing
-function hitasToast(message: string, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
+function hitasToast(message: string | JSX.Element, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
     toast(message, {...opts, className: type});
 }
 
