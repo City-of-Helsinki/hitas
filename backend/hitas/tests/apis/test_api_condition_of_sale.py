@@ -234,7 +234,7 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__list__show_fulfilled_under_three_months(api_client: HitasAPIClient, freezer):
+def test__api__condition_of_sale__list__fulfilled_under_x_months(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
     old_time_str = old_time.replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
@@ -253,8 +253,7 @@ def test__api__condition_of_sale__list__show_fulfilled_under_three_months(api_cl
     )
     condition_of_sale_2.delete()
 
-    freezer.move_to("2023-04-01 00:00:00+00:00")
-    assert relativedelta(timezone.now(), old_time) == relativedelta(months=3)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
 
     url = reverse(
         "hitas:conditions-of-sale-list",
@@ -270,7 +269,7 @@ def test__api__condition_of_sale__list__show_fulfilled_under_three_months(api_cl
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__list__dont_show_fulfilled_over_three_months(api_client: HitasAPIClient, freezer):
+def test__api__condition_of_sale__list__fulfilled_over_x_months(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
 
@@ -288,8 +287,7 @@ def test__api__condition_of_sale__list__dont_show_fulfilled_over_three_months(ap
     )
     condition_of_sale_2.delete()
 
-    freezer.move_to("2023-04-01 00:00:01+00:00")
-    assert relativedelta(timezone.now(), old_time) - relativedelta(months=3) == relativedelta(seconds=1)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
 
     url = reverse(
         "hitas:conditions-of-sale-list",
@@ -377,7 +375,7 @@ def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__retrieve__dont_show_fulfilled_over_three_months(api_client: HitasAPIClient, freezer):
+def test__api__condition_of_sale__retrieve__fulfilled_over_x_months(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
 
@@ -390,8 +388,7 @@ def test__api__condition_of_sale__retrieve__dont_show_fulfilled_over_three_month
     )
     condition_of_sale.delete()
 
-    freezer.move_to("2023-04-01 00:00:01+00:00")
-    assert relativedelta(timezone.now(), old_time) - relativedelta(months=3) == relativedelta(seconds=1)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
 
     url = reverse(
         "hitas:conditions-of-sale-detail",
@@ -864,7 +861,7 @@ def test__api__condition_of_sale__update__invalid(api_client: HitasAPIClient, in
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__delete(api_client: HitasAPIClient, freezer):
+def test__api__condition_of_sale__delete(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
 
@@ -886,15 +883,13 @@ def test__api__condition_of_sale__delete(api_client: HitasAPIClient, freezer):
     response_1 = api_client.delete(url)
     assert response_1.status_code == status.HTTP_204_NO_CONTENT, response_1.json()
 
-    freezer.move_to("2023-04-01 00:00:00+00:00")
-    assert relativedelta(timezone.now(), old_time) == relativedelta(months=3)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
 
     # You can still find it 3 months after
     response_2 = api_client.get(url)
     assert response_2.status_code == status.HTTP_200_OK, response_2.json()
 
-    freezer.move_to("2023-04-01 00:00:01+00:00")
-    assert relativedelta(timezone.now(), old_time) - relativedelta(months=3) == relativedelta(seconds=1)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
 
     # Can't find it over 3 months after
     response_2 = api_client.get(url)

@@ -1,6 +1,7 @@
 import os
 
 import environ
+from dateutil.relativedelta import relativedelta
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 
@@ -10,6 +11,11 @@ assert os.path.exists(root("manage.py"))
 var_root = root("var")
 
 BASE_DIR = root()
+
+
+def relativedelta_months(value: int) -> relativedelta:
+    return relativedelta(months=value)
+
 
 env = environ.Env(
     DEBUG=(bool, False),
@@ -25,6 +31,7 @@ env = environ.Env(
     SENTRY_ENVIRONMENT=(str, "unknown"),
     SENTRY_SAMPLE_RATE=(float, 1.0),
     SENTRY_TRACES_SAMPLE_RATE=(float, 0.1),
+    SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS=(relativedelta_months, relativedelta(months=2)),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -38,6 +45,9 @@ STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 UWSGI_WARMUP = env("UWSGI_WARMUP")
+
+# How long to show fulfilled (=deleted) conditions of sale from the endpoints
+SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS: relativedelta = env("SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS")
 
 # Application definition
 INSTALLED_APPS = [

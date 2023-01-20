@@ -345,7 +345,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__apartment__list__show_fulfilled_under_three_months(api_client: HitasAPIClient, freezer):
+def test__api__apartment__list__fulfilled_under_x_months(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
 
@@ -358,8 +358,7 @@ def test__api__apartment__list__show_fulfilled_under_three_months(api_client: Hi
     cos.delete()
     cos_fulfilled_str = cos.fulfilled.replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
 
-    freezer.move_to("2023-04-01 00:00:00+00:00")
-    assert relativedelta(timezone.now(), old_time) == relativedelta(months=3)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
 
     url = reverse(
         "hitas:apartment-list",
@@ -377,7 +376,7 @@ def test__api__apartment__list__show_fulfilled_under_three_months(api_client: Hi
 
 
 @pytest.mark.django_db
-def test__api__apartment__list__dont_show_fulfilled_over_three_months(api_client: HitasAPIClient, freezer):
+def test__api__apartment__list__fulfilled_over_x_months(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
     old_time = timezone.now()
 
@@ -389,8 +388,7 @@ def test__api__apartment__list__dont_show_fulfilled_over_three_months(api_client
     cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
     cos.delete()
 
-    freezer.move_to("2023-04-01 00:00:01+00:00")
-    assert relativedelta(timezone.now(), old_time) - relativedelta(months=3) == relativedelta(seconds=1)
+    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
 
     url = reverse(
         "hitas:apartment-list",

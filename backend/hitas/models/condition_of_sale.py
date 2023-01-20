@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -73,7 +73,8 @@ class ConditionOfSale(ExternalHitasModel):
 def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
     return (
         ConditionOfSale.all_objects.filter(
-            models.Q(deleted__isnull=True) | models.Q(deleted__gte=timezone.now() - relativedelta(months=3))
+            models.Q(deleted__isnull=True)
+            | models.Q(deleted__gte=timezone.now() - settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
         )
         .select_related(
             "new_ownership__owner",
