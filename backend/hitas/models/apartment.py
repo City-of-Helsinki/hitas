@@ -1,9 +1,10 @@
 import uuid
 from decimal import Decimal
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
@@ -12,6 +13,10 @@ from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelD
 from hitas.models.housing_company import HousingCompany
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
+from hitas.utils import get_many_or_cached_prefetch
+
+if TYPE_CHECKING:
+    from hitas.models.apartment_sale import ApartmentSale
 
 
 class ApartmentState(Enum):
@@ -108,6 +113,20 @@ class Apartment(ExternalHitasModel):
     @property
     def address(self) -> str:
         return f"{self.street_address} {self.stair} {self.apartment_number}"
+
+    @property
+    def is_new(self) -> bool:
+        today = timezone.now().date()
+        if self.completion_date is None or self.completion_date > today:
+            return True
+
+        sales: list["ApartmentSale"] = list(get_many_or_cached_prefetch(self, "sales"))
+        no_sales = len(sales) < 1
+
+        no_first_purchase_or_in_the_future = self.first_purchase_date is None or self.first_purchase_date > today
+        no_first_sale_or_in_the_future = no_sales or sales[0].purchase_date > today
+
+        return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
 
     class Meta:
         verbose_name = _("Apartment")

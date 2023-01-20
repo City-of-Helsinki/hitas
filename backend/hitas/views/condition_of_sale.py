@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Optional
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 
@@ -94,7 +94,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     ApartmentSale.objects.only(
                         "id",
                         "purchase_date",
-                    ),
+                    ).order_by("purchase_date"),
                 ),
             ).get(uuid=owner_uuid)
         except Owner.DoesNotExist as error:
@@ -110,21 +110,30 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
 
         for ownership in ownerships:
             apartment = ownership.apartment
-            sales = get_many_or_cached_prefetch(apartment, "sales", ApartmentSale)
 
-            # TODO: Finalize this check later
-            is_new_apartment = (
-                apartment.first_purchase_date is not None and apartment.latest_purchase_date is not None
-            ) or len(sales) > 0
-
-            if is_new_apartment:
+            if apartment.is_new:
                 for other_ownership in ownerships:
                     if ownership.id == other_ownership.id:
                         continue
 
                     to_save.append(ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership))
 
-        validated_data["conditions_of_sale"] = ConditionOfSale.objects.bulk_create(to_save, ignore_conflicts=True)
+        if not to_save:
+            validated_data["conditions_of_sale"] = []
+            return validated_data["conditions_of_sale"]
+
+        # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
+        ConditionOfSale.objects.bulk_create(to_save, ignore_conflicts=True)
+
+        # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
+        # the ids in the returned list from 'bulk_create' are not correct.
+        conditions_of_sale: list[ConditionOfSale] = list(
+            ConditionOfSale.objects.select_related("new_ownership__owner", "old_ownership__owner")
+            .filter(Q(new_ownership__owner=owner) | Q(old_ownership__owner=owner))
+            .all()
+        )
+
+        validated_data["conditions_of_sale"] = conditions_of_sale
         return validated_data["conditions_of_sale"]
 
     def to_representation(self, validated_data: list[ConditionOfSale]) -> dict[str, Any]:
