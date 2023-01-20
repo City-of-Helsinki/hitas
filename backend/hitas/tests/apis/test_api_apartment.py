@@ -3,7 +3,9 @@ import uuid
 from typing import Any
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from hitas.models import (
@@ -342,7 +344,65 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
     ]
 
 
-# TODO: Test that old fulfilled conditions of sale won't show up
+@pytest.mark.django_db
+def test__api__apartment__list__show_fulfilled_under_three_months(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+    old_time = timezone.now()
+
+    owner: Owner = OwnerFactory.create()
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    old_apartment: Apartment = ApartmentFactory.create()
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
+    cos.delete()
+    cos_fulfilled_str = cos.fulfilled.replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
+
+    freezer.move_to("2023-04-01 00:00:00+00:00")
+    assert relativedelta(timezone.now(), old_time) == relativedelta(months=3)
+
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.building.real_estate.housing_company.uuid.hex,
+        },
+    )
+    response_1 = api_client.get(url)
+
+    assert response_1.status_code == status.HTTP_200_OK, response_1.json()
+    assert len(response_1.json()["contents"]) == 1
+    assert len(response_1.json()["contents"][0]["conditions_of_sale"]) == 1
+    assert response_1.json()["contents"][0]["conditions_of_sale"][0]["id"] == cos.uuid.hex
+    assert response_1.json()["contents"][0]["conditions_of_sale"][0]["fulfilled"] == cos_fulfilled_str
+
+
+@pytest.mark.django_db
+def test__api__apartment__list__dont_show_fulfilled_over_three_months(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+    old_time = timezone.now()
+
+    owner: Owner = OwnerFactory.create()
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    old_apartment: Apartment = ApartmentFactory.create()
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
+    cos.delete()
+
+    freezer.move_to("2023-04-01 00:00:01+00:00")
+    assert relativedelta(timezone.now(), old_time) - relativedelta(months=3) == relativedelta(seconds=1)
+
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.building.real_estate.housing_company.uuid.hex,
+        },
+    )
+    response_1 = api_client.get(url)
+
+    assert response_1.status_code == status.HTTP_200_OK, response_1.json()
+    assert len(response_1.json()["contents"]) == 1
+    assert response_1.json()["contents"][0]["conditions_of_sale"] == []
 
 
 # Retrieve tests
