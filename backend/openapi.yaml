@@ -2030,9 +2030,9 @@ paths:
                 type: object
                 additionalProperties: false
                 required:
-                  - created
+                  - conditions_of_sale
                 properties:
-                  created:
+                  conditions_of_sale:
                     description: List of created conditions of sale
                     type: array
                     items:

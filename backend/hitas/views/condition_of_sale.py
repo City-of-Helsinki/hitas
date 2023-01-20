@@ -137,7 +137,11 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
         return validated_data["conditions_of_sale"]
 
     def to_representation(self, validated_data: list[ConditionOfSale]) -> dict[str, Any]:
-        return {"created": [ConditionOfSaleSerializer(condition_of_sale).data for condition_of_sale in validated_data]}
+        return {
+            "conditions_of_sale": [
+                ConditionOfSaleSerializer(condition_of_sale).data for condition_of_sale in validated_data
+            ]
+        }
 
 
 class ConditionOfSaleViewSet(HitasModelViewSet):
