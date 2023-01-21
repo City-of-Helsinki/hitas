@@ -57,7 +57,7 @@ function formatIndex(indexType: string) {
         case "construction_price_index":
             return "rakennuskustannusindeksi";
         case "surface_area_price_ceiling":
-            return "rajaneliöhinta";
+            return "rajaneliöhintaindeksi";
     }
 }
 

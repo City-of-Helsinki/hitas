@@ -293,9 +293,11 @@ const LoadedApartmentSalesPage = ({
                             <Button
                                 theme="black"
                                 onClick={handleCalculateButton}
+                                /* TODO: implement proper front end form validation and apply it here
                                 disabled={
                                     !(formData.purchase_date && formData.apartment_share_of_housing_company_loans)
                                 }
+                                */
                             >
                                 Tee enimmäishintalaskelma
                             </Button>
