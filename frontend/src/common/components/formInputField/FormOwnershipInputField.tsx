@@ -32,7 +32,7 @@ const CreateNewOwner = ({
         <>
             <Dialog.Content>
                 {error ? (
-                    <div>{`Virhe: ${error}`}</div>
+                    <div>{`Virhe: ${error.data.fields[0].message}`}</div>
                 ) : (
                     <>
                         <FormInputField
