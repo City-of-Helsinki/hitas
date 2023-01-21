@@ -51,7 +51,6 @@ const LoadedApartmentSalesPage = ({
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [hasNoOwnershipsError, setHasNoOwnershipsError] = useState(false);
     const [isExcludedFromStats, setIsExcludedFromStats] = useState(false);
-    const [isLoanValueChanged, setIsLoanValueChanged] = useState(false);
 
     const [saveSale, {data, error, isLoading}] = useCreateSaleMutation();
     const [saveMaximumPrice, {data: maxPriceData, error: maxPriceError, isLoading: isMaxPriceLoading}] =
@@ -85,33 +84,46 @@ const LoadedApartmentSalesPage = ({
         index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
     });
     const isTooHighPrice = Number(maxPrices.maximumPrice) < Number(formData.purchase_price);
+    const isLoanValueChanged =
+        Number(formData.apartment_share_of_housing_company_loans) !==
+            maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
+                .apartment_share_of_housing_company_loans && maxPriceCalculation;
 
     const onCheckboxChange = (event) => {
         setIsExcludedFromStats(event.target.checked);
     };
     const handleCalculateButton = () => {
-        saveMaximumPrice({
-            data: {
-                calculation_date: formData.purchase_date,
-                apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
-                apartment_share_of_housing_company_loans_date: formData.purchase_date,
-                additional_info: "",
-            },
-            id: undefined,
-            apartmentId: apartment.id,
-            housingCompanyId: apartment.links.housing_company.id,
-        }).then(() => {
-            setMaxPrices({
-                maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
-                maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
-                    ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
-                    : 0,
-                debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
-                primaryLoanAmount: apartment.prices.primary_loan_amount,
-                index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
+        if (formData.purchase_date && formData.apartment_share_of_housing_company_loans) {
+            saveMaximumPrice({
+                data: {
+                    calculation_date: formData.purchase_date,
+                    apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
+                    apartment_share_of_housing_company_loans_date: formData.purchase_date,
+                    additional_info: "",
+                },
+                id: undefined,
+                apartmentId: apartment.id,
+                housingCompanyId: apartment.links.housing_company.id,
+            }).then(() => {
+                setMaxPrices({
+                    maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
+                    maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
+                        ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
+                        : 0,
+                    debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
+                    primaryLoanAmount: apartment.prices.primary_loan_amount,
+                    index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
+                });
+                setIsModalVisible(true);
             });
-            setIsModalVisible(true);
-        });
+        } else
+            hitasToast(
+                <>
+                    Enimmäishintojen laskemiseen tarvitaan <span>kauppakirjan päivämäärä</span> sekä{" "}
+                    <span>yhtiön lainaosuus</span>!
+                </>,
+                "error"
+            );
     };
     const handleSaveButton = () => {
         if (formOwnershipsList.length < 1) {
@@ -140,24 +152,7 @@ const LoadedApartmentSalesPage = ({
             hitasToast("Kaupan tallentaminen epäonnistui.", "error");
         }
     }, [isLoading, error, data, navigate, apartment.links.housing_company.id, apartment.id]);
-    // Handle alert for changed loan value
-    useEffect(() => {
-        if (
-            Number(formData.apartment_share_of_housing_company_loans) !==
-                maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
-                    .apartment_share_of_housing_company_loans &&
-            maxPriceCalculation
-        )
-            setIsLoanValueChanged(true);
-        else setIsLoanValueChanged(false);
-    }, [
-        formData.apartment_share_of_housing_company_loans,
-        maxPriceCalculation,
-        setIsLoanValueChanged,
-        isLoanValueChanged,
-    ]);
-    console.log(maxPriceCalculation);
-    console.log(formData);
+
     return (
         <>
             <div className="field-sets">
@@ -202,7 +197,7 @@ const LoadedApartmentSalesPage = ({
                                 </span>
                             </div>
                         </div>
-                        <div>
+                        <div className={isLoanValueChanged ? "input-field--invalid" : ""}>
                             <FormInputField
                                 inputType="number"
                                 label="Osuus yhtiön lainoista"
@@ -216,9 +211,8 @@ const LoadedApartmentSalesPage = ({
                             />
                             <div className="error-message error-text">
                                 <span style={{display: isLoanValueChanged ? "block" : "none"}}>
-                                    Enimmäishintalaskelmassa{" "}
-                                    {maxPriceCalculation?.calculations.construction_price_index.calculation_variables
-                                        .apartment_share_of_housing_company_loans + " €"}
+                                    <IconAlertCircleFill />
+                                    Eri kuin enimmäishintalaskelmassa!
                                 </span>
                             </div>
                         </div>
@@ -258,28 +252,26 @@ const LoadedApartmentSalesPage = ({
                                 </div>
                             </div>
                             <div className="row row--prompt">
-                                {isLoanValueChanged ? (
-                                    <p>
-                                        <span>Osuus yhtiön lainoista</span> on muuttunut, ole hyvä ja
+                                <p>
+                                    Enimmäishinnat ovat laskettu{" "}
+                                    <span>
+                                        {` ${formatIndex(
+                                            maxPriceData ? maxPriceData.index : maxPriceCalculation.index
+                                        )}llä`}
+                                    </span>{" "}
+                                    ja{" "}
+                                    <span>
+                                        {formatMoney(
+                                            maxPriceCalculation?.calculations[maxPriceCalculation.index]
+                                                .calculation_variables.apartment_share_of_housing_company_loans
+                                        )}
+                                    </span>{" "}
+                                    lainaosuudella.{" "}
+                                </p>
+                                {isLoanValueChanged && (
+                                    <p className="error-text">
+                                        <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
                                         <span> tee uusi enimmäishintalaskelma</span>.
-                                    </p>
-                                ) : (
-                                    <p>
-                                        Enimmäishinnoissa on käytetty
-                                        <span>
-                                            {` ${formatIndex(
-                                                maxPriceData ? maxPriceData.index : maxPriceCalculation.index
-                                            )}ä`}
-                                        </span>{" "}
-                                        ja{" "}
-                                        <span>
-                                            {
-                                                maxPriceCalculation?.calculations[maxPriceCalculation.index]
-                                                    .calculation_variables.apartment_share_of_housing_company_loans
-                                            }
-                                            €
-                                        </span>{" "}
-                                        lainaosuutta.
                                     </p>
                                 )}
                                 <Button
@@ -301,6 +293,9 @@ const LoadedApartmentSalesPage = ({
                             <Button
                                 theme="black"
                                 onClick={handleCalculateButton}
+                                disabled={
+                                    !(formData.purchase_date && formData.apartment_share_of_housing_company_loans)
+                                }
                             >
                                 Tee enimmäishintalaskelma
                             </Button>
