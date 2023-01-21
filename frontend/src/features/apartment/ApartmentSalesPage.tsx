@@ -15,7 +15,7 @@ import {
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
 import {IApartmentDetails, IApartmentMaximumPrice, IOwnership} from "../../common/models";
-import {formatAddress, formatDate, formatIndex, formatMoney, hitasToast, today} from "../../common/utils";
+import {formatDate, formatIndex, formatMoney, hitasToast, today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -368,6 +368,15 @@ const MaxPriceCalculationLoader = ({apartment}) => {
         priceId: apartment.prices.maximum_prices.confirmed?.id as string,
     });
 
+    const SalesHeading = () => (
+        <Heading type="main">
+            Kauppatapahtuma
+            <span>
+                {`(${apartment.address.street_address} ${apartment.address.stair} ${apartment.address.apartment_number})`}
+            </span>
+        </Heading>
+    );
+
     if (hasValidCalculation) {
         return (
             <QueryStateHandler
@@ -375,10 +384,7 @@ const MaxPriceCalculationLoader = ({apartment}) => {
                 error={error}
                 isLoading={isLoading}
             >
-                <Heading type="main">
-                    Uusi kauppa
-                    <span>({formatAddress(apartment.address)})</span>
-                </Heading>
+                <SalesHeading />
                 <LoadedApartmentSalesPage
                     maxPriceCalculation={data as IApartmentMaximumPrice}
                     apartment={apartment}
@@ -388,10 +394,7 @@ const MaxPriceCalculationLoader = ({apartment}) => {
     } else
         return (
             <>
-                <Heading type="main">
-                    Uusi kauppa
-                    <span>({formatAddress(apartment.address)})</span>
-                </Heading>
+                <SalesHeading />
                 <LoadedApartmentSalesPage
                     maxPriceCalculation={null}
                     apartment={apartment}
