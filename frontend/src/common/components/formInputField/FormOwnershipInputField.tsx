@@ -5,7 +5,7 @@ import {useImmer} from "use-immer";
 
 import {useCreateOwnerMutation} from "../../../app/services";
 import {IOwner} from "../../models";
-import {hitasToast, validateSocialSecurityNumber} from "../../utils";
+import {doesAContainB, hitasToast, validateSocialSecurityNumber} from "../../utils";
 import QueryStateHandler from "../QueryStateHandler";
 import SaveButton from "../SaveButton";
 import FormInputField, {CommonFormInputFieldProps} from "./FormInputField";
@@ -118,11 +118,7 @@ export default function FormOwnershipInputField({
         (internalFilterValue.length >= MIN_LENGTH && {[relatedModelSearchField]: internalFilterValue}) || {},
         {skip: !isModalVisible}
     );
-    const [formData, setFormData] = useImmer<IOwner>({
-        name: "",
-        identifier: "",
-        email: "",
-    });
+    const [formData, setFormData] = useImmer<IOwner>({name: "", identifier: "", email: ""});
     const [createOwner, {data: createData, error: createError, isLoading: isCreating}] = useCreateOwnerMutation();
 
     const openModal = () => setIsModalVisible(true);
@@ -172,14 +168,15 @@ export default function FormOwnershipInputField({
     }, [formData.identifier, setIsInvalidSSNAllowed]);
 
     useEffect(() => {
-        if (!isCreating && !createError && createData) {
+        if (!isCreating && !createError && createData && doesAContainB(createData, formData)) {
+            setFormData({name: "", identifier: "", email: ""});
             hitasToast("Omistaja lisätty onnistuneesti!");
-            setDisplayedValue(createData.name);
+            setDisplayedValue(`${createData.name} (${createData.identifier})`);
             setFieldValue(createData.id);
             setIsAddingNew(false);
             closeModal();
         }
-    }, [createData, createError, isCreating, setFieldValue]);
+    }, [createData, createError, isCreating, setFieldValue, formData, setFormData]);
 
     return (
         <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>

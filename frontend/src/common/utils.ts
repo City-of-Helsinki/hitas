@@ -138,6 +138,22 @@ function hitasToast(message: string | JSX.Element, type?: "success" | "info" | "
     toast(message, {...opts, className: type});
 }
 
+// Returns true if obj1 contains the same key/value pairs as obj2. Note that this is non-exclusive, so obj1 doesn't
+// have to be identical to obj2, as it can contain more data than only the ones from obj2.
+function doesAContainB(A: object, B: object): boolean {
+    const AProps = Object.getOwnPropertyNames(A);
+    const BProps = Object.getOwnPropertyNames(B);
+    if (AProps.length < BProps.length) {
+        return false;
+    }
+    for (const prop of BProps) {
+        if (!Object.prototype.hasOwnProperty.call(A, prop) || A[prop] !== B[prop]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export {
     dotted,
     formatAddress,
@@ -149,4 +165,5 @@ export {
     validateSocialSecurityNumber,
     hitasToast,
     today,
+    doesAContainB,
 };
