@@ -7,9 +7,15 @@ interface EditButtonProps {
     state: object;
     pathname?: string;
     className?: string;
+    disabled?: boolean;
 }
 
-export default function EditButton({state, pathname = "edit", className}: EditButtonProps): JSX.Element {
+export default function EditButton({
+    state,
+    pathname = "edit",
+    className,
+    disabled = false,
+}: EditButtonProps): JSX.Element {
     return (
         <Link
             to={{pathname: pathname}}
@@ -20,6 +26,7 @@ export default function EditButton({state, pathname = "edit", className}: EditBu
                 theme="black"
                 size="small"
                 iconLeft={<IconPen />}
+                disabled={disabled}
             >
                 Muokkaa
             </Button>

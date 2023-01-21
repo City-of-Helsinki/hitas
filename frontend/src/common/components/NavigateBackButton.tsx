@@ -3,7 +3,7 @@ import React from "react";
 import {Button, IconArrowLeft} from "hds-react";
 import {useNavigate} from "react-router-dom";
 
-export default function NavigateBackButton(): JSX.Element {
+export default function NavigateBackButton({disabled = false}: {disabled?: boolean}): JSX.Element {
     const navigate = useNavigate();
     return (
         <Button
@@ -12,6 +12,7 @@ export default function NavigateBackButton(): JSX.Element {
             variant="secondary"
             className="back-button"
             onClick={() => navigate(-1)}
+            disabled={disabled}
         >
             Takaisin
         </Button>
