@@ -36,7 +36,7 @@ from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.models.condition_of_sale import condition_of_sale_queryset
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid, get_many_or_cached_prefetch
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import ConditionOfSaleSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -496,14 +496,12 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def get_conditions_of_sale(self, instance: Apartment) -> list[dict[str, Any]]:
         conditions_of_sale: list[ConditionOfSale] = []
 
-        ownerships = get_many_or_cached_prefetch(instance, "ownerships", Ownership)
-
-        for ownership in ownerships:
-            conditions_of_sale_new = get_many_or_cached_prefetch(ownership, "conditions_of_sale_new", ConditionOfSale)
+        for ownership in instance.ownerships.all():
+            conditions_of_sale_new = ownership.conditions_of_sale_new.all()
             for cond in conditions_of_sale_new:
                 conditions_of_sale.append(cond)
 
-            conditions_of_sale_old = get_many_or_cached_prefetch(ownership, "conditions_of_sale_old", ConditionOfSale)
+            conditions_of_sale_old = ownership.conditions_of_sale_old.all()
             for cond in conditions_of_sale_old:
                 conditions_of_sale.append(cond)
 

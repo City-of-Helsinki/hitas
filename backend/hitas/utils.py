@@ -5,7 +5,6 @@ from typing import Any, Optional, TypeVar
 
 from django.db import models
 from django.db.models import Value
-from django.db.models.base import ModelBase
 from django.db.models.functions import Round
 from django.utils import timezone
 
@@ -68,8 +67,8 @@ def valid_uuid(value: str, version: int = 4) -> bool:
 def lookup_id_to_uuid(lookup_id: str, model_class: type[models.Model]) -> uuid.UUID:
     try:
         return uuid.UUID(hex=lookup_id)
-    except ValueError:
-        raise HitasModelNotFound(model=model_class)
+    except ValueError as error:
+        raise HitasModelNotFound(model=model_class) from error
 
 
 def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **kwargs) -> int:
@@ -77,20 +76,8 @@ def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **k
 
     try:
         return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
-    except model_class.DoesNotExist:
-        raise HitasModelNotFound(model=model_class)
+    except model_class.DoesNotExist as error:
+        raise HitasModelNotFound(model=model_class) from error
 
 
 TModel = TypeVar("TModel", bound=models.Model)
-
-
-def get_many_or_cached_prefetch(
-    instance: models.Model,
-    field_name: str,
-    # Optional argument to provide return type hints
-    related_model: type[TModel] = ModelBase,  # noqa
-) -> models.QuerySet[TModel]:
-    if hasattr(instance, "_prefetched_objects_cache") and field_name in instance._prefetched_objects_cache:
-        return instance._prefetched_objects_cache[field_name]
-    else:
-        return getattr(instance, field_name).all()

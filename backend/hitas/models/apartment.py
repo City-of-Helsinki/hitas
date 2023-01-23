@@ -1,6 +1,6 @@
 import uuid
 from decimal import Decimal
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -13,10 +13,6 @@ from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelD
 from hitas.models.housing_company import HousingCompany
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
-from hitas.utils import get_many_or_cached_prefetch
-
-if TYPE_CHECKING:
-    from hitas.models.apartment_sale import ApartmentSale
 
 
 class ApartmentState(Enum):
@@ -120,7 +116,8 @@ class Apartment(ExternalHitasModel):
         if self.completion_date is None or self.completion_date > today:
             return True
 
-        sales: list["ApartmentSale"] = list(get_many_or_cached_prefetch(self, "sales"))
+        # Fetch all sales to take advantage of prefetch cache.
+        sales = list(self.sales.all())
         no_sales = len(sales) < 1
 
         no_first_purchase_or_in_the_future = self.first_purchase_date is None or self.first_purchase_date > today

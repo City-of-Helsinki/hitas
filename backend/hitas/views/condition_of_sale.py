@@ -8,7 +8,7 @@ from rest_framework import serializers
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset
-from hitas.utils import get_many_or_cached_prefetch, lookup_id_to_uuid
+from hitas.utils import lookup_id_to_uuid
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
@@ -105,7 +105,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
 
     def create(self, validated_data: dict[str, Any]) -> list[ConditionOfSale]:
         owner: Owner = validated_data.pop("owner")
-        ownerships = get_many_or_cached_prefetch(owner, "ownerships", Ownership)
+        ownerships = owner.ownerships.all()
 
         to_save: list[ConditionOfSale] = []
 
