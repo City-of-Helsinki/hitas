@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Optional
 
-from django.db.models import Prefetch, Q
+from django.db.models import OuterRef, Prefetch, Q, Subquery
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 
@@ -92,10 +92,15 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                 ),
                 Prefetch(
                     "ownerships__apartment__sales",
-                    ApartmentSale.objects.only(
-                        "id",
-                        "purchase_date",
-                    ),
+                    # Limit the fetched sales to only the first sale,
+                    # as we only need that to figure out if the apartment is new
+                    ApartmentSale.objects.filter(
+                        id__in=Subquery(
+                            ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
+                            .order_by("purchase_date")
+                            .values_list("id", flat=True)[:1]
+                        )
+                    ).only("id", "purchase_date"),
                 ),
             ).get(uuid=owner_uuid)
         except Owner.DoesNotExist as error:
