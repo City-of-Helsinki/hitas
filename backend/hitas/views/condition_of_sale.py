@@ -76,6 +76,8 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         owner_uuid = lookup_id_to_uuid(self.context["view"].kwargs.get("owner_uuid"), Owner)
 
+        # Check that owner exists and prefetch required fields for creating
+        # conditions of sale between their ownerships
         try:
             attrs["owner"] = Owner.objects.prefetch_related(
                 Prefetch(
@@ -85,7 +87,6 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                         "percentage",
                         "apartment__id",
                         "apartment__first_purchase_date",
-                        "apartment__latest_purchase_date",
                         "apartment__completion_date",
                     ),
                 ),
@@ -108,6 +109,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
 
         to_save: list[ConditionOfSale] = []
 
+        # Create conditions of sale for all ownerships to new apartments this owner has
         for ownership in ownerships:
             apartment = ownership.apartment
 
@@ -119,22 +121,16 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     to_save.append(ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership))
 
         if not to_save:
-            validated_data["conditions_of_sale"] = []
-            return validated_data["conditions_of_sale"]
+            return []
 
         # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
         ConditionOfSale.objects.bulk_create(to_save, ignore_conflicts=True)
 
         # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
-        # the ids in the returned list from 'bulk_create' are not correct.
-        conditions_of_sale: list[ConditionOfSale] = list(
-            ConditionOfSale.objects.select_related("new_ownership__owner", "old_ownership__owner")
-            .filter(Q(new_ownership__owner=owner) | Q(old_ownership__owner=owner))
-            .all()
+        # the ids or conditions of sale in the returned list from 'bulk_create' are not correct.
+        return list(
+            condition_of_sale_queryset().filter(Q(new_ownership__owner=owner) | Q(old_ownership__owner=owner)).all()
         )
-
-        validated_data["conditions_of_sale"] = conditions_of_sale
-        return validated_data["conditions_of_sale"]
 
     def to_representation(self, validated_data: list[ConditionOfSale]) -> dict[str, Any]:
         return {
