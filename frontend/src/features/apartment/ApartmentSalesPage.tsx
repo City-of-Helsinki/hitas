@@ -73,14 +73,12 @@ const LoadedApartmentSalesPage = ({
     );
     const [maxPrices, setMaxPrices] = useState({
         maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
-        maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
-            ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
-            : 0,
-        debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
-        primaryLoanAmount: maxPriceCalculation
-            ? maxPriceCalculation?.calculations.construction_price_index.calculation_variables
-                  .apartment_share_of_housing_company_loans
-            : null,
+        maxPricePerSquare: maxPriceCalculation
+            ? maxPriceCalculation.calculations.construction_price_index.calculation_variables.debt_free_price_m2
+            : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price_m2,
+        debtFreePurchasePrice: maxPriceCalculation
+            ? maxPriceCalculation.calculations.construction_price_index.calculation_variables.debt_free_price
+            : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price,
         index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
     });
     const isTooHighPrice = Number(maxPrices.maximumPrice) < Number(formData.purchase_price);
@@ -107,11 +105,14 @@ const LoadedApartmentSalesPage = ({
             }).then(() => {
                 setMaxPrices({
                     maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
-                    maxPricePerSquare: apartment.prices.maximum_prices.confirmed?.maximum_price
-                        ? apartment.prices.maximum_prices.confirmed?.maximum_price / apartment.surface_area
-                        : 0,
-                    debtFreePurchasePrice: apartment.prices.debt_free_purchase_price,
-                    primaryLoanAmount: apartment.prices.primary_loan_amount,
+                    maxPricePerSquare: maxPriceCalculation
+                        ? maxPriceCalculation.calculations.construction_price_index.calculation_variables
+                              .debt_free_price_m2
+                        : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price_m2,
+                    debtFreePurchasePrice: maxPriceCalculation
+                        ? maxPriceCalculation.calculations.construction_price_index.calculation_variables
+                              .debt_free_price
+                        : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price,
                     index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
                 });
                 setIsModalVisible(true);
@@ -127,7 +128,7 @@ const LoadedApartmentSalesPage = ({
     };
     const handleSaveButton = () => {
         if (formOwnershipsList.length < 1) {
-            hitasToast("Kaupalla täytyy olla ainakin yksi omistaja!", "error");
+            hitasToast("Asunnolla täytyy olla ainakin yksi omistaja!", "error");
             setHasNoOwnershipsError(true);
         } else {
             const saleData = {
@@ -166,6 +167,7 @@ const LoadedApartmentSalesPage = ({
                             setFormData={setFormData}
                             error={error}
                             required
+                            maxDate={new Date()}
                         />
                         <FormInputField
                             inputType="date"
@@ -175,6 +177,7 @@ const LoadedApartmentSalesPage = ({
                             setFormData={setFormData}
                             error={error}
                             required
+                            maxDate={new Date()}
                         />
                     </div>
                     <div className="row">
@@ -202,7 +205,7 @@ const LoadedApartmentSalesPage = ({
                                 inputType="number"
                                 label="Osuus yhtiön lainoista"
                                 unit="€"
-                                fractionDigits={2}
+                                fractionDigits={0}
                                 fieldPath="apartment_share_of_housing_company_loans"
                                 formData={formData}
                                 setFormData={setFormData}
