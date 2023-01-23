@@ -11,5 +11,8 @@ class ConditionOfSaleFactory(DjangoModelFactory):
         model = ConditionOfSale
 
     new_ownership = factory.SubFactory("hitas.tests.factories.OwnershipFactory")
-    old_ownership = factory.SubFactory("hitas.tests.factories.OwnershipFactory")
+    old_ownership = factory.SubFactory(
+        "hitas.tests.factories.OwnershipFactory",
+        owner=factory.LazyAttribute(lambda ownership: ownership.factory_parent.new_ownership.owner),
+    )
     grace_period = fuzzy.FuzzyChoice(state[0] for state in GracePeriod.choices())
