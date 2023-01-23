@@ -34,4 +34,4 @@ class ApartmentSale(ExternalHitasModel):
     class Meta:
         verbose_name = _("Apartment sale")
         verbose_name_plural = _("Apartment sales")
-        ordering = ["purchase_date"]
+        ordering = ["-purchase_date"]

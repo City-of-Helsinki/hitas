@@ -94,7 +94,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     ApartmentSale.objects.only(
                         "id",
                         "purchase_date",
-                    ).order_by("purchase_date"),
+                    ),
                 ),
             ).get(uuid=owner_uuid)
         except Owner.DoesNotExist as error:

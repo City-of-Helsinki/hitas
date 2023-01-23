@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterModelOptions(
             name="apartmentsale",
             options={
-                "ordering": ["purchase_date"],
+                "ordering": ["-purchase_date"],
                 "verbose_name": "Apartment sale",
                 "verbose_name_plural": "Apartment sales",
             },

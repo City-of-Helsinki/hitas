@@ -124,7 +124,11 @@ class Apartment(ExternalHitasModel):
         no_sales = len(sales) < 1
 
         no_first_purchase_or_in_the_future = self.first_purchase_date is None or self.first_purchase_date > today
-        no_first_sale_or_in_the_future = no_sales or sales[0].purchase_date > today
+        no_first_sale_or_in_the_future = (
+            no_sales
+            # Sort the sales to be sure we select the first sale in case prefetch cache has some other sorting
+            or sorted(sales, key=lambda sale: sale.purchase_date)[0].purchase_date > today
+        )
 
         return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
 
