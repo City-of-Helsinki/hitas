@@ -128,16 +128,13 @@ def run(
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
     if anonymize:
-        print("Creating anonymized data...")
-        print()
+        print("Creating anonymized data...\n")
         anonymize_data()
     else:
-        print("Creating *REAL* non-anonymized data...")
-        print()
+        print("Creating *REAL* non-anonymized data...\n")
 
     if truncate or truncate_only:
-        print("Removing existing data...")
-        print()
+        print("Removing existing data...\n")
         do_truncate()
 
     if truncate_only:
@@ -156,8 +153,7 @@ def run(
 
     with engine.connect() as connection:
         with connection.begin():
-            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.")
-            print()
+            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.\n")
 
             # Codebooks by id
             codebooks_by_id = read_codebooks(connection)
@@ -212,12 +208,9 @@ def run(
                 len(hc.real_estates) for hc in converted_data.created_housing_companies_by_oracle_id.values()
             )
 
-            print(f"Loaded {total_real_estates} real estates.")
-            print()
-            print(f"Loaded {total_real_estates} buildings.")
-            print()
-            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.")
-            print()
+            print(f"Loaded {total_real_estates} real estates.\n")
+            print(f"Loaded {total_real_estates} buildings.\n")
+            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.\n")
 
             # Apartment improvements
             create_apartment_improvements(connection, converted_data)
@@ -322,8 +315,7 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
     with django_connection.cursor() as cursor:
         cursor.execute("ALTER SEQUENCE hitas_housingcompany_id_seq RESTART WITH %s", [max_id + 1])
 
-    print(f"Loaded {len(housing_companies_by_id)} housing companies.")
-    print()
+    print(f"Loaded {len(housing_companies_by_id)} housing companies.\n")
 
     return housing_companies_by_id
 
@@ -399,8 +391,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
     if bulk_mpi:
         HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {count} housing company improvements.")
-    print()
+    print(f"Loaded {count} housing company improvements.\n")
 
 
 def create_real_estates_and_buildings(
@@ -582,8 +573,7 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
     if bulk_mpi:
         ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {count} apartment improvements.")
-    print()
+    print(f"Loaded {count} apartment improvements.\n")
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
@@ -643,8 +633,7 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         Owner.objects.bulk_create(bulk_owners)
         Ownership.objects.bulk_create(bulk_ownerships)
 
-    print(f"Loaded {count} owners.")
-    print()
+    print(f"Loaded {count} owners.\n")
 
 
 def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
@@ -684,8 +673,7 @@ def create_property_managers(connection: Connection) -> Dict[str, PropertyManage
 
         property_managers_by_id[pm[property_managers.c.id]] = new
 
-    print(f"Loaded {len(property_managers_by_id)} property managers.")
-    print()
+    print(f"Loaded {len(property_managers_by_id)} property managers.\n")
 
     return property_managers_by_id
 
@@ -712,8 +700,7 @@ def create_users(connection: Connection) -> Dict[str, Dict[str, get_user_model()
 
         users_by_id[user["username"]] = created_user
 
-    print(f"Loaded {len(users_by_id)} users.")
-    print()
+    print(f"Loaded {len(users_by_id)} users.\n")
 
     return users_by_id
 
@@ -751,8 +738,7 @@ def read_codebooks(connection: Connection) -> Dict[str, List[LegacyRow]]:
             new_codes.append(code)
             total_codes += 1
 
-    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.")
-    print()
+    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.\n")
 
     return codebooks_by_id
 
