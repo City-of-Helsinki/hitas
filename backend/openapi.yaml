@@ -5040,6 +5040,7 @@ components:
         - confirmed_at
         - calculation_date
         - maximum_price
+        - maximum_price_per_square
         - index
         - new_hitas
         - created_at
@@ -5055,6 +5056,11 @@ components:
           type: number
           minimum: 0
           example: 223558.87
+        maximum_price_per_square:
+          description: The maximum price per square meter for this apartment.
+          type: number
+          minimum: 0
+          example: 7451.96
         created_at:
           description: The timestamp when this maximum price calculation was done.
           type: string
