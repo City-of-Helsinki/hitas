@@ -1,6 +1,7 @@
 import React from "react";
 
 import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
+import {Updater} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useGetOwnersQuery} from "../../app/services";
@@ -8,7 +9,15 @@ import {IOwner, IOwnership} from "../models";
 import {dotted, formatOwner} from "../utils";
 import {FormInputField} from "./index";
 
-const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) => {
+const OwnershipsList = ({
+    formOwnershipsList,
+    setFormOwnershipsList,
+    noOwnersError = false,
+}: {
+    formOwnershipsList: (IOwnership & {key: string})[];
+    setFormOwnershipsList: Updater<(IOwnership & {key: string})[]>;
+    noOwnersError?: boolean;
+}) => {
     const error = {};
 
     // Ownerships
@@ -43,14 +52,14 @@ const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) 
     };
 
     return (
-        <>
+        <div>
             <ul className="ownerships-list">
                 {formOwnershipsList.length ? (
                     <>
                         <li>
                             <legend className="ownership-headings">
-                                <span>Omistaja</span>
-                                <span>Omistajuusprosentti</span>
+                                <span>Omistaja *</span>
+                                <span>Omistajuusprosentti *</span>
                             </legend>
                         </li>
                         {formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
@@ -74,6 +83,7 @@ const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) 
                                         formData={formOwnershipsList[index]}
                                         setterFunction={handleSetOwnershipLine(index, "owner.id")}
                                         error={error}
+                                        required
                                     />
                                 </div>
                                 <div className="percentage">
@@ -86,6 +96,7 @@ const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) 
                                         formData={formOwnershipsList[index]}
                                         setterFunction={handleSetOwnershipLine(index, "percentage")}
                                         error={error}
+                                        required
                                     />
                                 </div>
                                 <div className="icon--remove">
@@ -98,7 +109,14 @@ const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) 
                         ))}
                     </>
                 ) : (
-                    <div style={{textAlign: "center"}}>- Asunnolla ei ole omistajuuksia -</div>
+                    <div
+                        className={noOwnersError ? "error-text" : ""}
+                        style={{textAlign: "center"}}
+                    >
+                        <IconAlertCircleFill />
+                        Asunnolla ei ole omistajuuksia
+                        <IconAlertCircleFill />
+                    </div>
                 )}
                 {getOwnershipPercentageError(error) && (
                     <>
@@ -111,13 +129,13 @@ const OwnershipsList = ({apartment, formOwnershipsList, setFormOwnershipsList}) 
                 <Button
                     onClick={handleAddOwnershipLine}
                     iconLeft={<IconPlus />}
-                    variant="secondary"
+                    variant={formOwnershipsList.length > 0 ? "secondary" : "primary"}
                     theme="black"
                 >
                     Lisää omistajuus
                 </Button>
             </div>
-        </>
+        </div>
     );
 };
 

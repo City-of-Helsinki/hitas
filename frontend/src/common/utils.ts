@@ -57,7 +57,7 @@ function formatIndex(indexType: string) {
         case "construction_price_index":
             return "rakennuskustannusindeksi";
         case "surface_area_price_ceiling":
-            return "rajaneliöhinta";
+            return "rajaneliöhintaindeksi";
     }
 }
 
@@ -131,9 +131,27 @@ function validateSocialSecurityNumber(value: string): boolean {
     return checkDigits[Number(value.substring(0, 6) + idNumber) % 31] === checkDigit;
 }
 
+const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
+
 // Toast hook with easier Notification typing
-function hitasToast(message: string, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
+function hitasToast(message: string | JSX.Element, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
     toast(message, {...opts, className: type});
+}
+
+// Returns true if obj1 contains the same key/value pairs as obj2. Note that this is non-exclusive, so obj1 doesn't
+// have to be identical to obj2, as it can contain more data than only the ones from obj2.
+function doesAContainB(A: object, B: object): boolean {
+    const AProps = Object.getOwnPropertyNames(A);
+    const BProps = Object.getOwnPropertyNames(B);
+    if (AProps.length < BProps.length) {
+        return false;
+    }
+    for (const prop of BProps) {
+        if (!Object.prototype.hasOwnProperty.call(A, prop) || A[prop] !== B[prop]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 export {
@@ -146,4 +164,6 @@ export {
     validateBusinessId,
     validateSocialSecurityNumber,
     hitasToast,
+    today,
+    doesAContainB,
 };

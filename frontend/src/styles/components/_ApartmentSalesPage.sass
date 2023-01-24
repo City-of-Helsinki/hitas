@@ -13,21 +13,38 @@
     grid-template-columns: 55% 45%
     gap: 1em
     fieldset
+      position: relative
       background-color: $color-engel-medium-light
       padding: $spacing-s
       width: 100%
-      grid-row: 1
+      grid-column: 1
       .max-prices
-        padding-top: $spacing-s
         .row--buttons
           margin-bottom: 0
+          button
+            min-width: 300px
         .row--max-prices
           justify-content: space-between
         p > span
           font-weight: bold
-        .fieldset--max-prices__value span
-          font-weight: bold
-          font-size: $fontsize-body-xl
+        .fieldset--max-prices__value
+          span
+            font-weight: bold
+            font-size: $fontsize-body-xl
+          &.expired span
+            color: $color-black-40 !important
+            text-decoration: line-through
+        .error-text
+          margin: -1rem 0 0
+      &.ownerships-fieldset
+        grid-row: 1 / span 2
+        grid-column: 2
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include justify-content(space-between)
+        .error-text
+          text-align: center
+          margin-bottom: $spacing-s
     legend[class*="hds"]
       background-color: $color-engel-medium-light
       padding: $spacing-s
@@ -43,7 +60,7 @@
         svg
           position: absolute
           right: 1rem
-          top: 2.25rem
+          top: 2.5rem
           transform: translateY(2px)
       &--prompt
         flex-flow: column nowrap

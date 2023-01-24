@@ -63,8 +63,11 @@ ul, ol
   gap: 10px
 
 .error-text
-  color: var(--color-error)
+  color: var(--color-error) !important
 
 [class*="checkbox_hds-checkbox"]
   --background-unselected: white
   --background-selected: black
+
+[class*="notification_hds-notification--error"] span
+  font-weight: 700

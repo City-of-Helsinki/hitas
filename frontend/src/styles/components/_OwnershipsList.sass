@@ -1,0 +1,14 @@
+@use "../imports" as *
+
+.ownership
+  &-headings
+    font-weight: 700
+  &s-list > div
+    svg
+      display: none
+    &.error-text svg
+      display: inline-block
+      margin: 0 $spacing-s
+      vertical-align: middle
+  &-item label
+    display: none

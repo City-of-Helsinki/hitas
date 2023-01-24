@@ -29,7 +29,7 @@ const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}
                         theme="black"
                         iconLeft={<IconGlyphEuro />}
                     >
-                        Uusi kauppa
+                        Kauppatapahtuma
                     </Button>
                 </Link>
                 <Link to="sales-conditions">
