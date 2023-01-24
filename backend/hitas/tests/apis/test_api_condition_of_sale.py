@@ -1,5 +1,5 @@
 import uuid
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -706,6 +706,260 @@ def test__api__condition_of_sale__create__only_one_new_apartment(api_client: Hit
 
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
     assert len(conditions_of_sale) == 0
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__single(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create()
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+
+    # Additional ownership to add
+    owner_2: Owner = OwnerFactory.create()
+    other_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    other_ownership: Ownership = OwnershipFactory.create(owner=owner_2, apartment=other_apartment)
+
+    data = {
+        "additional_ownerships": [
+            other_ownership.uuid.hex,
+        ]
+    }
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    assert "conditions_of_sale" in response_1.json(), response_1.json()
+    assert len(response_1.json()["conditions_of_sale"]) == 1, response_1.json()["conditions_of_sale"]
+
+    assert len(ConditionOfSale.objects.all()) == 1
+    assert ConditionOfSale.objects.filter(new_ownership=other_ownership, old_ownership=old_ownership).exists()
+
+    url_2 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json()["contents"] == response_1.json()["conditions_of_sale"]
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__multiple(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create()
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+
+    # Additional ownerships to add
+    owner_2: Owner = OwnerFactory.create()
+    other_apartment_1: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    other_apartment_2: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    other_ownership_1: Ownership = OwnershipFactory.create(owner=owner_2, apartment=other_apartment_1)
+    other_ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, apartment=other_apartment_2)
+
+    data = {
+        "additional_ownerships": [
+            other_ownership_1.uuid.hex,
+            other_ownership_2.uuid.hex,
+        ]
+    }
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    assert "conditions_of_sale" in response_1.json(), response_1.json()
+    # Conditions of sale between the additional ownerships should not be created
+    assert len(response_1.json()["conditions_of_sale"]) == 2, response_1.json()["conditions_of_sale"]
+
+    assert len(ConditionOfSale.objects.all()) == 2
+    assert ConditionOfSale.objects.filter(new_ownership=other_ownership_1, old_ownership=old_ownership).exists()
+    assert ConditionOfSale.objects.filter(new_ownership=other_ownership_2, old_ownership=old_ownership).exists()
+
+    url_2 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json()["contents"] == response_1.json()["conditions_of_sale"]
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__not_new(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+
+    # Additional ownership to add
+    owner_2: Owner = OwnerFactory.create()
+    other_apartment: Apartment = ApartmentFactory.create()
+    other_ownership: Ownership = OwnershipFactory.create(owner=owner_2, apartment=other_apartment)
+
+    data = {
+        "additional_ownerships": [
+            other_ownership.uuid.hex,
+        ]
+    }
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    assert "conditions_of_sale" in response_1.json(), response_1.json()
+    assert len(response_1.json()["conditions_of_sale"]) == 0, response_1.json()["conditions_of_sale"]
+
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__also_own_new_apartment(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    old_apartment: Apartment = ApartmentFactory.create()
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=new_apartment)
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+
+    # Additional ownership to add
+    owner_2: Owner = OwnerFactory.create()
+    other_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    other_ownership: Ownership = OwnershipFactory.create(owner=owner_2, apartment=other_apartment)
+
+    data = {
+        "additional_ownerships": [
+            other_ownership.uuid.hex,
+        ]
+    }
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    assert "conditions_of_sale" in response_1.json(), response_1.json()
+    assert len(response_1.json()["conditions_of_sale"]) == 4, response_1.json()["conditions_of_sale"]
+
+    assert len(ConditionOfSale.objects.all()) == 4
+    assert ConditionOfSale.objects.filter(new_ownership=new_ownership, old_ownership=old_ownership).exists()
+    assert ConditionOfSale.objects.filter(new_ownership=new_ownership, old_ownership=other_ownership).exists()
+    assert ConditionOfSale.objects.filter(new_ownership=other_ownership, old_ownership=old_ownership).exists()
+    assert ConditionOfSale.objects.filter(new_ownership=other_ownership, old_ownership=new_ownership).exists()
+
+    url_2 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json()["contents"] == response_1.json()["conditions_of_sale"]
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__not_exist(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+
+    data = {
+        "additional_ownerships": [
+            uuid.uuid4().hex,
+        ]
+    }
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    assert "conditions_of_sale" in response_1.json(), response_1.json()
+    assert len(response_1.json()["conditions_of_sale"]) == 0, response_1.json()["conditions_of_sale"]
+
+    assert len(ConditionOfSale.objects.all()) == 0
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Some other string": InvalidInput(
+                invalid_data={"additional_ownerships": ["foo"]},
+                fields=[{"field": "additional_ownerships", "message": "Not a valid UUID hex."}],
+            ),
+            "Empty String.": InvalidInput(
+                invalid_data={"additional_ownerships": [""]},
+                fields=[{"field": "additional_ownerships", "message": "Not a valid UUID hex."}],
+            ),
+            "Some other type": InvalidInput(
+                invalid_data={"additional_ownerships": [1]},
+                fields=[{"field": "additional_ownerships", "message": "Not a valid UUID hex."}],
+            ),
+            "Not a list": InvalidInput(
+                invalid_data={"additional_ownerships": "foo"},
+                fields=[{"field": "additional_ownerships", "message": 'Expected a list of items but got type "str".'}],
+            ),
+            "Null value in list": InvalidInput(
+                invalid_data={"additional_ownerships": [None]},
+                fields=[{"field": "additional_ownerships.0", "message": "This field is mandatory and cannot be null."}],
+            ),
+            "Null value": InvalidInput(
+                invalid_data={"additional_ownerships": None},
+                fields=[{"field": "additional_ownerships", "message": "This field is mandatory and cannot be null."}],
+            ),
+        },
+    ),
+)
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__additional_ownerships__invalid(
+    api_client: HitasAPIClient,
+    invalid_data: dict[str, Any],
+    fields: list[dict[str, str]],
+):
+    owner: Owner = OwnerFactory.create()
+
+    url_1 = reverse(
+        "hitas:conditions-of-sale-list",
+        kwargs={
+            "owner_uuid": owner.uuid.hex,
+        },
+    )
+    response = api_client.post(url_1, data=invalid_data, format="json", openapi_validate_request=False)
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 # Update tests

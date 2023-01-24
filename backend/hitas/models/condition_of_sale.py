@@ -2,7 +2,6 @@ import datetime
 from typing import Optional
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -58,16 +57,11 @@ class ConditionOfSale(ExternalHitasModel):
     def fulfilled(self) -> Optional[datetime.datetime]:
         return self.deleted  # noqa
 
-    def save(self, keep_deleted=False, **kwargs) -> None:
-        self.clean()
-        super().save(keep_deleted=keep_deleted, **kwargs)
-
-    def clean(self) -> None:
-        if self.new_ownership.owner != self.old_ownership.owner:
-            raise ValidationError("Owners must be the same.")
-
     def __str__(self) -> str:
-        return f"{self.new_ownership.owner}: {self.new_ownership.apartment} -> {self.old_ownership.apartment}"
+        return (
+            f"{self.old_ownership.owner}: {self.old_ownership.apartment} "
+            f"-> {self.new_ownership.owner}: {self.new_ownership.apartment}"
+        )
 
 
 def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:

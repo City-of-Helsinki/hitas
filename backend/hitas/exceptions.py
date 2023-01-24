@@ -222,7 +222,7 @@ def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[
         current_name = field_name
 
         if subfield_name != api_settings.NON_FIELD_ERRORS_KEY:
-            current_name += "." + subfield_name
+            current_name += "." + str(subfield_name)
 
         if isinstance(suberror, list):
             retval.extend(_convert_field_errors_list(current_name, suberror))
@@ -248,6 +248,7 @@ def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, An
         "max_length",
         "max_decimal_places",
         "invalid_choice",
+        "not_a_list",
     ]:
         return {"field": field_name, "message": error["message"]}
     else:

@@ -2019,7 +2019,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object  # Empty request body
+              additionalProperties: false
+              $ref: '#/components/schemas/ConditionOfSaleCreate'
       responses:
         '201':
           description: Successfully fetched list of sales
@@ -6186,6 +6187,23 @@ components:
           readOnly: true
           format: date-time
           example: 1985-12-10T00:00:00+00:00
+
+    ConditionOfSaleCreate:
+      description: Create conditions of sale parameters
+      type: object
+      additionalProperties: false
+      properties:
+        additional_ownerships:
+          description: |-
+            List of additional ownerships to new apartments (belonging to some other owner),
+            for which new conditions of sale should be created for this owner's ownerships.
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            description: ID of an ownership
+            type: string
+            example: dc1072975bab4ba69f64814f021c6785
 
     ConditionOfSaleOwnership:
       description: Ownership relating to a condition of sale

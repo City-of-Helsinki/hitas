@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from enumfields import Enum
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -24,11 +24,14 @@ class HitasDecimalField(serializers.DecimalField):
 
 
 class UUIDField(serializers.Field):
-    def to_representation(self, obj):
+    def to_representation(self, obj: UUID) -> str:
         return obj.hex
 
-    def to_internal_value(self, data: str):
-        return super().to_internal_value(data=UUID(hex=str(data)))
+    def to_internal_value(self, data: str) -> UUID:
+        try:
+            return UUID(hex=str(data))
+        except ValueError as error:
+            raise ValidationError("Not a valid UUID hex.", code="invalid") from error
 
 
 class UUIDRelatedField(SlugRelatedField):
