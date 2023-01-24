@@ -163,6 +163,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
     def ownerships_with_apartment() -> QuerySet[Ownership]:
         return Ownership.objects.select_related("apartment").only(
             "id",
+            "uuid",
             "percentage",
             "apartment__id",
             "apartment__first_purchase_date",
