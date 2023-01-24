@@ -54,14 +54,3 @@ class OwnershipFactory(DjangoModelFactory):
     apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
     owner = factory.SubFactory("hitas.tests.factories.OwnerFactory")
     percentage = 100
-    start_date = None
-    end_date = None
-
-    @factory.post_generation
-    def conditions_of_sale(self, create: bool, extracted: Optional[Iterable[Ownership]], **kwargs: Any) -> None:
-        if not create:
-            return
-
-        if extracted:
-            for ownership in extracted:
-                ConditionOfSaleFactory.create(new_ownership=self, old_ownership=ownership, **kwargs)

@@ -565,8 +565,6 @@ export interface IOwner {
 export interface IOwnership {
     owner: IOwner;
     percentage: number;
-    start_date?: string | null;
-    end_date?: string | null;
 }
 
 // Requests / Responses

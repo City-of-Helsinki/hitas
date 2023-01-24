@@ -1,6 +1,5 @@
-import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Iterable, TypedDict, Union
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -51,8 +50,6 @@ class Ownership(HitasModel):
         ],
         editable=False,
     )
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
 
     class Meta:
         verbose_name = _("Ownership")
@@ -70,12 +67,7 @@ class Ownership(HitasModel):
         return f"{self.owner}, {self.apartment}"
 
 
-class _OwnershipLike(TypedDict, total=False):
-    start_date: Optional[datetime.date]
-    end_date: Optional[datetime.date]
-
-
-class OwnershipLike(_OwnershipLike):
+class OwnershipLike(TypedDict):
     percentage: Decimal
     owner: "Owner"
 

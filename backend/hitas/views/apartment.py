@@ -768,8 +768,6 @@ class ApartmentViewSet(HitasModelViewSet):
                         "id",
                         "apartment_id",
                         "percentage",
-                        "start_date",
-                        "end_date",
                         "owner__uuid",
                         "owner__name",
                         "owner__identifier",
