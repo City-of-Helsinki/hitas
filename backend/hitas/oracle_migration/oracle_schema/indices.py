@@ -191,7 +191,7 @@ apartment_construction_price_indices = Table(
     Column("C_POISTOKOODI", String(16), nullable=False),  # Always 'HITRAKHUONE'
     Column(
         "C_POISTOPROS", String(12), key="depreciation_percentage", nullable=False
-    ),  # Always '0000', '0001', '0002' == 0%, 2.5%, 10%
+    ),  # Always '000', '001', '002' == 0%, 2.5%, 10%
     Column("C_POISTOAIKA", HitasDuration, key="depreciation_period", nullable=False),
     Column("C_HUOPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),
@@ -281,7 +281,7 @@ apartment_market_price_indices = Table(
     Column("C_VALMPVM", HitasYearMonth, key="completion_date", nullable=False),
     Column("C_POISTOKOODI", String(16), nullable=False),  # Always 'HITMHRAJAT'
     Column("C_POISTOVUODET", String(12), nullable=False),  # Always '000' or '002'
-    Column("C_OMAVASTUU", String(12), nullable=False),  # Always '000' or '004'.
+    Column("C_OMAVASTUU", String(12), key="excess", nullable=False),  # Always '000' or '004'.
     Column("C_POISTOAIKA", HitasDuration, key="depreciation_period", nullable=False),
     Column("C_HUOPAR", String(100), key="name", nullable=False),
     Column("N_HARVO", Integer, key="value", nullable=False),

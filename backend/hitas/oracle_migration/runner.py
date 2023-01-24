@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
 from typing import Callable, Dict, List, TypeVar
 
@@ -26,6 +27,7 @@ from hitas.models import (
     BuildingType,
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
+    DepreciationPercentage,
     Developer,
     FinancingMethod,
     HitasPostalCode,
@@ -74,6 +76,7 @@ from hitas.oracle_migration.utils import (
     turn_off_auto_now,
     value_to_depreciation_percentage,
 )
+from hitas.utils import monthify
 
 
 @dataclass
@@ -498,75 +501,145 @@ def create_apartments(
     return apartments_by_id
 
 
-def create_apartment_improvements(connection: Connection, converted_data: ConvertedData) -> None:
+def create_apartment_improvements(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
+    """
+    Create improvements for apartments from the latest maximum price calculation that has any improvements
+    Detect improvements that are 'Additional work during construction' and move their values to the Apartment model
+    """
+
+    def get_latest_improvements(index_table, improvements_table, apartment_oracle_id):
+        # Get all calculations that have improvements
+        improvements_list = list(
+            connection.execute(
+                select(index_table, improvements_table)
+                .join(
+                    index_table,
+                    (improvements_table.c.max_price_index_id == index_table.c.id),
+                )
+                .where(index_table.c.apartment_id == apartment_oracle_id and improvements_table.c.value > 0)
+                .order_by(desc(index_table.c.calculation_date), desc(index_table.c.id))
+            )
+        )
+
+        if not improvements_list:
+            return []
+
+        # Only include improvements from the latest max price calculation.
+        # Improvements are ignored if they don't have any original value.
+        return [
+            i
+            for i in improvements_list
+            if i.max_price_index_id == improvements_list[0].max_price_index_id and i.value > 0
+        ]
+
+    def is_date_within_one_month(date1: date, date2: date):
+        return abs(date1 - date2).days <= 31
 
     count = 0
     bulk_cpi = []
     bulk_mpi = []
 
     for apartment_oracle_id, v in converted_data.apartments_by_oracle_id.items():
-        #
-        # Construction price index calculations
-        #
-        construction_price_index = connection.execute(
-            select(construction_price_indices)
-            .where(construction_price_indices.c.apartment_id == apartment_oracle_id)
-            .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
-        ).first()
+        # awdc = Additional Work During Construction
+        cpi_awdc = {"improvements": [], "date": None}
+        mpi_awdc = {"improvements": [], "date": None}
 
-        if construction_price_index:
-            cpi_improvements = connection.execute(
-                select(apartment_construction_price_indices).where(
-                    apartment_construction_price_indices.c.max_price_index_id == construction_price_index.id
-                )
-            ).fetchall()
+        #
+        # Construction price index improvements
+        #
 
-            for cpi_improvement in cpi_improvements:
-                new = ApartmentConstructionPriceImprovement(
-                    apartment=v,
-                    name=cpi_improvement["name"],
-                    completion_date=cpi_improvement["completion_date"],
-                    value=cpi_improvement["value"],
-                    depreciation_percentage=value_to_depreciation_percentage(
-                        cpi_improvement["depreciation_percentage"]
-                    ),
-                )
-                bulk_cpi.append(new)
-                count += 1
+        cpi_improvements = get_latest_improvements(
+            construction_price_indices, apartment_construction_price_indices, apartment_oracle_id
+        )
+        for cpi_improvement in cpi_improvements:
+            new = ApartmentConstructionPriceImprovement(
+                apartment=v,
+                name=cpi_improvement["name"],
+                completion_date=cpi_improvement["completion_date"],
+                value=cpi_improvement["value"],
+                depreciation_percentage=value_to_depreciation_percentage(cpi_improvement["depreciation_percentage"]),
+            )
+
+            # Check if CPI improvement value should be moved to apartment.additional_work_during_construction instead
+            if new.depreciation_percentage == DepreciationPercentage.ZERO and is_date_within_one_month(
+                new.completion_date, monthify(v.completion_date)
+            ):
+                cpi_awdc["improvements"].append(new)
+                cpi_awdc["date"] = cpi_improvement.calculation_date
+                continue
+
+            bulk_cpi.append(new)
+            count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
             bulk_cpi = []
 
         #
-        # Market price index calculations
+        # Market price index improvements
         #
-        market_price_index = connection.execute(
-            select(market_price_indices)
-            .where(market_price_indices.c.apartment_id == apartment_oracle_id)
-            .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
-        ).first()
 
-        if market_price_index:
-            mpi_improvements = connection.execute(
-                select(apartment_market_price_indices).where(
-                    apartment_market_price_indices.c.max_price_index_id == market_price_index.id
-                )
-            ).fetchall()
+        mpi_improvements = get_latest_improvements(
+            market_price_indices, apartment_market_price_indices, apartment_oracle_id
+        )
+        for mpi_improvement in mpi_improvements:
+            new = ApartmentMarketPriceImprovement(
+                apartment=v,
+                name=mpi_improvement["name"],
+                completion_date=mpi_improvement["completion_date"],
+                value=mpi_improvement["value"],
+            )
 
-            for mpi_improvement in mpi_improvements:
-                new = ApartmentMarketPriceImprovement(
-                    apartment=v,
-                    name=mpi_improvement["name"],
-                    completion_date=mpi_improvement["completion_date"],
-                    value=mpi_improvement["value"],
-                )
-                bulk_mpi.append(new)
-                count += 1
+            # Check if improvement value should be moved to apartment.additional_work_during_construction instead
+            if mpi_improvement["excess"] == "000" and is_date_within_one_month(
+                new.completion_date, monthify(v.completion_date)
+            ):
+                mpi_awdc["improvements"].append(new)
+                mpi_awdc["date"] = mpi_improvement.calculation_date
+                continue
 
+            bulk_mpi.append(new)
+            count += 1
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
             bulk_mpi = []
+
+        #
+        # Additional work during construction improvements
+        #
+
+        # One index improvements may contain the same improvements, but they are split into multiple separate
+        # improvements, so we need to compare the sums of both indices and if they match the sum value can be moved.
+        sum_cpi = sum(i.value for i in cpi_awdc["improvements"])
+        sum_mpi = sum(i.value for i in mpi_awdc["improvements"])
+        awdc = 0
+
+        if sum_cpi == sum_mpi or sum_cpi == 0 or sum_mpi == 0:
+            # CPI and MPI sums match, or one index is missing is completely.
+            awdc = max(sum_cpi, sum_mpi)
+        elif cpi_awdc["date"] != mpi_awdc["date"]:
+            # Mismatch on index improvement sums, use the latest calculation instead as its most up to date.
+            if cpi_awdc["date"] > mpi_awdc["date"]:
+                awdc = sum_cpi
+            else:
+                awdc = sum_mpi
+        else:
+            # Unable to convert improvements automatically.
+            # Print out and add them as normal improvements to be handled manually later.
+            bulk_cpi.extend(cpi_awdc["improvements"])
+            bulk_mpi.extend(mpi_awdc["improvements"])
+            print(
+                f"""
+Unhandled 'Additional work during construction' improvement, adding it as a regular improvement:
+{v.housing_company.id}, {v.housing_company.display_name}
+{apartment_oracle_id}, {v.address}, Calculation: {cpi_awdc['date']}
+RKI, {sum_cpi} €, {[str(i) for i in cpi_awdc['improvements']]}
+MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
+                """
+            )
+
+        v.additional_work_during_construction = v.additional_work_during_construction + awdc
+        v.save()
 
     if bulk_cpi:
         ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
@@ -591,6 +664,10 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
     for ownership in connection.execute(
         select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
     ).fetchall():
+        # Skip importing ownership if the apartment has not been imported
+        if not converted_data.apartments_by_oracle_id.get(ownership["apartment_id"]):
+            continue
+
         skip_append = False
         new_owner = Owner()
         new_owner.name = ownership["name"]
