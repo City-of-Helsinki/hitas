@@ -4,6 +4,7 @@ from hitas.models.apartment import (
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
     ApartmentState,
+    DepreciationPercentage,
 )
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.building import Building

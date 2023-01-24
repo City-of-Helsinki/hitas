@@ -47,3 +47,6 @@ class HitasImprovement(HitasModel):
     class Meta:
         abstract = True
         ordering = ["completion_date", "id"]
+
+    def __str__(self):
+        return f"{self.name} ({self.value} €)"
