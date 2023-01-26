@@ -13,7 +13,7 @@ import hitas.models.condition_of_sale
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("hitas", "0051_ownership_uuid"),
+        ("hitas", "0050_change_apartment_sale_statistics_field_name"),
     ]
 
     operations = [

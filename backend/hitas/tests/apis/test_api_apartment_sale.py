@@ -62,7 +62,6 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
             "id": sale.uuid.hex,
             "ownerships": [
                 {
-                    "id": ownership.uuid.hex,
                     "owner": {
                         "id": ownership.owner.uuid.hex,
                         "name": ownership.owner.name,
@@ -115,7 +114,6 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
         "id": sale.uuid.hex,
         "ownerships": [
             {
-                "id": ownership.uuid.hex,
                 "owner": {
                     "id": ownership.owner.uuid.hex,
                     "name": ownership.owner.name,
@@ -655,7 +653,7 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
     owner_1.refresh_from_db()
     ownerships_post = list(owner_1.ownerships.all())
     assert len(ownerships_post) == 1
-    assert ownerships_post[0].uuid.hex == new_ownership.uuid.hex
+    assert ownerships_post[0].id == new_ownership.id
 
     condition_of_sale.refresh_from_db()
     assert condition_of_sale.fulfilled is not None
@@ -687,7 +685,6 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
         "id": sale.uuid.hex,
         "ownerships": [
             {
-                "id": ownership.uuid.hex,
                 "owner": {
                     "id": ownership.owner.uuid.hex,
                     "name": ownership.owner.name,

@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("hitas", "0052_add_condition_of_sale"),
+        ("hitas", "0051_add_condition_of_sale"),
     ]
 
     operations = [

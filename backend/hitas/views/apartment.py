@@ -766,7 +766,6 @@ class ApartmentViewSet(HitasModelViewSet):
                     "ownerships",
                     Ownership.objects.select_related("owner").only(
                         "id",
-                        "uuid",
                         "apartment_id",
                         "percentage",
                         "start_date",

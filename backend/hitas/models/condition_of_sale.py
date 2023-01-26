@@ -82,10 +82,8 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "grace_period",
             "deleted",
             "new_ownership__id",
-            "new_ownership__uuid",
             "new_ownership__percentage",
             "old_ownership__id",
-            "old_ownership__uuid",
             "old_ownership__percentage",
             # New ownership apartment
             "new_ownership__apartment__id",

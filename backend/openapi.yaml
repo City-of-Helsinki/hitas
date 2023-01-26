@@ -1959,20 +1959,12 @@ paths:
 
   # Condition of Sale
 
-  /api/v1/owners/{owner_id}/conditions-of-sale:
+  /api/v1/conditions-of-sale:
     get:
-      description: List all conditions of sale belonging to this owner
+      description: List all conditions of sale
       operationId: list-conditions-of-sale
       tags:
-        - Owners
-      parameters:
-        - name: owner_id
-          required: true
-          in: path
-          description: Owner ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
+        - Condition of Sale
       responses:
         '200':
           description: Successfully fetched list of conditions of sale
@@ -2003,18 +1995,10 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     post:
-      description: Create new conditions of sale for an owner
+      description: Create new conditions of sale for a household
       operationId: create-conditions-of-sale
       tags:
-        - Owners
-      parameters:
-        - name: owner_id
-          required: true
-          in: path
-          description: Owner ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
+        - Condition of Sale
       requestBody:
         content:
           application/json:
@@ -2023,7 +2007,7 @@ paths:
               $ref: '#/components/schemas/ConditionOfSaleCreate'
       responses:
         '201':
-          description: Successfully fetched list of sales
+          description: All conditions of sale for the owners in the given household, old and new
           content:
             application/json:
               schema:
@@ -2051,20 +2035,13 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/owners/{owner_id}/conditions-of-sale/{condition_of_sale_id}:
+  /api/v1/conditions-of-sale/{condition_of_sale_id}:
     get:
-      description: List a single condition of sale belonging to this owner
+      description: Read a single condition of sale
       operationId: read-conditions-of-sale
       tags:
-        - Owners
+        - Condition of Sale
       parameters:
-        - name: owner_id
-          required: true
-          in: path
-          description: Owner ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
         - name: condition_of_sale_id
           required: true
           in: path
@@ -2090,18 +2067,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     put:
-      description: Update a condition of sale for an owner
+      description: Update a condition of sale
       operationId: update-conditions-of-sale
       tags:
-        - Owners
+        - Condition of Sale
       parameters:
-        - name: owner_id
-          required: true
-          in: path
-          description: Owner ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
         - name: condition_of_sale_id
           required: true
           in: path
@@ -2137,18 +2107,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      description: Remove a condition of sale for an owner
+      description: Remove a condition of sale
       operationId: delete-condition-of-sale
       tags:
-        - Owners
+        - Condition of Sale
       parameters:
-        - name: owner_id
-          required: true
-          in: path
-          description: Owner ID
-          schema:
-            type: string
-            example: a3181b8fa60b47df8ccba0d554a913bb
         - name: condition_of_sale_id
           required: true
           in: path
@@ -5555,17 +5518,11 @@ components:
       type: object
       additionalProperties: false
       required:
-        - id
         - owner
         - percentage
         - start_date
         - end_date
       properties:
-        id:
-          description: ID of this ownership
-          type: string
-          readOnly: true
-          example: dc1072975bab4ba69f64814f021c6785
         owner:
           $ref: '#/components/schemas/ReadOnlyOwner'
         percentage:
@@ -6189,19 +6146,20 @@ components:
           example: 1985-12-10T00:00:00+00:00
 
     ConditionOfSaleCreate:
-      description: Create conditions of sale parameters
+      description: Create conditions of sale for a household
       type: object
       additionalProperties: false
       properties:
-        additional_ownerships:
+        household:
           description: |-
-            List of additional ownerships to new apartments (belonging to some other owner),
-            for which new conditions of sale should be created for this owner's ownerships.
+            List of owners belonging to the same household.
+            Conditions of sale will be created for each ownership
+            to a new apartment in this household.
           type: array
-          minItems: 0
+          minItems: 1
           uniqueItems: true
           items:
-            description: ID of an ownership
+            description: ID of an owner
             type: string
             example: dc1072975bab4ba69f64814f021c6785
 
@@ -6210,16 +6168,10 @@ components:
       type: object
       additionalProperties: false
       required:
-        - id
         - percentage
         - apartment
         - owner
       properties:
-        id:
-          description: ID of this ownership
-          type: string
-          readOnly: true
-          example: dc1072975bab4ba69f64814f021c6785
         percentage:
           description: Percentage that the owner owns of the apartment
           type: number

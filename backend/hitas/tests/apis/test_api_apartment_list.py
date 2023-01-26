@@ -58,7 +58,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "completion_date": str(ap1.completion_date),
             "ownerships": [
                 {
-                    "id": o1.uuid.hex,
                     "owner": {
                         "id": o1.owner.uuid.hex,
                         "name": o1.owner.name,
@@ -70,7 +69,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "end_date": None,
                 },
                 {
-                    "id": o2.uuid.hex,
                     "owner": {
                         "id": o2.owner.uuid.hex,
                         "name": o2.owner.name,

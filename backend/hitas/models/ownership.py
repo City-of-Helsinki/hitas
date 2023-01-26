@@ -8,14 +8,14 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
+from hitas.models._base import HitasModel, HitasModelDecimalField
 
 if TYPE_CHECKING:
     from hitas.models import Owner
 
 
 # 'Omistajuus'
-class Ownership(ExternalHitasModel):
+class Ownership(HitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     apartment = models.ForeignKey(

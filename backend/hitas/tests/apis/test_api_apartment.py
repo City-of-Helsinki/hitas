@@ -110,7 +110,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "completion_date": str(ap1.completion_date),
                 "ownerships": [
                     {
-                        "id": o1.uuid.hex,
                         "owner": {
                             "id": o1.owner.uuid.hex,
                             "name": o1.owner.name,
@@ -122,7 +121,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "end_date": None,
                     },
                     {
-                        "id": o2.uuid.hex,
                         "owner": {
                             "id": o2.owner.uuid.hex,
                             "name": o2.owner.name,
@@ -167,7 +165,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "grace_period": str(cos.grace_period.value),
                         "fulfilled": cos.fulfilled,
                         "new_ownership": {
-                            "id": o3.uuid.hex,
                             "percentage": float(o3.percentage),
                             "apartment": {
                                 "id": ap3.uuid.hex,
@@ -184,7 +181,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                             },
                         },
                         "old_ownership": {
-                            "id": o2.uuid.hex,
                             "percentage": float(o2.percentage),
                             "apartment": {
                                 "id": ap1.uuid.hex,
@@ -539,7 +535,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         },
         "ownerships": [
             {
-                "id": os1.uuid.hex,
                 "owner": {
                     "id": os1.owner.uuid.hex,
                     "name": os1.owner.name,
@@ -575,7 +570,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "grace_period": str(cos.grace_period.value),
                 "fulfilled": cos.fulfilled,
                 "new_ownership": {
-                    "id": os2.uuid.hex,
                     "percentage": float(os2.percentage),
                     "apartment": {
                         "id": ap2.uuid.hex,
@@ -592,7 +586,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     },
                 },
                 "old_ownership": {
-                    "id": os1.uuid.hex,
                     "percentage": float(os1.percentage),
                     "apartment": {
                         "id": ap1.uuid.hex,
