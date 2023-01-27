@@ -4,6 +4,7 @@ from typing import Optional
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
@@ -108,6 +109,25 @@ class Apartment(ExternalHitasModel):
     @property
     def address(self) -> str:
         return f"{self.street_address} {self.stair} {self.apartment_number}"
+
+    @property
+    def is_new(self) -> bool:
+        today = timezone.now().date()
+        if self.completion_date is None or self.completion_date > today:
+            return True
+
+        # Fetch all sales to take advantage of prefetch cache.
+        sales = list(self.sales.all())
+        no_sales = len(sales) < 1
+
+        no_first_purchase_or_in_the_future = self.first_purchase_date is None or self.first_purchase_date > today
+        no_first_sale_or_in_the_future = (
+            no_sales
+            # Sort the sales to be sure we select the first sale in case prefetch cache has some other sorting
+            or sorted(sales, key=lambda sale: sale.purchase_date)[0].purchase_date > today
+        )
+
+        return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
 
     class Meta:
         verbose_name = _("Apartment")

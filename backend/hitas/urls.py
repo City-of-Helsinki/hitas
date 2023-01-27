@@ -36,6 +36,7 @@ router.register(r"financing-methods", views.FinancingMethodViewSet, basename="fi
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
 router.register(r"developers", views.DeveloperViewSet, basename="developer")
 router.register(r"apartment-types", views.ApartmentTypeViewSet, basename="apartment-type")
+router.register(r"conditions-of-sale", views.ConditionOfSaleViewSet, basename="conditions-of-sale")
 
 # Nested routers
 housing_company_router = NestedSimpleRouter(router, r"housing-companies", lookup="housing_company")
@@ -43,14 +44,14 @@ housing_company_router = NestedSimpleRouter(router, r"housing-companies", lookup
 # /api/v1/housing-companies/{housing_company_id}/real-estates
 housing_company_router.register(r"real-estates", views.RealEstateViewSet, basename="real-estate")
 
-# /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings
-real_estate_router = NestedSimpleRouter(housing_company_router, r"real-estates", lookup="real_estate")
-real_estate_router.register(r"buildings", views.BuildingViewSet, basename="building")
-
 # /api/v1/housing-companies/{housing_company_id}/apartments
 housing_company_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
+
+real_estate_router = NestedSimpleRouter(housing_company_router, r"real-estates", lookup="real_estate")
 apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", lookup="apartment")
-apartment_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
+
+# /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings
+real_estate_router.register(r"buildings", views.BuildingViewSet, basename="building")
 
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
 apartment_router.register(r"maximum-prices", views.ApartmentMaximumPriceViewSet, basename="maximum-price")

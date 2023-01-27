@@ -2,9 +2,15 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, ApartmentSale, Owner, Ownership
+from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, OwnerFactory, OwnershipFactory
+from hitas.tests.factories import (
+    ApartmentFactory,
+    ApartmentSaleFactory,
+    ConditionOfSaleFactory,
+    OwnerFactory,
+    OwnershipFactory,
+)
 from hitas.views.apartment_sale import ApartmentSaleSerializer
 from hitas.views.ownership import OwnershipSerializer
 
@@ -543,6 +549,114 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create()
+    owner_1: Owner = OwnerFactory.create()
+    owner_2: Owner = OwnerFactory.create()
+    owner_3: Owner = OwnerFactory.create()
+    ownership_1: Ownership = OwnershipFactory.create(owner=owner_1, apartment=apartment, percentage=60.0)
+    ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, apartment=apartment, percentage=40.0)
+    ApartmentSaleFactory.create(apartment=apartment, ownerships=[ownership_1, ownership_2])
+
+    apartment_sales_pre = list(apartment.sales.all())
+    apartment_ownerships_pre = list(apartment.ownerships.all())
+    assert len(apartment_sales_pre) == 1
+    assert len(apartment_ownerships_pre) == 2
+    assert apartment_ownerships_pre[0].owner.uuid.hex == owner_1.uuid.hex
+    assert apartment_ownerships_pre[1].owner.uuid.hex == owner_2.uuid.hex
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner_3.uuid.hex,
+                },
+                "percentage": 100.0,
+                "start_date": None,
+                "end_date": None,
+            },
+        ],
+        "notification_date": "2023-02-01",
+        "purchase_date": "2023-02-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    apartment.refresh_from_db()
+    apartment_sales_post = list(apartment.sales.all())
+    apartment_ownerships_post = list(apartment.ownerships.all())
+    assert len(apartment_sales_post) == 2
+    assert len(apartment_ownerships_post) == 1
+    assert apartment_ownerships_post[0].owner.uuid.hex == owner_3.uuid.hex
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    owner_2: Owner = OwnerFactory.create()
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    old_apartment: Apartment = ApartmentFactory.create()
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=new_apartment)
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
+    condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create(
+        new_ownership=new_ownership,
+        old_ownership=old_ownership,
+    )
+
+    ownerships_pre = list(owner_1.ownerships.all())
+    assert len(ownerships_pre) == 2
+    assert condition_of_sale.fulfilled is None
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner_2.uuid.hex,
+                },
+                "percentage": 100.0,
+                "start_date": None,
+                "end_date": None,
+            },
+        ],
+        "notification_date": "2023-02-01",
+        "purchase_date": "2023-02-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.housing_company.uuid.hex,
+            "apartment_uuid": old_apartment.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    # Old ownership released, new one is maintained
+    owner_1.refresh_from_db()
+    ownerships_post = list(owner_1.ownerships.all())
+    assert len(ownerships_post) == 1
+    assert ownerships_post[0].id == new_ownership.id
+
+    condition_of_sale.refresh_from_db()
+    assert condition_of_sale.fulfilled is not None
 
 
 # Update tests
