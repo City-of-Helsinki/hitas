@@ -1,14 +1,12 @@
-import datetime
 import logging
 from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
-from typing import Callable, Dict, List, Optional, Type, TypeVar
+from typing import Callable, Dict, List, TypeVar
 
-import pytz
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
-from django.db import models
 from django.db.models import Max
 from safedelete import HARD_DELETE
 from sqlalchemy import create_engine, desc
@@ -29,13 +27,13 @@ from hitas.models import (
     BuildingType,
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
+    DepreciationPercentage,
     Developer,
     FinancingMethod,
     HitasPostalCode,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
     MaximumPriceIndex,
@@ -46,7 +44,6 @@ from hitas.models import (
     RealEstate,
     SurfaceAreaPriceCeiling,
 )
-from hitas.models.apartment import DepreciationPercentage
 from hitas.models.indices import AbstractIndex
 from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
@@ -70,9 +67,16 @@ from hitas.oracle_migration.oracle_schema import (
     real_estates,
     users,
 )
-from hitas.oracle_migration.types import str_to_year_month
-
-TZ = pytz.timezone("Europe/Helsinki")
+from hitas.oracle_migration.utils import (
+    combine_notes,
+    date_to_datetime,
+    format_building_type,
+    housing_company_state_from,
+    str_to_year_month,
+    turn_off_auto_now,
+    value_to_depreciation_percentage,
+)
+from hitas.utils import monthify
 
 
 @dataclass
@@ -112,20 +116,6 @@ class ConvertedData:
 BULK_INSERT_THRESHOLD = 1000
 
 
-def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> None:
-    for code in codes:
-        index = model_class()
-
-        index.value = float(code["value"])
-        index.month = str_to_year_month(code["code_id"])
-
-        # Skip indices with '0' values
-        if index.value == 0:
-            continue
-
-        index.save()
-
-
 def run(
     oracle_host: str,
     oracle_port: str,
@@ -136,22 +126,18 @@ def run(
     truncate: bool,
     truncate_only: bool,
 ) -> None:
-
     if debug:
         logging.basicConfig()
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
     if anonymize:
-        print("Creating anonymized data...")
-        print()
+        print("Creating anonymized data...\n")
         anonymize_data()
     else:
-        print("Creating *REAL* non-anonymized data...")
-        print()
+        print("Creating *REAL* non-anonymized data...\n")
 
     if truncate or truncate_only:
-        print("Removing existing data...")
-        print()
+        print("Removing existing data...\n")
         do_truncate()
 
     if truncate_only:
@@ -170,8 +156,7 @@ def run(
 
     with engine.connect() as connection:
         with connection.begin():
-            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.")
-            print()
+            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.\n")
 
             # Codebooks by id
             codebooks_by_id = read_codebooks(connection)
@@ -223,15 +208,12 @@ def run(
                 converted_data.apartments_by_oracle_id.update(created_apartments)
 
             total_real_estates = sum(
-                map(lambda hc: len(hc.real_estates), converted_data.created_housing_companies_by_oracle_id.values())
+                len(hc.real_estates) for hc in converted_data.created_housing_companies_by_oracle_id.values()
             )
 
-            print(f"Loaded {total_real_estates} real estates.")
-            print()
-            print(f"Loaded {total_real_estates} buildings.")
-            print()
-            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.")
-            print()
+            print(f"Loaded {total_real_estates} real estates.\n")
+            print(f"Loaded {total_real_estates} buildings.\n")
+            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.\n")
 
             # Apartment improvements
             create_apartment_improvements(connection, converted_data)
@@ -245,7 +227,50 @@ def run(
     MigrationDone.objects.create()
 
 
-def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> Dict[str, CreatedHousingCompany]:
+def do_truncate():
+    for model_class in [
+        Apartment,
+        ApartmentType,
+        Building,
+        RealEstate,
+        HousingCompany,
+        PropertyManager,
+        BuildingType,
+        Developer,
+        FinancingMethod,
+        Owner,
+        HitasPostalCode,
+    ]:
+        model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
+
+    for model_class in [
+        get_user_model(),
+        SurfaceAreaPriceCeiling,
+        ConstructionPriceIndex2005Equal100,
+        ConstructionPriceIndex,
+        MarketPriceIndex,
+        MarketPriceIndex2005Equal100,
+        ApartmentMaximumPriceCalculation,
+        MigrationDone,
+    ]:
+        model_class.objects.all().delete()
+
+
+def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> None:
+    for code in codes:
+        index = model_class()
+
+        index.value = float(code["value"])
+        index.month = str_to_year_month(code["code_id"])
+
+        # Skip indices with '0' values
+        if index.value == 0:
+            continue
+
+        index.save()
+
+
+def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> dict[int, CreatedHousingCompany]:
     housing_companies_by_id = {}
 
     for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
@@ -293,25 +318,17 @@ def create_housing_companies(connection: Connection, converted_data: ConvertedDa
     with django_connection.cursor() as cursor:
         cursor.execute("ALTER SEQUENCE hitas_housingcompany_id_seq RESTART WITH %s", [max_id + 1])
 
-    print(f"Loaded {len(housing_companies_by_id)} housing companies.")
-    print()
+    print(f"Loaded {len(housing_companies_by_id)} housing companies.\n")
 
     return housing_companies_by_id
 
 
-def create_housing_company_improvements(
-    connection: Connection, converted_data: ConvertedData
-) -> dict[int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]]:
-    created: dict[
-        int, tuple[list[HousingCompanyConstructionPriceImprovement], list[HousingCompanyMarketPriceImprovement]]
-    ] = {}
-
+def create_housing_company_improvements(connection: Connection, converted_data: ConvertedData):
+    count = 0
     bulk_cpi = []
     bulk_mpi = []
 
     for company_oracle_id, v in converted_data.created_housing_companies_by_oracle_id.items():
-        created[v.value.id] = ([], [])
-
         #
         # Construction price index
         #
@@ -336,7 +353,7 @@ def create_housing_company_improvements(
                     value=cpi_improvement["value"],
                 )
                 bulk_cpi.append(new)
-                created[v.value.id][0].append(new)
+                count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
@@ -366,7 +383,7 @@ def create_housing_company_improvements(
                     value=mpi_improvement["value"],
                 )
                 bulk_mpi.append(new)
-                created[v.value.id][1].append(new)
+                count += 1
 
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
@@ -377,10 +394,7 @@ def create_housing_company_improvements(
     if bulk_mpi:
         HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} housing company improvements.")
-    print()
-
-    return created
+    print(f"Loaded {count} housing company improvements.\n")
 
 
 def create_real_estates_and_buildings(
@@ -411,25 +425,18 @@ def create_real_estates_and_buildings(
     return created_real_estates
 
 
-def fetch_payments(connection: Connection, apartment_id: int):
-    retval = []
-    for payment in connection.execute(
-        select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
-    ).fetchall():
-        retval.append(
-            Payment(
-                date=payment.date,
-                percentage=Decimal(payment.percentage),
-            )
-        )
-    return retval
-
-
 def create_apartments(
     building: Building, connection: Connection, converted_data: ConvertedData
 ) -> Dict[int, Apartment]:
-    apartments_by_id = {}
+    def fetch_payments(connection: Connection, apartment_id: int):
+        retval = []
+        for payment in connection.execute(
+            select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
+        ).fetchall():
+            retval.append(Payment(date=payment.date, percentage=Decimal(payment.percentage)))
+        return retval
 
+    apartments_by_id = {}
     bulk_apartments = []
 
     for apartment in connection.execute(
@@ -494,101 +501,152 @@ def create_apartments(
     return apartments_by_id
 
 
-def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
-    match value:  # noqa: E999
-        case "000":
-            return DepreciationPercentage.ZERO
-        case "001":
-            return DepreciationPercentage.TWO_AND_HALF
-        case "002":
-            return DepreciationPercentage.TEN
-        case _:
-            raise ValueError(f"Invalid value '{value}'.")
+def create_apartment_improvements(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
+    """
+    Create improvements for apartments from the latest maximum price calculation that has any improvements
+    Detect improvements that are 'Additional work during construction' and move their values to the Apartment model
+    """
 
+    def get_latest_improvements(index_table, improvements_table, apartment_oracle_id):
+        # Get all calculations that have improvements
+        improvements_list = list(
+            connection.execute(
+                select(index_table, improvements_table)
+                .join(
+                    index_table,
+                    (improvements_table.c.max_price_index_id == index_table.c.id),
+                )
+                .where(index_table.c.apartment_id == apartment_oracle_id and improvements_table.c.value > 0)
+                .order_by(desc(index_table.c.calculation_date), desc(index_table.c.id))
+            )
+        )
 
-def create_apartment_improvements(
-    connection: Connection, converted_data: ConvertedData
-) -> dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]]:
-    created: dict[int, tuple[list[ApartmentConstructionPriceImprovement], list[ApartmentMarketPriceImprovement]]] = {}
+        if not improvements_list:
+            return []
 
+        # Only include improvements from the latest max price calculation.
+        # Improvements are ignored if they don't have any original value.
+        return [
+            i
+            for i in improvements_list
+            if i.max_price_index_id == improvements_list[0].max_price_index_id and i.value > 0
+        ]
+
+    def is_date_within_one_month(date1: date, date2: date):
+        return abs(date1 - date2).days <= 31
+
+    count = 0
     bulk_cpi = []
     bulk_mpi = []
 
     for apartment_oracle_id, v in converted_data.apartments_by_oracle_id.items():
-        created[v.id] = ([], [])
+        # awdc = Additional Work During Construction
+        cpi_awdc = {"improvements": [], "date": None}
+        mpi_awdc = {"improvements": [], "date": None}
 
         #
-        # Construction price index
+        # Construction price index improvements
         #
-        construction_price_index = connection.execute(
-            select(construction_price_indices)
-            .where(construction_price_indices.c.apartment_id == apartment_oracle_id)
-            .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
-        ).first()
 
-        if construction_price_index:
-            cpi_improvements = connection.execute(
-                select(apartment_construction_price_indices).where(
-                    apartment_construction_price_indices.c.max_price_index_id == construction_price_index.id
-                )
-            ).fetchall()
+        cpi_improvements = get_latest_improvements(
+            construction_price_indices, apartment_construction_price_indices, apartment_oracle_id
+        )
+        for cpi_improvement in cpi_improvements:
+            new = ApartmentConstructionPriceImprovement(
+                apartment=v,
+                name=cpi_improvement["name"],
+                completion_date=cpi_improvement["completion_date"],
+                value=cpi_improvement["value"],
+                depreciation_percentage=value_to_depreciation_percentage(cpi_improvement["depreciation_percentage"]),
+            )
 
-            for cpi_improvement in cpi_improvements:
-                new = ApartmentConstructionPriceImprovement(
-                    apartment=v,
-                    name=cpi_improvement["name"],
-                    completion_date=cpi_improvement["completion_date"],
-                    value=cpi_improvement["value"],
-                    depreciation_percentage=value_to_depreciation_percentage(
-                        cpi_improvement["depreciation_percentage"]
-                    ),
-                )
-                bulk_cpi.append(new)
-                created[v.id][0].append(new)
+            # Check if CPI improvement value should be moved to apartment.additional_work_during_construction instead
+            if new.depreciation_percentage == DepreciationPercentage.ZERO and is_date_within_one_month(
+                new.completion_date, monthify(v.completion_date)
+            ):
+                cpi_awdc["improvements"].append(new)
+                cpi_awdc["date"] = cpi_improvement.calculation_date
+                continue
+
+            bulk_cpi.append(new)
+            count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
             bulk_cpi = []
 
         #
-        # Market price index
+        # Market price index improvements
         #
-        market_price_index = connection.execute(
-            select(market_price_indices)
-            .where(market_price_indices.c.apartment_id == apartment_oracle_id)
-            .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
-        ).first()
 
-        if market_price_index:
-            mpi_improvements = connection.execute(
-                select(apartment_market_price_indices).where(
-                    apartment_market_price_indices.c.max_price_index_id == market_price_index.id
-                )
-            ).fetchall()
+        mpi_improvements = get_latest_improvements(
+            market_price_indices, apartment_market_price_indices, apartment_oracle_id
+        )
+        for mpi_improvement in mpi_improvements:
+            new = ApartmentMarketPriceImprovement(
+                apartment=v,
+                name=mpi_improvement["name"],
+                completion_date=mpi_improvement["completion_date"],
+                value=mpi_improvement["value"],
+            )
 
-            for mpi_improvement in mpi_improvements:
-                new = ApartmentMarketPriceImprovement(
-                    apartment=v,
-                    name=mpi_improvement["name"],
-                    completion_date=mpi_improvement["completion_date"],
-                    value=mpi_improvement["value"],
-                )
-                bulk_mpi.append(new)
-                created[v.id][1].append(new)
+            # Check if improvement value should be moved to apartment.additional_work_during_construction instead
+            if mpi_improvement["excess"] == "000" and is_date_within_one_month(
+                new.completion_date, monthify(v.completion_date)
+            ):
+                mpi_awdc["improvements"].append(new)
+                mpi_awdc["date"] = mpi_improvement.calculation_date
+                continue
 
+            bulk_mpi.append(new)
+            count += 1
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
             bulk_mpi = []
+
+        #
+        # Additional work during construction improvements
+        #
+
+        # One index improvements may contain the same improvements, but they are split into multiple separate
+        # improvements, so we need to compare the sums of both indices and if they match the sum value can be moved.
+        sum_cpi = sum(i.value for i in cpi_awdc["improvements"])
+        sum_mpi = sum(i.value for i in mpi_awdc["improvements"])
+        awdc = 0
+
+        if sum_cpi == sum_mpi or sum_cpi == 0 or sum_mpi == 0:
+            # CPI and MPI sums match, or one index is missing is completely.
+            awdc = max(sum_cpi, sum_mpi)
+        elif cpi_awdc["date"] != mpi_awdc["date"]:
+            # Mismatch on index improvement sums, use the latest calculation instead as its most up to date.
+            if cpi_awdc["date"] > mpi_awdc["date"]:
+                awdc = sum_cpi
+            else:
+                awdc = sum_mpi
+        else:
+            # Unable to convert improvements automatically.
+            # Print out and add them as normal improvements to be handled manually later.
+            bulk_cpi.extend(cpi_awdc["improvements"])
+            bulk_mpi.extend(mpi_awdc["improvements"])
+            print(
+                f"""
+Unhandled 'Additional work during construction' improvement, adding it as a regular improvement:
+{v.housing_company.id}, {v.housing_company.display_name}
+{apartment_oracle_id}, {v.address}, Calculation: {cpi_awdc['date']}
+RKI, {sum_cpi} €, {[str(i) for i in cpi_awdc['improvements']]}
+MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
+                """
+            )
+
+        v.additional_work_during_construction = v.additional_work_during_construction + awdc
+        v.save()
 
     if bulk_cpi:
         ApartmentConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
     if bulk_mpi:
         ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {sum(map(lambda x: len(x[0]) + len(x[1]), created.values()))} apartment improvements.")
-    print()
-
-    return created
+    print(f"Loaded {count} apartment improvements.\n")
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
@@ -606,6 +664,10 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
     for ownership in connection.execute(
         select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
     ).fetchall():
+        # Skip importing ownership if the apartment has not been imported
+        if not converted_data.apartments_by_oracle_id.get(ownership["apartment_id"]):
+            continue
+
         skip_append = False
         new_owner = Owner()
         new_owner.name = ownership["name"]
@@ -648,12 +710,10 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         Owner.objects.bulk_create(bulk_owners)
         Ownership.objects.bulk_create(bulk_ownerships)
 
-    print(f"Loaded {count} owners.")
-    print()
+    print(f"Loaded {count} owners.\n")
 
 
 def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
-
     for mpc in (
         connection.execute(select(construction_price_indices)).fetchall()
         + connection.execute(select(market_price_indices)).fetchall()
@@ -690,15 +750,54 @@ def create_property_managers(connection: Connection) -> Dict[str, PropertyManage
 
         property_managers_by_id[pm[property_managers.c.id]] = new
 
-    print(f"Loaded {len(property_managers_by_id)} property managers.")
-    print()
+    print(f"Loaded {len(property_managers_by_id)} property managers.\n")
 
     return property_managers_by_id
 
 
-def read_codebooks(
-    connection: Connection,
-) -> Dict[str, List[LegacyRow]]:
+def create_users(connection: Connection) -> Dict[str, Dict[str, get_user_model()]]:
+    users_by_id = {}
+
+    #
+    # Fetch all enabled users
+    #
+    for user in connection.execute(select(users)).fetchall():  # noqa
+        splitted_name = user["name"].split(" ", maxsplit=1)
+        first_name, last_name = splitted_name[0].capitalize(), splitted_name[1].capitalize()
+
+        created_user = get_user_model().objects.create_user(
+            user["username"],
+            password=user["password"],
+            first_name=first_name,
+            last_name=last_name,
+            is_active=user["is_active"],
+            is_superuser=True,
+            is_staff=True,
+        )
+
+        users_by_id[user["username"]] = created_user
+
+    print(f"Loaded {len(users_by_id)} users.\n")
+
+    return users_by_id
+
+
+def create_unsaved_postal_codes(codes: List[LegacyRow]) -> Dict[str, HitasPostalCode]:
+    retval = {}
+
+    for code in codes:
+        postal_code = HitasPostalCode()
+
+        postal_code.value = code["code_id"]
+        postal_code.city = code["value"].capitalize()
+        postal_code.cost_area = hitas_cost_area(code["code_id"])
+
+        retval[postal_code.value] = postal_code
+
+    return retval
+
+
+def read_codebooks(connection: Connection) -> Dict[str, List[LegacyRow]]:
     codebooks_by_id = {}
     total_codes = 0
 
@@ -716,92 +815,9 @@ def read_codebooks(
             new_codes.append(code)
             total_codes += 1
 
-    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.")
-    print()
+    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.\n")
 
     return codebooks_by_id
-
-
-def create_users(
-    connection: Connection,
-) -> Dict[str, Dict[str, get_user_model()]]:
-    users_by_id = {}
-
-    #
-    # Fetch all enabled users
-    #
-
-    for user in connection.execute(select(users)).fetchall():  # noqa
-        splitted_name = user["name"].split(" ", maxsplit=1)
-        first_name, last_name = splitted_name[0].capitalize(), splitted_name[1].capitalize()
-
-        created_user = get_user_model().objects.create_user(
-            user["username"],
-            password=user["password"],
-            first_name=first_name,
-            last_name=last_name,
-            is_active=user["is_active"],
-            is_superuser=True,
-            is_staff=True,
-        )
-
-        users_by_id[user["username"]] = created_user
-
-    print(f"Loaded {len(users_by_id)} users.")
-    print()
-
-    return users_by_id
-
-
-def combine_notes(a: LegacyRow) -> str:
-    return "\n".join(
-        [note for note in [a["TEKSTI1"], a["TEKSTI2"], a["TEKSTI3"], a["TEKSTI4"], a["TEKSTI5"]] if note is not None]
-    )
-
-
-def format_building_type(bt: BuildingType) -> None:
-    bt.value = bt.value.capitalize()
-
-
-def housing_company_state_from(code: str) -> HousingCompanyState:
-    # These are hardcoded as the code number (C_KOODISTOID) and
-    # the name (C_NAME) are the only ones that can be used to
-    # identify these types
-    match code:
-        case "000":
-            return HousingCompanyState.NOT_READY
-        case "001":
-            return HousingCompanyState.LESS_THAN_30_YEARS
-        case "002":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
-        case "003":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_FREE
-        case "004":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION
-        case "005":
-            return HousingCompanyState.HALF_HITAS
-
-
-def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
-    if d is None:
-        return None
-
-    return TZ.localize(datetime.datetime.combine(d, datetime.datetime.min.time()))
-
-
-def create_unsaved_postal_codes(codes: List[LegacyRow]) -> Dict[str, HitasPostalCode]:
-    retval = {}
-
-    for code in codes:
-        postal_code = HitasPostalCode()
-
-        postal_code.value = code["code_id"]
-        postal_code.city = code["value"].capitalize()
-        postal_code.cost_area = hitas_cost_area(code["code_id"])
-
-        retval[postal_code.value] = postal_code
-
-    return retval
 
 
 T = TypeVar("T", bound=AbstractCode)
@@ -833,36 +849,3 @@ def create_codes(
         new.save()
 
     return retval
-
-
-def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
-    model._meta.get_field(field_name).auto_now = False
-
-
-def do_truncate():
-    for model_class in [
-        Apartment,
-        ApartmentType,
-        Building,
-        RealEstate,
-        HousingCompany,
-        PropertyManager,
-        BuildingType,
-        Developer,
-        FinancingMethod,
-        Owner,
-        HitasPostalCode,
-    ]:
-        model_class.objects.all_with_deleted().delete(force_policy=HARD_DELETE)
-
-    for model_class in [
-        get_user_model(),
-        SurfaceAreaPriceCeiling,
-        ConstructionPriceIndex2005Equal100,
-        ConstructionPriceIndex,
-        MarketPriceIndex,
-        MarketPriceIndex2005Equal100,
-        ApartmentMaximumPriceCalculation,
-        MigrationDone,
-    ]:
-        model_class.objects.all().delete()
