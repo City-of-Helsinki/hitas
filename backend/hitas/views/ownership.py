@@ -34,6 +34,4 @@ class OwnershipSerializer(serializers.ModelSerializer):
         fields = [
             "owner",
             "percentage",
-            "start_date",
-            "end_date",
         ]

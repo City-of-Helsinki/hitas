@@ -14876,9 +14876,7 @@
       "deleted_by_cascade": false,
       "apartment": 1,
       "owner": 1,
-      "percentage": "100.00",
-      "start_date": "2022-01-01",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14889,9 +14887,7 @@
       "deleted_by_cascade": false,
       "apartment": 2,
       "owner": 2,
-      "percentage": "100.00",
-      "start_date": "2010-12-03",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14902,9 +14898,7 @@
       "deleted_by_cascade": false,
       "apartment": 3,
       "owner": 3,
-      "percentage": "100.00",
-      "start_date": "2021-08-27",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14915,9 +14909,7 @@
       "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 4,
-      "percentage": "50.00",
-      "start_date": "2021-07-31",
-      "end_date": null
+      "percentage": "50.00"
     }
   },
   {
@@ -14928,9 +14920,7 @@
       "deleted_by_cascade": false,
       "apartment": 5,
       "owner": 5,
-      "percentage": "100.00",
-      "start_date": "2018-09-08",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14941,9 +14931,7 @@
       "deleted_by_cascade": false,
       "apartment": 6,
       "owner": 6,
-      "percentage": "100.00",
-      "start_date": "2010-05-24",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14954,9 +14942,7 @@
       "deleted_by_cascade": false,
       "apartment": 7,
       "owner": 7,
-      "percentage": "100.00",
-      "start_date": "2018-11-12",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14967,9 +14953,7 @@
       "deleted_by_cascade": false,
       "apartment": 8,
       "owner": 8,
-      "percentage": "100.00",
-      "start_date": "2016-08-13",
-      "end_date": null
+      "percentage": "100.00"
     }
   },
   {
@@ -14980,9 +14964,7 @@
       "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 9,
-      "percentage": "50.00",
-      "start_date": "2021-07-31",
-      "end_date": null
+      "percentage": "50.00"
     }
   },
   {

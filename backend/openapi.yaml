@@ -5520,8 +5520,6 @@ components:
       required:
         - owner
         - percentage
-        - start_date
-        - end_date
       properties:
         owner:
           $ref: '#/components/schemas/ReadOnlyOwner'
@@ -5531,18 +5529,6 @@ components:
           minimum: 0
           maximum: 100
           example: 100
-        start_date:
-          description: Date owner took ownership of the apartment
-          type: string
-          format: date
-          example: 2010-01-01
-          nullable: true
-        end_date:
-          description: Date owner released ownership of the apartment
-          type: string
-          format: date
-          example: null
-          nullable: true
 
     Owner:
       description: Owner information

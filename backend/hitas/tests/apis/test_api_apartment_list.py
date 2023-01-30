@@ -65,8 +65,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "email": o1.owner.email,
                     },
                     "percentage": float(o1.percentage),
-                    "start_date": str(o1.start_date) if o1.start_date else None,
-                    "end_date": None,
                 },
                 {
                     "owner": {
@@ -76,8 +74,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "email": o2.owner.email,
                     },
                     "percentage": float(o2.percentage),
-                    "start_date": str(o2.start_date) if o2.start_date else None,
-                    "end_date": None,
                 },
             ],
             "links": {

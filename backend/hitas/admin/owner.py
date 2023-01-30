@@ -19,6 +19,4 @@ class OwnershipAdmin(admin.ModelAdmin):
         "apartment",
         "owner",
         "percentage",
-        "start_date",
-        "end_date",
     ]

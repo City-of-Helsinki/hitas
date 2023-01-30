@@ -694,8 +694,6 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
         new.owner = new_owner
         new.percentage = ownership["percentage"]
-        new.start_date = None
-        new.end_date = None
 
         bulk_ownerships.append(new)
 

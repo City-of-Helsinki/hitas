@@ -117,8 +117,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                             "email": o1.owner.email,
                         },
                         "percentage": float(o1.percentage),
-                        "start_date": str(o1.start_date) if o1.start_date else None,
-                        "end_date": None,
                     },
                     {
                         "owner": {
@@ -128,8 +126,6 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                             "email": o2.owner.email,
                         },
                         "percentage": float(o2.percentage),
-                        "start_date": str(o2.start_date) if o2.start_date else None,
-                        "end_date": None,
                     },
                 ],
                 "links": {
@@ -542,8 +538,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "email": os1.owner.email,
                 },
                 "percentage": float(os1.percentage),
-                "start_date": str(os1.start_date) if os1.start_date else None,
-                "end_date": None,
             },
         ],
         "improvements": {
@@ -1037,14 +1031,10 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
             {
                 "owner": {"id": owner1.uuid.hex},
                 "percentage": 50,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
             {
                 "owner": {"id": owner2.uuid.hex},
                 "percentage": 50,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
         ],
         "improvements": {
@@ -1444,14 +1434,10 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                         "percentage": 100,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
                         "percentage": 50,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1469,14 +1455,10 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                         "percentage": 10,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
                         "percentage": 10,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1494,14 +1476,10 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                         "percentage": 100,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
                         "percentage": 0,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1519,14 +1497,10 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                         "percentage": 200,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
                         "percentage": -100,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1538,14 +1512,10 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                         "percentage": "foo",
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
                         "percentage": "baz",
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1560,20 +1530,14 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                     {
                         "owner": {"id": "foo"},
                         "percentage": 50,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": None},
                         "percentage": 30,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                     {
                         "owner": {"id": "27771d28e27145caa7efbd99d2e40601"},
                         "percentage": 20,
-                        "start_date": "2020-01-01",
-                        "end_date": None,
                     },
                 ]
             },
@@ -1988,42 +1952,30 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
             {
                 "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                 "percentage": 100,
-                "start_date": "2020-01-01",
-                "end_date": None,
             }
         ],
         [
             {
                 "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                 "percentage": 50,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
             {
                 "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
                 "percentage": 50,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
         ],
         [
             {
                 "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
                 "percentage": 33.33,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
             {
                 "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
                 "percentage": 33.33,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
             {
                 "owner": {"id": "2b44c90e8e0448a3b75399e66a220a1d"},
                 "percentage": 33.34,
-                "start_date": "2020-01-01",
-                "end_date": None,
             },
         ],
     ],
