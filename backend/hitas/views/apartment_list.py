@@ -1,9 +1,12 @@
 from typing import Optional
 
+from django.db import models
+from django.db.models import Case, Count, Prefetch, Q, When
+from django_filters.rest_framework import BooleanFilter
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework import mixins, serializers, viewsets
 
-from hitas.models import Apartment
+from hitas.models import Apartment, ConditionOfSale, Ownership
 from hitas.models.apartment import ApartmentState
 from hitas.views.apartment import ApartmentHitasAddressSerializer, create_links
 from hitas.views.ownership import OwnershipSerializer
@@ -28,10 +31,18 @@ class ApartmentFilterSet(HitasFilterSet):
     owner_identifier = HitasCharFilter(
         field_name="ownerships__owner__identifier", lookup_expr="icontains", max_length=11
     )
+    sales_condition = BooleanFilter()
 
     class Meta:
         model = Apartment
-        fields = ["housing_company_name", "street_address", "postal_code", "owner_name", "owner_identifier"]
+        fields = [
+            "housing_company_name",
+            "street_address",
+            "postal_code",
+            "owner_name",
+            "owner_identifier",
+            "sales_condition",
+        ]
 
 
 class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
@@ -70,7 +81,20 @@ class ApartmentListViewSet(HitasModelMixin, mixins.ListModelMixin, viewsets.Gene
 
     def get_list_queryset(self):
         return (
-            Apartment.objects.prefetch_related("ownerships", "ownerships__owner")
+            Apartment.objects.prefetch_related(
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.select_related("owner").all(),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_new",
+                    ConditionOfSale.objects.all(),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_old",
+                    ConditionOfSale.objects.all(),
+                ),
+            )
             .select_related(
                 "building",
                 "building__real_estate",
@@ -78,22 +102,17 @@ class ApartmentListViewSet(HitasModelMixin, mixins.ListModelMixin, viewsets.Gene
                 "building__real_estate__housing_company",
                 "building__real_estate__housing_company__postal_code",
             )
-            .only(
-                "uuid",
-                "state",
-                "surface_area",
-                "street_address",
-                "apartment_number",
-                "floor",
-                "stair",
-                "completion_date",
-                "building__uuid",
-                "building__real_estate__uuid",
-                "building__real_estate__housing_company__uuid",
-                "apartment_type__value",
-                "building__real_estate__housing_company__display_name",
-                "building__real_estate__housing_company__postal_code__value",
-                "building__real_estate__housing_company__postal_code__city",
+            .alias(
+                number_of_conditions_of_sale=(
+                    Count("ownerships__conditions_of_sale_new") + Count("ownerships__conditions_of_sale_old")
+                ),
+            )
+            .annotate(
+                sales_condition=Case(
+                    When(condition=Q(number_of_conditions_of_sale__gt=0), then=True),
+                    default=False,
+                    output_field=models.BooleanField(),
+                ),
             )
             .order_by("apartment_number", "id")
         )

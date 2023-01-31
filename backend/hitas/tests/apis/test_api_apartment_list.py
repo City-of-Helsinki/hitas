@@ -8,7 +8,7 @@ from rest_framework import status
 from hitas.models import Apartment, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentFactory, HousingCompanyFactory, OwnershipFactory
+from hitas.tests.factories import ApartmentFactory, ConditionOfSaleFactory, HousingCompanyFactory, OwnershipFactory
 
 # List tests
 
@@ -162,19 +162,22 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 
 
 @pytest.mark.parametrize(
-    "selected_filter",
+    ["selected_filter", "number_of_apartments"],
     [
-        {"housing_company_name": "testdisplay"},
-        {"street_address": "test-str"},
-        {"postal_code": "99999"},
-        {"owner_name": "megatr"},
-        {"owner_name": "etimus pri"},
-        {"owner_identifier": "010199-123A"},
-        {"owner_identifier": "010199-123a"},
+        [{"housing_company_name": "testdisplay"}, 1],
+        [{"street_address": "test-str"}, 1],
+        [{"postal_code": "99999"}, 1],
+        [{"owner_name": "megatr"}, 1],
+        [{"owner_name": "etimus pri"}, 1],
+        [{"owner_identifier": "010199-123A"}, 1],
+        [{"owner_identifier": "010199-123a"}, 1],
+        [{"sales_condition": "True"}, 2],
+        [{"sales_condition": "true"}, 2],
+        [{"sales_condition": "1"}, 2],
     ],
 )
 @pytest.mark.django_db
-def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
+def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, number_of_apartments):
     ApartmentFactory.create(
         state=ApartmentState.FREE,
         building__real_estate__housing_company__uuid=UUID("38432c23-3a91-4dfb-9c2f-54d9f5ad9063"),
@@ -189,10 +192,14 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter):
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
+    old_apartment = ApartmentFactory.create(state=ApartmentState.FREE)
+    new_apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
+    ConditionOfSaleFactory(new_ownership__apartment=new_apartment, old_ownership__apartment=old_apartment)
+
     url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 1, response.json()
+    assert len(response.json()["contents"]) == number_of_apartments, response.json()
 
 
 @pytest.mark.parametrize(
