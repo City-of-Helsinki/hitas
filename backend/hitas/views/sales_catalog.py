@@ -53,7 +53,7 @@ class SalesCatalogDataSerializer(serializers.Serializer):
     confirmation_date = serializers.DateTimeField()
     total_surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_acquisition_price = serializers.DecimalField(max_digits=15, decimal_places=2)
-    realised_acquisition_price = serializers.DecimalField(max_digits=15, decimal_places=2)
+    acquisition_price_limit = serializers.DecimalField(max_digits=15, decimal_places=2)
 
 
 class SalesCatalogView(ViewSet):
@@ -81,7 +81,7 @@ class SalesCatalogView(ViewSet):
             extra_format={
                 "1": {},
                 "2": {"confirmation_date": "F"},
-                "3": {"realised_acquisition_price": "E"},
+                "3": {"acquisition_price_limit": "E"},
                 "4": {},
                 "final": {"total_surface_area": "F", "total_acquisition_price": "K"},
             },

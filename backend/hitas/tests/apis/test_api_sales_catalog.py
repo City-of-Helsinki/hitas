@@ -181,7 +181,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
             },
         ],
         "confirmation_date": "2021-08-06T00:00:00",
-        "realised_acquisition_price": 2060000,
+        "acquisition_price_limit": 2060000,
         "total_acquisition_price": 2055000,
         "total_surface_area": 560,
     }
@@ -364,13 +364,13 @@ def test__api__sales_catalog__missing_apartment_types(api_client: HitasAPIClient
                     },
                 ],
             ),
-            "Missing realised_acquisition_price": InvalidInput(
+            "Missing acquisition_price_limit": InvalidInput(
                 invalid_data={
                     "E3": None,
                 },
                 fields=[
                     {
-                        "field": "E3.realised_acquisition_price",
+                        "field": "E3.acquisition_price_limit",
                         "message": "This field is mandatory and cannot be null.",
                     },
                 ],

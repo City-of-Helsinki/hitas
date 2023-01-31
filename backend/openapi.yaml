@@ -6314,7 +6314,7 @@ components:
         - confirmation_date
         - total_surface_area
         - total_acquisition_price
-        - realised_acquisition_price
+        - acquisition_price_limit
       properties:
         apartments:
           description: Apartments read from the sheet
@@ -6334,8 +6334,8 @@ components:
           description: Total acquisition price of all apartments
           type: number
           example: 23456.64
-        realised_acquisition_price:
-          description: Realised acquisition price of all apartments
+        acquisition_price_limit:
+          description: Decided limit on the total acquisition price
           type: number
           example: 23500.00
 
