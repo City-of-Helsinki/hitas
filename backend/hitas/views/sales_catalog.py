@@ -5,6 +5,7 @@ from typing import TypedDict, Union
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -54,6 +55,15 @@ class SalesCatalogDataSerializer(serializers.Serializer):
     total_surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_acquisition_price = serializers.DecimalField(max_digits=15, decimal_places=2)
     acquisition_price_limit = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+    def validate(self, data):
+        if data["total_acquisition_price"] > data["acquisition_price_limit"]:
+            raise ValidationError(
+                detail={
+                    "total_acquisition_price": "'total_acquisition_price' is higher than 'acquisition_price_limit'.",
+                },
+            )
+        return data
 
 
 class SalesCatalogView(ViewSet):

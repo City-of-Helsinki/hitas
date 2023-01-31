@@ -450,6 +450,18 @@ def test__api__sales_catalog__missing_apartment_types(api_client: HitasAPIClient
                     },
                 ],
             ),
+            "total_acquisition_price over acquisition_price_limit": InvalidInput(
+                invalid_data={
+                    "E3": 1,  # acquisition_price_limit
+                    "K13": 2,  # total_acquisition_price
+                },
+                fields=[
+                    {
+                        "field": "K13.total_acquisition_price",
+                        "message": "'total_acquisition_price' is higher than 'acquisition_price_limit'.",
+                    },
+                ],
+            ),
         },
     )
 )
