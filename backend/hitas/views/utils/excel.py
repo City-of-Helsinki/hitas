@@ -77,6 +77,7 @@ def parse_sheet(
                          (e.g. column sums) so that the final row can be identified properly, and the extra data
                          can be included for 'extra_serializer'.
     :param extra_serializer: Serializer for extra data found from the sheet using 'extra_format'.
+                             When validating, the row data can be found from 'self.initial_data' under 'row_data_key'.
     :param row_data_key: Key to return the row data under in the final response.
     :param row_post_validators: Extra validators to run for all rows after they have been parsed.
                                 Errors should be added to the 'error'-dictionary passed to the validator.
@@ -120,6 +121,8 @@ def parse_sheet(
     for validator in row_post_validators:
         validator(row_data, row_format, errors)
 
+    extra_data[row_data_key] = row_data
+
     # Extra data validation
     extra = extra_serializer(data=extra_data)
     if not extra.is_valid():
@@ -131,7 +134,6 @@ def parse_sheet(
     if errors:
         raise ValidationError(errors)
 
-    extra_data[row_data_key] = row_data
     return extra_data
 
 
