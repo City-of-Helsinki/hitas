@@ -678,6 +678,62 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Sales catalog
+
+  /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/sales-catalog:
+
+    post:
+      description: Read new apartments from a sales catalog, but do not save them
+      operationId: read-sales-catalog
+      tags:
+        - Sales catalog
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: real_estate_id
+          required: true
+          in: path
+          description: Real estate ID
+          schema:
+            type: string
+            example: c86eaa399ce141d89d962d46bb81ab2b
+      requestBody:
+        required: true
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+          application/vnd.ms-excel:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Successfully read sales sheet
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/SalesCatalog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptableExcel'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeExcel'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Apartment
 
   /api/v1/housing-companies/{housing_company_id}/apartments:
@@ -6249,6 +6305,130 @@ components:
         - three_months
         - six_months
 
+    SalesCatalog:
+      description: Apartment sales catalog
+      type: object
+      additionalProperties: false
+      required:
+        - apartments
+        - confirmation_date
+        - total_surface_area
+        - total_acquisition_price
+        - realised_acquisition_price
+      properties:
+        apartments:
+          description: Apartments read from the sheet
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesCatalogApartment'
+        confirmation_date:
+          description: Sales catalog confirmation date
+          type: string
+          format: date-time
+          example: 2022-07-05T15:42:39.64745
+        total_surface_area:
+          description: Total surface area of all apartments
+          type: number
+          example: 2234.0
+        total_acquisition_price:
+          description: Total acquisition price of all apartments
+          type: number
+          example: 23456.64
+        realised_acquisition_price:
+          description: Realised acquisition price of all apartments
+          type: number
+          example: 23500.00
+
+    SalesCatalogApartment:
+      description: Apartment sale catalog apartment
+      type: object
+      additionalProperties: false
+      required:
+        - row
+        - stair
+        - floor
+        - apartment_number
+        - rooms
+        - apartment_type
+        - surface_area
+        - share_number_start
+        - share_number_end
+        - debt_free_purchase_price
+        - primary_loan_amount
+        - acquisition_price
+      properties:
+        row:
+          description: Excel row where the Apartment was parsed from, 1-indexed
+          type: integer
+          minimum: 1
+          example: 1
+        stair:
+          description: Apartment stair
+          type: string
+          maxLength: 16
+          example: A
+        floor:
+          description: Apartment floor
+          type: string
+          maxLength: 50
+          example: "5"
+        apartment_number:
+          description: Apartment number
+          type: number
+          minimum: 0
+          example: 14
+        rooms:
+          description: Number of rooms for this apartment
+          type: integer
+          minimum: 0
+          example: 2
+        apartment_type:
+          type: object
+          description: Apartment type
+          properties:
+            id:
+              description: Apartment type ID
+              type: string
+              example: dc1072975bab4ba69f64814f021c6785
+            value:
+              description: Apartment type code
+              type: string
+              example: h+k+s
+        surface_area:
+          description: Apartment's surface area
+          type: number
+          minimum: 0
+          example: 30.0
+        share_number_start:
+          description: First share number
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 100
+        share_number_end:
+          description: Last share number
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 150
+        debt_free_purchase_price:
+          description: The price paid to the seller when the house is bought
+          type: number
+          minimum: 0
+          example: 18281
+        primary_loan_amount:
+          description: Buyer's loan amount to the housing company
+          type: number
+          minimum: 0
+          nullable: true
+          example: 4208
+        acquisition_price:
+          description: Actual price paid by the buyer for the house
+          type: number
+          minimum: 0
+          nullable: true
+          example: 55430
+
     # Errors
 
     BadRequestError:
@@ -6570,6 +6750,24 @@ components:
             error: not_acceptable
             message: Only 'application/json' Content-Type is supported.
 
+    NotAcceptableExcel:
+      description: |-
+        Only 'application/vnd.ms-excel' or
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content-types are supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAcceptableError'
+          example:
+            status: 406
+            reason: Not Acceptable
+            error: not_acceptable
+            message: |-
+              Only 'application/vnd.ms-excel' or
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              content-types are supported.
+
     Conflict:
       description: The request could not be completed due to a conflict with the current state of the resource.
       content:
@@ -6593,6 +6791,24 @@ components:
             reason: Unsupported Media Type
             error: unsupported_media_type
             message: Only 'application/json' Content-Type is supported.
+
+    UnsupportedMediaTypeExcel:
+      description: |-
+        Only 'application/vnd.ms-excel' or
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content-types are supported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+          example:
+            status: 415
+            reason: Unsupported Media Type
+            error: unsupported_media_type
+            message: |-
+              Only 'application/vnd.ms-excel' or
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              content-types are supported.
 
     InternalServerError:
       description: Unexpected internal server error occurred

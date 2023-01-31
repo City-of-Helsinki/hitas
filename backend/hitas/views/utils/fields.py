@@ -1,8 +1,9 @@
 from uuid import UUID
 
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from enumfields import Enum
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty
 from rest_framework.relations import SlugRelatedField
 
@@ -94,3 +95,24 @@ class HitasEnumField(serializers.ChoiceField):
             raise serializers.ValidationError(
                 f"Unsupported value '{data}'. Supported values are: [{', '.join(supported_values)}]."
             ) from error
+
+
+class NumberOrRangeField(serializers.IntegerField):
+    """Parse number or a range of numbers into an integer (for a range, use the max value)."""
+
+    def to_internal_value(self, data) -> int:
+        if isinstance(data, str) and len(data) > self.MAX_STRING_LENGTH:
+            self.fail("max_string_length")
+
+        return self.parse_value(str(data))
+
+    def parse_value(self, value: str) -> int:
+        # If a range, get the max value
+        value = value.split("-")[-1]
+        # Check if a float, but allow e.g. '1.0' as an int, but not '1.2'
+        value = self.re_decimal.sub("", value)
+
+        try:
+            return int(value)
+        except (ValueError, TypeError) as error:
+            raise ValidationError(f"Value {value!r} is not an integer or an integer range") from error
