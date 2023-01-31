@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Any
+from typing import Any, NamedTuple
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -21,7 +21,8 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
-from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
+from hitas.models.condition_of_sale import GracePeriod
+from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
@@ -86,7 +87,11 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 
     ap3: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
     o3: Ownership = OwnershipFactory.create(apartment=ap3, owner=o2.owner, percentage=100)
-    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=o3, old_ownership=o2)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(
+        new_ownership=o3,
+        old_ownership=o2,
+        grace_period=GracePeriod.NOT_GIVEN,
+    )
 
     response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
 
@@ -194,6 +199,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         },
                     }
                 ],
+                "sell_by_date": str(ap3.completion_date),
             },
             {
                 "id": ap2.uuid.hex,
@@ -239,6 +245,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     },
                 },
                 "conditions_of_sale": [],
+                "sell_by_date": None,
             },
         ],
         "page": {
@@ -332,6 +339,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
                 },
             },
             "conditions_of_sale": [],
+            "sell_by_date": None,
         },
     ]
 
@@ -395,6 +403,118 @@ def test__api__apartment__list__fulfilled_over_x_months(api_client: HitasAPIClie
     assert response_1.json()["contents"][0]["conditions_of_sale"] == []
 
 
+class GracePeriodTestArgs(NamedTuple):
+    grace_period: GracePeriod
+    sell_by_date: datetime.date
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "No grace period": GracePeriodTestArgs(
+                grace_period=GracePeriod.NOT_GIVEN,
+                sell_by_date=datetime.date(2023, 1, 1),
+            ),
+            "Grace period of three months": GracePeriodTestArgs(
+                grace_period=GracePeriod.THREE_MONTHS,
+                sell_by_date=datetime.date(2023, 4, 1),
+            ),
+            "Grace period of six months": GracePeriodTestArgs(
+                grace_period=GracePeriod.SIX_MONTHS,
+                sell_by_date=datetime.date(2023, 7, 1),
+            ),
+        }
+    )
+)
+@pytest.mark.django_db
+def test__api__apartment__list__sell_by_date(api_client: HitasAPIClient, grace_period, sell_by_date):
+    old_apartment: Apartment = ApartmentFactory.create(apartment_number=1)
+    new_apartment: Apartment = ApartmentFactory.create(
+        first_purchase_date=None,
+        latest_purchase_date=None,
+        completion_date=datetime.date(2023, 1, 1),
+    )
+    old_ownerships: Ownership = OwnershipFactory.create(apartment=old_apartment)
+    new_ownership: Ownership = OwnershipFactory.create(apartment=new_apartment)
+
+    ConditionOfSaleFactory.create(
+        new_ownership=new_ownership,
+        old_ownership=old_ownerships,
+        grace_period=grace_period,
+    )
+
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.housing_company.uuid.hex,
+        },
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1
+    assert response.json()["contents"][0]["sell_by_date"] == str(sell_by_date)
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "No grace period, New apartment 1 is first": GracePeriodTestArgs(
+                grace_period=GracePeriod.NOT_GIVEN,
+                sell_by_date=datetime.date(2023, 1, 1),
+            ),
+            "Grace period of three months, New apartment 2 is first": GracePeriodTestArgs(
+                grace_period=GracePeriod.THREE_MONTHS,
+                sell_by_date=datetime.date(2023, 3, 1),
+            ),
+            "Grace period of six months, New apartment 2 is first": GracePeriodTestArgs(
+                grace_period=GracePeriod.SIX_MONTHS,
+                sell_by_date=datetime.date(2023, 3, 1),
+            ),
+        }
+    )
+)
+@pytest.mark.django_db
+def test__api__apartment__list__sell_by_date__multiple(api_client: HitasAPIClient, grace_period, sell_by_date):
+    old_apartment: Apartment = ApartmentFactory.create(apartment_number=1)
+    new_apartment_1: Apartment = ApartmentFactory.create(
+        first_purchase_date=None,
+        latest_purchase_date=None,
+        completion_date=datetime.date(2023, 1, 1),
+    )
+    new_apartment_2: Apartment = ApartmentFactory.create(
+        first_purchase_date=None,
+        latest_purchase_date=None,
+        completion_date=datetime.date(2023, 3, 1),
+    )
+    old_ownerships: Ownership = OwnershipFactory.create(apartment=old_apartment)
+    new_ownership_1: Ownership = OwnershipFactory.create(apartment=new_apartment_1)
+    new_ownership_2: Ownership = OwnershipFactory.create(apartment=new_apartment_2)
+
+    ConditionOfSaleFactory.create(
+        new_ownership=new_ownership_1,
+        old_ownership=old_ownerships,
+        grace_period=grace_period,
+    )
+    ConditionOfSaleFactory.create(
+        new_ownership=new_ownership_2,
+        old_ownership=old_ownerships,
+        grace_period=GracePeriod.NOT_GIVEN,
+    )
+
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.housing_company.uuid.hex,
+        },
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1
+    assert response.json()["contents"][0]["sell_by_date"] == str(sell_by_date)
+
+
 # Retrieve tests
 
 
@@ -423,7 +543,11 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
     ap2: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
     os2: Ownership = OwnershipFactory.create(apartment=ap2, owner=os1.owner, percentage=100)
-    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=os2, old_ownership=os1)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(
+        new_ownership=os2,
+        old_ownership=os1,
+        grace_period=GracePeriod.NOT_GIVEN,
+    )
 
     response = api_client.get(
         reverse(
@@ -597,6 +721,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 },
             }
         ],
+        "sell_by_date": str(ap2.completion_date),
     }
 
 
@@ -1214,6 +1339,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "surface_area": None,
             "type": None,
             "conditions_of_sale": [],
+            "sell_by_date": None,
         }
 
 
@@ -1999,6 +2125,7 @@ def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner
     del data["address"]["city"]
     del data["links"]
     del data["conditions_of_sale"]
+    del data["sell_by_date"]
     data["ownerships"] = owner_data
     data["building"] = {"id": b.uuid.hex}
 
@@ -2141,6 +2268,7 @@ def test__api__apartment__update__overlapping_shares(
     del data["address"]["city"]
     del data["links"]
     del data["conditions_of_sale"]
+    del data["sell_by_date"]
     data["ownerships"] = []
     data["building"] = {"id": building_1.uuid.hex}
     data["shares"]["start"] = 20
