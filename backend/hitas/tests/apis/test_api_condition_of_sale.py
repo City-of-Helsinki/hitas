@@ -805,15 +805,15 @@ def test__api__condition_of_sale__create__two_households(api_client: HitasAPICli
         {
             "Some other string": InvalidInput(
                 invalid_data={"household": ["foo"]},
-                fields=[{"field": "household", "message": "Not a valid UUID hex."}],
+                fields=[{"field": "household.0", "message": "Not a valid UUID hex."}],
             ),
             "Empty String.": InvalidInput(
                 invalid_data={"household": [""]},
-                fields=[{"field": "household", "message": "Not a valid UUID hex."}],
+                fields=[{"field": "household.0", "message": "Not a valid UUID hex."}],
             ),
             "Some other type": InvalidInput(
                 invalid_data={"household": [1]},
-                fields=[{"field": "household", "message": "Not a valid UUID hex."}],
+                fields=[{"field": "household.0", "message": "Not a valid UUID hex."}],
             ),
             "Not a list": InvalidInput(
                 invalid_data={"household": "foo"},
