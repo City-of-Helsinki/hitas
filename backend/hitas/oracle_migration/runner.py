@@ -98,6 +98,12 @@ class CreatedHousingCompany:
     real_estates: List[CreatedRealEstate] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class OwnerKey:
+    identifier: str
+    name: str
+
+
 @dataclass
 class ConvertedData:
     created_housing_companies_by_oracle_id: Dict[int, CreatedHousingCompany] = None
@@ -111,6 +117,8 @@ class ConvertedData:
     financing_methods_by_code_number: Dict[str, FinancingMethod] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
     apartment_types_by_code_numer: Dict[str, ApartmentType] = None
+
+    owners: Dict[OwnerKey, Owner] = None
 
 
 BULK_INSERT_THRESHOLD = 1000
@@ -219,7 +227,7 @@ def run(
             create_apartment_improvements(connection, converted_data)
 
             # Apartment owners
-            create_ownerships(connection, converted_data)
+            converted_data.owners = create_ownerships(connection, converted_data)
 
             # Apartment maximum price calculations
             create_apartment_max_price_calculations(connection, converted_data)
@@ -649,16 +657,32 @@ MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
     print(f"Loaded {count} apartment improvements.\n")
 
 
-def create_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
-    @dataclass(frozen=True)
-    class OwnershipKey:
-        identifier: str
-        name: str
+def create_ownerships(connection: Connection, converted_data: ConvertedData) -> dict[OwnerKey, Owner]:
+    def create_owner(ownership) -> Owner:
+        nonlocal count
+        new_owner = Owner(
+            name=ownership["name"],
+            identifier=ownership["social_security_number"],
+            valid_identifier=check_social_security_number(ownership["social_security_number"])
+            or check_business_id(ownership["social_security_number"]),
+        )
+
+        # Check if this owner has been already added.
+        # If it is, do not create a new one but combine them into one.
+        # Only do this when the owner has a valid social security number or a valid business id
+        if new_owner.valid_identifier:
+            key = OwnerKey(new_owner.identifier, new_owner.name)
+            if key in already_created:
+                return already_created[key]
+            already_created[key] = new_owner
+
+        bulk_owners.append(new_owner)
+        count += 1
+        return new_owner
 
     count = 0
     bulk_owners = []
     bulk_ownerships = []
-
     already_created = {}
 
     for ownership in connection.execute(
@@ -668,39 +692,19 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         if not converted_data.apartments_by_oracle_id.get(ownership["apartment_id"]):
             continue
 
-        skip_append = False
-        new_owner = Owner()
-        new_owner.name = ownership["name"]
-        new_owner.identifier = ownership["social_security_number"]
-        new_owner.valid_identifier = check_social_security_number(new_owner.identifier) or check_business_id(
-            new_owner.identifier
+        new_owner = create_owner(ownership)
+
+        new = Ownership(
+            apartment=converted_data.apartments_by_oracle_id[ownership["apartment_id"]],
+            owner=new_owner,
+            percentage=ownership["percentage"],
         )
-
-        # Check if this owner has been already added. If it is, do not create a new one but combine them into one.
-        # Only do this when the owner has a valid social security number or a valid business id
-        if new_owner.valid_identifier:
-            key = OwnershipKey(new_owner.identifier, new_owner.name)
-            if key not in already_created:
-                already_created[key] = new_owner
-            else:
-                new_owner = already_created[key]
-                skip_append = True
-
-        if not skip_append:
-            bulk_owners.append(new_owner)
-            count += 1
-
-        new = Ownership()
-        new.apartment = converted_data.apartments_by_oracle_id[ownership["apartment_id"]]
-        new.owner = new_owner
-        new.percentage = ownership["percentage"]
 
         bulk_ownerships.append(new)
 
         if len(bulk_owners) == BULK_INSERT_THRESHOLD:
             Owner.objects.bulk_create(bulk_owners)
             Ownership.objects.bulk_create(bulk_ownerships)
-
             bulk_owners = []
             bulk_ownerships = []
 
@@ -709,6 +713,7 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
         Ownership.objects.bulk_create(bulk_ownerships)
 
     print(f"Loaded {count} owners.\n")
+    return already_created
 
 
 def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
