@@ -29,7 +29,7 @@ class ExternalHitasModel(SafeDeleteModel):
         abstract = True
 
     def __repr__(self) -> str:
-        return f"<{type(self).__name__}:{self.pk}:{self.uuid}>"
+        return f"<{type(self).__name__}:{self.pk}>"
 
 
 class HitasModelDecimalField(models.DecimalField):
