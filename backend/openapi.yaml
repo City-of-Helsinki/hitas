@@ -1736,6 +1736,13 @@ paths:
             type: string
             maxLength: 11
             example: 131052-308T
+        - name: sales_condition
+          description: Filter apartments based on whether there are conditions of sale for its ownerships or not
+          required: false
+          in: query
+          schema:
+            type: boolean
+            example: true
       responses:
         '200':
           description: Successfully fetched list of apartments
