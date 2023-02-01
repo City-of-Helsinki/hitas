@@ -1,6 +1,7 @@
 import datetime
 import uuid
 from http import HTTPStatus
+from itertools import chain
 from typing import Any, Dict, Optional, Union, Iterable
 
 from dateutil.relativedelta import relativedelta
@@ -34,7 +35,7 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
-from hitas.models.condition_of_sale import condition_of_sale_queryset
+from hitas.models.condition_of_sale import condition_of_sale_queryset, GracePeriod
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
 from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
@@ -492,20 +493,40 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     improvements = ApartmentImprovementSerializer(source="*")
 
     conditions_of_sale = serializers.SerializerMethodField()
+    sell_by_date = serializers.SerializerMethodField()
 
-    def get_conditions_of_sale(self, instance: Apartment) -> list[dict[str, Any]]:
-        conditions_of_sale: list[ConditionOfSale] = []
-
-        for ownership in instance.ownerships.all():
-            conditions_of_sale_new = ownership.conditions_of_sale_new.all()
-            for cond in conditions_of_sale_new:
-                conditions_of_sale.append(cond)
-
-            conditions_of_sale_old = ownership.conditions_of_sale_old.all()
-            for cond in conditions_of_sale_old:
-                conditions_of_sale.append(cond)
+    @staticmethod
+    def get_conditions_of_sale(instance: Apartment) -> list[dict[str, Any]]:
+        conditions_of_sale: list[ConditionOfSale] = [
+            cos
+            for ownership in instance.ownerships.all()
+            for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all())
+        ]
 
         return [ConditionOfSaleSerializer(condition_of_sale).data for condition_of_sale in conditions_of_sale]
+
+    @staticmethod
+    def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
+        sell_by_dates: set[datetime.date] = set()
+
+        for ownership in instance.ownerships.all():
+            for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
+                if cos.fulfilled:
+                    continue
+
+                completion_date = cos.new_ownership.apartment.completion_date
+
+                if cos.grace_period == GracePeriod.NOT_GIVEN:
+                    sell_by_dates.add(completion_date)
+                elif cos.grace_period == GracePeriod.THREE_MONTHS:
+                    sell_by_dates.add(completion_date + relativedelta(months=3))
+                elif cos.grace_period == GracePeriod.SIX_MONTHS:
+                    sell_by_dates.add(completion_date + relativedelta(months=6))
+
+        if not sell_by_dates:
+            return None
+
+        return min(sell_by_dates)
 
     @staticmethod
     def get_links(instance: Apartment):
@@ -607,6 +628,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             "building",
             "improvements",
             "conditions_of_sale",
+            "sell_by_date",
         ]
 
 
@@ -630,6 +652,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "ownerships",
             "links",
             "conditions_of_sale",
+            "sell_by_date",
         ]
 
 
