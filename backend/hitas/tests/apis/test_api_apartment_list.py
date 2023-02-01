@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import Apartment, HousingCompany, Ownership
+from hitas.models import Apartment, ConditionOfSale, HousingCompany, Ownership
 from hitas.models.apartment import ApartmentState
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentFactory, ConditionOfSaleFactory, HousingCompanyFactory, OwnershipFactory
@@ -192,9 +192,17 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
-    old_apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
-    ConditionOfSaleFactory(new_ownership__apartment=new_apartment, old_ownership__apartment=old_apartment)
+    old_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
+    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
+    ConditionOfSaleFactory(new_ownership__apartment=new_apartment_1, old_ownership__apartment=old_apartment_1)
+
+    old_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
+    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
+    cos: ConditionOfSale = ConditionOfSaleFactory(
+        new_ownership__apartment=new_apartment_2,
+        old_ownership__apartment=old_apartment_2,
+    )
+    cos.delete()  # fulfill condition of sale
 
     url = reverse("hitas:apartment-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)

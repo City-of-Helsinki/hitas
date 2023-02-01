@@ -104,7 +104,14 @@ class ApartmentListViewSet(HitasModelMixin, mixins.ListModelMixin, viewsets.Gene
             )
             .alias(
                 number_of_conditions_of_sale=(
-                    Count("ownerships__conditions_of_sale_new") + Count("ownerships__conditions_of_sale_old")
+                    Count(
+                        "ownerships__conditions_of_sale_new",
+                        filter=Q(ownerships__conditions_of_sale_new__deleted__isnull=True),
+                    )
+                    + Count(
+                        "ownerships__conditions_of_sale_old",
+                        filter=Q(ownerships__conditions_of_sale_old__deleted__isnull=True),
+                    )
                 ),
             )
             .annotate(
