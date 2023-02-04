@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
 from django.db.models import Max
+from django.utils import timezone
 from safedelete import HARD_DELETE
 from sqlalchemy import asc, create_engine, desc, func
 from sqlalchemy.engine import LegacyRow
@@ -21,6 +22,7 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
+    ApartmentSale,
     ApartmentState,
     ApartmentType,
     Building,
@@ -62,12 +64,14 @@ from hitas.oracle_migration.oracle_schema import (
     company_construction_price_indices,
     company_market_price_indices,
     construction_price_indices,
+    hitas_monitoring,
     market_price_indices,
     property_managers,
     real_estates,
     users,
 )
 from hitas.oracle_migration.utils import (
+    ApartmentSaleMonitoringState,
     combine_notes,
     date_to_datetime,
     format_building_type,
@@ -231,6 +235,9 @@ def run(
 
             # Apartment maximum price calculations
             create_apartment_max_price_calculations(connection, converted_data)
+
+            # Apartment sales history
+            create_apartment_sales(connection, converted_data)
 
     MigrationDone.objects.create()
 
@@ -870,3 +877,221 @@ def create_codes(
         new.save()
 
     return retval
+
+
+def create_apartment_sales(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
+    def get_all_apartment_sales(apartment_oracle_id) -> list[hitas_monitoring]:
+        """Fetch all sales for given apartment"""
+        return list(
+            connection.execute(
+                select(hitas_monitoring)
+                .where(hitas_monitoring.c.apartment_id == apartment_oracle_id)
+                .order_by(asc(hitas_monitoring.c.purchase_date), asc(hitas_monitoring.c.id))
+            )
+        )
+
+    def create_sale_for_original_ownership() -> None:
+        """
+        Create a sale for an apartment that is never sold and still held by the original owner
+
+        Ownerships are already in the database, so bulk_create can't be used.
+        """
+        sale = ApartmentSale.objects.create(
+            apartment=apartment,
+            notification_date=apartment.first_purchase_date,
+            purchase_date=apartment.first_purchase_date,
+            purchase_price=apartment.purchase_price,
+            apartment_share_of_housing_company_loans=apartment.primary_loan_amount,
+            exclude_in_statistics=False,
+        )
+        # Link apartment ownerships to this sale
+        apartment.ownerships.all().update(sale=sale)
+
+    def get_or_create_buyers(sale) -> list[Owner]:
+        """Get buyers (Owner) from already converted data, or create new ones."""
+        buyers = []
+
+        # Handle both Buyer 1 and Buyer 2
+        for i in ["1", "2"]:
+            name = sale["buyer_name_" + i]
+
+            # Owner is unknown, can be skipped
+            if not name or name == "Ei tiedossa":
+                continue
+
+            identifier = sale["buyer_identifier_" + i] or ""
+            new_owner = Owner(
+                name=name.replace("\x00", ""),
+                identifier=identifier,
+                valid_identifier=check_social_security_number(identifier) or check_business_id(identifier),
+            )
+
+            # Check if this owner has been already added.
+            # If it is, do not create a new one but combine them into one.
+            # Only do this when the owner has a valid social security number or a valid business id
+
+            if not new_owner.valid_identifier:
+                bulk_owners.append(new_owner)
+                buyers.append(new_owner)
+                continue
+
+            key = OwnerKey(new_owner.identifier, new_owner.name)
+            if key in converted_data.owners:
+                buyers.append(converted_data.owners[key])
+                continue
+
+            converted_data.owners[key] = new_owner
+            buyers.append(new_owner)
+            bulk_owners.append(new_owner)
+
+        return buyers
+
+    def create_ownerships(buyers: list[Owner], is_latest_sale) -> None:
+        new_ownerships = [
+            Ownership(
+                apartment=apartment,
+                owner=buyer,
+                sale=new,
+                percentage=100 / len(buyers),  # Assume equal split, as there is no way to know the real percentages
+                deleted=timezone.now() if is_latest_sale else None,  # We only want the latest sale to be non-deleted
+            )
+            for buyer in buyers
+        ]
+        bulk_ownerships.extend(new_ownerships)
+
+    count = 0
+    bulk_apartment_sales = []
+    bulk_owners = []
+    bulk_ownerships = []
+
+    for apartment_oracle_id, apartment in converted_data.apartments_by_oracle_id.items():
+        # Edge case, skip importing sales.
+        # These are apartments with missing data, incomplete apartments or rented apartments.
+        if not apartment.first_purchase_date:
+            continue
+
+        # Apartment has been bought, but never resold.
+        # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
+        if apartment.first_purchase_date and not apartment.latest_purchase_date:
+            create_sale_for_original_ownership()
+            count += 1
+            continue
+
+        created_apartment_sales: dict[str, set[OwnerKey]] = {}  # Keep track of owners in this apartments sales
+        current_owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
+        is_latest_sale_created = False  # Used to determine if creating a sale based only on apartment data is needed.
+
+        # Apartment has been resold, so fetch all sales (=confirmed max price calculations).
+        apartment_sales = get_all_apartment_sales(apartment_oracle_id)
+        for sale in apartment_sales:
+            # Skip any calculations with missing buyer or purchase date, as it is most likely
+            # only a calculation, and couldn't be imported anyway due to missing data.
+            # The only exception to this rule is the latest calculation (the active one).
+            if sale["monitoring_state"] != ApartmentSaleMonitoringState.ACTIVE.value and (
+                not sale["purchase_date"] or not sale["buyer_name_1"] or sale["buyer_name_1"] == "Ei tiedossa"
+            ):
+                continue
+
+            # Special logic for the last active calculation if its missing data.
+            if sale["monitoring_state"] == ApartmentSaleMonitoringState.ACTIVE.value and not sale["purchase_date"]:
+                # Check if the calculation was at valid the last time apartment was sold.
+                # 4 Months is the longest a calculation can be active (when using Surface Area Price Ceiling)
+                alt_date: date = sale["calculation_date"] or sale["notification_date"]
+                if not (alt_date <= apartment.latest_purchase_date <= (alt_date + relativedelta(months=4))):
+                    # Not valid, can be skipped
+                    continue
+
+                new = ApartmentSale.objects.create(
+                    apartment=apartment,
+                    notification_date=sale["notification_date"],
+                    # Purchase date is unknown in the calculation, but it can be found in the apartment data.
+                    purchase_date=apartment.latest_purchase_date,
+                    # If purchase price is missing, the price is almost certainly missing as well. Assume it if missing.
+                    purchase_price=sale["purchase_price"] or sale["maximum_price"],
+                    apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
+                    exclude_in_statistics=sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                )
+                apartment.ownerships.all().update(sale=new)
+                owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
+                created_apartment_sales[sale["id"]] = owner_keys
+                is_latest_sale_created = True
+                count += 1
+
+            # Normal logic for sales that have all the necessary data
+            else:
+                new = ApartmentSale(
+                    apartment=apartment,
+                    notification_date=sale["notification_date"],
+                    purchase_date=sale["purchase_date"],
+                    purchase_price=sale["purchase_price"],
+                    apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
+                    exclude_in_statistics=sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                )
+
+                # Check if this is the latest apartment sale
+                if sale["purchase_date"] == apartment.latest_purchase_date:
+                    # The dates match exactly, update ownerships instead of creating new ones.
+                    new.save()
+                    apartment.ownerships.all().update(sale=new)
+                    owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
+                    created_apartment_sales[sale["id"]] = owner_keys
+                    is_latest_sale_created = True
+                    count += 1
+                    continue
+
+                buyers = get_or_create_buyers(sale)
+                owner_keys = {OwnerKey(o.identifier, o.name) for o in buyers}
+
+                # Check for duplicate owners, we don't want to create multiple sales to the same set of owners
+                if owner_keys in created_apartment_sales.values():
+                    print("Duplicate sale detected:", apartment_oracle_id, sale["id"])
+                    continue
+
+                # If the sale buyers are the same as apartment current owners, this is the latest sale for the apartment
+                if current_owner_keys == owner_keys:
+                    is_latest_sale_created = True
+                    create_ownerships(buyers, True)
+                else:
+                    create_ownerships(buyers, False)
+
+                created_apartment_sales[sale["id"]] = owner_keys
+
+                bulk_apartment_sales.append(new)
+                count += 1
+
+        # Oh, no! The latest sale/change of ownership was not available in apartment sales.
+        # Create the latest apartment sale from apartment data and assume any missing data.
+        if not is_latest_sale_created and apartment.latest_purchase_date:
+            # Here we end up in cases such as:
+            # - Apartment had its first and last sale date is filled, but no sales were found in monitoring table.
+            # - Sales were created, but latest sale buyers are different from the owners listed under apartment.
+            new = ApartmentSale.objects.create(
+                apartment=apartment,
+                notification_date=apartment.latest_purchase_date,
+                purchase_date=apartment.latest_purchase_date,
+                purchase_price=1,  # There is no way to get the actual purchase price, so hardcode it as `1`.
+                apartment_share_of_housing_company_loans=0,  # Assumed, no way to get this value accurately anywhere.
+                exclude_in_statistics=True,  # Since the price is hardcoded to `1`, these sales should be excluded.
+            )
+            apartment.ownerships.all().update(sale=new)
+            is_latest_sale_created = True
+            count += 1
+
+        # This should never happen, but just in case let's check
+        if not is_latest_sale_created:
+            print("Latest sale of an apartment not created:", apartment_oracle_id, created_apartment_sales)
+
+        if max(len(bulk_apartment_sales), len(bulk_owners), len(bulk_ownerships)) >= BULK_INSERT_THRESHOLD:
+            ApartmentSale.objects.bulk_create(bulk_apartment_sales)
+            Owner.objects.bulk_create(bulk_owners)
+            Ownership.objects.bulk_create(bulk_ownerships)
+            bulk_apartment_sales = []
+            bulk_owners = []
+            bulk_ownerships = []
+
+    if len(bulk_apartment_sales) or len(bulk_owners) or len(bulk_ownerships):
+        ApartmentSale.objects.bulk_create(bulk_apartment_sales)
+        Owner.objects.bulk_create(bulk_owners)
+        Ownership.objects.bulk_create(bulk_ownerships)
+
+    print(f"Loaded {count} apartment sales.\n")
