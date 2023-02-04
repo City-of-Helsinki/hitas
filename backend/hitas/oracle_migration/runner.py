@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
 from django.db.models import Max
 from safedelete import HARD_DELETE
-from sqlalchemy import create_engine, desc
+from sqlalchemy import asc, create_engine, desc, func
 from sqlalchemy.engine import LegacyRow
 from sqlalchemy.engine.base import Connection
 from sqlalchemy.sql import select
@@ -658,6 +658,26 @@ MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
 
 
 def create_ownerships(connection: Connection, converted_data: ConvertedData) -> dict[OwnerKey, Owner]:
+    def get_all_ownerships():
+        return connection.execute(
+            # As some apartments have duplicate owners, we can't simply select all owners, and instead
+            # we need to `group_by` owners to remove duplicates, and sum any percentages of the duplicate ownerships.
+            select(
+                [
+                    apartment_ownerships.c.apartment_id,
+                    func.coalesce(apartment_ownerships.c.name, "Ei tiedossa").label("name"),
+                    apartment_ownerships.c.social_security_number,
+                    func.sum(apartment_ownerships.c.percentage).label("percentage"),
+                ]
+            )
+            .group_by(
+                apartment_ownerships.c.apartment_id,
+                apartment_ownerships.c.name,
+                apartment_ownerships.c.social_security_number,
+            )
+            .where(apartment_ownerships.c.apartment_id != 0)
+        ).fetchall()
+
     def create_owner(ownership) -> Owner:
         nonlocal count
         new_owner = Owner(
@@ -685,9 +705,7 @@ def create_ownerships(connection: Connection, converted_data: ConvertedData) -> 
     bulk_ownerships = []
     already_created = {}
 
-    for ownership in connection.execute(
-        select(apartment_ownerships).where(apartment_ownerships.c.apartment_id != 0)
-    ).fetchall():
+    for ownership in get_all_ownerships():
         # Skip importing ownership if the apartment has not been imported
         if not converted_data.apartments_by_oracle_id.get(ownership["apartment_id"]):
             continue
