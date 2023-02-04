@@ -576,8 +576,10 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
             )
 
             # Check if CPI improvement value should be moved to apartment.additional_work_during_construction instead
-            if new.depreciation_percentage == DepreciationPercentage.ZERO and is_date_within_one_month(
-                new.completion_date, monthify(v.completion_date)
+            if (
+                new.depreciation_percentage == DepreciationPercentage.ZERO
+                and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
+                and cpi_improvement["accepted_value"] > 0
             ):
                 cpi_awdc["improvements"].append(new)
                 cpi_awdc["date"] = cpi_improvement.calculation_date
