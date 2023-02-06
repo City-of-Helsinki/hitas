@@ -3,6 +3,7 @@ from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Table
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
     HitasAnonymizedName,
+    HitasAnonymizedSSN,
     HitasBoolean,
     HitasDuration,
     HitasYearMonth,
@@ -310,10 +311,10 @@ hitas_monitoring = Table(
     Column("N_EHINTA", Integer, key="maximum_price", nullable=False),
     Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
     Column("D_KAUPPVM", Date, key="purchase_date"),
-    Column("C_OSTAJA1", String(120), key="buyer_name_1", nullable=False),
-    Column("C_OSTAJA2", String(120), key="buyer_name_2"),
-    Column("C_SOTU1", String(11), key="buyer_identifier_1"),
-    Column("C_SOTU2", String(11), key="buyer_identifier_2"),
+    Column("C_OSTAJA1", HitasAnonymizedName(50), key="buyer_name_1", nullable=False),
+    Column("C_OSTAJA2", HitasAnonymizedName(50), key="buyer_name_2"),
+    Column("C_SOTU1", HitasAnonymizedSSN(11), key="buyer_identifier_1"),
+    Column("C_SOTU2", HitasAnonymizedSSN(11), key="buyer_identifier_2"),
     Column("N_VEHINTA", Integer, nullable=False),
     Column("N_YHTLAINA", Integer, key="apartment_share_of_housing_company_loans", nullable=False),
     Column("N_EHINTAM2", Integer, nullable=False),
