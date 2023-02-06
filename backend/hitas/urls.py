@@ -53,6 +53,9 @@ apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", loo
 # /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings
 real_estate_router.register(r"buildings", views.BuildingViewSet, basename="building")
 
+# /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/sales-catalog
+real_estate_router.register(r"sales-catalog", views.SalesCatalogView, basename="sales-catalog")
+
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
 apartment_router.register(r"maximum-prices", views.ApartmentMaximumPriceViewSet, basename="maximum-price")
 

@@ -1,7 +1,7 @@
 import datetime
 import operator
 import uuid
-from typing import Any, Optional, TypeVar
+from typing import Any, Iterable, Optional
 
 from django.db import models
 from django.db.models import Value
@@ -80,4 +80,19 @@ def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **k
         raise HitasModelNotFound(model=model_class) from error
 
 
-TModel = TypeVar("TModel", bound=models.Model)
+def check_for_overlap(range_1: set[int], range_2: Iterable[int]) -> tuple[Optional[int], Optional[int]]:
+    overlapping: set[int] = range_1.intersection(range_2)
+    if not overlapping:
+        return None, None
+
+    if len(overlapping) == 1:
+        share: int = next(iter(overlapping))
+        start: int = next(iter(range_1))
+
+        if share == start:
+            return share, None
+
+        return None, share
+
+    sorted_shares: list[int] = sorted(overlapping)
+    return sorted_shares[0], sorted_shares[-1]

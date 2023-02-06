@@ -37,7 +37,7 @@ from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
 from hitas.models.condition_of_sale import condition_of_sale_queryset, GracePeriod
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid
+from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid, check_for_overlap
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import ConditionOfSaleSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -192,28 +192,24 @@ class SharesSerializer(serializers.Serializer):
 
         errors: dict[str, list[str]] = {}
         for share_range, address in share_ranges.items():
-            overlapping: set[int] = new_share_range.intersection(share_range)
-            if not overlapping:
-                continue
+            start, end = check_for_overlap(new_share_range, share_range)
 
-            if len(overlapping) == 1:
-                share: int = next(iter(overlapping))
-                if share == start:
-                    errors.setdefault("start", [])
-                    errors["start"].append(f"Share {share} has already been taken by {address}.")
-                    continue
-
+            if start is not None and end is not None:
+                msg = f"Shares {start}-{end} have already been taken by {address}."
+                errors.setdefault("start", [])
                 errors.setdefault("end", [])
-                errors["end"].append(f"Share {share} has already been taken by {address}.")
-                continue
+                errors["start"].append(msg)
+                errors["end"].append(msg)
 
-            sorted_shares: list[int] = sorted(overlapping)
-            first: int = sorted_shares[0]
-            last: int = sorted_shares[-1]
-            errors.setdefault("start", [])
-            errors.setdefault("end", [])
-            errors["start"].append(f"Shares {first}-{last} have already been taken by {address}.")
-            errors["end"].append(f"Shares {first}-{last} have already been taken by {address}.")
+            elif start is not None:
+                msg = f"Share {start} has already been taken by {address}."
+                errors.setdefault("start", [])
+                errors["start"].append(msg)
+
+            elif end is not None:
+                msg = f"Share {end} has already been taken by {address}."
+                errors.setdefault("end", [])
+                errors["end"].append(msg)
 
         if errors:
             raise ValidationError(errors)
