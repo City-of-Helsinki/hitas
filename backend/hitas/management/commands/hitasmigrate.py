@@ -35,6 +35,11 @@ class Command(BaseCommand):
             default="Downloads/instantclient_19_8",
             help="Oracle instantclient location, MacOS only (default: 'Downloads/instantclient_19_8').",
         )
+        parser.add_argument(
+            "--minimal-dataset",
+            action="store_true",
+            help="Only migrate a pre-specified set of housing companies e.g. for a testing environment",
+        )
 
     def handle(self, *args, **options) -> None:
         if sys.platform.startswith("darwin"):  # MacOS
@@ -69,4 +74,5 @@ class Command(BaseCommand):
             not options["skip_anonymize"],
             options["truncate"],
             options["truncate_only"],
+            options["minimal_dataset"],
         )

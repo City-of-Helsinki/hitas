@@ -137,6 +137,7 @@ def run(
     anonymize: bool,
     truncate: bool,
     truncate_only: bool,
+    minimal_dataset: bool,
 ) -> None:
     if debug:
         logging.basicConfig()
@@ -203,7 +204,9 @@ def run(
             converted_data.property_managers_by_oracle_id = create_property_managers(connection)
 
             # Housing companies
-            converted_data.created_housing_companies_by_oracle_id = create_housing_companies(connection, converted_data)
+            converted_data.created_housing_companies_by_oracle_id = create_housing_companies(
+                connection, converted_data, minimal_dataset
+            )
 
             # Housing company improvements
             create_housing_company_improvements(connection, converted_data)
@@ -285,10 +288,24 @@ def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> 
         index.save()
 
 
-def create_housing_companies(connection: Connection, converted_data: ConvertedData) -> dict[int, CreatedHousingCompany]:
+def create_housing_companies(
+    connection: Connection, converted_data: ConvertedData, minimal_dataset: bool
+) -> dict[int, CreatedHousingCompany]:
+    def fetch_housing_companies():
+        command = select(companies, additional_infos).join(additional_infos, isouter=True)
+        if minimal_dataset:
+            # Only migrate a pre-specified set of housing companies e.g. for a testing environment
+            print("Running migration with a minimal housing company dataset.")
+            command = command.where(
+                companies.c.id.in_(
+                    (485, 500, 513, 515, 523, 510, 428, 466, 552, 577, 580, 583, 601, 610, 614, 631, 621)
+                )
+            )
+        return connection.execute(command).fetchall()
+
     housing_companies_by_id = {}
 
-    for hc in connection.execute(select(companies, additional_infos).join(additional_infos, isouter=True)).fetchall():
+    for hc in fetch_housing_companies():
         new = HousingCompany()
         new.id = hc[companies.c.id]  # Keep original IDs as archive id
         new.official_name = hc["official_name"]
