@@ -45,7 +45,7 @@ class OwnerFactory(DjangoModelFactory):
     name = factory.Faker("name")
     identifier = faker.identifier()
     email = factory.Faker("email")
-    bypass_conditions_of_sale = True
+    bypass_conditions_of_sale = False
 
 
 class OwnershipFactory(DjangoModelFactory):

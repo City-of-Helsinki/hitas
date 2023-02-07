@@ -89,7 +89,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
     @staticmethod
     def create_conditions_of_sale(owners: list[Owner]) -> list[ConditionOfSale]:
         ownerships: list[Ownership] = [
-            ownership for owner in owners for ownership in owner.ownerships.all() if owner.bypass_conditions_of_sale
+            ownership for owner in owners for ownership in owner.ownerships.all() if not owner.bypass_conditions_of_sale
         ]
 
         to_save: list[ConditionOfSale] = []
