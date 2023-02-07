@@ -262,17 +262,8 @@ class HousingCompanyViewSet(HitasModelViewSet):
     def get_list_queryset(self):
         return (
             HousingCompany.objects.select_related("postal_code")
-            .only(
-                "uuid",
-                "display_name",
-                "state",
-                "street_address",
-                "postal_code__value",
-                "postal_code__city",
-                "postal_code__cost_area",
-            )
             .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
-            .order_by("id")
+            .order_by("-date")
         )
 
     def get_detail_queryset(self):
