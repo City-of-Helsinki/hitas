@@ -83,7 +83,14 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
 
     def create(self, validated_data: dict[str, Any]) -> list[ConditionOfSale]:
         owners: list[Owner] = validated_data.pop("household", [])
-        ownerships: list[Ownership] = [ownership for owner in owners for ownership in owner.ownerships.all()]
+
+        return self.create_conditions_of_sale(owners)
+
+    @staticmethod
+    def create_conditions_of_sale(owners: list[Owner]) -> list[ConditionOfSale]:
+        ownerships: list[Ownership] = [
+            ownership for owner in owners for ownership in owner.ownerships.all() if owner.bypass_conditions_of_sale
+        ]
 
         to_save: list[ConditionOfSale] = []
 
@@ -122,13 +129,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
             Owner.objects.prefetch_related(
                 Prefetch(
                     "ownerships",
-                    Ownership.objects.select_related("apartment").only(
-                        "id",
-                        "percentage",
-                        "apartment__id",
-                        "apartment__first_purchase_date",
-                        "apartment__completion_date",
-                    ),
+                    Ownership.objects.select_related("apartment"),
                 ),
                 Prefetch(
                     "ownerships__apartment__sales",
@@ -140,11 +141,9 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                             .order_by("purchase_date")
                             .values_list("id", flat=True)[:1]
                         )
-                    ).only("id", "purchase_date"),
+                    ),
                 ),
-            )
-            .only("id")
-            .filter(uuid__in=owner_uuids)
+            ).filter(uuid__in=owner_uuids)
         )
 
         if len(owners) != len(owner_uuids):

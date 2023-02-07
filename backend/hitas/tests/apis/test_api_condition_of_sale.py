@@ -863,6 +863,32 @@ def test__api__condition_of_sale__create__additional_ownerships__invalid(
     }
 
 
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPIClient):
+    # given:
+    # - An owner with ownerships to one new and one old apartment
+    # - Owner set to bypass conditions of sale (e.g. Helsinki city)
+    owner: Owner = OwnerFactory.create(bypass_conditions_of_sale=False)
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    old_apartment: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(owner=owner, apartment=new_apartment)
+    OwnershipFactory.create(owner=owner, apartment=old_apartment)
+
+    # when:
+    # - New conditions of sale are created for this owner as a household
+    data = {"household": [owner.uuid.hex]}
+    url = reverse("hitas:conditions-of-sale-list")
+    response = api_client.post(url, data=data, format="json")
+
+    # then:
+    # - The response contains no conditions of sale
+    # - The database contains no conditions of sale
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 0, response.json()
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0
+
+
 # Update tests
 
 
