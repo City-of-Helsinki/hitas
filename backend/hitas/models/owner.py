@@ -10,7 +10,7 @@ class Owner(ExternalHitasModel):
     identifier = models.CharField(max_length=11, blank=True, null=True)
     valid_identifier = models.BooleanField(default=False)
     email = models.EmailField(blank=True, null=True)
-    bypass_conditions_of_sale = models.BooleanField(default=True)
+    bypass_conditions_of_sale = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.valid_identifier = check_social_security_number(self.identifier) or check_business_id(self.identifier)

@@ -868,7 +868,7 @@ def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPICl
     # given:
     # - An owner with ownerships to one new and one old apartment
     # - Owner set to bypass conditions of sale (e.g. Helsinki city)
-    owner: Owner = OwnerFactory.create(bypass_conditions_of_sale=False)
+    owner: Owner = OwnerFactory.create(bypass_conditions_of_sale=True)
     new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
     old_apartment: Apartment = ApartmentFactory.create()
     OwnershipFactory.create(owner=owner, apartment=new_apartment)

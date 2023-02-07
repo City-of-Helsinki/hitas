@@ -14762,7 +14762,7 @@
       "identifier": "010199-123A",
       "valid_identifier": false,
       "email": "matti@hitas.fi",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14776,7 +14776,7 @@
       "identifier": "050462-494C",
       "valid_identifier": false,
       "email": "juhanisaari@example.com",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14790,7 +14790,7 @@
       "identifier": "300505A522H",
       "valid_identifier": false,
       "email": "kaarinalehto@example.com",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14804,7 +14804,7 @@
       "identifier": "151124-088K",
       "valid_identifier": false,
       "email": "mattigustafsson@example.org",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14818,7 +14818,7 @@
       "identifier": "230919-757D",
       "valid_identifier": false,
       "email": "emiliaseppanen@example.net",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14832,7 +14832,7 @@
       "identifier": "160339-233A",
       "valid_identifier": false,
       "email": "artturiihimaki@example.org",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14846,7 +14846,7 @@
       "identifier": "211283-058H",
       "valid_identifier": false,
       "email": "ensio55@example.org",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14860,7 +14860,7 @@
       "identifier": "160288-587K",
       "valid_identifier": false,
       "email": "onurmi@example.org",
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
@@ -14874,7 +14874,7 @@
       "identifier": "111269-222X",
       "valid_identifier": false,
       "email": null,
-      "bypass_conditions_of_sale": true
+      "bypass_conditions_of_sale": false
     }
   },
   {
