@@ -14761,7 +14761,8 @@
       "name": "Matti Meikäläinen",
       "identifier": "010199-123A",
       "valid_identifier": false,
-      "email": "matti@hitas.fi"
+      "email": "matti@hitas.fi",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14774,7 +14775,8 @@
       "name": "Kerttu Kuusisto",
       "identifier": "050462-494C",
       "valid_identifier": false,
-      "email": "juhanisaari@example.com"
+      "email": "juhanisaari@example.com",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14787,7 +14789,8 @@
       "name": "Juhani Kujala",
       "identifier": "300505A522H",
       "valid_identifier": false,
-      "email": "kaarinalehto@example.com"
+      "email": "kaarinalehto@example.com",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14800,7 +14803,8 @@
       "name": "Kerttu Asikainen",
       "identifier": "151124-088K",
       "valid_identifier": false,
-      "email": "mattigustafsson@example.org"
+      "email": "mattigustafsson@example.org",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14813,7 +14817,8 @@
       "name": "Jaakko Virtanen",
       "identifier": "230919-757D",
       "valid_identifier": false,
-      "email": "emiliaseppanen@example.net"
+      "email": "emiliaseppanen@example.net",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14826,7 +14831,8 @@
       "name": "Marjaana Myllymäki",
       "identifier": "160339-233A",
       "valid_identifier": false,
-      "email": "artturiihimaki@example.org"
+      "email": "artturiihimaki@example.org",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14839,7 +14845,8 @@
       "name": "Seppo Lahtinen",
       "identifier": "211283-058H",
       "valid_identifier": false,
-      "email": "ensio55@example.org"
+      "email": "ensio55@example.org",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14852,7 +14859,8 @@
       "name": "Riitta Ojanen",
       "identifier": "160288-587K",
       "valid_identifier": false,
-      "email": "onurmi@example.org"
+      "email": "onurmi@example.org",
+      "bypass_conditions_of_sale": true
     }
   },
   {
@@ -14865,7 +14873,8 @@
       "name": "Katariina Virna",
       "identifier": "111269-222X",
       "valid_identifier": false,
-      "email": null
+      "email": null,
+      "bypass_conditions_of_sale": true
     }
   },
   {

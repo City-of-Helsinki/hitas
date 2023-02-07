@@ -9,8 +9,11 @@ class OwnerAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "email",
+        "bypass_conditions_of_sale",
     ]
-    readonly_fields = ("uuid",)
+    readonly_fields = [
+        "uuid",
+    ]
 
 
 @admin.register(Ownership)
