@@ -972,7 +972,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 owner=buyer,
                 sale=new,
                 percentage=100 / len(buyers),  # Assume equal split, as there is no way to know the real percentages
-                deleted=timezone.now() if is_latest_sale else None,  # We only want the latest sale to be non-deleted
+                deleted=timezone.now() if not is_latest_sale else None,  # Delete all but the latest ownerships
             )
             for buyer in buyers
         ]
