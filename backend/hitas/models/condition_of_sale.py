@@ -1,13 +1,18 @@
 import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
 from hitas.models._base import ExternalHitasModel
+
+if TYPE_CHECKING:
+    from hitas.models.owner import Owner
+    from hitas.models.ownership import Ownership
 
 
 class GracePeriod(Enum):
@@ -132,4 +137,44 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "new_ownership__apartment__building__real_estate__housing_company__postal_code__city",
             "old_ownership__apartment__building__real_estate__housing_company__postal_code__city",
         )
+    )
+
+
+def create_conditions_of_sale(owners: list["Owner"]) -> list[ConditionOfSale]:
+    ownerships: list[Ownership] = [
+        ownership for owner in owners for ownership in owner.ownerships.all() if not owner.bypass_conditions_of_sale
+    ]
+
+    to_save: dict[tuple[int, int], ConditionOfSale] = {}
+
+    # Create conditions of sale for all ownerships to new apartments this owner has,
+    # and all the additional ownerships given (if they are for new apartments)
+    for ownership in ownerships:
+        apartment = ownership.apartment
+
+        if apartment.is_new:
+            for other_ownership in ownerships:
+                # Don't create circular conditions of sale
+                if ownership.id == other_ownership.id:
+                    continue
+
+                # Only one condition of sale between two new apartments
+                key: tuple[int, int] = tuple(sorted([ownership.id, other_ownership.id]))  # type: ignore
+                if key in to_save:
+                    continue
+
+                to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
+
+    if not to_save:
+        return []
+
+    # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
+    ConditionOfSale.objects.bulk_create(to_save.values(), ignore_conflicts=True)
+
+    # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
+    # the ids or conditions of sale in the returned list from 'bulk_create' are not correct.
+    return list(
+        condition_of_sale_queryset()
+        .filter(Q(new_ownership__owner__in=owners) | Q(old_ownership__owner__in=owners))
+        .all()
     )

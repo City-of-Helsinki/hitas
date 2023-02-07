@@ -1626,7 +1626,7 @@ paths:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentSale'
+                $ref: '#/components/schemas/ApartmentSaleCreated'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -6155,7 +6155,7 @@ components:
           example: false
 
     ApartmentSaleCreate:
-      description: Apartment sale
+      description: Apartment sale create data
       type: object
       additionalProperties: false
       required:
@@ -6196,8 +6196,60 @@ components:
           type: boolean
           example: false
 
+    ApartmentSaleCreated:
+      description: Apartment sale created
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - ownerships
+        - notification_date
+        - purchase_date
+        - purchase_price
+        - apartment_share_of_housing_company_loans
+        - exclude_in_statistics
+        - conditions_of_sale_created
+      properties:
+        id:
+          description: Apartment sale ID
+          type: string
+          example: b477389cb3514fb1b444052a39bfb65d
+        ownerships:
+          description: List of ownerships resulting from this sale
+          type: array
+          items:
+            $ref: '#/components/schemas/Ownership'
+        notification_date:
+          description: Sale notification date
+          type: string
+          format: date
+          example: 1985-12-10
+        purchase_date:
+          description: Sale purchase date
+          type: string
+          format: date
+          example: 1985-12-10
+        purchase_price:
+          description: Sale purchase price
+          type: number
+          minimum: 0
+          example: 51222
+        apartment_share_of_housing_company_loans:
+          description: Apartment share of housing company loans
+          type: number
+          minimum: 0
+          example: 51222
+        exclude_in_statistics:
+          description: Should sale be excluded from statistics?
+          type: boolean
+          example: false
+        conditions_of_sale_created:
+          description: Were any conditions of sale created with this sale?
+          type: boolean
+          example: false
+
     ApartmentSaleUpdate:
-      description: Apartment sale
+      description: Apartment sale update data
       type: object
       additionalProperties: false
       required:

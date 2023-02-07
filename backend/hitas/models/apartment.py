@@ -2,19 +2,22 @@ import datetime
 import uuid
 from decimal import Decimal
 from itertools import chain
-from typing import Optional
+from typing import Any, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import OuterRef, Prefetch, Subquery
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HousingCompany
+from hitas.models.ownership import Ownership, OwnershipLike
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
 
@@ -168,6 +171,13 @@ class Apartment(ExternalHitasModel):
                     return True
         return False
 
+    def change_ownerships(self, ownership_data: list[OwnershipLike], **kwargs: Any) -> list[Ownership]:
+        # Mark current ownerships for the apartment as "past"
+        Ownership.objects.filter(apartment=self).delete()
+
+        # Replace with the new ownerships
+        return Ownership.objects.bulk_create([Ownership(apartment=self, **kwargs, **entry) for entry in ownership_data])
+
     class Meta:
         verbose_name = _("Apartment")
         verbose_name_plural = _("Apartments")
@@ -254,3 +264,21 @@ class ApartmentMaximumPriceCalculation(models.Model):
     class Meta:
         verbose_name = _("Apartment maximum price calculation")
         verbose_name_plural = _("Apartment maximum price calculations")
+
+
+def prefetch_first_sale(lookup_prefix: str = "") -> Prefetch:
+    """Prefetch only the first sale of an apartment.
+
+    :param lookup_prefix: Add prefix to lookup, e.g. 'ownerships__apartment__'
+                          depending on the prefix context. Should end with '__'.
+    """
+    return Prefetch(
+        f"{lookup_prefix}sales",
+        ApartmentSale.objects.filter(
+            id__in=Subquery(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
+                .order_by("purchase_date")
+                .values_list("id", flat=True)[:1]
+            )
+        ),
+    )

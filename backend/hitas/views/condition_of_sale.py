@@ -3,13 +3,13 @@ import uuid
 from typing import Any, Optional
 
 from django.core.exceptions import ValidationError
-from django.db.models import OuterRef, Prefetch, Q, Subquery
+from django.db.models import OuterRef, Prefetch, Subquery
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
-from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset
+from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset, create_conditions_of_sale
 from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
@@ -89,51 +89,6 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
             value = self.get_household(value)
         return value
 
-    def create(self, validated_data: dict[str, Any]) -> list[ConditionOfSale]:
-        owners: list[Owner] = validated_data.pop("household", [])
-
-        return self.create_conditions_of_sale(owners)
-
-    @staticmethod
-    def create_conditions_of_sale(owners: list[Owner]) -> list[ConditionOfSale]:
-        ownerships: list[Ownership] = [
-            ownership for owner in owners for ownership in owner.ownerships.all() if not owner.bypass_conditions_of_sale
-        ]
-
-        to_save: dict[tuple[int, int], ConditionOfSale] = {}
-
-        # Create conditions of sale for all ownerships to new apartments this owner has,
-        # and all the additional ownerships given (if they are for new apartments)
-        for ownership in ownerships:
-            apartment = ownership.apartment
-
-            if apartment.is_new:
-                for other_ownership in ownerships:
-                    # Don't create circular conditions of sale
-                    if ownership.id == other_ownership.id:
-                        continue
-
-                    # Only one condition of sale between two new apartments
-                    key: tuple[int, int] = tuple(sorted([ownership.id, other_ownership.id]))  # type: ignore
-                    if key in to_save:
-                        continue
-
-                    to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
-
-        if not to_save:
-            return []
-
-        # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
-        ConditionOfSale.objects.bulk_create(to_save.values(), ignore_conflicts=True)
-
-        # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
-        # the ids or conditions of sale in the returned list from 'bulk_create' are not correct.
-        return list(
-            condition_of_sale_queryset()
-            .filter(Q(new_ownership__owner__in=owners) | Q(old_ownership__owner__in=owners))
-            .all()
-        )
-
     @staticmethod
     def get_household(owner_uuids: list[uuid.UUID]) -> list[Owner]:
         # Check that owners exists and prefetch required fields for creating
@@ -167,6 +122,10 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
             raise ValidationError(f"Owners not found: {missing_owners}.")
 
         return owners
+
+    def create(self, validated_data: dict[str, Any]) -> list[ConditionOfSale]:
+        owners: list[Owner] = validated_data.pop("household", [])
+        return create_conditions_of_sale(owners)
 
     def to_representation(self, validated_data: list[ConditionOfSale]) -> dict[str, Any]:
         return {
