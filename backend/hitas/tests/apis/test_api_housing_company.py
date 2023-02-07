@@ -72,18 +72,6 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
-            "id": hc1.uuid.hex,
-            "name": hc1.display_name,
-            "state": hc1.state.value,
-            "address": {
-                "street_address": hc1.street_address,
-                "postal_code": hc1.postal_code.value,
-                "city": hc1.postal_code.city,
-            },
-            "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-            "date": str(ap2.completion_date),
-        },
-        {
             "id": hc2.uuid.hex,
             "name": hc2.display_name,
             "state": hc2.state.value,
@@ -94,6 +82,18 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             },
             "area": {"name": hc2.postal_code.city, "cost_area": hc2.postal_code.cost_area},
             "date": None,
+        },
+        {
+            "id": hc1.uuid.hex,
+            "name": hc1.display_name,
+            "state": hc1.state.value,
+            "address": {
+                "street_address": hc1.street_address,
+                "postal_code": hc1.postal_code.value,
+                "city": hc1.postal_code.city,
+            },
+            "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
+            "date": str(ap2.completion_date),
         },
     ]
     assert response.json()["page"] == {
@@ -1012,8 +1012,8 @@ def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPICli
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 3, response.json()
     assert response.json()["contents"][0]["id"] == apartment_just_before_2011.housing_company.uuid.hex
-    assert response.json()["contents"][1]["id"] == apartment_2009.housing_company.uuid.hex
-    assert response.json()["contents"][2]["id"] == hc_both_old_and_new.uuid.hex
+    assert response.json()["contents"][1]["id"] == hc_both_old_and_new.uuid.hex
+    assert response.json()["contents"][2]["id"] == apartment_2009.housing_company.uuid.hex
 
 
 @pytest.mark.django_db
