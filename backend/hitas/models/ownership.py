@@ -66,6 +66,9 @@ class Ownership(HitasModel):
     def __str__(self):
         return f"{self.owner}, {self.apartment}"
 
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
+
 
 class OwnershipLike(TypedDict):
     percentage: Decimal

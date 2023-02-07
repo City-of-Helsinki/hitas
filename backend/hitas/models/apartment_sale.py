@@ -31,6 +31,9 @@ class ApartmentSale(ExternalHitasModel):
     def cost_area(self) -> int:
         return self.apartment.postal_code.cost_area
 
+    def __str__(self):
+        return f"Sale of {self.apartment} on {self.purchase_date}{' (E)' if self.exclude_in_statistics else ''}"
+
     class Meta:
         verbose_name = _("Apartment sale")
         verbose_name_plural = _("Apartment sales")

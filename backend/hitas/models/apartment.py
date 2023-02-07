@@ -163,7 +163,10 @@ class Apartment(ExternalHitasModel):
         ]
 
     def __str__(self):
-        return f"{self.street_address} {self.apartment_number}"
+        return f"{self.street_address} {self.stair} {self.apartment_number}"
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
 
 
 class ApartmentMarketPriceImprovement(HitasImprovement):

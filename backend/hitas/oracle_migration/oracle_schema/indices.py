@@ -3,6 +3,7 @@ from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Table
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
     HitasAnonymizedName,
+    HitasAnonymizedSSN,
     HitasBoolean,
     HitasDuration,
     HitasYearMonth,
@@ -197,7 +198,7 @@ apartment_construction_price_indices = Table(
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_RAKIARVO", Float, nullable=False),  # Indeksin tarkistus arvo
     Column("N_POISTOARVO", Float, nullable=False),  # Poisto
-    Column("N_HYVARVO", Float, nullable=False),  # Hyväksytty
+    Column("N_HYVARVO", Float, key="accepted_value", nullable=False),  # Hyväksytty arvo
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )
@@ -303,22 +304,22 @@ hitas_monitoring = Table(
     Column(
         "C_LASKNIMI", String(15), key="max_price_index_name", nullable=False
     ),  # The type of calculation this is. Always one of [EI LASKELMAA, RAKINDEKSI, RAJAHINTA, HITINDEKSI, MHINDEKSI]
-    Column("D_LASKPVM", Date),
+    Column("D_LASKPVM", Date, key="calculation_date"),
     Column("KG_EHIND", Integer, key="max_price_index_id", nullable=False),  # Actually FK to max price calculation table
-    Column("D_ILMPVM", Date, nullable=False),
+    Column("D_ILMPVM", Date, key="notification_date", nullable=False),
     Column("C_MYYJA", String(250), nullable=False),
-    Column("N_EHINTA", Integer, nullable=False),
-    Column("N_KAUPHINTA", Integer, nullable=False),
-    Column("D_KAUPPVM", Date),
-    Column("C_OSTAJA1", String(120), nullable=False),
-    Column("C_OSTAJA2", String(120)),
-    Column("C_SOTU1", String(11)),
-    Column("C_SOTU2", String(11)),
+    Column("N_EHINTA", Integer, key="maximum_price", nullable=False),
+    Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
+    Column("D_KAUPPVM", Date, key="purchase_date"),
+    Column("C_OSTAJA1", HitasAnonymizedName(50), key="buyer_name_1", nullable=False),
+    Column("C_OSTAJA2", HitasAnonymizedName(50), key="buyer_name_2"),
+    Column("C_SOTU1", HitasAnonymizedSSN(11), key="buyer_identifier_1"),
+    Column("C_SOTU2", HitasAnonymizedSSN(11), key="buyer_identifier_2"),
     Column("N_VEHINTA", Integer, nullable=False),
-    Column("N_YHTLAINA", Integer, nullable=False),
+    Column("N_YHTLAINA", Integer, key="apartment_share_of_housing_company_loans", nullable=False),
     Column("N_EHINTAM2", Integer, nullable=False),
     Column("C_VALVKOODI", String(16), nullable=False),
-    Column("C_VALVTILA", String(12), nullable=False),
+    Column("C_VALVTILA", String(12), key="monitoring_state", nullable=False),
     Column("C_LISATIETO", String(1), nullable=False),
     Column("C_LISATVIITE", String(10), nullable=False),
     Column("C_MUUTTAJA", String(10), nullable=False),

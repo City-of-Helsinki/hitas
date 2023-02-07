@@ -3,10 +3,13 @@ from typing import Optional, Type
 
 import pytz
 from django.db import models
+from enumfields import Enum
 from sqlalchemy.engine import LegacyRow
 
 from hitas.models import BuildingType, HousingCompanyState
 from hitas.models.apartment import DepreciationPercentage
+
+from django.utils.translation import gettext_lazy as _
 
 TZ = pytz.timezone("Europe/Helsinki")
 
@@ -65,3 +68,18 @@ def housing_company_state_from(code: str) -> HousingCompanyState:
             return HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION
         case "005":
             return HousingCompanyState.HALF_HITAS
+
+
+class ApartmentSaleMonitoringState(Enum):
+    UNKNOWN = "000"  # Not in use
+    ACTIVE = "001"  # This is the latest calculation
+    CANCELLED = "002"  # Old calculation
+    COMPLETE = "003"  # Apartment was sold
+    RELATIVE_SALE = "004"  # Apartment was sold to a relative (or similar). Don't include in statistics
+
+    class Labels:
+        UNKNOWN = _("not_ready")
+        ACTIVE = _("active")
+        CANCELLED = _("cancelled")
+        COMPLETE = _("complete")
+        RELATIVE_SALE = _("relative_sale")
