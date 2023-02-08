@@ -536,6 +536,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
                     continue
 
                 completion_date = cos.new_ownership.apartment.completion_date
+                if completion_date is None:
+                    continue
 
                 if cos.grace_period == GracePeriod.NOT_GIVEN:
                     sell_by_dates.add(completion_date)
