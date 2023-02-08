@@ -15,12 +15,32 @@ import {
     IApartmentConfirmedMaximumPrice,
     IApartmentDetails,
     IApartmentUnconfirmedMaximumPrice,
+    IConditionOfSale,
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}) => {
+const SingleApartmentConditionOfSale = ({conditionOfSale}: {conditionOfSale: IConditionOfSale}) => {
+    return (
+        <li>
+            <h3>
+                {conditionOfSale.owner.name} ({conditionOfSale.owner.identifier})
+            </h3>
+            <ul>
+                <li className={conditionOfSale.fulfilled ? "resolved" : "unresolved"}>
+                    <Link
+                        to={`/housing-companies/${conditionOfSale.apartment.housing_company.id}/apartments/${conditionOfSale.apartment.id}`}
+                    >
+                        {conditionOfSale.fulfilled ? <IconLockOpen /> : <IconLock />}
+                        {formatAddress(conditionOfSale.apartment.address)}
+                    </Link>
+                </li>
+            </ul>
+        </li>
+    );
+};
+const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
     return (
         <Card>
             <div className="row row--buttons">
@@ -43,34 +63,12 @@ const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}
             </div>
             <label className="card-heading">Myyntiehdot</label>
             <ul>
-                <li>
-                    <h3>Daniel Demola (010101-101A)</h3>
-                    <ul>
-                        <li className="unresolved">
-                            <Link to="#">
-                                <IconLock />
-                                Jokukatu 4, 00500
-                            </Link>
-                        </li>
-                        <li className="resolved">
-                            <Link to="#">
-                                <IconLockOpen />
-                                Umpikuja 0, 00404 - (myyty 3.1.2023)
-                            </Link>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h3>Erkki Esimerkki (101099-666B)</h3>
-                    <ul>
-                        <li className="unresolved">
-                            <Link to="#">
-                                <IconLock />
-                                Peruskatu 1, 00820
-                            </Link>
-                        </li>
-                    </ul>
-                </li>
+                {conditionsOfSale.map((cos) => (
+                    <SingleApartmentConditionOfSale
+                        key={cos.id}
+                        conditionOfSale={cos}
+                    />
+                ))}
             </ul>
         </Card>
     );
@@ -273,7 +271,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard apartment={data} />
-                <ApartmentSalesConditionCard apartment={data} />
+                <ApartmentConditionsOfSaleCard conditionsOfSale={data.conditions_of_sale} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">

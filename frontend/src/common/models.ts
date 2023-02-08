@@ -238,6 +238,17 @@ export interface IApartment {
     readonly links: IApartmentLinkedModels;
 }
 
+export interface IConditionOfSale {
+    id: string;
+    owner: Omit<IOwner, "id"> & {id: string};
+    apartment: {
+        id: string;
+        address: IApartmentAddress;
+        housing_company: IApartmentLinkedModel & {display_name: string};
+    };
+    grace_period: "not_given" | "three_months" | "six_months";
+    fulfilled: string | null;
+}
 export interface IApartmentDetails {
     readonly id: string;
     state: ApartmentState;
@@ -255,6 +266,7 @@ export interface IApartmentDetails {
         construction_price_index: IApartmentConstructionPriceIndexImprovement[];
     };
     readonly links: IApartmentLinkedModels;
+    readonly conditions_of_sale: IConditionOfSale[];
 }
 
 export interface IApartmentWritable {
