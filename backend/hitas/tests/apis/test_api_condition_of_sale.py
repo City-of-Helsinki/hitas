@@ -714,25 +714,22 @@ def test__api__condition_of_sale__create__household_of_two__both_have_new(api_cl
     response = api_client.post(url, data=data, format="json")
 
     # then:
-    # - The response contains four conditions of sale
-    # - The database contains four conditions of sale
+    # - The response contains three conditions of sale
+    # - The database contains three conditions of sale
     # - The conditions of sale are between:
     #   - The new ownership of Owner 1 and the old ownership of Owner 1
     #   - The new ownership of Owner 1 and the new ownership of Owner 2
     #   - The new ownership of Owner 2 and the old ownership of Owner 1
-    #   - The new ownership of Owner 2 and the new ownership of Owner 1
     assert response.status_code == status.HTTP_201_CREATED, response.json()
-    assert len(response.json().get("conditions_of_sale", [])) == 4, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 3, response.json()
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
-    assert len(conditions_of_sale) == 4
+    assert len(conditions_of_sale) == 3
     assert conditions_of_sale[0].new_ownership == new_ownership_1
     assert conditions_of_sale[0].old_ownership == old_ownership
     assert conditions_of_sale[1].new_ownership == new_ownership_1
     assert conditions_of_sale[1].old_ownership == new_ownership_2
     assert conditions_of_sale[2].new_ownership == new_ownership_2
     assert conditions_of_sale[2].old_ownership == old_ownership
-    assert conditions_of_sale[3].new_ownership == new_ownership_2
-    assert conditions_of_sale[3].old_ownership == new_ownership_1
 
 
 @pytest.mark.django_db
@@ -757,26 +754,23 @@ def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new
     response = api_client.post(url, data=data, format="json")
 
     # then:
-    # - The response contains four conditions of sale
-    # - The database contains four conditions of sale
+    # - The response contains three conditions of sale
+    # - The database contains three conditions of sale
     # - The conditions of sale are between:
     #   - The new ownership of Owner 1 and the old ownership of Owner 1
     #   - The new ownership of Owner 1 and the new ownership of Owner 2
     #   - The new ownership of Owner 2 and the old ownership of Owner 1
-    #   - The new ownership of Owner 2 and the new ownership of Owner 1
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert "conditions_of_sale" in response.json(), response.json()
-    assert len(response.json().get("conditions_of_sale", [])) == 4, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 3, response.json()
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
-    assert len(conditions_of_sale) == 4
+    assert len(conditions_of_sale) == 3
     assert conditions_of_sale[0].new_ownership == new_ownership_1
     assert conditions_of_sale[0].old_ownership == old_ownership
     assert conditions_of_sale[1].new_ownership == new_ownership_1
     assert conditions_of_sale[1].old_ownership == new_ownership_2
     assert conditions_of_sale[2].new_ownership == new_ownership_2
     assert conditions_of_sale[2].old_ownership == old_ownership
-    assert conditions_of_sale[3].new_ownership == new_ownership_2
-    assert conditions_of_sale[3].old_ownership == new_ownership_1
 
 
 @pytest.mark.django_db

@@ -75,7 +75,6 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "new_ownership__apartment",
             "old_ownership__owner",
             "old_ownership__apartment",
-            # New stuff
             "new_ownership__apartment__building",
             "old_ownership__apartment__building",
             "new_ownership__apartment__building__real_estate",
