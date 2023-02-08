@@ -21,26 +21,45 @@ import {
 } from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-const SingleApartmentConditionOfSale = ({conditionOfSale}: {conditionOfSale: IConditionOfSale}) => {
+const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
     return (
         <li>
             <h3>
-                {conditionOfSale.owner.name} ({conditionOfSale.owner.identifier})
+                {conditionsOfSale[0].owner.name} ({conditionsOfSale[0].owner.identifier})
             </h3>
             <ul>
-                <li className={conditionOfSale.fulfilled ? "resolved" : "unresolved"}>
-                    <Link
-                        to={`/housing-companies/${conditionOfSale.apartment.housing_company.id}/apartments/${conditionOfSale.apartment.id}`}
+                {conditionsOfSale.map((cos) => (
+                    <li
+                        key={cos.id}
+                        className={cos.fulfilled ? "resolved" : "unresolved"}
                     >
-                        {conditionOfSale.fulfilled ? <IconLockOpen /> : <IconLock />}
-                        {formatAddress(conditionOfSale.apartment.address)}
-                    </Link>
-                </li>
+                        <Link
+                            to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
+                        >
+                            {cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                            {formatAddress(cos.apartment.address)}
+                        </Link>
+                    </li>
+                ))}
             </ul>
         </li>
     );
 };
+
 const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
+    // Create a dict with owner id as key, and all of their conditions of sale in a list as value
+    interface IGroupedConditionsOfSale {
+        [ownerId: string]: IConditionOfSale[];
+    }
+    const groupedConditionsOfSale: IGroupedConditionsOfSale = conditionsOfSale.reduce((acc, obj) => {
+        if (obj.owner.id in acc) {
+            acc[obj.owner.id].push(obj);
+        } else {
+            acc[obj.owner.id] = [obj];
+        }
+        return acc;
+    }, {});
+
     return (
         <Card>
             <div className="row row--buttons">
@@ -63,10 +82,10 @@ const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IC
             </div>
             <label className="card-heading">Myyntiehdot</label>
             <ul>
-                {conditionsOfSale.map((cos) => (
+                {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
                     <SingleApartmentConditionOfSale
-                        key={cos.id}
-                        conditionOfSale={cos}
+                        key={ownerId}
+                        conditionsOfSale={cos}
                     />
                 ))}
             </ul>
