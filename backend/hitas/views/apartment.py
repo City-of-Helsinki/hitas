@@ -51,7 +51,7 @@ from hitas.views.utils import (
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
-from hitas.views.utils.serializers import ReadOnlySerializer, YearMonthSerializer
+from hitas.views.utils.serializers import ReadOnlySerializer, YearMonthSerializer, ApartmentHitasAddressSerializer
 
 
 class MarketPriceImprovementSerializer(serializers.ModelSerializer):
@@ -115,15 +115,6 @@ class ConstructionPriceImprovementSerializer(MarketPriceImprovementSerializer):
             "value",
             "depreciation_percentage",
         ]
-
-
-class ApartmentHitasAddressSerializer(serializers.Serializer):
-    street_address = serializers.CharField()
-    postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
-    city = serializers.CharField(source="building.real_estate.housing_company.city", read_only=True)
-    apartment_number = serializers.IntegerField(min_value=0)
-    floor = serializers.CharField(max_length=50, required=False, allow_null=True, allow_blank=True)
-    stair = serializers.CharField(max_length=16)
 
 
 class SharesSerializer(serializers.Serializer):
