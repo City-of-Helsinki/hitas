@@ -75,6 +75,15 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "new_ownership__apartment",
             "old_ownership__owner",
             "old_ownership__apartment",
+            # New stuff
+            "new_ownership__apartment__building",
+            "old_ownership__apartment__building",
+            "new_ownership__apartment__building__real_estate",
+            "old_ownership__apartment__building__real_estate",
+            "new_ownership__apartment__building__real_estate__housing_company",
+            "old_ownership__apartment__building__real_estate__housing_company",
+            "new_ownership__apartment__building__real_estate__housing_company__postal_code",
+            "old_ownership__apartment__building__real_estate__housing_company__postal_code",
         )
         .only(
             "id",
@@ -113,5 +122,15 @@ def condition_of_sale_queryset() -> models.QuerySet[ConditionOfSale]:
             "old_ownership__owner__name",
             "old_ownership__owner__identifier",
             "old_ownership__owner__email",
+            # Housing company info
+            "new_ownership__apartment__building__real_estate__housing_company__uuid",
+            "old_ownership__apartment__building__real_estate__housing_company__uuid",
+            "new_ownership__apartment__building__real_estate__housing_company__display_name",
+            "old_ownership__apartment__building__real_estate__housing_company__display_name",
+            # Address info
+            "new_ownership__apartment__building__real_estate__housing_company__postal_code__value",
+            "old_ownership__apartment__building__real_estate__housing_company__postal_code__value",
+            "new_ownership__apartment__building__real_estate__housing_company__postal_code__city",
+            "old_ownership__apartment__building__real_estate__housing_company__postal_code__city",
         )
     )
