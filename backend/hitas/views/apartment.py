@@ -12,7 +12,7 @@ from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
-from enumfields.drf import EnumSupportSerializerMixin
+from enumfields.drf import EnumSupportSerializerMixin, EnumField
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
@@ -39,7 +39,7 @@ from hitas.models.condition_of_sale import condition_of_sale_queryset, GracePeri
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
 from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid, check_for_overlap
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
-from hitas.views.condition_of_sale import ConditionOfSaleSerializer
+from hitas.views.condition_of_sale import MinimalOwnerSerializer, MinimalApartmentSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasDecimalField,
@@ -474,6 +474,39 @@ class ReadOnlyBuildingSerializer(ReadOnlySerializer):
         fields = ["id"]
 
 
+class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
+    owner = serializers.SerializerMethodField()
+    apartment = serializers.SerializerMethodField()
+    grace_period = EnumField(GracePeriod)
+    fulfilled = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_fulfilled(instance: ConditionOfSale) -> Optional[datetime.datetime]:
+        return instance.fulfilled
+
+    def select_ownership(self, instance: ConditionOfSale) -> Ownership:
+        if instance.old_ownership.apartment == self.context["apartment"]:
+            return instance.new_ownership
+        else:
+            return instance.old_ownership
+
+    def get_owner(self, instance: ConditionOfSale):
+        return MinimalOwnerSerializer(self.select_ownership(instance).owner).data
+
+    def get_apartment(self, instance: ConditionOfSale):
+        return MinimalApartmentSerializer(self.select_ownership(instance).apartment).data
+
+    class Meta:
+        model = ConditionOfSale
+        fields = [
+            "id",
+            "owner",
+            "apartment",
+            "grace_period",
+            "fulfilled",
+        ]
+
+
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     state = HitasEnumField(enum=ApartmentState, required=False, allow_null=True)
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type", required=False, allow_null=True)
@@ -499,7 +532,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all())
         ]
 
-        return [ConditionOfSaleSerializer(condition_of_sale).data for condition_of_sale in conditions_of_sale]
+        context = {"apartment": instance}
+        return [ApartmentConditionsOfSaleSerializer(cos, context=context).data for cos in conditions_of_sale]
 
     @staticmethod
     def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:

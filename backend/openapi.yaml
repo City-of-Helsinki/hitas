@@ -3848,7 +3848,7 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/ConditionOfSale'
+            $ref: '#/components/schemas/ApartmentConditionOfSale'
         sell_by_date:
           description: |-
             The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
@@ -4088,7 +4088,7 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/ConditionOfSale'
+            $ref: '#/components/schemas/ApartmentConditionOfSale'
         sell_by_date:
           description: |-
             The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
@@ -6181,6 +6181,38 @@ components:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
+
+    ApartmentConditionOfSale:
+      description: Condition of Sale under an apartment
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - owner
+        - apartment
+        - grace_period
+        - fulfilled
+      properties:
+        id:
+          description: ID of this condition of sale
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        owner:
+          readOnly: true
+          $ref: '#/components/schemas/ReadOnlyOwner'
+        apartment:
+          readOnly: true
+          $ref: '#/components/schemas/ConditionOfSaleApartment'
+        grace_period:
+          $ref: '#/components/schemas/GracePeriod'
+        fulfilled:
+          description: When this condition of sale was fulfilled, null if not fulfilled yet
+          type: string
+          nullable: true
+          readOnly: true
+          format: date-time
+          example: 1985-12-10T00:00:00+00:00
 
     ConditionOfSale:
       description: Condition of sale between two ownerships
