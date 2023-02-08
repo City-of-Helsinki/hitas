@@ -6293,7 +6293,7 @@ components:
         - street_address
         - apartment_number
         - floor
-        - stair
+        - housing_company
       properties:
         id:
           description: ID of this apartment
@@ -6320,6 +6320,22 @@ components:
           type: string
           maxLength: 16
           example: A
+        housing_company:
+          description: Links to apartment's housing company
+          type: object
+          additionalProperties: false
+          required:
+            - id
+            - display_name
+          properties:
+            id:
+              description: Housing company ID
+              type: string
+              example: a3181b8fa60b47df8ccba0d554a913bb
+            display_name:
+              description: Housing company's display name
+              type: string
+              example: Taloyhtiö Helmi
 
     GracePeriod:
       description: |-

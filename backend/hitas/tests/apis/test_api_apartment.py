@@ -171,6 +171,10 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                             "apartment_number": ap3.apartment_number,
                             "floor": ap3.floor,
                             "stair": ap3.stair,
+                            "housing_company": {
+                                "id": ap3.housing_company.uuid.hex,
+                                "display_name": ap3.housing_company.display_name,
+                            },
                         },
                         "owner": {
                             "id": o3.owner.uuid.hex,
@@ -674,6 +678,10 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "apartment_number": ap2.apartment_number,
                     "floor": ap2.floor,
                     "stair": ap2.stair,
+                    "housing_company": {
+                        "id": ap2.housing_company.uuid.hex,
+                        "display_name": ap2.housing_company.display_name,
+                    },
                 },
                 "owner": {
                     "id": os2.owner.uuid.hex,

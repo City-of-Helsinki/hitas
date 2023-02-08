@@ -14,6 +14,14 @@ from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
 class MinimalApartmentSerializer(HitasModelSerializer):
+    housing_company = serializers.SerializerMethodField()
+
+    def get_housing_company(self, instance: Apartment):
+        return {
+            "id": instance.housing_company.uuid.hex,
+            "display_name": instance.housing_company.display_name,
+        }
+
     class Meta:
         model = Apartment
         fields = [
@@ -22,6 +30,7 @@ class MinimalApartmentSerializer(HitasModelSerializer):
             "apartment_number",
             "floor",
             "stair",
+            "housing_company",
         ]
 
 

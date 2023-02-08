@@ -43,46 +43,54 @@ def test__api__condition_of_sale__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
-    condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create()
+    cos: ConditionOfSale = ConditionOfSaleFactory.create()
 
     url = reverse("hitas:conditions-of-sale-list")
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
-            "id": condition_of_sale.uuid.hex,
-            "grace_period": str(condition_of_sale.grace_period.value),
-            "fulfilled": condition_of_sale.fulfilled,
+            "id": cos.uuid.hex,
+            "grace_period": str(cos.grace_period.value),
+            "fulfilled": cos.fulfilled,
             "new_ownership": {
-                "percentage": float(condition_of_sale.new_ownership.percentage),
+                "percentage": float(cos.new_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale.new_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale.new_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale.new_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale.new_ownership.apartment.floor,
-                    "stair": condition_of_sale.new_ownership.apartment.stair,
+                    "id": cos.new_ownership.apartment.uuid.hex,
+                    "street_address": cos.new_ownership.apartment.street_address,
+                    "apartment_number": cos.new_ownership.apartment.apartment_number,
+                    "floor": cos.new_ownership.apartment.floor,
+                    "stair": cos.new_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos.new_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos.new_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale.new_ownership.owner.uuid.hex,
-                    "name": condition_of_sale.new_ownership.owner.name,
-                    "identifier": condition_of_sale.new_ownership.owner.identifier,
-                    "email": condition_of_sale.new_ownership.owner.email,
+                    "id": cos.new_ownership.owner.uuid.hex,
+                    "name": cos.new_ownership.owner.name,
+                    "identifier": cos.new_ownership.owner.identifier,
+                    "email": cos.new_ownership.owner.email,
                 },
             },
             "old_ownership": {
-                "percentage": float(condition_of_sale.old_ownership.percentage),
+                "percentage": float(cos.old_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale.old_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale.old_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale.old_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale.old_ownership.apartment.floor,
-                    "stair": condition_of_sale.old_ownership.apartment.stair,
+                    "id": cos.old_ownership.apartment.uuid.hex,
+                    "street_address": cos.old_ownership.apartment.street_address,
+                    "apartment_number": cos.old_ownership.apartment.apartment_number,
+                    "floor": cos.old_ownership.apartment.floor,
+                    "stair": cos.old_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos.old_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos.old_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale.old_ownership.owner.uuid.hex,
-                    "name": condition_of_sale.old_ownership.owner.name,
-                    "identifier": condition_of_sale.old_ownership.owner.identifier,
-                    "email": condition_of_sale.old_ownership.owner.email,
+                    "id": cos.old_ownership.owner.uuid.hex,
+                    "name": cos.old_ownership.owner.name,
+                    "identifier": cos.old_ownership.owner.identifier,
+                    "email": cos.old_ownership.owner.email,
                 },
             },
         }
@@ -101,84 +109,100 @@ def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
-    condition_of_sale_1: ConditionOfSale = ConditionOfSaleFactory.create()
-    condition_of_sale_2: ConditionOfSale = ConditionOfSaleFactory.create()
+    cos_1: ConditionOfSale = ConditionOfSaleFactory.create()
+    cos_2: ConditionOfSale = ConditionOfSaleFactory.create()
 
     url = reverse("hitas:conditions-of-sale-list")
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
-            "id": condition_of_sale_1.uuid.hex,
-            "grace_period": str(condition_of_sale_1.grace_period.value),
-            "fulfilled": condition_of_sale_1.fulfilled,
+            "id": cos_1.uuid.hex,
+            "grace_period": str(cos_1.grace_period.value),
+            "fulfilled": cos_1.fulfilled,
             "new_ownership": {
-                "percentage": float(condition_of_sale_1.new_ownership.percentage),
+                "percentage": float(cos_1.new_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale_1.new_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale_1.new_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale_1.new_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale_1.new_ownership.apartment.floor,
-                    "stair": condition_of_sale_1.new_ownership.apartment.stair,
+                    "id": cos_1.new_ownership.apartment.uuid.hex,
+                    "street_address": cos_1.new_ownership.apartment.street_address,
+                    "apartment_number": cos_1.new_ownership.apartment.apartment_number,
+                    "floor": cos_1.new_ownership.apartment.floor,
+                    "stair": cos_1.new_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos_1.new_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos_1.new_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale_1.new_ownership.owner.uuid.hex,
-                    "name": condition_of_sale_1.new_ownership.owner.name,
-                    "identifier": condition_of_sale_1.new_ownership.owner.identifier,
-                    "email": condition_of_sale_1.new_ownership.owner.email,
+                    "id": cos_1.new_ownership.owner.uuid.hex,
+                    "name": cos_1.new_ownership.owner.name,
+                    "identifier": cos_1.new_ownership.owner.identifier,
+                    "email": cos_1.new_ownership.owner.email,
                 },
             },
             "old_ownership": {
-                "percentage": float(condition_of_sale_1.old_ownership.percentage),
+                "percentage": float(cos_1.old_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale_1.old_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale_1.old_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale_1.old_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale_1.old_ownership.apartment.floor,
-                    "stair": condition_of_sale_1.old_ownership.apartment.stair,
+                    "id": cos_1.old_ownership.apartment.uuid.hex,
+                    "street_address": cos_1.old_ownership.apartment.street_address,
+                    "apartment_number": cos_1.old_ownership.apartment.apartment_number,
+                    "floor": cos_1.old_ownership.apartment.floor,
+                    "stair": cos_1.old_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos_1.old_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos_1.old_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale_1.old_ownership.owner.uuid.hex,
-                    "name": condition_of_sale_1.old_ownership.owner.name,
-                    "identifier": condition_of_sale_1.old_ownership.owner.identifier,
-                    "email": condition_of_sale_1.old_ownership.owner.email,
+                    "id": cos_1.old_ownership.owner.uuid.hex,
+                    "name": cos_1.old_ownership.owner.name,
+                    "identifier": cos_1.old_ownership.owner.identifier,
+                    "email": cos_1.old_ownership.owner.email,
                 },
             },
         },
         {
-            "id": condition_of_sale_2.uuid.hex,
-            "grace_period": str(condition_of_sale_2.grace_period.value),
-            "fulfilled": condition_of_sale_2.fulfilled,
+            "id": cos_2.uuid.hex,
+            "grace_period": str(cos_2.grace_period.value),
+            "fulfilled": cos_2.fulfilled,
             "new_ownership": {
-                "percentage": float(condition_of_sale_2.new_ownership.percentage),
+                "percentage": float(cos_2.new_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale_2.new_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale_2.new_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale_2.new_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale_2.new_ownership.apartment.floor,
-                    "stair": condition_of_sale_2.new_ownership.apartment.stair,
+                    "id": cos_2.new_ownership.apartment.uuid.hex,
+                    "street_address": cos_2.new_ownership.apartment.street_address,
+                    "apartment_number": cos_2.new_ownership.apartment.apartment_number,
+                    "floor": cos_2.new_ownership.apartment.floor,
+                    "stair": cos_2.new_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos_2.new_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos_2.new_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale_2.new_ownership.owner.uuid.hex,
-                    "name": condition_of_sale_2.new_ownership.owner.name,
-                    "identifier": condition_of_sale_2.new_ownership.owner.identifier,
-                    "email": condition_of_sale_2.new_ownership.owner.email,
+                    "id": cos_2.new_ownership.owner.uuid.hex,
+                    "name": cos_2.new_ownership.owner.name,
+                    "identifier": cos_2.new_ownership.owner.identifier,
+                    "email": cos_2.new_ownership.owner.email,
                 },
             },
             "old_ownership": {
-                "percentage": float(condition_of_sale_2.old_ownership.percentage),
+                "percentage": float(cos_2.old_ownership.percentage),
                 "apartment": {
-                    "id": condition_of_sale_2.old_ownership.apartment.uuid.hex,
-                    "street_address": condition_of_sale_2.old_ownership.apartment.street_address,
-                    "apartment_number": condition_of_sale_2.old_ownership.apartment.apartment_number,
-                    "floor": condition_of_sale_2.old_ownership.apartment.floor,
-                    "stair": condition_of_sale_2.old_ownership.apartment.stair,
+                    "id": cos_2.old_ownership.apartment.uuid.hex,
+                    "street_address": cos_2.old_ownership.apartment.street_address,
+                    "apartment_number": cos_2.old_ownership.apartment.apartment_number,
+                    "floor": cos_2.old_ownership.apartment.floor,
+                    "stair": cos_2.old_ownership.apartment.stair,
+                    "housing_company": {
+                        "id": cos_2.old_ownership.apartment.housing_company.uuid.hex,
+                        "display_name": cos_2.old_ownership.apartment.housing_company.display_name,
+                    },
                 },
                 "owner": {
-                    "id": condition_of_sale_2.old_ownership.owner.uuid.hex,
-                    "name": condition_of_sale_2.old_ownership.owner.name,
-                    "identifier": condition_of_sale_2.old_ownership.owner.identifier,
-                    "email": condition_of_sale_2.old_ownership.owner.email,
+                    "id": cos_2.old_ownership.owner.uuid.hex,
+                    "name": cos_2.old_ownership.owner.name,
+                    "identifier": cos_2.old_ownership.owner.identifier,
+                    "email": cos_2.old_ownership.owner.email,
                 },
             },
         },
@@ -246,50 +270,58 @@ def test__api__condition_of_sale__list__fulfilled_over_x_months(api_client: Hita
 
 @pytest.mark.django_db
 def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
-    condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create()
+    cos: ConditionOfSale = ConditionOfSaleFactory.create()
 
     url = reverse(
         "hitas:conditions-of-sale-detail",
         kwargs={
-            "uuid": condition_of_sale.uuid.hex,
+            "uuid": cos.uuid.hex,
         },
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
-        "id": condition_of_sale.uuid.hex,
-        "grace_period": str(condition_of_sale.grace_period.value),
-        "fulfilled": condition_of_sale.fulfilled,
+        "id": cos.uuid.hex,
+        "grace_period": str(cos.grace_period.value),
+        "fulfilled": cos.fulfilled,
         "new_ownership": {
-            "percentage": float(condition_of_sale.new_ownership.percentage),
+            "percentage": float(cos.new_ownership.percentage),
             "apartment": {
-                "id": condition_of_sale.new_ownership.apartment.uuid.hex,
-                "street_address": condition_of_sale.new_ownership.apartment.street_address,
-                "apartment_number": condition_of_sale.new_ownership.apartment.apartment_number,
-                "floor": condition_of_sale.new_ownership.apartment.floor,
-                "stair": condition_of_sale.new_ownership.apartment.stair,
+                "id": cos.new_ownership.apartment.uuid.hex,
+                "street_address": cos.new_ownership.apartment.street_address,
+                "apartment_number": cos.new_ownership.apartment.apartment_number,
+                "floor": cos.new_ownership.apartment.floor,
+                "stair": cos.new_ownership.apartment.stair,
+                "housing_company": {
+                    "id": cos.new_ownership.apartment.housing_company.uuid.hex,
+                    "display_name": cos.new_ownership.apartment.housing_company.display_name,
+                },
             },
             "owner": {
-                "id": condition_of_sale.new_ownership.owner.uuid.hex,
-                "name": condition_of_sale.new_ownership.owner.name,
-                "identifier": condition_of_sale.new_ownership.owner.identifier,
-                "email": condition_of_sale.new_ownership.owner.email,
+                "id": cos.new_ownership.owner.uuid.hex,
+                "name": cos.new_ownership.owner.name,
+                "identifier": cos.new_ownership.owner.identifier,
+                "email": cos.new_ownership.owner.email,
             },
         },
         "old_ownership": {
-            "percentage": float(condition_of_sale.old_ownership.percentage),
+            "percentage": float(cos.old_ownership.percentage),
             "apartment": {
-                "id": condition_of_sale.old_ownership.apartment.uuid.hex,
-                "street_address": condition_of_sale.old_ownership.apartment.street_address,
-                "apartment_number": condition_of_sale.old_ownership.apartment.apartment_number,
-                "floor": condition_of_sale.old_ownership.apartment.floor,
-                "stair": condition_of_sale.old_ownership.apartment.stair,
+                "id": cos.old_ownership.apartment.uuid.hex,
+                "street_address": cos.old_ownership.apartment.street_address,
+                "apartment_number": cos.old_ownership.apartment.apartment_number,
+                "floor": cos.old_ownership.apartment.floor,
+                "stair": cos.old_ownership.apartment.stair,
+                "housing_company": {
+                    "id": cos.old_ownership.apartment.housing_company.uuid.hex,
+                    "display_name": cos.old_ownership.apartment.housing_company.display_name,
+                },
             },
             "owner": {
-                "id": condition_of_sale.old_ownership.owner.uuid.hex,
-                "name": condition_of_sale.old_ownership.owner.name,
-                "identifier": condition_of_sale.old_ownership.owner.identifier,
-                "email": condition_of_sale.old_ownership.owner.email,
+                "id": cos.old_ownership.owner.uuid.hex,
+                "name": cos.old_ownership.owner.name,
+                "identifier": cos.old_ownership.owner.identifier,
+                "email": cos.old_ownership.owner.email,
             },
         },
     }
