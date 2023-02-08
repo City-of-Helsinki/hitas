@@ -10,11 +10,12 @@ from rest_framework.serializers import ModelSerializer
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDField
+from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
 class MinimalApartmentSerializer(HitasModelSerializer):
     housing_company = serializers.SerializerMethodField()
+    address = ApartmentHitasAddressSerializer(source="*")
 
     def get_housing_company(self, instance: Apartment):
         return {
@@ -26,10 +27,7 @@ class MinimalApartmentSerializer(HitasModelSerializer):
         model = Apartment
         fields = [
             "id",
-            "street_address",
-            "apartment_number",
-            "floor",
-            "stair",
+            "address",
             "housing_company",
         ]
 

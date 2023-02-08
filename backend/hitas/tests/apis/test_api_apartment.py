@@ -167,10 +167,14 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "fulfilled": cos.fulfilled,
                         "apartment": {
                             "id": ap3.uuid.hex,
-                            "street_address": ap3.street_address,
-                            "apartment_number": ap3.apartment_number,
-                            "floor": ap3.floor,
-                            "stair": ap3.stair,
+                            "address": {
+                                "street_address": ap3.street_address,
+                                "apartment_number": ap3.apartment_number,
+                                "floor": ap3.floor,
+                                "stair": ap3.stair,
+                                "city": "Helsinki",
+                                "postal_code": ap3.postal_code.value,
+                            },
                             "housing_company": {
                                 "id": ap3.housing_company.uuid.hex,
                                 "display_name": ap3.housing_company.display_name,
@@ -674,10 +678,14 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "fulfilled": cos.fulfilled,
                 "apartment": {
                     "id": ap2.uuid.hex,
-                    "street_address": ap2.street_address,
-                    "apartment_number": ap2.apartment_number,
-                    "floor": ap2.floor,
-                    "stair": ap2.stair,
+                    "address": {
+                        "street_address": ap2.street_address,
+                        "apartment_number": ap2.apartment_number,
+                        "floor": ap2.floor,
+                        "stair": ap2.stair,
+                        "city": "Helsinki",
+                        "postal_code": ap2.postal_code.value,
+                    },
                     "housing_company": {
                         "id": ap2.housing_company.uuid.hex,
                         "display_name": ap2.housing_company.display_name,

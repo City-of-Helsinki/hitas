@@ -6290,9 +6290,7 @@ components:
       additionalProperties: false
       required:
         - id
-        - street_address
-        - apartment_number
-        - floor
+        - address
         - housing_company
       properties:
         id:
@@ -6300,26 +6298,8 @@ components:
           type: string
           readOnly: true
           example: dc1072975bab4ba69f64814f021c6785
-        street_address:
-          description: Street address
-          type: string
-          example: Hannunkatu 24
-        apartment_number:
-          description: Apartment number
-          type: number
-          minimum: 0
-          example: 14
-        floor:
-          description: Apartment floor
-          type: string
-          maxLength: 50
-          nullable: true
-          example: "5"
-        stair:
-          description: Apartment stair
-          type: string
-          maxLength: 16
-          example: A
+        address:
+          $ref: '#/components/schemas/ApartmentAddress'
         housing_company:
           description: Links to apartment's housing company
           type: object

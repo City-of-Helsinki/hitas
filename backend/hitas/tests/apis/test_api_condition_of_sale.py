@@ -57,10 +57,14 @@ def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
                 "percentage": float(cos.new_ownership.percentage),
                 "apartment": {
                     "id": cos.new_ownership.apartment.uuid.hex,
-                    "street_address": cos.new_ownership.apartment.street_address,
-                    "apartment_number": cos.new_ownership.apartment.apartment_number,
-                    "floor": cos.new_ownership.apartment.floor,
-                    "stair": cos.new_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos.new_ownership.apartment.street_address,
+                        "apartment_number": cos.new_ownership.apartment.apartment_number,
+                        "floor": cos.new_ownership.apartment.floor,
+                        "stair": cos.new_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos.new_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos.new_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos.new_ownership.apartment.housing_company.display_name,
@@ -77,10 +81,14 @@ def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
                 "percentage": float(cos.old_ownership.percentage),
                 "apartment": {
                     "id": cos.old_ownership.apartment.uuid.hex,
-                    "street_address": cos.old_ownership.apartment.street_address,
-                    "apartment_number": cos.old_ownership.apartment.apartment_number,
-                    "floor": cos.old_ownership.apartment.floor,
-                    "stair": cos.old_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos.old_ownership.apartment.street_address,
+                        "apartment_number": cos.old_ownership.apartment.apartment_number,
+                        "floor": cos.old_ownership.apartment.floor,
+                        "stair": cos.old_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos.old_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos.old_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos.old_ownership.apartment.housing_company.display_name,
@@ -124,10 +132,14 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                 "percentage": float(cos_1.new_ownership.percentage),
                 "apartment": {
                     "id": cos_1.new_ownership.apartment.uuid.hex,
-                    "street_address": cos_1.new_ownership.apartment.street_address,
-                    "apartment_number": cos_1.new_ownership.apartment.apartment_number,
-                    "floor": cos_1.new_ownership.apartment.floor,
-                    "stair": cos_1.new_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos_1.new_ownership.apartment.street_address,
+                        "apartment_number": cos_1.new_ownership.apartment.apartment_number,
+                        "floor": cos_1.new_ownership.apartment.floor,
+                        "stair": cos_1.new_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos_1.new_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos_1.new_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos_1.new_ownership.apartment.housing_company.display_name,
@@ -144,10 +156,14 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                 "percentage": float(cos_1.old_ownership.percentage),
                 "apartment": {
                     "id": cos_1.old_ownership.apartment.uuid.hex,
-                    "street_address": cos_1.old_ownership.apartment.street_address,
-                    "apartment_number": cos_1.old_ownership.apartment.apartment_number,
-                    "floor": cos_1.old_ownership.apartment.floor,
-                    "stair": cos_1.old_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos_1.old_ownership.apartment.street_address,
+                        "apartment_number": cos_1.old_ownership.apartment.apartment_number,
+                        "floor": cos_1.old_ownership.apartment.floor,
+                        "stair": cos_1.old_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos_1.old_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos_1.old_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos_1.old_ownership.apartment.housing_company.display_name,
@@ -169,10 +185,14 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                 "percentage": float(cos_2.new_ownership.percentage),
                 "apartment": {
                     "id": cos_2.new_ownership.apartment.uuid.hex,
-                    "street_address": cos_2.new_ownership.apartment.street_address,
-                    "apartment_number": cos_2.new_ownership.apartment.apartment_number,
-                    "floor": cos_2.new_ownership.apartment.floor,
-                    "stair": cos_2.new_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos_2.new_ownership.apartment.street_address,
+                        "apartment_number": cos_2.new_ownership.apartment.apartment_number,
+                        "floor": cos_2.new_ownership.apartment.floor,
+                        "stair": cos_2.new_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos_2.new_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos_2.new_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos_2.new_ownership.apartment.housing_company.display_name,
@@ -189,10 +209,14 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                 "percentage": float(cos_2.old_ownership.percentage),
                 "apartment": {
                     "id": cos_2.old_ownership.apartment.uuid.hex,
-                    "street_address": cos_2.old_ownership.apartment.street_address,
-                    "apartment_number": cos_2.old_ownership.apartment.apartment_number,
-                    "floor": cos_2.old_ownership.apartment.floor,
-                    "stair": cos_2.old_ownership.apartment.stair,
+                    "address": {
+                        "street_address": cos_2.old_ownership.apartment.street_address,
+                        "apartment_number": cos_2.old_ownership.apartment.apartment_number,
+                        "floor": cos_2.old_ownership.apartment.floor,
+                        "stair": cos_2.old_ownership.apartment.stair,
+                        "city": "Helsinki",
+                        "postal_code": cos_2.old_ownership.apartment.postal_code.value,
+                    },
                     "housing_company": {
                         "id": cos_2.old_ownership.apartment.housing_company.uuid.hex,
                         "display_name": cos_2.old_ownership.apartment.housing_company.display_name,
@@ -288,10 +312,14 @@ def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
             "percentage": float(cos.new_ownership.percentage),
             "apartment": {
                 "id": cos.new_ownership.apartment.uuid.hex,
-                "street_address": cos.new_ownership.apartment.street_address,
-                "apartment_number": cos.new_ownership.apartment.apartment_number,
-                "floor": cos.new_ownership.apartment.floor,
-                "stair": cos.new_ownership.apartment.stair,
+                "address": {
+                    "street_address": cos.new_ownership.apartment.street_address,
+                    "apartment_number": cos.new_ownership.apartment.apartment_number,
+                    "floor": cos.new_ownership.apartment.floor,
+                    "stair": cos.new_ownership.apartment.stair,
+                    "city": "Helsinki",
+                    "postal_code": cos.new_ownership.apartment.postal_code.value,
+                },
                 "housing_company": {
                     "id": cos.new_ownership.apartment.housing_company.uuid.hex,
                     "display_name": cos.new_ownership.apartment.housing_company.display_name,
@@ -308,10 +336,14 @@ def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
             "percentage": float(cos.old_ownership.percentage),
             "apartment": {
                 "id": cos.old_ownership.apartment.uuid.hex,
-                "street_address": cos.old_ownership.apartment.street_address,
-                "apartment_number": cos.old_ownership.apartment.apartment_number,
-                "floor": cos.old_ownership.apartment.floor,
-                "stair": cos.old_ownership.apartment.stair,
+                "address": {
+                    "street_address": cos.old_ownership.apartment.street_address,
+                    "apartment_number": cos.old_ownership.apartment.apartment_number,
+                    "floor": cos.old_ownership.apartment.floor,
+                    "stair": cos.old_ownership.apartment.stair,
+                    "city": "Helsinki",
+                    "postal_code": cos.old_ownership.apartment.postal_code.value,
+                },
                 "housing_company": {
                     "id": cos.old_ownership.apartment.housing_company.uuid.hex,
                     "display_name": cos.old_ownership.apartment.housing_company.display_name,
