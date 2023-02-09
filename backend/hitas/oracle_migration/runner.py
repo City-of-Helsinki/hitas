@@ -297,9 +297,7 @@ def create_housing_companies(
             # Only migrate a pre-specified set of housing companies e.g. for a testing environment
             print("Running migration with a minimal housing company dataset.")
             command = command.where(
-                companies.c.id.in_(
-                    (485, 500, 513, 515, 523, 510, 428, 466, 552, 577, 580, 583, 601, 610, 614, 631, 621)
-                )
+                companies.c.id.in_((441, 461, 468, 504, 514, 657, 658, 659, 696, 709, 763, 779, 805))
             )
         return connection.execute(command).fetchall()
 
