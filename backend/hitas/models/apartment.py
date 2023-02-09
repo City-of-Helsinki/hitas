@@ -2,7 +2,7 @@ import datetime
 import uuid
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Optional
+from typing import Any, Collection, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
@@ -266,17 +266,19 @@ class ApartmentMaximumPriceCalculation(models.Model):
         verbose_name_plural = _("Apartment maximum price calculations")
 
 
-def prefetch_first_sale(lookup_prefix: str = "") -> Prefetch:
+def prefetch_first_sale(lookup_prefix: str = "", ignore: Collection[int] = ()) -> Prefetch:
     """Prefetch only the first sale of an apartment.
 
     :param lookup_prefix: Add prefix to lookup, e.g. 'ownerships__apartment__'
                           depending on the prefix context. Should end with '__'.
+    :param ignore: These sale ID's should be ignored.
     """
     return Prefetch(
         f"{lookup_prefix}sales",
         ApartmentSale.objects.filter(
             id__in=Subquery(
                 ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
+                .exclude(id__in=ignore)
                 .order_by("purchase_date")
                 .values_list("id", flat=True)[:1]
             )

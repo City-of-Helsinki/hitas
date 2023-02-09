@@ -87,13 +87,22 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                     Ownership.objects.select_related("apartment"),
                 ),
                 # Limit the fetched sales to only the first sale,
-                # as we only need that to figure out if the apartment is new
-                prefetch_first_sale("ownerships__apartment__"),
+                # as we only need that to figure out if the apartment is new.
+                # Ignore the sale we just created so that this apartment is treated as new.
+                prefetch_first_sale("ownerships__apartment__", ignore=[instance.id]),
             )
             for owner in owners:
                 cos = create_conditions_of_sale(owners=[owner])
                 if cos:
                     self.context["conditions_of_sale_created"] = True
+
+            apartment.first_purchase_date = instance.purchase_date
+            apartment.save()
+            return instance
+
+        if apartment.latest_purchase_date is None or instance.purchase_date > apartment.latest_purchase_date:
+            apartment.latest_purchase_date = instance.purchase_date
+            apartment.save()
 
         return instance
 
