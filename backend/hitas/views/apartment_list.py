@@ -56,6 +56,7 @@ class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     ownerships = OwnershipSerializer(many=True, read_only=False)
     links = serializers.SerializerMethodField()
     sell_by_date = serializers.SerializerMethodField()
+    on_grace_period = serializers.SerializerMethodField()
 
     @staticmethod
     def get_type(instance: Apartment) -> Optional[str]:
@@ -69,6 +70,10 @@ class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
         return instance.sell_by_date()
 
+    @staticmethod
+    def get_on_grace_period(instance: Apartment) -> Optional[datetime.date]:
+        return instance.on_grace_period()
+
     class Meta:
         model = Apartment
         fields = [
@@ -80,6 +85,7 @@ class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
             "address",
             "completion_date",
             "sell_by_date",
+            "on_grace_period",
             "ownerships",
         ]
 

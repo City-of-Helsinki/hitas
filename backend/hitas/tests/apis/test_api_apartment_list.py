@@ -111,6 +111,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 },
             },
             "sell_by_date": None,
+            "on_grace_period": False,
         },
         {
             "id": ap2.uuid.hex,
@@ -154,6 +155,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "completion_date": str(ap2.completion_date),
             "ownerships": [],
             "sell_by_date": None,
+            "on_grace_period": False,
         },
     ]
     assert response.json()["page"] == {
@@ -185,7 +187,7 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
     o1: Ownership = OwnershipFactory.create(owner=owner, apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o3: Ownership = OwnershipFactory.create(owner=owner, apartment=ap2)
-    ConditionOfSaleFactory.create(new_ownership=o3, old_ownership=o1, grace_period=GracePeriod.NOT_GIVEN)
+    ConditionOfSaleFactory.create(new_ownership=o3, old_ownership=o1, grace_period=GracePeriod.THREE_MONTHS)
 
     response = api_client.get(reverse("hitas:apartment-list"))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -250,7 +252,8 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
                     "link": f"/api/v1/housing-companies/{hc1.uuid.hex}/apartments/{ap1.uuid.hex}",
                 },
             },
-            "sell_by_date": str(ap2.completion_date),
+            "sell_by_date": str(date(2023, 4, 1)),
+            "on_grace_period": True,
         },
         {
             "id": ap2.uuid.hex,
@@ -303,7 +306,8 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
                     "percentage": float(o3.percentage),
                 }
             ],
-            "sell_by_date": str(ap2.completion_date),
+            "sell_by_date": str(date(2023, 4, 1)),
+            "on_grace_period": True,
         },
     ]
     assert response.json()["page"] == {

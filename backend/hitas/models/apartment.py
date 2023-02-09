@@ -157,6 +157,15 @@ class Apartment(ExternalHitasModel):
 
         return min(sell_by_dates)
 
+    def on_grace_period(self) -> bool:
+        for ownership in self.ownerships.all():
+            for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
+                if cos.fulfilled:
+                    continue
+                if cos.grace_period != GracePeriod.NOT_GIVEN:
+                    return True
+        return False
+
     class Meta:
         verbose_name = _("Apartment")
         verbose_name_plural = _("Apartments")
