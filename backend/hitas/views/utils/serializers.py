@@ -59,3 +59,12 @@ class AddressSerializer(serializers.Serializer):
 class YearMonthSerializer(serializers.DateField):
     format = "%Y-%m"
     input_formats = [format]
+
+
+class ApartmentHitasAddressSerializer(serializers.Serializer):
+    street_address = serializers.CharField()
+    postal_code = serializers.CharField(source="building.real_estate.housing_company.postal_code.value", read_only=True)
+    city = serializers.CharField(source="building.real_estate.housing_company.postal_code.city", read_only=True)
+    apartment_number = serializers.IntegerField(min_value=0)
+    floor = serializers.CharField(max_length=50, required=False, allow_null=True, allow_blank=True)
+    stair = serializers.CharField(max_length=16)

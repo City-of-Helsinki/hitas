@@ -165,37 +165,26 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "id": cos.uuid.hex,
                         "grace_period": str(cos.grace_period.value),
                         "fulfilled": cos.fulfilled,
-                        "new_ownership": {
-                            "percentage": float(o3.percentage),
-                            "apartment": {
-                                "id": ap3.uuid.hex,
+                        "apartment": {
+                            "id": ap3.uuid.hex,
+                            "address": {
                                 "street_address": ap3.street_address,
                                 "apartment_number": ap3.apartment_number,
                                 "floor": ap3.floor,
                                 "stair": ap3.stair,
+                                "city": "Helsinki",
+                                "postal_code": ap3.postal_code.value,
                             },
-                            "owner": {
-                                "id": o3.owner.uuid.hex,
-                                "name": o3.owner.name,
-                                "identifier": o3.owner.identifier,
-                                "email": o3.owner.email,
+                            "housing_company": {
+                                "id": ap3.housing_company.uuid.hex,
+                                "display_name": ap3.housing_company.display_name,
                             },
                         },
-                        "old_ownership": {
-                            "percentage": float(o2.percentage),
-                            "apartment": {
-                                "id": ap1.uuid.hex,
-                                "street_address": ap1.street_address,
-                                "apartment_number": ap1.apartment_number,
-                                "floor": ap1.floor,
-                                "stair": ap1.stair,
-                            },
-                            "owner": {
-                                "id": o2.owner.uuid.hex,
-                                "name": o2.owner.name,
-                                "identifier": o2.owner.identifier,
-                                "email": o2.owner.email,
-                            },
+                        "owner": {
+                            "id": o3.owner.uuid.hex,
+                            "name": o3.owner.name,
+                            "identifier": o3.owner.identifier,
+                            "email": o3.owner.email,
                         },
                     }
                 ],
@@ -687,37 +676,26 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "id": cos.uuid.hex,
                 "grace_period": str(cos.grace_period.value),
                 "fulfilled": cos.fulfilled,
-                "new_ownership": {
-                    "percentage": float(os2.percentage),
-                    "apartment": {
-                        "id": ap2.uuid.hex,
+                "apartment": {
+                    "id": ap2.uuid.hex,
+                    "address": {
                         "street_address": ap2.street_address,
                         "apartment_number": ap2.apartment_number,
                         "floor": ap2.floor,
                         "stair": ap2.stair,
+                        "city": "Helsinki",
+                        "postal_code": ap2.postal_code.value,
                     },
-                    "owner": {
-                        "id": os2.owner.uuid.hex,
-                        "name": os2.owner.name,
-                        "identifier": os2.owner.identifier,
-                        "email": os2.owner.email,
+                    "housing_company": {
+                        "id": ap2.housing_company.uuid.hex,
+                        "display_name": ap2.housing_company.display_name,
                     },
                 },
-                "old_ownership": {
-                    "percentage": float(os1.percentage),
-                    "apartment": {
-                        "id": ap1.uuid.hex,
-                        "street_address": ap1.street_address,
-                        "apartment_number": ap1.apartment_number,
-                        "floor": ap1.floor,
-                        "stair": ap1.stair,
-                    },
-                    "owner": {
-                        "id": os1.owner.uuid.hex,
-                        "name": os1.owner.name,
-                        "identifier": os1.owner.identifier,
-                        "email": os1.owner.email,
-                    },
+                "owner": {
+                    "id": os2.owner.uuid.hex,
+                    "name": os2.owner.name,
+                    "identifier": os2.owner.identifier,
+                    "email": os2.owner.email,
                 },
             }
         ],

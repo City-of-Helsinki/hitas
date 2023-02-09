@@ -15,12 +15,51 @@ import {
     IApartmentConfirmedMaximumPrice,
     IApartmentDetails,
     IApartmentUnconfirmedMaximumPrice,
+    IConditionOfSale,
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/models";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}) => {
+const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
+    return (
+        <li>
+            <h3>
+                {conditionsOfSale[0].owner.name} ({conditionsOfSale[0].owner.identifier})
+            </h3>
+            <ul>
+                {conditionsOfSale.map((cos) => (
+                    <li
+                        key={cos.id}
+                        className={cos.fulfilled ? "resolved" : "unresolved"}
+                    >
+                        <Link
+                            to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
+                        >
+                            {cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                            {formatAddress(cos.apartment.address)}
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        </li>
+    );
+};
+
+const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
+    // Create a dict with owner id as key, and all of their conditions of sale in a list as value
+    interface IGroupedConditionsOfSale {
+        [ownerId: string]: IConditionOfSale[];
+    }
+    const groupedConditionsOfSale: IGroupedConditionsOfSale = conditionsOfSale.reduce((acc, obj) => {
+        if (obj.owner.id in acc) {
+            acc[obj.owner.id].push(obj);
+        } else {
+            acc[obj.owner.id] = [obj];
+        }
+        return acc;
+    }, {});
+
     return (
         <Card>
             <div className="row row--buttons">
@@ -43,34 +82,12 @@ const ApartmentSalesConditionCard = ({apartment}: {apartment: IApartmentDetails}
             </div>
             <label className="card-heading">Myyntiehdot</label>
             <ul>
-                <li>
-                    <h3>Daniel Demola (010101-101A)</h3>
-                    <ul>
-                        <li className="unresolved">
-                            <Link to="#">
-                                <IconLock />
-                                Jokukatu 4, 00500
-                            </Link>
-                        </li>
-                        <li className="resolved">
-                            <Link to="#">
-                                <IconLockOpen />
-                                Umpikuja 0, 00404 - (myyty 3.1.2023)
-                            </Link>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <h3>Erkki Esimerkki (101099-666B)</h3>
-                    <ul>
-                        <li className="unresolved">
-                            <Link to="#">
-                                <IconLock />
-                                Peruskatu 1, 00820
-                            </Link>
-                        </li>
-                    </ul>
-                </li>
+                {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
+                    <SingleApartmentConditionOfSale
+                        key={ownerId}
+                        conditionsOfSale={cos}
+                    />
+                ))}
             </ul>
         </Card>
     );
@@ -273,7 +290,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard apartment={data} />
-                <ApartmentSalesConditionCard apartment={data} />
+                <ApartmentConditionsOfSaleCard conditionsOfSale={data.conditions_of_sale} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">

@@ -10,18 +10,26 @@ from rest_framework.serializers import ModelSerializer
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDField
+from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
 class MinimalApartmentSerializer(HitasModelSerializer):
+    housing_company = serializers.SerializerMethodField()
+    address = ApartmentHitasAddressSerializer(source="*")
+
+    @staticmethod
+    def get_housing_company(instance: Apartment):
+        return {
+            "id": instance.housing_company.uuid.hex,
+            "display_name": instance.housing_company.display_name,
+        }
+
     class Meta:
         model = Apartment
         fields = [
             "id",
-            "street_address",
-            "apartment_number",
-            "floor",
-            "stair",
+            "address",
+            "housing_company",
         ]
 
 
@@ -92,7 +100,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
             ownership for owner in owners for ownership in owner.ownerships.all() if not owner.bypass_conditions_of_sale
         ]
 
-        to_save: list[ConditionOfSale] = []
+        to_save: dict[tuple[int, int], ConditionOfSale] = {}
 
         # Create conditions of sale for all ownerships to new apartments this owner has,
         # and all the additional ownerships given (if they are for new apartments)
@@ -105,13 +113,18 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     if ownership.id == other_ownership.id:
                         continue
 
-                    to_save.append(ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership))
+                    # Only one condition of sale between two new apartments
+                    key: tuple[int, int] = tuple(sorted([ownership.id, other_ownership.id]))  # type: ignore
+                    if key in to_save:
+                        continue
+
+                    to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
 
         if not to_save:
             return []
 
         # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
-        ConditionOfSale.objects.bulk_create(to_save, ignore_conflicts=True)
+        ConditionOfSale.objects.bulk_create(to_save.values(), ignore_conflicts=True)
 
         # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
         # the ids or conditions of sale in the returned list from 'bulk_create' are not correct.

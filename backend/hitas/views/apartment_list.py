@@ -8,9 +8,10 @@ from rest_framework import mixins, serializers, viewsets
 
 from hitas.models import Apartment, ConditionOfSale, Ownership
 from hitas.models.apartment import ApartmentState
-from hitas.views.apartment import ApartmentHitasAddressSerializer, create_links
+from hitas.views.apartment import create_links
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
+    ApartmentHitasAddressSerializer,
     HitasCharFilter,
     HitasDecimalField,
     HitasEnumField,

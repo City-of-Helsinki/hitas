@@ -3848,7 +3848,7 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/ConditionOfSale'
+            $ref: '#/components/schemas/ApartmentConditionOfSale'
         sell_by_date:
           description: |-
             The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
@@ -4088,7 +4088,7 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/ConditionOfSale'
+            $ref: '#/components/schemas/ApartmentConditionOfSale'
         sell_by_date:
           description: |-
             The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
@@ -6182,6 +6182,38 @@ components:
           type: boolean
           example: false
 
+    ApartmentConditionOfSale:
+      description: Condition of Sale under an apartment
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - owner
+        - apartment
+        - grace_period
+        - fulfilled
+      properties:
+        id:
+          description: ID of this condition of sale
+          type: string
+          readOnly: true
+          example: dc1072975bab4ba69f64814f021c6785
+        owner:
+          readOnly: true
+          $ref: '#/components/schemas/ReadOnlyOwner'
+        apartment:
+          readOnly: true
+          $ref: '#/components/schemas/ConditionOfSaleApartment'
+        grace_period:
+          $ref: '#/components/schemas/GracePeriod'
+        fulfilled:
+          description: When this condition of sale was fulfilled, null if not fulfilled yet
+          type: string
+          nullable: true
+          readOnly: true
+          format: date-time
+          example: 1985-12-10T00:00:00+00:00
+
     ConditionOfSale:
       description: Condition of sale between two ownerships
       type: object
@@ -6258,36 +6290,32 @@ components:
       additionalProperties: false
       required:
         - id
-        - street_address
-        - apartment_number
-        - floor
-        - stair
+        - address
+        - housing_company
       properties:
         id:
           description: ID of this apartment
           type: string
           readOnly: true
           example: dc1072975bab4ba69f64814f021c6785
-        street_address:
-          description: Street address
-          type: string
-          example: Hannunkatu 24
-        apartment_number:
-          description: Apartment number
-          type: number
-          minimum: 0
-          example: 14
-        floor:
-          description: Apartment floor
-          type: string
-          maxLength: 50
-          nullable: true
-          example: "5"
-        stair:
-          description: Apartment stair
-          type: string
-          maxLength: 16
-          example: A
+        address:
+          $ref: '#/components/schemas/ApartmentAddress'
+        housing_company:
+          description: Links to apartment's housing company
+          type: object
+          additionalProperties: false
+          required:
+            - id
+            - display_name
+          properties:
+            id:
+              description: Housing company ID
+              type: string
+              example: a3181b8fa60b47df8ccba0d554a913bb
+            display_name:
+              description: Housing company's display name
+              type: string
+              example: Taloyhtiö Helmi
 
     GracePeriod:
       description: |-
