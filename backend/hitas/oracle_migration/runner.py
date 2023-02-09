@@ -1045,19 +1045,19 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     exclude_in_statistics=sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
                 )
 
+                buyers = get_or_create_buyers(sale)
+                owner_keys = {OwnerKey(o.identifier, o.name) for o in buyers}
+
                 # Check if this is the latest apartment sale
-                if sale["purchase_date"] == apartment.latest_purchase_date:
+                # The latest sale can be signified by exact matching latest sale date or exactly matching owners
+                if sale["purchase_date"] == apartment.latest_purchase_date or owner_keys == current_owner_keys:
                     # The dates match exactly, update ownerships instead of creating new ones.
                     new.save()
                     apartment.ownerships.all().update(sale=new)
-                    owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
-                    created_apartment_sales[sale["id"]] = owner_keys
+                    created_apartment_sales[sale["id"]] = current_owner_keys
                     is_latest_sale_created = True
                     count += 1
                     continue
-
-                buyers = get_or_create_buyers(sale)
-                owner_keys = {OwnerKey(o.identifier, o.name) for o in buyers}
 
                 # Check for duplicate owners, we don't want to create multiple sales to the same set of owners
                 if owner_keys in created_apartment_sales.values():
