@@ -6,8 +6,7 @@ from hitas.views.utils.serializers import ReadOnlySerializer
 
 
 class OwnerSerializer(ReadOnlySerializer):
-    id = UUIDRelatedField(queryset=Owner.objects, source="uuid")
-
+    id = UUIDRelatedField(queryset=Owner.objects)
     name = serializers.CharField(read_only=True)
     identifier = serializers.CharField(read_only=True)
     email = serializers.CharField(read_only=True)
