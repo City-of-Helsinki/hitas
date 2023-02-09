@@ -907,13 +907,9 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             )
         )
 
-    def create_sale_for_original_ownership() -> None:
-        """
-        Create a sale for an apartment that is never sold and still held by the original owner
-
-        Ownerships are already in the database, so bulk_create can't be used.
-        """
-        sale = ApartmentSale.objects.create(
+    def create_sale_for_original_ownership(update_ownerships) -> None:
+        """Create a sale for an apartment that is never sold and still held by the original owner"""
+        sale = ApartmentSale(
             apartment=apartment,
             notification_date=apartment.first_purchase_date,
             purchase_date=apartment.first_purchase_date,
@@ -921,8 +917,13 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             apartment_share_of_housing_company_loans=apartment.primary_loan_amount,
             exclude_in_statistics=False,
         )
-        # Link apartment ownerships to this sale
-        apartment.ownerships.all().update(sale=sale)
+        if update_ownerships:
+            # Ownerships are already in the database, so bulk_create can't be used.
+            sale.save()
+            # Link apartment ownerships to this sale
+            apartment.ownerships.all().update(sale=sale)
+        else:
+            bulk_apartment_sales.append(sale)
 
     def get_or_create_buyers(sale) -> list[Owner]:
         """Get buyers (Owner) from already converted data, or create new ones."""
@@ -990,9 +991,12 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
         # Apartment has been bought, but never resold.
         # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
         if apartment.first_purchase_date and not apartment.latest_purchase_date:
-            create_sale_for_original_ownership()
+            create_sale_for_original_ownership(update_ownerships=True)
             count += 1
             continue
+        else:
+            create_sale_for_original_ownership(update_ownerships=False)
+            count += 1
 
         created_apartment_sales: dict[str, set[OwnerKey]] = {}  # Keep track of owners in this apartments sales
         current_owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
