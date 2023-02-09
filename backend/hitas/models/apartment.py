@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from datetime import date
 from decimal import Decimal
 from itertools import chain
 from typing import Any, Collection, Optional
@@ -59,16 +60,8 @@ class Apartment(ExternalHitasModel):
     # 'Porras'
     stair = models.CharField(max_length=16)
 
-    # 'Luovutushinta'
-    debt_free_purchase_price = HitasModelDecimalField(null=True)
-    # 'Ensisijaislaina'
-    primary_loan_amount = HitasModelDecimalField(default=0, null=True)
     # 'Kauppakirjahinta'
     purchase_price = HitasModelDecimalField(null=True, blank=True)
-    # 'Ensimmäinen kauppakirjapvm'
-    first_purchase_date = models.DateField(null=True, blank=True)
-    # 'Viimeisin kauppakirjapvm'
-    latest_purchase_date = models.DateField(null=True, blank=True)
     # 'Rakennusaikaiset lisätyöt'
     additional_work_during_construction = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset lainat'
@@ -89,6 +82,30 @@ class Apartment(ExternalHitasModel):
             return None
 
         return self.debt_free_purchase_price + self.primary_loan_amount
+
+    # 'Luovutushinta'
+    @property
+    def debt_free_purchase_price(self) -> Optional[Decimal]:
+        first_sale = self.sales.order_by("purchase_date").first()
+        return first_sale.purchase_price if first_sale is not None else None
+
+    # 'Ensisijaislaina'
+    @property
+    def primary_loan_amount(self) -> Optional[Decimal]:
+        first_sale = self.sales.order_by("purchase_date").first()
+        return first_sale.primary_loan_amount if first_sale is not None else None
+
+    # 'Ensimmäinen kauppakirjapvm'
+    @property
+    def first_purchase_date(self) -> Optional[date]:
+        first_sale = self.sales.order_by("purchase_date").first()
+        return first_sale.purchase_date if first_sale is not None else None
+
+    # 'Viimeisin kauppakirjapvm'
+    @property
+    def latest_purchase_date(self) -> Optional[date]:
+        last_sale = self.sales.order_by("purchase_date").last()
+        return last_sale.purchase_date if last_sale is not None else None
 
     @property
     def housing_company(self) -> HousingCompany:
