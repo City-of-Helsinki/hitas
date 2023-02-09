@@ -484,12 +484,8 @@ def create_apartments(
         new.floor = apartment["floor"]
         new.stair = apartment["stair"]
         new.rooms = apartment["rooms"]
-        new.first_purchase_date = apartment["first_purchase_date"]
-        new.latest_purchase_date = apartment["latest_purchase_date"]
-        new.debt_free_purchase_price = apartment["debt_free_purchase_price"]
         new.purchase_price = apartment["purchase_price"]
         new.additional_work_during_construction = apartment["additional_work_during_construction"]
-        new.primary_loan_amount = apartment["primary_loan_amount"]
         new.loans_during_construction = apartment["loans_during_construction"]
 
         if apartment["completion_date"]:
@@ -897,6 +893,9 @@ def create_codes(
 
 
 def create_apartment_sales(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
+    def get_oracle_apartment(apartment_oracle_id):
+        return connection.execute(select(apartments).where(apartments.c.id == apartment_oracle_id)).first()
+
     def get_all_apartment_sales(apartment_oracle_id) -> list[hitas_monitoring]:
         """Fetch all sales for given apartment"""
         return list(
@@ -907,14 +906,14 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             )
         )
 
-    def create_sale_for_original_ownership(update_ownerships) -> None:
+    def create_sale_for_original_ownership(oracle_apartment, update_ownerships) -> None:
         """Create a sale for an apartment that is never sold and still held by the original owner"""
         sale = ApartmentSale(
             apartment=apartment,
-            notification_date=apartment.first_purchase_date,
-            purchase_date=apartment.first_purchase_date,
-            purchase_price=apartment.purchase_price,
-            apartment_share_of_housing_company_loans=apartment.primary_loan_amount,
+            notification_date=oracle_apartment["first_purchase_date"],
+            purchase_date=oracle_apartment["first_purchase_date"],
+            purchase_price=oracle_apartment["purchase_price"],
+            apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
             exclude_in_statistics=False,
         )
         if update_ownerships:
@@ -983,19 +982,21 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
     bulk_ownerships = []
 
     for apartment_oracle_id, apartment in converted_data.apartments_by_oracle_id.items():
+        oracle_apartment = get_oracle_apartment(apartment_oracle_id)
+
         # Edge case, skip importing sales.
         # These are apartments with missing data, incomplete apartments or rented apartments.
-        if not apartment.first_purchase_date:
+        if not oracle_apartment["first_purchase_date"]:
             continue
 
         # Apartment has been bought, but never resold.
         # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
-        if apartment.first_purchase_date and not apartment.latest_purchase_date:
-            create_sale_for_original_ownership(update_ownerships=True)
+        if oracle_apartment["first_purchase_date"] and not oracle_apartment["latest_purchase_date"]:
+            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=True)
             count += 1
             continue
         else:
-            create_sale_for_original_ownership(update_ownerships=False)
+            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=False)
             count += 1
 
         created_apartment_sales: dict[str, set[OwnerKey]] = {}  # Keep track of owners in this apartments sales
@@ -1018,7 +1019,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 # Check if the calculation was at valid the last time apartment was sold.
                 # 4 Months is the longest a calculation can be active (when using Surface Area Price Ceiling)
                 alt_date: date = sale["calculation_date"] or sale["notification_date"]
-                if not (alt_date <= apartment.latest_purchase_date <= (alt_date + relativedelta(months=4))):
+                if not (alt_date <= oracle_apartment["latest_purchase_date"] <= (alt_date + relativedelta(months=4))):
                     # Not valid, can be skipped
                     continue
 
@@ -1026,7 +1027,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     apartment=apartment,
                     notification_date=sale["notification_date"],
                     # Purchase date is unknown in the calculation, but it can be found in the apartment data.
-                    purchase_date=apartment.latest_purchase_date,
+                    purchase_date=oracle_apartment["latest_purchase_date"],
                     # If purchase price is missing, the price is almost certainly missing as well. Assume it if missing.
                     purchase_price=sale["purchase_price"] or sale["maximum_price"],
                     apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
@@ -1054,7 +1055,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
 
                 # Check if this is the latest apartment sale
                 # The latest sale can be signified by exact matching latest sale date or exactly matching owners
-                if sale["purchase_date"] == apartment.latest_purchase_date or owner_keys == current_owner_keys:
+                if (
+                    sale["purchase_date"] == oracle_apartment["latest_purchase_date"]
+                    or owner_keys == current_owner_keys
+                ):
                     # The dates match exactly, update ownerships instead of creating new ones.
                     new.save()
                     apartment.ownerships.all().update(sale=new)
@@ -1082,14 +1086,14 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
 
         # Oh, no! The latest sale/change of ownership was not available in apartment sales.
         # Create the latest apartment sale from apartment data and assume any missing data.
-        if not is_latest_sale_created and apartment.latest_purchase_date:
+        if not is_latest_sale_created and oracle_apartment["latest_purchase_date"]:
             # Here we end up in cases such as:
             # - Apartment had its first and last sale date is filled, but no sales were found in monitoring table.
             # - Sales were created, but latest sale buyers are different from the owners listed under apartment.
             new = ApartmentSale.objects.create(
                 apartment=apartment,
-                notification_date=apartment.latest_purchase_date,
-                purchase_date=apartment.latest_purchase_date,
+                notification_date=oracle_apartment["latest_purchase_date"],
+                purchase_date=oracle_apartment["latest_purchase_date"],
                 purchase_price=1,  # There is no way to get the actual purchase price, so hardcode it as `1`.
                 apartment_share_of_housing_company_loans=0,  # Assumed, no way to get this value accurately anywhere.
                 exclude_in_statistics=True,  # Since the price is hardcoded to `1`, these sales should be excluded.
