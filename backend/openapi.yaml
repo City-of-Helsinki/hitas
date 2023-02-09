@@ -3871,6 +3871,7 @@ components:
         - completion_date
         - ownerships
         - links
+        - sell_by_date
       properties:
         id:
           description: Apartment ID
@@ -3911,6 +3912,15 @@ components:
         links:
           readOnly: true
           $ref: '#/components/schemas/ApartmentLinks'
+        sell_by_date:
+          description: |-
+            The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
+            ownership(s). In case of multiple conditions of sale, use the first one in chronological order.
+            The value will be null if there are no current conditions of sale for this apartment's ownerships.
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
 
     ApartmentDetails:
       description: Single apartment details

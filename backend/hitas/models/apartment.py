@@ -1,7 +1,10 @@
+import datetime
 import uuid
 from decimal import Decimal
+from itertools import chain
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -10,6 +13,7 @@ from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HousingCompany
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
@@ -128,6 +132,30 @@ class Apartment(ExternalHitasModel):
         )
 
         return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
+
+    def sell_by_date(self):
+        sell_by_dates: set[datetime.date] = set()
+
+        for ownership in self.ownerships.all():
+            for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
+                if cos.fulfilled:
+                    continue
+
+                completion_date = cos.new_ownership.apartment.completion_date
+                if completion_date is None:
+                    continue
+
+                if cos.grace_period == GracePeriod.NOT_GIVEN:
+                    sell_by_dates.add(completion_date)
+                elif cos.grace_period == GracePeriod.THREE_MONTHS:
+                    sell_by_dates.add(completion_date + relativedelta(months=3))
+                elif cos.grace_period == GracePeriod.SIX_MONTHS:
+                    sell_by_dates.add(completion_date + relativedelta(months=6))
+
+        if not sell_by_dates:
+            return None
+
+        return min(sell_by_dates)
 
     class Meta:
         verbose_name = _("Apartment")

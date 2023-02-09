@@ -528,28 +528,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     @staticmethod
     def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
-        sell_by_dates: set[datetime.date] = set()
-
-        for ownership in instance.ownerships.all():
-            for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
-                if cos.fulfilled:
-                    continue
-
-                completion_date = cos.new_ownership.apartment.completion_date
-                if completion_date is None:
-                    continue
-
-                if cos.grace_period == GracePeriod.NOT_GIVEN:
-                    sell_by_dates.add(completion_date)
-                elif cos.grace_period == GracePeriod.THREE_MONTHS:
-                    sell_by_dates.add(completion_date + relativedelta(months=3))
-                elif cos.grace_period == GracePeriod.SIX_MONTHS:
-                    sell_by_dates.add(completion_date + relativedelta(months=6))
-
-        if not sell_by_dates:
-            return None
-
-        return min(sell_by_dates)
+        return instance.sell_by_date()
 
     @staticmethod
     def get_links(instance: Apartment):
