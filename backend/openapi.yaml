@@ -680,7 +680,7 @@ paths:
 
   # Sales catalog
 
-  /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/sales-catalog:
+  /api/v1/housing-companies/{housing_company_id}/sales-catalog-validate:
 
     post:
       description: Read new apartments from a sales catalog, but do not save them
@@ -695,13 +695,6 @@ paths:
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
-        - name: real_estate_id
-          required: true
-          in: path
-          description: Real estate ID
-          schema:
-            type: string
-            example: c86eaa399ce141d89d962d46bb81ab2b
       requestBody:
         required: true
         content:
@@ -731,6 +724,49 @@ paths:
           $ref: '#/components/responses/NotAcceptableExcel'
         '415':
           $ref: '#/components/responses/UnsupportedMediaTypeExcel'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/sales-catalog-create:
+
+    post:
+      description: |-
+        Add apartments from sales catalog to the first real estate and building on this housing company.
+        If no real estate or apartment is found on the housing company, create dummy ones automatically.
+      operationId: create-sales-catalog
+      tags:
+        - Sales catalog
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Apartments from the sales catalog
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/components/schemas/SalesCatalogApartmentCreate'
+      responses:
+        '204':
+          description: Successfully created apartments from sales catalog
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -6456,6 +6492,75 @@ components:
           minimum: 0
           nullable: true
           example: 55430
+
+    SalesCatalogApartmentCreate:
+      description: Input for creating an apartment from sales catalog
+      type: object
+      additionalProperties: false
+      required:
+        - stair
+        - floor
+        - apartment_number
+        - rooms
+        - apartment_type
+        - surface_area
+        - share_number_start
+        - share_number_end
+        - debt_free_purchase_price
+        - primary_loan_amount
+      properties:
+        stair:
+          description: Apartment stair
+          type: string
+          maxLength: 16
+          example: A
+        floor:
+          description: Apartment floor
+          type: string
+          maxLength: 50
+          example: "5"
+        apartment_number:
+          description: Apartment number
+          type: number
+          minimum: 0
+          example: 14
+        rooms:
+          description: Number of rooms for this apartment
+          type: integer
+          minimum: 0
+          example: 2
+        apartment_type:
+          description: Apartment type ID
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
+        surface_area:
+          description: Apartment's surface area
+          type: number
+          minimum: 0
+          example: 30.0
+        share_number_start:
+          description: First share number
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 100
+        share_number_end:
+          description: Last share number
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 150
+        debt_free_purchase_price:
+          description: The price paid to the seller when the house is bought
+          type: number
+          minimum: 0
+          example: 18281
+        primary_loan_amount:
+          description: Buyer's loan amount to the housing company
+          type: number
+          minimum: 0
+          nullable: true
+          example: 4208
 
     # Errors
 

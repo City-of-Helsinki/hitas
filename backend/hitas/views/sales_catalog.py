@@ -1,6 +1,6 @@
 from decimal import Decimal
 from itertools import combinations
-from typing import TypedDict, Union
+from typing import Optional, TypedDict, Union
 
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -9,10 +9,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from hitas.models import ApartmentType
-from hitas.utils import check_for_overlap
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, RealEstate
+from hitas.utils import check_for_overlap, lookup_model_by_uuid
 from hitas.views.utils.excel import ErrorData, NewExcelParser, OldExcelParser, RowFormat, error_key, parse_sheet
-from hitas.views.utils.fields import NumberOrRangeField
+from hitas.views.utils.fields import NumberOrRangeField, UUIDRelatedField
 
 
 class MinimalApartmentType(TypedDict):
@@ -33,6 +33,19 @@ class SalesCatalogApartment(TypedDict):
     debt_free_purchase_price: Decimal
     primary_loan_amount: Decimal
     acquisition_price: Decimal
+
+
+class SalesCatalogApartmentCreate(TypedDict):
+    stair: str
+    floor: str
+    apartment_number: int
+    rooms: Union[int, str]
+    apartment_type: ApartmentType
+    surface_area: Decimal
+    share_number_start: int
+    share_number_end: int
+    debt_free_purchase_price: Decimal
+    primary_loan_amount: Decimal
 
 
 class SalesCatalogApartmentSerializer(serializers.Serializer):
@@ -66,7 +79,20 @@ class SalesCatalogDataSerializer(serializers.Serializer):
         return data
 
 
-class SalesCatalogView(ViewSet):
+class SalesCatalogApartmentCreateSerializer(serializers.Serializer):
+    stair = serializers.CharField(max_length=16)
+    floor = serializers.CharField(max_length=50)
+    apartment_number = serializers.IntegerField(min_value=0)
+    rooms = NumberOrRangeField(min_value=1)
+    apartment_type = UUIDRelatedField(queryset=ApartmentType.objects)
+    surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
+    share_number_start = serializers.IntegerField(min_value=1)
+    share_number_end = serializers.IntegerField(min_value=1)
+    debt_free_purchase_price = serializers.DecimalField(max_digits=15, decimal_places=2)
+    primary_loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class SalesCatalogValidateView(ViewSet):
     parser_classes = [NewExcelParser, OldExcelParser]
 
     def create(self, request, *args, **kwargs) -> Response:
@@ -103,6 +129,54 @@ class SalesCatalogView(ViewSet):
             ],
         )
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class SalesCatalogCreateView(ViewSet):
+    def create(self, request, *args, **kwargs):
+        housing_company = lookup_model_by_uuid(kwargs["housing_company_uuid"], HousingCompany)
+
+        serializer = SalesCatalogApartmentCreateSerializer(data=request.data, many=True, allow_empty=False)
+        serializer.is_valid(raise_exception=True)
+
+        apartments: list[SalesCatalogApartmentCreate] = serializer.data
+
+        real_estate: Optional[RealEstate] = housing_company.real_estates.first()
+        if real_estate is None:
+            real_estate = RealEstate.objects.create(
+                street_address=housing_company.street_address,
+                housing_company=housing_company,
+            )
+
+        building: Optional[Building] = real_estate.buildings.first()
+        if building is None:
+            building = Building.objects.create(
+                street_address=real_estate.street_address,
+                real_estate=real_estate,
+            )
+
+        to_create: list[Apartment] = []
+
+        for apartment in apartments:
+            to_create.append(
+                Apartment(
+                    building=building,
+                    street_address=building.street_address,
+                    stair=apartment["stair"],
+                    floor=apartment["floor"],
+                    apartment_number=apartment["apartment_number"],
+                    rooms=apartment["rooms"],
+                    apartment_type=apartment["apartment_type"],
+                    surface_area=apartment["surface_area"],
+                    share_number_start=apartment["share_number_start"],
+                    share_number_end=apartment["share_number_end"],
+                    debt_free_purchase_price=apartment["debt_free_purchase_price"],
+                    primary_loan_amount=apartment["primary_loan_amount"],
+                )
+            )
+
+        Apartment.objects.bulk_create(to_create)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def check_share_ranges(apartments: list[SalesCatalogApartment], row_format: RowFormat, errors: ErrorData) -> None:

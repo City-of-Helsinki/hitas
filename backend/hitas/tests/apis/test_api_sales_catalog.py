@@ -1,5 +1,6 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import Any
 
 import pytest
 from django.urls import reverse
@@ -8,24 +9,23 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
-from hitas.models import ApartmentType, RealEstate
+from hitas.models import Apartment, ApartmentType, Building, HousingCompany, RealEstate
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
-from hitas.tests.factories import ApartmentTypeFactory, RealEstateFactory
+from hitas.tests.factories import ApartmentTypeFactory, BuildingFactory, HousingCompanyFactory, RealEstateFactory
 
 
 @pytest.mark.django_db
 def test__api__sales_catalog(api_client: HitasAPIClient):
-    real_estate: RealEstate = RealEstateFactory.create()
+    housing_company: HousingCompany = HousingCompanyFactory.create()
 
     # Create necessary apartment types
     apartment_type_1: ApartmentType = ApartmentTypeFactory.create(value="h+k+s")
     apartment_type_2: ApartmentType = ApartmentTypeFactory.create(value="h+kt")
 
     url = reverse(
-        "hitas:sales-catalog-list",
+        "hitas:sales-catalog-validate-list",
         kwargs={
-            "housing_company_uuid": real_estate.housing_company.uuid.hex,
-            "real_estate_uuid": real_estate.uuid.hex,
+            "housing_company_uuid": housing_company.uuid.hex,
         },
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -189,13 +189,12 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__sales_catalog__missing_apartment_types(api_client: HitasAPIClient):
-    real_estate: RealEstate = RealEstateFactory.create()
+    housing_company: HousingCompany = HousingCompanyFactory.create()
 
     url = reverse(
-        "hitas:sales-catalog-list",
+        "hitas:sales-catalog-validate-list",
         kwargs={
-            "housing_company_uuid": real_estate.housing_company.uuid.hex,
-            "real_estate_uuid": real_estate.uuid.hex,
+            "housing_company_uuid": housing_company.uuid.hex,
         },
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -467,17 +466,16 @@ def test__api__sales_catalog__missing_apartment_types(api_client: HitasAPIClient
 )
 @pytest.mark.django_db
 def test__api__sales_catalog__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
-    real_estate: RealEstate = RealEstateFactory.create()
+    housing_company: HousingCompany = HousingCompanyFactory.create()
 
     # Create necessary apartment types
     ApartmentTypeFactory.create(value="h+k+s")
     ApartmentTypeFactory.create(value="h+kt")
 
     url = reverse(
-        "hitas:sales-catalog-list",
+        "hitas:sales-catalog-validate-list",
         kwargs={
-            "housing_company_uuid": real_estate.housing_company.uuid.hex,
-            "real_estate_uuid": real_estate.uuid.hex,
+            "housing_company_uuid": housing_company.uuid.hex,
         },
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -509,3 +507,358 @@ def test__api__sales_catalog__invalid_data(api_client: HitasAPIClient, invalid_d
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.django_db
+def test__api__sales_catalog__create(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+
+    # Create necessary apartment types
+    apartment_type_1: ApartmentType = ApartmentTypeFactory.create(value="h+k+s")
+    apartment_type_2: ApartmentType = ApartmentTypeFactory.create(value="h+kt")
+
+    url = reverse(
+        "hitas:sales-catalog-create-list",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+        },
+    )
+
+    data = [
+        {
+            "apartment_number": 1,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 200000.0,
+            "floor": "1",
+            "primary_loan_amount": 75000.0,
+            "rooms": 3,
+            "share_number_end": 75,
+            "share_number_start": 1,
+            "stair": "A",
+            "surface_area": 75.0,
+        },
+        {
+            "apartment_number": 2,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 100000.0,
+            "floor": "2",
+            "primary_loan_amount": 75000.0,
+            "rooms": 1,
+            "share_number_end": 115,
+            "share_number_start": 76,
+            "stair": "A",
+            "surface_area": 40.0,
+        },
+        {
+            "apartment_number": 3,
+            "apartment_type": apartment_type_2.uuid.hex,
+            "debt_free_purchase_price": 150000.0,
+            "floor": "3",
+            "primary_loan_amount": 75000.0,
+            "rooms": 2,
+            "share_number_end": 180,
+            "share_number_start": 116,
+            "stair": "A",
+            "surface_area": 65.0,
+        },
+        {
+            "apartment_number": 4,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 250000.0,
+            "floor": "4",
+            "primary_loan_amount": 100000.0,
+            "rooms": 5,
+            "share_number_end": 280,
+            "share_number_start": 181,
+            "stair": "A",
+            "surface_area": 100.0,
+        },
+        {
+            "apartment_number": 1,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 95000.0,
+            "floor": "5",
+            "primary_loan_amount": 75000.0,
+            "rooms": 1,
+            "share_number_end": 320,
+            "share_number_start": 281,
+            "stair": "B",
+            "surface_area": 40.0,
+        },
+        {
+            "apartment_number": 2,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 250000.0,
+            "floor": "6",
+            "primary_loan_amount": 100000.0,
+            "rooms": 5,
+            "share_number_end": 420,
+            "share_number_start": 321,
+            "stair": "B",
+            "surface_area": 100.0,
+        },
+        {
+            "apartment_number": 3,
+            "apartment_type": apartment_type_1.uuid.hex,
+            "debt_free_purchase_price": 200000.0,
+            "floor": "7",
+            "primary_loan_amount": 75000.0,
+            "rooms": 3,
+            "share_number_end": 495,
+            "share_number_start": 421,
+            "stair": "B",
+            "surface_area": 75.0,
+        },
+        {
+            "apartment_number": 4,
+            "apartment_type": apartment_type_2.uuid.hex,
+            "debt_free_purchase_price": 160000.0,
+            "floor": "8",
+            "primary_loan_amount": 75000.0,
+            "rooms": 2,
+            "share_number_end": 560,
+            "share_number_start": 496,
+            "stair": "B",
+            "surface_area": 65.0,
+        },
+    ]
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    apartments: list[Apartment] = list(Apartment.objects.all())
+    assert len(apartments) == 8
+    assert apartments[0].stair == "A"
+    assert apartments[0].apartment_number == 1
+    assert apartments[1].stair == "A"
+    assert apartments[1].apartment_number == 2
+    assert apartments[2].stair == "A"
+    assert apartments[2].apartment_number == 3
+    assert apartments[3].stair == "A"
+    assert apartments[3].apartment_number == 4
+    assert apartments[4].stair == "B"
+    assert apartments[4].apartment_number == 1
+    assert apartments[5].stair == "B"
+    assert apartments[5].apartment_number == 2
+    assert apartments[6].stair == "B"
+    assert apartments[6].apartment_number == 3
+    assert apartments[7].stair == "B"
+    assert apartments[7].apartment_number == 4
+
+    # Real estate and building created automatically
+    real_estates: list[RealEstate] = list(housing_company.real_estates.all())
+    assert len(real_estates) == 1
+    buildings: list[Building] = list(real_estates[0].buildings.all())
+    assert len(buildings) == 1
+
+
+@pytest.mark.django_db
+def test__api__sales_catalog__create__real_estate_and_building_exist(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+    real_estate: RealEstate = RealEstateFactory.create(housing_company=housing_company)
+    building: Building = BuildingFactory.create(real_estate=real_estate)
+
+    # Create necessary apartment types
+    apartment_type: ApartmentType = ApartmentTypeFactory.create(value="h+k+s")
+
+    url = reverse(
+        "hitas:sales-catalog-create-list",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+        },
+    )
+
+    data = [
+        {
+            "apartment_number": 1,
+            "apartment_type": apartment_type.uuid.hex,
+            "debt_free_purchase_price": 200000.0,
+            "floor": "1",
+            "primary_loan_amount": 75000.0,
+            "rooms": 3,
+            "share_number_end": 75,
+            "share_number_start": 1,
+            "stair": "A",
+            "surface_area": 75.0,
+        },
+    ]
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    apartments: list[Apartment] = list(Apartment.objects.all())
+    assert len(apartments) == 1
+
+    # Use existing real estate and building
+    real_estates: list[RealEstate] = list(housing_company.real_estates.all())
+    assert len(real_estates) == 1
+    assert real_estates[0] == real_estate
+    buildings: list[Building] = list(real_estates[0].buildings.all())
+    assert len(buildings) == 1
+    assert buildings[0] == building
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "apartment_number cannot be null": InvalidInput(
+                invalid_data={
+                    "apartment_number": None,
+                },
+                fields=[
+                    {
+                        "field": "0.apartment_number",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                ],
+            ),
+            "stair cannot be null": InvalidInput(
+                invalid_data={
+                    "stair": None,
+                },
+                fields=[
+                    {
+                        "field": "0.stair",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                ],
+            ),
+        },
+    )
+)
+@pytest.mark.django_db
+def test__api__sales_catalog__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+
+    # Create necessary apartment types
+    apartment_type: ApartmentType = ApartmentTypeFactory.create(value="h+k+s")
+
+    url = reverse(
+        "hitas:sales-catalog-create-list",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+        },
+    )
+
+    data = {
+        "apartment_number": 1,
+        "apartment_type": apartment_type.uuid.hex,
+        "debt_free_purchase_price": 200000.0,
+        "floor": "1",
+        "primary_loan_amount": 75000.0,
+        "rooms": 3,
+        "share_number_end": 75,
+        "share_number_start": 1,
+        "stair": "A",
+        "surface_area": 75.0,
+    }
+    data.update(invalid_data)
+
+    response = api_client.post(url, data=[data], format="json", openapi_validate_request=False)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": fields,
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+    # Real estate is not created
+    real_estates: list[RealEstate] = list(housing_company.real_estates.all())
+    assert len(real_estates) == 0
+
+
+@pytest.mark.django_db
+def test__api__sales_catalog__create__invalid_data__some_in_list(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+
+    # Create necessary apartment types
+    apartment_type: ApartmentType = ApartmentTypeFactory.create(value="h+k+s")
+
+    url = reverse(
+        "hitas:sales-catalog-create-list",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+        },
+    )
+
+    invalid_data = {
+        "apartment_number": None,
+    }
+
+    data_1: dict[str, Any] = {
+        "apartment_number": 1,
+        "apartment_type": apartment_type.uuid.hex,
+        "debt_free_purchase_price": 200000.0,
+        "floor": "1",
+        "primary_loan_amount": 75000.0,
+        "rooms": 3,
+        "share_number_end": 75,
+        "share_number_start": 1,
+        "stair": "A",
+        "surface_area": 75.0,
+    }
+    data_2 = data_1.copy()
+    data_3 = data_1.copy()
+    data_1.update(invalid_data)
+    data_3.update(invalid_data)
+
+    response = api_client.post(url, data=[data_1, data_2, data_3], format="json", openapi_validate_request=False)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "0.apartment_number",
+                "message": "This field is mandatory and cannot be null.",
+            },
+            {
+                "field": "2.apartment_number",
+                "message": "This field is mandatory and cannot be null.",
+            },
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+    # Real estate is not created
+    real_estates: list[RealEstate] = list(housing_company.real_estates.all())
+    assert len(real_estates) == 0
+
+
+@pytest.mark.django_db
+def test__api__sales_catalog__create__empty(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+
+    url = reverse(
+        "hitas:sales-catalog-create-list",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+        },
+    )
+
+    response = api_client.post(url, data=[], format="json", openapi_validate_request=False)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "non_field_errors",
+                "message": "This list may not be empty.",
+            },
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+    # Real estate is not created
+    real_estates: list[RealEstate] = list(housing_company.real_estates.all())
+    assert len(real_estates) == 0

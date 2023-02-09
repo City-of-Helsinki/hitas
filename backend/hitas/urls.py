@@ -47,14 +47,19 @@ housing_company_router.register(r"real-estates", views.RealEstateViewSet, basena
 # /api/v1/housing-companies/{housing_company_id}/apartments
 housing_company_router.register(r"apartments", views.ApartmentViewSet, basename="apartment")
 
+# /api/v1/housing-companies/{housing_company_id}/sales-catalog-validate
+housing_company_router.register(
+    r"sales-catalog-validate", views.SalesCatalogValidateView, basename="sales-catalog-validate"
+)
+
+# /api/v1/housing-companies/{housing_company_id}/sales-catalog-create
+housing_company_router.register(r"sales-catalog-create", views.SalesCatalogCreateView, basename="sales-catalog-create")
+
 real_estate_router = NestedSimpleRouter(housing_company_router, r"real-estates", lookup="real_estate")
 apartment_router = NestedSimpleRouter(housing_company_router, r"apartments", lookup="apartment")
 
 # /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings
 real_estate_router.register(r"buildings", views.BuildingViewSet, basename="building")
-
-# /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/sales-catalog
-real_estate_router.register(r"sales-catalog", views.SalesCatalogView, basename="sales-catalog")
 
 # /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-price
 apartment_router.register(r"maximum-prices", views.ApartmentMaximumPriceViewSet, basename="maximum-price")
