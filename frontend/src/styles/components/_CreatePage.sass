@@ -112,7 +112,6 @@
     margin: $spacing-layout-s auto
 
 .view--create-improvements
-
   .field-sets
     @include flex-direction(column)
     padding-top: $spacing-layout-s
@@ -197,3 +196,35 @@
       height: 24px
       &:hover
         color: $color-error
+
+.view--apartment-conditions-of-sale
+  .conditions-of-sale-headers
+    position: relative
+    display: grid
+    grid-template-columns: auto 300px 150px 100px
+    gap: 1em
+    height: $spacing-layout-s
+    font-size: $fontsize-body-s
+    font-weight: 700
+    span
+      font-size: $fontsize-body-l
+      line-height: 0
+
+  .conditions-of-sale-list
+    padding: $spacing-layout-s
+    background: $color-engel-medium-light
+    display: grid
+    row-gap: 2em
+    &-item
+      display: grid
+      grid-template-columns: auto 300px 150px 100px
+      gap: 1em
+    .unresolved
+      color: $color-black-60
+    .resolved
+      color: $color-black-30
+      text-decoration: line-through
+    .unresolved a:hover
+      color: $color-black
+    .resolved a:hover
+      color: $color-black-50
