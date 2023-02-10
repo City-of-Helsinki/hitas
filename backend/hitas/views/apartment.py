@@ -528,7 +528,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
     @staticmethod
     def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
-        return instance.sell_by_date()
+        return instance.sell_by_date
 
     @staticmethod
     def get_links(instance: Apartment):

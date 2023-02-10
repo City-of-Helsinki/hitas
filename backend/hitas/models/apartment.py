@@ -133,6 +133,7 @@ class Apartment(ExternalHitasModel):
 
         return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
 
+    @property
     def sell_by_date(self):
         sell_by_dates: set[datetime.date] = set()
 
@@ -157,7 +158,8 @@ class Apartment(ExternalHitasModel):
 
         return min(sell_by_dates)
 
-    def on_grace_period(self) -> bool:
+    @property
+    def has_grace_period(self) -> bool:
         for ownership in self.ownerships.all():
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
                 if cos.fulfilled:

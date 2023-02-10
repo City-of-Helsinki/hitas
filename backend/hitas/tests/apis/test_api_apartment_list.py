@@ -111,7 +111,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 },
             },
             "sell_by_date": None,
-            "on_grace_period": False,
+            "has_grace_period": False,
         },
         {
             "id": ap2.uuid.hex,
@@ -155,7 +155,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "completion_date": str(ap2.completion_date),
             "ownerships": [],
             "sell_by_date": None,
-            "on_grace_period": False,
+            "has_grace_period": False,
         },
     ]
     assert response.json()["page"] == {

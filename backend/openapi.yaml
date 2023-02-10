@@ -3872,7 +3872,7 @@ components:
         - ownerships
         - links
         - sell_by_date
-        - on_grace_period
+        - has_grace_period
       properties:
         id:
           description: Apartment ID
@@ -3922,7 +3922,7 @@ components:
           format: date
           nullable: true
           readOnly: true
-        on_grace_period:
+        has_grace_period:
           description: Do any of the conditions of sale related to this apartment have a grace period set?
           type: boolean
 
