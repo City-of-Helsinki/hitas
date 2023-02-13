@@ -176,7 +176,7 @@ class SalesCatalogCreateView(ViewSet):
 
         Apartment.objects.bulk_create(to_create)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 def check_share_ranges(apartments: list[SalesCatalogApartment], row_format: RowFormat, errors: ErrorData) -> None:

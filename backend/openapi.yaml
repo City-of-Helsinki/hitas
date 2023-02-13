@@ -755,7 +755,7 @@ paths:
               items:
                 $ref: '#/components/schemas/SalesCatalogApartmentCreate'
       responses:
-        '204':
+        '201':
           description: Successfully created apartments from sales catalog
         '400':
           $ref: '#/components/responses/BadRequest'

@@ -625,7 +625,7 @@ def test__api__sales_catalog__create(api_client: HitasAPIClient):
 
     response = api_client.post(url, data=data, format="json")
 
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     apartments: list[Apartment] = list(Apartment.objects.all())
     assert len(apartments) == 8
@@ -686,7 +686,7 @@ def test__api__sales_catalog__create__real_estate_and_building_exist(api_client:
 
     response = api_client.post(url, data=data, format="json")
 
-    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
 
     apartments: list[Apartment] = list(Apartment.objects.all())
     assert len(apartments) == 1
