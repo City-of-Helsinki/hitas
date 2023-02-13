@@ -1,8 +1,11 @@
+from contextlib import contextmanager
 from typing import Any, NamedTuple, Optional, TypedDict, TypeVar
 
+import pytest
 import yaml
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import connection
 from openapi_core import Spec
 from openapi_core.contrib.django import DjangoOpenAPIRequest, DjangoOpenAPIResponse
 from openapi_core.templating.paths.datatypes import ServerOperationPath
@@ -184,3 +187,29 @@ def parametrize_helper(__tests: dict[str, T], /) -> ParametrizeArgs:
         )
     except Exception as error:  # noqa
         raise RuntimeError("Improper configuration. Did you use a NamedTuple for T?") from error
+
+
+@contextmanager
+def count_queries(expected: int, *, list_exceptions: bool = False):
+    orig_debug = settings.DEBUG
+    try:
+        settings.DEBUG = True
+        connection.queries_log.clear()
+        yield
+        database_queries = [
+            query["sql"]
+            for query in connection.queries
+            if "sql" in query
+            and not query["sql"].startswith("SAVEPOINT")
+            and not query["sql"].startswith("RELEASE SAVEPOINT")
+        ]
+        number_of_queries = len(database_queries)
+        if number_of_queries != expected:
+            msg = f"Unexpected database query count, {number_of_queries} instead of {expected}."
+            if list_exceptions:
+                hints = " Queries:\n- ".join(database_queries)
+                msg += f"\n- {hints}"
+            pytest.fail(msg)
+    finally:
+        connection.queries_log.clear()
+        settings.DEBUG = orig_debug

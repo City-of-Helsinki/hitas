@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 import pytest
@@ -5,10 +6,17 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import Apartment, ConditionOfSale, HousingCompany, Ownership
+from hitas.models import Apartment, ConditionOfSale, HousingCompany, Owner, Ownership
 from hitas.models.apartment import ApartmentState
-from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentFactory, ConditionOfSaleFactory, HousingCompanyFactory, OwnershipFactory
+from hitas.models.condition_of_sale import GracePeriod
+from hitas.tests.apis.helpers import HitasAPIClient, count_queries
+from hitas.tests.factories import (
+    ApartmentFactory,
+    ConditionOfSaleFactory,
+    HousingCompanyFactory,
+    OwnerFactory,
+    OwnershipFactory,
+)
 
 # List tests
 
@@ -39,7 +47,15 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
-    response = api_client.get(reverse("hitas:apartment-list"))
+    # Database queries performed:
+    # 1. Pagination count query
+    # 2. Fetch apartment
+    # 3. Join ownerships
+    # 4. Join conditions of sale where one of the ownerships is a "new ownership"
+    # 5. Join conditions of sale where one of the ownerships is an "old ownership"
+    with count_queries(5, list_exceptions=True):
+        response = api_client.get(reverse("hitas:apartment-list"))
+
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
@@ -102,6 +118,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "link": f"/api/v1/housing-companies/{hc1.uuid.hex}/apartments/{ap1.uuid.hex}",
                 },
             },
+            "sell_by_date": None,
+            "has_grace_period": False,
         },
         {
             "id": ap2.uuid.hex,
@@ -144,6 +162,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             },
             "completion_date": str(ap2.completion_date),
             "ownerships": [],
+            "sell_by_date": None,
+            "has_grace_period": False,
         },
     ]
     assert response.json()["page"] == {
@@ -156,6 +176,41 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             "previous": None,
         },
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
+    ap1: Apartment = ApartmentFactory.create(
+        apartment_number=1,
+        completion_date=date(2022, 1, 1),
+    )
+    ap2: Apartment = ApartmentFactory.create(
+        apartment_number=2,
+        completion_date=date(2023, 1, 1),
+        first_purchase_date=None,
+    )
+    owner: Owner = OwnerFactory.create()
+    o1: Ownership = OwnershipFactory.create(owner=owner, apartment=ap1, percentage=50)
+    OwnershipFactory.create(apartment=ap1, percentage=50)
+    o2: Ownership = OwnershipFactory.create(owner=owner, apartment=ap2)
+    ConditionOfSaleFactory.create(new_ownership=o2, old_ownership=o1, grace_period=GracePeriod.THREE_MONTHS)
+
+    # Database queries performed:
+    # 1. Pagination count query
+    # 2. Fetch apartment
+    # 3. Join ownerships
+    # 4. Join conditions of sale where one of the ownerships is a "new ownership"
+    # 5. Join conditions of sale where one of the ownerships is an "old ownership"
+    with count_queries(5, list_exceptions=True):
+        response = api_client.get(reverse("hitas:apartment-list"))
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    contents = response.json()["contents"]
+    assert len(contents) == 2
+    assert contents[0]["sell_by_date"] == str(date(2023, 4, 1))
+    assert contents[0]["has_grace_period"] is True
+    assert contents[1]["sell_by_date"] == str(date(2023, 4, 1))
+    assert contents[1]["has_grace_period"] is True
 
 
 # Filter tests

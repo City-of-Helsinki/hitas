@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from django.db import models
@@ -54,13 +55,24 @@ class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     completion_date = serializers.DateField(required=False, allow_null=True)
     ownerships = OwnershipSerializer(many=True, read_only=False)
     links = serializers.SerializerMethodField()
+    sell_by_date = serializers.SerializerMethodField()
+    has_grace_period = serializers.SerializerMethodField()
 
     @staticmethod
     def get_type(instance: Apartment) -> Optional[str]:
         return getattr(getattr(instance, "apartment_type", None), "value", None)
 
-    def get_links(self, instance: Apartment):
+    @staticmethod
+    def get_links(instance: Apartment):
         return create_links(instance)
+
+    @staticmethod
+    def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
+        return instance.sell_by_date
+
+    @staticmethod
+    def get_has_grace_period(instance: Apartment) -> Optional[datetime.date]:
+        return instance.has_grace_period
 
     class Meta:
         model = Apartment
@@ -72,6 +84,8 @@ class ApartmentListSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
             "surface_area",
             "address",
             "completion_date",
+            "sell_by_date",
+            "has_grace_period",
             "ownerships",
         ]
 
@@ -89,17 +103,23 @@ class ApartmentListViewSet(HitasModelMixin, mixins.ListModelMixin, viewsets.Gene
                 ),
                 Prefetch(
                     "ownerships__conditions_of_sale_new",
-                    ConditionOfSale.objects.all(),
+                    ConditionOfSale.objects.select_related(
+                        "new_ownership__apartment",
+                        "old_ownership__apartment",
+                    ).all(),
                 ),
                 Prefetch(
                     "ownerships__conditions_of_sale_old",
-                    ConditionOfSale.objects.all(),
+                    ConditionOfSale.objects.select_related(
+                        "new_ownership__apartment",
+                        "old_ownership__apartment",
+                    ).all(),
                 ),
             )
             .select_related(
+                "apartment_type",
                 "building",
                 "building__real_estate",
-                "apartment_type",
                 "building__real_estate__housing_company",
                 "building__real_estate__housing_company__postal_code",
             )
