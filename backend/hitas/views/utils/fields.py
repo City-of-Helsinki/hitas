@@ -1,6 +1,8 @@
+from typing import TypeVar, Union, overload
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Manager, QuerySet
 from enumfields import Enum
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -9,6 +11,7 @@ from rest_framework.relations import SlugRelatedField
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import HitasPostalCode
+from hitas.models._base import ExternalHitasModel
 
 
 class ValueOrNullField(serializers.Field):
@@ -35,29 +38,42 @@ class UUIDField(serializers.Field):
             raise ValidationError("Not a valid UUID hex.", code="invalid") from error
 
 
+TModel = TypeVar("TModel", bound=ExternalHitasModel)
+
+
 class UUIDRelatedField(SlugRelatedField):
-    def __init__(self, **kwargs):
-        super().__init__(slug_field="uuid", **kwargs)
+    def __init__(self, queryset: Union[QuerySet[TModel], Manager[TModel]], **kwargs):
+        kwargs.setdefault("source", "uuid")
+        kwargs.setdefault("slug_field", "uuid")
+        super().__init__(queryset=queryset, **kwargs)
 
     def run_validation(self, data=empty):
         if data == "":
             if self.required:
-                raise serializers.ValidationError(code="blank")
+                raise ValidationError(code="blank")
             return None
 
         return super().run_validation(data)
 
-    def to_representation(self, uuid):
-        return uuid.hex
-
-    def to_internal_value(self, data):
-        queryset = self.get_queryset()
+    def to_internal_value(self, value: str) -> TModel:
+        queryset: QuerySet[TModel] = self.get_queryset()
         try:
-            return queryset.get(**{self.slug_field: UUID(hex=str(data))})
+            return queryset.get(**{self.slug_field: UUID(hex=value)})
         except (ObjectDoesNotExist, TypeError, ValueError) as error:
-            raise serializers.ValidationError(
-                f"Object does not exist with given id '{data}'.", code="invalid"
-            ) from error
+            raise ValidationError(f"Object does not exist with given id {value!r}.", code="invalid") from error
+
+    @overload
+    def to_representation(self, obj: TModel) -> TModel:
+        ...
+
+    @overload
+    def to_representation(self, obj: UUID) -> str:
+        ...
+
+    def to_representation(self, obj):
+        if isinstance(obj, UUID):
+            return obj.hex
+        return obj
 
 
 class HitasPostalCodeField(SlugRelatedField):
@@ -85,14 +101,14 @@ class HitasEnumField(serializers.ChoiceField):
 
     def to_internal_value(self, data: str):
         if data == "":
-            raise serializers.ValidationError(code="blank")
+            raise ValidationError(code="blank")
 
         try:
             return self.enum_class(data)
         except ValueError as error:
             supported_values = [f"'{e.value}'" for e in self.enum_class]
 
-            raise serializers.ValidationError(
+            raise ValidationError(
                 f"Unsupported value '{data}'. Supported values are: [{', '.join(supported_values)}]."
             ) from error
 

@@ -6,7 +6,10 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
-def validate_property_id(value: str) -> None:
+def validate_property_id(value: Optional[str]) -> None:
+    if value is None:
+        return
+
     # Example valid value: '1-1234-321-56'
     match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$", value)
 
@@ -17,8 +20,7 @@ def validate_property_id(value: str) -> None:
         )
 
 
-def validate_business_id(value: str) -> None:
-    # Don't raise on None
+def validate_business_id(value: Optional[str]) -> None:
     if value is None:
         return
 
@@ -28,7 +30,7 @@ def validate_business_id(value: str) -> None:
         raise ValidationError("'%(value)s' is not a valid business id.", params={"value": value})
 
 
-def check_business_id(value: str) -> bool:
+def check_business_id(value: Optional[str]) -> bool:
     if value is None:
         return False
 

@@ -13,12 +13,15 @@ class RealEstate(ExternalHitasModel):
 
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")
 
+    street_address = models.CharField(max_length=1024)
+
     # 'kiinteistötunnus'
     property_identifier = models.CharField(
-        max_length=19, validators=[validate_property_id], help_text=_("Format: 1234-1234-1234-1234")
+        null=True,
+        max_length=19,
+        validators=[validate_property_id],
+        help_text=_("Format: 1234-1234-1234-1234"),
     )
-
-    street_address = models.CharField(max_length=1024)
 
     @property
     def postal_code(self) -> HitasPostalCode:

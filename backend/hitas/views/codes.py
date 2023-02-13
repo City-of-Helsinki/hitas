@@ -39,7 +39,7 @@ class ApartmentTypeSerializer(AbstractCodeSerializer):
 
 def define_read_only_serializer(model_class):
     class DynamicReadOnlySerializer(ReadOnlySerializer):
-        id = UUIDRelatedField(queryset=model_class.objects, source="uuid")
+        id = UUIDRelatedField(queryset=model_class.objects)
         value = serializers.CharField(read_only=True)
         description = serializers.CharField(read_only=True)
         code = serializers.CharField(source="legacy_code_number", read_only=True)

@@ -16,7 +16,12 @@ def exception_handler(exc, context):
         if isinstance(exc, exceptions.ValidationError):
             fields = []
 
-            for field_name, error in exc.get_full_details().items():
+            details = exc.get_full_details()
+
+            if isinstance(details, list):
+                details = {f"{num}": detail for num, detail in enumerate(details)}
+
+            for field_name, error in details.items():
                 fields.extend(_convert_fields(field_name, error))
 
             return BadRequest(fields).to_response()
@@ -249,6 +254,7 @@ def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, An
         "max_decimal_places",
         "invalid_choice",
         "not_a_list",
+        "empty",
     ]:
         return {"field": field_name, "message": error["message"]}
     else:

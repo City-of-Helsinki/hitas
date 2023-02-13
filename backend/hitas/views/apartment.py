@@ -456,7 +456,7 @@ class ApartmentImprovementSerializer(serializers.Serializer):
 
 
 class ReadOnlyBuildingSerializer(ReadOnlySerializer):
-    id = UUIDRelatedField(queryset=Building.objects, source="uuid", write_only=True)
+    id = UUIDRelatedField(queryset=Building.objects, write_only=True)
 
     def get_model_class(self):
         return Building

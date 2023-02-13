@@ -1,7 +1,7 @@
 import datetime
 import operator
-import uuid
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, TypeVar
+from uuid import UUID
 
 from django.db import models
 from django.db.models import Value
@@ -58,26 +58,33 @@ def monthify(date: datetime.date) -> datetime.date:
 
 def valid_uuid(value: str, version: int = 4) -> bool:
     try:
-        uuid.UUID(value, version=version)
+        UUID(value, version=version)
         return True
     except ValueError:
         return False
 
 
-def lookup_id_to_uuid(lookup_id: str, model_class: type[models.Model]) -> uuid.UUID:
+TModel = TypeVar("TModel", bound=models.Model)
+
+
+def lookup_id_to_uuid(lookup_id: str, model_class: type[TModel]) -> UUID:
     try:
-        return uuid.UUID(hex=lookup_id)
+        return UUID(hex=lookup_id)
     except ValueError as error:
         raise HitasModelNotFound(model=model_class) from error
 
 
-def lookup_model_id_by_uuid(lookup_id: str, model_class: type[models.Model], **kwargs) -> int:
+def lookup_model_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> TModel:
     uuid = lookup_id_to_uuid(lookup_id, model_class)
 
     try:
-        return model_class.objects.only("id").get(uuid=uuid, **kwargs).id
+        return model_class.objects.get(uuid=uuid, **kwargs)
     except model_class.DoesNotExist as error:
         raise HitasModelNotFound(model=model_class) from error
+
+
+def lookup_model_id_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> int:
+    return lookup_model_by_uuid(lookup_id, model_class, **kwargs).id
 
 
 def check_for_overlap(range_1: set[int], range_2: Iterable[int]) -> tuple[Optional[int], Optional[int]]:

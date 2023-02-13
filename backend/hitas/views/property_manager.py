@@ -34,7 +34,7 @@ class PropertyManagerSerializer(HitasModelSerializer):
 
 
 class ReadOnlyPropertyManagerSerializer(serializers.Serializer):
-    id = UUIDRelatedField(queryset=PropertyManager.objects, source="uuid")
+    id = UUIDRelatedField(queryset=PropertyManager.objects)
     name = serializers.CharField(read_only=True)
     email = serializers.CharField(read_only=True)
     address = PropertyManagerAddressSerializer(source="*", read_only=True)
