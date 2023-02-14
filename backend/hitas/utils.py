@@ -4,7 +4,7 @@ from typing import Any, Iterable, Optional, TypeVar
 from uuid import UUID
 
 from django.db import models
-from django.db.models import Value
+from django.db.models import Count, Model, OuterRef, Subquery, Value
 from django.db.models.functions import Round
 from django.utils import timezone
 
@@ -30,6 +30,26 @@ class RoundWithPrecision(Round):
     def _resolve_output_field(self):
         source = self.get_source_expressions()[0]
         return source.output_field
+
+
+def subquery_count(model: type[Model], outer_field: str, **kwargs) -> Subquery:
+    return Subquery(
+        queryset=(
+            model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
+            .values(outer_field)  # fixes grouping
+            .annotate(__count=Count("*"))
+            .values("__count")
+        ),
+        output_field=models.IntegerField(),
+    )
+
+
+def subquery_first_id(model: type[Model], outer_field: str, order_by: str, **kwargs) -> Subquery:
+    return Subquery(
+        model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
+        .order_by(order_by)
+        .values_list("id", flat=True)[:1]
+    )
 
 
 def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:

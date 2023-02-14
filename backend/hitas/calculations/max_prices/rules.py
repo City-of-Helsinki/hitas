@@ -5,16 +5,16 @@ from typing import List
 from dateutil.relativedelta import relativedelta
 
 from hitas.calculations.max_prices.types import IndexCalculation, SurfaceAreaPriceCeilingCalculation
-from hitas.models import Apartment
+from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class CalculatorRules:
-    def validate_indices(self, apartment: Apartment) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
         raise NotImplementedError()
 
     def calculate_construction_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -26,7 +26,7 @@ class CalculatorRules:
 
     def calculate_market_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -38,7 +38,7 @@ class CalculatorRules:
 
     @staticmethod
     def calculate_surface_area_price_ceiling(
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
         calculation_date: datetime.date,

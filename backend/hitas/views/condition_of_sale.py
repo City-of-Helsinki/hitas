@@ -3,13 +3,14 @@ import uuid
 from typing import Any, Optional
 
 from django.core.exceptions import ValidationError
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import Prefetch
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset, create_conditions_of_sale
+from hitas.utils import subquery_first_id
 from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
@@ -104,11 +105,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     # Limit the fetched sales to only the first sale,
                     # as we only need that to figure out if the apartment is new
                     ApartmentSale.objects.filter(
-                        id__in=Subquery(
-                            ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
-                            .order_by("purchase_date")
-                            .values_list("id", flat=True)[:1]
-                        )
+                        id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="purchase_date"),
                     ),
                 ),
             ).filter(uuid__in=owner_uuids)

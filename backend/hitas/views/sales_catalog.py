@@ -169,8 +169,8 @@ class SalesCatalogCreateView(ViewSet):
                     surface_area=apartment["surface_area"],
                     share_number_start=apartment["share_number_start"],
                     share_number_end=apartment["share_number_end"],
-                    debt_free_purchase_price=apartment["debt_free_purchase_price"],
-                    primary_loan_amount=apartment["primary_loan_amount"],
+                    catalog_purchase_price=apartment["debt_free_purchase_price"],
+                    catalog_primary_loan_amount=apartment["primary_loan_amount"],
                 )
             )
 

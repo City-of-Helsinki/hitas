@@ -1,11 +1,13 @@
 import datetime
 import uuid
+from decimal import Decimal
 from http import HTTPStatus
 from itertools import chain
 from typing import Any, Dict, Optional, Union, Iterable
 
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Prefetch, Q
 from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
@@ -32,12 +34,27 @@ from hitas.models import (
     Ownership,
     SurfaceAreaPriceCeiling,
     ConditionOfSale,
+    ApartmentSale,
 )
 from hitas.models._base import HitasModelDecimalField
-from hitas.models.apartment import ApartmentMarketPriceImprovement, ApartmentState, DepreciationPercentage
+from hitas.models.apartment import (
+    ApartmentMarketPriceImprovement,
+    ApartmentState,
+    DepreciationPercentage,
+    ApartmentWithAnnotations,
+)
+from hitas.models.apartment_sale import ApartmentSaleWithAnnotations
 from hitas.models.condition_of_sale import condition_of_sale_queryset, GracePeriod
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import RoundWithPrecision, this_month, valid_uuid, lookup_model_id_by_uuid, check_for_overlap
+from hitas.utils import (
+    RoundWithPrecision,
+    this_month,
+    valid_uuid,
+    lookup_model_id_by_uuid,
+    check_for_overlap,
+    subquery_count,
+    subquery_first_id,
+)
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalOwnerSerializer, MinimalApartmentSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -294,14 +311,39 @@ class ConstructionPrices(serializers.Serializer):
 
 
 class PricesSerializer(serializers.Serializer):
-    debt_free_purchase_price = HitasDecimalField(required=False, allow_null=True)
-    primary_loan_amount = HitasDecimalField(required=False, allow_null=True)
-    acquisition_price = HitasDecimalField(read_only=True)
-    purchase_price = HitasDecimalField(required=False, allow_null=True)
-    first_purchase_date = serializers.DateField(required=False, allow_null=True)
-    latest_purchase_date = serializers.DateField(required=False, allow_null=True)
+
+    debt_free_purchase_price = serializers.SerializerMethodField()
+    primary_loan_amount = serializers.SerializerMethodField()
+    acquisition_price = serializers.SerializerMethodField()
+    purchase_price = serializers.SerializerMethodField()
+    first_purchase_date = serializers.SerializerMethodField()
+    latest_purchase_date = serializers.SerializerMethodField()
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
     maximum_prices = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_debt_free_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.primary_purchase_price
+
+    @staticmethod
+    def get_primary_loan_amount(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.primary_loan_amount
+
+    @staticmethod
+    def get_acquisition_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.acquisition_price
+
+    @staticmethod
+    def get_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.purchase_price
+
+    @staticmethod
+    def get_first_purchase_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
+        return instance.first_purchase_date
+
+    @staticmethod
+    def get_latest_purchase_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
+        return instance.latest_purchase_date
 
     def get_maximum_prices(self, instance: Apartment) -> Dict[str, Any]:
         return {
@@ -709,8 +751,8 @@ class ApartmentViewSet(HitasModelViewSet):
 
         return RoundWithPrecision(
             (
-                F("debt_free_purchase_price")
-                + F("primary_loan_amount")
+                F("_primary_purchase_price")
+                + F("_primary_loan_amount")
                 + F("additional_work_during_construction")
                 + interest
             )
@@ -731,53 +773,80 @@ class ApartmentViewSet(HitasModelViewSet):
             precision=2,
         )
 
+    @staticmethod
+    def primary_purchase_price():
+        return Subquery(
+            queryset=(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                .order_by("purchase_date")
+                .values_list("purchase_price", flat=True)[:1]
+            ),
+            output_field=HitasModelDecimalField(null=True),
+        )
+
+    @staticmethod
+    def primary_loan_amount():
+        return Subquery(
+            queryset=(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                .order_by("purchase_date")
+                .values_list("apartment_share_of_housing_company_loans", flat=True)[:1]
+            ),
+            output_field=HitasModelDecimalField(null=True),
+        )
+
+    @staticmethod
+    def purchase_price():
+        return Subquery(
+            queryset=(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                .exclude(
+                    id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
+                )
+                .order_by("-purchase_date")
+                .values_list("purchase_price", flat=True)[:1]
+            ),
+            output_field=HitasModelDecimalField(null=True),
+        )
+
+    @staticmethod
+    def first_purchase_date():
+        return Subquery(
+            queryset=(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                .order_by("purchase_date")
+                .values_list("purchase_date", flat=True)[:1]
+            ),
+            output_field=models.DateField(null=True),
+        )
+
+    @staticmethod
+    def latest_purchase_date():
+        return Subquery(
+            queryset=(
+                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                .exclude(
+                    id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
+                )
+                .order_by("-purchase_date")
+                .values_list("purchase_date", flat=True)[:1]
+            ),
+            output_field=models.DateField(null=True),
+        )
+
     def get_detail_queryset(self):
-        return (
-            self.get_list_queryset()
-            .only(
-                "uuid",
-                "state",
-                "surface_area",
-                "street_address",
-                "apartment_number",
-                "floor",
-                "stair",
-                "rooms",
-                "share_number_start",
-                "share_number_end",
-                "debt_free_purchase_price",
-                "primary_loan_amount",
-                "purchase_price",
-                "first_purchase_date",
-                "latest_purchase_date",
-                "additional_work_during_construction",
-                "loans_during_construction",
-                "interest_during_construction_6",
-                "interest_during_construction_14",
-                "debt_free_purchase_price_during_construction",
-                "notes",
-                "completion_date",
-                "building__uuid",
-                "building__real_estate__uuid",
-                "apartment_type__uuid",
-                "apartment_type__value",
-                "apartment_type__legacy_code_number",
-                "apartment_type__description",
-                "building__street_address",
-                "building__real_estate__housing_company__uuid",
-                "building__real_estate__housing_company__display_name",
-                "building__real_estate__housing_company__postal_code__value",
-                "building__real_estate__housing_company__postal_code__city",
-                "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
-            )
-            .annotate(
-                completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
-                cpi=self.select_index(ConstructionPriceIndex),
-                cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),
-                mpi=self.select_index(MarketPriceIndex),
-                mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100),
-                sapc=self.select_sapc(),
-            )
+        return self.get_list_queryset().annotate(
+            _primary_purchase_price=self.primary_purchase_price(),
+            _primary_loan_amount=self.primary_loan_amount(),
+            _purchase_price=self.purchase_price(),
+            _first_purchase_date=self.first_purchase_date(),
+            _latest_purchase_date=self.latest_purchase_date(),
+            completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
+            cpi=self.select_index(ConstructionPriceIndex),
+            cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),
+            mpi=self.select_index(MarketPriceIndex),
+            mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100),
+            sapc=self.select_sapc(),
         )
 
     def get_list_queryset(self):
@@ -788,15 +857,7 @@ class ApartmentViewSet(HitasModelViewSet):
             .prefetch_related(
                 Prefetch(
                     "ownerships",
-                    Ownership.objects.select_related("owner").only(
-                        "id",
-                        "apartment_id",
-                        "percentage",
-                        "owner__uuid",
-                        "owner__name",
-                        "owner__identifier",
-                        "owner__email",
-                    ),
+                    Ownership.objects.select_related("owner"),
                 ),
                 Prefetch(
                     "ownerships__conditions_of_sale_new",
@@ -808,51 +869,20 @@ class ApartmentViewSet(HitasModelViewSet):
                 ),
                 Prefetch(
                     "market_price_improvements",
-                    ApartmentMarketPriceImprovement.objects.only(
-                        "name",
-                        "completion_date",
-                        "value",
-                        "apartment_id",
-                    ).order_by("completion_date", "id"),
+                    ApartmentMarketPriceImprovement.objects.order_by("completion_date", "id"),
                 ),
                 Prefetch(
                     "construction_price_improvements",
-                    ApartmentConstructionPriceImprovement.objects.only(
-                        "name",
-                        "completion_date",
-                        "value",
-                        "apartment_id",
-                        "depreciation_percentage",
-                    ).order_by("completion_date", "id"),
+                    ApartmentConstructionPriceImprovement.objects.order_by("completion_date", "id"),
                 ),
             )
             .select_related(
                 "building",
-                "building__real_estate",
                 "apartment_type",
+                "building__real_estate",
                 "building__real_estate__housing_company",
                 "building__real_estate__housing_company__postal_code",
                 "building__real_estate__housing_company__financing_method",
-            )
-            .only(
-                "uuid",
-                "state",
-                "surface_area",
-                "street_address",
-                "apartment_number",
-                "floor",
-                "stair",
-                "rooms",
-                "completion_date",
-                "apartment_type__value",
-                "building__uuid",
-                "building__street_address",
-                "building__real_estate__uuid",
-                "building__real_estate__housing_company__uuid",
-                "building__real_estate__housing_company__display_name",
-                "building__real_estate__housing_company__postal_code__value",
-                "building__real_estate__housing_company__postal_code__city",
-                "building__real_estate__housing_company__financing_method__old_hitas_ruleset",
             )
             .order_by("apartment_number", "id")
         )

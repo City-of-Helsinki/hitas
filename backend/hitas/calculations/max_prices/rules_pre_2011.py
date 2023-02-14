@@ -18,11 +18,11 @@ from hitas.calculations.improvements.rules_pre_2011_mpi import (
 )
 from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
-from hitas.models import Apartment
+from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class RulesPre2011(CalculatorRules):
-    def validate_indices(self, apartment: Apartment) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
         if (
             apartment.calculation_date_cpi is None
             or apartment.completion_date_cpi is None
@@ -34,7 +34,7 @@ class RulesPre2011(CalculatorRules):
 
     def calculate_construction_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -144,7 +144,7 @@ class RulesPre2011(CalculatorRules):
 
     def calculate_market_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,

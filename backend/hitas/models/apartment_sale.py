@@ -38,3 +38,11 @@ class ApartmentSale(ExternalHitasModel):
         verbose_name = _("Apartment sale")
         verbose_name_plural = _("Apartment sales")
         ordering = ["-purchase_date"]
+
+
+# This is for typing only
+class ApartmentSaleWithAnnotations(ApartmentSale):
+    sale_count: int
+
+    class Meta:
+        abstract = True
