@@ -96,14 +96,6 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                 if cos:
                     self.context["conditions_of_sale_created"] = True
 
-            apartment.first_purchase_date = instance.purchase_date
-            apartment.save()
-            return instance
-
-        if apartment.latest_purchase_date is None or instance.purchase_date > apartment.latest_purchase_date:
-            apartment.latest_purchase_date = instance.purchase_date
-            apartment.save()
-
         return instance
 
     def to_representation(self, validated_data: ApartmentSale) -> dict[str, Any]:
