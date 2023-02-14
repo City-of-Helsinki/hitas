@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("hitas", "0055_alter_owner_bypass_conditions_of_sale"),
+        ("hitas", "0056_alter_realestate_property_identifier"),
     ]
 
     operations = [

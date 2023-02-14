@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("hitas", "0056_remove_apartment_first_sale_fields"),
+        ("hitas", "0058_add_sales_catalog_fields"),
     ]
 
     operations = [
