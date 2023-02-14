@@ -304,7 +304,7 @@ def fetch_apartment(
             ),
         )
         .annotate(
-            _primary_purchase_price=Subquery(
+            _first_sale_purchase_price=Subquery(
                 queryset=(
                     ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
                     .order_by("purchase_date")
@@ -312,7 +312,7 @@ def fetch_apartment(
                 ),
                 output_field=HitasModelDecimalField(null=True),
             ),
-            _primary_loan_amount=Subquery(
+            _first_sale_share_of_housing_company_loans=Subquery(
                 queryset=(
                     ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
                     .order_by("purchase_date")

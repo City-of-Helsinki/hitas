@@ -33,6 +33,7 @@ class RoundWithPrecision(Round):
 
 
 def subquery_count(model: type[Model], outer_field: str, **kwargs) -> Subquery:
+    """Annotates the number of rows on the model (with references to outer_field) to the queryset."""
     return Subquery(
         queryset=(
             model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
@@ -45,6 +46,7 @@ def subquery_count(model: type[Model], outer_field: str, **kwargs) -> Subquery:
 
 
 def subquery_first_id(model: type[Model], outer_field: str, order_by: str, **kwargs) -> Subquery:
+    """Selects the first row on the model (with references to outer_field) based on the given ordering."""
     return Subquery(
         model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
         .order_by(order_by)

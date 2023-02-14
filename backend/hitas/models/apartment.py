@@ -82,8 +82,8 @@ class Apartment(ExternalHitasModel):
     # 'Hankinta-arvo'
     @property
     def acquisition_price(self) -> Optional[Decimal]:
-        if self.primary_purchase_price is not None and self.primary_loan_amount is not None:
-            return self.primary_purchase_price + self.primary_loan_amount
+        if self.first_sale_purchase_price is not None and self.first_sale_share_of_housing_company_loans is not None:
+            return self.first_sale_purchase_price + self.first_sale_share_of_housing_company_loans
 
         if self.catalog_purchase_price is not None and self.catalog_primary_loan_amount is not None:
             return self.catalog_purchase_price + self.catalog_primary_loan_amount
@@ -92,59 +92,59 @@ class Apartment(ExternalHitasModel):
 
     # 'Luovutushinta' = Ensimmäisen kaupan kauppakirjahinta
     @property
-    def primary_purchase_price(self) -> Optional[Decimal]:
+    def first_sale_purchase_price(self) -> Optional[Decimal]:
         # Allow caches for the instance
-        if hasattr(self, "_primary_purchase_price"):
-            return self._primary_purchase_price
+        if hasattr(self, "_first_sale_purchase_price"):
+            return self._first_sale_purchase_price
 
         first_sale = self.first_sale
-        self._primary_purchase_price = first_sale.purchase_price if first_sale is not None else None
-        return self._primary_purchase_price
+        self._first_sale_purchase_price = first_sale.purchase_price if first_sale is not None else None
+        return self._first_sale_purchase_price
 
     # 'Ensisijaislaina' = Ensimmäisen kaupan yhtiölainaosuus
     @property
-    def primary_loan_amount(self) -> Optional[Decimal]:
+    def first_sale_share_of_housing_company_loans(self) -> Optional[Decimal]:
         # Allow caches for the instance
-        if hasattr(self, "_primary_loan_amount"):
-            return self._primary_loan_amount
+        if hasattr(self, "_first_sale_share_of_housing_company_loans"):
+            return self._first_sale_share_of_housing_company_loans
 
         first_sale = self.first_sale
-        self._primary_loan_amount = (
+        self._first_sale_share_of_housing_company_loans = (
             first_sale.apartment_share_of_housing_company_loans if first_sale is not None else None
         )
-        return self._primary_loan_amount
+        return self._first_sale_share_of_housing_company_loans
 
     # 'Viimeisin Kauppakirjahinta'
     @property
-    def purchase_price(self) -> Optional[Decimal]:
+    def latest_sale_purchase_price(self) -> Optional[Decimal]:
         # Allow caches for the instance
-        if hasattr(self, "_purchase_price"):
-            return self._purchase_price
+        if hasattr(self, "_latest_sale_purchase_price"):
+            return self._latest_sale_purchase_price
 
         latest_sale = self.latest_sale_with_sale_count
-        self._purchase_price = None
+        self._latest_sale_purchase_price = None
         if latest_sale is None:
             return None
         if latest_sale.sale_count < 2:
             return None
-        self._purchase_price = latest_sale.purchase_price
-        return self._purchase_price
+        self._latest_sale_purchase_price = latest_sale.purchase_price
+        return self._latest_sale_purchase_price
 
     # 'Viimeisin yhtiölainaosuus'
     @property
-    def apartment_share_of_housing_company_loans(self) -> Optional[Decimal]:
+    def latest_sale_share_of_housing_company_loans(self) -> Optional[Decimal]:
         # Allow caches for the instance
-        if hasattr(self, "_apartment_share_of_housing_company_loans"):
-            return self._apartment_share_of_housing_company_loans
+        if hasattr(self, "_latest_sale_share_of_housing_company_loans"):
+            return self._latest_sale_share_of_housing_company_loans
 
         latest_sale = self.latest_sale_with_sale_count
-        self._apartment_share_of_housing_company_loans = None
+        self._latest_sale_share_of_housing_company_loans = None
         if latest_sale is None:
             return None
         if latest_sale.sale_count < 2:
             return None
-        self._apartment_share_of_housing_company_loans = latest_sale.apartment_share_of_housing_company_loans
-        return self._apartment_share_of_housing_company_loans
+        self._latest_sale_share_of_housing_company_loans = latest_sale.apartment_share_of_housing_company_loans
+        return self._latest_sale_share_of_housing_company_loans
 
     # 'Ensimmäinen kauppakirjapvm'
     @property
@@ -320,9 +320,9 @@ class ApartmentWithAnnotations(Apartment):
     mpi: Optional[Decimal]
     mpi_2005_100: Optional[Decimal]
     sapc: Optional[Decimal]
-    _primary_purchase_price: Optional[Decimal]
-    _primary_loan_amount: Optional[Decimal]
-    _purchase_price: Optional[Decimal]
+    _first_sale_purchase_price: Optional[Decimal]
+    _first_sale_share_of_housing_company_loans: Optional[Decimal]
+    _latest_sale_purchase_price: Optional[Decimal]
     _first_purchase_date: Optional[date]
     _latest_purchase_date: Optional[date]
 
@@ -332,8 +332,8 @@ class ApartmentWithAnnotations(Apartment):
 
 # This is for typing only
 class ApartmentWithAnnotationsMaxPrice(Apartment):
-    _primary_purchase_price: Optional[Decimal]
-    _primary_loan_amount: Optional[Decimal]
+    _first_sale_purchase_price: Optional[Decimal]
+    _first_sale_share_of_housing_company_loans: Optional[Decimal]
     completion_month: Optional[date]
     calculation_date_cpi: Optional[Decimal]
     calculation_date_cpi_2005eq100: Optional[Decimal]

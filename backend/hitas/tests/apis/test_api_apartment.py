@@ -566,10 +566,10 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         },
         "completion_date": str(ap1.completion_date),
         "prices": {
-            "debt_free_purchase_price": float(ap1.primary_purchase_price),
-            "primary_loan_amount": float(ap1.primary_loan_amount),
+            "debt_free_purchase_price": float(ap1.first_sale_purchase_price),
+            "primary_loan_amount": float(ap1.first_sale_share_of_housing_company_loans),
             "acquisition_price": float(ap1.acquisition_price),
-            "purchase_price": ap1.purchase_price,
+            "purchase_price": ap1.latest_sale_purchase_price,
             "first_purchase_date": str(ap1.first_purchase_date),
             "latest_purchase_date": ap1.latest_purchase_date,
             "construction": {
