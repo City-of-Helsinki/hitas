@@ -161,27 +161,30 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
         },
     )
     response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is False
 
     sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
     assert len(sales) == 1
-    assert sales[0].uuid.hex == response_1.json()["id"]
+    assert sales[0].uuid.hex == response_data["id"]
 
     ownerships: list[Ownership] = list(Ownership.objects.all())
     assert len(ownerships) == 1
-
-    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
 
     url_2 = reverse(
         "hitas:apartment-sale-detail",
         kwargs={
             "housing_company_uuid": apartment.housing_company.uuid.hex,
             "apartment_uuid": apartment.uuid.hex,
-            "uuid": response_1.json()["id"],
+            "uuid": response_data["id"],
         },
     )
     response_2 = api_client.get(url_2)
     assert response_2.status_code == status.HTTP_200_OK, response_2.json()
-    assert response_2.json() == response_1.json()
+    assert response_2.json() == response_data
 
 
 @pytest.mark.django_db
@@ -220,27 +223,30 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
         },
     )
     response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is False
 
     sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
     assert len(sales) == 1
-    assert sales[0].uuid.hex == response_1.json()["id"]
+    assert sales[0].uuid.hex == response_data["id"]
 
     ownerships: list[Ownership] = list(Ownership.objects.all())
     assert len(ownerships) == 2
-
-    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
 
     url_2 = reverse(
         "hitas:apartment-sale-detail",
         kwargs={
             "housing_company_uuid": apartment.housing_company.uuid.hex,
             "apartment_uuid": apartment.uuid.hex,
-            "uuid": response_1.json()["id"],
+            "uuid": response_data["id"],
         },
     )
     response_2 = api_client.get(url_2)
     assert response_2.status_code == status.HTTP_200_OK, response_2.json()
-    assert response_2.json() == response_1.json()
+    assert response_2.json() == response_data
 
 
 @pytest.mark.parametrize(
@@ -621,6 +627,330 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
 
     condition_of_sale.refresh_from_db()
     assert condition_of_sale.fulfilled is not None
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    apartment_1: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(apartment=apartment_1, owner=owner)
+
+    apartment_2: Apartment = ApartmentFactory.create(completion_date=None)
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is True
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 1
+    assert sales[0].uuid.hex == response_data["id"]
+
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 2
+
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 1
+    assert conditions_of_sale[0].new_ownership.apartment == apartment_2
+    assert conditions_of_sale[0].old_ownership.apartment == apartment_1
+
+    url_2 = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+            "uuid": response_data["id"],
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json() == response_data
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__new_apartment__no_other_apartments(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    apartment: Apartment = ApartmentFactory.create(completion_date=None)
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is False
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 1
+    assert sales[0].uuid.hex == response_data["id"]
+
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 1
+
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0  # No conditions of sale created
+
+    url_2 = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+            "uuid": response_data["id"],
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json() == response_data
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create()
+    owner_2: Owner = OwnerFactory.create()
+
+    # One owner has an old apartment
+    apartment_1: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(apartment=apartment_1, owner=owner_1)
+
+    apartment_2: Apartment = ApartmentFactory.create(completion_date=None)
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner_1.uuid.hex,
+                },
+                "percentage": 40.0,
+            },
+            {
+                "owner": {
+                    "id": owner_2.uuid.hex,
+                },
+                "percentage": 60.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is True
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 1
+    assert sales[0].uuid.hex == response_data["id"]
+
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 3
+
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 1
+    assert conditions_of_sale[0].new_ownership.apartment == apartment_2
+    assert conditions_of_sale[0].old_ownership.apartment == apartment_1
+
+    url_2 = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+            "uuid": response_data["id"],
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json() == response_data
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create()
+    OwnershipFactory.create(apartment=old_apartment, owner=owner)
+
+    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+
+    assert new_apartment.is_new is True
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": new_apartment.housing_company.uuid.hex,
+            "apartment_uuid": new_apartment.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is True
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 1
+    assert sales[0].uuid.hex == response_data["id"]
+
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 2
+
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 1
+    assert conditions_of_sale[0].new_ownership.apartment == new_apartment
+    assert conditions_of_sale[0].old_ownership.apartment == old_apartment
+
+    new_apartment.refresh_from_db()
+    assert new_apartment.is_new is False
+
+    url_2 = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": new_apartment.housing_company.uuid.hex,
+            "apartment_uuid": new_apartment.uuid.hex,
+            "uuid": response_data["id"],
+        },
+    )
+    response_2 = api_client.get(url_2)
+    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
+    assert response_2.json() == response_data
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_date(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    apartment: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_in_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+
+    # First sale sets 'first_purchase_date'
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data_1 = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data_1
+
+    assert response_data_1.pop("conditions_of_sale_created", None) is False
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 1
+    assert sales[0].uuid.hex == response_data_1["id"]
+
+    apartment.refresh_from_db()
+    assert apartment.first_purchase_date is not None
+    assert apartment.latest_purchase_date is None
+
+    # Second sale sets 'latest_purchase_date'
+    response_2 = api_client.post(url_1, data=data, format="json")
+    response_data_2 = response_2.json()
+
+    assert response_2.status_code == status.HTTP_201_CREATED, response_data_2
+
+    assert response_data_2.pop("conditions_of_sale_created", None) is False
+
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 2
+    assert sales[0].uuid.hex == response_data_1["id"]
+    assert sales[1].uuid.hex == response_data_2["id"]
+
+    apartment.refresh_from_db()
+    assert apartment.first_purchase_date is not None
+    assert apartment.latest_purchase_date is not None
 
 
 # Update tests

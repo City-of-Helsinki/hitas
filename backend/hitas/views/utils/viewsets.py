@@ -19,14 +19,14 @@ class HitasModelMixin:
     lookup_field = "uuid"
     pagination_class = HitasPagination
 
-    def get_list_queryset(self):
+    def get_default_queryset(self):
         return self.model_class.objects.all()
 
-    def get_retrieve_queryset(self):
-        return self.get_list_queryset()
+    def get_list_queryset(self):
+        return self.get_default_queryset()
 
     def get_detail_queryset(self):
-        return self.model_class.objects.all()
+        return self.get_default_queryset()
 
     def get_create_queryset(self):
         return self.get_detail_queryset()
@@ -71,31 +71,21 @@ class HitasModelMixin:
         if self.action == "list" and self.list_serializer_class is not None:
             return self.list_serializer_class
 
-        if self.action == "retrieve":
-            if self.detail_serializer_class is not None:
-                return self.detail_serializer_class
-            if self.list_serializer_class is not None:
-                return self.list_serializer_class
+        if self.action == "retrieve" and self.detail_serializer_class is not None:
+            return self.detail_serializer_class
 
-        if self.action == "create":
-            if self.create_serializer_class is not None:
-                return self.create_serializer_class
-            if self.detail_serializer_class is not None:
-                return self.detail_serializer_class
+        if self.action == "create" and self.create_serializer_class is not None:
+            return self.create_serializer_class
 
         if self.action == "update":
             if self.update_serializer_class is not None:
                 return self.update_serializer_class
-            if self.detail_serializer_class is not None:
-                return self.detail_serializer_class
 
         if self.action == "partial_update":
             if self.partial_update_serializer_class is not None:
                 return self.partial_update_serializer_class
             if self.update_serializer_class is not None:
                 return self.update_serializer_class
-            if self.detail_serializer_class is not None:
-                return self.detail_serializer_class
 
         return self.serializer_class
 
