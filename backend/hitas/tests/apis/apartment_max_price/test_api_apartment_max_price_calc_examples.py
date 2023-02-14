@@ -34,13 +34,13 @@ from hitas.tests.factories.indices import (
 @pytest.mark.django_db
 def test__api__apartment_max_price__construction_price_index__2011_onwards(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=80350,
-        primary_loan_amount=119150,
         additional_work_during_construction=0,
         completion_date=datetime.date(2019, 11, 27),
         surface_area=30.0,
         share_number_start=18402,
         share_number_end=20784,
+        sales__purchase_price=80350,
+        sales__apartment_share_of_housing_company_loans=119150,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
@@ -247,13 +247,13 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
 @pytest.mark.django_db
 def test__api__apartment_max_price__market_price_index__2011_onwards(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=139706,
-        primary_loan_amount=80955,
         additional_work_during_construction=0,
         completion_date=datetime.date(2014, 8, 27),
         surface_area=48.0,
         share_number_start=1,
         share_number_end=142,
+        sales__purchase_price=139706,
+        sales__apartment_share_of_housing_company_loans=80955,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
@@ -434,8 +434,6 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
 @pytest.mark.django_db
 def test__api__apartment_max_price__market_price_index__pre_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=104693.0,
-        primary_loan_amount=18480.0,
         interest_during_construction_6=3455.0,
         interest_during_construction_14=4000.0,
         additional_work_during_construction=4307.0,
@@ -444,13 +442,15 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         share_number_start=1729,
         share_number_end=1888,
         building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        sales__purchase_price=104693.0,
+        sales__apartment_share_of_housing_company_loans=18480.0,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         surface_area=3336,
-        debt_free_purchase_price=0.0,
-        primary_loan_amount=0.0,
+        sales__purchase_price=0.0,
+        sales__apartment_share_of_housing_company_loans=0.0,
     )
 
     mpi_hc_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
@@ -668,8 +668,6 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
 @pytest.mark.django_db
 def test__api__apartment_max_price__construction_price_index__pre_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=52738.0,
-        primary_loan_amount=123192.0,
         interest_during_construction_6=2703.0,
         interest_during_construction_14=3233.0,
         additional_work_during_construction=2500.0,
@@ -678,30 +676,32 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         share_number_start=19717,
         share_number_end=20188,
         building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        sales__purchase_price=52738.0,
+        sales__apartment_share_of_housing_company_loans=123192.0,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         completion_date=datetime.date(2010, 1, 1),
-        debt_free_purchase_price=0.0,
-        primary_loan_amount=0.0,
         surface_area=10915.0,
+        sales__purchase_price=0.0,
+        sales__apartment_share_of_housing_company_loans=0.0,
     )
     # Create another apartment with same completion date and rest of the acquisition price
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         completion_date=a.completion_date,
         surface_area=0,
-        debt_free_purchase_price=16551639.5,
-        primary_loan_amount=0.5,
+        sales__purchase_price=16551639.5,
+        sales__apartment_share_of_housing_company_loans=0.5,
     )
     # Create another apartment with different completion date and rest of the acquisition price
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         completion_date=datetime.date(2011, 12, 30),
         surface_area=0.0,
-        debt_free_purchase_price=20545029.0,
-        primary_loan_amount=1.0,
+        sales__purchase_price=20545029.0,
+        sales__apartment_share_of_housing_company_loans=1.0,
     )
 
     cpi_hc_improvement: HousingCompanyConstructionPriceImprovement = (
@@ -920,8 +920,6 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
 @pytest.mark.django_db
 def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasAPIClient, during_construction):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=100000,
-        primary_loan_amount=0,
         interest_during_construction_6=during_construction,
         interest_during_construction_14=during_construction,
         additional_work_during_construction=during_construction,
@@ -930,6 +928,8 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
         share_number_start=100,
         share_number_end=200,
         building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        sales__purchase_price=100000,
+        sales__apartment_share_of_housing_company_loans=0,
     )
     # Create necessary apartment's completion date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=100)
@@ -1054,13 +1054,13 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
 @pytest.mark.django_db
 def test__api__apartment_max_price__surface_area_price_ceiling(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        debt_free_purchase_price=107753,
-        primary_loan_amount=61830,
         additional_work_during_construction=0,
         completion_date=datetime.date(2012, 1, 13),
         surface_area=48.5,
         share_number_start=504,
         share_number_end=601,
+        sales__purchase_price=107753,
+        sales__apartment_share_of_housing_company_loans=61830,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)

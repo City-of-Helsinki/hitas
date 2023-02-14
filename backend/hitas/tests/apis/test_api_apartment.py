@@ -27,6 +27,7 @@ from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
     ApartmentMarketPriceImprovementFactory,
+    ApartmentSaleFactory,
     ApartmentTypeFactory,
     BuildingFactory,
     ConditionOfSaleFactory,
@@ -85,7 +86,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
     o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
 
-    ap3: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    ap3: Apartment = ApartmentFactory.create(sales=[])
     o3: Ownership = OwnershipFactory.create(apartment=ap3, owner=o2.owner, percentage=100)
     cos: ConditionOfSale = ConditionOfSaleFactory.create(
         new_ownership=o3,
@@ -268,17 +269,13 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
         apartment_number=1,
         floor=None,
         stair="A",
-        debt_free_purchase_price=None,
-        primary_loan_amount=None,
-        purchase_price=None,
-        first_purchase_date=None,
-        latest_purchase_date=None,
         additional_work_during_construction=None,
         loans_during_construction=None,
         interest_during_construction_6=None,
         interest_during_construction_14=None,
         debt_free_purchase_price_during_construction=None,
         notes=None,
+        sales=[],
     )
 
     response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
@@ -339,7 +336,7 @@ def test__api__apartment__list__fulfilled_under_x_months(api_client: HitasAPICli
     old_time = timezone.now()
 
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
     old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
@@ -370,7 +367,7 @@ def test__api__apartment__list__fulfilled_over_x_months(api_client: HitasAPIClie
     old_time = timezone.now()
 
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
     old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
@@ -419,8 +416,7 @@ class GracePeriodTestArgs(NamedTuple):
 def test__api__apartment__list__sell_by_date(api_client: HitasAPIClient, grace_period, sell_by_date):
     old_apartment: Apartment = ApartmentFactory.create(apartment_number=1)
     new_apartment: Apartment = ApartmentFactory.create(
-        first_purchase_date=None,
-        latest_purchase_date=None,
+        sales=[],
         completion_date=datetime.date(2023, 1, 1),
     )
     old_ownerships: Ownership = OwnershipFactory.create(apartment=old_apartment)
@@ -467,13 +463,11 @@ def test__api__apartment__list__sell_by_date(api_client: HitasAPIClient, grace_p
 def test__api__apartment__list__sell_by_date__multiple(api_client: HitasAPIClient, grace_period, sell_by_date):
     old_apartment: Apartment = ApartmentFactory.create(apartment_number=1)
     new_apartment_1: Apartment = ApartmentFactory.create(
-        first_purchase_date=None,
-        latest_purchase_date=None,
+        sales=[],
         completion_date=datetime.date(2023, 1, 1),
     )
     new_apartment_2: Apartment = ApartmentFactory.create(
-        first_purchase_date=None,
-        latest_purchase_date=None,
+        sales=[],
         completion_date=datetime.date(2023, 3, 1),
     )
     old_ownerships: Ownership = OwnershipFactory.create(apartment=old_apartment)
@@ -511,10 +505,10 @@ def test__api__apartment__list__sell_by_date__multiple(api_client: HitasAPIClien
 def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ap1: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2011, 1, 1),
-        debt_free_purchase_price=80000.1,
-        primary_loan_amount=15000.3,
         additional_work_during_construction=4999.9,
         surface_area=50.5,
+        sales__purchase_price=80000.1,
+        sales__apartment_share_of_housing_company_loans=15000.3,
     )
     hc: HousingCompany = ap1.housing_company
     os1: Ownership = OwnershipFactory.create(apartment=ap1)
@@ -530,7 +524,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     MarketPriceIndex2005Equal100Factory.create(month=now, value=250.5)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000.5)
 
-    ap2: Apartment = ApartmentFactory.create(first_purchase_date=None, latest_purchase_date=None)
+    ap2: Apartment = ApartmentFactory.create(sales=[])
     os2: Ownership = OwnershipFactory.create(apartment=ap2, owner=os1.owner, percentage=100)
     cos: ConditionOfSale = ConditionOfSaleFactory.create(
         new_ownership=os2,
@@ -572,12 +566,12 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         },
         "completion_date": str(ap1.completion_date),
         "prices": {
-            "debt_free_purchase_price": float(ap1.debt_free_purchase_price),
+            "debt_free_purchase_price": float(ap1.primary_purchase_price),
             "primary_loan_amount": float(ap1.primary_loan_amount),
-            "acquisition_price": round(float(ap1.debt_free_purchase_price + ap1.primary_loan_amount), 2),
-            "purchase_price": float(ap1.purchase_price),
-            "first_purchase_date": ap1.first_purchase_date.strftime("%Y-%m-%d"),
-            "latest_purchase_date": ap1.latest_purchase_date.strftime("%Y-%m-%d"),
+            "acquisition_price": float(ap1.acquisition_price),
+            "purchase_price": ap1.purchase_price,
+            "first_purchase_date": str(ap1.first_purchase_date),
+            "latest_purchase_date": ap1.latest_purchase_date,
             "construction": {
                 "loans": float(ap1.loans_during_construction),
                 "interest": {
@@ -817,14 +811,16 @@ def _test_max_prices(
 
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
-        debt_free_purchase_price=80000 if not null_values else None,
-        primary_loan_amount=15000 if not null_values else None,
         additional_work_during_construction=5000 if not null_values else None,
         surface_area=50 if not null_values else None,
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
         building__real_estate__housing_company__financing_method__old_hitas_ruleset=old_hitas_ruleset,
+        sales=[],
     )
+
+    if not null_values:
+        ApartmentSaleFactory.create(apartment=ap, purchase_price=80000, apartment_share_of_housing_company_loans=15000)
 
     if create_completion_indices:
         cpi_factory.create(month=ap.completion_date, value=100)
@@ -1436,23 +1432,6 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             [{"field": "address.apartment_number", "message": "Ensure this value is greater than or equal to 0."}],
         ),
         (
-            {"prices": {"debt_free_purchase_price": -1}},
-            [
-                {
-                    "field": "prices.debt_free_purchase_price",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                }
-            ],
-        ),
-        (
-            {"prices": {"purchase_price": -1}},
-            [{"field": "prices.purchase_price", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
-            {"prices": {"primary_loan_amount": -1}},
-            [{"field": "prices.primary_loan_amount", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
             {"prices": {"construction": {"loans": -1}}},
             [{"field": "prices.construction.loans", "message": "Ensure this value is greater than or equal to 0."}],
         ),
@@ -1980,11 +1959,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
             "stair": "X",
         },
         "prices": {
-            "debt_free_purchase_price": 11111,
-            "purchase_price": 22222,
-            "primary_loan_amount": 33333,
-            "first_purchase_date": "1999-01-01",
-            "latest_purchase_date": "2010-08-01",
             "construction": {
                 "loans": 44444,
                 "interest": {
@@ -2025,11 +1999,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert ap.apartment_number == data["address"]["apartment_number"]
     assert ap.floor == data["address"]["floor"]
     assert ap.stair == data["address"]["stair"]
-    assert ap.debt_free_purchase_price == data["prices"]["debt_free_purchase_price"]
-    assert ap.purchase_price == data["prices"]["purchase_price"]
-    assert ap.primary_loan_amount == data["prices"]["primary_loan_amount"]
-    assert str(ap.first_purchase_date) == data["prices"]["first_purchase_date"]
-    assert str(ap.latest_purchase_date) == data["prices"]["latest_purchase_date"]
     assert ap.loans_during_construction == data["prices"]["construction"]["loans"]
     assert ap.interest_during_construction_6 == data["prices"]["construction"]["interest"]["rate_6"]
     assert ap.interest_during_construction_14 == data["prices"]["construction"]["interest"]["rate_14"]

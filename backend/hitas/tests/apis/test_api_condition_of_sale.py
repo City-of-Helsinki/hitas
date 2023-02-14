@@ -411,7 +411,7 @@ def test__api__condition_of_sale__create__single(api_client: HitasAPIClient):
     # given:
     # - An owner with ownerships to one new and one old apartment
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
     old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
@@ -486,7 +486,7 @@ def test__api__condition_of_sale__create__some_already_exist(api_client: HitasAP
     # - An owner with ownerships to one new and two old apartment
     # - A condition of sale already exists between one new and old apartment, but not the other
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment_1: Apartment = ApartmentFactory.create()
     old_apartment_2: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
@@ -520,7 +520,7 @@ def test__api__condition_of_sale__create__all_already_exist(api_client: HitasAPI
     # - An owner with ownerships to one new and two old apartment
     # - Conditions of sale already exists between the new and both old apartments
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment_1: Apartment = ApartmentFactory.create()
     old_apartment_2: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
@@ -555,7 +555,7 @@ def test__api__condition_of_sale__create__has_sales__in_the_future(api_client: H
     # - An owner with ownerships to one new and two old apartment
     # - the new apartment has apartment sales in the future (apartment is still new)
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
     old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
@@ -589,7 +589,7 @@ def test__api__condition_of_sale__create__has_sales__in_the_past(api_client: Hit
     # - An owner with ownerships to one new and two old apartment
     # - the new apartment has apartment sales in the past (apartment is no longer new)
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
     OwnershipFactory.create(owner=owner, apartment=old_apartment)
@@ -642,7 +642,7 @@ def test__api__condition_of_sale__create__only_one_new_apartment(api_client: Hit
     # given:
     # - An owner with ownerships to a single new apartment
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     OwnershipFactory.create(owner=owner, apartment=new_apartment)
 
     # when:
@@ -669,7 +669,7 @@ def test__api__condition_of_sale__create__household_of_two__one_has_new(api_clie
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
     new_ownership: Ownership = OwnershipFactory.create(owner=owner_2, apartment=new_apartment)
 
@@ -701,8 +701,8 @@ def test__api__condition_of_sale__create__household_of_two__both_have_new(api_cl
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create()
-    new_apartment_1: Apartment = ApartmentFactory.create(first_purchase_date=None)
-    new_apartment_2: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment_1: Apartment = ApartmentFactory.create(sales=[])
+    new_apartment_2: Apartment = ApartmentFactory.create(sales=[])
     old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
     new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_1, apartment=new_apartment_1)
     new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, apartment=new_apartment_2)
@@ -741,8 +741,8 @@ def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create()
-    new_apartment_1: Apartment = ApartmentFactory.create(first_purchase_date=None)
-    new_apartment_2: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment_1: Apartment = ApartmentFactory.create(sales=[])
+    new_apartment_2: Apartment = ApartmentFactory.create(sales=[])
     old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
     new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_2, apartment=new_apartment_1)
     new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, apartment=new_apartment_2)
@@ -812,8 +812,8 @@ def test__api__condition_of_sale__create__two_households(api_client: HitasAPICli
     owner_2: Owner = OwnerFactory.create()
     owner_3: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create()
-    new_apartment_1: Apartment = ApartmentFactory.create(first_purchase_date=None)
-    new_apartment_2: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment_1: Apartment = ApartmentFactory.create(sales=[])
+    new_apartment_2: Apartment = ApartmentFactory.create(sales=[])
     old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)
     new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_2, apartment=new_apartment_1)
     new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_3, apartment=new_apartment_2)
@@ -927,7 +927,7 @@ def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPICl
     # - An owner with ownerships to one new and one old apartment
     # - Owner set to bypass conditions of sale (e.g. Helsinki city)
     owner: Owner = OwnerFactory.create(bypass_conditions_of_sale=True)
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     OwnershipFactory.create(owner=owner, apartment=new_apartment)
     OwnershipFactory.create(owner=owner, apartment=old_apartment)

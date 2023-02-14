@@ -19,7 +19,7 @@ from hitas.views.ownership import OwnershipSerializer
 
 @pytest.mark.django_db
 def test__api__apartment_sale__list__empty(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create()
+    apartment: Apartment = ApartmentFactory.create(sales=[])
 
     url = reverse(
         "hitas:apartment-sale-list",
@@ -45,7 +45,7 @@ def test__api__apartment_sale__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__list(api_client: HitasAPIClient):
-    ownership: Ownership = OwnershipFactory.create()
+    ownership: Ownership = OwnershipFactory.create(apartment__sales=[])
     sale: ApartmentSale = ApartmentSaleFactory.create(ownerships=[ownership])
 
     url = reverse(
@@ -134,7 +134,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create()
+    apartment: Apartment = ApartmentFactory.create(sales=[])
     owner: Owner = OwnerFactory.create()
 
     data = {
@@ -189,7 +189,7 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create()
+    apartment: Apartment = ApartmentFactory.create(sales=[])
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
 
@@ -527,7 +527,7 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create()
+    apartment: Apartment = ApartmentFactory.create(sales=[])
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     owner_3: Owner = OwnerFactory.create()
@@ -580,7 +580,7 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
 def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: HitasAPIClient):
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(first_purchase_date=None)
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=new_apartment)
     old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, apartment=old_apartment)

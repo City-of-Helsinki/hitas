@@ -187,7 +187,7 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
     ap2: Apartment = ApartmentFactory.create(
         apartment_number=2,
         completion_date=date(2023, 1, 1),
-        first_purchase_date=None,
+        sales=[],
     )
     owner: Owner = OwnerFactory.create()
     o1: Ownership = OwnershipFactory.create(owner=owner, apartment=ap1, percentage=50)
@@ -248,11 +248,11 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
     old_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
+    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, sales=[])
     ConditionOfSaleFactory(new_ownership__apartment=new_apartment_1, old_ownership__apartment=old_apartment_1)
 
     old_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, first_purchase_date=None)
+    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, sales=[])
     cos: ConditionOfSale = ConditionOfSaleFactory(
         new_ownership__apartment=new_apartment_2,
         old_ownership__apartment=old_apartment_2,
