@@ -26,11 +26,8 @@
       "apartment_number": 1,
       "floor": "1",
       "stair": "A",
-      "debt_free_purchase_price": "11000.00",
-      "primary_loan_amount": "44000.00",
-      "purchase_price": "22000.00",
-      "first_purchase_date": "2014-06-02",
-      "latest_purchase_date": "2015-06-02",
+      "catalog_purchase_price": null,
+      "catalog_primary_loan_amount": null,
       "additional_work_during_construction": "33442.00",
       "loans_during_construction": "55000.00",
       "interest_during_construction_6": "2222.00",
@@ -58,11 +55,8 @@
       "apartment_number": 68,
       "floor": "4",
       "stair": "Z",
-      "debt_free_purchase_price": "198680.00",
-      "primary_loan_amount": "15222953.00",
-      "purchase_price": "143535.00",
-      "first_purchase_date": "2022-12-06",
-      "latest_purchase_date": "2022-12-15",
+      "catalog_purchase_price": null,
+      "catalog_primary_loan_amount": null,
       "additional_work_during_construction": "3000.00",
       "loans_during_construction": "167725.00",
       "interest_during_construction_6": "4444.00",
@@ -90,11 +84,8 @@
       "apartment_number": 2,
       "floor": "5",
       "stair": "W",
-      "debt_free_purchase_price": "11584201.00",
-      "primary_loan_amount": "18304503.00",
-      "purchase_price": "10198118.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "11584201.00",
+      "catalog_primary_loan_amount": "18304503.00",
       "additional_work_during_construction": "22.00",
       "loans_during_construction": "12426834.00",
       "interest_during_construction_6": "12311.00",
@@ -122,11 +113,8 @@
       "apartment_number": 95,
       "floor": "2",
       "stair": "Q",
-      "debt_free_purchase_price": "1080780.00",
-      "primary_loan_amount": "16844104.00",
-      "purchase_price": "1680653.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "1080780.00",
+      "catalog_primary_loan_amount": "16844104.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "1499646.00",
       "interest_during_construction_6": "0.00",
@@ -154,11 +142,8 @@
       "apartment_number": 39,
       "floor": "6",
       "stair": "C",
-      "debt_free_purchase_price": "158183.00",
-      "primary_loan_amount": "14639110.00",
-      "purchase_price": "191676.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "158183.00",
+      "catalog_primary_loan_amount": "14639110.00",
       "additional_work_during_construction": "22223.00",
       "loans_during_construction": "163860.00",
       "interest_during_construction_6": "223.00",
@@ -186,11 +171,8 @@
       "apartment_number": 87,
       "floor": "9",
       "stair": "M",
-      "debt_free_purchase_price": "194932.00",
-      "primary_loan_amount": "120237.00",
-      "purchase_price": "101511.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "194932.00",
+      "catalog_primary_loan_amount": "120237.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "147004.00",
       "interest_during_construction_6": null,
@@ -218,11 +200,8 @@
       "apartment_number": 88,
       "floor": "9",
       "stair": "A",
-      "debt_free_purchase_price": "166968.00",
-      "primary_loan_amount": "150795.00",
-      "purchase_price": "119595.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "166968.00",
+      "catalog_primary_loan_amount": "150795.00",
       "additional_work_during_construction": "1233.00",
       "loans_during_construction": "110982.00",
       "interest_during_construction_6": null,
@@ -250,11 +229,8 @@
       "apartment_number": 53,
       "floor": "8",
       "stair": "P",
-      "debt_free_purchase_price": "106031.00",
-      "primary_loan_amount": "102128.00",
-      "purchase_price": "185278.00",
-      "first_purchase_date": null,
-      "latest_purchase_date": null,
+      "catalog_purchase_price": "106031.00",
+      "catalog_primary_loan_amount": "102128.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "131965.00",
       "interest_during_construction_6": null,
@@ -14878,6 +14854,62 @@
     }
   },
   {
+    "model": "hitas.apartmentsale",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 1,
+      "notification_date": "2014-06-02",
+      "purchase_date": "2014-06-02",
+      "purchase_price": "11000.00",
+      "apartment_share_of_housing_company_loans": "44000.00",
+      "exclude_in_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 1,
+      "notification_date": "2015-06-02",
+      "purchase_date": "2015-06-02",
+      "purchase_price": "22000.00",
+      "apartment_share_of_housing_company_loans": "0.00",
+      "exclude_in_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 2,
+      "notification_date": "2022-12-06",
+      "purchase_date": "2022-12-06",
+      "purchase_price": "198680.00",
+      "apartment_share_of_housing_company_loans": "15222953.00",
+      "exclude_in_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "apartment": 2,
+      "notification_date": "2022-12-15",
+      "purchase_date": "2022-12-15",
+      "purchase_price": "143535.00",
+      "apartment_share_of_housing_company_loans": "0.00",
+      "exclude_in_statistics": false
+    }
+  },
+  {
     "model": "hitas.ownership",
     "pk": 1,
     "fields": {
@@ -14885,6 +14917,7 @@
       "deleted_by_cascade": false,
       "apartment": 1,
       "owner": 1,
+      "sale": 2,
       "percentage": "100.00"
     }
   },
@@ -14896,6 +14929,7 @@
       "deleted_by_cascade": false,
       "apartment": 2,
       "owner": 2,
+      "sale": 4,
       "percentage": "100.00"
     }
   },
@@ -14907,6 +14941,7 @@
       "deleted_by_cascade": false,
       "apartment": 3,
       "owner": 3,
+      "sale": null,
       "percentage": "100.00"
     }
   },
@@ -14918,6 +14953,7 @@
       "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 4,
+      "sale": null,
       "percentage": "50.00"
     }
   },
@@ -14929,6 +14965,7 @@
       "deleted_by_cascade": false,
       "apartment": 5,
       "owner": 5,
+      "sale": null,
       "percentage": "100.00"
     }
   },
@@ -14940,6 +14977,7 @@
       "deleted_by_cascade": false,
       "apartment": 6,
       "owner": 6,
+      "sale": null,
       "percentage": "100.00"
     }
   },
@@ -14951,6 +14989,7 @@
       "deleted_by_cascade": false,
       "apartment": 7,
       "owner": 7,
+      "sale": null,
       "percentage": "100.00"
     }
   },
@@ -14962,6 +15001,7 @@
       "deleted_by_cascade": false,
       "apartment": 8,
       "owner": 8,
+      "sale": null,
       "percentage": "100.00"
     }
   },
@@ -14973,6 +15013,7 @@
       "deleted_by_cascade": false,
       "apartment": 4,
       "owner": 9,
+      "sale": null,
       "percentage": "50.00"
     }
   },
