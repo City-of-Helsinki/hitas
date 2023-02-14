@@ -3,19 +3,27 @@ import React from "react";
 import {Button, IconSaveDisketteFill} from "hds-react";
 
 interface SaveButtonProps {
-    onClick: () => void;
+    onClick?: () => void;
     isLoading?: boolean;
     disabled?: boolean;
+    type?: "submit";
 }
 
-export default function SaveButton({onClick, isLoading = false, disabled = false}: SaveButtonProps): JSX.Element {
+export default function SaveButton({onClick, isLoading = false, disabled = false, type}: SaveButtonProps): JSX.Element {
     return (
         <Button
             iconLeft={<IconSaveDisketteFill />}
             theme="black"
-            onClick={onClick}
+            onClick={
+                type // If the type is set (to "submit"), we don't want another onClick to happen here
+                    ? () => {
+                          return;
+                      }
+                    : onClick
+            }
             isLoading={isLoading}
             disabled={disabled}
+            type={type || "button"}
         >
             Tallenna
         </Button>
