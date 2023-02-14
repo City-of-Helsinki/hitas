@@ -12,7 +12,7 @@ import {
     QueryStateHandler,
 } from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
-import {IHousingCompany, IHousingCompanyListResponse} from "../../common/models";
+import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
 import {formatAddress, formatDate} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {

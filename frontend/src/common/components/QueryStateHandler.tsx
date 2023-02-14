@@ -4,7 +4,7 @@ import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {LoadingSpinner} from "hds-react";
 
-import {PageInfo} from "../models";
+import {PageInfo} from "../schemas";
 
 interface QueryLoadingProps {
     data:

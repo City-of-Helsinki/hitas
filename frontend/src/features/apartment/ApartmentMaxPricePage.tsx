@@ -22,7 +22,7 @@ import {
     IApartmentMaximumPrice,
     IApartmentMaximumPriceWritable,
     IHousingCompanyDetails,
-} from "../../common/models";
+} from "../../common/schemas";
 import {today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 

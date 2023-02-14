@@ -13,7 +13,7 @@ import {
     IIndexCalculationConstructionPriceIndexBefore2011,
     IIndexCalculationMarketPriceIndexBefore2011,
     SurfaceAreaPriceCeilingCalculation,
-} from "../../../common/models";
+} from "../../../common/schemas";
 import {formatDate, formatMoney, hitasToast} from "../../../common/utils";
 
 const tableTheme = {

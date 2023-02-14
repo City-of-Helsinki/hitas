@@ -21,7 +21,14 @@ import {
     SaveDialogModal,
 } from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
-import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwnership} from "../../common/models";
+import {
+    ApartmentWritableSchema,
+    IApartmentDetails,
+    IApartmentWritable,
+    ICode,
+    IOwnership,
+    apartmentStates,
+} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 interface IApartmentState {

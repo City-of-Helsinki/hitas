@@ -2,7 +2,7 @@ import React from "react";
 
 import {Button} from "hds-react";
 
-import {PageInfo} from "../models";
+import {PageInfo} from "../schemas";
 
 interface ListPageNumbersProps {
     pageInfo: PageInfo | undefined;

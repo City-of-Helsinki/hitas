@@ -14,8 +14,15 @@ import {
 } from "../../app/services";
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
-import {IApartmentDetails, IApartmentMaximumPrice, IOwnership} from "../../common/models";
 import {formatDate, formatIndex, formatMoney, hitasToast, today} from "../../common/utils";
+import {
+    // ApartmentSaleFormSchema,
+    ApartmentSaleSchema,
+    IApartmentDetails,
+    IApartmentMaximumPrice,
+    IApartmentSaleForm,
+    IOwnership,
+} from "../../common/schemas";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {

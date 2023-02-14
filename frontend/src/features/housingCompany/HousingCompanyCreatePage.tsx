@@ -14,13 +14,13 @@ import {
 } from "../../app/services";
 import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
 import {
-    HousingCompanyStates,
     ICode,
     IHousingCompanyDetails,
     IHousingCompanyWritable,
     IPostalCode,
     IPropertyManager,
-} from "../../common/models";
+    housingCompanyStates,
+} from "../../common/schemas";
 import {hitasToast, validateBusinessId} from "../../common/utils";
 
 const getHousingCompanyStateName = (state) => {
@@ -73,7 +73,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                       official: "",
                   },
                   notes: "",
-                  primary_loan: null,
+                  primary_loan: undefined,
                   property_manager: null,
                   state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
@@ -90,7 +90,7 @@ const HousingCompanyCreatePage = (): JSX.Element => {
         saveHousingCompany({data: formData, id: state?.housingCompany.id});
     };
 
-    const stateOptions = HousingCompanyStates.map((state) => {
+    const stateOptions = housingCompanyStates.map((state) => {
         return {label: getHousingCompanyStateName(state), value: state};
     });
 

@@ -7,7 +7,7 @@ import {v4 as uuidv4} from "uuid";
 
 import {useSaveHousingCompanyMutation} from "../../app/services";
 import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
-import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/models";
+import {IHousingCompanyDetails, IHousingCompanyWritable, IImprovement} from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
 
 type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};

@@ -5,9 +5,9 @@ import {Updater} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {useGetOwnersQuery} from "../../app/services";
-import {IOwner, IOwnership} from "../models";
 import {dotted, formatOwner} from "../utils";
 import {FormInputField} from "./index";
+import {IOwner, IOwnership} from "../schemas";
 
 const OwnershipsList = ({
     formOwnershipsList,

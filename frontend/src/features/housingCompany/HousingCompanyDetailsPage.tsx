@@ -5,7 +5,7 @@ import {Link, useParams} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
-import {IHousingCompanyDetails} from "../../common/models";
+import {IHousingCompanyDetails} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 

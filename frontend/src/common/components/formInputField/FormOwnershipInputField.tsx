@@ -4,7 +4,7 @@ import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput}
 import {useImmer} from "use-immer";
 
 import {useCreateOwnerMutation} from "../../../app/services";
-import {IOwner} from "../../models";
+import {IOwner} from "../../schemas";
 import {doesAContainB, hitasToast, validateSocialSecurityNumber} from "../../utils";
 import QueryStateHandler from "../QueryStateHandler";
 import SaveButton from "../SaveButton";

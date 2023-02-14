@@ -11,16 +11,16 @@ import {
     ListPageNumbers,
     QueryStateHandler,
 } from "../../common/components";
-import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/models";
+import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/schemas";
 
 interface ApartmentListItemProps {
-    id: string;
-    apartmentNumber: number;
+    id: string | null;
+    apartmentNumber: number | null;
     stair: string;
     ownerships: IOwnership[];
-    apartmentType?: string;
+    apartmentType?: string | null;
     rooms: number | null;
-    surfaceArea: number;
+    surfaceArea: number | null;
     address: IApartmentAddress;
     state: string;
     hcId: string;

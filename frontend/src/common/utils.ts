@@ -1,6 +1,6 @@
 import toast, {ToastOptions} from "react-hot-toast";
 
-import {IAddress, IApartmentAddress, IOwner} from "./models";
+import {IAddress, IApartmentAddress, IOwner} from "./schemas";
 
 function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
     /*
