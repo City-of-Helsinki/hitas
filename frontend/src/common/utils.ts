@@ -31,8 +31,8 @@ function formatOwner(owner: IOwner): string {
     return `${owner.name} (${owner.identifier})`;
 }
 
-function formatMoney(value: number | null, forceDecimals = false): string {
-    if (value === null) return "-";
+function formatMoney(value: number | undefined | null, forceDecimals = false): string {
+    if (!value) return "-";
 
     const formatOptions = {
         style: "currency",
@@ -138,6 +138,13 @@ function hitasToast(message: string | JSX.Element, type?: "success" | "info" | "
     toast(message, {...opts, className: type});
 }
 
+const hdsToast = {
+    success: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "success"}),
+    info: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
+    error: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "error"}),
+    alert: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "alert"}),
+};
+
 // Returns true if obj1 contains the same key/value pairs as obj2. Note that this is non-exclusive, so obj1 doesn't
 // have to be identical to obj2, as it can contain more data than only the ones from obj2.
 function doesAContainB(A: object, B: object): boolean {
@@ -164,6 +171,7 @@ export {
     validateBusinessId,
     validateSocialSecurityNumber,
     hitasToast,
+    hdsToast,
     today,
     doesAContainB,
 };
