@@ -1,9 +1,24 @@
 @use "../imports" as *
 
-.input-field--invalid
-  [class*="text-input_hds-text-input"]
-    border-color: $color-error !important
+.input-field
+  height: 100px
+  margin-bottom: $spacing-xs
+  &--invalid
+    [class*="text-input_hds-text-input"]
+      border-color: $color-error !important
+  &--required label
+    font-weight: 700
 
-.input-field--required label
-  font-weight: 700
+input, input + label::before
+  --focus-outline-color: var(--color-black-50)
 
+[class*="input_hds-text-input__error-text"], [class*="text-input_hds-text-input__helper-text"]
+  margin-top: 0 !important
+  // top: -6px
+
+[class*="ToggleButton-module"]
+  --toggle-button-color: var(--color-black-80)
+  --toggle-button-hover-color: var(--color-black)
+  --toggle-button-unselected-color: var(--color-black-60)
+  &:focus::after
+    border-color: $color-black-80 !important

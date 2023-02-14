@@ -392,7 +392,10 @@ const ApartmentSaleFormSchema = object({
 });
 
 const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
-    object({id: string().optional(), ownerships: ownershipSchema.array()})
+    object({
+        id: string().optional(),
+        ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
+    })
 );
 
 // ********************************
