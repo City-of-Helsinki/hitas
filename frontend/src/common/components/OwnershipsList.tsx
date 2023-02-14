@@ -1,55 +1,47 @@
 import React from "react";
 
 import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
-import {Updater} from "use-immer";
+import {Control, useFieldArray, useWatch} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
 import {useGetOwnersQuery} from "../../app/services";
-import {IOwner, IOwnership} from "../models";
-import {dotted, formatOwner} from "../utils";
-import {FormInputField} from "./index";
+import {IOwner, IOwnership} from "../schemas";
+import {formatOwner} from "../utils";
+import {NumberInput, RelatedModelInput} from "./form";
+
+type FormValues = {
+    ownerships: IOwnership[];
+};
 
 const OwnershipsList = ({
     formOwnershipsList,
-    setFormOwnershipsList,
     noOwnersError = false,
+    formObject,
 }: {
-    formOwnershipsList: (IOwnership & {key: string})[];
-    setFormOwnershipsList: Updater<(IOwnership & {key: string})[]>;
+    formOwnershipsList: IOwnership[];
     noOwnersError?: boolean;
+    formObject?;
 }) => {
-    const error = {};
+    const {fields, append, remove} = useFieldArray({
+        name: "ownerships",
+        control: formObject.control,
+        rules: {required: "Kauppatapahtumassa täytyy olla ainakin yksi omistajuus!"},
+    });
+    const getTotal = (payload) => {
+        let sum = 0;
+        for (const item of payload) {
+            sum = sum + (Number.isNaN(item.percentage) ? 0 : item.percentage);
+        }
+        return sum;
+    };
 
     // Ownerships
-    const handleAddOwnershipLine = () => {
-        setFormOwnershipsList((draft) => {
-            draft.push({
-                key: uuidv4(),
-                owner: {id: ""} as IOwner,
-                percentage: 100,
-            });
-        });
-    };
-    const handleSetOwnershipLine = (index, fieldPath) => (value) => {
-        setFormOwnershipsList((draft) => {
-            dotted(draft[index], fieldPath, value);
-        });
-    };
-    const handleRemoveOwnershipLine = (index) => {
-        setFormOwnershipsList((draft) => {
-            draft.splice(index, 1);
-        });
-    };
-    const getOwnershipPercentageError = (error) => {
-        if (
-            error &&
-            error?.data?.fields &&
-            error.data.fields.filter((e) => e.field === "ownerships.percentage").length
-        ) {
-            return error.data.fields.filter((e) => e.field === "ownerships.percentage")[0].message;
-        }
-        return "";
-    };
+    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
+
+    function TotalAmount({control}: {control: Control<FormValues>}) {
+        const ownershipValues = useWatch({control, name: "ownerships"});
+        return <span>{getTotal(ownershipValues)}</span>;
+    }
 
     return (
         <div>
@@ -59,50 +51,47 @@ const OwnershipsList = ({
                         <li>
                             <legend className="ownership-headings">
                                 <span>Omistaja *</span>
-                                <span>Omistajuusprosentti *</span>
+                                <span>
+                                    Omistajuusprosentti (<TotalAmount control={formObject.control} /> / 100%) *
+                                </span>
                             </legend>
                         </li>
-                        {formOwnershipsList.map((ownership: IOwnership & {key: string}, index) => (
+                        {fields.map((field, index) => (
                             <li
                                 className="ownership-item"
-                                key={`ownership-item-${ownership.key}`}
+                                key={field.id}
                             >
                                 <div className="owner">
-                                    <FormInputField
-                                        inputType="ownership"
-                                        label=""
+                                    <RelatedModelInput
+                                        name={`ownerships.${index}.owner.id`}
                                         fieldPath="owner.id"
-                                        placeholder={
-                                            ownership?.owner.name
-                                                ? `${ownership?.owner.name} (${ownership?.owner.identifier})`
-                                                : ""
-                                        }
                                         queryFunction={useGetOwnersQuery}
                                         relatedModelSearchField="name"
-                                        getRelatedModelLabel={(obj: IOwner) => formatOwner(obj)}
-                                        formData={formOwnershipsList[index]}
-                                        setterFunction={handleSetOwnershipLine(index, "owner.id")}
-                                        error={error}
+                                        getRelatedModelLabel={(obj) => formatOwner(obj)}
+                                        formObject={formObject}
+                                        placeholder={
+                                            formObject.getValues(`ownerships.${index}.owner.name`)
+                                                ? `${formObject.getValues(
+                                                      `ownerships.${index}.owner.name`
+                                                  )} (${formObject.getValues(`ownerships.${index}.owner.identifier`)})`
+                                                : ""
+                                        }
                                         required
                                     />
                                 </div>
                                 <div className="percentage">
-                                    <FormInputField
-                                        inputType="number"
-                                        label=""
-                                        fieldPath="percentage"
+                                    <NumberInput
+                                        name={`ownerships.${index}.percentage`}
                                         fractionDigits={2}
-                                        placeholder={ownership.percentage.toString()}
-                                        formData={formOwnershipsList[index]}
-                                        setterFunction={handleSetOwnershipLine(index, "percentage")}
-                                        error={error}
+                                        formObject={formObject}
                                         required
                                     />
+                                    <span>%</span>
                                 </div>
                                 <div className="icon--remove">
                                     <IconCrossCircle
                                         size="m"
-                                        onClick={() => handleRemoveOwnershipLine(index)}
+                                        onClick={() => remove(index)}
                                     />
                                 </div>
                             </li>
@@ -118,19 +107,13 @@ const OwnershipsList = ({
                         <IconAlertCircleFill />
                     </div>
                 )}
-                {getOwnershipPercentageError(error) && (
-                    <>
-                        <IconAlertCircleFill className="error-text" />
-                        <span className="error-text">{getOwnershipPercentageError(error)}</span>
-                    </>
-                )}
             </ul>
             <div className="row row--buttons">
                 <Button
-                    onClick={handleAddOwnershipLine}
                     iconLeft={<IconPlus />}
                     variant={formOwnershipsList.length > 0 ? "secondary" : "primary"}
                     theme="black"
+                    onClick={() => append(emptyOwnership)}
                 >
                     Lisää omistajuus
                 </Button>

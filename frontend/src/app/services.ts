@@ -21,7 +21,7 @@ import {
     IOwner,
     IPostalCodeResponse,
     IRealEstate,
-} from "../common/models";
+} from "../common/schemas";
 import {hitasToast} from "../common/utils";
 
 declare global {

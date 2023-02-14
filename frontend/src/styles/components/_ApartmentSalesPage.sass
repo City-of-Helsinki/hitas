@@ -50,7 +50,7 @@
       padding: $spacing-s
       margin-left: calc(var(--spacing-s) * -1)
     .row
-      gap: 1em
+      gap: 2em
       > div
         width: 50%
         position: relative
@@ -68,8 +68,11 @@
           font-weight: bold
     .input-field--invalid input
       color: $color-error
-    [class*="Checkbox-module"]
+    [class*="toggleButtonContainerInlineVariant"]
+      @include justify-content(flex-end)
       margin-bottom: $spacing-xs
+      button
+        margin-right: $spacing-s
     .ownerships-list
       margin-top: 0
       legend

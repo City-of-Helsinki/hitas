@@ -12,16 +12,16 @@ import {
 import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
+    IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,
     IApartmentDetails,
     IApartmentUnconfirmedMaximumPrice,
-    IConditionOfSale,
     IHousingCompanyDetails,
     IOwnership,
-} from "../../common/models";
+} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 
-const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
+const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (
         <li>
             <h3>
@@ -46,10 +46,10 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
     );
 };
 
-const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IConditionOfSale[]}) => {
+const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     // Create a dict with owner id as key, and all of their conditions of sale in a list as value
     interface IGroupedConditionsOfSale {
-        [ownerId: string]: IConditionOfSale[];
+        [ownerId: string]: IApartmentConditionOfSale[];
     }
     const groupedConditionsOfSale: IGroupedConditionsOfSale = conditionsOfSale.reduce((acc, obj) => {
         if (obj.owner.id in acc) {

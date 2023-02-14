@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 
+import {zodResolver} from "@hookform/resolvers/zod";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Checkbox, Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
+import {Button, Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
+import {useForm} from "react-hook-form";
 import {useNavigate, useParams} from "react-router-dom";
-import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {
@@ -12,10 +13,11 @@ import {
     useGetApartmentMaximumPriceQuery,
     useSaveApartmentMaximumPriceMutation,
 } from "../../app/services";
-import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
+import {Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
-import {IApartmentDetails, IApartmentMaximumPrice, IOwnership} from "../../common/models";
-import {formatDate, formatIndex, formatMoney, hitasToast, today} from "../../common/utils";
+import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
+import {ApartmentSaleSchema, IApartmentDetails, IApartmentMaximumPrice, IApartmentSaleForm} from "../../common/schemas";
+import {formatDate, formatIndex, formatMoney, hdsToast, today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -47,16 +49,15 @@ const LoadedApartmentSalesPage = ({
     maxPriceCalculation: IApartmentMaximumPrice | null;
 }) => {
     const navigate = useNavigate();
-
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [hasNoOwnershipsError, setHasNoOwnershipsError] = useState(false);
-    const [isExcludedFromStats, setIsExcludedFromStats] = useState(false);
-
+    // We need a reference to the formik form-element, to be able to dispatch a submit event dynamically
+    const formRef = useRef<HTMLFormElement | null>(null);
+    // Queries and mutations
     const [saveSale, {data, error, isLoading}] = useCreateSaleMutation();
     const [saveMaximumPrice, {data: maxPriceData, error: maxPriceError, isLoading: isMaxPriceLoading}] =
         useSaveApartmentMaximumPriceMutation();
 
-    const initialFormData = {
+    // Form data, schema and variables
+    const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
         purchase_date: apartment.prices.maximum_prices.confirmed?.valid.is_valid
             ? apartment.prices.maximum_prices.confirmed.calculation_date
@@ -66,11 +67,19 @@ const LoadedApartmentSalesPage = ({
             ? maxPriceCalculation.calculations.construction_price_index.calculation_variables
                   .apartment_share_of_housing_company_loans
             : null,
+        exclude_from_statistics: false,
     };
-    const [formData, setFormData] = useImmer(initialFormData);
-    const [formOwnershipsList, setFormOwnershipsList] = useImmer<(IOwnership & {key: string})[]>(
-        apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : []
-    );
+    const formOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
+    const formObject = useForm({
+        defaultValues: {...initialFormData, ownerships: formOwnershipsList},
+        mode: "all",
+        resolver: zodResolver(ApartmentSaleSchema),
+    });
+    const {
+        formState: {isDirty, isValid, errors},
+    } = formObject;
+
+    //  Maximum price calculation variables
     const [maxPrices, setMaxPrices] = useState({
         maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
         maxPricePerSquare: maxPriceCalculation
@@ -81,22 +90,51 @@ const LoadedApartmentSalesPage = ({
             : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price,
         index: maxPriceData ? maxPriceData.index : maxPriceCalculation?.index,
     });
-    const isTooHighPrice = Number(maxPrices.maximumPrice) < Number(formData.purchase_price);
+
+    // Flags
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const isTooHighPrice = Number(maxPrices.maximumPrice) < Number(formObject.getValues("purchase_price"));
     const isLoanValueChanged =
-        Number(formData.apartment_share_of_housing_company_loans) !==
+        Number(formObject.getValues("apartment_share_of_housing_company_loans")) !==
             maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
                 .apartment_share_of_housing_company_loans && maxPriceCalculation;
+    const hasNoOwnershipsError = !!formOwnershipsList.length;
 
-    const onCheckboxChange = (event) => {
-        setIsExcludedFromStats(event.target.checked);
-    };
+    // Handle "calculate maximum price"-button press
     const handleCalculateButton = () => {
-        if (formData.purchase_date && formData.apartment_share_of_housing_company_loans) {
+        if (formObject.getValues("purchase_date") && formObject.getValues("apartment_share_of_housing_company_loans")) {
+            // Validate relevant fields for the calculation
+            if (errors.purchase_date || errors.apartment_share_of_housing_company_loans) {
+                if (errors.purchase_date)
+                    hdsToast.error(
+                        <>
+                            Tarkista <span>kauppakirjan päivämäärä</span>!
+                        </>
+                    );
+                else
+                    hdsToast.error(
+                        <>
+                            Tarkista <span>yhtiön lainaosuus</span>!
+                        </>
+                    );
+            } else handleValidatedCalculation();
+        } else
+            hdsToast.error(
+                <>
+                    Enimmäishintojen laskemiseen tarvitaan <span>kauppakirjan päivämäärä</span> sekä{" "}
+                    <span>yhtiön lainaosuus</span>!
+                </>
+            );
+    };
+
+    const handleValidatedCalculation = () => {
+        if (formObject.getValues("purchase_date") && formObject.getValues("apartment_share_of_housing_company_loans")) {
             saveMaximumPrice({
                 data: {
-                    calculation_date: formData.purchase_date,
-                    apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
-                    apartment_share_of_housing_company_loans_date: formData.purchase_date,
+                    calculation_date: formObject.getValues("purchase_date"),
+                    apartment_share_of_housing_company_loans:
+                        formObject.getValues("apartment_share_of_housing_company_loans") || 0,
+                    apartment_share_of_housing_company_loans_date: formObject.getValues("purchase_date"),
                     additional_info: "",
                 },
                 id: undefined,
@@ -117,115 +155,172 @@ const LoadedApartmentSalesPage = ({
                 });
                 setIsModalVisible(true);
             });
-        } else
-            hitasToast(
-                <>
-                    Enimmäishintojen laskemiseen tarvitaan <span>kauppakirjan päivämäärä</span> sekä{" "}
-                    <span>yhtiön lainaosuus</span>!
-                </>,
-                "error"
-            );
-    };
-    const handleSaveButton = () => {
-        if (formOwnershipsList.length < 1) {
-            hitasToast("Asunnolla täytyy olla ainakin yksi omistaja!", "error");
-            setHasNoOwnershipsError(true);
-        } else {
-            const saleData = {
-                ...formData,
-                ownerships: formOwnershipsList,
-                exclude_from_statistics: isExcludedFromStats,
-            };
-            saveSale({
-                data: saleData,
-                apartmentId: apartment.id,
-                housingCompanyId: apartment.links.housing_company.id,
-            });
         }
     };
 
-    // Handle saving flow
+    // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
+    const handleSaveButton = () => {
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
+    };
+
+    // Handle form submit event
+    const onSubmit = (data) => {
+        saveSale({
+            data: data,
+            apartmentId: apartment.id,
+            housingCompanyId: apartment.links.housing_company.id,
+        });
+    };
+
+    // Handle saving flow and navigate the user back to the apartment's details view upon success
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
-            hitasToast("Kauppa tallennettu onnistuneesti!");
+            hdsToast.success("Kauppa tallennettu onnistuneesti!");
             navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         } else if (error) {
-            hitasToast("Kaupan tallentaminen epäonnistui.", "error");
+            hdsToast.error("Kaupan tallentaminen epäonnistui.");
         }
     }, [isLoading, error, data, navigate, apartment.links.housing_company.id, apartment.id]);
 
+    const MaximumPriceCalculationExists = ({maxPriceCalculation}) => {
+        return (
+            <div className="max-prices">
+                <div className="row row--max-prices">
+                    <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
+                        <legend>Enimmäishinta (€)</legend>
+                        <span className={isTooHighPrice ? "error-text" : ""}>
+                            {formatMoney(maxPrices.maximumPrice as number)}
+                        </span>
+                    </div>
+                    <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
+                        <legend>Enimmäishinta per m² (€)</legend>
+                        <span>{formatMoney(maxPrices.maxPricePerSquare)}</span>
+                    </div>
+                    <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
+                        <legend>Velaton enimmäishinta (€)</legend>
+                        <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
+                    </div>
+                </div>
+                <div className="row row--prompt">
+                    <p>
+                        Enimmäishinnat ovat laskettu{" "}
+                        <span>
+                            {` ${formatIndex(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}llä`}
+                        </span>{" "}
+                        ja{" "}
+                        <span>
+                            {formatMoney(
+                                maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
+                                    .apartment_share_of_housing_company_loans
+                            )}
+                        </span>{" "}
+                        lainaosuudella.{" "}
+                    </p>
+                    {isLoanValueChanged && (
+                        <p className="error-text">
+                            <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
+                            <span> tee uusi enimmäishintalaskelma</span>.
+                        </p>
+                    )}
+                    <Button
+                        theme="black"
+                        variant={isLoanValueChanged ? "primary" : "secondary"}
+                        onClick={handleCalculateButton}
+                        disabled={
+                            !formObject.getValues("purchase_date") ||
+                            !formObject.getValues("apartment_share_of_housing_company_loans")
+                        }
+                    >
+                        Tee uusi enimmäishintalaskelma
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+    const MaximumPriceCalculationMissing = () => {
+        return (
+            <div className="row row--prompt">
+                <p>
+                    Asunnosta ei ole vahvistettua enimmäishintalaskelmaa, tai se ei ole enää voimassa. Syötä{" "}
+                    <span>kauppakirjan päivämäärä</span> sekä <span>yhtiön lainaosuus</span>, ja tee sitten uusi
+                    enimmäishintalaskelma saadaksesi asunnon enimmäishinnat kauppaa varten.
+                </p>
+                <Button
+                    theme="black"
+                    onClick={handleCalculateButton}
+                    disabled={
+                        !formObject.getValues("purchase_date") ||
+                        !formObject.getValues("apartment_share_of_housing_company_loans")
+                    }
+                >
+                    Tee enimmäishintalaskelma
+                </Button>
+            </div>
+        );
+    };
     return (
         <>
             <div className="field-sets">
                 <Fieldset heading="Kaupan tiedot">
-                    <div className="row">
-                        <FormInputField
-                            inputType="date"
-                            label="Ilmoituspäivämäärä"
-                            fieldPath="notification_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            required
-                            maxDate={new Date()}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Kauppakirjan päivämäärä"
-                            fieldPath="purchase_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            required
-                            maxDate={new Date()}
-                        />
-                    </div>
-                    <div className="row">
-                        <div className={isTooHighPrice ? "input-field--invalid" : ""}>
-                            <FormInputField
-                                inputType="number"
-                                label="Kauppahinta"
-                                unit="€"
-                                fractionDigits={2}
-                                fieldPath="purchase_price"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
+                    <form
+                        ref={formRef}
+                        onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(errors))}
+                    >
+                        <div className="row">
+                            <DateInput
+                                name="notification_date"
+                                label="Ilmoituspäivämäärä"
+                                formObject={formObject}
+                                maxDate={new Date()}
                                 required
                             />
-                            <div className="error-message error-text">
-                                <span style={{display: isTooHighPrice ? "block" : "none"}}>
-                                    <IconAlertCircleFill />
-                                    Kauppahinta ylittää enimmäishinnan!
-                                </span>
-                            </div>
-                        </div>
-                        <div className={isLoanValueChanged ? "input-field--invalid" : ""}>
-                            <FormInputField
-                                inputType="number"
-                                label="Osuus yhtiön lainoista"
-                                unit="€"
-                                fractionDigits={0}
-                                fieldPath="apartment_share_of_housing_company_loans"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
+                            <DateInput
+                                name="purchase_date"
+                                label="Kauppakirjan päivämäärä"
+                                formObject={formObject}
+                                maxDate={new Date()}
                                 required
                             />
-                            <div className="error-message error-text">
-                                <span style={{display: isLoanValueChanged ? "block" : "none"}}>
-                                    <IconAlertCircleFill />
-                                    Eri kuin enimmäishintalaskelmassa!
-                                </span>
+                        </div>
+                        <div className="row">
+                            <div className={isTooHighPrice ? "input-field--invalid" : ""}>
+                                <NumberInput
+                                    name="purchase_price"
+                                    label="Kauppahinta"
+                                    formObject={formObject}
+                                    unit="€"
+                                    fractionDigits={2}
+                                    required
+                                />
+                                <div className="error-message error-text">
+                                    <span style={{display: isTooHighPrice ? "block" : "none"}}>
+                                        <IconAlertCircleFill />
+                                        Kauppahinta ylittää enimmäishinnan!
+                                    </span>
+                                </div>
+                            </div>
+                            <div className={isLoanValueChanged ? "input-field--invalid" : ""}>
+                                <NumberInput
+                                    name="apartment_share_of_housing_company_loans"
+                                    label="Osuus yhtiön lainoista"
+                                    formObject={formObject}
+                                    unit="€"
+                                    required
+                                />
+                                <div className="error-message error-text">
+                                    <span style={{display: isLoanValueChanged ? "block" : "none"}}>
+                                        <IconAlertCircleFill />
+                                        Eri kuin enimmäishintalaskelmassa!
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <Checkbox
-                        id="exclude-from-stats"
-                        label="Ei tilastoihin (esim. sukulaiskauppa)"
-                        checked={isExcludedFromStats}
-                        onChange={(event) => onCheckboxChange(event)}
-                    />
+                        <Checkbox
+                            name="exclude_from_statistics"
+                            label="Ei tilastoihin (esim. sukulaiskauppa)"
+                            formObject={formObject}
+                        />
+                    </form>
                 </Fieldset>
                 <Fieldset
                     heading={`Enimmäishintalaskelma ${
@@ -237,74 +332,9 @@ const LoadedApartmentSalesPage = ({
                     } *`}
                 >
                     {maxPriceCalculation ? (
-                        <div className="max-prices">
-                            <div className="row row--max-prices">
-                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
-                                    <legend>Enimmäishinta (€)</legend>
-                                    <span className={isTooHighPrice ? "error-text" : ""}>
-                                        {formatMoney(maxPrices.maximumPrice as number)}
-                                    </span>
-                                </div>
-                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
-                                    <legend>Enimmäishinta per m² (€)</legend>
-                                    <span>{formatMoney(maxPrices.maxPricePerSquare)}</span>
-                                </div>
-                                <div className={`fieldset--max-prices__value ${isLoanValueChanged ? " expired" : ""}`}>
-                                    <legend>Velaton enimmäishinta (€)</legend>
-                                    <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
-                                </div>
-                            </div>
-                            <div className="row row--prompt">
-                                <p>
-                                    Enimmäishinnat ovat laskettu{" "}
-                                    <span>
-                                        {` ${formatIndex(
-                                            maxPriceData ? maxPriceData.index : maxPriceCalculation.index
-                                        )}llä`}
-                                    </span>{" "}
-                                    ja{" "}
-                                    <span>
-                                        {formatMoney(
-                                            maxPriceCalculation?.calculations[maxPriceCalculation.index]
-                                                .calculation_variables.apartment_share_of_housing_company_loans
-                                        )}
-                                    </span>{" "}
-                                    lainaosuudella.{" "}
-                                </p>
-                                {isLoanValueChanged && (
-                                    <p className="error-text">
-                                        <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
-                                        <span> tee uusi enimmäishintalaskelma</span>.
-                                    </p>
-                                )}
-                                <Button
-                                    theme="black"
-                                    variant={isLoanValueChanged ? "primary" : "secondary"}
-                                    onClick={handleCalculateButton}
-                                >
-                                    Tee uusi enimmäishintalaskelma
-                                </Button>
-                            </div>
-                        </div>
+                        <MaximumPriceCalculationExists maxPriceCalculation={maxPriceCalculation} />
                     ) : (
-                        <div className="row row--prompt">
-                            <p>
-                                Asunnosta ei ole vahvistettua enimmäishintalaskelmaa, tai se ei ole enää voimassa. Syötä{" "}
-                                <span>kauppakirjan päivämäärä</span> sekä <span>yhtiön lainaosuus</span>, ja tee sitten
-                                uusi enimmäishintalaskelma saadaksesi asunnon enimmäishinnat kauppaa varten.
-                            </p>
-                            <Button
-                                theme="black"
-                                onClick={handleCalculateButton}
-                                /* TODO: implement proper front end form validation and apply it here
-                                disabled={
-                                    !(formData.purchase_date && formData.apartment_share_of_housing_company_loans)
-                                }
-                                */
-                            >
-                                Tee enimmäishintalaskelma
-                            </Button>
-                        </div>
+                        <MaximumPriceCalculationMissing />
                     )}
                 </Fieldset>
                 <Fieldset
@@ -313,8 +343,8 @@ const LoadedApartmentSalesPage = ({
                 >
                     <OwnershipsList
                         formOwnershipsList={formOwnershipsList}
-                        setFormOwnershipsList={setFormOwnershipsList}
                         noOwnersError={hasNoOwnershipsError}
+                        formObject={formObject}
                     />
                 </Fieldset>
             </div>
@@ -323,6 +353,7 @@ const LoadedApartmentSalesPage = ({
                 <SaveButton
                     onClick={handleSaveButton}
                     isLoading={isLoading}
+                    disabled={!isDirty || !isValid}
                 />
             </div>
             <Dialog

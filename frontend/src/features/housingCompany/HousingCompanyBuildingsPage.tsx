@@ -16,7 +16,7 @@ import {
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import {IBuildingWritable} from "../../common/models";
+import {IBuildingWritable} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 const blankForm: IBuildingWritable = {

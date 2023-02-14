@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 
-import {Fieldset, TextInput} from "hds-react";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Fieldset} from "hds-react";
+import {SubmitHandler, useForm} from "react-hook-form";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -21,7 +23,14 @@ import {
     SaveDialogModal,
 } from "../../common/components";
 import OwnershipsList from "../../common/components/OwnershipsList";
-import {ApartmentStates, IApartmentDetails, IApartmentWritable, ICode, IOwnership} from "../../common/models";
+import {DateInput, NumberInput, RelatedModelInput, Select, TextInput} from "../../common/components/form";
+import {
+    ApartmentWritableSchema,
+    IApartmentDetails,
+    IApartmentWritable,
+    ICode,
+    apartmentStates,
+} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 interface IApartmentState {
@@ -42,7 +51,7 @@ const getApartmentStateLabel = (state) => {
     }
 };
 
-const apartmentStateOptions = ApartmentStates.map((state) => {
+const apartmentStateOptions = apartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};
 });
 
@@ -71,20 +80,15 @@ const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWrit
 
 const ApartmentCreatePage = () => {
     const navigate = useNavigate();
-
     const {pathname, state}: IApartmentState = useLocation();
-    const isEditPage = pathname.split("/").at(-1) === "edit";
-
     const params = useParams() as {readonly housingCompanyId: string};
-
+    const formRef = useRef<HTMLFormElement | null>(null);
     const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
     const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
     const [removeApartment, {data: removeData, error: removeError, isLoading: isRemoving}] =
         useRemoveApartmentMutation();
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions =
         isHousingCompanyLoading || !housingCompanyData
@@ -94,11 +98,13 @@ const ApartmentCreatePage = () => {
                       return {label: building.address.street_address, value: building.id};
                   });
               });
+
+    // Form
     const initialFormData: IApartmentWritable =
         state === null || state?.apartment === undefined
             ? {
                   state: "free",
-                  type: null,
+                  type: {id: null},
                   surface_area: null,
                   rooms: null,
                   shares: {
@@ -109,7 +115,7 @@ const ApartmentCreatePage = () => {
                       street_address: (buildingOptions.length === 1 && buildingOptions[0].label) || "",
                       apartment_number: null,
                       floor: null,
-                      stair: null,
+                      stair: "",
                   },
                   completion_date: null,
                   prices: {
@@ -137,17 +143,18 @@ const ApartmentCreatePage = () => {
                   notes: "",
               }
             : convertApartmentDetailToWritable(state.apartment);
-    const [formData, setFormData] = useImmer<IApartmentWritable>(initialFormData);
-    const [formOwnershipsList, setFormOwnershipsList] = useImmer<(IOwnership & {key: string})[]>(
-        state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : []
-    );
-
-    const handleSaveButtonClicked = () => {
+    const formObject = useForm<IApartmentWritable>({
+        defaultValues: initialFormData,
+        mode: "all",
+        reValidateMode: "onBlur",
+        resolver: zodResolver(ApartmentWritableSchema),
+    });
+    const onSubmit: SubmitHandler<IApartmentWritable> = (data) => {
         const formDataWithOwnerships = {
-            ...formData,
+            ...data,
             // Copy street_address from selected building
             address: {
-                ...formData.address,
+                ...data.address,
                 street_address: buildingOptions.find((option) => option.value === formData.building.id)?.label || "",
             },
 
@@ -156,8 +163,8 @@ const ApartmentCreatePage = () => {
 
             // Clean share fields
             shares: {
-                start: formData.shares.start || null,
-                end: formData.shares.end || null,
+                start: formObject.getValues("shares.start") ?? null,
+                end: formObject.getValues("shares.end") ?? null,
             },
         };
 
@@ -171,6 +178,20 @@ const ApartmentCreatePage = () => {
         if (!isEditPage) {
             setIsEndModalVisible(true);
         }
+    };
+
+    const [formData, setFormData] = useImmer<IApartmentWritable>(initialFormData);
+    const formOwnershipsList =
+        state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
+
+    // Flags
+    const isEditPage = pathname.split("/").at(-1) === "edit";
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+
+    // Event handlers
+    const handleSubmitButtonClick = () => {
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
 
     const handleConfirmedRemove = () => {
@@ -217,244 +238,200 @@ const ApartmentCreatePage = () => {
                     ${state.apartment.address.apartment_number}`
                     : "Uusi asunto"}
             </Heading>
-            <div className="field-sets">
-                <Fieldset heading="">
-                    <TextInput
-                        id="input-housing_company.name"
-                        label="Asunto-osakeyhtiö"
-                        value={
-                            housingCompanyData?.name.display !== undefined
-                                ? housingCompanyData?.name.display
-                                : state?.apartment !== undefined
-                                ? state.apartment.links.housing_company.display_name
-                                : ""
-                        }
-                        disabled
-                    />
-                    <div className="row">
-                        <FormInputField
-                            inputType="select"
-                            label="Rakennus"
-                            fieldPath="building"
-                            placeholder={formData.address.street_address}
-                            defaultValue={{
-                                label: formData.address.street_address || "",
-                                value: formData.building.id || "",
-                            }}
-                            options={buildingOptions || []}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            label="Rappu"
-                            fieldPath="address.stair"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            label="Asunnon numero"
-                            fieldPath="address.apartment_number"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            label="Kerros"
-                            fieldPath="address.floor"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            fractionDigits={2}
-                            label="Pinta-ala"
-                            fieldPath="surface_area"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            label="Huoneiden määrä"
-                            fieldPath="rooms"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Asuntotyyppi"
-                            fieldPath="type.id"
-                            placeholder={state?.apartment.type !== null ? state?.apartment.type.value : ""}
-                            queryFunction={useGetApartmentTypesQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="select"
-                            label="Tila"
-                            fieldPath="state"
-                            options={apartmentStateOptions}
-                            defaultValue={{label: "Vapaa", value: "free"}}
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Valmistumispäivä"
-                            fieldPath="completion_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                </Fieldset>
-                <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            label="Osakkeet, alku"
-                            fieldPath="shares.start"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            label="Osakkeet, loppu"
-                            fieldPath="shares.end"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Luovutushinta"
-                            fieldPath="prices.debt_free_purchase_price"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            fractionDigits={2}
-                            label="Kauppakirjahinta"
-                            fieldPath="prices.purchase_price"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Rakennusaikaiset lainat"
-                            fieldPath="prices.construction.loans"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Rak.aik. korko (6%)"
-                            fieldPath="prices.construction.interest.rate_6"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Rak.aik. korko (14%)"
-                            fieldPath="prices.construction.interest.rate_14"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Luovutushinta (RA)"
-                            fieldPath="prices.construction.debt_free_purchase_price"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Rakennusaikaiset lisätyöt"
-                            fieldPath="prices.construction.additional_work"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            label="Ensisijaislaina"
-                            fieldPath="prices.primary_loan_amount"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <div />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="date"
-                            label="Ensimmäinen ostopäivä"
-                            fieldPath="prices.first_purchase_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Viimeisin ostopäivä"
-                            fieldPath="prices.latest_purchase_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                </Fieldset>
-            </div>
+            <form
+                ref={formRef}
+                onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}
+            >
+                <div className="field-sets">
+                    <Fieldset heading="">
+                        <div className="input-field">
+                            <TextInput
+                                name="housing_company"
+                                id="input-housing_company.name"
+                                label="Asunto-osakeyhtiö"
+                                value={
+                                    housingCompanyData?.name.display !== undefined
+                                        ? housingCompanyData?.name.display
+                                        : state?.apartment !== undefined
+                                        ? state.apartment.links.housing_company.display_name
+                                        : ""
+                                }
+                                formObject={formObject}
+                                disabled
+                            />
+                        </div>
+                        <div className="row">
+                            <Select
+                                label="Rakennus"
+                                options={buildingOptions || []}
+                                name="building"
+                                // placeholder={formData.address.street_address}
+                                defaultValue={{
+                                    label: formData.address.street_address || "",
+                                    value: formData.building.id || "",
+                                }}
+                                formObject={formObject}
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <TextInput
+                                name="address.stair"
+                                label="Rappu"
+                                formObject={formObject}
+                                required
+                            />
+                            <NumberInput
+                                name="address.apartment_number"
+                                label="Asunnon numero"
+                                formObject={formObject}
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="address.floor"
+                                label="Kerros"
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="address.apartment_number"
+                                label="Pinta-ala"
+                                formObject={formObject}
+                                fractionDigits={2}
+                                unit="m²"
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="rooms"
+                                label="Huoneiden määrä"
+                                formObject={formObject}
+                            />
+                            <RelatedModelInput
+                                name="type.id"
+                                label="Asuntotyyppi"
+                                fieldPath="type.id"
+                                placeholder={state?.apartment.type !== null ? state?.apartment.type.value : ""}
+                                queryFunction={useGetApartmentTypesQuery}
+                                relatedModelSearchField="value"
+                                getRelatedModelLabel={(obj: ICode) => obj.value}
+                                formObject={formObject}
+                            />
+                        </div>
+                        <div className="row">
+                            <Select
+                                label="tila"
+                                options={apartmentStateOptions}
+                                defaultValue={{label: "Vapaa", value: "free"}}
+                                name="state"
+                                formObject={formObject}
+                            />
+                            <DateInput
+                                name="completion_date"
+                                label="Valmistumispäivä"
+                                formObject={formObject}
+                            />
+                        </div>
+                    </Fieldset>
+                    <Fieldset heading="">
+                        <div className="row">
+                            <NumberInput
+                                name="shares.start"
+                                label="Osakkeet, alku"
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="shares.end"
+                                label="Osakkeet, loppu"
+                                formObject={formObject}
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="prices.debt_free_purchase_price"
+                                label="Luovutushinta"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="prices.purchase_price"
+                                label="Kauppakirjahinta"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="prices.construction.loans"
+                                label="Rakennusaikaiset lainat"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="prices.construction.interest.rate_6"
+                                label="Rak.aik. korko (6%)"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="prices.construction.interest.rate_14"
+                                label="Rak.aik. korko(14%)"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="prices.construction.debt_free_purchase_price"
+                                label="Luovutushinta (RA)"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                            <NumberInput
+                                name="prices.construction.additional_work"
+                                label="Rakennusaikaiset lisätyöt"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                name="prices.primary_loan_amount"
+                                label="Ensisijaislaina"
+                                unit="€"
+                                fractionDigits={2}
+                                formObject={formObject}
+                            />
+                            <div />
+                        </div>
+                        <div className="row">
+                            <DateInput
+                                name="prices.first_purchase_date"
+                                label="Ensimmäinen ostopäivä"
+                                formObject={formObject}
+                            />
+                            <DateInput
+                                name="prices.latest_purchase_date"
+                                label="Viimeisin ostopäivä"
+                                formObject={formObject}
+                            />
+                        </div>
+                    </Fieldset>
+                </div>
+            </form>
             <div className="field-sets">
                 <Fieldset heading="Omistajuudet">
                     <OwnershipsList
                         formOwnershipsList={formOwnershipsList}
-                        setFormOwnershipsList={setFormOwnershipsList}
+                        formObject={formObject}
                     />
                 </Fieldset>
                 <Fieldset heading="">
@@ -479,7 +456,7 @@ const ApartmentCreatePage = () => {
                     />
                 )}
                 <SaveButton
-                    onClick={handleSaveButtonClicked}
+                    onClick={handleSubmitButtonClick}
                     isLoading={isLoading}
                 />
             </div>

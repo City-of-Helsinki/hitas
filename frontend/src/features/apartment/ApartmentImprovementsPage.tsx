@@ -12,7 +12,7 @@ import {
     IApartmentDetails,
     IApartmentWritable,
     IImprovement,
-} from "../../common/models";
+} from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
 
 type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};

@@ -16,7 +16,7 @@ import {
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import {IRealEstate} from "../../common/models";
+import {IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 const HousingCompanyRealEstatesPage = (): JSX.Element => {

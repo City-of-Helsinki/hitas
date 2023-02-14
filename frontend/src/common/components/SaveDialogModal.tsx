@@ -5,7 +5,7 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../models";
+import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../schemas";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface SaveStateProps {

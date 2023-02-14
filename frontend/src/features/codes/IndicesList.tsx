@@ -5,7 +5,7 @@ import {useImmer} from "use-immer";
 
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
 import {FilterTextInputField, FormInputField, QueryStateHandler, SaveButton} from "../../common/components";
-import {IIndex} from "../../common/models";
+import {IIndex} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 const indexTypes: {label: string}[] = [
