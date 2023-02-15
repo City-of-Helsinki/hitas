@@ -290,8 +290,8 @@ const ApartmentPricesSchema = object({
     first_sale_purchase_price: number().nullable(),
     first_sale_share_of_housing_company_loans: number().nullable(),
     first_sale_acquisition_price: number().optional(),
-    purchase_price: number().nullable(),
     first_purchase_date: string().nullable(),
+    latest_sale_purchase_price: number().nullable(),
     latest_purchase_date: string().nullable(),
     construction: object({
         loans: number().nullable(),

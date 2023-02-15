@@ -313,8 +313,8 @@ class PricesSerializer(serializers.Serializer):
     first_sale_purchase_price = serializers.SerializerMethodField()
     first_sale_share_of_housing_company_loans = serializers.SerializerMethodField()
     first_sale_acquisition_price = serializers.SerializerMethodField()
-    purchase_price = serializers.SerializerMethodField()
     first_purchase_date = serializers.SerializerMethodField()
+    latest_sale_purchase_price = serializers.SerializerMethodField()
     latest_purchase_date = serializers.SerializerMethodField()
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
     maximum_prices = serializers.SerializerMethodField()
@@ -332,12 +332,12 @@ class PricesSerializer(serializers.Serializer):
         return instance.first_sale_acquisition_price
 
     @staticmethod
-    def get_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
-        return instance.latest_sale_purchase_price
-
-    @staticmethod
     def get_first_purchase_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
         return instance.first_purchase_date
+
+    @staticmethod
+    def get_latest_sale_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.latest_sale_purchase_price
 
     @staticmethod
     def get_latest_purchase_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
@@ -794,7 +794,7 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     @staticmethod
-    def purchase_price():
+    def latest_sale_purchase_price():
         return Subquery(
             queryset=(
                 ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
@@ -836,8 +836,8 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_list_queryset().annotate(
             _first_sale_purchase_price=self.primary_purchase_price(),
             _first_sale_share_of_housing_company_loans=self.primary_loan_amount(),
-            _latest_sale_purchase_price=self.purchase_price(),
             _first_purchase_date=self.first_purchase_date(),
+            _latest_sale_purchase_price=self.latest_sale_purchase_price(),
             _latest_purchase_date=self.latest_purchase_date(),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
             cpi=self.select_index(ConstructionPriceIndex),

@@ -569,8 +569,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "first_sale_purchase_price": float(ap1.first_sale_purchase_price),
             "first_sale_share_of_housing_company_loans": float(ap1.first_sale_share_of_housing_company_loans),
             "first_sale_acquisition_price": float(ap1.first_sale_acquisition_price),
-            "purchase_price": ap1.latest_sale_purchase_price,
             "first_purchase_date": str(ap1.first_purchase_date),
+            "latest_sale_purchase_price": ap1.latest_sale_purchase_price,
             "latest_purchase_date": ap1.latest_purchase_date,
             "construction": {
                 "loans": float(ap1.loans_during_construction),
@@ -1112,9 +1112,9 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         "completion_date": "2022-08-26",
         "prices": {
             "first_sale_purchase_price": 12345.1,
-            "purchase_price": 23456.2,
             "first_sale_share_of_housing_company_loans": 34567.3,
             "first_purchase_date": "2000-01-01",
+            "latest_sale_purchase_price": 23456.2,
             "latest_purchase_date": "2020-05-05",
             "construction": {
                 "loans": 123.1,
@@ -1177,8 +1177,8 @@ def get_minimal_apartment_data(data):
             "first_sale_purchase_price": None,
             "first_sale_share_of_housing_company_loans": None,
             "first_sale_acquisition_price": None,
-            "purchase_price": None,
             "first_purchase_date": None,
+            "latest_sale_purchase_price": None,
             "latest_purchase_date": None,
             "construction": {
                 "loans": None,
@@ -1283,16 +1283,18 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "notes": None,
             "ownerships": [],
             "prices": {
+                "first_sale_purchase_price": None,
+                "first_sale_share_of_housing_company_loans": None,
                 "first_sale_acquisition_price": None,
+                "first_purchase_date": None,
+                "latest_sale_purchase_price": None,
+                "latest_purchase_date": None,
                 "construction": {
                     "additional_work": None,
                     "debt_free_purchase_price": None,
                     "interest": None,
                     "loans": None,
                 },
-                "first_sale_purchase_price": None,
-                "first_purchase_date": None,
-                "latest_purchase_date": None,
                 "maximum_prices": {
                     "confirmed": None,
                     "unconfirmed": {
@@ -1304,8 +1306,6 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                         "pre_2011": None,
                     },
                 },
-                "first_sale_share_of_housing_company_loans": None,
-                "purchase_price": None,
             },
             "rooms": None,
             "shares": None,

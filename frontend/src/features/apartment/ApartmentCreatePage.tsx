@@ -120,7 +120,7 @@ const ApartmentCreatePage = () => {
                   completion_date: null,
                   prices: {
                       first_sale_purchase_price: null,
-                      purchase_price: null,
+                      latest_sale_purchase_price: null,
                       first_sale_share_of_housing_company_loans: null,
                       first_purchase_date: null,
                       latest_purchase_date: null,
@@ -356,7 +356,7 @@ const ApartmentCreatePage = () => {
                                 formObject={formObject}
                             />
                             <NumberInput
-                                name="prices.purchase_price"
+                                name="prices.latest_sale_purchase_price"
                                 label="Kauppakirjahinta"
                                 unit="€"
                                 fractionDigits={2}

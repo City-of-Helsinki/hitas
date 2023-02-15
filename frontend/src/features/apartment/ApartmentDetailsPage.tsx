@@ -305,7 +305,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                     <div>
                                         <DetailField
                                             label="Kauppakirjahinta"
-                                            value={formatMoney(data.prices.purchase_price)}
+                                            value={formatMoney(data.prices.latest_sale_purchase_price)}
                                         />
                                     </div>
                                     <div>
