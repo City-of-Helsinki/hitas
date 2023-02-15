@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from http import HTTPStatus
 from typing import Any, Optional, Tuple
 
@@ -68,6 +69,11 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
+            try:
+                uuid.UUID(hex=kwargs["pk"])
+            except ValueError:
+                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
+
             mpc = ApartmentMaximumPriceCalculation.objects.only(
                 "json_version", "json", "confirmed_at", "apartment_id"
             ).get(

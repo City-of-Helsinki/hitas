@@ -229,3 +229,20 @@ def test__api__apartment_max_price__retrieve__nonexistent_calculation_id(api_cli
         "reason": "Not Found",
         "status": 404,
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__retrieve__invalid_calculation_uuid(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create()
+
+    # Create max price calculation
+    response = api_client.get(
+        reverse("hitas:maximum-price-detail", args=[a.housing_company.uuid.hex, a.uuid.hex, "foo"]),
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "apartment_maximum_price_calculation_not_found",
+        "message": "Apartment maximum price calculation not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
