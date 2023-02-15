@@ -242,7 +242,7 @@ const ApartmentConditionOfSaleSchema = object({
         address: ApartmentAddressSchema,
         housing_company: ApartmentLinkedModelSchema.and(object({display_name: string()})),
     }),
-    grace_period: string(), // FIXME: should be litera: "not_given" | "three_months" | "six_months",
+    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
     fulfilled: string().nullable(),
 });
 
@@ -266,7 +266,7 @@ const ConditionOfSaleSchema = object({
             }),
         })
     ),
-    grace_period: string(), // FIXME: should be litera: "not_given" | "three_months" | "six_months",
+    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
     fulfilled: string().nullable(),
 });
 const ApartmentUnconfirmedMaximumPriceSchema = object({maximum: boolean(), value: number()});

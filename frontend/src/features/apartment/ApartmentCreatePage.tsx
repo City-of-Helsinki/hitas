@@ -119,9 +119,9 @@ const ApartmentCreatePage = () => {
                   },
                   completion_date: null,
                   prices: {
-                      debt_free_purchase_price: null,
+                      first_sale_purchase_price: null,
                       purchase_price: null,
-                      primary_loan_amount: null,
+                      first_sale_share_of_housing_company_loans: null,
                       first_purchase_date: null,
                       latest_purchase_date: null,
                       construction: {
@@ -349,7 +349,7 @@ const ApartmentCreatePage = () => {
                         </div>
                         <div className="row">
                             <NumberInput
-                                name="prices.debt_free_purchase_price"
+                                name="prices.first_sale_purchase_price"
                                 label="Luovutushinta"
                                 unit="€"
                                 fractionDigits={2}
@@ -404,7 +404,7 @@ const ApartmentCreatePage = () => {
                         </div>
                         <div className="row">
                             <NumberInput
-                                name="prices.primary_loan_amount"
+                                name="prices.first_sale_share_of_housing_company_loans"
                                 label="Ensisijaislaina"
                                 unit="€"
                                 fractionDigits={2}

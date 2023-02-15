@@ -311,7 +311,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                     <div>
                                         <DetailField
                                             label="Hankinta-arvo"
-                                            value={formatMoney(data.prices.acquisition_price)}
+                                            value={formatMoney(data.prices.first_sale_acquisition_price)}
                                         />
                                     </div>
                                     <div>
@@ -363,11 +363,11 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                         )}
                                         <DetailField
                                             label="Luovutushinta"
-                                            value={formatMoney(data.prices.debt_free_purchase_price)}
+                                            value={formatMoney(data.prices.first_sale_purchase_price)}
                                         />
                                         <DetailField
                                             label="Ensisijaislaina"
-                                            value={formatMoney(data.prices.primary_loan_amount)}
+                                            value={formatMoney(data.prices.first_sale_share_of_housing_company_loans)}
                                         />
                                         <DetailField
                                             label="Ensimmäinen ostopäivä"
