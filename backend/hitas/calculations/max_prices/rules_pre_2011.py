@@ -69,7 +69,7 @@ class RulesPre2011(CalculatorRules):
         # Apartment share share
         apartment_share_of_housing_company_assets = (
             housing_company_assets
-            * apartment.acquisition_price
+            * apartment.first_sale_acquisition_price
             / apartment.completion_date_realized_housing_company_acquisition_price
         )
 
@@ -156,7 +156,7 @@ class RulesPre2011(CalculatorRules):
 
         # Basic price
         basic_price = (
-            apartment.acquisition_price
+            apartment.first_sale_acquisition_price
             + (apartment.interest_during_construction_6 or 0)
             + (apartment.additional_work_during_construction or 0)
         )
@@ -216,7 +216,7 @@ class RulesPre2011(CalculatorRules):
             maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
-                acquisition_price=apartment.acquisition_price,
+                first_sale_acquisition_price=apartment.first_sale_acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
                 interest_during_construction_percentage=6,
                 additional_work_during_construction=apartment.additional_work_during_construction or 0,

@@ -287,10 +287,10 @@ const ApartmentConfirmedMaximumPriceSchema = object({
 }).nullable();
 
 const ApartmentPricesSchema = object({
-    acquisition_price: number().optional(),
-    debt_free_purchase_price: number().nullable(),
+    first_sale_purchase_price: number().nullable(),
+    first_sale_share_of_housing_company_loans: number().nullable(),
+    first_sale_acquisition_price: number().optional(),
     purchase_price: number().nullable(),
-    primary_loan_amount: number().nullable(),
     first_purchase_date: string().nullable(),
     latest_purchase_date: string().nullable(),
     construction: object({
@@ -360,7 +360,7 @@ const ApartmentWritableSchema = object({
     rooms: number().nullable(),
     shares: object({start: number().nullable(), end: number().nullable()}),
     address: ApartmentAddressSchema,
-    prices: ApartmentPricesSchema.omit({maximum_prices: true, acquisition_price: true}),
+    prices: ApartmentPricesSchema.omit({maximum_prices: true, first_sale_acquisition_price: true}),
     completion_date: string().nullish(),
     building: object({id: string()}),
     ownerships: ownershipsSchema,
@@ -424,7 +424,7 @@ const CommonCalculationVarsSchema = object({
 });
 
 const CalculationVars2011OnwardsSchema = object({
-    acquisition_price: number(),
+    first_sale_acquisition_price: number(),
     additional_work_during_construction: number(),
     basic_price: number(),
     index_adjustment: number(),
@@ -461,7 +461,7 @@ const IndexCalculationMarketPriceIndexBefore2011Schema = IndexCalculationSchema.
     object({
         calculation_variables: CommonCalculationVarsSchema.and(
             object({
-                acquisition_price: number(),
+                first_sale_acquisition_price: number(),
                 interest_during_construction: number(),
                 interest_during_construction_percentage: number(),
                 additional_work_during_construction: number(),

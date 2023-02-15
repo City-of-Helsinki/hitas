@@ -1215,7 +1215,7 @@ paths:
                         valid_until: "2022-10-05"
                         maximum: true
                         calculation_variables:
-                          acquisition_price: 199500.0
+                          first_sale_acquisition_price: 199500.0
                           additional_work_during_construction: 0.0
                           basic_price: 199500.0
                           index_adjustment: 26401.46
@@ -1249,7 +1249,7 @@ paths:
                         valid_until: "2022-10-05"
                         maximum: false
                         calculation_variables:
-                          acquisition_price: 199500.0
+                          first_sale_acquisition_price: 199500.0
                           additional_work_during_construction: 0.0
                           basic_price: 199500.0
                           index_adjustment: 25189.99
@@ -1372,7 +1372,7 @@ paths:
                         maximum: false
                       market_price_index:
                         calculation_variables:
-                          acquisition_price: 123173.0
+                          first_sale_acquisition_price: 123173.0
                           interest_during_construction: 3455.0
                           basic_price: 126628.0
                           index_adjustment: 153577.28
@@ -3625,7 +3625,7 @@ components:
               minimum: 0
               example: 98500
         acquisition_price:
-          description: Initial acquisition price
+          description: Initial acquisition price of the housing company
           type: number
           format: float
           minimum: 0
@@ -4183,7 +4183,7 @@ components:
       description: Variables used for apartment's maximum price calculations
       type: object
       required:
-        - acquisition_price
+        - first_sale_acquisition_price
         - additional_work_during_construction
         - basic_price
         - index_adjustment
@@ -4197,7 +4197,7 @@ components:
         - calculation_date
         - calculation_date_index
       properties:
-        acquisition_price:
+        first_sale_acquisition_price:
           description: Apartment's acquisition price
           type: number
           minimum: 0
@@ -4273,7 +4273,7 @@ components:
       description: Variables used for apartment's maximum price calculations
       type: object
       required:
-        - acquisition_price
+        - first_sale_acquisition_price
         - basic_price
         - interest_during_construction
         - additional_work_during_construction
@@ -4289,7 +4289,7 @@ components:
         - calculation_date
         - calculation_date_index
       properties:
-        acquisition_price:
+        first_sale_acquisition_price:
           description: Apartment's acquisition price
           type: number
           minimum: 0
@@ -5440,19 +5440,19 @@ components:
       type: object
       additionalProperties: false
       properties:
-        debt_free_purchase_price:
+        first_sale_purchase_price:
           description: TBD
           type: number
           minimum: 0
           nullable: true
           example: 51222
-        primary_loan_amount:
-          description: TBD
+        first_sale_share_of_housing_company_loans:
+          description: The amount of loans this apartment had when it was sold for the first time.
           type: number
           minimum: 0
           nullable: true
           example: 4208
-        acquisition_price:
+        first_sale_acquisition_price:
           description: TBD
           type: number
           minimum: 0

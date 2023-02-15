@@ -41,7 +41,7 @@ class IndexCalculation:
 
     @dataclass
     class CalculationVars2011Onwards(CommonCalculationVars):
-        acquisition_price: Decimal
+        first_sale_acquisition_price: Decimal
         additional_work_during_construction: Decimal
         basic_price: Decimal
         index_adjustment: Decimal
@@ -59,7 +59,7 @@ class IndexCalculation:
 
     @dataclass
     class CalculationVarsMarketPriceIndexBefore2011(CommonCalculationVars):
-        acquisition_price: Decimal
+        first_sale_acquisition_price: Decimal
         interest_during_construction: Decimal
         interest_during_construction_percentage: int
         additional_work_during_construction: Decimal

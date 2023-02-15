@@ -100,7 +100,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                 "valid_until": "2022-10-05",
                 "maximum": True,
                 "calculation_variables": {
-                    "acquisition_price": 199500.0,
+                    "first_sale_acquisition_price": 199500.0,
                     "additional_work_during_construction": 0.0,
                     "basic_price": 199500.0,
                     "index_adjustment": 26401.46,
@@ -142,7 +142,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                 "valid_until": "2022-10-05",
                 "maximum": False,
                 "calculation_variables": {
-                    "acquisition_price": 199500.0,
+                    "first_sale_acquisition_price": 199500.0,
                     "additional_work_during_construction": 0.0,
                     "basic_price": 199500.0,
                     "index_adjustment": 25189.99,
@@ -334,7 +334,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
     }
     assert calculations["construction_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 220661.0,
+            "first_sale_acquisition_price": 220661.0,
             "additional_work_during_construction": 0.0,
             "basic_price": 220661.0,
             "index_adjustment": 40916.09,
@@ -376,7 +376,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
     }
     assert calculations["market_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 220661.0,
+            "first_sale_acquisition_price": 220661.0,
             "additional_work_during_construction": 0.0,
             "basic_price": 220661.0,
             "index_adjustment": 56410.68,
@@ -569,7 +569,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     }
     assert calculations["market_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 123173.0,
+            "first_sale_acquisition_price": 123173.0,
             "interest_during_construction": 3455.0,
             "interest_during_construction_percentage": 6,
             "additional_work_during_construction": 4307.0,
@@ -851,7 +851,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     }
     assert calculations["market_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 175_930.0,
+            "first_sale_acquisition_price": 175_930.0,
             "interest_during_construction": 2703.0,
             "interest_during_construction_percentage": 6,
             "additional_work_during_construction": 2500.0,
@@ -999,7 +999,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
     }
     assert calculations["market_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 100000.0,
+            "first_sale_acquisition_price": 100000.0,
             "interest_during_construction": 0,
             "interest_during_construction_percentage": 6,
             "additional_work_during_construction": 0.0,
@@ -1128,7 +1128,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     }
     assert calculations["construction_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 169583.0,
+            "first_sale_acquisition_price": 169583.0,
             "additional_work_during_construction": 0.0,
             "basic_price": 169583.0,
             "index_adjustment": 48577.7,
@@ -1161,7 +1161,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
     }
     assert calculations["market_price_index"] == {
         "calculation_variables": {
-            "acquisition_price": 169583.0,
+            "first_sale_acquisition_price": 169583.0,
             "additional_work_during_construction": 0.0,
             "basic_price": 169583.0,
             "index_adjustment": 62626.6,

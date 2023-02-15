@@ -5,7 +5,6 @@ from http import HTTPStatus
 from itertools import chain
 from typing import Any, Dict, Optional, Union, Iterable
 
-from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Prefetch, Q
@@ -311,10 +310,9 @@ class ConstructionPrices(serializers.Serializer):
 
 
 class PricesSerializer(serializers.Serializer):
-
-    debt_free_purchase_price = serializers.SerializerMethodField()
-    primary_loan_amount = serializers.SerializerMethodField()
-    acquisition_price = serializers.SerializerMethodField()
+    first_sale_purchase_price = serializers.SerializerMethodField()
+    first_sale_share_of_housing_company_loans = serializers.SerializerMethodField()
+    first_sale_acquisition_price = serializers.SerializerMethodField()
     purchase_price = serializers.SerializerMethodField()
     first_purchase_date = serializers.SerializerMethodField()
     latest_purchase_date = serializers.SerializerMethodField()
@@ -322,16 +320,16 @@ class PricesSerializer(serializers.Serializer):
     maximum_prices = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_debt_free_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+    def get_first_sale_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
         return instance.first_sale_purchase_price
 
     @staticmethod
-    def get_primary_loan_amount(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+    def get_first_sale_share_of_housing_company_loans(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
         return instance.first_sale_share_of_housing_company_loans
 
     @staticmethod
-    def get_acquisition_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
-        return instance.acquisition_price
+    def get_first_sale_acquisition_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.first_sale_acquisition_price
 
     @staticmethod
     def get_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:

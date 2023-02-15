@@ -169,4 +169,4 @@ def test__properties__apartment__acquisition_price(primary_price, catalog_price,
         apartment.catalog_primary_loan_amount = 0
         apartment.save()
 
-    assert apartment.acquisition_price == acquisition_price
+    assert apartment.first_sale_acquisition_price == acquisition_price
