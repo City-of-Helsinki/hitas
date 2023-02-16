@@ -31,6 +31,7 @@ import {
     apartmentStates,
 } from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 
 interface IApartmentState {
     pathname: string;
@@ -231,12 +232,7 @@ const ApartmentCreatePage = () => {
 
     return (
         <div className="view--create">
-            <Heading>
-                {state?.apartment
-                    ? `${state.apartment.address.street_address} - ${state.apartment.address.stair}
-                    ${state.apartment.address.apartment_number}`
-                    : "Uusi asunto"}
-            </Heading>
+            {state?.apartment ? <ApartmentHeader apartment={state.apartment} /> : <Heading>Uusi asunto</Heading>}
             <form
                 ref={formRef}
                 onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}

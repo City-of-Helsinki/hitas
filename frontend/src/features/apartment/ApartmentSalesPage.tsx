@@ -18,6 +18,7 @@ import OwnershipsList from "../../common/components/OwnershipsList";
 import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
 import {ApartmentSaleSchema, IApartmentDetails, IApartmentMaximumPrice, IApartmentSaleForm} from "../../common/schemas";
 import {formatDate, formatIndex, formatMoney, hdsToast, today} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -400,12 +401,10 @@ const MaxPriceCalculationLoader = ({apartment}) => {
     });
 
     const SalesHeading = () => (
-        <Heading type="main">
-            Kauppatapahtuma
-            <span>
-                {`(${apartment.address.street_address} ${apartment.address.stair} ${apartment.address.apartment_number})`}
-            </span>
-        </Heading>
+        <>
+            <ApartmentHeader apartment={apartment} />
+            <Heading type="main">Kauppatapahtuma</Heading>
+        </>
     );
 
     if (hasValidCalculation) {

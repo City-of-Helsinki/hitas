@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Dialog, IconCrossCircle, IconLock, IconLockOpen, IconPlus, StatusLabel} from "hds-react";
+import {Button, Dialog, IconCrossCircle, IconLock, IconLockOpen, IconPlus} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -9,6 +9,7 @@ import {useCreateConditionOfSaleMutation, useGetApartmentDetailQuery, useGetOwne
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hitasToast} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 
 const OwnersList = ({formOwnerList, setFormOwnerList}) => {
     const handleAddOwnerLine = () => {
@@ -205,15 +206,7 @@ const ApartmentSalesConditionsPage = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                <div className="view--apartment-details">
-                    <Heading type="main">
-                        <Link to={`/housing-companies/${data?.links.housing_company.id}`}>
-                            <span className="name">{data?.links.housing_company.display_name}</span>
-                            <span className="address">{data && formatAddress(data?.address)}</span>
-                            <StatusLabel>{data?.state}</StatusLabel>
-                        </Link>
-                    </Heading>
-                </div>
+                <ApartmentHeader apartment={data as IApartmentDetails} />
             </QueryStateHandler>
             <Heading type="main">Myyntiehdot</Heading>
             <QueryStateHandler

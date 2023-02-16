@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -9,7 +9,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConditionOfSale,
@@ -20,6 +20,7 @@ import {
     IOwnership,
 } from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (
@@ -273,14 +274,10 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
 
     return (
         <>
-            <Heading type="main">
-                <Link to={`/housing-companies/${data.links.housing_company.id}`}>
-                    <span className="name">{data.links.housing_company.display_name}</span>
-                    <span className="address">{formatAddress(data.address)}</span>
-                    <StatusLabel>{data.state}</StatusLabel>
-                </Link>
-                <EditButton state={{apartment: data}} />
-            </Heading>
+            <ApartmentHeader
+                apartment={data as IApartmentDetails}
+                showEditButton={true}
+            />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {data.address.stair}
