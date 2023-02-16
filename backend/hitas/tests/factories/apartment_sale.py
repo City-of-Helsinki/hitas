@@ -13,7 +13,10 @@ class ApartmentSaleFactory(DjangoModelFactory):
     class Meta:
         model = ApartmentSale
 
-    apartment = factory.SubFactory("hitas.tests.factories.ApartmentFactory")
+    apartment = factory.SubFactory(
+        "hitas.tests.factories.ApartmentFactory",
+        sales=factory.LazyAttribute(lambda _: []),  # prevents another sale from being created
+    )
     notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     purchase_price = fuzzy.FuzzyDecimal(100_000, 200_000)
@@ -25,8 +28,8 @@ class ApartmentSaleFactory(DjangoModelFactory):
         if not create:
             return
 
-        if not extracted:
-            extracted = [OwnershipFactory.create(**kwargs)]
+        if extracted is None:
+            extracted = [OwnershipFactory.create(apartment=self.apartment, apartment__sales=self, **kwargs)]
 
         for ownership in extracted:
             self.ownerships.add(ownership)

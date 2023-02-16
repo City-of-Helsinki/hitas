@@ -30,8 +30,8 @@ class SalesCatalogApartment(TypedDict):
     surface_area: Decimal
     share_number_start: int
     share_number_end: int
-    debt_free_purchase_price: Decimal
-    primary_loan_amount: Decimal
+    catalog_purchase_price: Decimal
+    catalog_primary_loan_amount: Decimal
     acquisition_price: Decimal
 
 
@@ -44,8 +44,8 @@ class SalesCatalogApartmentCreate(TypedDict):
     surface_area: Decimal
     share_number_start: int
     share_number_end: int
-    debt_free_purchase_price: Decimal
-    primary_loan_amount: Decimal
+    catalog_purchase_price: Decimal
+    catalog_primary_loan_amount: Decimal
 
 
 class SalesCatalogApartmentSerializer(serializers.Serializer):
@@ -58,8 +58,8 @@ class SalesCatalogApartmentSerializer(serializers.Serializer):
     surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
     share_number_start = serializers.IntegerField(min_value=1)
     share_number_end = serializers.IntegerField(min_value=1)
-    debt_free_purchase_price = serializers.DecimalField(max_digits=15, decimal_places=2)
-    primary_loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    catalog_purchase_price = serializers.DecimalField(max_digits=15, decimal_places=2)
+    catalog_primary_loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
     acquisition_price = serializers.DecimalField(max_digits=15, decimal_places=2)
 
 
@@ -88,8 +88,8 @@ class SalesCatalogApartmentCreateSerializer(serializers.Serializer):
     surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
     share_number_start = serializers.IntegerField(min_value=1)
     share_number_end = serializers.IntegerField(min_value=1)
-    debt_free_purchase_price = serializers.DecimalField(max_digits=15, decimal_places=2)
-    primary_loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
+    catalog_purchase_price = serializers.DecimalField(max_digits=15, decimal_places=2)
+    catalog_primary_loan_amount = serializers.DecimalField(max_digits=15, decimal_places=2)
 
 
 class SalesCatalogValidateView(ViewSet):
@@ -110,8 +110,8 @@ class SalesCatalogValidateView(ViewSet):
                 "surface_area": "F",
                 "share_number_start": "G",
                 "share_number_end": "H",
-                "debt_free_purchase_price": "I",
-                "primary_loan_amount": "J",
+                "catalog_purchase_price": "I",
+                "catalog_primary_loan_amount": "J",
                 "acquisition_price": "K",
             },
             extra_format={
@@ -169,8 +169,8 @@ class SalesCatalogCreateView(ViewSet):
                     surface_area=apartment["surface_area"],
                     share_number_start=apartment["share_number_start"],
                     share_number_end=apartment["share_number_end"],
-                    debt_free_purchase_price=apartment["debt_free_purchase_price"],
-                    primary_loan_amount=apartment["primary_loan_amount"],
+                    catalog_purchase_price=apartment["catalog_purchase_price"],
+                    catalog_primary_loan_amount=apartment["catalog_primary_loan_amount"],
                 )
             )
 

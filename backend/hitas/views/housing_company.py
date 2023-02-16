@@ -1,8 +1,7 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from django.db.models import F, Min, Prefetch, Sum
-from django.db.models.functions import Round
+from django.db.models import F, Min, OuterRef, Prefetch, Subquery, Sum
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
@@ -10,6 +9,9 @@ from rest_framework.exceptions import ValidationError
 
 from hitas.exceptions import ModelConflict
 from hitas.models import (
+    Apartment,
+    ApartmentSale,
+    Building,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
@@ -17,7 +19,7 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.utils import validate_business_id
-from hitas.utils import safe_attrgetter
+from hitas.utils import RoundWithPrecision, safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
@@ -261,7 +263,9 @@ class HousingCompanyViewSet(HitasModelViewSet):
     def get_list_queryset(self):
         return (
             HousingCompany.objects.select_related("postal_code")
-            .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
+            .annotate(
+                date=Min("real_estates__buildings__apartments__completion_date"),
+            )
             .order_by("-date")
         )
 
@@ -270,22 +274,23 @@ class HousingCompanyViewSet(HitasModelViewSet):
             HousingCompany.objects.prefetch_related(
                 Prefetch(
                     "real_estates",
-                    queryset=RealEstate.objects.prefetch_related("buildings").order_by("id"),
+                    queryset=RealEstate.objects.order_by("id"),
+                ),
+                Prefetch(
+                    "real_estates__buildings",
+                    queryset=Building.objects.order_by("id"),
+                ),
+                Prefetch(
+                    "real_estates__buildings__apartments",
+                    queryset=Apartment.objects.order_by("id"),
                 ),
                 Prefetch(
                     "market_price_improvements",
-                    queryset=HousingCompanyMarketPriceImprovement.objects.only(
-                        "name", "value", "completion_date", "housing_company_id"
-                    ).order_by("completion_date", "id"),
+                    queryset=HousingCompanyMarketPriceImprovement.objects.order_by("completion_date", "id"),
                 ),
                 Prefetch(
                     "construction_price_improvements",
-                    queryset=HousingCompanyConstructionPriceImprovement.objects.only(
-                        "name",
-                        "value",
-                        "completion_date",
-                        "housing_company_id",
-                    ).order_by("completion_date", "id"),
+                    queryset=HousingCompanyConstructionPriceImprovement.objects.order_by("completion_date", "id"),
                 ),
             )
             .select_related(
@@ -296,62 +301,31 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "property_manager",
                 "last_modified_by",
             )
-            .only(
-                "id",
-                "uuid",
-                "business_id",
-                "display_name",
-                "official_name",
-                "state",
-                "street_address",
-                "acquisition_price",
-                "primary_loan",
-                "sales_price_catalogue_confirmation_date",
-                "notes",
-                "notification_date",
-                "last_modified_datetime",
-                "financing_method__uuid",
-                "financing_method__value",
-                "financing_method__description",
-                "financing_method__legacy_code_number",
-                "developer__uuid",
-                "developer__value",
-                "developer__description",
-                "developer__legacy_code_number",
-                "building_type__uuid",
-                "building_type__value",
-                "building_type__description",
-                "building_type__legacy_code_number",
-                "property_manager__uuid",
-                "property_manager__name",
-                "property_manager__email",
-                "property_manager__street_address",
-                "property_manager__postal_code",
-                "property_manager__city",
-                "last_modified_by__id",
-                "last_modified_by__username",
-                "last_modified_by__first_name",
-                "last_modified_by__last_name",
-                "postal_code__uuid",
-                "postal_code__value",
-                "postal_code__city",
-                "postal_code__cost_area",
+            .alias(
+                _acquisition_price=Subquery(
+                    queryset=(
+                        ApartmentSale.objects.filter(apartment_id=OuterRef("real_estates__buildings__apartments__id"))
+                        .order_by("purchase_date")
+                        .annotate(
+                            _acquisition_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans"))
+                        )
+                        .values_list("_acquisition_price", flat=True)[:1]
+                    ),
+                ),
             )
-            .annotate(date=Min("real_estates__buildings__apartments__completion_date"))
             .annotate(
-                sum_acquisition_price=Sum(
-                    F("real_estates__buildings__apartments__debt_free_purchase_price")
-                    + F("real_estates__buildings__apartments__primary_loan_amount")
-                )
-            )
-            .annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
-            .annotate(avg_price_per_square_meter=Round(F("sum_acquisition_price") / F("sum_surface_area"), precision=2))
-            .annotate(
+                date=Min("real_estates__buildings__apartments__completion_date"),
+                sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
+                sum_acquisition_price=Sum("_acquisition_price"),
+                avg_price_per_square_meter=RoundWithPrecision(
+                    F("sum_acquisition_price") / F("sum_surface_area"),
+                    precision=2,
+                ),
                 sum_total_shares=Sum(
                     F("real_estates__buildings__apartments__share_number_end")
                     - F("real_estates__buildings__apartments__share_number_start")
                     + 1
-                )
+                ),
             )
         )
 

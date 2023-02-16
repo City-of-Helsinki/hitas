@@ -17,7 +17,7 @@
     {% if not sapc_calculation %}
         {% if maximum_price_calculation.json.new_hitas %}
             {% set table_right = [
-                ["Hankinta-arvo", vars.acquisition_price|intcomma],
+                ["Hankinta-arvo", vars.first_sale_acquisition_price|intcomma],
                 ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
                 ["= Perushinta", vars.basic_price|intcomma],
                 ["+ Indeksin muutos", vars.index_adjustment|intcomma],
@@ -31,7 +31,7 @@
         {% else %}
             {% if index_name_short == "mark.hintaindeksi" %}
                 {% set table_right = [
-                    ["Hankinta-arvo", vars.acquisition_price|intcomma],
+                    ["Hankinta-arvo", vars.first_sale_acquisition_price|intcomma],
                     ["+ Rakennusaikaiset korot ("~vars.interest_during_construction_percentage~" %)", vars.interest_during_construction|intcomma],
                     ["+ Rakennusaik. lisä- ja muutostyöt", vars.additional_work_during_construction|intcomma],
                     ["= Perushinta", vars.basic_price|intcomma],

@@ -3,7 +3,8 @@ import datetime
 import uuid
 from typing import Any, Dict, Optional
 
-from django.db.models import Prefetch, Sum
+from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models.functions import Round, TruncMonth
 from django.utils import timezone
 
 from hitas.calculations.max_prices.rules_2011_onwards import Rules2011Onwards
@@ -13,11 +14,20 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
+    ApartmentSale,
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
     Ownership,
+    SurfaceAreaPriceCeiling,
 )
+from hitas.models._base import HitasModelDecimalField
+from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
+from hitas.utils import monthify
 
 
 def create_max_price_calculation(
@@ -62,7 +72,7 @@ def create_max_price_calculation(
 
 
 def calculate_max_price(
-    apartment: Apartment,
+    apartment: ApartmentWithAnnotationsMaxPrice,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
@@ -205,32 +215,12 @@ def fetch_apartment(
     housing_company_uuid: str,
     apartment_uuid: str,
     calculation_date: Optional[datetime.date],
-) -> Apartment:
+) -> ApartmentWithAnnotationsMaxPrice:
     return (
-        Apartment.objects.only(
-            "additional_work_during_construction",
-            "share_number_start",
-            "share_number_end",
-            "street_address",
-            "floor",
-            "stair",
-            "apartment_number",
-            "rooms",
-            "apartment_type_id",
-            "surface_area",
-            "completion_date",
-            "debt_free_purchase_price",
-            "primary_loan_amount",
-            "apartment_type__value",
-            "building__real_estate__housing_company__id",
-            "building__real_estate__housing_company__official_name",
-            "building__real_estate__housing_company__postal_code__value",
-            "building__real_estate__housing_company__postal_code__city",
-            "building__real_estate__housing_company__property_manager__name",
-            "building__real_estate__housing_company__property_manager__street_address",
-        )
-        .select_related(
+        Apartment.objects.select_related(
             "apartment_type",
+            "building",
+            "building__real_estate",
             "building__real_estate__housing_company",
             "building__real_estate__housing_company__property_manager",
             "building__real_estate__housing_company__postal_code",
@@ -238,158 +228,221 @@ def fetch_apartment(
         .prefetch_related(
             Prefetch(
                 "ownerships",
-                Ownership.objects.only("apartment_id", "percentage", "owner__name").select_related("owner"),
+                Ownership.objects.select_related("owner"),
             ),
             Prefetch(
                 "construction_price_improvements",
-                ApartmentConstructionPriceImprovement.objects.only(
-                    "value", "apartment_id", "depreciation_percentage"
-                ).extra(
-                    select={
-                        "completion_date_index": """
-    SELECT completion_date_index.value
-    FROM hitas_constructionpriceindex AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_apartmentconstructionpriceimprovement.completion_date)
-    """,
-                    },
+                ApartmentConstructionPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
                 ),
             ),
             Prefetch(
                 "market_price_improvements",
-                ApartmentMarketPriceImprovement.objects.only("value", "apartment_id").extra(
-                    select={
-                        "completion_date_index": """
-    SELECT completion_date_index.value
-    FROM hitas_marketpriceindex AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_apartmentmarketpriceimprovement.completion_date)
-    """,
-                    },
+                ApartmentMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            MarketPriceIndex.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
                 ),
             ),
             Prefetch(
                 "building__real_estate__housing_company__construction_price_improvements",
-                HousingCompanyConstructionPriceImprovement.objects.only("value", "housing_company_id",).extra(
-                    select={
-                        "completion_date_index_2005eq100": """
-    SELECT completion_date_index.value
-    FROM hitas_constructionpriceindex2005equal100 AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_housingcompanyconstructionpriceimprovement.completion_date)
-    """,
-                        "completion_date_index": """
-    SELECT completion_date_index.value
-    FROM hitas_constructionpriceindex AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_housingcompanyconstructionpriceimprovement.completion_date)
-    """,
-                    },
+                HousingCompanyConstructionPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                    completion_date_index_2005eq100=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex2005Equal100.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
                 ),
             ),
             Prefetch(
                 "building__real_estate__housing_company__market_price_improvements",
-                HousingCompanyMarketPriceImprovement.objects.only("value", "housing_company_id",).extra(
-                    select={
-                        "completion_date_index_2005eq100": """
-    SELECT completion_date_index.value
-    FROM hitas_marketpriceindex2005equal100 AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_housingcompanymarketpriceimprovement.completion_date)
-    """,
-                        "completion_date_index": """
-    SELECT completion_date_index.value
-    FROM hitas_marketpriceindex AS completion_date_index
-    WHERE completion_date_index.month
-         = DATE_TRUNC('month', hitas_housingcompanymarketpriceimprovement.completion_date)
-    """,
-                    },
+                HousingCompanyMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            MarketPriceIndex.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                    completion_date_index_2005eq100=Subquery(
+                        queryset=(
+                            MarketPriceIndex2005Equal100.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
                 ),
             ),
         )
+        .annotate(
+            _first_sale_purchase_price=Subquery(
+                queryset=(
+                    ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                    .order_by("purchase_date")
+                    .values_list("purchase_price", flat=True)[:1]
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            _first_sale_share_of_housing_company_loans=Subquery(
+                queryset=(
+                    ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
+                    .order_by("purchase_date")
+                    .values_list("apartment_share_of_housing_company_loans", flat=True)[:1]
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_month=TruncMonth("completion_date"),
+            calculation_date_cpi=Subquery(
+                queryset=(
+                    ConstructionPriceIndex.objects.filter(
+                        month=monthify(calculation_date),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            calculation_date_cpi_2005eq100=Subquery(
+                queryset=(
+                    ConstructionPriceIndex2005Equal100.objects.filter(
+                        month=monthify(calculation_date),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_cpi=Subquery(
+                queryset=(
+                    ConstructionPriceIndex.objects.filter(
+                        month=OuterRef("completion_month"),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_cpi_2005eq100=Subquery(
+                queryset=(
+                    ConstructionPriceIndex2005Equal100.objects.filter(
+                        month=OuterRef("completion_month"),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            calculation_date_mpi=Subquery(
+                queryset=(
+                    MarketPriceIndex.objects.filter(
+                        month=monthify(calculation_date),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            calculation_date_mpi_2005eq100=Subquery(
+                queryset=(
+                    MarketPriceIndex2005Equal100.objects.filter(
+                        month=monthify(calculation_date),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_mpi=Subquery(
+                queryset=(
+                    MarketPriceIndex.objects.filter(
+                        month=OuterRef("completion_month"),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_mpi_2005eq100=Subquery(
+                queryset=(
+                    MarketPriceIndex2005Equal100.objects.filter(
+                        month=OuterRef("completion_month"),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            surface_area_price_ceiling_m2=Subquery(
+                queryset=(
+                    SurfaceAreaPriceCeiling.objects.filter(
+                        month=monthify(calculation_date),
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            surface_area_price_ceiling=Round(F("surface_area_price_ceiling_m2") * F("surface_area")),
+        )
         .extra(
             select={
-                "calculation_date_cpi": """
-SELECT calculation_date_index.value
-FROM hitas_constructionpriceindex AS calculation_date_index
-WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
-""",
-                "calculation_date_cpi_2005eq100": """
-SELECT calculation_date_index.value
-FROM hitas_constructionpriceindex2005equal100 AS calculation_date_index
-WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
-""",
-                "completion_date_cpi": """
-SELECT completion_date_index.value
-FROM hitas_apartment AS a
-LEFT JOIN hitas_constructionpriceindex AS completion_date_index ON
-    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
-WHERE a.id = hitas_apartment.id
-""",
-                "completion_date_cpi_2005eq100": """
-SELECT completion_date_index.value
-FROM hitas_apartment AS a
-LEFT JOIN hitas_constructionpriceindex2005equal100 AS completion_date_index ON
-    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
-WHERE a.id = hitas_apartment.id
-""",
-                "calculation_date_mpi": """
-SELECT calculation_date_index.value
-FROM hitas_marketpriceindex AS calculation_date_index
-WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
-""",
-                "calculation_date_mpi_2005eq100": """
-SELECT calculation_date_index.value
-FROM hitas_marketpriceindex2005equal100 AS calculation_date_index
-WHERE calculation_date_index.month = DATE_TRUNC('month', %s)
-""",
-                "completion_date_mpi": """
-SELECT completion_date_index.value
-FROM hitas_apartment AS a
-LEFT JOIN hitas_marketpriceindex AS completion_date_index ON
-    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
-WHERE a.id = hitas_apartment.id
-""",
-                "completion_date_mpi_2005eq100": """
-SELECT completion_date_index.value
-FROM hitas_apartment AS a
-LEFT JOIN hitas_marketpriceindex2005equal100 AS completion_date_index ON
-    completion_date_index.month = DATE_TRUNC('month', a.completion_date)
-WHERE a.id = hitas_apartment.id
-""",
-                "surface_area_price_ceiling": """
-    SELECT ROUND(a.surface_area * sapc.value)
-    FROM hitas_apartment AS a
-    LEFT JOIN hitas_surfaceareapriceceiling AS sapc
-        ON sapc.month = DATE_TRUNC('month', %s)
-    WHERE a.id = hitas_apartment.id
-""",
-                "surface_area_price_ceiling_m2": """
-    SELECT value
-    FROM hitas_surfaceareapriceceiling
-    WHERE month = DATE_TRUNC('month', %s)
-""",
-                "realized_housing_company_acquisition_price": """
-    SELECT
-        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
-    FROM hitas_apartment AS a
-        LEFT JOIN hitas_building AS b ON a.building_id = b.id
-        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
-        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
-        WHERE hc.id = hitas_housingcompany.id
-""",
-                "completion_date_realized_housing_company_acquisition_price": """
-    SELECT
-        SUM(a.debt_free_purchase_price + a.primary_loan_amount)
-    FROM hitas_apartment AS a
-        LEFT JOIN hitas_building AS b ON a.building_id = b.id
-        LEFT JOIN hitas_realestate AS r on r.id = b.real_estate_id
-        LEFT JOIN hitas_housingcompany AS hc ON hc.id = r.housing_company_id
-        WHERE hc.id = hitas_housingcompany.id
-            AND a.completion_date = hitas_apartment.completion_date
-""",
+                "realized_housing_company_acquisition_price": (
+                    """
+                    SELECT
+                        SUM(
+                            (
+                                SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
+                                FROM hitas_apartmentsale AS aps
+                                WHERE aps.apartment_id = a.id
+                                GROUP BY aps.purchase_date
+                                ORDER BY aps.purchase_date
+                                LIMIT 1
+                            )
+                        )
+                    FROM hitas_apartment AS a
+                        INNER JOIN hitas_building AS b ON (a.building_id = b.id)
+                        INNER JOIN hitas_realestate AS r ON (r.id = b.real_estate_id)
+                        INNER JOIN hitas_housingcompany AS hc ON (hc.id = r.housing_company_id)
+                        WHERE (
+                            hc.id = hitas_housingcompany.id
+                        )
+                    """
+                ),
+                "completion_date_realized_housing_company_acquisition_price": (
+                    """
+                    SELECT
+                        SUM(
+                            (
+                                SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
+                                FROM hitas_apartmentsale AS aps
+                                WHERE aps.apartment_id = a.id
+                                GROUP BY aps.purchase_date
+                                ORDER BY aps.purchase_date
+                                LIMIT 1
+                            )
+                        )
+                    FROM hitas_apartment AS a
+                        INNER JOIN hitas_building AS b ON (a.building_id = b.id)
+                        INNER JOIN hitas_realestate AS r ON (r.id = b.real_estate_id)
+                        INNER JOIN hitas_housingcompany AS hc ON (hc.id = r.housing_company_id)
+                        WHERE (
+                            hc.id = hitas_housingcompany.id
+                            AND a.completion_date = hitas_apartment.completion_date
+                        )
+                    """
+                ),
             },
-            select_params=[calculation_date] * 6,
         )
         .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
     )

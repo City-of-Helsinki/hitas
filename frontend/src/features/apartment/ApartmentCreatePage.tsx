@@ -22,7 +22,6 @@ import {
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import OwnershipsList from "../../common/components/OwnershipsList";
 import {DateInput, NumberInput, RelatedModelInput, Select, TextInput} from "../../common/components/form";
 import {
     ApartmentWritableSchema,
@@ -119,9 +118,9 @@ const ApartmentCreatePage = () => {
                   },
                   completion_date: null,
                   prices: {
-                      debt_free_purchase_price: null,
-                      purchase_price: null,
-                      primary_loan_amount: null,
+                      first_sale_purchase_price: null,
+                      latest_sale_purchase_price: null,
+                      first_sale_share_of_housing_company_loans: null,
                       first_purchase_date: null,
                       latest_purchase_date: null,
                       construction: {
@@ -321,15 +320,15 @@ const ApartmentCreatePage = () => {
                         </div>
                         <div className="row">
                             <Select
-                                label="tila"
+                                label="Tila"
+                                name="state"
                                 options={apartmentStateOptions}
                                 defaultValue={{label: "Vapaa", value: "free"}}
-                                name="state"
                                 formObject={formObject}
                             />
                             <DateInput
-                                name="completion_date"
                                 label="Valmistumispäivä"
+                                name="completion_date"
                                 formObject={formObject}
                             />
                         </div>
@@ -344,22 +343,6 @@ const ApartmentCreatePage = () => {
                             <NumberInput
                                 name="shares.end"
                                 label="Osakkeet, loppu"
-                                formObject={formObject}
-                            />
-                        </div>
-                        <div className="row">
-                            <NumberInput
-                                name="prices.debt_free_purchase_price"
-                                label="Luovutushinta"
-                                unit="€"
-                                fractionDigits={2}
-                                formObject={formObject}
-                            />
-                            <NumberInput
-                                name="prices.purchase_price"
-                                label="Kauppakirjahinta"
-                                unit="€"
-                                fractionDigits={2}
                                 formObject={formObject}
                             />
                         </div>
@@ -380,7 +363,7 @@ const ApartmentCreatePage = () => {
                             />
                             <NumberInput
                                 name="prices.construction.interest.rate_14"
-                                label="Rak.aik. korko(14%)"
+                                label="Rak.aik. korko (14%)"
                                 unit="€"
                                 fractionDigits={2}
                                 formObject={formObject}
@@ -403,50 +386,18 @@ const ApartmentCreatePage = () => {
                             />
                         </div>
                         <div className="row">
-                            <NumberInput
-                                name="prices.primary_loan_amount"
-                                label="Ensisijaislaina"
-                                unit="€"
-                                fractionDigits={2}
-                                formObject={formObject}
-                            />
-                            <div />
-                        </div>
-                        <div className="row">
-                            <DateInput
-                                name="prices.first_purchase_date"
-                                label="Ensimmäinen ostopäivä"
-                                formObject={formObject}
-                            />
-                            <DateInput
-                                name="prices.latest_purchase_date"
-                                label="Viimeisin ostopäivä"
-                                formObject={formObject}
+                            <FormInputField
+                                inputType="textArea"
+                                label="Muistiinpanot"
+                                fieldPath="notes"
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
                             />
                         </div>
                     </Fieldset>
                 </div>
             </form>
-            <div className="field-sets">
-                <Fieldset heading="Omistajuudet">
-                    <OwnershipsList
-                        formOwnershipsList={formOwnershipsList}
-                        formObject={formObject}
-                    />
-                </Fieldset>
-                <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            inputType="textArea"
-                            label="Muistiinpanot"
-                            fieldPath="notes"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                </Fieldset>
-            </div>
             <div className="row row--buttons">
                 <NavigateBackButton />
                 {isEditPage && (

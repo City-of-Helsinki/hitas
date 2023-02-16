@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from typing import Any, Collection, Optional
 
 import factory
 from factory import fuzzy
@@ -11,9 +12,11 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
+    ApartmentSale,
 )
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
 from hitas.tests.factories._base import AbstractImprovementFactory
+from hitas.tests.factories.apartment_sale import ApartmentSaleFactory
 from hitas.tests.factories.codes import OldHitasFinancingMethodFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
@@ -39,17 +42,26 @@ class ApartmentFactory(DjangoModelFactory):
     apartment_number = fuzzy.FuzzyInteger(1, 99)
     floor = factory.Faker("numerify", text="%")
     stair = factory.Faker("bothify", text="?")  # Random letter
-    first_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    latest_purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    debt_free_purchase_price = fuzzy.FuzzyDecimal(100000, 200000)
-    purchase_price = fuzzy.FuzzyDecimal(100000, 200000)
-    primary_loan_amount = fuzzy.FuzzyDecimal(100000, 200000)
+    catalog_purchase_price = fuzzy.FuzzyDecimal(100000, 200000)
+    catalog_primary_loan_amount = fuzzy.FuzzyDecimal(100000, 200000)
     additional_work_during_construction = fuzzy.FuzzyDecimal(10000, 20000)
     loans_during_construction = fuzzy.FuzzyDecimal(100000, 200000)
     interest_during_construction_6 = fuzzy.FuzzyDecimal(10000, 20000)
     interest_during_construction_14 = fuzzy.FuzzyDecimal(20000, 30000)
     debt_free_purchase_price_during_construction = fuzzy.FuzzyDecimal(100000, 200000)
     notes = factory.Faker("text")
+
+    @factory.post_generation
+    def sales(self, create: bool, extracted: Optional[Collection[ApartmentSale]], **kwargs: Any) -> None:
+        if not create:
+            return
+
+        if extracted is None:
+            kwargs.setdefault("ownerships", [])  # prevents infinite recursion
+            extracted = [ApartmentSaleFactory.create(apartment=self, **kwargs)]
+
+        for ownership in extracted:
+            self.sales.add(ownership)
 
 
 class ApartmentMarketPriceImprovementFactory(AbstractImprovementFactory):

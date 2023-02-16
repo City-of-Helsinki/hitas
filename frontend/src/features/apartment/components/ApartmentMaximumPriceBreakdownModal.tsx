@@ -76,7 +76,7 @@ const Breakdown2011Onwards = ({calculation}: {calculation: IIndexCalculation2011
         <>
             <BreakdownValue
                 label="Hankinta-arvo"
-                value={calculation.calculation_variables.acquisition_price}
+                value={calculation.calculation_variables.first_sale_acquisition_price}
             />
             {calculation.calculation_variables.additional_work_during_construction ? (
                 <BreakdownValue
@@ -124,7 +124,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
         <>
             <BreakdownValue
                 label="Hankinta-arvo"
-                value={calculation.calculation_variables.acquisition_price}
+                value={calculation.calculation_variables.first_sale_acquisition_price}
             />
             <BreakdownValue
                 label={`+ Rakennusaikaiset korot (${calculation.calculation_variables.interest_during_construction_percentage}%)`}

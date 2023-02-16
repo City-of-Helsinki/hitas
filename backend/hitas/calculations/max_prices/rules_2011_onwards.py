@@ -9,11 +9,11 @@ from hitas.calculations.improvements.common import ImprovementData
 from hitas.calculations.improvements.rules_2011_onwards import calculate_housing_company_improvements_2011_onwards
 from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
-from hitas.models import Apartment
+from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class Rules2011Onwards(CalculatorRules):
-    def validate_indices(self, apartment: Apartment) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
         if (
             apartment.calculation_date_cpi_2005eq100 is None
             or apartment.completion_date_cpi_2005eq100 is None
@@ -25,7 +25,7 @@ class Rules2011Onwards(CalculatorRules):
 
     def calculate_construction_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -46,7 +46,7 @@ class Rules2011Onwards(CalculatorRules):
 
     def calculate_market_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -67,7 +67,7 @@ class Rules2011Onwards(CalculatorRules):
 
     @staticmethod
     def _calculate_max_price(
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         calculation_date_index: Decimal,
         completion_date_index: Decimal,
         total_surface_area: Decimal,
@@ -79,7 +79,7 @@ class Rules2011Onwards(CalculatorRules):
         # Start calculations
 
         # basic price
-        basic_price = apartment.acquisition_price + (apartment.additional_work_during_construction or 0)
+        basic_price = apartment.first_sale_acquisition_price + (apartment.additional_work_during_construction or 0)
 
         # index adjustment
         index_adjustment = ((calculation_date_index / completion_date_index) * basic_price) - basic_price
@@ -113,7 +113,7 @@ class Rules2011Onwards(CalculatorRules):
             maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVars2011Onwards(
-                acquisition_price=apartment.acquisition_price,
+                first_sale_acquisition_price=apartment.first_sale_acquisition_price,
                 additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 basic_price=basic_price,
                 index_adjustment=index_adjustment,

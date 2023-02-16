@@ -1,5 +1,5 @@
-import datetime
 import uuid
+from datetime import date
 from decimal import Decimal
 from itertools import chain
 from typing import Any, Collection, Optional
@@ -9,17 +9,19 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
-from hitas.models.apartment_sale import ApartmentSale
+from hitas.models.apartment_sale import ApartmentSale, ApartmentSaleWithAnnotations
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HousingCompany
 from hitas.models.ownership import Ownership, OwnershipLike
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
+from hitas.utils import subquery_count
 
 
 class ApartmentState(Enum):
@@ -59,36 +61,117 @@ class Apartment(ExternalHitasModel):
     # 'Porras'
     stair = models.CharField(max_length=16)
 
-    # 'Luovutushinta'
-    debt_free_purchase_price = HitasModelDecimalField(null=True)
-    # 'Ensisijaislaina'
-    primary_loan_amount = HitasModelDecimalField(default=0, null=True)
-    # 'Kauppakirjahinta'
-    purchase_price = HitasModelDecimalField(null=True, blank=True)
-    # 'Ensimmäinen kauppakirjapvm'
-    first_purchase_date = models.DateField(null=True, blank=True)
-    # 'Viimeisin kauppakirjapvm'
-    latest_purchase_date = models.DateField(null=True, blank=True)
+    # 'Myyntihintaluettelon luovutushinta'
+    catalog_purchase_price: Optional[Decimal] = HitasModelDecimalField(null=True)
+    # 'Myyntihintaluettelon ensisijaislaina'
+    catalog_primary_loan_amount: Optional[Decimal] = HitasModelDecimalField(null=True)
+
     # 'Rakennusaikaiset lisätyöt'
-    additional_work_during_construction = HitasModelDecimalField(null=True)
+    additional_work_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset lainat'
-    loans_during_construction = HitasModelDecimalField(null=True)
+    loans_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset korot 6%'
-    interest_during_construction_6 = HitasModelDecimalField(null=True)
+    interest_during_construction_6: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset korot 14%'
-    interest_during_construction_14 = HitasModelDecimalField(null=True)
+    interest_during_construction_14: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Luovutushinta (RA)'
-    debt_free_purchase_price_during_construction = HitasModelDecimalField(null=True)
+    debt_free_purchase_price_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
 
     notes = models.TextField(blank=True, null=True)
 
-    # 'Hankinta-arvo'
+    # 'Hankinta-arvo' = Ensimmäisen kaupan (tai myyntihintaluettelon) kauppakirjahinta + yhtiölainaosuus
     @property
-    def acquisition_price(self) -> Optional[Decimal]:
-        if self.debt_free_purchase_price is None or self.primary_loan_amount is None:
-            return None
+    def first_sale_acquisition_price(self) -> Optional[Decimal]:
+        if self.first_sale_purchase_price is not None and self.first_sale_share_of_housing_company_loans is not None:
+            return self.first_sale_purchase_price + self.first_sale_share_of_housing_company_loans
 
-        return self.debt_free_purchase_price + self.primary_loan_amount
+        if self.catalog_purchase_price is not None and self.catalog_primary_loan_amount is not None:
+            return self.catalog_purchase_price + self.catalog_primary_loan_amount
+
+        return None
+
+    # 'Luovutushinta' = Ensimmäisen kaupan kauppakirjahinta
+    @property
+    def first_sale_purchase_price(self) -> Optional[Decimal]:
+        # Allow caches for the instance
+        if hasattr(self, "_first_sale_purchase_price"):
+            return self._first_sale_purchase_price
+
+        first_sale = self.first_sale
+        self._first_sale_purchase_price = first_sale.purchase_price if first_sale is not None else None
+        return self._first_sale_purchase_price
+
+    # 'Ensisijaislaina' = Ensimmäisen kaupan yhtiölainaosuus
+    @property
+    def first_sale_share_of_housing_company_loans(self) -> Optional[Decimal]:
+        # Allow caches for the instance
+        if hasattr(self, "_first_sale_share_of_housing_company_loans"):
+            return self._first_sale_share_of_housing_company_loans
+
+        first_sale = self.first_sale
+        self._first_sale_share_of_housing_company_loans = (
+            first_sale.apartment_share_of_housing_company_loans if first_sale is not None else None
+        )
+        return self._first_sale_share_of_housing_company_loans
+
+    # 'Viimeisin Kauppakirjahinta'
+    @property
+    def latest_sale_purchase_price(self) -> Optional[Decimal]:
+        # Allow caches for the instance
+        if hasattr(self, "_latest_sale_purchase_price"):
+            return self._latest_sale_purchase_price
+
+        latest_sale = self.latest_sale_with_sale_count
+        self._latest_sale_purchase_price = None
+        if latest_sale is None:
+            return None
+        if latest_sale.sale_count < 2:
+            return None
+        self._latest_sale_purchase_price = latest_sale.purchase_price
+        return self._latest_sale_purchase_price
+
+    # 'Viimeisin yhtiölainaosuus'
+    @property
+    def latest_sale_share_of_housing_company_loans(self) -> Optional[Decimal]:
+        # Allow caches for the instance
+        if hasattr(self, "_latest_sale_share_of_housing_company_loans"):
+            return self._latest_sale_share_of_housing_company_loans
+
+        latest_sale = self.latest_sale_with_sale_count
+        self._latest_sale_share_of_housing_company_loans = None
+        if latest_sale is None:
+            return None
+        if latest_sale.sale_count < 2:
+            return None
+        self._latest_sale_share_of_housing_company_loans = latest_sale.apartment_share_of_housing_company_loans
+        return self._latest_sale_share_of_housing_company_loans
+
+    # 'Ensimmäinen kauppakirjapvm'
+    @property
+    def first_purchase_date(self) -> Optional[date]:
+        # Allow caches for the instance
+        if hasattr(self, "_first_purchase_date"):
+            return self._first_purchase_date
+
+        first_sale = self.first_sale
+        self._first_purchase_date = first_sale.purchase_date if first_sale is not None else None
+        return self._first_purchase_date
+
+    # 'Viimeisin kauppakirjapvm'
+    @property
+    def latest_purchase_date(self) -> Optional[date]:
+        # Allow caches for the instance
+        if hasattr(self, "_latest_purchase_date"):
+            return self._latest_purchase_date
+
+        latest_sale = self.latest_sale_with_sale_count
+        self._latest_purchase_date = None
+        if latest_sale is None:
+            return None
+        if latest_sale.sale_count < 2:
+            return None
+        self._latest_purchase_date = latest_sale.purchase_date
+        return self._latest_purchase_date
 
     @property
     def housing_company(self) -> HousingCompany:
@@ -119,26 +202,22 @@ class Apartment(ExternalHitasModel):
 
     @property
     def is_new(self) -> bool:
+        """Is this apartment considered new for the purposes of creating conditions of sale?"""
         today = timezone.now().date()
         if self.completion_date is None or self.completion_date > today:
             return True
 
         # Fetch all sales to take advantage of prefetch cache.
-        sales = list(self.sales.all())
-        no_sales = len(sales) < 1
+        # Sort the sales to be sure we select the first sale in case prefetch cache has some other sorting.
+        sales = sorted(self.sales.all(), key=lambda sale: sale.purchase_date)
+        if not sales:
+            return True
 
-        no_first_purchase_or_in_the_future = self.first_purchase_date is None or self.first_purchase_date > today
-        no_first_sale_or_in_the_future = (
-            no_sales
-            # Sort the sales to be sure we select the first sale in case prefetch cache has some other sorting
-            or sorted(sales, key=lambda sale: sale.purchase_date)[0].purchase_date > today
-        )
-
-        return no_first_purchase_or_in_the_future and no_first_sale_or_in_the_future
+        return sales[0].purchase_date > today
 
     @property
     def sell_by_date(self):
-        sell_by_dates: set[datetime.date] = set()
+        sell_by_dates: set[date] = set()
 
         for ownership in self.ownerships.all():
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
@@ -170,6 +249,21 @@ class Apartment(ExternalHitasModel):
                 if cos.grace_period != GracePeriod.NOT_GIVEN:
                     return True
         return False
+
+    @cached_property
+    def first_sale(self) -> Optional[ApartmentSale]:
+        return self.sales.order_by("purchase_date").first()
+
+    @cached_property
+    def latest_sale_with_sale_count(self) -> Optional[ApartmentSaleWithAnnotations]:
+        """Get the latest sale for this apartment, with the total number of sales annotated."""
+        return (
+            self.sales.annotate(
+                sale_count=subquery_count(ApartmentSale, "apartment_id"),
+            )
+            .order_by("purchase_date")
+            .last()
+        )
 
     def change_ownerships(self, ownership_data: list[OwnershipLike], **kwargs: Any) -> list[Ownership]:
         # Mark current ownerships for the apartment as "past"
@@ -216,6 +310,46 @@ class Apartment(ExternalHitasModel):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
+
+
+# This is for typing only
+class ApartmentWithAnnotations(Apartment):
+    completion_month: Optional[date]
+    cpi: Optional[Decimal]
+    cpi_2005_100: Optional[Decimal]
+    mpi: Optional[Decimal]
+    mpi_2005_100: Optional[Decimal]
+    sapc: Optional[Decimal]
+    _first_sale_purchase_price: Optional[Decimal]
+    _first_sale_share_of_housing_company_loans: Optional[Decimal]
+    _latest_sale_purchase_price: Optional[Decimal]
+    _first_purchase_date: Optional[date]
+    _latest_purchase_date: Optional[date]
+
+    class Meta:
+        abstract = True
+
+
+# This is for typing only
+class ApartmentWithAnnotationsMaxPrice(Apartment):
+    _first_sale_purchase_price: Optional[Decimal]
+    _first_sale_share_of_housing_company_loans: Optional[Decimal]
+    completion_month: Optional[date]
+    calculation_date_cpi: Optional[Decimal]
+    calculation_date_cpi_2005eq100: Optional[Decimal]
+    completion_date_cpi: Optional[Decimal]
+    completion_date_cpi_2005eq100: Optional[Decimal]
+    calculation_date_mpi: Optional[Decimal]
+    calculation_date_mpi_2005eq100: Optional[Decimal]
+    completion_date_mpi: Optional[Decimal]
+    completion_date_mpi_2005eq100: Optional[Decimal]
+    surface_area_price_ceiling_m2: Optional[Decimal]
+    surface_area_price_ceiling: Optional[Decimal]
+    realized_housing_company_acquisition_price: Optional[Decimal]
+    completion_date_realized_housing_company_acquisition_price: Optional[Decimal]
+
+    class Meta:
+        abstract = True
 
 
 class ApartmentMarketPriceImprovement(HitasImprovement):

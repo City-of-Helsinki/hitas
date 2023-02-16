@@ -1,5 +1,3 @@
-from typing import Iterable, Optional, Any
-
 import factory
 from factory.django import DjangoModelFactory
 from faker import Faker
@@ -7,7 +5,6 @@ from faker.providers import BaseProvider
 
 from hitas.models import Owner, Ownership
 from hitas.models.utils import _business_id_checksum
-from hitas.tests.factories.condition_of_sale import ConditionOfSaleFactory
 
 faker = Faker(locale="fi_FI")
 

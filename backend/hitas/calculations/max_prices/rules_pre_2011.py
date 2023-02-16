@@ -18,11 +18,11 @@ from hitas.calculations.improvements.rules_pre_2011_mpi import (
 )
 from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
-from hitas.models import Apartment
+from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class RulesPre2011(CalculatorRules):
-    def validate_indices(self, apartment: Apartment) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
         if (
             apartment.calculation_date_cpi is None
             or apartment.completion_date_cpi is None
@@ -34,7 +34,7 @@ class RulesPre2011(CalculatorRules):
 
     def calculate_construction_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -69,7 +69,7 @@ class RulesPre2011(CalculatorRules):
         # Apartment share share
         apartment_share_of_housing_company_assets = (
             housing_company_assets
-            * apartment.acquisition_price
+            * apartment.first_sale_acquisition_price
             / apartment.completion_date_realized_housing_company_acquisition_price
         )
 
@@ -144,7 +144,7 @@ class RulesPre2011(CalculatorRules):
 
     def calculate_market_price_index_max_price(
         self,
-        apartment: Apartment,
+        apartment: ApartmentWithAnnotationsMaxPrice,
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
@@ -156,7 +156,7 @@ class RulesPre2011(CalculatorRules):
 
         # Basic price
         basic_price = (
-            apartment.acquisition_price
+            apartment.first_sale_acquisition_price
             + (apartment.interest_during_construction_6 or 0)
             + (apartment.additional_work_during_construction or 0)
         )
@@ -216,7 +216,7 @@ class RulesPre2011(CalculatorRules):
             maximum_price=max_price,
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
-                acquisition_price=apartment.acquisition_price,
+                first_sale_acquisition_price=apartment.first_sale_acquisition_price,
                 interest_during_construction=apartment.interest_during_construction_6 or 0,
                 interest_during_construction_percentage=6,
                 additional_work_during_construction=apartment.additional_work_during_construction or 0,
