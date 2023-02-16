@@ -82,14 +82,18 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                 </Link>
             </div>
             <label className="card-heading">Myyntiehdot</label>
-            <ul>
-                {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
-                    <SingleApartmentConditionOfSale
-                        key={ownerId}
-                        conditionsOfSale={cos}
-                    />
-                ))}
-            </ul>
+            {Object.keys(groupedConditionsOfSale).length ? (
+                <ul>
+                    {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
+                        <SingleApartmentConditionOfSale
+                            key={ownerId}
+                            conditionsOfSale={cos}
+                        />
+                    ))}
+                </ul>
+            ) : (
+                <span>Ei myyntiehtoja.</span>
+            )}
         </Card>
     );
 };
