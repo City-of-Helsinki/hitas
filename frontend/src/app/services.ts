@@ -11,6 +11,8 @@ import {
     IBuilding,
     IBuildingWritable,
     ICodeResponse,
+    IConditionOfSale,
+    ICreateConditionOfSale,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
@@ -351,6 +353,19 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
+        createConditionOfSale: builder.mutation<
+            {conditions_of_sale: IConditionOfSale[]},
+            {data: ICreateConditionOfSale}
+        >({
+            query: ({data}) => ({
+                url: `conditions-of-sale`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+            invalidatesTags: (result, error) =>
+                !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
+        }),
     }),
 });
 
@@ -383,4 +398,5 @@ export const {
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
     useCreateSaleMutation,
+    useCreateConditionOfSaleMutation,
 } = mutationApi;
