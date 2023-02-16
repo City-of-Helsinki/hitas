@@ -779,6 +779,8 @@ paths:
       tags:
         - Apartments
       parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
         - name: housing_company_id
           required: true
           in: path
@@ -786,8 +788,45 @@ paths:
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - name: street_address
+          description: Search apartments with street address containing the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 2
+            example: Hannunkatu
+        - name: postal_code
+          description: Search apartments located in given postal code
+          required: false
+          in: query
+          schema:
+            type: string
+            pattern: '^\d{5}$'
+            example: "00100"
+        - name: owner_name
+          description: Search apartments whose owner first name or last name contains the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 2
+            example: matti
+        - name: owner_identifier
+          description: Search apartments whose social security number matches the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            maxLength: 11
+            example: 131052-308T
+        - name: has_conditions_of_sale
+          description: Filter apartments based on whether there are conditions of sale for its ownerships or not
+          required: false
+          in: query
+          schema:
+            type: boolean
+            example: true
       responses:
         '200':
           description: Successfully fetched list of apartments
@@ -1828,7 +1867,7 @@ paths:
             type: string
             maxLength: 11
             example: 131052-308T
-        - name: sales_condition
+        - name: has_conditions_of_sale
           description: Filter apartments based on whether there are conditions of sale for its ownerships or not
           required: false
           in: query
@@ -1854,7 +1893,7 @@ paths:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/ApartmentList'
+                      $ref: '#/components/schemas/Apartment'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3837,78 +3876,10 @@ components:
         - address
         - completion_date
         - ownerships
-        - links
-        - conditions_of_sale
-        - sell_by_date
-      properties:
-        id:
-          description: Apartment ID
-          type: string
-          example: b477389cb3514fb1b444052a39bfb65d
-        state:
-          nullable: true
-          $ref: '#/components/schemas/ApartmentState'
-        type:
-          description: Apartment type
-          type: string
-          example: h+k
-          nullable: true
-        surface_area:
-          description: Surface area of the apartment measured in square meters
-          type: number
-          nullable: true
-          minimum: 0
-          example: 67
-        rooms:
-          description: The amount of rooms in this apartment
-          type: number
-          nullable: true
-          minimum: 1
-          example: 4
-        address:
-          $ref: '#/components/schemas/ApartmentAddress'
-        completion_date:
-          description: Date that the apartment was completed on
-          type: string
-          format: date
-          nullable: true
-        ownerships:
-          description: List of apartment's ownerships
-          type: array
-          items:
-            $ref: '#/components/schemas/Ownership'
-        links:
-          readOnly: true
-          $ref: '#/components/schemas/ApartmentLinks'
-        conditions_of_sale:
-          readOnly: true
-          type: array
-          items:
-            $ref: '#/components/schemas/ApartmentConditionOfSale'
-        sell_by_date:
-          description: |-
-            The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
-            ownership(s). In case of multiple conditions of sale, use the first one in chronological order.
-            The value will be null if there are no current conditions of sale for this apartment's ownerships.
-          type: string
-          format: date
-          nullable: true
-          readOnly: true
-
-    ApartmentList:
-      description: Single apartment
-      type: object
-      additionalProperties: false
-      required:
-        - id
-        - state
-        - surface_area
-        - address
-        - completion_date
-        - ownerships
-        - links
-        - sell_by_date
+        - has_conditions_of_sale
         - has_grace_period
+        - sell_by_date
+        - links
       properties:
         id:
           description: Apartment ID
@@ -3946,21 +3917,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Ownership'
-        links:
-          readOnly: true
-          $ref: '#/components/schemas/ApartmentLinks'
-        sell_by_date:
-          description: |-
-            The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
-            ownership(s). In case of multiple conditions of sale, use the first one in chronological order.
-            The value will be null if there are no current conditions of sale for this apartment's ownerships.
-          type: string
-          format: date
-          nullable: true
-          readOnly: true
+        has_conditions_of_sale:
+          description: Does this apartment have any conditions of sale
+          type: boolean
         has_grace_period:
           description: Do any of the conditions of sale related to this apartment have a grace period set?
           type: boolean
+        sell_by_date:
+          description: |-
+            The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
+            ownership(s). In case of multiple conditions of sale, use the first one in chronological order.
+            The value will be null if there are no current conditions of sale for this apartment's ownerships.
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        links:
+          readOnly: true
+          $ref: '#/components/schemas/ApartmentLinks'
 
     ApartmentDetails:
       description: Single apartment details

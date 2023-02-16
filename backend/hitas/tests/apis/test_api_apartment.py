@@ -88,7 +88,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 
     ap3: Apartment = ApartmentFactory.create(sales=[])
     o3: Ownership = OwnershipFactory.create(apartment=ap3, owner=o2.owner, percentage=100)
-    cos: ConditionOfSale = ConditionOfSaleFactory.create(
+    ConditionOfSaleFactory.create(
         new_ownership=o3,
         old_ownership=o2,
         grace_period=GracePeriod.NOT_GIVEN,
@@ -161,34 +161,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
                     },
                 },
-                "conditions_of_sale": [
-                    {
-                        "id": cos.uuid.hex,
-                        "grace_period": str(cos.grace_period.value),
-                        "fulfilled": cos.fulfilled,
-                        "apartment": {
-                            "id": ap3.uuid.hex,
-                            "address": {
-                                "street_address": ap3.street_address,
-                                "apartment_number": ap3.apartment_number,
-                                "floor": ap3.floor,
-                                "stair": ap3.stair,
-                                "city": "Helsinki",
-                                "postal_code": ap3.postal_code.value,
-                            },
-                            "housing_company": {
-                                "id": ap3.housing_company.uuid.hex,
-                                "display_name": ap3.housing_company.display_name,
-                            },
-                        },
-                        "owner": {
-                            "id": o3.owner.uuid.hex,
-                            "name": o3.owner.name,
-                            "identifier": o3.owner.identifier,
-                            "email": o3.owner.email,
-                        },
-                    }
-                ],
+                "has_conditions_of_sale": True,
+                "has_grace_period": False,
                 "sell_by_date": str(ap3.completion_date),
             },
             {
@@ -234,7 +208,8 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap2.uuid.hex}",
                     },
                 },
-                "conditions_of_sale": [],
+                "has_conditions_of_sale": False,
+                "has_grace_period": False,
                 "sell_by_date": None,
             },
         ],
@@ -324,69 +299,31 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
                     "link": f"/api/v1/housing-companies/{hc.uuid.hex}/apartments/{ap1.uuid.hex}",
                 },
             },
-            "conditions_of_sale": [],
+            "has_conditions_of_sale": False,
+            "has_grace_period": False,
             "sell_by_date": None,
         },
     ]
 
 
 @pytest.mark.django_db
-def test__api__apartment__list__fulfilled_under_x_months(api_client: HitasAPIClient, freezer, settings):
-    freezer.move_to("2023-01-01 00:00:00+00:00")
-    old_time = timezone.now()
-
-    owner: Owner = OwnerFactory.create()
+def test__api__apartment__list__fulfilled_not_listed(api_client: HitasAPIClient, settings):
     new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
-    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(
+        new_ownership__apartment=new_apartment, old_ownership__apartment=old_apartment
+    )
     cos.delete()
-    cos_fulfilled_str = cos.fulfilled.replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
-
-    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
 
     url = reverse(
         "hitas:apartment-list",
-        kwargs={
-            "housing_company_uuid": old_apartment.building.real_estate.housing_company.uuid.hex,
-        },
+        kwargs={"housing_company_uuid": old_apartment.building.real_estate.housing_company.uuid.hex},
     )
     response_1 = api_client.get(url)
 
     assert response_1.status_code == status.HTTP_200_OK, response_1.json()
     assert len(response_1.json()["contents"]) == 1
-    assert len(response_1.json()["contents"][0]["conditions_of_sale"]) == 1
-    assert response_1.json()["contents"][0]["conditions_of_sale"][0]["id"] == cos.uuid.hex
-    assert response_1.json()["contents"][0]["conditions_of_sale"][0]["fulfilled"] == cos_fulfilled_str
-
-
-@pytest.mark.django_db
-def test__api__apartment__list__fulfilled_over_x_months(api_client: HitasAPIClient, freezer, settings):
-    freezer.move_to("2023-01-01 00:00:00+00:00")
-    old_time = timezone.now()
-
-    owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(sales=[])
-    old_apartment: Apartment = ApartmentFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
-    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
-    cos.delete()
-
-    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
-
-    url = reverse(
-        "hitas:apartment-list",
-        kwargs={
-            "housing_company_uuid": old_apartment.building.real_estate.housing_company.uuid.hex,
-        },
-    )
-    response_1 = api_client.get(url)
-
-    assert response_1.status_code == status.HTTP_200_OK, response_1.json()
-    assert len(response_1.json()["contents"]) == 1
-    assert response_1.json()["contents"][0]["conditions_of_sale"] == []
+    assert response_1.json()["contents"][0]["has_conditions_of_sale"] is False
 
 
 class GracePeriodTestArgs(NamedTuple):
@@ -1022,6 +959,45 @@ def test__api__apartment__retrieve__indices__null_values(
         create_current_indices=create_current_indices,
         null_values=True,
     )
+
+
+@pytest.mark.parametrize("should_be_shown", [False, True])
+@pytest.mark.django_db
+def test__api__apartment__retrieve__condition_of_sale_fulfilled(api_client, freezer, settings, should_be_shown):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+    old_time = timezone.now()
+
+    owner: Owner = OwnerFactory.create()
+    new_apartment: Apartment = ApartmentFactory.create(sales=[])
+    old_apartment: Apartment = ApartmentFactory.create()
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=new_apartment)
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner, apartment=old_apartment)
+    cos: ConditionOfSale = ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership)
+    cos.delete()
+
+    freezer.move_to(
+        old_time
+        + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS
+        + relativedelta(seconds=int(not should_be_shown))
+    )
+
+    response = api_client.get(
+        reverse(
+            "hitas:apartment-detail",
+            args=[old_apartment.building.real_estate.housing_company.uuid.hex, old_apartment.uuid.hex],
+        )
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    cos_list = response.json()["conditions_of_sale"]
+    if should_be_shown:
+        cos_fulfilled_str = cos.fulfilled.replace(tzinfo=None).isoformat(timespec="seconds") + "Z"
+
+        assert len(cos_list) == 1
+        assert cos_list[0]["id"] == cos.uuid.hex
+        assert cos_list[0]["fulfilled"] == cos_fulfilled_str
+    else:
+        assert cos_list == []
 
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
