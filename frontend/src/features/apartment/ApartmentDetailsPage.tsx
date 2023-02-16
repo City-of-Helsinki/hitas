@@ -46,7 +46,8 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
     );
 };
 
-const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
+const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetails}) => {
+    const conditionsOfSale = apartment.conditions_of_sale;
     // Create a dict with owner id as key, and all of their conditions of sale in a list as value
     interface IGroupedConditionsOfSale {
         [ownerId: string]: IApartmentConditionOfSale[];
@@ -71,7 +72,10 @@ const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IA
                         Kauppatapahtuma
                     </Button>
                 </Link>
-                <Link to="sales-conditions">
+                <Link
+                    to="sales-conditions"
+                    state={{apartment: apartment}}
+                >
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
@@ -290,7 +294,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard apartment={data} />
-                <ApartmentConditionsOfSaleCard conditionsOfSale={data.conditions_of_sale} />
+                <ApartmentConditionsOfSaleCard apartment={data} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
