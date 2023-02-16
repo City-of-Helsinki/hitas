@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
+import {Checkbox, IconLock, SearchInput, StatusLabel, TextInput} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
@@ -24,6 +24,7 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 <div className="number">
                     {apartment.address.stair}
                     {apartment.address.apartment_number}
+                    {apartment.sell_by_date ? <IconLock /> : null}
                 </div>
                 <div className="details">
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
