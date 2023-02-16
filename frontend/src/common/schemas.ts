@@ -330,8 +330,9 @@ const ApartmentSchema = object({
     housing_company: string(),
     ownerships: ownershipsSchema,
     links: ApartmentLinkedModelsSchema,
-    sell_by_date: string().nullable(),
+    has_conditions_of_sale: boolean(),
     has_grace_period: boolean(),
+    sell_by_date: string().nullable(),
 });
 
 const ApartmentDetailsSchema = object({

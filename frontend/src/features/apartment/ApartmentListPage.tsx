@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Checkbox, IconLock, SearchInput, StatusLabel, TextInput} from "hds-react";
+import {IconLock, SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
@@ -11,6 +11,7 @@ import {
     ListPageNumbers,
     QueryStateHandler,
 } from "../../common/components";
+import FilterCheckboxField from "../../common/components/FilterCheckboxField";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
 
 const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
@@ -24,7 +25,7 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 <div className="number">
                     {apartment.address.stair}
                     {apartment.address.apartment_number}
-                    {apartment.sell_by_date ? <IconLock /> : null}
+                    {apartment.has_conditions_of_sale ? <IconLock /> : null}
                 </div>
                 <div className="details">
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
@@ -34,9 +35,10 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                         <br />
                         {`${apartment.address.postal_code} ${apartment.address.city}`}
                     </div>
-                    <div className="area">{`${apartment.surface_area ? apartment.surface_area + "m²" : ""} ${
-                        apartment.rooms || ""
-                    } ${apartment.type}`}</div>
+                    <div className="area">
+                        {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
+                        ${apartment.rooms || ""} ${apartment.type}`}
+                    </div>
                 </div>
                 <div className="state">
                     <StatusLabel>{apartment.state}</StatusLabel>
@@ -141,15 +143,12 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <TextInput
-                id="filter__ostajaehdokas"
-                label="Ostajaehdokas"
-                disabled
-            />
-            <Checkbox
-                id="sales_condition"
+            <FilterCheckboxField
                 label="Löytyy myyntiehto"
-                disabled
+                filterFieldName="has_conditions_of_sale"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+                applyOnlyOnTrue
             />
         </div>
     );
