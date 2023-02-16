@@ -379,10 +379,6 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             value={formatDate(data.prices.latest_purchase_date)}
                                         />
                                         <DetailField
-                                            label="Rakennusaikaiset lainat"
-                                            value={formatMoney(data.prices.construction.loans)}
-                                        />
-                                        <DetailField
                                             label="Rakennusaikaiset korot (6 %)"
                                             value={
                                                 data.prices.construction.interest
@@ -399,13 +395,21 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             }
                                         />
                                         <DetailField
-                                            label="Luovutushinta (RA)"
-                                            value={formatMoney(data.prices.construction.debt_free_purchase_price)}
-                                        />
-                                        <DetailField
                                             label="Rakennusaikaiset lisätyöt"
                                             value={formatMoney(data.prices.construction.additional_work)}
                                         />
+                                        {data.prices.construction.loans ? (
+                                            <DetailField
+                                                label="Rakennusaikaiset lainat"
+                                                value={formatMoney(data.prices.construction.loans)}
+                                            />
+                                        ) : null}
+                                        {data.prices.construction.debt_free_purchase_price ? (
+                                            <DetailField
+                                                label="Luovutushinta (RA)"
+                                                value={formatMoney(data.prices.construction.debt_free_purchase_price)}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>
