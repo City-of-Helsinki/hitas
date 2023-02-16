@@ -188,7 +188,7 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
 const ApartmentAddressSchema = object({
     street_address: string().nullable(),
     postal_code: string().optional(),
-    city: string().optional(),
+    city: string().optional(), // Read only
     apartment_number: number().nullable(),
     floor: number().nullable(),
     stair: string().min(1, "Pakollinen kenttä!"),
@@ -242,7 +242,7 @@ const ApartmentConditionOfSaleSchema = object({
         address: ApartmentAddressSchema,
         housing_company: ApartmentLinkedModelSchema.and(object({display_name: string()})),
     }),
-    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
+    grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable(),
 });
 
@@ -266,7 +266,7 @@ const ConditionOfSaleSchema = object({
             }),
         })
     ),
-    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
+    grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable(),
 });
 const ApartmentUnconfirmedMaximumPriceSchema = object({maximum: boolean(), value: number()});
@@ -287,12 +287,12 @@ const ApartmentConfirmedMaximumPriceSchema = object({
 }).nullable();
 
 const ApartmentPricesSchema = object({
-    first_sale_purchase_price: number().nullable(),
-    first_sale_share_of_housing_company_loans: number().nullable(),
-    first_sale_acquisition_price: number().optional(),
-    first_purchase_date: string().nullable(),
-    latest_sale_purchase_price: number().nullable(),
-    latest_purchase_date: string().nullable(),
+    first_sale_purchase_price: number().nullable(), // Read only
+    first_sale_share_of_housing_company_loans: number().nullable(), // Read only
+    first_sale_acquisition_price: number().optional(), // Read only
+    first_purchase_date: string().nullable(), // Read only
+    latest_sale_purchase_price: number().nullable(), // Read only
+    latest_purchase_date: string().nullable(), // Read only
     construction: object({
         loans: number().nullable(),
         additional_work: number().nullable(),
@@ -303,6 +303,7 @@ const ApartmentPricesSchema = object({
         debt_free_purchase_price: number().nullable(),
     }),
     maximum_prices: object({
+        // Read only
         confirmed: ApartmentConfirmedMaximumPriceSchema,
         unconfirmed: object({
             onwards_2011: ApartmentUnconfirmedMaximumPriceIndicesSchema,
@@ -311,7 +312,21 @@ const ApartmentPricesSchema = object({
     }),
 });
 
-const ApartmentSharesSchema = object({start: number(), end: number(), total: number()}).nullable();
+const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
+    first_sale_purchase_price: true,
+    first_sale_share_of_housing_company_loans: true,
+    first_sale_acquisition_price: true,
+    first_purchase_date: true,
+    latest_sale_purchase_price: true,
+    latest_purchase_date: true,
+    maximum_prices: true,
+});
+
+const ApartmentSharesSchema = object({
+    start: number().nullable(),
+    end: number().nullable(),
+    total: number(),
+});
 
 const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     object({
@@ -361,9 +376,9 @@ const ApartmentWritableSchema = object({
     type: object({id: string().nullable()}),
     surface_area: number().nullable(),
     rooms: number().nullable(),
-    shares: object({start: number().nullable(), end: number().nullable()}),
+    shares: ApartmentSharesSchema.omit({total: true}),
     address: ApartmentAddressSchema,
-    prices: ApartmentPricesSchema.omit({maximum_prices: true, first_sale_acquisition_price: true}),
+    prices: ApartmentWritablePricesSchema,
     completion_date: string().nullish(),
     building: object({id: string()}),
     ownerships: ownershipsSchema,

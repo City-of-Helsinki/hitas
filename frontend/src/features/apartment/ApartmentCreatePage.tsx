@@ -119,11 +119,6 @@ const ApartmentCreatePage = () => {
                   },
                   completion_date: null,
                   prices: {
-                      first_sale_purchase_price: null,
-                      latest_sale_purchase_price: null,
-                      first_sale_share_of_housing_company_loans: null,
-                      first_purchase_date: null,
-                      latest_purchase_date: null,
                       construction: {
                           loans: null,
                           interest: {
