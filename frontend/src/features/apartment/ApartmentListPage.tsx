@@ -31,9 +31,10 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
                     <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="address">
-                        {apartment.address.street_address}
+                        {apartment.address.street_address} {apartment.address.stair}{" "}
+                        {apartment.address.apartment_number}
                         <br />
-                        {`${apartment.address.postal_code} ${apartment.address.city}`}
+                        {`${apartment.address.postal_code}, ${apartment.address.city}`}
                     </div>
                     <div className="area">
                         {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
