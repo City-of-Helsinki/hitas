@@ -105,12 +105,16 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
 
     useEffect(() => {
         if (isLoading || !data) return;
-        if (!error && data && data.conditions_of_sale.length) {
-            hitasToast("Myyntiehdot luotu onnistuneesti", "success");
-            setFormOwnerList(initialFormOwnerList);
+        if (!error && data) {
+            if (data.conditions_of_sale.length) {
+                hitasToast("Myyntiehdot luotu onnistuneesti.", "success");
+                setFormOwnerList(initialFormOwnerList);
+            } else {
+                hitasToast("Yhtään myyntiehtoa ei voitu luoda.", "info");
+            }
             closeModal();
         } else {
-            hitasToast("Myyntiehtojen luonti epäonnistui", "error");
+            hitasToast("Myyntiehtojen luonti epäonnistui.", "error");
         }
         // eslint-disable-next-line
     }, [isLoading, error, data]);
