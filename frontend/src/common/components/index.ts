@@ -1,6 +1,7 @@
 import ConfirmDialogModal from "./ConfirmDialogModal";
 import DetailField from "./DetailField";
 import EditButton from "./EditButton";
+import FilterCheckboxField from "./FilterCheckboxField";
 import FilterComboboxField from "./FilterComboboxField";
 import FilterIntegerField from "./FilterIntegerField";
 import FilterTextInputField from "./FilterTextInputField";
@@ -17,14 +18,15 @@ import SaveDialogModal from "./SaveDialogModal";
 import FormInputField from "./formInputField/FormInputField";
 
 export {
-    Heading,
     ConfirmDialogModal,
     DetailField,
     EditButton,
+    FilterCheckboxField,
     FilterComboboxField,
     FilterIntegerField,
     FilterTextInputField,
     FormInputField,
+    Heading,
     ImprovementsTable,
     ListPageNumbers,
     NavigateBackButton,
