@@ -24,6 +24,9 @@ function dotted(obj: object, path: string | string[], value?: number | string | 
 }
 
 function formatAddress(address: IAddress | IApartmentAddress): string {
+    if ("apartment_number" in address) {
+        return `${address.street_address} ${address.stair} ${address.apartment_number}, ${address.postal_code}, ${address.city}`;
+    }
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 
