@@ -2,12 +2,11 @@ import uuid
 from datetime import date
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Collection, Optional
+from typing import Any, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -16,7 +15,7 @@ from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
 from hitas.models.apartment_sale import ApartmentSale, ApartmentSaleWithAnnotations
-from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.condition_of_sale import ConditionOfSaleAnnotated, GracePeriod
 from hitas.models.housing_company import HousingCompany
 from hitas.models.ownership import Ownership, OwnershipLike
 from hitas.models.postal_code import HitasPostalCode
@@ -217,27 +216,43 @@ class Apartment(ExternalHitasModel):
 
     @property
     def sell_by_date(self):
+        """
+        Calculate the sell by date for an apartment based on its conditions of sale.
+
+        Apartment should have its ownerships with their conditions of sales prefetched,
+        and each condition of sale should have its apartment's completion date joined,
+        and the apartment's first sale date annotated as 'first_purchase_date'.
+        """
         sell_by_dates: set[date] = set()
 
         for ownership in self.ownerships.all():
+            cos: ConditionOfSaleAnnotated
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
                 if cos.fulfilled:
                     continue
 
-                completion_date = cos.new_ownership.apartment.completion_date
-                if completion_date is None:
+                # If the apartment has not been completed, there is no sell by date yet.
+                sell_by_date = cos.new_ownership.apartment.completion_date
+                if sell_by_date is None:
                     continue
 
-                if cos.grace_period == GracePeriod.NOT_GIVEN:
-                    sell_by_dates.add(completion_date)
-                elif cos.grace_period == GracePeriod.THREE_MONTHS:
-                    sell_by_dates.add(completion_date + relativedelta(months=3))
+                # If apartment was first sold after it was completed,
+                # the sell by date is calculated based on first sale date.
+                if cos.first_purchase_date is not None and cos.first_purchase_date > sell_by_date:
+                    sell_by_date = cos.first_purchase_date
+
+                # If grace period has been given, it should be included
+                if cos.grace_period == GracePeriod.THREE_MONTHS:
+                    sell_by_date += relativedelta(months=3)
                 elif cos.grace_period == GracePeriod.SIX_MONTHS:
-                    sell_by_dates.add(completion_date + relativedelta(months=6))
+                    sell_by_date += relativedelta(months=6)
+
+                sell_by_dates.add(sell_by_date)
 
         if not sell_by_dates:
             return None
 
+        # If apartment has multiple conditions of sale, the earliest sell by date is counted.
         return min(sell_by_dates)
 
     @property
@@ -399,23 +414,3 @@ class ApartmentMaximumPriceCalculation(models.Model):
     class Meta:
         verbose_name = _("Apartment maximum price calculation")
         verbose_name_plural = _("Apartment maximum price calculations")
-
-
-def prefetch_first_sale(lookup_prefix: str = "", ignore: Collection[int] = ()) -> Prefetch:
-    """Prefetch only the first sale of an apartment.
-
-    :param lookup_prefix: Add prefix to lookup, e.g. 'ownerships__apartment__'
-                          depending on the prefix context. Should end with '__'.
-    :param ignore: These sale ID's should be ignored.
-    """
-    return Prefetch(
-        f"{lookup_prefix}sales",
-        ApartmentSale.objects.filter(
-            id__in=Subquery(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
-                .exclude(id__in=ignore)
-                .order_by("purchase_date")
-                .values_list("id", flat=True)[:1]
-            )
-        ),
-    )

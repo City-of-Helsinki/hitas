@@ -435,6 +435,38 @@ def test__api__apartment__list__sell_by_date__multiple(api_client: HitasAPIClien
     assert response.json()["contents"][0]["sell_by_date"] == str(sell_by_date)
 
 
+@pytest.mark.django_db
+def test__api__apartment__list__sell_by_date__first_sale_after_completion(api_client: HitasAPIClient):
+    completion_date = datetime.date(2023, 1, 1)
+    first_sale_date = datetime.date(2023, 2, 1)
+
+    old_apartment: Apartment = ApartmentFactory.create(apartment_number=1)
+    new_apartment: Apartment = ApartmentFactory.create(
+        completion_date=completion_date,
+        sales__purchase_date=first_sale_date,
+    )
+    old_ownerships: Ownership = OwnershipFactory.create(apartment=old_apartment)
+    new_ownership: Ownership = OwnershipFactory.create(apartment=new_apartment)
+
+    ConditionOfSaleFactory.create(
+        new_ownership=new_ownership,
+        old_ownership=old_ownerships,
+        grace_period=GracePeriod.NOT_GIVEN,
+    )
+
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": old_apartment.housing_company.uuid.hex,
+        },
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert len(response.json()["contents"]) == 1
+    assert response.json()["contents"][0]["sell_by_date"] == str(first_sale_date)
+
+
 # Retrieve tests
 
 

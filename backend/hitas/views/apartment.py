@@ -44,8 +44,16 @@ from hitas.models.apartment import (
     DepreciationPercentage,
     ApartmentWithAnnotations,
 )
+from hitas.services.apartment import (
+    subquery_first_sale_purchase_price,
+    subquery_first_sale_loan_amount,
+    subquery_latest_sale_purchase_price,
+    subquery_first_purchase_date,
+    subquery_latest_purchase_date,
+)
 from hitas.models.apartment_sale import ApartmentSaleWithAnnotations
-from hitas.models.condition_of_sale import condition_of_sale_queryset, GracePeriod
+from hitas.models.condition_of_sale import GracePeriod
+from hitas.services.condition_of_sale import condition_of_sale_queryset
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
 from hitas.utils import (
     RoundWithPrecision,
@@ -814,67 +822,6 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     @staticmethod
-    def primary_purchase_price():
-        return Subquery(
-            queryset=(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                .order_by("purchase_date")
-                .values_list("purchase_price", flat=True)[:1]
-            ),
-            output_field=HitasModelDecimalField(null=True),
-        )
-
-    @staticmethod
-    def primary_loan_amount():
-        return Subquery(
-            queryset=(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                .order_by("purchase_date")
-                .values_list("apartment_share_of_housing_company_loans", flat=True)[:1]
-            ),
-            output_field=HitasModelDecimalField(null=True),
-        )
-
-    @staticmethod
-    def latest_sale_purchase_price():
-        return Subquery(
-            queryset=(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                .exclude(
-                    id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
-                )
-                .order_by("-purchase_date")
-                .values_list("purchase_price", flat=True)[:1]
-            ),
-            output_field=HitasModelDecimalField(null=True),
-        )
-
-    @staticmethod
-    def first_purchase_date():
-        return Subquery(
-            queryset=(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                .order_by("purchase_date")
-                .values_list("purchase_date", flat=True)[:1]
-            ),
-            output_field=models.DateField(null=True),
-        )
-
-    @staticmethod
-    def latest_purchase_date():
-        return Subquery(
-            queryset=(
-                ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                .exclude(
-                    id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
-                )
-                .order_by("-purchase_date")
-                .values_list("purchase_date", flat=True)[:1]
-            ),
-            output_field=models.DateField(null=True),
-        )
-
-    @staticmethod
     def get_base_queryset():
         return (
             Apartment.objects.prefetch_related(
@@ -926,11 +873,11 @@ class ApartmentViewSet(HitasModelViewSet):
 
     def get_detail_queryset(self):
         return self.get_list_queryset().annotate(
-            _first_sale_purchase_price=self.primary_purchase_price(),
-            _first_sale_share_of_housing_company_loans=self.primary_loan_amount(),
-            _first_purchase_date=self.first_purchase_date(),
-            _latest_sale_purchase_price=self.latest_sale_purchase_price(),
-            _latest_purchase_date=self.latest_purchase_date(),
+            _first_sale_purchase_price=subquery_first_sale_purchase_price("id"),
+            _first_sale_share_of_housing_company_loans=subquery_first_sale_loan_amount("id"),
+            _first_purchase_date=subquery_first_purchase_date("id"),
+            _latest_sale_purchase_price=subquery_latest_sale_purchase_price("id"),
+            _latest_purchase_date=subquery_latest_purchase_date("id"),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
             cpi=self.select_index(ConstructionPriceIndex),
             cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),

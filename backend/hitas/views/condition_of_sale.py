@@ -9,7 +9,8 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
-from hitas.models.condition_of_sale import GracePeriod, condition_of_sale_queryset, create_conditions_of_sale
+from hitas.models.condition_of_sale import GracePeriod
+from hitas.services.condition_of_sale import condition_of_sale_queryset, create_conditions_of_sale
 from hitas.utils import subquery_first_id
 from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
