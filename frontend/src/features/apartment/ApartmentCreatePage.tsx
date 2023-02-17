@@ -15,18 +15,25 @@ import {
 } from "../../app/services";
 import {
     ConfirmDialogModal,
-    FormInputField,
     Heading,
     NavigateBackButton,
     RemoveButton,
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import {DateInput, NumberInput, RelatedModelInput, Select, TextInput} from "../../common/components/form";
 import {
-    ApartmentWritableSchema,
+    DateInput,
+    NumberInput,
+    RelatedModelInput,
+    Select,
+    TextAreaInput,
+    TextInput,
+} from "../../common/components/form";
+import {
+    ApartmentWritableFormSchema,
     IApartmentDetails,
     IApartmentWritable,
+    IApartmentWritableForm,
     ICode,
     apartmentStates,
 } from "../../common/schemas";
@@ -55,26 +62,12 @@ const apartmentStateOptions = apartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};
 });
 
-const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
+const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritableForm => {
     return {
         ...ap,
         shares: ap.shares || {start: null, end: null},
         ownerships: [], // Stored in a separate state, not needed here
-        building: {id: ap.links.building.id},
-        address: {
-            ...ap.address,
-            street_address: ap.links.building.street_address,
-        },
-        prices: {
-            ...ap.prices,
-            construction: {
-                ...ap.prices.construction,
-                interest: ap.prices.construction.interest || {
-                    rate_6: null,
-                    rate_14: null,
-                },
-            },
-        },
+        building: {label: ap.links.building.street_address, value: ap.links.building.id},
     };
 };
 
@@ -100,19 +93,15 @@ const ApartmentCreatePage = () => {
               });
 
     // Form
-    const initialFormData: IApartmentWritable =
+    const initialFormData: IApartmentWritableForm =
         state === null || state?.apartment === undefined
             ? {
                   state: "free",
                   type: {id: null},
                   surface_area: null,
                   rooms: null,
-                  shares: {
-                      start: null,
-                      end: null,
-                  },
+                  shares: {start: null, end: null},
                   address: {
-                      street_address: (buildingOptions.length === 1 && buildingOptions[0].label) || "",
                       apartment_number: null,
                       floor: null,
                       stair: "",
@@ -129,7 +118,10 @@ const ApartmentCreatePage = () => {
                           additional_work: null,
                       },
                   },
-                  building: {id: (buildingOptions.length === 1 && buildingOptions[0].value) || ""},
+                  building:
+                      buildingOptions.length === 1
+                          ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
+                          : {label: "", value: ""},
                   ownerships: [],
                   improvements: {
                       market_price_index: [],
@@ -138,20 +130,18 @@ const ApartmentCreatePage = () => {
                   notes: "",
               }
             : convertApartmentDetailToWritable(state.apartment);
-    const formObject = useForm<IApartmentWritable>({
+    const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
         mode: "all",
         reValidateMode: "onBlur",
-        resolver: zodResolver(ApartmentWritableSchema),
+        resolver: zodResolver(ApartmentWritableFormSchema),
     });
-    const onSubmit: SubmitHandler<IApartmentWritable> = (data) => {
-        const formDataWithOwnerships = {
+    const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
+        const formattedFormData: IApartmentWritable = {
             ...data,
             // Copy street_address from selected building
-            address: {
-                ...data.address,
-                street_address: buildingOptions.find((option) => option.value === formData.building.id)?.label || "",
-            },
+            address: {...data.address, street_address: data.building.label},
+            building: {id: data.building.value},
 
             // Clean away ownership items that don't have an owner selected
             ownerships: formOwnershipsList.filter((o) => o.owner.id),
@@ -163,9 +153,9 @@ const ApartmentCreatePage = () => {
             },
         };
 
-        setFormData(() => formDataWithOwnerships);
+        setFormData(() => formattedFormData);
         saveApartment({
-            data: formDataWithOwnerships,
+            data: formattedFormData,
             id: state?.apartment.id,
             housingCompanyId: params.housingCompanyId,
         });
@@ -175,7 +165,7 @@ const ApartmentCreatePage = () => {
         }
     };
 
-    const [formData, setFormData] = useImmer<IApartmentWritable>(initialFormData);
+    const [formData, setFormData] = useImmer<IApartmentWritableForm>(initialFormData);
     const formOwnershipsList =
         state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
 
@@ -255,10 +245,9 @@ const ApartmentCreatePage = () => {
                                 label="Rakennus"
                                 options={buildingOptions || []}
                                 name="building"
-                                // placeholder={formData.address.street_address}
                                 defaultValue={{
-                                    label: formData.address.street_address || "",
-                                    value: formData.building.id || "",
+                                    label: formData.building.label || "",
+                                    value: formData.building.value || "",
                                 }}
                                 formObject={formObject}
                                 required
@@ -285,7 +274,7 @@ const ApartmentCreatePage = () => {
                                 formObject={formObject}
                             />
                             <NumberInput
-                                name="address.apartment_number"
+                                name="surface_area"
                                 label="Pinta-ala"
                                 formObject={formObject}
                                 fractionDigits={2}
@@ -307,6 +296,7 @@ const ApartmentCreatePage = () => {
                                 relatedModelSearchField="value"
                                 getRelatedModelLabel={(obj: ICode) => obj.value}
                                 formObject={formObject}
+                                required
                             />
                         </div>
                         <div className="row">
@@ -377,13 +367,10 @@ const ApartmentCreatePage = () => {
                             />
                         </div>
                         <div className="row">
-                            <FormInputField
-                                inputType="textArea"
+                            <TextAreaInput
+                                name="notes"
                                 label="Muistiinpanot"
-                                fieldPath="notes"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
+                                formObject={formObject}
                             />
                         </div>
                     </Fieldset>

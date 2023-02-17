@@ -186,7 +186,7 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
 // ********************************
 
 const ApartmentAddressSchema = object({
-    street_address: string().nullable(),
+    street_address: string(),
     postal_code: string().optional(),
     city: string().optional(), // Read only
     apartment_number: number().nullable(),
@@ -388,6 +388,16 @@ const ApartmentWritableSchema = object({
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
 });
+
+const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
+    building: true,
+    address: true,
+}).and(
+    object({
+        building: object({label: string(), value: string()}),
+        address: ApartmentAddressSchema.omit({street_address: true, city: true}),
+    })
+);
 
 const ApartmentSaleFormSchema = object({
     key: string().optional(),
@@ -755,6 +765,7 @@ export {
     ApartmentSchema,
     ApartmentDetailsSchema,
     ApartmentWritableSchema,
+    ApartmentWritableFormSchema,
     ApartmentMaximumPriceSchema,
     ApartmentMaximumPrice2011OnwardsSchema,
     ApartmentMaximumPricePre2011Schema,
@@ -797,6 +808,7 @@ export type IApartmentConstructionPriceIndexImprovement = z.infer<
 export type IApartment = z.infer<typeof ApartmentSchema>;
 export type IApartmentDetails = z.infer<typeof ApartmentDetailsSchema>;
 export type IApartmentWritable = z.infer<typeof ApartmentWritableSchema>;
+export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>;
 export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
 export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
 export type IIndexCalculation = z.infer<typeof IndexCalculationSchema>;
