@@ -42,21 +42,21 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 additional_info=serializer.validated_data.get("additional_info", ""),
             )
             return Response(max_prices)
-        except InvalidCalculationResultException:
+        except InvalidCalculationResultException as e:
             return Response(
                 {
                     "error": "invalid_calculation_result",
-                    "message": "Maximum price calculation could not be completed.",
+                    "message": f"Maximum price calculation could not be completed. ({e})",
                     "reason": "Conflict",
                     "status": 409,
                 },
                 status=HTTPStatus.CONFLICT,
             )
-        except IndexMissingException:
+        except IndexMissingException as e:
             return Response(
                 {
                     "error": "index_missing",
-                    "message": "One or more indices required for max price calculation is missing.",
+                    "message": f"One or more indices required for max price calculation is missing. ({e})",
                     "reason": "Conflict",
                     "status": 409,
                 },

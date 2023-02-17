@@ -23,14 +23,16 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 class RulesPre2011(CalculatorRules):
     def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
-        if (
-            apartment.calculation_date_cpi is None
-            or apartment.completion_date_cpi is None
-            or apartment.calculation_date_mpi is None
-            or apartment.completion_date_mpi is None
-            or apartment.surface_area_price_ceiling is None
-        ):
-            raise IndexMissingException()
+        if apartment.calculation_date_cpi is None:
+            raise IndexMissingException("calculation_date_cpi")
+        if apartment.completion_date_cpi is None:
+            raise IndexMissingException("completion_date_cpi")
+        if apartment.calculation_date_mpi is None:
+            raise IndexMissingException("calculation_date_mpi")
+        if apartment.completion_date_mpi is None:
+            raise IndexMissingException("completion_date_mpi")
+        if apartment.surface_area_price_ceiling is None:
+            raise IndexMissingException("surface_area_price_ceiling")
 
     def calculate_construction_price_index_max_price(
         self,
@@ -42,6 +44,11 @@ class RulesPre2011(CalculatorRules):
         housing_company_improvements: List,
         calculation_date: datetime.date,
     ) -> IndexCalculation:
+        if not apartment.completion_date_realized_housing_company_acquisition_price:
+            raise InvalidCalculationResultException(
+                "missing_completion_date_realized_housing_company_acquisition_price"
+            )
+
         housing_company_index_adjusted_acquisition_price = (
             apartment.completion_date_realized_housing_company_acquisition_price
             * apartment.calculation_date_cpi
@@ -116,7 +123,7 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException()
+            raise InvalidCalculationResultException("max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,
@@ -210,7 +217,7 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException()
+            raise InvalidCalculationResultException("max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,

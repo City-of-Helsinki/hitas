@@ -14,14 +14,16 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 class Rules2011Onwards(CalculatorRules):
     def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
-        if (
-            apartment.calculation_date_cpi_2005eq100 is None
-            or apartment.completion_date_cpi_2005eq100 is None
-            or apartment.calculation_date_mpi_2005eq100 is None
-            or apartment.completion_date_mpi_2005eq100 is None
-            or apartment.surface_area_price_ceiling is None
-        ):
-            raise IndexMissingException()
+        if apartment.calculation_date_cpi_2005eq100 is None:
+            raise IndexMissingException("calculation_date_cpi_2005eq100")
+        if apartment.completion_date_cpi_2005eq100 is None:
+            raise IndexMissingException("completion_date_cpi_2005eq100")
+        if apartment.calculation_date_mpi_2005eq100 is None:
+            raise IndexMissingException("calculation_date_mpi_2005eq100")
+        if apartment.completion_date_mpi_2005eq100 is None:
+            raise IndexMissingException("completion_date_mpi_2005eq100")
+        if apartment.surface_area_price_ceiling is None:
+            raise IndexMissingException("surface_area_price_ceiling")
 
     def calculate_construction_price_index_max_price(
         self,
@@ -107,7 +109,7 @@ class Rules2011Onwards(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException()
+            raise InvalidCalculationResultException("max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,

@@ -138,10 +138,11 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
         reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
     )
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    response_json = response.json()
 
-    assert response.json() == {
+    assert "One or more indices required for max price calculation is missing." in response_json.pop("message")
+    assert response_json == {
         "error": "index_missing",
-        "message": "One or more indices required for max price calculation is missing.",
         "reason": "Conflict",
         "status": 409,
     }
@@ -165,7 +166,7 @@ def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
 
     assert response.json() == {
         "error": "invalid_calculation_result",
-        "message": "Maximum price calculation could not be completed.",
+        "message": "Maximum price calculation could not be completed. (max_price_lte_zero)",
         "reason": "Conflict",
         "status": 409,
     }

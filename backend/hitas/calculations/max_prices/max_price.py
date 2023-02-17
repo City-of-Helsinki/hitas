@@ -7,6 +7,7 @@ from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
 from django.db.models.functions import Round, TruncMonth
 from django.utils import timezone
 
+from hitas.calculations.exceptions import InvalidCalculationResultException
 from hitas.calculations.max_prices.rules_2011_onwards import Rules2011Onwards
 from hitas.calculations.max_prices.rules_pre_2011 import RulesPre2011
 from hitas.models import (
@@ -43,6 +44,8 @@ def create_max_price_calculation(
     #
     apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
 
+    raise_missing_value_errors(apartment)
+
     # Do the calculation
     calculation = calculate_max_price(
         apartment,
@@ -69,6 +72,14 @@ def create_max_price_calculation(
     calculation["confirmed_at"] = None
 
     return calculation
+
+
+def raise_missing_value_errors(apartment: ApartmentWithAnnotationsMaxPrice):
+    if apartment.completion_date is None:
+        raise InvalidCalculationResultException("missing_completion_date")
+
+    if not apartment.surface_area:
+        raise InvalidCalculationResultException("missing_surface_area")
 
 
 def calculate_max_price(
