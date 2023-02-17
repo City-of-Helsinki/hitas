@@ -711,8 +711,8 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
         return getattr(getattr(instance, "apartment_type", None), "value", None)
 
     @staticmethod
-    def get_has_conditions_of_sale(instance: Apartment) -> bool:
-        return instance.has_conditions_of_sale  # Annotated field
+    def get_has_conditions_of_sale(instance: ApartmentWithAnnotations) -> bool:
+        return instance.has_conditions_of_sale
 
     @staticmethod
     def get_has_grace_period(instance: Apartment) -> bool:

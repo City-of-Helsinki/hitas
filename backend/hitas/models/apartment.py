@@ -325,6 +325,7 @@ class ApartmentWithAnnotations(Apartment):
     _latest_sale_purchase_price: Optional[Decimal]
     _first_purchase_date: Optional[date]
     _latest_purchase_date: Optional[date]
+    has_conditions_of_sale: Optional[bool]
 
     class Meta:
         abstract = True
