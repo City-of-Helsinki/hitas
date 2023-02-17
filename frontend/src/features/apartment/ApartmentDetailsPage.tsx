@@ -250,6 +250,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     <Button
                         theme="black"
                         size="small"
+                        disabled={!apartment.completion_date}
                     >
                         Vahvista
                     </Button>
