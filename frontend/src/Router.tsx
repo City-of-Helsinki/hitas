@@ -6,12 +6,12 @@ import {Navigate, Route, Routes} from "react-router-dom";
 import App from "./app/App";
 import {store} from "./app/store";
 import {
+    ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
     ApartmentDetailsPage,
     ApartmentImprovementsPage,
     ApartmentListPage,
     ApartmentMaxPricePage,
-    ApartmentSalesConditionsPage,
     ApartmentSalesPage,
 } from "./features/apartment";
 import {Codes} from "./features/codes";
@@ -98,8 +98,8 @@ export default function Router() {
                                     element={<ApartmentSalesPage />}
                                 />
                                 <Route
-                                    path="sales-conditions"
-                                    element={<ApartmentSalesConditionsPage />}
+                                    path="conditions-of-sale"
+                                    element={<ApartmentConditionsOfSalePage />}
                                 />
                             </Route>
                         </Route>

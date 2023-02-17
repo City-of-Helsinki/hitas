@@ -156,7 +156,7 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
     );
 };
 
-const SalesConditionsList = ({apartment}: {apartment: IApartmentDetails}) => {
+const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
     return (
         <>
             {apartment.conditions_of_sale.length ? (
@@ -195,7 +195,7 @@ const SalesConditionsList = ({apartment}: {apartment: IApartmentDetails}) => {
     );
 };
 
-const ApartmentSalesConditionsPage = () => {
+const ApartmentConditionsOfSalePage = () => {
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery({
         housingCompanyId: params.housingCompanyId as string,
@@ -219,7 +219,7 @@ const ApartmentSalesConditionsPage = () => {
                 isLoading={isLoading}
             >
                 <ul className="conditions-of-sale-list">
-                    <SalesConditionsList apartment={data as IApartmentDetails} />
+                    <ConditionsOfSaleList apartment={data as IApartmentDetails} />
                 </ul>
                 <div className="row row--buttons">
                     <NavigateBackButton />
@@ -243,4 +243,4 @@ const ApartmentSalesConditionsPage = () => {
     );
 };
 
-export default ApartmentSalesConditionsPage;
+export default ApartmentConditionsOfSalePage;

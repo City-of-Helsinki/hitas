@@ -73,7 +73,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                         Kauppatapahtuma
                     </Button>
                 </Link>
-                <Link to="sales-conditions">
+                <Link to="conditions-of-sale">
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
