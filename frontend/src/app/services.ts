@@ -7,6 +7,7 @@ import {
     IApartmentMaximumPriceWritable,
     IApartmentQuery,
     IApartmentSale,
+    IApartmentSaleCreated,
     IApartmentWritable,
     IBuilding,
     IBuildingWritable,
@@ -334,7 +335,7 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
         createSale: builder.mutation<
-            IApartmentSale,
+            IApartmentSaleCreated,
             {
                 data: IApartmentSale;
                 housingCompanyId: string;

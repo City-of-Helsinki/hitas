@@ -177,6 +177,9 @@ const LoadedApartmentSalesPage = ({
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
             hdsToast.success("Kauppa tallennettu onnistuneesti!");
+            if (data.conditions_of_sale_created) {
+                hdsToast.info("Asunnolle luotiin myyntiehtoja.");
+            }
             navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         } else if (error) {
             hdsToast.error("Kaupan tallentaminen epäonnistui.");

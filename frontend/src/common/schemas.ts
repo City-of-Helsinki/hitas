@@ -426,6 +426,17 @@ const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
     })
 );
 
+const ApartmentSaleCreatedSchema = object({
+    id: string(),
+    ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
+    notification_date: string(),
+    purchase_date: string(),
+    purchase_price: number(),
+    apartment_share_of_housing_company_loans: number(),
+    exclude_from_statistics: boolean(),
+    conditions_of_sale_created: boolean(),
+});
+
 // ********************************
 // * Maximum price schemas
 // ********************************
@@ -811,6 +822,7 @@ export type IApartmentWritable = z.infer<typeof ApartmentWritableSchema>;
 export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>;
 export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
 export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
+export type IApartmentSaleCreated = z.infer<typeof ApartmentSaleCreatedSchema>;
 export type IIndexCalculation = z.infer<typeof IndexCalculationSchema>;
 export type ICommonCalculationVars = z.infer<typeof CommonCalculationVarsSchema>;
 export type ICalculationVars2011Onwards = z.infer<typeof CalculationVars2011OnwardsSchema>;
