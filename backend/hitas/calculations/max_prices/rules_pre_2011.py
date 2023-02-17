@@ -22,17 +22,17 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class RulesPre2011(CalculatorRules):
-    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice, calculation_date: datetime.date) -> None:
         if apartment.calculation_date_cpi is None:
-            raise IndexMissingException("calculation_date_cpi")
+            raise IndexMissingException(error_code="cpi", date=calculation_date)
         if apartment.completion_date_cpi is None:
-            raise IndexMissingException("completion_date_cpi")
+            raise IndexMissingException(error_code="cpi", date=apartment.completion_date)
         if apartment.calculation_date_mpi is None:
-            raise IndexMissingException("calculation_date_mpi")
+            raise IndexMissingException(error_code="mpi", date=calculation_date)
         if apartment.completion_date_mpi is None:
-            raise IndexMissingException("completion_date_mpi")
+            raise IndexMissingException(error_code="mpi", date=apartment.completion_date)
         if apartment.surface_area_price_ceiling is None:
-            raise IndexMissingException("surface_area_price_ceiling")
+            raise IndexMissingException(error_code="sapc", date=apartment.completion_date)
 
     def calculate_construction_price_index_max_price(
         self,
@@ -44,9 +44,11 @@ class RulesPre2011(CalculatorRules):
         housing_company_improvements: List,
         calculation_date: datetime.date,
     ) -> IndexCalculation:
+        if not apartment.realized_housing_company_acquisition_price:
+            raise InvalidCalculationResultException(error_code="missing_realized_housing_company_acquisition_price")
         if not apartment.completion_date_realized_housing_company_acquisition_price:
             raise InvalidCalculationResultException(
-                "missing_completion_date_realized_housing_company_acquisition_price"
+                error_code="missing_completion_date_realized_housing_company_acquisition_price"
             )
 
         housing_company_index_adjusted_acquisition_price = (
@@ -123,7 +125,7 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException("max_price_lte_zero")
+            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,
@@ -217,7 +219,7 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException("max_price_lte_zero")
+            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,

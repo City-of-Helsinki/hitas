@@ -91,19 +91,19 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, d
 
 
 @pytest.mark.parametrize(
-    "missing_index",
+    "missing_index,error_msg",
     [
-        "cpi_completion_date",
-        "mpi_completion_date",
-        "improvement_cpi",
-        "improvement_mpi",
-        "cpi_calculation_date",
-        "mpi_calculation_date",
-        "sapc",
+        ("cpi_completion_date", "cpi2005eq100.2014-08"),
+        ("mpi_completion_date", "mpi2005eq100.2014-08"),
+        ("cpi_calculation_date", "cpi2005eq100.2022-07"),
+        ("mpi_calculation_date", "mpi2005eq100.2022-07"),
+        ("sapc", "sapc.2014-08"),
+        ("improvement_cpi", "cpi2005eq100.2020-05"),
+        ("improvement_mpi", "mpi2005eq100.2020-05"),
     ],
 )
 @pytest.mark.django_db
-def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str):
+def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str, error_msg: str):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2014, 8, 27),
     )
@@ -140,9 +140,9 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     response_json = response.json()
 
-    assert "One or more indices required for max price calculation is missing." in response_json.pop("message")
+    assert response_json.pop("error") == error_msg
     assert response_json == {
-        "error": "index_missing",
+        "message": "One or more indices required for max price calculation is missing.",
         "reason": "Conflict",
         "status": 409,
     }
@@ -165,8 +165,8 @@ def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
     assert response.json() == {
-        "error": "invalid_calculation_result",
-        "message": "Maximum price calculation could not be completed. (max_price_lte_zero)",
+        "error": "max_price_lte_zero",
+        "message": "Maximum price calculation could not be completed.",
         "reason": "Conflict",
         "status": 409,
     }

@@ -13,17 +13,17 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class Rules2011Onwards(CalculatorRules):
-    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice, calculation_date: datetime.date) -> None:
         if apartment.calculation_date_cpi_2005eq100 is None:
-            raise IndexMissingException("calculation_date_cpi_2005eq100")
+            raise IndexMissingException(error_code="cpi2005eq100", date=calculation_date)
         if apartment.completion_date_cpi_2005eq100 is None:
-            raise IndexMissingException("completion_date_cpi_2005eq100")
+            raise IndexMissingException(error_code="cpi2005eq100", date=apartment.completion_date)
         if apartment.calculation_date_mpi_2005eq100 is None:
-            raise IndexMissingException("calculation_date_mpi_2005eq100")
+            raise IndexMissingException(error_code="mpi2005eq100", date=calculation_date)
         if apartment.completion_date_mpi_2005eq100 is None:
-            raise IndexMissingException("completion_date_mpi_2005eq100")
+            raise IndexMissingException(error_code="mpi2005eq100", date=apartment.completion_date)
         if apartment.surface_area_price_ceiling is None:
-            raise IndexMissingException("surface_area_price_ceiling")
+            raise IndexMissingException(error_code="sapc", date=apartment.completion_date)
 
     def calculate_construction_price_index_max_price(
         self,
@@ -44,6 +44,7 @@ class Rules2011Onwards(CalculatorRules):
             apartment_share_of_housing_company_loans_date,
             housing_company_improvements,
             calculation_date,
+            "cpi2005eq100",
         )
 
     def calculate_market_price_index_max_price(
@@ -65,6 +66,7 @@ class Rules2011Onwards(CalculatorRules):
             apartment_share_of_housing_company_loans_date,
             housing_company_improvements,
             calculation_date,
+            "mpi2005eq100",
         )
 
     @staticmethod
@@ -77,6 +79,7 @@ class Rules2011Onwards(CalculatorRules):
         apartment_share_of_housing_company_loans_date: datetime.date,
         housing_company_improvements: List,
         calculation_date: datetime.date,
+        index_name: str,
     ) -> IndexCalculation:
         # Start calculations
 
@@ -100,6 +103,8 @@ class Rules2011Onwards(CalculatorRules):
             calculation_date_index=calculation_date_index,
             total_surface_area=total_surface_area,
             apartment_surface_area=apartment.surface_area,
+            calculation_date=calculation_date,
+            index_name=index_name,
         )
 
         # debt free shares price
@@ -109,7 +114,7 @@ class Rules2011Onwards(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException("max_price_lte_zero")
+            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
 
         return IndexCalculation(
             maximum_price=max_price,

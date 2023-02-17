@@ -87,8 +87,10 @@ def calculate_single_apartment_improvement_pre_2011_construction_price_index(
     calculation_date: datetime.date,
     calculation_date_index: Decimal,
 ) -> ApartmentImprovementCalculationResult:
-    if improvement.completion_date_index is None or calculation_date_index is None:
-        raise IndexMissingException()
+    if improvement.completion_date_index is None:
+        raise IndexMissingException(error_code="cpi", date=improvement.completion_date)
+    if calculation_date_index is None:
+        raise IndexMissingException(error_code="cpi", date=calculation_date)
 
     #
     # Calculate the accepted value ('hyväksytty') for this improvement

@@ -20,6 +20,7 @@ from rest_framework.decorators import action
 from rest_framework.fields import empty
 from rest_framework.response import Response
 
+from hitas.calculations.exceptions import IndexMissingException
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import (
     Apartment,
@@ -943,22 +944,15 @@ class ApartmentViewSet(HitasModelViewSet):
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
         ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
-        ump = ump["pre_2011"] if ump["pre_2011"] is not None else ump["onwards_2011"]
+        is_pre_2011 = ump["pre_2011"] is not None
+        ump = ump["pre_2011"] if is_pre_2011 else ump["onwards_2011"]
 
-        if (
-            ump["construction_price_index"]["value"] is None
-            or ump["market_price_index"]["value"] is None
-            or ump["surface_area_price_ceiling"]["value"] is None
-        ):
-            return Response(
-                {
-                    "error": "index_missing",
-                    "message": "One or more indices required for max price calculation is missing.",
-                    "reason": "Conflict",
-                    "status": 409,
-                },
-                status=HTTPStatus.CONFLICT,
-            )
+        if ump["construction_price_index"]["value"] is None:
+            raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=this_month())
+        if ump["market_price_index"]["value"] is None:
+            raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=this_month())
+        if ump["surface_area_price_ceiling"]["value"] is None:
+            raise IndexMissingException(error_code="sapc", date=this_month())
 
         sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month())
         context = {

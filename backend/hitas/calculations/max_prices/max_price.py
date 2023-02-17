@@ -76,10 +76,10 @@ def create_max_price_calculation(
 
 def raise_missing_value_errors(apartment: ApartmentWithAnnotationsMaxPrice):
     if apartment.completion_date is None:
-        raise InvalidCalculationResultException("missing_completion_date")
+        raise InvalidCalculationResultException(error_code="missing_completion_date")
 
     if not apartment.surface_area:
-        raise InvalidCalculationResultException("missing_surface_area")
+        raise InvalidCalculationResultException(error_code="missing_surface_area")
 
 
 def calculate_max_price(
@@ -119,7 +119,7 @@ def calculate_max_price(
     #
     # Check we found the necessary indices
     #
-    max_price_calculator.validate_indices(apartment)
+    max_price_calculator.validate_indices(apartment, calculation_date)
 
     #
     # Do the max price calculations for each index and surface area price ceiling
