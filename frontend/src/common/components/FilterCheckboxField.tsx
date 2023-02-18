@@ -21,7 +21,6 @@ export default function FilterCheckboxField({
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = e.target.checked;
-        console.log(isChecked);
         setIsInputChecked(isChecked);
 
         const filters = {...filterParams};

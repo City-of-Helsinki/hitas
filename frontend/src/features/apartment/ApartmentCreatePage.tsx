@@ -4,7 +4,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
 import {
@@ -153,7 +152,6 @@ const ApartmentCreatePage = () => {
             },
         };
 
-        setFormData(() => formattedFormData);
         saveApartment({
             data: formattedFormData,
             id: state?.apartment.id,
@@ -165,7 +163,6 @@ const ApartmentCreatePage = () => {
         }
     };
 
-    const [formData, setFormData] = useImmer<IApartmentWritableForm>(initialFormData);
     const formOwnershipsList =
         state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
 
@@ -246,8 +243,8 @@ const ApartmentCreatePage = () => {
                                 options={buildingOptions || []}
                                 name="building"
                                 defaultValue={{
-                                    label: formData.building.label || "",
-                                    value: formData.building.value || "",
+                                    label: initialFormData.building.label || "",
+                                    value: initialFormData.building.value || "",
                                 }}
                                 formObject={formObject}
                                 required
