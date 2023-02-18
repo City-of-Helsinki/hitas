@@ -257,6 +257,33 @@ header
 .list-wrapper--real-estates, .list-wrapper--buildings
   width: 50%
 
+[class*="pagination_hds-pagination"] nav
+  margin-top: $spacing-s
+  @include flexbox()
+  @include justify-content(space-between)
+  @include align-items(center)
+  height: 40px
+  > div
+    display: none
+  > ul
+    @include flex-grow(1)
+    li
+      min-width: 40px
+  [class*="Button-module"]
+    border-radius: 40px
+    width: 142px
+    div
+      transition: all 350ms ease-out
+    &:hover
+      background: $color-engel
+      text-decoration: underline
+      &[class*="button-next"] div
+        transform: translateX(8px)
+      &[class*="button-prev"] div
+        transform: translateX(-8px)
+  &:before
+    display: none
+
 .detail-list
   &__heading
     @include flexbox()

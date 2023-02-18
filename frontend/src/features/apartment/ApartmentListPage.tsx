@@ -64,7 +64,6 @@ function result(data, error, isLoading, currentPage, setCurrentPage) {
                     pageInfo={data?.page}
                 />
             </QueryStateHandler>
-            <></>
         </div>
     );
 }
