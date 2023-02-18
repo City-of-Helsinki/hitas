@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {Fieldset} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -14,12 +14,12 @@ import {
 } from "../../app/services";
 import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
 import {
+    housingCompanyStates,
     ICode,
     IHousingCompanyDetails,
     IHousingCompanyWritable,
     IPostalCode,
     IPropertyManager,
-    housingCompanyStates,
 } from "../../common/schemas";
 import {hitasToast, validateBusinessId} from "../../common/utils";
 

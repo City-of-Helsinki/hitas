@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 
 import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";

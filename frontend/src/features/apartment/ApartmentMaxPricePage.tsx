@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";

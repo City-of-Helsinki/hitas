@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 
 import {Fieldset, IconCrossCircle} from "hds-react";
 import {useParams} from "react-router-dom";

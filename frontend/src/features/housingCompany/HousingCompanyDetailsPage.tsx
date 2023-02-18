@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 

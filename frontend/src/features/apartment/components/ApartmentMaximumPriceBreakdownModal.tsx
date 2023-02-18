@@ -1,8 +1,7 @@
-import React, {useEffect} from "react";
+import {useEffect} from "react";
 
 import {Accordion, Button, Dialog, Table, Tabs} from "hds-react";
-import {useLocation} from "react-router";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {Button, Dialog, IconCheck, IconCross, IconCrossCircle, IconLock, IconLockOpen, IconPlus} from "hds-react";
 import {Link, useParams} from "react-router-dom";

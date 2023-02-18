@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";

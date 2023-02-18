@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
 import {Control, useFieldArray, useWatch} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 
 import {Button, Dialog, IconCrossCircle, IconSearch, Table, TextInput} from "hds-react";
 

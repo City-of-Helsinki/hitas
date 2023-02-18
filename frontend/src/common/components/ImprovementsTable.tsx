@@ -1,5 +1,3 @@
-import React from "react";
-
 import {IApartmentDetails, IHousingCompanyDetails} from "../schemas";
 import {formatMoney} from "../utils";
 import {EditButton, Heading} from "./index";

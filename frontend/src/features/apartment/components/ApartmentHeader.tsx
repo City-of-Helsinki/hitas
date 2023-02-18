@@ -1,5 +1,3 @@
-import React from "react";
-
 import {StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 

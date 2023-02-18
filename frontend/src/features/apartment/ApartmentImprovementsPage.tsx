@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
