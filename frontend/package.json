@@ -58,7 +58,6 @@
     ]
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
     "eslint": ">=8.32.0",
@@ -68,6 +67,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.32.1",
     "prettier": "^2.8.3",
+    "prettier-plugin-organize-imports": "^3.2.2",
     "react-scripts": "^5.0.1"
   },
   "resolutions": {
