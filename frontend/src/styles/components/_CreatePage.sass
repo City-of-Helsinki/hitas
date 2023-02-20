@@ -203,6 +203,7 @@
     display: grid
     grid-template-columns: auto 300px 150px 100px
     gap: 1em
+    grid-row: 1
     height: $spacing-layout-s
     font-size: $fontsize-body-s
     font-weight: 700
@@ -214,11 +215,29 @@
     padding: $spacing-layout-s
     background: $color-engel-medium-light
     display: grid
-    row-gap: 2em
+    grid-template-rows: 32px auto
+    grid-template-columns: 100%
+    row-gap: 1em
     &-item
+      background: white
       display: grid
       grid-template-columns: auto 300px 150px 100px
       gap: 1em
+      height: $spacing-layout-m
+      @include align-items(center)
+      .grace-period
+        padding-left: 18px
+      .fulfillment-date
+        align-items: center
+        margin: 0 auto
+      .input-wrap
+        @include flexbox()
+        @include align-items(center)
+      .icon-wrap
+        margin: 0 14px 0 -28px
+    svg
+      height: 22px
+      vertical-align: text-bottom
     .unresolved
       color: $color-black-60
     .resolved
@@ -228,3 +247,22 @@
       color: $color-black
     .resolved a:hover
       color: $color-black-50
+
+  // Add person/owner/entity at the condition of sale dialog
+#conditions-of-sale-creation-dialog
+  .ownership-item
+    @include flexbox()
+    @include align-items(center)
+    height: 56px
+    margin-bottom: 1em
+    .input-field
+      height: 56px
+      @include flex-grow(1)
+      margin-bottom: 0
+    .icon--remove
+      @include flexbox()
+      @include flex-flow(row)
+      @include align-items(center)
+      height: 100%
+      margin-left: $spacing-s
+

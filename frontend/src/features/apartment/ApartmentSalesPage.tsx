@@ -263,7 +263,7 @@ const LoadedApartmentSalesPage = ({
         );
     };
     return (
-        <>
+        <div className="view--apartment-conditions-of-sale">
             <div className="field-sets">
                 <Fieldset heading="Kaupan tiedot">
                     <form
@@ -390,7 +390,7 @@ const LoadedApartmentSalesPage = ({
                     />
                 </QueryStateHandler>
             </Dialog>
-        </>
+        </div>
     );
 };
 

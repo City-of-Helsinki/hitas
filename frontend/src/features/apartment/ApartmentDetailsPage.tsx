@@ -82,7 +82,9 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     </Button>
                 </Link>
             </div>
-            <label className="card-heading">Myyntiehdot</label>
+            <label className="card-heading">
+                <IconLock /> Myyntiehdot
+            </label>
             {Object.keys(groupedConditionsOfSale).length ? (
                 <ul>
                     {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (

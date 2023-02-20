@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 
-import {Button, Dialog, IconCrossCircle, IconLock, IconLockOpen, IconPlus} from "hds-react";
+import {Button, Dialog, IconCheck, IconCross, IconCrossCircle, IconLock, IconLockOpen, IconPlus} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -8,7 +8,7 @@ import {v4 as uuidv4} from "uuid";
 import {useCreateConditionOfSaleMutation, useGetApartmentDetailQuery, useGetOwnersQuery} from "../../app/services";
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
-import {formatAddress, formatDate, formatOwner, hitasToast} from "../../common/utils";
+import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
 const OwnersList = ({formOwnerList, setFormOwnerList}) => {
@@ -70,7 +70,7 @@ const OwnersList = ({formOwnerList, setFormOwnerList}) => {
                     variant={formOwnerList.length > 0 ? "secondary" : "primary"}
                     theme="black"
                 >
-                    Valitse omistaja
+                    Lisää omistaja
                 </Button>
             </div>
         </div>
@@ -99,7 +99,7 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
                 data: {household: ownerIdList},
             });
         } else {
-            hitasToast("Sinun täytyy valita vähintään yksi nykyinen omistaja.", "info");
+            hdsToast.info("Sinun täytyy valita vähintään yksi nykyinen omistaja.");
         }
     };
 
@@ -107,14 +107,14 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
         if (isLoading || !data) return;
         if (!error && data) {
             if (data.conditions_of_sale.length) {
-                hitasToast("Myyntiehdot luotu onnistuneesti.", "success");
+                hdsToast.success("Myyntiehdot luotu onnistuneesti.");
                 setFormOwnerList(initialFormOwnerList);
             } else {
-                hitasToast("Yhtään myyntiehtoa ei voitu luoda.", "info");
+                hdsToast.info("Yhtään myyntiehtoa ei voitu luoda.");
             }
             closeModal();
         } else {
-            hitasToast("Myyntiehtojen luonti epäonnistui.", "error");
+            hdsToast.error("Myyntiehtojen luonti epäonnistui.");
         }
         // eslint-disable-next-line
     }, [isLoading, error, data]);
@@ -156,11 +156,32 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
     );
 };
 
+const GracePeriodEntry = (gracePeriod) => {
+    switch (gracePeriod) {
+        case "not_given":
+            return <IconCross />;
+        case "three_months":
+            return (
+                <>
+                    <IconCheck /> 3kk
+                </>
+            );
+        case "six_months":
+            return (
+                <>
+                    <IconCheck /> 6kk
+                </>
+            );
+        default:
+            return <IconCross />;
+    }
+};
+
 const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
     return (
         <>
             {apartment.conditions_of_sale.length ? (
-                <>
+                <ul className="conditions-of-sale-list">
                     <li className="conditions-of-sale-headers">
                         <header>Omistaja</header>
                         <header>Asunto</header>
@@ -173,7 +194,7 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             className={`conditions-of-sale-list-item${cos.fulfilled ? " resolved" : " unresolved"}`}
                         >
                             <div className="input-wrap">
-                                {cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                                <div className="icon-wrap">{cos.fulfilled ? <IconLockOpen /> : <IconLock />}</div>
                                 {cos.owner.name} ({cos.owner.identifier})
                             </div>
                             <div className="input-wrap">
@@ -183,11 +204,13 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                                     {formatAddress(cos.apartment.address)}
                                 </Link>
                             </div>
-                            <div className="input-wrap">{cos.grace_period}</div>
-                            <div className="input-wrap">{formatDate(cos.fulfilled)} </div>
+                            <div className="input-wrap grace-period">
+                                <GracePeriodEntry gracePeriod={cos.grace_period} />
+                            </div>
+                            <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
                         </li>
                     ))}
-                </>
+                </ul>
             ) : (
                 <div>Ei myyntiehtoja</div>
             )}
@@ -218,9 +241,7 @@ const ApartmentConditionsOfSalePage = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                <ul className="conditions-of-sale-list">
-                    <ConditionsOfSaleList apartment={data as IApartmentDetails} />
-                </ul>
+                <ConditionsOfSaleList apartment={data as IApartmentDetails} />
                 <div className="row row--buttons">
                     <NavigateBackButton />
                     <Button

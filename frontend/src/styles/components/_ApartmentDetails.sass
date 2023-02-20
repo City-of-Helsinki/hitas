@@ -66,7 +66,7 @@
       a:hover
         text-decoration: underline
         svg
-          transform: scale(1.25)
+          transform: scale(1.2)
       .unresolved a:hover
         color: $color-black
       .resolved a:hover
@@ -76,7 +76,8 @@
       svg
         position: relative
         top: 4px
-        margin: 0px 10px 0 5px
+        margin: 0 10px 0 0
+        transition: transform 150ms linear
       .unresolved
         color: $color-black-60
       .resolved
