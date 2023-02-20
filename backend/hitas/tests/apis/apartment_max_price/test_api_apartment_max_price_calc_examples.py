@@ -1205,3 +1205,70 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
             "apartment_share_of_housing_company_loans_date": "2099-10-01",
         },
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__no_sales_on_apartment__post_2011(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2012, 1, 13),
+        sales=[],
+    )
+
+    # Create necessary indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=115.9)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=138.1)
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 9, 1), value=149.1)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 9, 1), value=189.1)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 9, 1), value=4872)
+
+    data = {
+        "calculation_date": "2022-09-29",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2099-10-01",  # Date in the future
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+
+    # Calculation should still work without any sales on the housing company apartments
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__no_sales_on_apartment__pre_2011(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2009, 1, 13),
+        sales=[],
+    )
+
+    # Create necessary indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2009, 1, 1), value=115.9)
+    MarketPriceIndexFactory.create(month=datetime.date(2009, 1, 1), value=138.1)
+    ConstructionPriceIndexFactory.create(month=datetime.date(2022, 9, 1), value=149.1)
+    MarketPriceIndexFactory.create(month=datetime.date(2022, 9, 1), value=189.1)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 9, 1), value=4872)
+
+    data = {
+        "calculation_date": "2022-09-29",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2099-10-01",  # Date in the future
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing_realized_housing_company_acquisition_price",
+        "message": "Maximum price calculation could not be completed.",
+        "reason": "Conflict",
+        "status": 409,
+    }

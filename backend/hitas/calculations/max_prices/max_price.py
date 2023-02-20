@@ -4,6 +4,7 @@ import uuid
 from typing import Any, Dict, Optional
 
 from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Round, TruncMonth
 from django.utils import timezone
 
@@ -405,21 +406,22 @@ def fetch_apartment(
                 output_field=HitasModelDecimalField(null=True),
             ),
             surface_area_price_ceiling=Round(F("surface_area_price_ceiling_m2") * F("surface_area")),
-        )
-        .extra(
-            select={
-                "realized_housing_company_acquisition_price": (
+            realized_housing_company_acquisition_price=RawSQL(
+                sql=(
                     """
                     SELECT
-                        SUM(
-                            (
-                                SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
-                                FROM hitas_apartmentsale AS aps
-                                WHERE aps.apartment_id = a.id
-                                GROUP BY aps.purchase_date
-                                ORDER BY aps.purchase_date
-                                LIMIT 1
-                            )
+                        COALESCE (
+                            SUM(
+                                (
+                                    SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
+                                    FROM hitas_apartmentsale AS aps
+                                    WHERE aps.apartment_id = a.id
+                                    GROUP BY aps.purchase_date
+                                    ORDER BY aps.purchase_date
+                                    LIMIT 1
+                                )
+                            ),
+                            0.0
                         )
                     FROM hitas_apartment AS a
                         INNER JOIN hitas_building AS b ON (a.building_id = b.id)
@@ -430,18 +432,25 @@ def fetch_apartment(
                         )
                     """
                 ),
-                "completion_date_realized_housing_company_acquisition_price": (
+                params=(),
+                output_field=HitasModelDecimalField(),
+            ),
+            completion_date_realized_housing_company_acquisition_price=RawSQL(
+                sql=(
                     """
                     SELECT
-                        SUM(
-                            (
-                                SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
-                                FROM hitas_apartmentsale AS aps
-                                WHERE aps.apartment_id = a.id
-                                GROUP BY aps.purchase_date
-                                ORDER BY aps.purchase_date
-                                LIMIT 1
-                            )
+                        COALESCE (
+                            SUM(
+                                (
+                                    SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
+                                    FROM hitas_apartmentsale AS aps
+                                    WHERE aps.apartment_id = a.id
+                                    GROUP BY aps.purchase_date
+                                    ORDER BY aps.purchase_date
+                                    LIMIT 1
+                                )
+                            ),
+                            0.0
                         )
                     FROM hitas_apartment AS a
                         INNER JOIN hitas_building AS b ON (a.building_id = b.id)
@@ -453,7 +462,9 @@ def fetch_apartment(
                         )
                     """
                 ),
-            },
+                params=(),
+                output_field=HitasModelDecimalField(),
+            ),
         )
         .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
     )
