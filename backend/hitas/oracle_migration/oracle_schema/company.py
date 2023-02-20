@@ -3,7 +3,6 @@ from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, In
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
     HitasAnonymizedAddress,
-    HitasAnonymizedDay,
     HitasAnonymizedMonthAndDay,
     HitasAnonymizedName,
     HitasAnonymizedNameCommaSeparated,
@@ -125,7 +124,7 @@ apartments = Table(
     Column("N_OSAKELKM1", Integer, key="share_number_start", nullable=False),
     Column("N_OSAKELKM2", Integer, key="share_number_end", nullable=False),
     Column("N_OSAKEYHT", Integer, nullable=False),
-    Column("D_VALMPVM", HitasAnonymizedDay, key="completion_date"),
+    Column("D_VALMPVM", Date, key="completion_date"),
     Column("N_LUOVHINTA", Integer, key="debt_free_purchase_price", nullable=False),
     Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
     Column("N_ENSIJLAINA", Integer, key="primary_loan_amount", nullable=False),
