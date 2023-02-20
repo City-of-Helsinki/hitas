@@ -34,6 +34,8 @@ def test_calculate_single_housing_company_improvement_2011_onwards():
         calculation_date_index=Decimal(146.4),
         total_surface_area=Decimal(4332),
         apartment_surface_area=Decimal(30),
+        calculation_date=datetime.date(2023, 1, 1),
+        index_name="foo",
     )
     assert result is not None
 
@@ -59,6 +61,8 @@ def test_calculate_housing_company_improvements_2011_onwards():
         calculation_date_index=Decimal(146.4),
         total_surface_area=Decimal(4332),
         apartment_surface_area=Decimal(30),
+        calculation_date=datetime.date(2023, 1, 1),
+        index_name="foo",
     )
     assert result is not None
 

@@ -54,6 +54,8 @@ def calculate_housing_company_improvements_2011_onwards(
     calculation_date_index: Decimal,
     total_surface_area: Decimal,
     apartment_surface_area: Decimal,
+    calculation_date: datetime.date,
+    index_name: str,
 ) -> ImprovementsResult:
     def calc_fn(improvement):
         return calculate_single_housing_company_improvement_2011_onwards(
@@ -61,6 +63,8 @@ def calculate_housing_company_improvements_2011_onwards(
             calculation_date_index=calculation_date_index,
             total_surface_area=total_surface_area,
             apartment_surface_area=apartment_surface_area,
+            calculation_date=calculation_date,
+            index_name=index_name,
         )
 
     return calculate_multiple_improvements(improvements, calc_fn, total_surface_area)
@@ -71,9 +75,13 @@ def calculate_single_housing_company_improvement_2011_onwards(
     calculation_date_index: Decimal,
     total_surface_area: Decimal,
     apartment_surface_area: Decimal,
+    calculation_date: datetime.date,
+    index_name: str,
 ) -> ImprovementCalculationResult:
-    if improvement.completion_date_index is None or calculation_date_index is None:
-        raise IndexMissingException()
+    if improvement.completion_date_index is None:
+        raise IndexMissingException(error_code=index_name, date=improvement.completion_date)
+    if calculation_date_index is None:
+        raise IndexMissingException(error_code=index_name, date=calculation_date)
 
     #
     # Calculate the excess

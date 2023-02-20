@@ -7,18 +7,20 @@ from typing import Any, Dict, Optional, Union, Iterable
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Prefetch, Q
+from django.db.models import Prefetch, Q, Count
 from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
+from django_filters.rest_framework import BooleanFilter
 from enumfields.drf import EnumSupportSerializerMixin, EnumField
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
 from rest_framework.response import Response
 
+from hitas.calculations.exceptions import IndexMissingException
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import (
     Apartment,
@@ -64,10 +66,37 @@ from hitas.views.utils import (
     HitasModelViewSet,
     UUIDRelatedField,
     ValueOrNullField,
+    HitasFilterSet,
+    HitasCharFilter,
+    HitasPostalCodeFilter,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
 from hitas.views.utils.serializers import ReadOnlySerializer, YearMonthSerializer, ApartmentHitasAddressSerializer
+
+
+class ApartmentFilterSet(HitasFilterSet):
+    housing_company_name = HitasCharFilter(
+        field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
+    )
+    street_address = HitasCharFilter(lookup_expr="icontains")
+    postal_code = HitasPostalCodeFilter(field_name="building__real_estate__housing_company__postal_code__value")
+    owner_name = HitasCharFilter(field_name="ownerships__owner__name", lookup_expr="icontains")
+    owner_identifier = HitasCharFilter(
+        field_name="ownerships__owner__identifier", lookup_expr="icontains", max_length=11
+    )
+    has_conditions_of_sale = BooleanFilter()
+
+    class Meta:
+        model = Apartment
+        fields = [
+            "housing_company_name",
+            "street_address",
+            "postal_code",
+            "owner_name",
+            "owner_identifier",
+            "has_conditions_of_sale",
+        ]
 
 
 class MarketPriceImprovementSerializer(serializers.ModelSerializer):
@@ -551,7 +580,6 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     links = serializers.SerializerMethodField()
     building = ReadOnlyBuildingSerializer(write_only=True)
     improvements = ApartmentImprovementSerializer(source="*")
-
     conditions_of_sale = serializers.SerializerMethodField()
     sell_by_date = serializers.SerializerMethodField()
 
@@ -676,10 +704,20 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
 class ApartmentListSerializer(ApartmentDetailSerializer):
     type = serializers.SerializerMethodField()
+    has_conditions_of_sale = serializers.SerializerMethodField()
+    has_grace_period = serializers.SerializerMethodField()
 
     @staticmethod
     def get_type(instance: Apartment) -> Optional[str]:
         return getattr(getattr(instance, "apartment_type", None), "value", None)
+
+    @staticmethod
+    def get_has_conditions_of_sale(instance: ApartmentWithAnnotations) -> bool:
+        return instance.has_conditions_of_sale
+
+    @staticmethod
+    def get_has_grace_period(instance: Apartment) -> bool:
+        return instance.has_grace_period
 
     class Meta:
         model = Apartment
@@ -692,16 +730,20 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
             "address",
             "completion_date",
             "ownerships",
-            "links",
-            "conditions_of_sale",
+            "has_conditions_of_sale",
+            "has_grace_period",
             "sell_by_date",
+            "links",
         ]
 
 
 class ApartmentViewSet(HitasModelViewSet):
+    model_class = Apartment
     serializer_class = ApartmentDetailSerializer
     list_serializer_class = ApartmentListSerializer
-    model_class = Apartment
+
+    def get_filterset_class(self):
+        return ApartmentFilterSet
 
     @staticmethod
     def select_index(
@@ -832,6 +874,56 @@ class ApartmentViewSet(HitasModelViewSet):
             output_field=models.DateField(null=True),
         )
 
+    @staticmethod
+    def get_base_queryset():
+        return (
+            Apartment.objects.prefetch_related(
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.select_related("owner"),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_new",
+                    condition_of_sale_queryset(),
+                ),
+                Prefetch(
+                    "ownerships__conditions_of_sale_old",
+                    condition_of_sale_queryset(),
+                ),
+            )
+            .select_related(
+                "building",
+                "apartment_type",
+                "building__real_estate",
+                "building__real_estate__housing_company",
+                "building__real_estate__housing_company__postal_code",
+            )
+            .alias(
+                number_of_conditions_of_sale=(
+                    Count(
+                        "ownerships__conditions_of_sale_new",
+                        filter=Q(ownerships__conditions_of_sale_new__deleted__isnull=True),
+                    )
+                    + Count(
+                        "ownerships__conditions_of_sale_old",
+                        filter=Q(ownerships__conditions_of_sale_old__deleted__isnull=True),
+                    )
+                ),
+            )
+            .annotate(
+                has_conditions_of_sale=Case(
+                    When(condition=Q(number_of_conditions_of_sale__gt=0), then=True),
+                    default=False,
+                    output_field=models.BooleanField(),
+                ),
+            )
+            .order_by("apartment_number", "id")
+        )
+
+    def get_list_queryset(self):
+        hc_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
+        return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
+
     def get_detail_queryset(self):
         return self.get_list_queryset().annotate(
             _first_sale_purchase_price=self.primary_purchase_price(),
@@ -847,65 +939,20 @@ class ApartmentViewSet(HitasModelViewSet):
             sapc=self.select_sapc(),
         )
 
-    def get_list_queryset(self):
-        hc_id = lookup_model_id_by_uuid(self.kwargs["housing_company_uuid"], HousingCompany)
-
-        return (
-            Apartment.objects.filter(building__real_estate__housing_company__id=hc_id)
-            .prefetch_related(
-                Prefetch(
-                    "ownerships",
-                    Ownership.objects.select_related("owner"),
-                ),
-                Prefetch(
-                    "ownerships__conditions_of_sale_new",
-                    condition_of_sale_queryset(),
-                ),
-                Prefetch(
-                    "ownerships__conditions_of_sale_old",
-                    condition_of_sale_queryset(),
-                ),
-                Prefetch(
-                    "market_price_improvements",
-                    ApartmentMarketPriceImprovement.objects.order_by("completion_date", "id"),
-                ),
-                Prefetch(
-                    "construction_price_improvements",
-                    ApartmentConstructionPriceImprovement.objects.order_by("completion_date", "id"),
-                ),
-            )
-            .select_related(
-                "building",
-                "apartment_type",
-                "building__real_estate",
-                "building__real_estate__housing_company",
-                "building__real_estate__housing_company__postal_code",
-                "building__real_estate__housing_company__financing_method",
-            )
-            .order_by("apartment_number", "id")
-        )
-
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
     def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
         ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
-        ump = ump["pre_2011"] if ump["pre_2011"] is not None else ump["onwards_2011"]
+        is_pre_2011 = ump["pre_2011"] is not None
+        ump = ump["pre_2011"] if is_pre_2011 else ump["onwards_2011"]
 
-        if (
-            ump["construction_price_index"]["value"] is None
-            or ump["market_price_index"]["value"] is None
-            or ump["surface_area_price_ceiling"]["value"] is None
-        ):
-            return Response(
-                {
-                    "error": "index_missing",
-                    "message": "One or more indices required for max price calculation is missing.",
-                    "reason": "Conflict",
-                    "status": 409,
-                },
-                status=HTTPStatus.CONFLICT,
-            )
+        if ump["construction_price_index"]["value"] is None:
+            raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=this_month())
+        if ump["market_price_index"]["value"] is None:
+            raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=this_month())
+        if ump["surface_area_price_ceiling"]["value"] is None:
+            raise IndexMissingException(error_code="sapc", date=this_month())
 
         sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month())
         context = {

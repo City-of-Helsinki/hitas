@@ -18,6 +18,7 @@ import OwnershipsList from "../../common/components/OwnershipsList";
 import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
 import {ApartmentSaleSchema, IApartmentDetails, IApartmentMaximumPrice, IApartmentSaleForm} from "../../common/schemas";
 import {formatDate, formatIndex, formatMoney, hdsToast, today} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
@@ -176,6 +177,9 @@ const LoadedApartmentSalesPage = ({
     useEffect(() => {
         if (!isLoading && !error && data && data.id) {
             hdsToast.success("Kauppa tallennettu onnistuneesti!");
+            if (data.conditions_of_sale_created) {
+                hdsToast.info("Asunnolle luotiin myyntiehtoja.");
+            }
             navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         } else if (error) {
             hdsToast.error("Kaupan tallentaminen epäonnistui.");
@@ -400,12 +404,10 @@ const MaxPriceCalculationLoader = ({apartment}) => {
     });
 
     const SalesHeading = () => (
-        <Heading type="main">
-            Kauppatapahtuma
-            <span>
-                {`(${apartment.address.street_address} ${apartment.address.stair} ${apartment.address.apartment_number})`}
-            </span>
-        </Heading>
+        <>
+            <ApartmentHeader apartment={apartment} />
+            <Heading type="main">Kauppatapahtuma</Heading>
+        </>
     );
 
     if (hasValidCalculation) {

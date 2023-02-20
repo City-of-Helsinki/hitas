@@ -13,14 +13,18 @@ import {
 } from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
-import {formatAddress, formatDate} from "../../common/utils";
+import {formatDate} from "../../common/utils";
 
 const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {
     return (
         <Link to={`/housing-companies/${id}`}>
             <li className="results-list__item">
                 <div className="name">{name}</div>
-                <div className="address">{formatAddress(address)}</div>
+                <div className="address">
+                    {address.street_address}
+                    <br />
+                    {address.postal_code}, {address.city}
+                </div>
                 <div className="date">{formatDate(date)}</div>
             </li>
         </Link>

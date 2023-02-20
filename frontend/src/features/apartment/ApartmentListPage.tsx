@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Checkbox, SearchInput, StatusLabel, TextInput} from "hds-react";
+import {IconLock, SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
@@ -11,60 +11,38 @@ import {
     ListPageNumbers,
     QueryStateHandler,
 } from "../../common/components";
-import {IApartment, IApartmentAddress, IApartmentListResponse, IOwnership} from "../../common/schemas";
+import FilterCheckboxField from "../../common/components/FilterCheckboxField";
+import {IApartment, IApartmentListResponse} from "../../common/schemas";
 
-interface ApartmentListItemProps {
-    id: string | null;
-    apartmentNumber: number | null;
-    stair: string;
-    ownerships: IOwnership[];
-    apartmentType?: string | null;
-    rooms: number | null;
-    surfaceArea: number | null;
-    address: IApartmentAddress;
-    state: string;
-    hcId: string;
-    housingCompanyName?: string;
-}
-
-const ApartmentListItem = ({
-    id,
-    apartmentNumber,
-    stair,
-    ownerships,
-    surfaceArea,
-    address,
-    state,
-    hcId,
-    housingCompanyName,
-    rooms,
-    apartmentType,
-}: ApartmentListItemProps): JSX.Element => {
+const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
     // Combine ownerships into a single formatted string
-    const ownershipsString = ownerships.length
-        ? ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
+    const ownershipsString = apartment.ownerships.length
+        ? apartment.ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
         : "Ei omistajuuksia";
     return (
-        <Link to={`/housing-companies/${hcId}/apartments/${id}`}>
+        <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
             <li className="results-list__item results-list__item--apartment">
                 <div className="number">
-                    {stair}
-                    {apartmentNumber}
+                    {apartment.address.stair}
+                    {apartment.address.apartment_number}
+                    {apartment.has_conditions_of_sale ? <IconLock /> : null}
                 </div>
                 <div className="details">
-                    <div className="housing-company">{housingCompanyName}</div>
+                    <div className="housing-company">{apartment.links.housing_company.display_name}</div>
                     <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="address">
-                        {address.street_address}
+                        {apartment.address.street_address} {apartment.address.stair}{" "}
+                        {apartment.address.apartment_number}
                         <br />
-                        {`${address.postal_code} ${address.city}`}
+                        {`${apartment.address.postal_code}, ${apartment.address.city}`}
                     </div>
-                    <div className="area">{`${surfaceArea ? surfaceArea + "m²" : ""} ${
-                        rooms || ""
-                    } ${apartmentType}`}</div>
+                    <div className="area">
+                        {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
+                        ${apartment.rooms || ""} ${apartment.type}`}
+                    </div>
                 </div>
                 <div className="state">
-                    <StatusLabel>{state}</StatusLabel>
+                    <StatusLabel>{apartment.state}</StatusLabel>
                 </div>
             </li>
         </Link>
@@ -107,17 +85,7 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                 {data.contents.map((item: IApartment) => (
                     <ApartmentListItem
                         key={item.id}
-                        id={item.id}
-                        hcId={item.links.housing_company.id}
-                        apartmentNumber={item.address.apartment_number}
-                        stair={item.address.stair || ""}
-                        ownerships={item.ownerships}
-                        apartmentType={item.type || ""}
-                        rooms={item.rooms}
-                        surfaceArea={item.surface_area}
-                        address={item.address}
-                        state={item.state}
-                        housingCompanyName={item.links.housing_company.display_name}
+                        apartment={item}
                     />
                 ))}
             </ul>
@@ -176,15 +144,12 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <TextInput
-                id="filter__ostajaehdokas"
-                label="Ostajaehdokas"
-                disabled
-            />
-            <Checkbox
-                id="sales_condition"
+            <FilterCheckboxField
                 label="Löytyy myyntiehto"
-                disabled
+                filterFieldName="has_conditions_of_sale"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+                applyOnlyOnTrue
             />
         </div>
     );

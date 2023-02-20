@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -9,7 +9,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConditionOfSale,
@@ -20,6 +20,7 @@ import {
     IOwnership,
 } from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
+import ApartmentHeader from "./components/ApartmentHeader";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (
@@ -46,7 +47,8 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
     );
 };
 
-const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
+const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetails}) => {
+    const conditionsOfSale = apartment.conditions_of_sale;
     // Create a dict with owner id as key, and all of their conditions of sale in a list as value
     interface IGroupedConditionsOfSale {
         [ownerId: string]: IApartmentConditionOfSale[];
@@ -71,7 +73,7 @@ const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IA
                         Kauppatapahtuma
                     </Button>
                 </Link>
-                <Link to="sales-conditions">
+                <Link to="conditions-of-sale">
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
@@ -81,14 +83,18 @@ const ApartmentConditionsOfSaleCard = ({conditionsOfSale}: {conditionsOfSale: IA
                 </Link>
             </div>
             <label className="card-heading">Myyntiehdot</label>
-            <ul>
-                {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
-                    <SingleApartmentConditionOfSale
-                        key={ownerId}
-                        conditionsOfSale={cos}
-                    />
-                ))}
-            </ul>
+            {Object.keys(groupedConditionsOfSale).length ? (
+                <ul>
+                    {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
+                        <SingleApartmentConditionOfSale
+                            key={ownerId}
+                            conditionsOfSale={cos}
+                        />
+                    ))}
+                </ul>
+            ) : (
+                <span>Ei myyntiehtoja.</span>
+            )}
         </Card>
     );
 };
@@ -244,6 +250,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     <Button
                         theme="black"
                         size="small"
+                        disabled={!apartment.completion_date}
                     >
                         Vahvista
                     </Button>
@@ -268,14 +275,10 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
 
     return (
         <>
-            <Heading type="main">
-                <Link to={`/housing-companies/${data.links.housing_company.id}`}>
-                    <span className="name">{data.links.housing_company.display_name}</span>
-                    <span className="address">{formatAddress(data.address)}</span>
-                    <StatusLabel>{data.state}</StatusLabel>
-                </Link>
-                <EditButton state={{apartment: data}} />
-            </Heading>
+            <ApartmentHeader
+                apartment={data as IApartmentDetails}
+                showEditButton={true}
+            />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {data.address.stair}
@@ -290,7 +293,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard apartment={data} />
-                <ApartmentConditionsOfSaleCard conditionsOfSale={data.conditions_of_sale} />
+                <ApartmentConditionsOfSaleCard apartment={data} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
@@ -378,10 +381,6 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             value={formatDate(data.prices.latest_purchase_date)}
                                         />
                                         <DetailField
-                                            label="Rakennusaikaiset lainat"
-                                            value={formatMoney(data.prices.construction.loans)}
-                                        />
-                                        <DetailField
                                             label="Rakennusaikaiset korot (6 %)"
                                             value={
                                                 data.prices.construction.interest
@@ -398,13 +397,21 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             }
                                         />
                                         <DetailField
-                                            label="Luovutushinta (RA)"
-                                            value={formatMoney(data.prices.construction.debt_free_purchase_price)}
-                                        />
-                                        <DetailField
                                             label="Rakennusaikaiset lisätyöt"
                                             value={formatMoney(data.prices.construction.additional_work)}
                                         />
+                                        {data.prices.construction.loans ? (
+                                            <DetailField
+                                                label="Rakennusaikaiset lainat"
+                                                value={formatMoney(data.prices.construction.loans)}
+                                            />
+                                        ) : null}
+                                        {data.prices.construction.debt_free_purchase_price ? (
+                                            <DetailField
+                                                label="Luovutushinta (RA)"
+                                                value={formatMoney(data.prices.construction.debt_free_purchase_price)}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>

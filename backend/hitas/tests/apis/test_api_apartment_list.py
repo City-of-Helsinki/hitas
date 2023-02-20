@@ -71,6 +71,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "stair": ap1.stair,
                 "floor": ap1.floor,
             },
+            "rooms": ap1.rooms,
             "completion_date": str(ap1.completion_date),
             "ownerships": [
                 {
@@ -118,8 +119,9 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "link": f"/api/v1/housing-companies/{hc1.uuid.hex}/apartments/{ap1.uuid.hex}",
                 },
             },
-            "sell_by_date": None,
+            "has_conditions_of_sale": False,
             "has_grace_period": False,
+            "sell_by_date": None,
         },
         {
             "id": ap2.uuid.hex,
@@ -134,6 +136,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "stair": ap2.stair,
                 "floor": ap2.floor,
             },
+            "rooms": ap2.rooms,
             "links": {
                 "housing_company": {
                     "id": hc2.uuid.hex,
@@ -162,8 +165,9 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             },
             "completion_date": str(ap2.completion_date),
             "ownerships": [],
-            "sell_by_date": None,
+            "has_conditions_of_sale": False,
             "has_grace_period": False,
+            "sell_by_date": None,
         },
     ]
     assert response.json()["page"] == {
@@ -226,9 +230,9 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
         [{"owner_name": "etimus pri"}, 1],
         [{"owner_identifier": "010199-123A"}, 1],
         [{"owner_identifier": "010199-123a"}, 1],
-        [{"sales_condition": "True"}, 2],
-        [{"sales_condition": "true"}, 2],
-        [{"sales_condition": "1"}, 2],
+        [{"has_conditions_of_sale": "True"}, 2],
+        [{"has_conditions_of_sale": "true"}, 2],
+        [{"has_conditions_of_sale": "1"}, 2],
     ],
 )
 @pytest.mark.django_db

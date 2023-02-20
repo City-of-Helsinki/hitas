@@ -186,9 +186,9 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
 // ********************************
 
 const ApartmentAddressSchema = object({
-    street_address: string().nullable(),
+    street_address: string(),
     postal_code: string().optional(),
-    city: string().optional(),
+    city: string().optional(), // Read only
     apartment_number: number().nullable(),
     floor: number().nullable(),
     stair: string().min(1, "Pakollinen kenttä!"),
@@ -242,7 +242,7 @@ const ApartmentConditionOfSaleSchema = object({
         address: ApartmentAddressSchema,
         housing_company: ApartmentLinkedModelSchema.and(object({display_name: string()})),
     }),
-    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
+    grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable(),
 });
 
@@ -266,7 +266,7 @@ const ConditionOfSaleSchema = object({
             }),
         })
     ),
-    grace_period: string(), // FIXME: should be literal: "not_given" | "three_months" | "six_months",
+    grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable(),
 });
 const ApartmentUnconfirmedMaximumPriceSchema = object({maximum: boolean(), value: number()});
@@ -287,12 +287,12 @@ const ApartmentConfirmedMaximumPriceSchema = object({
 }).nullable();
 
 const ApartmentPricesSchema = object({
-    first_sale_purchase_price: number().nullable(),
-    first_sale_share_of_housing_company_loans: number().nullable(),
-    first_sale_acquisition_price: number().optional(),
-    first_purchase_date: string().nullable(),
-    latest_sale_purchase_price: number().nullable(),
-    latest_purchase_date: string().nullable(),
+    first_sale_purchase_price: number().nullable(), // Read only
+    first_sale_share_of_housing_company_loans: number().nullable(), // Read only
+    first_sale_acquisition_price: number().optional(), // Read only
+    first_purchase_date: string().nullable(), // Read only
+    latest_sale_purchase_price: number().nullable(), // Read only
+    latest_purchase_date: string().nullable(), // Read only
     construction: object({
         loans: number().nullable(),
         additional_work: number().nullable(),
@@ -303,6 +303,7 @@ const ApartmentPricesSchema = object({
         debt_free_purchase_price: number().nullable(),
     }),
     maximum_prices: object({
+        // Read only
         confirmed: ApartmentConfirmedMaximumPriceSchema,
         unconfirmed: object({
             onwards_2011: ApartmentUnconfirmedMaximumPriceIndicesSchema,
@@ -311,7 +312,21 @@ const ApartmentPricesSchema = object({
     }),
 });
 
-const ApartmentSharesSchema = object({start: number(), end: number(), total: number()}).nullable();
+const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
+    first_sale_purchase_price: true,
+    first_sale_share_of_housing_company_loans: true,
+    first_sale_acquisition_price: true,
+    first_purchase_date: true,
+    latest_sale_purchase_price: true,
+    latest_purchase_date: true,
+    maximum_prices: true,
+});
+
+const ApartmentSharesSchema = object({
+    start: number().nullable(),
+    end: number().nullable(),
+    total: number(),
+});
 
 const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     object({
@@ -330,6 +345,9 @@ const ApartmentSchema = object({
     housing_company: string(),
     ownerships: ownershipsSchema,
     links: ApartmentLinkedModelsSchema,
+    has_conditions_of_sale: boolean(),
+    has_grace_period: boolean(),
+    sell_by_date: string().nullable(),
 });
 
 const ApartmentDetailsSchema = object({
@@ -358,9 +376,9 @@ const ApartmentWritableSchema = object({
     type: object({id: string().nullable()}),
     surface_area: number().nullable(),
     rooms: number().nullable(),
-    shares: object({start: number().nullable(), end: number().nullable()}),
+    shares: ApartmentSharesSchema.omit({total: true}),
     address: ApartmentAddressSchema,
-    prices: ApartmentPricesSchema.omit({maximum_prices: true, first_sale_acquisition_price: true}),
+    prices: ApartmentWritablePricesSchema,
     completion_date: string().nullish(),
     building: object({id: string()}),
     ownerships: ownershipsSchema,
@@ -370,6 +388,16 @@ const ApartmentWritableSchema = object({
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
 });
+
+const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
+    building: true,
+    address: true,
+}).and(
+    object({
+        building: object({label: string(), value: string()}),
+        address: ApartmentAddressSchema.omit({street_address: true, city: true}),
+    })
+);
 
 const ApartmentSaleFormSchema = object({
     key: string().optional(),
@@ -397,6 +425,17 @@ const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
         ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
     })
 );
+
+const ApartmentSaleCreatedSchema = object({
+    id: string(),
+    ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
+    notification_date: string(),
+    purchase_date: string(),
+    purchase_price: number(),
+    apartment_share_of_housing_company_loans: number(),
+    exclude_from_statistics: boolean(),
+    conditions_of_sale_created: boolean(),
+});
 
 // ********************************
 // * Maximum price schemas
@@ -737,6 +776,7 @@ export {
     ApartmentSchema,
     ApartmentDetailsSchema,
     ApartmentWritableSchema,
+    ApartmentWritableFormSchema,
     ApartmentMaximumPriceSchema,
     ApartmentMaximumPrice2011OnwardsSchema,
     ApartmentMaximumPricePre2011Schema,
@@ -779,8 +819,10 @@ export type IApartmentConstructionPriceIndexImprovement = z.infer<
 export type IApartment = z.infer<typeof ApartmentSchema>;
 export type IApartmentDetails = z.infer<typeof ApartmentDetailsSchema>;
 export type IApartmentWritable = z.infer<typeof ApartmentWritableSchema>;
+export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>;
 export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
 export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
+export type IApartmentSaleCreated = z.infer<typeof ApartmentSaleCreatedSchema>;
 export type IIndexCalculation = z.infer<typeof IndexCalculationSchema>;
 export type ICommonCalculationVars = z.infer<typeof CommonCalculationVarsSchema>;
 export type ICalculationVars2011Onwards = z.infer<typeof CalculationVars2011OnwardsSchema>;

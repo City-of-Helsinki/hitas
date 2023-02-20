@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.viewsets import ViewSet
 
-from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
 from hitas.calculations.max_prices import create_max_price_calculation
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Apartment, HousingCompany
@@ -32,36 +31,15 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         )
 
         # Calculate max price
-        try:
-            max_prices = create_max_price_calculation(
-                housing_company_uuid=kwargs["housing_company_uuid"],
-                apartment_uuid=kwargs["apartment_uuid"],
-                calculation_date=calculation_date,
-                apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
-                apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
-                additional_info=serializer.validated_data.get("additional_info", ""),
-            )
-            return Response(max_prices)
-        except InvalidCalculationResultException:
-            return Response(
-                {
-                    "error": "invalid_calculation_result",
-                    "message": "Maximum price calculation could not be completed.",
-                    "reason": "Conflict",
-                    "status": 409,
-                },
-                status=HTTPStatus.CONFLICT,
-            )
-        except IndexMissingException:
-            return Response(
-                {
-                    "error": "index_missing",
-                    "message": "One or more indices required for max price calculation is missing.",
-                    "reason": "Conflict",
-                    "status": 409,
-                },
-                status=HTTPStatus.CONFLICT,
-            )
+        max_prices = create_max_price_calculation(
+            housing_company_uuid=kwargs["housing_company_uuid"],
+            apartment_uuid=kwargs["apartment_uuid"],
+            calculation_date=calculation_date,
+            apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
+            apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
+            additional_info=serializer.validated_data.get("additional_info", ""),
+        )
+        return Response(max_prices)
 
     def retrieve(self, request, *args, **kwargs):
         # Verify housing company and apartment exists (so we can raise an appropriate error)

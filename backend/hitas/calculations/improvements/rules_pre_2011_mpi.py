@@ -296,7 +296,7 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
     else:
         # Use 2011 calculations as it's the same as this
         result = calculate_single_housing_company_improvement_2011_onwards(
-            improvement, calculation_date_index, total_surface_area, apartment_surface_area
+            improvement, calculation_date_index, total_surface_area, apartment_surface_area, calculation_date, "mpi"
         )
         return HousingCompanyImprovementCalculationResult(
             name=result.name,

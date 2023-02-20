@@ -9,7 +9,7 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 
 
 class CalculatorRules:
-    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice) -> None:
+    def validate_indices(self, apartment: ApartmentWithAnnotationsMaxPrice, calculation_date: datetime.date) -> None:
         raise NotImplementedError()
 
     def calculate_construction_price_index_max_price(
