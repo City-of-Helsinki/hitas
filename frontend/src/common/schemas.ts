@@ -658,6 +658,7 @@ const ApartmentMaximumPriceSchema = object({
     id: string(),
     index: z.enum(indexNames),
     maximum_price: number(),
+    maximum_price_per_square: number(),
     created_at: string(),
     confirmed_at: string().nullable(),
     calculation_date: string(),

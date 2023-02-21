@@ -182,6 +182,7 @@ def calculate_max_price(
         "calculation_date": calculation_date,
         "valid_until": valid_until,
         "maximum_price": max_price,
+        "maximum_price_per_square": max_price / apartment.surface_area,
         "index": max_index,
         "new_hitas": new_hitas_rules,
         "calculations": {
