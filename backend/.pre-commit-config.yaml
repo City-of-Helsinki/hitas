@@ -21,7 +21,6 @@ repos:
     -   id: ruff
         args: [
             "--fix",
-            "--force-exclude",
             ]
 
 -   repo: https://github.com/pycqa/bandit
