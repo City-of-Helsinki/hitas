@@ -72,7 +72,7 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                 <ListPageNumbers
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
-                    pageInfo={(data as IHousingCompanyListResponse).page}
+                    pageInfo={(data as IHousingCompanyListResponse)?.page}
                 />
             </QueryStateHandler>
         </div>
