@@ -227,6 +227,34 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
+def test__api__apartment__list__those_with_conditions_of_sale_come_first(api_client: HitasAPIClient):
+    hc: HousingCompany = HousingCompanyFactory.create()
+    re: RealEstate = RealEstateFactory.create(housing_company=hc)
+    b: Building = BuildingFactory.create(real_estate=re)
+    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1)
+    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2)
+    ap3: Apartment = ApartmentFactory.create(building=b, apartment_number=3)
+
+    o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
+    o2: Ownership = OwnershipFactory.create(apartment=ap3, owner=o1.owner, percentage=100)
+
+    ConditionOfSaleFactory.create(
+        new_ownership=o2,
+        old_ownership=o1,
+        grace_period=GracePeriod.NOT_GIVEN,
+    )
+
+    response = api_client.get(reverse("hitas:apartment-list", args=[hc.uuid.hex]))
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    response_data = response.json()["contents"]
+    assert len(response_data) == 3
+    assert response_data[0]["id"] == ap1.uuid.hex
+    assert response_data[1]["id"] == ap3.uuid.hex
+    assert response_data[2]["id"] == ap2.uuid.hex
+
+
+@pytest.mark.django_db
 def test__api__apartment__list__minimal(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)

@@ -1,7 +1,6 @@
 import datetime
 import uuid
 from decimal import Decimal
-from http import HTTPStatus
 from itertools import chain
 from typing import Any, Dict, Optional, Union, Iterable
 
@@ -35,7 +34,6 @@ from hitas.models import (
     Ownership,
     SurfaceAreaPriceCeiling,
     ConditionOfSale,
-    ApartmentSale,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
@@ -51,7 +49,6 @@ from hitas.services.apartment import (
     subquery_first_purchase_date,
     subquery_latest_purchase_date,
 )
-from hitas.models.apartment_sale import ApartmentSaleWithAnnotations
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.services.condition_of_sale import condition_of_sale_queryset
 from hitas.models.ownership import check_ownership_percentages, OwnershipLike
@@ -61,8 +58,6 @@ from hitas.utils import (
     valid_uuid,
     lookup_model_id_by_uuid,
     check_for_overlap,
-    subquery_count,
-    subquery_first_id,
 )
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalOwnerSerializer, MinimalApartmentSerializer
@@ -864,7 +859,7 @@ class ApartmentViewSet(HitasModelViewSet):
                     output_field=models.BooleanField(),
                 ),
             )
-            .order_by("apartment_number", "id")
+            .order_by("-has_conditions_of_sale", "apartment_number", "id")
         )
 
     def get_list_queryset(self):
