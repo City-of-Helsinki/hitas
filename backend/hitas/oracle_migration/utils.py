@@ -3,13 +3,12 @@ from typing import Optional, Type
 
 import pytz
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from enumfields import Enum
 from sqlalchemy.engine import LegacyRow
 
 from hitas.models import BuildingType, HousingCompanyState
 from hitas.models.apartment import DepreciationPercentage
-
-from django.utils.translation import gettext_lazy as _
 
 TZ = pytz.timezone("Europe/Helsinki")
 
