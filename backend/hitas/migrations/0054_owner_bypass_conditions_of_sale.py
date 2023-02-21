@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0053_remove_start_and_end_date_from_ownership"),
     ]

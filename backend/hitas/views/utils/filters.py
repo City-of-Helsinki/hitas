@@ -12,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet, filter
 from hitas.exceptions import HitasModelNotFound
 
 FILTER_FOR_DBFIELD_DEFAULTS = deepcopy(filterset.FILTER_FOR_DBFIELD_DEFAULTS)
-for (field_class, filter_class) in FILTER_FOR_DBFIELD_DEFAULTS.items():
+for field_class, filter_class in FILTER_FOR_DBFIELD_DEFAULTS.items():
     if filter_class["filter_class"] == CharFilter:
         FILTER_FOR_DBFIELD_DEFAULTS[field_class]["extra"] = lambda f: {"lookup_expr": "icontains"}
 

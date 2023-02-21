@@ -8,7 +8,6 @@ import hitas.models.apartment
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0019_alter_financingmethod_options"),
     ]

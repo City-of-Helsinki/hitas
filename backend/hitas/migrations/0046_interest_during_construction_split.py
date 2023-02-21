@@ -9,7 +9,6 @@ import hitas.models._base
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0045_rename_valid_ssn_owner_valid_identifier"),
     ]

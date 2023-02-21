@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0028_housing_company_remove_realized_acquisition_price"),
     ]

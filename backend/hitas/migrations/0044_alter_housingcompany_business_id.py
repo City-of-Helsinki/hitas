@@ -6,7 +6,6 @@ import hitas.models.utils
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0043_owner_valid_ssn"),
     ]

@@ -21,7 +21,6 @@ def remove_zero_value_indices(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0038_bump_json_version"),
     ]

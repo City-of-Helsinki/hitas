@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0035_apartment_max_price_calc_json_optional"),
     ]

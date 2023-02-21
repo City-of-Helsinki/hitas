@@ -11,7 +11,6 @@ import hitas.models.condition_of_sale
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0050_change_apartment_sale_statistics_field_name"),
     ]

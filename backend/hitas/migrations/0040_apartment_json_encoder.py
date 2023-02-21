@@ -7,7 +7,6 @@ import hitas.types
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0039_indices_min_value"),
     ]

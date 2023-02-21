@@ -15,7 +15,6 @@ from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
 class ApartmentSaleSerializer(HitasModelSerializer):
-
     ownerships = OwnershipSerializer(many=True)
 
     def to_internal_value(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -47,7 +46,6 @@ class ApartmentSaleSerializer(HitasModelSerializer):
 
 
 class ApartmentSaleCreateSerializer(HitasModelSerializer):
-
     ownerships = OwnershipSerializer(many=True)
     conditions_of_sale_created = serializers.ReadOnlyField(default=False)
 

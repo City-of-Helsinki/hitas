@@ -27,7 +27,6 @@ def migrate_owners(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0008_remove_postal_code_from_real_estate_building_apartment"),
     ]

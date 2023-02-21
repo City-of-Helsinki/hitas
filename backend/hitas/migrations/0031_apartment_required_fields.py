@@ -11,7 +11,6 @@ import hitas.models.apartment
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0030_apartment_rooms"),
     ]

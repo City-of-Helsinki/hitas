@@ -11,7 +11,6 @@ import hitas.models._base
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0048_bump_json_version_to_5"),
     ]

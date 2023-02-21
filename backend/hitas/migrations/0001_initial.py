@@ -17,7 +17,6 @@ import hitas.models.utils
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

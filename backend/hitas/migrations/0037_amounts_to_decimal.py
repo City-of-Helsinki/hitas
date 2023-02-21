@@ -9,7 +9,6 @@ import hitas.models._base
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0036_update_max_price_calc_json_version"),
     ]
