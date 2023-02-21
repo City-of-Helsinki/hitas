@@ -1,5 +1,5 @@
 import datetime
-from typing import TypeVar, Union, overload
+from typing import Any, TypeVar, Union, overload
 from uuid import UUID
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -140,3 +140,15 @@ class DateOnlyField(serializers.DateField):
         if isinstance(value, datetime.datetime):
             value = value.date()
         return super().to_internal_value(value)
+
+
+class IntegerOrEmpty(serializers.IntegerField):
+    """Integer field with an additional empty value allowed."""
+
+    def validate_empty_values(self, data) -> tuple[bool, Any]:
+        if data == "..":
+            if not self.allow_null:
+                self.fail("null")
+            return True, None
+
+        return super().validate_empty_values(data)

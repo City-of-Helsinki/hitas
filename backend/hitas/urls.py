@@ -17,7 +17,9 @@ router.register(
     basename="market-price-index-2005-equal-100",
 )
 router.register(
-    r"indices/construction-price-index", views.ConstructionPriceIndexViewSet, basename="construction-price-index"
+    r"indices/construction-price-index",
+    views.ConstructionPriceIndexViewSet,
+    basename="construction-price-index",
 )
 router.register(
     r"indices/construction-price-index-2005-equal-100",
@@ -28,6 +30,11 @@ router.register(
     r"indices/surface-area-price-ceiling",
     views.SurfaceAreaPriceCeilingViewSet,
     basename="surface-area-price-ceiling",
+)
+router.register(
+    r"external-sales-data",
+    views.ExternalSalesDataView,
+    basename="external-sales-data",
 )
 
 # Codes
