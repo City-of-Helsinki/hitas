@@ -30,7 +30,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-    path = Path(__file__).parent.parent / "static" / "mallihinnasto.xlsx"
+    path = Path(__file__).parent.parent / "static" / "myyntihintaluettelo_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -199,7 +199,7 @@ def test__api__sales_catalog__missing_apartment_types(api_client: HitasAPIClient
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-    path = Path(__file__).parent.parent / "static" / "mallihinnasto.xlsx"
+    path = Path(__file__).parent.parent / "static" / "myyntihintaluettelo_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -480,7 +480,7 @@ def test__api__sales_catalog__invalid_data(api_client: HitasAPIClient, invalid_d
     )
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-    path = Path(__file__).parent.parent / "static" / "mallihinnasto.xlsx"
+    path = Path(__file__).parent.parent / "static" / "myyntihintaluettelo_esimerkki.xlsx"
     wb: Workbook = load_workbook(path, data_only=True)
     ws: Worksheet = wb.worksheets[0]
 
