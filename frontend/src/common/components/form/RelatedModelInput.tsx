@@ -76,6 +76,14 @@ const RelatedModelInput = ({
         }
     };
 
+    const handleKeyDown = (e) => {
+        // Make other key presses than Tab (and Shift+Tab) open the modal
+        if (e.code !== ("Tab" || "Shift")) {
+            e.preventDefault();
+            openModal();
+        }
+    };
+
     return (
         <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>
             {children ? (
@@ -91,7 +99,7 @@ const RelatedModelInput = ({
                     invalid={errors[fieldName]}
                     buttonIcon={!required && formObject.getValues(fieldName) ? <IconCrossCircle /> : <IconSearch />}
                     onButtonClick={!required && formObject.getValues(fieldName) ? clearFieldValue : openModal}
-                    onKeyDown={!required && formObject.getValues(fieldName) ? clearFieldValue : openModal}
+                    onKeyDown={(e) => handleKeyDown(e)}
                     onClick={openModal}
                 />
             )}
