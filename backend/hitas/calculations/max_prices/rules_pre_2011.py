@@ -180,6 +180,7 @@ class RulesPre2011(CalculatorRules):
                 value=i.value,
                 completion_date=i.completion_date,
                 completion_date_index=i.completion_date_index,
+                no_deductions=i.no_deductions,
             )
             for i in apartment_improvements
         ]

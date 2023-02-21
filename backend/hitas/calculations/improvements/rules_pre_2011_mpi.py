@@ -92,6 +92,20 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
     calculation_date_index: Decimal,
     apartment_surface_area: Decimal,
 ) -> ApartmentImprovementCalculationResult:
+    # In a few cases the improvement value should be fully accepted without any deductions.
+    if improvement.no_deductions:
+        return ApartmentImprovementCalculationResult(
+            name=improvement.name,
+            value=improvement.value,
+            completion_date=improvement.completion_date,
+            value_without_excess=improvement.value,
+            depreciation=ApartmentImprovementCalculationResult.Depreciation(
+                time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(0),
+                amount=Decimal(0),
+            ),
+            accepted_value=improvement.value,
+        )
+
     #
     # Calculate the excess
     #

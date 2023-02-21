@@ -430,3 +430,45 @@ def test_calculate_apartment_improvements_before_2011_market_price_index():
     assert result.summary.value_without_excess == 296_000
     assert result.summary.depreciation == 296_000
     assert result.summary.accepted_value == 0
+
+
+def test_calculate_apartment_improvements_before_2011_market_price_index_no_deductions():
+    improvement = ImprovementData(
+        name="Test improvement",
+        value=Decimal(150_000),
+        completion_date=datetime.date(2009, 5, 1),
+        completion_date_index=Decimal(129.2),
+        no_deductions=True,
+    )
+
+    result = calculate_apartment_improvements_pre_2011_market_price_index(
+        [improvement, improvement],
+        calculation_date=datetime.date(2022, 5, 1),
+        calculation_date_index=Decimal(100.0),
+        apartment_surface_area=Decimal(20.0),
+    )
+
+    assert result is not None
+
+    # Verify item
+    assert result.items[0].name == improvement.name
+    assert result.items[0].value == improvement.value
+    assert result.items[0].completion_date == improvement.completion_date
+    assert result.items[0].value_without_excess == improvement.value
+    assert result.items[0].depreciation is not None
+    assert result.items[0].depreciation.amount == 0
+    assert result.items[0].depreciation.time is not None
+    assert result.items[0].depreciation.time.years == 0
+    assert result.items[0].depreciation.time.months == 0
+    assert roundup(result.items[0].accepted_value) == improvement.value
+
+    # Verify summary
+    assert result.summary is not None
+    assert result.summary.value == improvement.value * 2
+    assert result.summary.excess is not None
+    assert result.summary.excess.surface_area == 20
+    assert result.summary.excess.value_per_square_meter == 100
+    assert result.summary.excess.total == 2000
+    assert result.summary.value_without_excess == improvement.value * 2
+    assert result.summary.depreciation == 0
+    assert result.summary.accepted_value == improvement.value * 2
