@@ -6428,8 +6428,8 @@ components:
         confirmation_date:
           description: Sales catalog confirmation date
           type: string
-          format: date-time
-          example: 2022-07-05T15:42:39.64745
+          format: date
+          example: 2022-07-05
         total_surface_area:
           description: Total surface area of all apartments
           type: number

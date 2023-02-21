@@ -1,3 +1,4 @@
+import datetime
 from typing import TypeVar, Union, overload
 from uuid import UUID
 
@@ -132,3 +133,10 @@ class NumberOrRangeField(serializers.IntegerField):
             return int(value)
         except (ValueError, TypeError) as error:
             raise ValidationError(f"Value {value!r} is not an integer or an integer range") from error
+
+
+class DateOnlyField(serializers.DateField):
+    def to_internal_value(self, value):
+        if isinstance(value, datetime.datetime):
+            value = value.date()
+        return super().to_internal_value(value)

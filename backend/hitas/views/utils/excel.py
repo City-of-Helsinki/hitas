@@ -121,6 +121,7 @@ def parse_sheet(
     for validator in row_post_validators:
         validator(row_data, row_format, errors)
 
+    # Add row data so that extra serializer can access it if needed
     extra_data[row_data_key] = row_data
 
     # Extra data validation
@@ -130,6 +131,9 @@ def parse_sheet(
         error: list[ErrorDetail]
         for field_name, error in extra.errors.items():
             errors[f"{field_name_to_cell[field_name]}.{field_name}"] = error
+
+    extra_data = extra.data
+    extra_data[row_data_key] = row_data
 
     if errors:
         raise ValidationError(errors)

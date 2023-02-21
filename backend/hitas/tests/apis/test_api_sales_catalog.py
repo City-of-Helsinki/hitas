@@ -180,7 +180,7 @@ def test__api__sales_catalog(api_client: HitasAPIClient):
                 "surface_area": 65.0,
             },
         ],
-        "confirmation_date": "2021-08-06T00:00:00",
+        "confirmation_date": "2021-08-06",
         "acquisition_price_limit": 2060000,
         "total_acquisition_price": 2055000,
         "total_surface_area": 560,
