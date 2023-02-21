@@ -84,8 +84,8 @@ const LoadedApartmentSalesPage = ({
     const [maxPrices, setMaxPrices] = useState({
         maximumPrice: apartment.prices.maximum_prices.confirmed?.maximum_price,
         maxPricePerSquare: maxPriceCalculation
-            ? maxPriceCalculation.calculations.construction_price_index.calculation_variables.debt_free_price_m2
-            : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price_m2,
+            ? maxPriceCalculation.maximum_price_per_square
+            : maxPriceData?.maximum_price_per_square,
         debtFreePurchasePrice: maxPriceCalculation
             ? maxPriceCalculation.calculations.construction_price_index.calculation_variables.debt_free_price
             : maxPriceData?.calculations.construction_price_index.calculation_variables.debt_free_price,
