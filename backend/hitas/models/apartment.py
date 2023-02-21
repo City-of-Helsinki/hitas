@@ -371,6 +371,11 @@ class ApartmentWithAnnotationsMaxPrice(Apartment):
 class ApartmentMarketPriceImprovement(HitasImprovement):
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="market_price_improvements")
 
+    # No deductions = Excess is not removed from this apartment, and the improvement does not deprecate
+    # This mean that the full value of the improvement is always added to the price of the apartment
+    # This is used e.g. for construction an attic room, elevators or repair costs of construction defects
+    no_deductions = models.BooleanField(default=False)
+
 
 class DepreciationPercentage(Enum):
     ZERO = Decimal(0)

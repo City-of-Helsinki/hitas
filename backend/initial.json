@@ -417,7 +417,8 @@
       "name": "Officiis architecto numquam maxime.",
       "completion_date": "2011-03-01",
       "value": "20697.00",
-      "apartment": 1
+      "apartment": 1,
+      "no_deductions": false
     }
   },
   {
@@ -429,7 +430,8 @@
       "name": "Consectetur architecto ipsa quas debitis.",
       "completion_date": "2011-12-01",
       "value": "65252.00",
-      "apartment": 2
+      "apartment": 2,
+      "no_deductions": false
     }
   },
   {
@@ -441,7 +443,8 @@
       "name": "Ab quibusdam soluta laudantium eveniet inventore fugiat.",
       "completion_date": "2011-09-01",
       "value": "15030.00",
-      "apartment": 2
+      "apartment": 2,
+      "no_deductions": false
     }
   },
   {
@@ -453,7 +456,8 @@
       "name": "Dolor fugiat dolores quo quae.",
       "completion_date": "2014-07-01",
       "value": "7568.00",
-      "apartment": 3
+      "apartment": 3,
+      "no_deductions": false
     }
   },
   {
@@ -465,7 +469,8 @@
       "name": "Fugit ratione distinctio voluptate iste facilis similique.",
       "completion_date": "2016-08-01",
       "value": "6599.00",
-      "apartment": 4
+      "apartment": 4,
+      "no_deductions": false
     }
   },
   {
@@ -477,7 +482,8 @@
       "name": "Ab explicabo debitis adipisci unde facilis.",
       "completion_date": "2017-11-01",
       "value": "34980.00",
-      "apartment": 5
+      "apartment": 5,
+      "no_deductions": false
     }
   },
   {
@@ -489,7 +495,8 @@
       "name": "Dolorum ratione unde.",
       "completion_date": "2012-07-01",
       "value": "11651.00",
-      "apartment": 6
+      "apartment": 6,
+      "no_deductions": false
     }
   },
   {
@@ -513,7 +520,8 @@
       "name": "Incidunt asperiores repellat quisquam quibusdam.",
       "completion_date": "2020-11-01",
       "value": "96998.00",
-      "apartment": 6
+      "apartment": 6,
+      "no_deductions": false
     }
   },
   {
@@ -525,7 +533,8 @@
       "name": "Illum recusandae ducimus libero quas sed.",
       "completion_date": "2012-07-01",
       "value": "75447.00",
-      "apartment": 7
+      "apartment": 7,
+      "no_deductions": false
     }
   },
   {
@@ -537,7 +546,8 @@
       "name": "Consequatur natus culpa molestiae voluptate distinctio.",
       "completion_date": "2020-06-01",
       "value": "10604.00",
-      "apartment": 7
+      "apartment": 7,
+      "no_deductions": false
     }
   },
   {
@@ -549,7 +559,8 @@
       "name": "Nemo magni mollitia sint numquam quas unde.",
       "completion_date": "2015-01-01",
       "value": "62621.00",
-      "apartment": 8
+      "apartment": 8,
+      "no_deductions": false
     }
   },
   {
@@ -561,7 +572,8 @@
       "name": "Enim perspiciatis sequi dolorum ab.",
       "completion_date": "2019-03-01",
       "value": "22659.00",
-      "apartment": 8
+      "apartment": 8,
+      "no_deductions": false
     }
   },
   {
@@ -573,7 +585,8 @@
       "name": "Commodi repudiandae recusandae nam.",
       "completion_date": "2016-02-01",
       "value": "51857.00",
-      "apartment": 8
+      "apartment": 8,
+      "no_deductions": false
     }
   },
   {
