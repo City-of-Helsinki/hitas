@@ -2267,6 +2267,79 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # External Sales Data
+
+  /api/v1/external-sales-data:
+
+    post:
+      description: Read cost area sales catalog from statistics center to external sales data
+      operationId: create-external-sales-data
+      tags:
+        - External Sales Data
+      requestBody:
+        required: true
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+          application/vnd.ms-excel:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: Successfully read excel sheet
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ExternalSalesData'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptableExcel'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaTypeExcel'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/external-sales-data/{quarter}:
+
+    get:
+      description: Read external sales data for the quarter
+      operationId: read-external-sales-data
+      tags:
+        - External Sales Data
+      parameters:
+        - name: quarter
+          required: true
+          in: path
+          description: Calculation quarter
+          schema:
+            type: string
+            example: 2022Q1
+      responses:
+        '200':
+          description: Successfully read external sales data for the quarter
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ExternalSalesData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Property Manager
 
   /api/v1/property-managers:
@@ -6434,8 +6507,8 @@ components:
         confirmation_date:
           description: Sales catalog confirmation date
           type: string
-          format: date-time
-          example: 2022-07-05T15:42:39.64745
+          format: date
+          example: 2022-07-05
         total_surface_area:
           description: Total surface area of all apartments
           type: number
@@ -6607,6 +6680,74 @@ components:
           minimum: 0
           nullable: true
           example: 4208
+
+    ExternalSalesData:
+      description: External sales data from cost area sales catalog
+      type: object
+      additionalProperties: false
+      required:
+        - calculation_quarter
+        - quarter_1
+        - quarter_2
+        - quarter_3
+        - quarter_4
+      properties:
+        calculation_quarter:
+          description: Quarter this calculation is for.
+          type: string
+          example: 2022Q1
+        quarter_1:
+          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+        quarter_2:
+          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+        quarter_3:
+          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+        quarter_4:
+          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+
+    ExternalSalesDataQuarter:
+      description: External sales data quarter
+      type: object
+      additionalProperties: false
+      required:
+        - quarter
+        - areas
+      properties:
+        quarter:
+          description: Quarter this calculation is for.
+          type: string
+          example: 2022Q1
+        areas:
+          description: Cost areas for this quarter.
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalSalesDataCostAreaData'
+
+    ExternalSalesDataCostAreaData:
+      description: External sales data quarter cost areas
+      type: object
+      additionalProperties: false
+      required:
+        - postal_code
+        - sale_count
+        - price
+      properties:
+        postal_code:
+          description: Cost area postal code.
+          type: string
+          example: 00120
+        sale_count:
+          description: Sale count.
+          type: integer
+          minimum: 0
+          nullable: true
+          example: 150
+        price:
+          description: Square area price, arithmetic.
+          type: integer
+          minimum: 0
+          nullable: true
+          example: 28490
 
     # Errors
 

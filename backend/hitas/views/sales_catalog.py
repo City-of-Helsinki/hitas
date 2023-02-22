@@ -12,7 +12,7 @@ from rest_framework.viewsets import ViewSet
 from hitas.models import Apartment, ApartmentType, Building, HousingCompany, RealEstate
 from hitas.utils import check_for_overlap, lookup_model_by_uuid
 from hitas.views.utils.excel import ErrorData, NewExcelParser, OldExcelParser, RowFormat, error_key, parse_sheet
-from hitas.views.utils.fields import NumberOrRangeField, UUIDRelatedField
+from hitas.views.utils.fields import DateOnlyField, NumberOrRangeField, UUIDRelatedField
 
 
 class MinimalApartmentType(TypedDict):
@@ -64,7 +64,7 @@ class SalesCatalogApartmentSerializer(serializers.Serializer):
 
 
 class SalesCatalogDataSerializer(serializers.Serializer):
-    confirmation_date = serializers.DateTimeField()
+    confirmation_date = DateOnlyField()
     total_surface_area = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_acquisition_price = serializers.DecimalField(max_digits=15, decimal_places=2)
     acquisition_price_limit = serializers.DecimalField(max_digits=15, decimal_places=2)
