@@ -10,13 +10,17 @@ import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,
+    IApartmentMarketPriceIndexImprovement,
     IApartmentWritable,
-    IImprovement,
 } from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
-type IWritableImprovement = Omit<IImprovement, "value"> & {value: number | null; key: string; saved: boolean};
+type IWritableMarketImprovement = Omit<IApartmentMarketPriceIndexImprovement, "value"> & {
+    value: number | null;
+    key: string;
+    saved: boolean;
+};
 type IWritableConsImprovement = Omit<IApartmentConstructionPriceIndexImprovement, "value"> & {
     value: number | null;
     key: string;
@@ -69,7 +73,7 @@ const ApartmentImprovementsPage = () => {
     const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
     const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
     const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(state.apartment);
-    const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableImprovement[]>(
+    const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableMarketImprovement[]>(
         apartmentData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
     const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableConsImprovement[]>(
@@ -81,7 +85,9 @@ const ApartmentImprovementsPage = () => {
             ...apartmentData,
             // Don't send empty improvements to the API
             improvements: {
-                market_price_index: marketIndexImprovements.filter((i) => i.value) as IImprovement[],
+                market_price_index: marketIndexImprovements.filter(
+                    (i) => i.value
+                ) as IApartmentMarketPriceIndexImprovement[],
                 construction_price_index: constructionIndexImprovements
                     .filter((i) => i.value)
                     .map((i) => {
@@ -106,6 +112,7 @@ const ApartmentImprovementsPage = () => {
                 name: "",
                 value: null,
                 completion_date: "",
+                no_deductions: false,
             });
         });
     };
@@ -200,7 +207,7 @@ const ApartmentImprovementsPage = () => {
                                         Muodossa 'YYYY-MM', esim. '2022-01'
                                     </Tooltip>
                                 </li>
-                                {marketIndexImprovements.map((improvement: IWritableImprovement, index) => (
+                                {marketIndexImprovements.map((improvement: IWritableMarketImprovement, index) => (
                                     <li
                                         className="improvements-list-item"
                                         key={`market-improvement-item-${improvement.key}`}

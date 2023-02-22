@@ -328,6 +328,11 @@ const ApartmentSharesSchema = object({
     total: number(),
 });
 
+const ApartmentMarketPriceIndexImprovementSchema = ImprovementSchema.and(
+    object({
+        no_deductions: boolean(),
+    })
+);
 const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     object({
         depreciation_percentage: number(), // 0.0 | 2.5 | 10.0
@@ -363,7 +368,7 @@ const ApartmentDetailsSchema = object({
     ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
-        market_price_index: ImprovementSchema.array(),
+        market_price_index: ApartmentMarketPriceIndexImprovementSchema.array(),
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
     links: ApartmentLinkedModelsSchema,
@@ -384,7 +389,7 @@ const ApartmentWritableSchema = object({
     ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
-        market_price_index: ImprovementSchema.array(),
+        market_price_index: ApartmentMarketPriceIndexImprovementSchema.array(),
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
 });
@@ -814,6 +819,7 @@ export type IApartmentUnconfirmedMaximumPrice = z.infer<typeof ApartmentUnconfir
 export type IApartmentUnconfirmedMaximumPriceIndices = z.infer<typeof ApartmentUnconfirmedMaximumPriceIndicesSchema>;
 export type IApartmentConfirmedMaximumPrice = z.infer<typeof ApartmentConfirmedMaximumPriceSchema>;
 export type IApartmentPrices = z.infer<typeof ApartmentPricesSchema>;
+export type IApartmentMarketPriceIndexImprovement = z.infer<typeof ApartmentMarketPriceIndexImprovementSchema>;
 export type IApartmentConstructionPriceIndexImprovement = z.infer<
     typeof ApartmentConstructionPriceIndexImprovementSchema
 >;
