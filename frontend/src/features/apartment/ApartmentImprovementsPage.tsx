@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
+import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
@@ -206,6 +206,16 @@ const ApartmentImprovementsPage = () => {
                                     >
                                         Muodossa 'YYYY-MM', esim. '2022-01'
                                     </Tooltip>
+                                    <header>
+                                        Ei vähennyksiä <span>*</span>
+                                    </header>
+                                    <Tooltip
+                                        className="header__tooltip2"
+                                        placement="left-start"
+                                    >
+                                        Parannuksesta ei vähennetä omavastuu osuutta eikä tehdä poistoja. Käytetään
+                                        ainoastaan vanhoissa Hitas säännöissä.
+                                    </Tooltip>
                                 </li>
                                 {marketIndexImprovements.map((improvement: IWritableMarketImprovement, index) => (
                                     <li
@@ -247,6 +257,18 @@ const ApartmentImprovementsPage = () => {
                                                 )}
                                                 error={error}
                                                 required
+                                            />
+                                        </div>
+                                        <div>
+                                            <Checkbox
+                                                id={`input-no_deductions-${index}`}
+                                                checked={marketIndexImprovements[index].no_deductions}
+                                                onChange={(e) =>
+                                                    handleSetMarketImprovementLine(
+                                                        index,
+                                                        "no_deductions"
+                                                    )(e.target.checked)
+                                                }
                                             />
                                         </div>
                                         <ImprovementRemoveLineButton onClick={() => setMarketIndexToRemove(index)} />
