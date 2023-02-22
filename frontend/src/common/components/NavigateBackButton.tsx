@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Button, IconArrowLeft} from "hds-react";
 import {useNavigate} from "react-router-dom";
 

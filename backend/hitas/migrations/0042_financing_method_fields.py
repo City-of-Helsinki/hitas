@@ -14,7 +14,6 @@ def migrate_financing_methods(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0041_apartment_type_nullable"),
     ]

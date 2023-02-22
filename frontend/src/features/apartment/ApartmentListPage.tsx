@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 
 import {IconLock, SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";

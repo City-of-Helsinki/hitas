@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Combobox, Select} from "hds-react";
 
 import {CommonFormInputFieldProps} from "./FormInputField";

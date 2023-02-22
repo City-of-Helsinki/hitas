@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0047_change_on_delete_rules_to_protect"),
     ]

@@ -1,5 +1,3 @@
-import React from "react";
-
 import {NumberInput} from "hds-react";
 
 import {CommonFormInputFieldProps} from "./FormInputField";

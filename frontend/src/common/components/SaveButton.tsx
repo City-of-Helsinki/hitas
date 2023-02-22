@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Button, IconSaveDisketteFill} from "hds-react";
 
 interface SaveButtonProps {

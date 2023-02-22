@@ -11,7 +11,6 @@ import hitas.models.utils
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0025_indices_update"),
     ]

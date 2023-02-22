@@ -24,7 +24,6 @@ class OwnerSerializer(ReadOnlySerializer):
 
 
 class OwnershipSerializer(serializers.ModelSerializer):
-
     owner = OwnerSerializer()
     percentage = HitasDecimalField(required=True)
 

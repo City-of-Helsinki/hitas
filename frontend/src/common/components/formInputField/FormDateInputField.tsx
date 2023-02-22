@@ -1,5 +1,3 @@
-import React from "react";
-
 import {format, parse} from "date-fns";
 import {DateInput} from "hds-react";
 

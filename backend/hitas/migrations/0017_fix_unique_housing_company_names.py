@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0016_apartment_hitas_apartment_share_number_both_set"),
     ]

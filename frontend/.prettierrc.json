@@ -10,13 +10,5 @@
     "singleQuote": false,
     "bracketSpacing": false,
     "parser": "typescript",
-    "singleAttributePerLine": true,
-    "importOrder": [
-        "^react$",
-        "<THIRD_PARTY_MODULES>",
-        "^[./]"
-    ],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
+    "singleAttributePerLine": true
 }
-

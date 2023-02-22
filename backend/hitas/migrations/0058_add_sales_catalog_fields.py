@@ -9,7 +9,6 @@ import hitas.models._base
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0057_remove_apartment_first_sale_fields"),
     ]

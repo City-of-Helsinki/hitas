@@ -26,7 +26,6 @@ def reverse_migrate_postal_codes(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0003_legacy_code_number_length"),
     ]

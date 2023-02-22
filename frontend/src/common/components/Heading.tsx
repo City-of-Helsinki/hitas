@@ -1,5 +1,3 @@
-import React from "react";
-
 interface HeadingProps {
     children;
     type?: "main" | "list" | "body";

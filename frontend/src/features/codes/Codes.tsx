@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Tabs} from "hds-react";
 
 import IndicesList from "./IndicesList";

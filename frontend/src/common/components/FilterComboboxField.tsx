@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Combobox} from "hds-react";
 
 interface FilterComboboxProps {

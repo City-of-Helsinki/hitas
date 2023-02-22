@@ -47,7 +47,6 @@ class MinimalOwnerSerializer(HitasModelSerializer):
 
 
 class ConditionOfSaleOwnershipSerializer(ModelSerializer):
-
     apartment = MinimalApartmentSerializer()
     owner = MinimalOwnerSerializer()
 
@@ -61,7 +60,6 @@ class ConditionOfSaleOwnershipSerializer(ModelSerializer):
 
 
 class ConditionOfSaleSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
-
     new_ownership = ConditionOfSaleOwnershipSerializer(read_only=True)
     old_ownership = ConditionOfSaleOwnershipSerializer(read_only=True)
     grace_period = EnumField(GracePeriod)
@@ -83,7 +81,6 @@ class ConditionOfSaleSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
 
 class ConditionOfSaleCreateSerializer(serializers.Serializer):
-
     household = serializers.ListField(child=UUIDField())
 
     def validate_household(self, value: list[uuid.UUID]) -> list[Owner]:

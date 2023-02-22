@@ -2,18 +2,18 @@ import datetime
 import uuid
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Dict, Optional, Union, Iterable
+from typing import Any, Dict, Iterable, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Prefetch, Q, Count
+from django.db.models import Count, Prefetch, Q
 from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django_filters.rest_framework import BooleanFilter
-from enumfields.drf import EnumSupportSerializerMixin, EnumField
+from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
@@ -26,6 +26,7 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMaximumPriceCalculation,
     Building,
+    ConditionOfSale,
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
     HousingCompany,
@@ -33,49 +34,42 @@ from hitas.models import (
     MarketPriceIndex2005Equal100,
     Ownership,
     SurfaceAreaPriceCeiling,
-    ConditionOfSale,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
     ApartmentMarketPriceImprovement,
     ApartmentState,
-    DepreciationPercentage,
     ApartmentWithAnnotations,
-)
-from hitas.services.apartment import (
-    subquery_first_sale_purchase_price,
-    subquery_first_sale_loan_amount,
-    subquery_latest_sale_purchase_price,
-    subquery_first_purchase_date,
-    subquery_latest_purchase_date,
+    DepreciationPercentage,
 )
 from hitas.models.condition_of_sale import GracePeriod
-from hitas.services.condition_of_sale import condition_of_sale_queryset
-from hitas.models.ownership import check_ownership_percentages, OwnershipLike
-from hitas.utils import (
-    RoundWithPrecision,
-    this_month,
-    valid_uuid,
-    lookup_model_id_by_uuid,
-    check_for_overlap,
+from hitas.models.ownership import OwnershipLike, check_ownership_percentages
+from hitas.services.apartment import (
+    subquery_first_purchase_date,
+    subquery_first_sale_loan_amount,
+    subquery_first_sale_purchase_price,
+    subquery_latest_purchase_date,
+    subquery_latest_sale_purchase_price,
 )
+from hitas.services.condition_of_sale import condition_of_sale_queryset
+from hitas.utils import RoundWithPrecision, check_for_overlap, lookup_model_id_by_uuid, this_month, valid_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
-from hitas.views.condition_of_sale import MinimalOwnerSerializer, MinimalApartmentSerializer
+from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
+    HitasCharFilter,
     HitasDecimalField,
     HitasEnumField,
+    HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
+    HitasPostalCodeFilter,
     UUIDRelatedField,
     ValueOrNullField,
-    HitasFilterSet,
-    HitasCharFilter,
-    HitasPostalCodeFilter,
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.pdf import get_pdf_response
-from hitas.views.utils.serializers import ReadOnlySerializer, YearMonthSerializer, ApartmentHitasAddressSerializer
+from hitas.views.utils.serializers import ApartmentHitasAddressSerializer, ReadOnlySerializer, YearMonthSerializer
 
 
 class ApartmentFilterSet(HitasFilterSet):

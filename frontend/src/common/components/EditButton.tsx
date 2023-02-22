@@ -1,5 +1,3 @@
-import React from "react";
-
 import {Button, IconPen} from "hds-react";
 import {Link} from "react-router-dom";
 

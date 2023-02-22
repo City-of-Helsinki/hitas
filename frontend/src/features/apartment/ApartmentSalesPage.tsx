@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
@@ -14,8 +14,8 @@ import {
     useSaveApartmentMaximumPriceMutation,
 } from "../../app/services";
 import {Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
-import OwnershipsList from "../../common/components/OwnershipsList";
 import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
+import OwnershipsList from "../../common/components/OwnershipsList";
 import {ApartmentSaleSchema, IApartmentDetails, IApartmentMaximumPrice, IApartmentSaleForm} from "../../common/schemas";
 import {formatDate, formatIndex, formatMoney, hdsToast, today} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";

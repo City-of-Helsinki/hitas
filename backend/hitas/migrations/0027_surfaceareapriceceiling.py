@@ -9,7 +9,6 @@ import hitas.models._base
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("hitas", "0026_housing_company_required_fields"),
     ]

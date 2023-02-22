@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
@@ -29,12 +29,12 @@ import {
     TextInput,
 } from "../../common/components/form";
 import {
+    apartmentStates,
     ApartmentWritableFormSchema,
     IApartmentDetails,
     IApartmentWritable,
     IApartmentWritableForm,
     ICode,
-    apartmentStates,
 } from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
