@@ -374,6 +374,7 @@ class ApartmentMarketPriceImprovement(HitasImprovement):
     # No deductions = Excess is not removed from this apartment, and the improvement does not deprecate
     # This mean that the full value of the improvement is always added to the price of the apartment
     # This is used e.g. for construction an attic room, elevators or repair costs of construction defects
+    # These improvements values are also index adjusted.
     no_deductions = models.BooleanField(default=False)
 
 

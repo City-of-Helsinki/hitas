@@ -8,6 +8,7 @@ from rest_framework import status
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
+    ApartmentMarketPriceImprovement,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
     Ownership,
@@ -17,6 +18,7 @@ from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
+    ApartmentMarketPriceImprovementFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
     OldHitasFinancingMethodFactory,
@@ -455,6 +457,13 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         sales__apartment_share_of_housing_company_loans=0.0,
     )
 
+    mpi_ap_improvement: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(
+        apartment=a, value=10000, completion_date=datetime.date(2003, 5, 1)
+    )
+    mpi_ap_improvement2: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(
+        apartment=a, value=10000, completion_date=datetime.date(2003, 5, 1), no_deductions=True
+    )
+
     mpi_hc_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=0, completion_date=datetime.date(2003, 5, 1)
     )
@@ -499,8 +508,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     assert response_json == {
         "confirmed_at": None,
         "calculation_date": "2022-09-07",
-        "maximum_price": 289735.91,
-        "maximum_price_per_square": 5316.26,
+        "maximum_price": 311864.13,
+        "maximum_price_per_square": 5722.28,
         "valid_until": "2022-12-07",
         "index": "market_price_index",
         "new_hitas": False,
@@ -579,17 +588,32 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "basic_price": 130935.0,
             "index_adjustment": 158800.91,
             "apartment_improvements": {
-                "items": [],
-                "summary": {
-                    "value": 0.0,
-                    "value_without_excess": 0.0,
-                    "depreciation": 0.0,
-                    "excess": {
-                        "surface_area": 54.5,
-                        "total": 5450.0,
-                        "value_per_square_meter": 100.0,
+                "items": [
+                    {
+                        "name": mpi_ap_improvement.name,
+                        "value": 10000.0,
+                        "value_without_excess": 4550.0,
+                        "completion_date": "2003-05-01",
+                        "depreciation": {"amount": 4550.0, "time": {"months": 4, "years": 19}},
+                        "accepted_value": 0.0,
+                        "no_deductions": False,
                     },
-                    "accepted_value": 0.0,
+                    {
+                        "name": mpi_ap_improvement2.name,
+                        "value": 10000.0,
+                        "value_without_excess": 22128.22,
+                        "completion_date": "2003-05-01",
+                        "depreciation": {"amount": 0.0, "time": {"months": 0, "years": 0}},
+                        "accepted_value": 22128.22,
+                        "no_deductions": True,
+                    },
+                ],
+                "summary": {
+                    "value": 20000.0,
+                    "value_without_excess": 22128.22 + 4550.0,
+                    "depreciation": 4550.0,
+                    "excess": {"surface_area": 54.5, "total": 5450.0, "value_per_square_meter": 100.0},
+                    "accepted_value": 22128.22,
                 },
             },
             "housing_company_improvements": {
@@ -608,6 +632,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                         },
                         "accepted_value_for_housing_company": 0.0,
                         "accepted_value": 0.0,
+                        "no_deductions": False,
                     },
                     {
                         "name": mpi_hc_improvement2.name,
@@ -623,6 +648,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                         },
                         "accepted_value_for_housing_company": 0.0,
                         "accepted_value": 0.0,
+                        "no_deductions": False,
                     },
                 ],
                 "summary": {
@@ -640,8 +666,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                     "accepted_value": 0.0,
                 },
             },
-            "debt_free_price": 289735.91,
-            "debt_free_price_m2": 5316.26,
+            "debt_free_price": 311864.13,
+            "debt_free_price_m2": 5722.28,
             "apartment_share_of_housing_company_loans": 0,
             "apartment_share_of_housing_company_loans_date": "2022-09-05",
             "completion_date": "2003-05-09",
@@ -649,7 +675,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "calculation_date": "2022-09-07",
             "calculation_date_index": 583.3,
         },
-        "maximum_price": 289735.91,
+        "maximum_price": 311864.13,
         "valid_until": "2022-12-07",
         "maximum": True,
     }

@@ -4768,6 +4768,9 @@ components:
                 type: number
                 minimum: 0
                 example: 157.26
+              no_deductions:
+                description: Should this improvement be exempt from all deductions (excess, deprecation)
+                type: boolean
         summary:
           description: Summary data across all improvements
           type: object
@@ -4868,6 +4871,7 @@ components:
               - value_without_excess
               - depreciation
               - accepted_value
+              - no_deductions
             properties:
               name:
                 description: Name of this improvement
@@ -4925,6 +4929,9 @@ components:
                 type: number
                 minimum: 0
                 example: 157.26
+              no_deductions:
+                description: Should this improvement be exempt from all deductions (excess, deprecation)
+                type: boolean
         summary:
           description: Summary data across all improvements
           type: object

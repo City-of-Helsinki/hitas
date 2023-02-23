@@ -38,6 +38,8 @@ class ApartmentImprovementCalculationResult:
     depreciation: Depreciation
     # Final accepted value for the improvement
     accepted_value: Decimal
+    # Should this improvement be exempt from all deductions (excess, deprecation)
+    no_deductions: Optional[bool] = False
 
 
 @dataclass
@@ -94,16 +96,18 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
 ) -> ApartmentImprovementCalculationResult:
     # In a few cases the improvement value should be fully accepted without any deductions.
     if improvement.no_deductions:
+        index_adjusted = improvement.value * calculation_date_index / improvement.completion_date_index
         return ApartmentImprovementCalculationResult(
             name=improvement.name,
             value=improvement.value,
             completion_date=improvement.completion_date,
-            value_without_excess=improvement.value,
+            value_without_excess=index_adjusted,
             depreciation=ApartmentImprovementCalculationResult.Depreciation(
                 time=ApartmentImprovementCalculationResult.Depreciation.DepreciationTime.create(0),
                 amount=Decimal(0),
             ),
-            accepted_value=improvement.value,
+            accepted_value=index_adjusted,
+            no_deductions=improvement.no_deductions,
         )
 
     #
@@ -147,6 +151,7 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
         value_without_excess=value_without_excess,
         depreciation=depreciation_result,
         accepted_value=accepted,
+        no_deductions=False,
     )
 
 
@@ -198,7 +203,7 @@ def calculate_multiple_apartment_improvements(
 @dataclass
 class HousingCompanyImprovementCalculationResult(ApartmentImprovementCalculationResult):
     # Final accepted value for the whole housing company
-    accepted_value_for_housing_company: Decimal
+    accepted_value_for_housing_company: Decimal = 0
 
 
 @dataclass
