@@ -595,9 +595,14 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
                 # and the improvements accepted value should not be less than the original value
                 and cpi_improvement["accepted_value"] > cpi_improvement["value"]
             ):
-                cpi_awdc["improvements"].append(new)
-                cpi_awdc["date"] = cpi_improvement.calculation_date
-                continue
+                if new.name == "Ullakkohuoneen rakentaminen":
+                    # 'Attic room' improvements are not considered awdc improvements, as they require special handling
+                    # The special handling is done only for MPI improvements, but we can't consider CPI as AWDC either
+                    pass
+                else:
+                    cpi_awdc["improvements"].append(new)
+                    cpi_awdc["date"] = cpi_improvement.calculation_date
+                    continue
 
             bulk_cpi.append(new)
             count += 1
@@ -630,9 +635,13 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
                 # and the improvements accepted value should not be less than the original value
                 and mpi_improvement["accepted_value"] >= mpi_improvement["value"]
             ):
-                mpi_awdc["improvements"].append(new)
-                mpi_awdc["date"] = mpi_improvement.calculation_date
-                continue
+                if new.name == "Ullakkohuoneen rakentaminen":
+                    # 'Attic room' improvements are not considered awdc improvements, as they require special handling
+                    new.no_deductions = True
+                else:
+                    mpi_awdc["improvements"].append(new)
+                    mpi_awdc["date"] = mpi_improvement.calculation_date
+                    continue
 
             bulk_mpi.append(new)
             count += 1
