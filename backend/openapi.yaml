@@ -3923,6 +3923,9 @@ components:
                     example: 78284.25
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
+                  no_deductions:
+                    description: Should this improvement be exempt from all deductions (excess, deprecation)
+                    type: boolean
             construction_price_index:
               description: List of improvements for construction price index
               type: array
@@ -4789,6 +4792,7 @@ components:
               - depreciation
               - accepted_value_for_housing_company
               - accepted_value
+              - no_deductions
             properties:
               name:
                 description: Name of this improvement

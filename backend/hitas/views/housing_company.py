@@ -102,11 +102,25 @@ class HousingCompanyNameSerializer(serializers.Serializer):
         return value
 
 
-class ImprovementSerializer(serializers.ModelSerializer):
+class MarketPriceImprovementSerializer(serializers.ModelSerializer):
     completion_date = YearMonthSerializer()
+    no_deductions = serializers.BooleanField(default=False)
 
     class Meta:
         model = HousingCompanyMarketPriceImprovement
+        fields = [
+            "name",
+            "completion_date",
+            "value",
+            "no_deductions",
+        ]
+
+
+class ConstructionPriceImprovementSerializer(serializers.ModelSerializer):
+    completion_date = YearMonthSerializer()
+
+    class Meta:
+        model = HousingCompanyConstructionPriceImprovement
         fields = [
             "name",
             "completion_date",
@@ -115,8 +129,10 @@ class ImprovementSerializer(serializers.ModelSerializer):
 
 
 class HousingCompanyImprovementSerializer(serializers.Serializer):
-    market_price_index = ImprovementSerializer(many=True, source="market_price_improvements")
-    construction_price_index = ImprovementSerializer(many=True, source="construction_price_improvements")
+    market_price_index = MarketPriceImprovementSerializer(many=True, source="market_price_improvements")
+    construction_price_index = ConstructionPriceImprovementSerializer(
+        many=True, source="construction_price_improvements"
+    )
 
 
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
@@ -162,7 +178,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             existing_qs=instance.market_price_improvements.all(),
             wanted=mpi,
             create_defaults={"housing_company": instance},
-            equal_fields=["value", "completion_date", "name"],
+            equal_fields=["value", "completion_date", "name", "no_deductions"],
         )
 
         merge_model(

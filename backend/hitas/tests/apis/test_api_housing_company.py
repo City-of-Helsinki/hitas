@@ -371,6 +371,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                     "name": mpi.name,
                     "value": float(mpi.value),
                     "completion_date": mpi.completion_date.strftime("%Y-%m"),
+                    "no_deductions": False,
                 },
             ],
         },
@@ -460,6 +461,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
                     "value": 3456,
                     "name": "market-price-index-improvement",
                     "completion_date": "2022-05",
+                    "no_deductions": False,
                 }
             ],
         },
