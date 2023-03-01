@@ -36,7 +36,7 @@ from hitas.models import FinancingMethod
 # +----------------------------------------------+--------------+----------------------+------------+
 
 
-def financing_method_is_before_2011(financing_method: str):
+def financing_method_is_pre_2011(financing_method: str):
     return not financing_method_is_2011_onwards(financing_method)
 
 
@@ -70,4 +70,4 @@ def format_financing_method(fm: FinancingMethod) -> None:
 
     fm.include_in_statistics = financing_method_include_in_statistics(fm.value)
     fm.half_hitas = financing_method_is_half_hitas(fm.value)
-    fm.old_hitas_ruleset = financing_method_is_before_2011(fm.value)
+    fm.old_hitas_ruleset = financing_method_is_pre_2011(fm.value)

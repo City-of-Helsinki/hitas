@@ -20,6 +20,8 @@ from hitas.calculations.improvements.rules_pre_2011_mpi import (
 )
 from hitas.utils import roundup
 
+# 2011 Onwards
+
 
 def test_calculate_single_housing_company_improvement_2011_onwards():
     improvement = ImprovementData(
@@ -87,7 +89,10 @@ def test_calculate_housing_company_improvements_2011_onwards():
     assert roundup(result.summary.value_for_apartment) == Decimal("314.51")
 
 
-def test_calculate_single_housing_company_improvement_before_2011_construction_price_index():
+# Pre-2011 > CPI > Housing Company
+
+
+def test_calculate_single_housing_company_improvement_pre_2011_construction_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -107,7 +112,7 @@ def test_calculate_single_housing_company_improvement_before_2011_construction_p
     assert result.value_for_apartment == 75_000
 
 
-def test_calculate_housing_company_improvements_before_2011_construction_price_index():
+def test_calculate_housing_company_improvements_pre_2011_construction_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -135,7 +140,10 @@ def test_calculate_housing_company_improvements_before_2011_construction_price_i
     assert result.summary.value_for_apartment == 150_000
 
 
-def test_calculate_single_apartment_improvement_before_2011_construction_price_index():
+# Pre-2011 > CPI > Apartment
+
+
+def test_calculate_single_apartment_improvement_pre_2011_construction_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -165,7 +173,7 @@ def test_calculate_single_apartment_improvement_before_2011_construction_price_i
     assert result.value_for_apartment == 237_500
 
 
-def test_calculate_apartment_improvements_before_2011_construction_price_index():
+def test_calculate_apartment_improvements_pre_2011_construction_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -203,7 +211,10 @@ def test_calculate_apartment_improvements_before_2011_construction_price_index()
     assert result.summary.value_for_apartment == 475_000
 
 
-def test_calculate_single_housing_company_improvement_before_2011_market_price_index__after_2010():
+# Pre-2011 > MPI > Housing Company
+
+
+def test_calculate_single_housing_company_improvement_pre_2011_market_price_index__after_2010():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -235,7 +246,7 @@ def test_calculate_single_housing_company_improvement_before_2011_market_price_i
     assert roundup(result.accepted_value) == 73500  # 367_500 / 100 * 20
 
 
-def test_calculate_housing_company_improvements_before_2011_market_price_index__after_2010():
+def test_calculate_housing_company_improvements_pre_2011_market_price_index__after_2010():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -282,7 +293,7 @@ def test_calculate_housing_company_improvements_before_2011_market_price_index__
     assert result.summary.accepted_value == 147_000
 
 
-def test_calculate_single_housing_company_improvement_before_2011_market_price_index__before_2010():
+def test_calculate_single_housing_company_improvement_pre_2011_market_price_index__before_2010():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -314,7 +325,7 @@ def test_calculate_single_housing_company_improvement_before_2011_market_price_i
     assert roundup(result.accepted_value) == 3600
 
 
-def test_calculate_housing_company_improvements_before_2011_market_price_index__before_2010():
+def test_calculate_housing_company_improvements_pre_2011_market_price_index__before_2010():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -361,7 +372,10 @@ def test_calculate_housing_company_improvements_before_2011_market_price_index__
     assert result.summary.accepted_value == 7200
 
 
-def test_calculate_single_apartment_improvement_before_2011_market_price_index():
+# Pre-2011 > MPI > Apartment
+
+
+def test_calculate_single_apartment_improvement_pre_2011_market_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -391,7 +405,7 @@ def test_calculate_single_apartment_improvement_before_2011_market_price_index()
     assert roundup(result.accepted_value) == 0  # 18_000 / 100 * 20
 
 
-def test_calculate_apartment_improvements_before_2011_market_price_index():
+def test_calculate_apartment_improvements_pre_2011_market_price_index():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
@@ -432,7 +446,7 @@ def test_calculate_apartment_improvements_before_2011_market_price_index():
     assert result.summary.accepted_value == 0
 
 
-def test_calculate_apartment_improvements_before_2011_market_price_index_no_deductions():
+def test_calculate_apartment_improvements_pre_2011_market_price_index_no_deductions():
     improvement = ImprovementData(
         name="Test improvement",
         value=Decimal(150_000),
