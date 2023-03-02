@@ -6,17 +6,20 @@
 
 ## Pull request checklist
 
-Check the boxes for each DoD items that has been completed:
+Check the boxes for each DoD item that has been completed:
 
-- **Frontend**
-    - [ ] Changes have been tested
-- **Backend**
-    - [ ] Changes have been tested
-    - [ ] Automatic tests has been added
-    - [ ] OpenAPI definitions have been updated
-    - [ ] Database migrations will work in test environment
-    - [ ] Oracle migration has been updated
-    - [ ] initial.json has been updated to work with migrations
+- **Testing**
+  - [ ] Changes have been tested
+  - [ ] Automatic tests have been added
+- **Database**
+  - [ ] Database migrations will work in the DEV & TEST environments
+  - [ ] initial.json has been updated to work with migrations
+  - [ ] Oracle migration has been updated
+- **Documentation**
+  - [ ] Tooltips have been added in the frontend for all new fields
+  - [ ] OpenAPI definitions have been updated
+  - [ ] Test instructions have been written for the customer in the appropriate ticket in Jira
+  - [ ] Terminology page in Confluence has been updated
 
 ## Test plan
 
