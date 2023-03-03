@@ -90,6 +90,36 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment_sale__list__dont_include_sales_for_other_apartments(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(sales=[])
+
+    # Sales for some other apartment
+    ownership: Ownership = OwnershipFactory.create(apartment__sales=[])
+    ApartmentSaleFactory.create(ownerships=[ownership])
+
+    url = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["contents"] == []
+    assert response.json()["page"] == {
+        "size": 0,
+        "current_page": 1,
+        "total_items": 0,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
+
+
 # Retrieve tests
 
 
