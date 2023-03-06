@@ -288,7 +288,7 @@ apartment_market_price_indices = Table(
     Column("N_HARVO", Integer, key="value", nullable=False),
     Column("N_ARVOLISAYS", Float, nullable=False),  # Arvon lisäys
     Column("N_POISTOARVO", Float, nullable=False),  # Poisto
-    Column("N_HYVARVO", Float, nullable=False),  # Hyväksytty
+    Column("N_HYVARVO", Float, key="accepted_value", nullable=False),  # Hyväksytty arvo
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )

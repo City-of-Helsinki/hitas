@@ -100,6 +100,7 @@ class MarketPriceImprovementSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     value = HitasDecimalField(required=True, allow_null=False)
     completion_date = YearMonthSerializer(required=True, allow_null=False)
+    no_deductions = serializers.BooleanField(default=False)
 
     class Meta:
         model = ApartmentMarketPriceImprovement
@@ -107,6 +108,7 @@ class MarketPriceImprovementSerializer(serializers.ModelSerializer):
             "name",
             "completion_date",
             "value",
+            "no_deductions",
         ]
 
 
@@ -665,7 +667,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             existing_qs=instance.market_price_improvements.all(),
             wanted=mpi,
             create_defaults={"apartment": instance},
-            equal_fields=["value", "completion_date", "name"],
+            equal_fields=["value", "completion_date", "name", "no_deductions"],
         )
         merge_model(
             model_class=ApartmentConstructionPriceImprovement,

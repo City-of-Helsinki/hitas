@@ -17,6 +17,8 @@ class ImprovementData:
     completion_date_index: Optional[Decimal] = None
     # Depreciation percentage for this improvement. Not needed for all the calculations.
     depreciation_percentage: Optional[Decimal] = None
+    # If this improvement should have no deductions made to its original value. Not needed for all the calculations.
+    no_deductions: Optional[bool] = False
 
 
 class Excess(Enum):

@@ -34,9 +34,6 @@
     label
       font-size: $fontsize-body-s
       height: 20px
-      z-index: 1
-
-
 
     .input-field--date
       position: relative
@@ -128,7 +125,7 @@
   .improvement-headers
     position: relative
     display: grid
-    grid-template-columns: auto 160px 192px
+    grid-template-columns: auto 165px 165px 192px
     height: $spacing-layout-s
     font-size: $fontsize-body-s
     font-weight: 700
@@ -136,6 +133,12 @@
       font-size: $fontsize-body-l
       line-height: 0
     .header__tooltip
+      position: absolute
+      top: -3px
+      right: calc(192px + 24px)
+      section
+        width: 280px
+    .header__tooltip2
       position: absolute
       top: -3px
       right: 48px
@@ -147,7 +150,7 @@
     background: $color-engel-medium-light
     &-item
       display: grid
-      grid-template-columns: auto 150px 150px 32px
+      grid-template-columns: auto 150px 150px 150px 32px
       gap: 1em
       [class*="input-field"]
         height: 61px
@@ -163,14 +166,6 @@
           color: $color-black-80
           &:hover
             color: $color-error
-
-    &--construction-index
-      .improvement-headers
-        grid-template-columns: auto 165px 165px 192px
-        .header__tooltip
-          right: calc(192px + 24px)
-      .improvements-list-item
-        grid-template-columns: auto 150px 150px 150px 32px
 
 .view--buildings
   .building-identifier-field
@@ -265,4 +260,3 @@
       @include align-items(center)
       height: 100%
       margin-left: $spacing-s
-

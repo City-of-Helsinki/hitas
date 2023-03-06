@@ -588,13 +588,21 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
 
             # Check if CPI improvement value should be moved to apartment.additional_work_during_construction instead
             if (
+                # awdc Improvements do not depreciate
                 new.depreciation_percentage == DepreciationPercentage.ZERO
+                # and us completed at almost the same time as the apartment
                 and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
-                and cpi_improvement["accepted_value"] > 0
+                # and the improvements accepted value should not be less than the original value
+                and cpi_improvement["accepted_value"] > cpi_improvement["value"]
             ):
-                cpi_awdc["improvements"].append(new)
-                cpi_awdc["date"] = cpi_improvement.calculation_date
-                continue
+                if new.name == "Ullakkohuoneen rakentaminen":
+                    # 'Attic room' improvements are not considered awdc improvements, as they require special handling
+                    # The special handling is done only for MPI improvements, but we can't consider CPI as AWDC either
+                    pass
+                else:
+                    cpi_awdc["improvements"].append(new)
+                    cpi_awdc["date"] = cpi_improvement.calculation_date
+                    continue
 
             bulk_cpi.append(new)
             count += 1
@@ -619,12 +627,21 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
             )
 
             # Check if improvement value should be moved to apartment.additional_work_during_construction instead
-            if mpi_improvement["excess"] == "000" and is_date_within_one_month(
-                new.completion_date, monthify(v.completion_date)
+            if (
+                # awdc Improvements have no excess
+                mpi_improvement["excess"] == "000"
+                # and is completed at almost the same time as the apartment
+                and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
+                # and the improvements accepted value should not be less than the original value
+                and mpi_improvement["accepted_value"] >= mpi_improvement["value"]
             ):
-                mpi_awdc["improvements"].append(new)
-                mpi_awdc["date"] = mpi_improvement.calculation_date
-                continue
+                if new.name == "Ullakkohuoneen rakentaminen":
+                    # 'Attic room' improvements are not considered awdc improvements, as they require special handling
+                    new.no_deductions = True
+                else:
+                    mpi_awdc["improvements"].append(new)
+                    mpi_awdc["date"] = mpi_improvement.calculation_date
+                    continue
 
             bulk_mpi.append(new)
             count += 1

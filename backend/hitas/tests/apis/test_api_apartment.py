@@ -658,6 +658,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "name": mpi.name,
                     "value": float(mpi.value),
                     "completion_date": mpi.completion_date.strftime("%Y-%m"),
+                    "no_deductions": False,
                 },
             ],
         },
@@ -1188,7 +1189,12 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
                 },
             ],
             "market_price_index": [
-                {"value": 3456.7, "name": "test-market-price-1", "completion_date": "1998-05"},
+                {
+                    "value": 3456.7,
+                    "name": "test-market-price-1",
+                    "completion_date": "1998-05",
+                    "no_deductions": False,
+                },
             ],
         },
         "building": {"id": building.uuid.hex},

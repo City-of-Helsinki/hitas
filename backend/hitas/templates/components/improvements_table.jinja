@@ -79,16 +79,21 @@
 
 {% macro apartment_improvements_table_mpi(improvements) %}
 {% if improvements["items"] %}
+    {% set no_deduction_improvements_count = improvements["items"]|selectattr("no_deductions")|list|length %}
+
     <h3 class="bordered-header">HUONEISTOKOHTAISET PARANNUKSET</h3>
     <table class="improvements-table">
         <tr style="border-bottom: 1px solid black;">
             <td class="improvement-cell" style="width: 172px;"><b>Parannus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Arvo</b></td>
+            <td class="improvement-cell improvement-column" style="width: 75px;"><b>Arvo</b></td>
             <td class="improvement-cell improvement-column" style="width: 90px;"><b>Valmistunut</b></td>
             <td class="improvement-cell improvement-column" style="width: 90px;"><b>Arvoa korot-<br>tava osuus</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Poistoaika</b></td>
-            <td class="improvement-cell improvement-column" style="width: 80px;"><b>Poiston<br>määrä</b></td>
+            <td class="improvement-cell improvement-column" style="width: 75px;"><b>Poistoaika</b></td>
+            <td class="improvement-cell improvement-column" style="width: 75px;"><b>Poiston<br>määrä</b></td>
             <td class="improvement-cell improvement-column" style="width: 90px;"><b>Hyväksytty</b></td>
+            {% if no_deduction_improvements_count and no_deduction_improvements_count < improvements["items"]|length %}
+              <td class="improvement-cell improvement-column" style="width: 15px;">&nbsp</td>
+            {% endif %}
         </tr>
         {% for improvement in improvements["items"] %}
             <tr>
@@ -99,6 +104,16 @@
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.time.years }} v {{ improvement.depreciation.time.months }} kk{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right">{% if improvement.depreciation is not none %}{{ improvement.depreciation.amount|intcomma }}{% else %}-{% endif %}</td>
                 <td class="improvement-cell text-right">{{ improvement.accepted_value|intcomma }}</td>
+
+                <td class="improvement-cell text-right">
+                {% if no_deduction_improvements_count > 0 and no_deduction_improvements_count != improvements["items"]|length %}
+                  {% if not improvement.no_deductions %}
+                    <small>1</small>
+                  {% else %}
+                    <small>2</small>
+                  {% endif %}
+                {% endif %}
+                </td>
             </tr>
         {% endfor %}
         <tr style="border-top: 1px solid gray; padding-top: 2px;">
@@ -109,24 +124,34 @@
             <td></td>
             <td class="improvement-cell text-right"><b>{{ improvements.summary.depreciation|intcomma }}</b></td>
             <td class="improvement-cell text-right"><b>{{ improvements.summary.accepted_value|intcomma }}</b></td>
+            <td></td>
         </tr>
     </table>
-
     {% set excess = improvements.summary.excess %}
-    {% if excess %}
+    {% if excess or no_deduction_improvements_count %}
       <table style="line-height: 1rem">
         <tr style="padding-top: 0.5rem;">
           <td style="width: 10px;"></td>
           <td style="width: auto;"></td>
         </tr>
+
+        {% if excess and no_deduction_improvements_count != improvements["items"]|length %}
         <tr style="padding-top: 0.5rem;">
-          <td>&#x2022;</td>
+          <td>{% if no_deduction_improvements_count == 0 %}&#x2022;{% else %}<small>1</small>{% endif %}</td>
           <td>Jokaisen parannuksen omavastuu on {{ excess.surface_area|intcomma }} m² x {{ excess.value_per_square_meter|intcomma }} euroa/m² = {{ excess.total|intcomma }} euroa.</td>
         </tr>
         <tr>
           <td>&nbsp</td>
           <td>Parannusten poistoaika on 10 vuotta ja poisto lasketaan arvoa korottavasta osuudesta.</td>
         </tr>
+        {% endif %}
+
+        {% if no_deduction_improvements_count > 0 %}
+        <tr style="padding-top: 0.5rem;">
+          <td style="vertical-align: top;">{% if no_deduction_improvements_count == improvements["items"]|length %}&#x2022;{% else %}<small>2</small>{% endif %}</td>
+          <td>Rakennuttajalta tilatuista muutos- ja lisätöistä aiheutuviin kustannuksiin tehdään indeksitarkistus ilman omavastuuosuutta ja poistoja.</td>
+        </tr>
+        {% endif %}
       </table>
     {% endif %}
     <br>
