@@ -443,8 +443,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         additional_work_during_construction=4307.0,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=54.5,
-        share_number_start=1729,
-        share_number_end=1888,
+        share_number_start=1,
+        share_number_end=2,
         building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
         sales__purchase_price=104693.0,
         sales__apartment_share_of_housing_company_loans=18480.0,
@@ -455,6 +455,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         surface_area=3336,
         sales__purchase_price=0.0,
         sales__apartment_share_of_housing_company_loans=0.0,
+        share_number_start=3,
+        share_number_end=4,
     )
 
     mpi_ap_improvement: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(
@@ -470,6 +472,9 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     mpi_hc_improvement2: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=1587, completion_date=datetime.date(2004, 10, 1)
     )
+    mpi_hc_improvement3: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=2000, completion_date=datetime.date(2004, 10, 1), no_deductions=True
+    )
     o1: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
     o2: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
 
@@ -483,8 +488,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 9, 1), value=4872)
 
     # Create necessary improvement's completion date indices
-    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2004, 10, 1), value=238.5)
-    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2004, 10, 1), value=291.1)
+    ConstructionPriceIndexFactory.create(month=datetime.date(2004, 10, 1), value=238.5)
+    MarketPriceIndexFactory.create(month=datetime.date(2004, 10, 1), value=291.1)
 
     data = {
         "calculation_date": "2022-09-07",
@@ -508,13 +513,13 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     assert response_json == {
         "confirmed_at": None,
         "calculation_date": "2022-09-07",
-        "maximum_price": 311864.13,
-        "maximum_price_per_square": 5722.28,
+        "maximum_price": 313867.91,
+        "maximum_price_per_square": 5759.04,
         "valid_until": "2022-12-07",
         "index": "market_price_index",
         "new_hitas": False,
         "apartment": {
-            "shares": {"start": 1729, "end": 1888, "total": 160},
+            "shares": {"start": 1, "end": 2, "total": 2},
             "rooms": a.rooms,
             "type": a.apartment_type.value,
             "surface_area": 54.5,
@@ -650,10 +655,26 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                         "accepted_value": 0.0,
                         "no_deductions": False,
                     },
+                    {
+                        "name": mpi_hc_improvement3.name,
+                        "value": 2000.0,
+                        "completion_date": "2004-10-01",
+                        "value_without_excess": 4007.56,
+                        "depreciation": {
+                            "amount": 0.0,
+                            "time": {
+                                "years": 0,
+                                "months": 0,
+                            },
+                        },
+                        "accepted_value_for_housing_company": 4007.56,
+                        "accepted_value": 2003.78,
+                        "no_deductions": True,
+                    },
                 ],
                 "summary": {
-                    "value": 1587.0,
-                    "value_without_excess": 0.0,
+                    "value": 3587.0,
+                    "value_without_excess": 4007.56,
                     "excess": {
                         "surface_area": 3390.5,
                         "value_per_square_meter_before_2010": 150.0,
@@ -662,12 +683,12 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
                         "total_after_2010": None,
                     },
                     "depreciation": 0.0,
-                    "accepted_value_for_housing_company": 0.0,
-                    "accepted_value": 0.0,
+                    "accepted_value_for_housing_company": 4007.56,
+                    "accepted_value": 2003.78,
                 },
             },
-            "debt_free_price": 311864.13,
-            "debt_free_price_m2": 5722.28,
+            "debt_free_price": 313867.91,
+            "debt_free_price_m2": 5759.04,
             "apartment_share_of_housing_company_loans": 0,
             "apartment_share_of_housing_company_loans_date": "2022-09-05",
             "completion_date": "2003-05-09",
@@ -675,7 +696,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "calculation_date": "2022-09-07",
             "calculation_date_index": 583.3,
         },
-        "maximum_price": 311864.13,
+        "maximum_price": 313867.91,
         "valid_until": "2022-12-07",
         "maximum": True,
     }

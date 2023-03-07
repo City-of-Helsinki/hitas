@@ -199,6 +199,7 @@ class RulesPre2011(CalculatorRules):
                     value=i.value,
                     completion_date=i.completion_date,
                     completion_date_index=i.completion_date_index,
+                    no_deductions=i.no_deductions,
                 )
                 for i in housing_company_improvements
             ],
@@ -206,6 +207,9 @@ class RulesPre2011(CalculatorRules):
             calculation_date_index=apartment.calculation_date_mpi,
             total_surface_area=total_surface_area,
             apartment_surface_area=apartment.surface_area,
+            # Share values are only used in a `no_deduction` improvements
+            housing_company_shares_count=apartment.housing_company.total_shares_count,
+            apartment_shares_count=apartment.shares_count,
         )
 
         # Debt free shares price

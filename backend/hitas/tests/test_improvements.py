@@ -228,6 +228,8 @@ def test_calculate_single_housing_company_improvement_pre_2011_market_price_inde
         calculation_date_index=Decimal(100.0),
         total_surface_area=Decimal(100.0),
         apartment_surface_area=Decimal(20.0),
+        housing_company_shares_count=0,
+        apartment_shares_count=0,  # Irrelevant in this test
     )
 
     assert result is not None
@@ -260,6 +262,8 @@ def test_calculate_housing_company_improvements_pre_2011_market_price_index__aft
         calculation_date_index=Decimal(100.0),
         total_surface_area=Decimal(100.0),
         apartment_surface_area=Decimal(20.0),
+        housing_company_shares_count=0,
+        apartment_shares_count=0,  # Irrelevant in this test
     )
 
     assert result is not None
@@ -307,6 +311,8 @@ def test_calculate_single_housing_company_improvement_pre_2011_market_price_inde
         calculation_date_index=Decimal(100.0),
         total_surface_area=Decimal(100.0),
         apartment_surface_area=Decimal(20.0),
+        housing_company_shares_count=0,
+        apartment_shares_count=0,  # Irrelevant in this test
     )
 
     assert result is not None
@@ -339,6 +345,8 @@ def test_calculate_housing_company_improvements_pre_2011_market_price_index__bef
         calculation_date_index=Decimal(100.0),
         total_surface_area=Decimal(100.0),
         apartment_surface_area=Decimal(20.0),
+        housing_company_shares_count=0,
+        apartment_shares_count=0,  # Irrelevant in this test
     )
 
     assert result is not None
