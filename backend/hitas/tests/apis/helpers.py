@@ -190,7 +190,7 @@ def parametrize_helper(__tests: dict[str, T], /) -> ParametrizeArgs:
 
 
 @contextmanager
-def count_queries(expected: int, *, list_exceptions: bool = False):
+def count_queries(expected: int, *, list_queries_on_failure: bool = False):
     orig_debug = settings.DEBUG
     try:
         settings.DEBUG = True
@@ -206,9 +206,9 @@ def count_queries(expected: int, *, list_exceptions: bool = False):
         number_of_queries = len(database_queries)
         if number_of_queries != expected:
             msg = f"Unexpected database query count, {number_of_queries} instead of {expected}."
-            if list_exceptions:
-                hints = " Queries:\n- ".join(database_queries)
-                msg += f"\n- {hints}"
+            if list_queries_on_failure:
+                hints = "\n- ".join(database_queries)
+                msg += f" Queries:\n- {hints}"
             pytest.fail(msg)
     finally:
         connection.queries_log.clear()

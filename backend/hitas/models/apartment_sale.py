@@ -23,7 +23,7 @@ class ApartmentSale(ExternalHitasModel):
 
     @property
     def total_price(self) -> Decimal:
-        # "Velaton kokonaishinta"
+        # "Velaton kauppahinta"
         return self.purchase_price + self.apartment_share_of_housing_company_loans
 
     @property

@@ -52,7 +52,8 @@ from hitas.services.apartment import (
     subquery_latest_sale_purchase_price,
 )
 from hitas.services.condition_of_sale import condition_of_sale_queryset
-from hitas.utils import RoundWithPrecision, check_for_overlap, lookup_model_id_by_uuid, this_month, valid_uuid
+from hitas.utils import RoundWithPrecision, check_for_overlap, this_month, valid_uuid
+from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
 from hitas.views.ownership import OwnershipSerializer

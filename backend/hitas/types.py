@@ -4,7 +4,7 @@ from decimal import Decimal
 from rest_framework.renderers import JSONRenderer
 from rest_framework.utils.encoders import JSONEncoder
 
-from hitas.calculations.helpers import roundup
+from hitas.utils import roundup
 
 
 class Month:

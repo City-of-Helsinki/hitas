@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.models import Apartment, ApartmentType, Building, HousingCompany, RealEstate
-from hitas.utils import check_for_overlap, lookup_model_by_uuid
+from hitas.services.validation import lookup_model_by_uuid
+from hitas.utils import check_for_overlap
 from hitas.views.utils.excel import ErrorData, NewExcelParser, OldExcelParser, RowFormat, error_key, parse_sheet
 from hitas.views.utils.fields import DateOnlyField, NumberOrRangeField, UUIDRelatedField
 

@@ -3,7 +3,7 @@ from django.http import Http404
 from rest_framework import serializers, viewsets
 
 from hitas.exceptions import HitasModelNotFound
-from hitas.utils import lookup_id_to_uuid
+from hitas.services.validation import lookup_id_to_uuid
 from hitas.views.utils import HitasPagination
 
 

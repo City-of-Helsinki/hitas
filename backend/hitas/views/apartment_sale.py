@@ -9,7 +9,7 @@ from hitas.models import Apartment, ApartmentSale
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import prefetch_first_sale
 from hitas.services.condition_of_sale import create_conditions_of_sale
-from hitas.utils import lookup_id_to_uuid, lookup_model_id_by_uuid
+from hitas.services.validation import lookup_id_to_uuid, lookup_model_id_by_uuid
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
