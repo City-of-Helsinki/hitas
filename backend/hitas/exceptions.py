@@ -1,11 +1,14 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, TypeVar, Union
 
+from django.db.models import Model
 from django.http.response import JsonResponse
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import exception_handler as drf_exc_handler
 from rest_framework.views import set_rollback
+
+TModel = TypeVar("TModel", bound=Model)
 
 
 def exception_handler(exc, context):
@@ -260,3 +263,10 @@ def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, An
         return {"field": field_name, "message": error["message"]}
     else:
         raise Exception(f"Unhandled error code '{error['code']}'.")
+
+
+def get_hitas_object_or_404(model: type[TModel], **kwargs: Any) -> TModel:
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist as error:
+        raise HitasModelNotFound(model) from error

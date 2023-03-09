@@ -2340,6 +2340,43 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Regulation
+
+  /api/v1/thirty-year-regulation:
+
+    get:
+      description: Check housing companies over 30 years old whether they should be released from hitas regulation or not.
+      operationId: check-regulation
+      tags:
+        - Thirty Year Regulation
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully performed thrity year regulation for housing companies
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ThirtyYearRegulationResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
   # Property Manager
 
   /api/v1/property-managers:
@@ -6758,6 +6795,64 @@ components:
           minimum: 0
           nullable: true
           example: 28490
+
+    ThirtyYearRegulationResults:
+      description: Thirty year regulation results
+      type: object
+      additionalProperties: false
+      required:
+        - automatically_released
+        - released_from_regulation
+        - stays_regulated
+      properties:
+        automatically_released:
+          description: Housing Companies that are release from regulation automatically.
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirtyYearRegulationData'
+        released_from_regulation:
+          description: Housing Companies that are released from regulation based on 30 year comparison.
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirtyYearRegulationData'
+        stays_regulated:
+          description: Housing Companies that stay regulated.
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirtyYearRegulationData'
+
+    ThirtyYearRegulationData:
+      description: Thirty year regulation data for a checked housing company
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - display_name
+        - price
+        - old_ruleset
+      properties:
+        id:
+          description: ID of a housing company
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
+        display_name:
+          description: Housing company's display name
+          type: string
+          example: Taloyhtiö Helmi
+        price:
+          description: |-
+            Average price per square meter for all apartments in the housing company,
+            or current surface area price ceiling, which ever is the highest. This value
+            was compared to the housing company's postal code's average price per square meter.
+
+            In case the housing company was released automatically, this value will be zero.
+          type: number
+          minimum: 0
+          example: 23456.64
+        old_ruleset:
+          description: Does this housing company use the old or the new hitas ruleset?
+          type: boolean
+          example: false
 
     # Errors
 

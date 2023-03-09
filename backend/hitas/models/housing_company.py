@@ -1,3 +1,7 @@
+import datetime
+from decimal import Decimal
+from typing import Optional
+
 from crum import get_current_user
 from django.conf import settings
 from django.db import models
@@ -97,6 +101,15 @@ class HousingCompany(ExternalHitasModel):
 
     def __str__(self):
         return self.display_name
+
+
+class HousingCompanyWithAnnotations(HousingCompany):
+    completion_date: datetime.date
+    completion_month: datetime.date
+    avg_price_per_square_meter: Optional[Decimal]
+
+    class Meta:
+        abstract = True
 
 
 class HousingCompanyMarketPriceImprovement(HitasImprovement):

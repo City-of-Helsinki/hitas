@@ -9,6 +9,8 @@ router.register(r"housing-companies", views.HousingCompanyViewSet, basename="hou
 router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
 router.register(r"owners", views.OwnerViewSet, basename="owner")
+router.register(r"conditions-of-sale", views.ConditionOfSaleViewSet, basename="conditions-of-sale")
+router.register(r"thirty-year-regulation", views.ThirtyYearRegulationView, basename="thirty-year-regulation")
 router.register(r"indices/maximum-price-index", views.MaximumPriceIndexViewSet, basename="maximum-price-index")
 router.register(r"indices/market-price-index", views.MarketPriceIndexViewSet, basename="market-price-index")
 router.register(
@@ -43,7 +45,6 @@ router.register(r"financing-methods", views.FinancingMethodViewSet, basename="fi
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
 router.register(r"developers", views.DeveloperViewSet, basename="developer")
 router.register(r"apartment-types", views.ApartmentTypeViewSet, basename="apartment-type")
-router.register(r"conditions-of-sale", views.ConditionOfSaleViewSet, basename="conditions-of-sale")
 
 # Nested routers
 housing_company_router = NestedSimpleRouter(router, r"housing-companies", lookup="housing_company")
