@@ -6218,7 +6218,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - exclude_in_statistics
+        - exclude_from_statistics
       properties:
         id:
           description: Apartment sale ID
@@ -6249,7 +6249,7 @@ components:
           type: number
           minimum: 0
           example: 51222
-        exclude_in_statistics:
+        exclude_from_statistics:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
@@ -6264,7 +6264,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - exclude_in_statistics
+        - exclude_from_statistics
       properties:
         ownerships:
           description: List of ownerships resulting from this sale
@@ -6291,7 +6291,7 @@ components:
           type: number
           minimum: 0
           example: 51222
-        exclude_in_statistics:
+        exclude_from_statistics:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
@@ -6307,7 +6307,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - exclude_in_statistics
+        - exclude_from_statistics
         - conditions_of_sale_created
       properties:
         id:
@@ -6339,7 +6339,7 @@ components:
           type: number
           minimum: 0
           example: 51222
-        exclude_in_statistics:
+        exclude_from_statistics:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false
@@ -6357,7 +6357,7 @@ components:
         - purchase_date
         - purchase_price
         - apartment_share_of_housing_company_loans
-        - exclude_in_statistics
+        - exclude_from_statistics
       properties:
         notification_date:
           description: Sale notification date
@@ -6379,7 +6379,7 @@ components:
           type: number
           minimum: 0
           example: 51222
-        exclude_in_statistics:
+        exclude_from_statistics:
           description: Should sale be excluded from statistics?
           type: boolean
           example: false

@@ -931,7 +931,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             purchase_date=oracle_apartment["first_purchase_date"],
             purchase_price=oracle_apartment["purchase_price"],
             apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
-            exclude_in_statistics=False,
+            exclude_from_statistics=False,
         )
         if update_ownerships:
             # Ownerships are already in the database, so bulk_create can't be used.
@@ -1048,7 +1048,8 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     # If purchase price is missing, the price is almost certainly missing as well. Assume it if missing.
                     purchase_price=sale["purchase_price"] or sale["maximum_price"],
                     apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
-                    exclude_in_statistics=sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                    exclude_from_statistics=sale["monitoring_state"]
+                    == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
                 )
                 apartment.ownerships.all().update(sale=new)
                 owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
@@ -1064,7 +1065,8 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     purchase_date=sale["purchase_date"],
                     purchase_price=sale["purchase_price"],
                     apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
-                    exclude_in_statistics=sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                    exclude_from_statistics=sale["monitoring_state"]
+                    == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
                 )
 
                 buyers = get_or_create_buyers(sale)
@@ -1113,7 +1115,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 purchase_date=oracle_apartment["latest_purchase_date"],
                 purchase_price=1,  # There is no way to get the actual purchase price, so hardcode it as `1`.
                 apartment_share_of_housing_company_loans=0,  # Assumed, no way to get this value accurately anywhere.
-                exclude_in_statistics=True,  # Since the price is hardcoded to `1`, these sales should be excluded.
+                exclude_from_statistics=True,  # Since the price is hardcoded to `1`, these sales should be excluded.
             )
             apartment.ownerships.all().update(sale=new)
             is_latest_sale_created = True

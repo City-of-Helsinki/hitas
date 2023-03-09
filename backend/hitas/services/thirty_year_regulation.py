@@ -403,7 +403,7 @@ def _get_sales_data(
             ~Q(id__in=F("_first_sale_id")),
             purchase_date__gte=from_,
             purchase_date__lt=to_,
-            exclude_in_statistics=False,
+            exclude_from_statistics=False,
             # TODO: apartment__building__real_estate__housing_company__exclude_from_statistics=False,
             apartment__building__real_estate__housing_company__postal_code__value__in=postal_codes,
             apartment__building__real_estate__housing_company__state__in=[

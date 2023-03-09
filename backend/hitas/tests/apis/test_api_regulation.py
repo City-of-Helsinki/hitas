@@ -881,7 +881,7 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
         apartment=apartment,
         purchase_date=previous_year_last_month + relativedelta(days=1),
         purchase_price=40_000,
-        exclude_in_statistics=True,
+        exclude_from_statistics=True,
         apartment_share_of_housing_company_loans=9_000,
     )
 
@@ -949,7 +949,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         apartment=apartment,
         purchase_date=previous_year_last_month - relativedelta(years=1) + relativedelta(days=1),
         purchase_price=40_000,
-        exclude_in_statistics=True,
+        exclude_from_statistics=True,
         apartment_share_of_housing_company_loans=9_000,
     )
 
@@ -1506,7 +1506,7 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
         apartment=apartment,
         purchase_date=previous_year_last_month + relativedelta(days=1),
         purchase_price=100_000,
-        exclude_in_statistics=True,
+        exclude_from_statistics=True,
         apartment_share_of_housing_company_loans=99_999,
     )
     # This sale does affect the average price per square meter, since it is excluded from statistics
@@ -1515,7 +1515,7 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
         apartment=apartment,
         purchase_date=previous_year_last_month + relativedelta(days=2),
         purchase_price=40_000,
-        exclude_in_statistics=False,  # being explicit here
+        exclude_from_statistics=False,  # being explicit here
         apartment_share_of_housing_company_loans=9_000,
     )
 
