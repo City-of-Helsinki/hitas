@@ -1242,7 +1242,6 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
 def test__api__apartment_max_price__no_sales_on_apartment__post_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2012, 1, 13),
-        sales=[],
     )
 
     # Create necessary indices

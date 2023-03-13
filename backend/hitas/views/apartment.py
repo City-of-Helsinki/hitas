@@ -342,6 +342,9 @@ class PricesSerializer(serializers.Serializer):
     first_sale_purchase_price = serializers.SerializerMethodField()
     first_sale_share_of_housing_company_loans = serializers.SerializerMethodField()
     first_sale_acquisition_price = serializers.SerializerMethodField()
+    catalog_purchase_price = serializers.SerializerMethodField()
+    catalog_share_of_housing_company_loans = serializers.SerializerMethodField()
+    catalog_acquisition_price = serializers.SerializerMethodField()
     first_purchase_date = serializers.SerializerMethodField()
     latest_sale_purchase_price = serializers.SerializerMethodField()
     latest_purchase_date = serializers.SerializerMethodField()
@@ -359,6 +362,18 @@ class PricesSerializer(serializers.Serializer):
     @staticmethod
     def get_first_sale_acquisition_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
         return instance.first_sale_acquisition_price
+
+    @staticmethod
+    def get_catalog_purchase_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.catalog_purchase_price
+
+    @staticmethod
+    def get_catalog_share_of_housing_company_loans(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.catalog_primary_loan_amount
+
+    @staticmethod
+    def get_catalog_acquisition_price(instance: ApartmentWithAnnotations) -> Optional[Decimal]:
+        return instance.catalog_acquisition_price
 
     @staticmethod
     def get_first_purchase_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
