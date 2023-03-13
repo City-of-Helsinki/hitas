@@ -7,7 +7,7 @@ from rest_framework import serializers
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
-from hitas.utils import lookup_model_id_by_uuid
+from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
 
 

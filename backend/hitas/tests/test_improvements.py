@@ -1,7 +1,6 @@
 import datetime
 from decimal import Decimal
 
-from hitas.calculations.helpers import roundup
 from hitas.calculations.improvements.common import ImprovementData
 from hitas.calculations.improvements.rules_2011_onwards import (
     calculate_housing_company_improvements_2011_onwards,
@@ -19,6 +18,7 @@ from hitas.calculations.improvements.rules_pre_2011_mpi import (
     calculate_single_apartment_improvement_pre_2011_market_price_index,
     calculate_single_housing_company_improvement_pre_2011_market_price_index,
 )
+from hitas.utils import roundup
 
 
 def test_calculate_single_housing_company_improvement_2011_onwards():

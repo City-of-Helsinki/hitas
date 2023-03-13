@@ -14877,7 +14877,7 @@
       "purchase_date": "2014-06-02",
       "purchase_price": "11000.00",
       "apartment_share_of_housing_company_loans": "44000.00",
-      "exclude_in_statistics": false
+      "exclude_from_statistics": false
     }
   },
   {
@@ -14891,7 +14891,7 @@
       "purchase_date": "2015-06-02",
       "purchase_price": "22000.00",
       "apartment_share_of_housing_company_loans": "0.00",
-      "exclude_in_statistics": false
+      "exclude_from_statistics": false
     }
   },
   {
@@ -14905,7 +14905,7 @@
       "purchase_date": "2022-12-06",
       "purchase_price": "198680.00",
       "apartment_share_of_housing_company_loans": "15222953.00",
-      "exclude_in_statistics": false
+      "exclude_from_statistics": false
     }
   },
   {
@@ -14919,7 +14919,7 @@
       "purchase_date": "2022-12-15",
       "purchase_price": "143535.00",
       "apartment_share_of_housing_company_loans": "0.00",
-      "exclude_in_statistics": false
+      "exclude_from_statistics": false
     }
   },
   {

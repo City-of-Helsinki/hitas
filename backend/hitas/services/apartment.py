@@ -1,7 +1,7 @@
 from typing import Collection
 
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import Case, F, OuterRef, Prefetch, Subquery, Sum, Value, When
 
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment_sale import ApartmentSale
@@ -25,6 +25,18 @@ def prefetch_first_sale(lookup_prefix: str = "", ignore: Collection[int] = ()) -
                 .values_list("id", flat=True)[:1]
             )
         ),
+    )
+
+
+def subquery_first_sale_acquisition_price(outer_ref: str) -> Subquery:
+    return Subquery(
+        queryset=(
+            ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
+            .order_by("purchase_date")
+            .annotate(_first_sale_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans")))
+            .values_list("_first_sale_price", flat=True)[:1]
+        ),
+        output_field=HitasModelDecimalField(null=True),
     )
 
 
@@ -86,4 +98,19 @@ def subquery_latest_purchase_date(outer_ref: str) -> Subquery:
             .values_list("purchase_date", flat=True)[:1]
         ),
         output_field=models.DateField(null=True),
+    )
+
+
+def aggregate_catalog_prices_where_no_sales(lookup_prefix: str) -> Case:
+    """Add up catalog prices for apartments which do not have any sales.
+
+    :param lookup_prefix: Add prefix to lookup, e.g. 'real_estates__buildings__apartments__'
+                          depending on the context. Should end with '__'.
+    """
+    return Case(
+        When(
+            real_estates__buildings__apartments__sales__isnull=True,
+            then=Sum(F(f"{lookup_prefix}catalog_purchase_price") + F(f"{lookup_prefix}catalog_primary_loan_amount")),
+        ),
+        default=Value(0, output_field=HitasModelDecimalField()),
     )

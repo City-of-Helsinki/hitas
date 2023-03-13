@@ -19,11 +19,11 @@ class ApartmentSale(ExternalHitasModel):
     # "Yhtiölainaosuus"
     apartment_share_of_housing_company_loans = HitasModelDecimalField()
     # "Kirjataanko kauppa tilastoihin?"
-    exclude_in_statistics = models.BooleanField(default=False)
+    exclude_from_statistics = models.BooleanField(default=False)
 
     @property
     def total_price(self) -> Decimal:
-        # "Velaton kokonaishinta"
+        # "Velaton kauppahinta"
         return self.purchase_price + self.apartment_share_of_housing_company_loans
 
     @property
@@ -31,7 +31,7 @@ class ApartmentSale(ExternalHitasModel):
         return self.apartment.postal_code.cost_area
 
     def __str__(self):
-        return f"Sale of {self.apartment} on {self.purchase_date}{' (E)' if self.exclude_in_statistics else ''}"
+        return f"Sale of {self.apartment} on {self.purchase_date}{' (E)' if self.exclude_from_statistics else ''}"
 
     class Meta:
         verbose_name = _("Apartment sale")

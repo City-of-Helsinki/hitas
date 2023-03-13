@@ -2,6 +2,7 @@ import os
 
 import environ
 from dateutil.relativedelta import relativedelta
+from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 
@@ -27,6 +28,7 @@ env = environ.Env(
     MEDIA_URL=(str, "/media/"),
     CORS_ALLOWED_ORIGINS=(list, []),
     UWSGI_WARMUP=(bool, True),
+    DJANGO_LOG_LEVEL=(str, "INFO"),
     SENTRY_DSN=(str, None),
     SENTRY_ENVIRONMENT=(str, "unknown"),
     SENTRY_SAMPLE_RATE=(float, 1.0),
@@ -180,6 +182,26 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# Logging
+# https://docs.djangoproject.com/en/3.2/topics/logging/#configuring-logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": DEFAULT_LOGGING["filters"],
+    "formatters": DEFAULT_LOGGING["formatters"],
+    "handlers": DEFAULT_LOGGING["handlers"]
+    | {
+        "default": {
+            "class": "logging.StreamHandler",
+        }
+    },
+    "loggers": DEFAULT_LOGGING["loggers"],
+    "root": {
+        "handlers": ["default"],
+        "level": env("DJANGO_LOG_LEVEL"),
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

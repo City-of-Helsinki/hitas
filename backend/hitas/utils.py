@@ -1,14 +1,13 @@
 import datetime
 import operator
-from typing import Any, Iterable, Optional, TypeVar
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Any, Iterable, Optional, overload
 from uuid import UUID
 
 from django.db import models
-from django.db.models import Count, Model, OuterRef, Subquery, Value
-from django.db.models.functions import Round
+from django.db.models import Count, F, Max, Model, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce, NullIf, Round
 from django.utils import timezone
-
-from hitas.exceptions import HitasModelNotFound
 
 
 class RoundWithPrecision(Round):
@@ -54,6 +53,18 @@ def subquery_first_id(model: type[Model], outer_field: str, order_by: str, **kwa
     )
 
 
+def max_if_all_not_null(ref: str, inf: Any) -> NullIf:
+    """Return the maximum value in the referenced array, but only if the array contains no null values.
+
+    Null values will be converted to the supplied 'inf' value (which should always be the largest value in the array),
+    and if the 'inf' value exists in the array, the aggregation result will be null instead of the 'inf' value.
+
+    :param ref: Reference to an array of items to aggregate.
+    :param inf: Value representing infinity, which will replace nulls, e.g., 'datetime.max'.
+    """
+    return NullIf(Max(Coalesce(F(ref), inf)), inf)
+
+
 def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
     """
     Examples:
@@ -78,35 +89,59 @@ def monthify(date: datetime.date) -> datetime.date:
     return date.replace(day=1)
 
 
+def business_quarter(date: datetime.date) -> datetime.date:
+    """Get business quarter (yyyy-[1,4,7,10]-01) from the given date."""
+    if date.month in (1, 2, 3):
+        return date.replace(month=1, day=1)
+    if date.month in (4, 5, 6):
+        return date.replace(month=4, day=1)
+    if date.month in (7, 8, 9):
+        return date.replace(month=7, day=1)
+    return date.replace(month=10, day=1)
+
+
+def hitas_calculation_quarter(date: datetime.date) -> datetime.date:
+    """Get hitas calculation quarter (yyyy-[2,5,8,11]-01) from the given date.
+
+    Hitas calculation quarters are different from business quarters, since hitas calculations
+    have to be made at least one month after business quarters start due to delays in receiving index
+    information from Tilastokeskus.
+    """
+    if date.month == 1:
+        return date.replace(year=date.year - 1, month=11, day=1)
+    if date.month in (2, 3, 4):
+        return date.replace(month=2, day=1)
+    if date.month in (5, 6, 7):
+        return date.replace(month=5, day=1)
+    if date.month in (8, 9, 10):
+        return date.replace(month=8, day=1)
+    return date.replace(month=11, day=1)
+
+
+def to_quarter(date: datetime.date) -> str:
+    if date.month in (1, 2, 3):
+        return f"{date.year}Q1"
+    if date.month in (4, 5, 6):
+        return f"{date.year}Q2"
+    if date.month in (7, 8, 9):
+        return f"{date.year}Q3"
+    if date.month in (10, 11, 12):
+        return f"{date.year}Q4"
+    raise NotImplementedError
+
+
+def from_iso_format_or_today_if_none(date: Optional[str]) -> datetime.date:
+    if date is None:
+        return timezone.now().date()
+    return datetime.date.fromisoformat(date)
+
+
 def valid_uuid(value: str, version: int = 4) -> bool:
     try:
         UUID(value, version=version)
         return True
     except ValueError:
         return False
-
-
-TModel = TypeVar("TModel", bound=models.Model)
-
-
-def lookup_id_to_uuid(lookup_id: str, model_class: type[TModel]) -> UUID:
-    try:
-        return UUID(hex=lookup_id)
-    except ValueError as error:
-        raise HitasModelNotFound(model=model_class) from error
-
-
-def lookup_model_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> TModel:
-    uuid = lookup_id_to_uuid(lookup_id, model_class)
-
-    try:
-        return model_class.objects.get(uuid=uuid, **kwargs)
-    except model_class.DoesNotExist as error:
-        raise HitasModelNotFound(model=model_class) from error
-
-
-def lookup_model_id_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> int:
-    return lookup_model_by_uuid(lookup_id, model_class, **kwargs).id
 
 
 def check_for_overlap(range_1: set[int], range_2: Iterable[int]) -> tuple[Optional[int], Optional[int]]:
@@ -125,3 +160,22 @@ def check_for_overlap(range_1: set[int], range_2: Iterable[int]) -> tuple[Option
 
     sorted_shares: list[int] = sorted(overlapping)
     return sorted_shares[0], sorted_shares[-1]
+
+
+@overload
+def roundup(v: Decimal, precision: int = 2) -> Decimal:
+    ...
+
+
+@overload
+def roundup(v: None, precision: int = 2) -> None:
+    ...
+
+
+def roundup(v, precision: int = 2):
+    if v is None:
+        return None
+
+    if precision <= 0:
+        return v.quantize(Decimal("1"), ROUND_HALF_UP)
+    return v.quantize(Decimal("." + "0" * precision), ROUND_HALF_UP)

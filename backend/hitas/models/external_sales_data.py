@@ -4,10 +4,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class CostAreaData(TypedDict):
-    postal_code: str
+class SaleData(TypedDict):
     sale_count: int
     price: int
+
+
+class CostAreaData(SaleData):
+    postal_code: str
 
 
 class QuarterData(TypedDict):

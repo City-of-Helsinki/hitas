@@ -75,7 +75,7 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
             "purchase_date": sale.purchase_date.isoformat(),
             "purchase_price": float(sale.purchase_price),
             "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-            "exclude_in_statistics": sale.exclude_in_statistics,
+            "exclude_from_statistics": sale.exclude_from_statistics,
         }
     ]
     assert response.json()["page"] == {
@@ -155,7 +155,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
         "purchase_date": sale.purchase_date.isoformat(),
         "purchase_price": float(sale.purchase_price),
         "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-        "exclude_in_statistics": sale.exclude_in_statistics,
+        "exclude_from_statistics": sale.exclude_from_statistics,
     }
 
 
@@ -180,7 +180,7 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -242,7 +242,7 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -393,10 +393,10 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
                 ],
             ),
             "'Exclude in statistics' can't be null": InvalidInput(
-                invalid_data={"exclude_in_statistics": None},
+                invalid_data={"exclude_from_statistics": None},
                 fields=[
                     {
-                        "field": "exclude_in_statistics",
+                        "field": "exclude_from_statistics",
                         "message": "This field is mandatory and cannot be null.",
                     }
                 ],
@@ -524,7 +524,7 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
     data.update(invalid_data)
 
@@ -585,7 +585,7 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
         "purchase_date": "2023-02-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -636,7 +636,7 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
         "purchase_date": "2023-02-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -680,7 +680,7 @@ def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(a
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -740,7 +740,7 @@ def test__api__apartment_sale__create__new_apartment__no_other_apartments(api_cl
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -810,7 +810,7 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -875,7 +875,7 @@ def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(a
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -938,7 +938,7 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
         "purchase_date": "2023-01-01",
         "purchase_price": 100_000,
         "apartment_share_of_housing_company_loans": 50_000,
-        "exclude_in_statistics": True,
+        "exclude_from_statistics": True,
     }
 
     url_1 = reverse(
@@ -1022,7 +1022,7 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
         "purchase_date": sale.purchase_date.isoformat(),
         "purchase_price": float(sale.purchase_price),
         "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-        "exclude_in_statistics": sale.exclude_in_statistics,
+        "exclude_from_statistics": sale.exclude_from_statistics,
     }
 
 
@@ -1066,10 +1066,10 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
                 ],
             ),
             "'Exclude in statistics' can't be null": InvalidInput(
-                invalid_data={"exclude_in_statistics": None},
+                invalid_data={"exclude_from_statistics": None},
                 fields=[
                     {
-                        "field": "exclude_in_statistics",
+                        "field": "exclude_from_statistics",
                         "message": "This field is mandatory and cannot be null.",
                     }
                 ],

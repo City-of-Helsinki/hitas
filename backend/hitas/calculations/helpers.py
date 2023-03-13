@@ -1,15 +1,6 @@
 import datetime
-from decimal import ROUND_HALF_UP, Decimal
-from typing import Optional
 
 from dateutil import relativedelta
-
-
-def roundup(v: Decimal) -> Optional[Decimal]:
-    if v is None:
-        return None
-
-    return v.quantize(Decimal(".00"), ROUND_HALF_UP)
 
 
 def months_between_dates(first: datetime.date, second: datetime.date) -> int:

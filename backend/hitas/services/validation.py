@@ -1,6 +1,13 @@
 import re
+from typing import TypeVar
+from uuid import UUID
 
+from django.db import models
 from rest_framework.exceptions import ValidationError
+
+from hitas.exceptions import HitasModelNotFound
+
+TModel = TypeVar("TModel", bound=models.Model)
 
 
 def validate_postal_code(postal_code: str) -> str:
@@ -17,3 +24,23 @@ def validate_quarter(value: str) -> str:
     if match is None:
         raise ValidationError(f"{value!r} is not a valid quarter.")
     return value
+
+
+def lookup_id_to_uuid(lookup_id: str, model_class: type[TModel]) -> UUID:
+    try:
+        return UUID(hex=lookup_id)
+    except ValueError as error:
+        raise HitasModelNotFound(model=model_class) from error
+
+
+def lookup_model_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> TModel:
+    uuid = lookup_id_to_uuid(lookup_id, model_class)
+
+    try:
+        return model_class.objects.get(uuid=uuid, **kwargs)
+    except model_class.DoesNotExist as error:
+        raise HitasModelNotFound(model=model_class) from error
+
+
+def lookup_model_id_by_uuid(lookup_id: str, model_class: type[TModel], **kwargs) -> int:
+    return lookup_model_by_uuid(lookup_id, model_class, **kwargs).id
