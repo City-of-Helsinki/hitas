@@ -11,7 +11,7 @@ from django.db.models.functions import Coalesce, NullIf, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from hitas.exceptions import get_hitas_object_or_404
+from hitas.exceptions import MissingValues, get_hitas_object_or_404
 from hitas.models import Apartment
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment_sale import ApartmentSale
@@ -177,8 +177,8 @@ def _get_housing_companies_to_check(regulation_month: datetime.date) -> list[Hou
     if not housing_companies:
         return []
 
-    logger.info(f"- {len(housing_companies)} housing companies found!")
-    logger.info("- Validating housing company apartment prices and surface areas...")
+    logger.info(f"{len(housing_companies)} housing companies found!")
+    logger.info("Validating housing company apartment prices and surface areas...")
     _validate_prices_and_surface_areas(housing_companies)
 
     return housing_companies
@@ -235,7 +235,7 @@ def _validate_prices_and_surface_areas(housing_companies: list[HousingCompanyWit
 
             errors.append(msg)
 
-        raise ValidationError(detail={api_settings.NON_FIELD_ERRORS_KEY: errors})
+        raise MissingValues(missing=errors, message="Missing apartment details")
 
 
 def _check_automatic_release(housing_companies: list[HousingCompanyWithAnnotations]) -> list[ComparisonData]:
@@ -246,7 +246,7 @@ def _check_automatic_release(housing_companies: list[HousingCompanyWithAnnotatio
     for i, housing_company in enumerate(housing_companies):
         if not housing_company.financing_method.old_hitas_ruleset:
             logger.info(
-                f"- Housing company {housing_company.display_name!r} uses new hitas ruleset. "
+                f"Housing company {housing_company.display_name!r} uses new hitas ruleset. "
                 f"Automatically qualified for release from regulation."
             )
             automatically_released.append(
@@ -270,10 +270,10 @@ def _index_adjustment(
     """
     Make index adjustments for housing company prices.
     """
-    logger.info("- Looking for indices...")
+    logger.info("Looking for indices...")
     indexes = _get_indexes(housing_companies, calculation_month)
 
-    logger.info("- All indices found, continuing adjustments...")
+    logger.info("All indices found, continuing adjustments...")
     missing_prices: list[HousingCompanyNameT] = []
     for housing_company in housing_companies:
         if housing_company.financing_method.old_hitas_ruleset:
@@ -343,7 +343,7 @@ def _get_indexes(
             missing_new = ", ".join(f"'{month.strftime('%Y-%m')}'" for month in sorted(missing_new_indexes))
             errors.append(f"Post 2011 market price indices missing for months: {missing_new}.")
 
-        raise ValidationError(detail={api_settings.NON_FIELD_ERRORS_KEY: errors})
+        raise MissingValues(missing=errors, message="Missing required indices")
 
     return {"old": old_indexes, "new": new_indexes}
 
@@ -511,13 +511,13 @@ def _determine_regulation_need(
             # TODO: Is this off by one?
             if comparison_value <= postal_code_average_price_per_square_meter:
                 logger.info(
-                    f"- Housing company {display_name!r} should be released from regulation since: "
+                    f"Housing company {display_name!r} should be released from regulation since: "
                     f"{comparison_value} <= {postal_code_average_price_per_square_meter}."
                 )
                 results["released_from_regulation"].append(comparison_data)
             else:
                 logger.info(
-                    f"- Housing company {display_name!r} should stay regulated since: "
+                    f"Housing company {display_name!r} should stay regulated since: "
                     f"{comparison_value} > {postal_code_average_price_per_square_meter}."
                 )
                 results["stays_regulated"].append(comparison_data)

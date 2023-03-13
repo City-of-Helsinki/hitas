@@ -324,19 +324,18 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
 
     response = api_client.get(url)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-    # TODO: Use 409 Conflict here?
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "bad_request",
+        "error": "missing_values",
         "fields": [
             {
                 "field": "non_field_errors",
                 "message": "Pre 2011 market price indices missing for months: '1993-02', '2023-02'.",
             },
         ],
-        "message": "Bad request",
-        "reason": "Bad Request",
-        "status": 400,
+        "message": "Missing required indices",
+        "reason": "Conflict",
+        "status": 409,
     }
 
 
@@ -1250,9 +1249,9 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
 
     response = api_client.get(url)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "bad_request",
+        "error": "missing_values",
         "fields": [
             {
                 "field": "non_field_errors",
@@ -1263,9 +1262,9 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
                 ),
             },
         ],
-        "message": "Bad request",
-        "reason": "Bad Request",
-        "status": 400,
+        "message": "Missing apartment details",
+        "reason": "Conflict",
+        "status": 409,
     }
 
 
@@ -1347,9 +1346,9 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
 
     response = api_client.get(url)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "bad_request",
+        "error": "missing_values",
         "fields": [
             {
                 "field": "non_field_errors",
@@ -1360,9 +1359,9 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
                 ),
             },
         ],
-        "message": "Bad request",
-        "reason": "Bad Request",
-        "status": 400,
+        "message": "Missing apartment details",
+        "reason": "Conflict",
+        "status": 409,
     }
 
 
@@ -1445,9 +1444,9 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
 
     response = api_client.get(url)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "bad_request",
+        "error": "missing_values",
         "fields": [
             {
                 "field": "non_field_errors",
@@ -1459,9 +1458,9 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
                 ),
             },
         ],
-        "message": "Bad request",
-        "reason": "Bad Request",
-        "status": 400,
+        "message": "Missing apartment details",
+        "reason": "Conflict",
+        "status": 409,
     }
 
 

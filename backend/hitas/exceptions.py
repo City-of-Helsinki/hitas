@@ -1,8 +1,9 @@
-from typing import Any, Dict, List, TypeVar, Union
+from typing import Any, TypeVar
 
 from django.db.models import Model
 from django.http.response import JsonResponse
 from rest_framework import exceptions
+from rest_framework.exceptions import _get_error_details, _get_full_details
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import exception_handler as drf_exc_handler
@@ -198,7 +199,24 @@ class ModelConflict(HitasException):
         )
 
 
-def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
+class MissingValues(HitasException):
+    def __init__(self, missing: list[str] | dict[str, str], *, message: str):
+        super().__init__(
+            status_code=409,
+            data={
+                "error": "missing_values",
+                "fields": _convert_fields(
+                    field_name=api_settings.NON_FIELD_ERRORS_KEY,
+                    error=_get_full_details(_get_error_details(missing, default_code="missing")),
+                ),
+                "message": message,
+                "reason": "Conflict",
+                "status": 409,
+            },
+        )
+
+
+def _convert_fields(field_name: str, error: dict[str, Any] | list[dict[str, Any]]) -> list[dict[str, Any]]:
     if isinstance(error, list):
         return _convert_field_errors_list(field_name, error)
     elif isinstance(error, dict):
@@ -207,7 +225,7 @@ def _convert_fields(field_name: str, error: Union[Dict[str, Any], List[Dict[str,
         raise NotImplementedError()
 
 
-def _convert_field_errors_list(field_name: str, errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _convert_field_errors_list(field_name: str, errors: list[dict[str, Any]]) -> list[dict[str, Any]]:
     retval = []
 
     for error in errors:
@@ -220,7 +238,7 @@ def _convert_field_errors_list(field_name: str, errors: List[Dict[str, Any]]) ->
     return retval
 
 
-def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _convert_field_errors_dict(field_name: str, errors: dict[str, Any]) -> list[dict[str, Any]]:
     if "code" in errors:
         return [_convert_field_error(field_name, errors)]
 
@@ -242,7 +260,7 @@ def _convert_field_errors_dict(field_name: str, errors: Dict[str, Any]) -> List[
     return retval
 
 
-def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, Any]:
+def _convert_field_error(field_name: str, error: dict[str, Any]) -> dict[str, Any]:
     if error["code"] in ["required", "null"]:
         return {"field": field_name, "message": "This field is mandatory and cannot be null."}
     elif error["code"] in ["blank"]:
@@ -259,6 +277,7 @@ def _convert_field_error(field_name: str, error: Dict[str, Any]) -> Dict[str, An
         "not_a_list",
         "empty",
         "datetime",
+        "missing",
     ]:
         return {"field": field_name, "message": error["message"]}
     else:

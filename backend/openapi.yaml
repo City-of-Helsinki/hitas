@@ -2373,6 +2373,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -7058,6 +7060,26 @@ components:
             - owner_in_use
             - index_missing
             - invalid_calculation_result
+        fields:
+          description: Details about specific validation failures
+          type: array
+          items:
+            description: Single validation detail
+            type: object
+            additionalProperties: false
+            required:
+              - field
+              - message
+            properties:
+              field:
+                description: |-
+                  Always "non_field_errors" if given. Indicates that the error was not caused by a serializer field.
+                type: string
+                example: non_field_errors
+              message:
+                description: Error message with details about the failure
+                type: string
+                example: Values needed for the endpoint are missing
 
     UnsupportedMediaTypeError:
       description: Unsupported media type error
