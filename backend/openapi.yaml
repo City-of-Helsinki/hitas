@@ -3444,6 +3444,48 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/indices/surface-area-price-ceiling:
+    post:
+      description: Create new surface area price ceiling for the next three months
+      operationId: create-surface-area-price-ceiling
+      tags:
+        - Indices
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              description: Inputs for the calculation
+              type: object
+              additionalProperties: false
+              properties:
+                calculation_date:
+                  description: Calculation date, use current date if not given
+                  type: string
+                  example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully created surface area price ceiling for the next three months
+          content:
+            application/json:
+              schema:
+                description: List of surface area price ceilings created
+                type: array
+                minItems: 3
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/Index'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/indices/{index}/{month}:
     get:
       description: Read a single index by month
@@ -3547,6 +3589,7 @@ components:
           - market-price-index-2005-equal-100
           - construction-price-index
           - construction-price-index-2005-equal-100
+          - surface-area-price-ceiling
         type: string
         example: maximum-price-index
         x-extensible-enum:
@@ -3555,6 +3598,7 @@ components:
           - market-price-index-2005-equal-100
           - construction-price-index
           - construction-price-index-2005-equal-100
+          - surface-area-price-ceiling
       description: Specifies the index name used
 
   schemas:

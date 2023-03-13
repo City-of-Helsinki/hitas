@@ -2,7 +2,7 @@ import datetime
 from typing import ClassVar
 
 from django.db.models import Q
-from rest_framework import mixins
+from rest_framework import mixins, status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -17,6 +17,8 @@ from hitas.models import (
     SurfaceAreaPriceCeiling,
 )
 from hitas.models.indices import AbstractIndex
+from hitas.services.indices import calculate_surface_area_price_ceiling
+from hitas.utils import from_iso_format_or_today_if_none
 from hitas.views.utils import (
     HitasDecimalField,
     HitasFilterSet,
@@ -123,3 +125,12 @@ class ConstructionPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
 
 class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
     model_class = SurfaceAreaPriceCeiling
+
+    def create(self, request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(kwargs.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        result = calculate_surface_area_price_ceiling(calculation_date)
+        return Response(data=result, status=status.HTTP_200_OK)
