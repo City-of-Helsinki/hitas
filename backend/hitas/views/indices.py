@@ -1,4 +1,5 @@
 import datetime
+from typing import ClassVar
 
 from django.db.models import Q
 from rest_framework import mixins
@@ -58,12 +59,9 @@ class _AbstractIndicesViewSet(
     mixins.ListModelMixin,
     GenericViewSet,
 ):
+    model_class: ClassVar[type[AbstractIndex]]
     serializer_class = IndicesSerializer
     lookup_field = "month"
-
-    def __init__(self, model_class, **kwargs):
-        self.model_class = model_class
-        super().__init__(**kwargs)
 
     def update(self, request, *args, **kwargs):
         if request.data["value"] is None:
@@ -104,30 +102,24 @@ class _AbstractIndicesViewSet(
 
 
 class MaximumPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MaximumPriceIndex, **kwargs)
+    model_class = MaximumPriceIndex
 
 
 class MarketPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MarketPriceIndex, **kwargs)
+    model_class = MarketPriceIndex
 
 
 class MarketPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MarketPriceIndex2005Equal100, **kwargs)
+    model_class = MarketPriceIndex2005Equal100
 
 
 class ConstructionPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(ConstructionPriceIndex, **kwargs)
+    model_class = ConstructionPriceIndex
 
 
 class ConstructionPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(ConstructionPriceIndex2005Equal100, **kwargs)
+    model_class = ConstructionPriceIndex2005Equal100
 
 
 class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(SurfaceAreaPriceCeiling, **kwargs)
+    model_class = SurfaceAreaPriceCeiling
