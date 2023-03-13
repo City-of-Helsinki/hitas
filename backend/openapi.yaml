@@ -2340,7 +2340,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  # Regulation
+  # Thirty Year Regulation
 
   /api/v1/thirty-year-regulation:
 
@@ -6819,6 +6819,11 @@ components:
             $ref: '#/components/schemas/ThirtyYearRegulationData'
         stays_regulated:
           description: Housing Companies that stay regulated.
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirtyYearRegulationData'
+        skipped:
+          description: Housing Companies that could not be checked for regulation.
           type: array
           items:
             $ref: '#/components/schemas/ThirtyYearRegulationData'

@@ -41,6 +41,7 @@ class RegulationResults(TypedDict):
     automatically_released: list[ComparisonData]
     released_from_regulation: list[ComparisonData]
     stays_regulated: list[ComparisonData]
+    skipped: list[ComparisonData]
 
 
 def perform_thirty_year_regulation(calculation_date: datetime.date) -> RegulationResults:
@@ -67,6 +68,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             automatically_released=[],
             released_from_regulation=[],
             stays_regulated=[],
+            skipped=[],
         )
 
     automatically_released = _check_automatic_release(housing_companies)
@@ -76,6 +78,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             automatically_released=automatically_released,
             released_from_regulation=[],
             stays_regulated=[],
+            skipped=[],
         )
         _free_housing_companies_from_regulation(housing_companies, results)
         logger.info("Regulation check complete!")
@@ -116,7 +119,8 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     logger.info(
         f"{len(results['automatically_released'])} housing companies are released from regulation automatically, "
         f"{len(results['released_from_regulation'])} are released after regulation checks, "
-        f"{len(results['stays_regulated'])} stay regulated."
+        f"{len(results['stays_regulated'])} stay regulated, "
+        f"{len(results['skipped'])} could not be checked."
     )
 
     _free_housing_companies_from_regulation(housing_companies, results)
@@ -486,6 +490,7 @@ def _determine_regulation_need(
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[],
     )
 
     for postal_code, comparison_data_by_housing_company in comparison_values.items():
@@ -494,20 +499,18 @@ def _determine_regulation_need(
         if postal_code_average_price_per_square_meter is None:
             postal_code_average_price_per_square_meter = _find_average_of_nearest(postal_code, price_by_area)
 
-            if postal_code_average_price_per_square_meter is None:
-                # TODO: What here?
-                companies = ", ".join(
-                    (f"{data['display_name']!r}" for data in comparison_data_by_housing_company.values())
-                )
-                logger.error(
-                    f"No average price per square meter found for postal code {postal_code!r}, "
-                    f"cannot determine regulation need for the following housing companies: {companies}"
-                )
-                continue
-
-        for _housing_company_id, comparison_data in comparison_data_by_housing_company.items():
+        for comparison_data in comparison_data_by_housing_company.values():
             display_name = comparison_data["display_name"]
             comparison_value = comparison_data["price"]
+
+            if postal_code_average_price_per_square_meter is None:
+                logger.info(
+                    f"No average price per square meter found for postal code {postal_code!r}, "
+                    f"cannot determine regulation need for {display_name!r}."
+                )
+                results["skipped"].append(comparison_data)
+                continue
+
             # TODO: Is this off by one?
             if comparison_value <= postal_code_average_price_per_square_meter:
                 logger.info(

@@ -29,6 +29,7 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -120,6 +121,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
     sale.apartment.housing_company.refresh_from_db()
@@ -214,6 +216,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        skipped=[],
     )
 
     sale.apartment.housing_company.refresh_from_db()
@@ -297,6 +300,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -465,6 +469,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         ],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -554,6 +559,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                 old_ruleset=sale_2.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        skipped=[],
     )
 
 
@@ -636,6 +642,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        skipped=[],
     )
 
 
@@ -654,7 +661,8 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     # Sale for the apartment in a housing company that will be under regulation checking
-    ApartmentSaleFactory.create(
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -703,6 +711,14 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+            )
+        ],
     )
 
 
@@ -721,7 +737,8 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     # Sale for the apartment in a housing company that will be under regulation checking
-    ApartmentSaleFactory.create(
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -770,6 +787,14 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+            )
+        ],
     )
 
 
@@ -788,7 +813,8 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     # Sale for the apartment in a housing company that will be under regulation checking
-    ApartmentSaleFactory.create(
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -838,6 +864,14 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+            )
+        ],
     )
 
 
@@ -856,7 +890,8 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     # Sale for the apartment in a housing company that will be under regulation checking
-    ApartmentSaleFactory.create(
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -906,6 +941,14 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+            )
+        ],
     )
 
 
@@ -924,7 +967,8 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     # Sale for the apartment in a housing company that will be under regulation checking
-    ApartmentSaleFactory.create(
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -974,6 +1018,14 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+            )
+        ],
     )
 
 
@@ -1046,6 +1098,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -1135,6 +1188,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -1216,6 +1270,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -1551,6 +1606,7 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
             )
         ],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -1587,6 +1643,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[],
+        skipped=[],
     )
 
 
@@ -1671,10 +1728,12 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
                 )
             ],
             stays_regulated=[],
+            skipped=[],
         )
     else:
         assert response.json() == RegulationResults(
             automatically_released=[],
             released_from_regulation=[],
             stays_regulated=[],
+            skipped=[],
         )
