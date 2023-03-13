@@ -406,11 +406,18 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
             ).fetchall()
 
             for mpi_improvement in mpi_improvements:
+                # Can always be deduced from the improvement name
+                no_deductions = mpi_improvement["name"] in [
+                    "Hissien rakentaminen",
+                    "Rakennusvirheistä johtuvat korjauskustannukset",
+                ]
+
                 new = HousingCompanyMarketPriceImprovement(
                     housing_company=v.value,
                     name=mpi_improvement["name"],
                     completion_date=mpi_improvement["completion_date"],
                     value=mpi_improvement["value"],
+                    no_deductions=no_deductions,
                 )
                 bulk_mpi.append(new)
                 count += 1
@@ -590,7 +597,7 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
             if (
                 # awdc Improvements do not depreciate
                 new.depreciation_percentage == DepreciationPercentage.ZERO
-                # and us completed at almost the same time as the apartment
+                # and is completed at almost the same time as the apartment
                 and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
                 # and the improvements accepted value should not be less than the original value
                 and cpi_improvement["accepted_value"] > cpi_improvement["value"]
