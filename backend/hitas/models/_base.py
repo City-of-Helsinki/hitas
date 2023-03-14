@@ -50,3 +50,15 @@ class HitasImprovement(HitasModel):
 
     def __str__(self):
         return f"{self.name} ({self.value} €)"
+
+
+class HitasMarketPriceImprovement(HitasImprovement):
+    # No deductions = Excess is not removed from this apartment, and the improvement does not deprecate
+    # This means that the full value of the improvement is always added to the price of the apartment
+    # This is used e.g. for an attic room, elevators or repair costs of construction defects
+    # These improvements values are also index adjusted.
+    no_deductions = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+        ordering = HitasImprovement.Meta.ordering

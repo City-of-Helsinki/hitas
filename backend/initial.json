@@ -9343,7 +9343,8 @@
       "name": "Rem inventore aperiam odio voluptate quidem.",
       "completion_date": "2015-10-28",
       "value": "16124.00",
-      "housing_company": 1
+      "housing_company": 1,
+      "no_deductions": false
     }
   },
   {
@@ -9355,7 +9356,8 @@
       "name": "Dignissimos dolores temporibus facilis.",
       "completion_date": "2017-09-22",
       "value": "8767.00",
-      "housing_company": 1
+      "housing_company": 1,
+      "no_deductions": false
     }
   },
   {
@@ -9367,7 +9369,8 @@
       "name": "Ipsam explicabo praesentium ducimus quas ab repellendus.",
       "completion_date": "2017-12-15",
       "value": "87670.00",
-      "housing_company": 2
+      "housing_company": 2,
+      "no_deductions": false
     }
   },
   {
@@ -9379,7 +9382,8 @@
       "name": "Nulla quia quam iusto quos at quia.",
       "completion_date": "2020-07-19",
       "value": "90306.00",
-      "housing_company": 3
+      "housing_company": 3,
+      "no_deductions": false
     }
   },
   {
@@ -9391,7 +9395,8 @@
       "name": "Suscipit laudantium nesciunt.",
       "completion_date": "2015-02-22",
       "value": "91049.00",
-      "housing_company": 4
+      "housing_company": 4,
+      "no_deductions": false
     }
   },
   {
@@ -9403,7 +9408,8 @@
       "name": "Labore odio in.",
       "completion_date": "2020-12-30",
       "value": "52437.00",
-      "housing_company": 5
+      "housing_company": 5,
+      "no_deductions": false
     }
   },
   {
@@ -9415,7 +9421,8 @@
       "name": "Quo ipsam animi voluptatem necessitatibus minus perspiciatis reprehenderit.",
       "completion_date": "2015-07-28",
       "value": "83605.00",
-      "housing_company": 5
+      "housing_company": 5,
+      "no_deductions": false
     }
   },
   {
@@ -9427,7 +9434,8 @@
       "name": "Quo error eveniet quis esse illo doloremque.",
       "completion_date": "2016-05-09",
       "value": "78534.00",
-      "housing_company": 6
+      "housing_company": 6,
+      "no_deductions": false
     }
   },
   {
@@ -9439,7 +9447,8 @@
       "name": "Praesentium praesentium est illo minus ad.",
       "completion_date": "2011-03-22",
       "value": "11299.00",
-      "housing_company": 7
+      "housing_company": 7,
+      "no_deductions": false
     }
   },
   {
@@ -9451,7 +9460,8 @@
       "name": "Cum quia amet deserunt voluptate.",
       "completion_date": "2014-09-25",
       "value": "99019.00",
-      "housing_company": 7
+      "housing_company": 7,
+      "no_deductions": false
     }
   },
   {
@@ -9463,7 +9473,8 @@
       "name": "Ab neque adipisci.",
       "completion_date": "2016-06-12",
       "value": "26177.00",
-      "housing_company": 7
+      "housing_company": 7,
+      "no_deductions": false
     }
   },
   {
@@ -9475,7 +9486,8 @@
       "name": "Iure libero et reiciendis eius.",
       "completion_date": "2020-10-01",
       "value": "52257.00",
-      "housing_company": 8
+      "housing_company": 8,
+      "no_deductions": false
     }
   },
   {
@@ -9487,7 +9499,8 @@
       "name": "Inventore reiciendis cumque illum ratione aspernatur corrupti.",
       "completion_date": "2018-01-09",
       "value": "25121.00",
-      "housing_company": 8
+      "housing_company": 8,
+      "no_deductions": false
     }
   },
   {

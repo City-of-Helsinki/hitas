@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
 from hitas.models.utils import validate_business_id
 
 
@@ -112,7 +112,7 @@ class HousingCompanyWithAnnotations(HousingCompany):
         abstract = True
 
 
-class HousingCompanyMarketPriceImprovement(HitasImprovement):
+class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany", on_delete=models.CASCADE, related_name="market_price_improvements"
     )
