@@ -44,22 +44,22 @@ def get_completed_housing_companies(
         .alias(
             _first_sale_prices=subquery_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
             _catalog_prices=aggregate_catalog_prices_where_no_sales("real_estates__buildings__apartments__"),
-            _realized_acquisition_price=ExpressionWrapper(
+        )
+        .annotate(
+            realized_acquisition_price=ExpressionWrapper(
                 Coalesce(Sum("_first_sale_prices"), 0) + F("_catalog_prices"),
                 output_field=HitasModelDecimalField(),
             ),
-            _total_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
-        )
-        .annotate(
+            surface_area=Sum("real_estates__buildings__apartments__surface_area"),
             completion_date=max_if_all_not_null(
                 ref="real_estates__buildings__apartments__completion_date",
                 inf=datetime.date.max,
             ),
             completion_month=TruncMonth("completion_date"),
             avg_price_per_square_meter=(
-                F("_realized_acquisition_price")
+                F("realized_acquisition_price")
                 # Prevent zero-division errors
-                / (NullIf(F("_total_surface_area"), 0, output_field=HitasModelDecimalField()))
+                / (NullIf(F("surface_area"), 0, output_field=HitasModelDecimalField()))
             ),
         )
         .filter(
@@ -82,22 +82,22 @@ def get_completed_housing_companies(
 def make_index_adjustment_for_housing_companies(
     housing_companies: list[HousingCompanyWithAnnotations],
     calculation_month: datetime.date,
-) -> None:
+) -> dict[Literal["old", "new"], dict[datetime.date, Decimal]]:
     """
     Make index adjustments for housing company prices.
     """
     logger.info("Looking for indices...")
-    indexes = _get_indices_for_adjustment(housing_companies, calculation_month)
+    indices = _get_indices_for_adjustment(housing_companies, calculation_month)
 
     logger.info("All indices found, continuing adjustments...")
     missing_prices: list[HousingCompanyNameT] = []
     for housing_company in housing_companies:
         if housing_company.financing_method.old_hitas_ruleset:
-            calculation_month_index = indexes["old"][calculation_month]
-            completion_month_index = indexes["old"][housing_company.completion_month]
+            calculation_month_index = indices["old"][calculation_month]
+            completion_month_index = indices["old"][housing_company.completion_month]
         else:
-            calculation_month_index = indexes["new"][calculation_month]
-            completion_month_index = indexes["new"][housing_company.completion_month]
+            calculation_month_index = indices["new"][calculation_month]
+            completion_month_index = indices["new"][housing_company.completion_month]
 
         if housing_company.avg_price_per_square_meter in (None, Decimal("0")):
             missing_prices.append(housing_company.display_name)
@@ -117,6 +117,8 @@ def make_index_adjustment_for_housing_companies(
                 )
             },
         )
+
+    return indices
 
 
 def _get_indices_for_adjustment(

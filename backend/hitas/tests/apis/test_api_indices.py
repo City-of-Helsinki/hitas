@@ -6,7 +6,13 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import HousingCompanyState
+from hitas.models import ApartmentSale, HousingCompanyState
+from hitas.models.indices import (
+    CalculationData,
+    HousingCompanyData,
+    SurfaceAreaPriceCeilingCalculationData,
+    SurfaceAreaPriceCeilingResult,
+)
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentSaleFactory
 from hitas.tests.factories.indices import (
@@ -238,7 +244,7 @@ def test__api__indices__create__surface_area_price_ceiling__single(api_client: H
 
     # Sale in a finished housing company.
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    ApartmentSaleFactory.create(
+    sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=completion_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -258,10 +264,33 @@ def test__api__indices__create__surface_area_price_ceiling__single(api_client: H
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == [
-        {"month": "2023-02", "value": 12000.0},
-        {"month": "2023-03", "value": 12000.0},
-        {"month": "2023-04", "value": 12000.0},
+        SurfaceAreaPriceCeilingResult(month="2023-02", value=12_000.0),
+        SurfaceAreaPriceCeilingResult(month="2023-03", value=12_000.0),
+        SurfaceAreaPriceCeilingResult(month="2023-04", value=12_000.0),
     ]
+
+    calc_data = list(SurfaceAreaPriceCeilingCalculationData.objects.all())
+    assert len(calc_data) == 1
+    assert calc_data[0].calculation_month == this_month
+    assert calc_data[0].data == CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name=sale.apartment.housing_company.display_name,
+                completion_date=completion_month.isoformat(),
+                surface_area=float(sale.apartment.surface_area),
+                realized_acquisition_price=60_000.0,
+                unadjusted_average_price_per_square_meter=6_000.0,
+                adjusted_average_price_per_square_meter=12_000.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+        ],
+        created_surface_area_price_ceilings=[
+            SurfaceAreaPriceCeilingResult(month="2023-02", value=12_000.0),
+            SurfaceAreaPriceCeilingResult(month="2023-03", value=12_000.0),
+            SurfaceAreaPriceCeilingResult(month="2023-04", value=12_000.0),
+        ],
+    )
 
 
 @pytest.mark.django_db
@@ -278,7 +307,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
 
     # Sale in a finished housing company.
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    ApartmentSaleFactory.create(
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=completion_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -289,7 +318,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
 
     # Sale in another finished housing company.
     # Index adjusted price for the housing company will be: (30_000 + 10_000) / 25 * (200 / 100) = 3_200
-    ApartmentSaleFactory.create(
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=completion_month,
         purchase_price=30_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -309,10 +338,43 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == [
-        {"month": "2023-02", "value": 7600.0},
-        {"month": "2023-03", "value": 7600.0},
-        {"month": "2023-04", "value": 7600.0},
+        SurfaceAreaPriceCeilingResult(month="2023-02", value=7_600.0),
+        SurfaceAreaPriceCeilingResult(month="2023-03", value=7_600.0),
+        SurfaceAreaPriceCeilingResult(month="2023-04", value=7_600.0),
     ]
+
+    calc_data = list(SurfaceAreaPriceCeilingCalculationData.objects.all())
+    assert len(calc_data) == 1
+    assert calc_data[0].calculation_month == this_month
+    assert calc_data[0].data == CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name=sale_1.apartment.housing_company.display_name,
+                completion_date=completion_month.isoformat(),
+                surface_area=float(sale_1.apartment.surface_area),
+                realized_acquisition_price=60_000.0,
+                unadjusted_average_price_per_square_meter=6_000.0,
+                adjusted_average_price_per_square_meter=12_000.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+            HousingCompanyData(
+                name=sale_2.apartment.housing_company.display_name,
+                completion_date=completion_month.isoformat(),
+                surface_area=float(sale_2.apartment.surface_area),
+                realized_acquisition_price=40_000.0,
+                unadjusted_average_price_per_square_meter=1_600.0,
+                adjusted_average_price_per_square_meter=3_200.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+        ],
+        created_surface_area_price_ceilings=[
+            SurfaceAreaPriceCeilingResult(month="2023-02", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-03", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-04", value=7_600.0),
+        ],
+    )
 
 
 @pytest.mark.django_db
