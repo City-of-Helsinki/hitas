@@ -393,7 +393,8 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         # Market price index
         #
         market_price_index = connection.execute(
-            select(market_price_indices)
+            select(market_price_indices, additional_infos)
+            .join(additional_infos, isouter=True)
             .where(market_price_indices.c.company_id == company_oracle_id)
             .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
         ).first()
@@ -412,6 +413,11 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
                     "Rakennusvirheistä johtuvat korjauskustannukset",
                 ]
 
+                if no_deductions:
+                    improvement_notes = combine_notes(market_price_index)
+                    if improvement_notes:
+                        v.value.notes = "\n".join([v.value.notes, improvement_notes])
+                        v.value.save()
                 new = HousingCompanyMarketPriceImprovement(
                     housing_company=v.value,
                     name=mpi_improvement["name"],

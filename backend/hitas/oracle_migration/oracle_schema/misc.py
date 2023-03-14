@@ -6,6 +6,12 @@ from hitas.oracle_migration.types import HitasAnonymizedName, HitasAnonymizedTex
 additional_infos = Table(
     "HITLISAT",
     metadata_obj,
+    # Possible type values:
+    # HITYHTIO HITHUONE HITISANTA
+    # HITVALVO
+    # HITEHIND HITHLIYH HITHLIHU
+    # HITRAKIND HITRAKIYH HITRAKIHU
+    # HITMHIND HITMHIYH HITMHIHU
     Column("C_LISATVIITE", String(10), key="type", primary_key=True, nullable=False),
     Column("KG_LTUNNUS", Integer, key="object_id", primary_key=True, nullable=False),
     Column("TEKSTI1", HitasAnonymizedText(100), nullable=False),

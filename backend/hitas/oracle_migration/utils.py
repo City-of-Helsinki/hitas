@@ -47,7 +47,7 @@ def format_building_type(bt: BuildingType) -> None:
 def combine_notes(a: LegacyRow) -> str:
     return "\n".join(
         [note for note in [a["TEKSTI1"], a["TEKSTI2"], a["TEKSTI3"], a["TEKSTI4"], a["TEKSTI5"]] if note is not None]
-    )
+    ).replace("-\n", "")
 
 
 def housing_company_state_from(code: str) -> HousingCompanyState:
