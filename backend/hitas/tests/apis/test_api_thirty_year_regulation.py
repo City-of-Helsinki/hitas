@@ -10,7 +10,12 @@ from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCom
 from hitas.models.external_sales_data import CostAreaData, QuarterData
 from hitas.services.thirty_year_regulation import ComparisonData, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.factories import (
+    ApartmentFactory,
+    ApartmentSaleFactory,
+    NewHitasFinancingMethodFactory,
+    OldHitasFinancingMethodFactory,
+)
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -496,7 +501,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=False,
+        apartment__building__real_estate__housing_company__financing_method=NewHitasFinancingMethodFactory(),
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
     # This housing company will be checked, since it is using the old hitas ruleset
@@ -507,7 +512,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
