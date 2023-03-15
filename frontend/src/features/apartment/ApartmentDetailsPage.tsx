@@ -375,11 +375,11 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             value={formatMoney(data.prices.first_sale_share_of_housing_company_loans)}
                                         />
                                         <DetailField
-                                            label="Ensimmäinen ostopäivä"
+                                            label="Ensimmäinen kauppapäivä"
                                             value={formatDate(data.prices.first_purchase_date)}
                                         />
                                         <DetailField
-                                            label="Viimeisin ostopäivä"
+                                            label="Viimeisin kauppapäivä"
                                             value={formatDate(data.prices.latest_purchase_date)}
                                         />
                                         <DetailField
