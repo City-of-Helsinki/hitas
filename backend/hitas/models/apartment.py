@@ -78,14 +78,19 @@ class Apartment(ExternalHitasModel):
 
     notes = models.TextField(blank=True, null=True)
 
-    # 'Hankinta-arvo' = Ensimmäisen kaupan (tai myyntihintaluettelon) kauppakirjahinta + yhtiölainaosuus
+    # 'Myyntihintaluettelon Hankinta-arvo' = Myyntihintaluettelon kauppakirjahinta + yhtiölainaosuus
+    @property
+    def catalog_acquisition_price(self) -> Optional[Decimal]:
+        if self.catalog_purchase_price is not None and self.catalog_primary_loan_amount is not None:
+            return self.catalog_purchase_price + self.catalog_primary_loan_amount
+
+        return None
+
+    # 'Hankinta-arvo' = Ensimmäisen kaupan kauppakirjahinta + yhtiölainaosuus
     @property
     def first_sale_acquisition_price(self) -> Optional[Decimal]:
         if self.first_sale_purchase_price is not None and self.first_sale_share_of_housing_company_loans is not None:
             return self.first_sale_purchase_price + self.first_sale_share_of_housing_company_loans
-
-        if self.catalog_purchase_price is not None and self.catalog_primary_loan_amount is not None:
-            return self.catalog_purchase_price + self.catalog_primary_loan_amount
 
         return None
 

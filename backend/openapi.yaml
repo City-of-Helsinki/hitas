@@ -5604,6 +5604,24 @@ components:
           minimum: 0
           nullable: true
           example: 55430
+        catalog_purchase_price:
+          description: Purchase price given in the sales catalog for this apartment
+          type: number
+          minimum: 0
+          nullable: true
+          example: 51222
+        catalog_share_of_housing_company_loans:
+          description: Share of housing company loans given in the sales catalog for this apartment
+          type: number
+          minimum: 0
+          nullable: true
+          example: 4208
+        catalog_acquisition_price:
+          description: Acquisition price based on sales catalog purchase price and share of housing company loans
+          type: number
+          minimum: 0
+          nullable: true
+          example: 55430
         latest_sale_purchase_price:
           description: TBD
           type: number
@@ -5725,7 +5743,6 @@ components:
                       $ref: '#/components/schemas/MaximumValue'
                     surface_area_price_ceiling:
                       $ref: '#/components/schemas/MaximumValue'
-
         construction:
           description: Single apartment construction price information
           type: object
