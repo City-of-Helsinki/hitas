@@ -47,12 +47,15 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 <div className="state">
                     {apartment.has_conditions_of_sale && apartment.sell_by_date ? (
                         <StatusLabel
+                            className="conditions-of-sale"
                             type={getConditionsOfSaleStatusLabelType(
                                 apartment.has_grace_period,
                                 apartment.sell_by_date
                             )}
                             iconLeft={<IconLock size="s" />}
-                        />
+                        >
+                            <div className="sell-by-date">{formatDate(apartment.sell_by_date)}</div>
+                        </StatusLabel>
                     ) : null}
                     <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
                 </div>
