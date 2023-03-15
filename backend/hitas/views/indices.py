@@ -1,7 +1,8 @@
 import datetime
+from typing import ClassVar
 
 from django.db.models import Q
-from rest_framework import mixins
+from rest_framework import mixins, status
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -16,6 +17,8 @@ from hitas.models import (
     SurfaceAreaPriceCeiling,
 )
 from hitas.models.indices import AbstractIndex
+from hitas.services.indices import calculate_surface_area_price_ceiling
+from hitas.utils import from_iso_format_or_today_if_none
 from hitas.views.utils import (
     HitasDecimalField,
     HitasFilterSet,
@@ -58,12 +61,9 @@ class _AbstractIndicesViewSet(
     mixins.ListModelMixin,
     GenericViewSet,
 ):
+    model_class: ClassVar[type[AbstractIndex]]
     serializer_class = IndicesSerializer
     lookup_field = "month"
-
-    def __init__(self, model_class, **kwargs):
-        self.model_class = model_class
-        super().__init__(**kwargs)
 
     def update(self, request, *args, **kwargs):
         if request.data["value"] is None:
@@ -104,30 +104,33 @@ class _AbstractIndicesViewSet(
 
 
 class MaximumPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MaximumPriceIndex, **kwargs)
+    model_class = MaximumPriceIndex
 
 
 class MarketPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MarketPriceIndex, **kwargs)
+    model_class = MarketPriceIndex
 
 
 class MarketPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(MarketPriceIndex2005Equal100, **kwargs)
+    model_class = MarketPriceIndex2005Equal100
 
 
 class ConstructionPriceIndexViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(ConstructionPriceIndex, **kwargs)
+    model_class = ConstructionPriceIndex
 
 
 class ConstructionPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(ConstructionPriceIndex2005Equal100, **kwargs)
+    model_class = ConstructionPriceIndex2005Equal100
 
 
 class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
-    def __init__(self, **kwargs):
-        super().__init__(SurfaceAreaPriceCeiling, **kwargs)
+    model_class = SurfaceAreaPriceCeiling
+
+    def create(self, request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(kwargs.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        result = calculate_surface_area_price_ceiling(calculation_date)
+        return Response(data=result, status=status.HTTP_200_OK)

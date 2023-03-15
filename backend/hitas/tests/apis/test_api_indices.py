@@ -2,10 +2,13 @@ import datetime
 from itertools import product
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status
 
+from hitas.models import HousingCompanyState
 from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.factories import ApartmentSaleFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
@@ -148,7 +151,7 @@ def test__api__indices__list__filter_by_year__invalid(api_client: HitasAPIClient
 # Create
 
 
-@pytest.mark.parametrize("index", indices)
+@pytest.mark.parametrize("index", indices[:-1])
 @pytest.mark.django_db
 def test__api__indices__create(api_client: HitasAPIClient, index):
     response = api_client.post(reverse(f"hitas:{index}-list"), data={}, openapi_validate=False)
@@ -158,6 +161,195 @@ def test__api__indices__create(api_client: HitasAPIClient, index):
         "message": "Method not allowed",
         "reason": "Method Not Allowed",
         "status": 405,
+    }
+
+
+# Create (SurfaceAreaPriceCeiling)
+
+
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__empty(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing",
+        "message": "No housing companies completed before '2023-02-01' or all have wrong state.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__wrong_state(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    completion_month = this_month - relativedelta(years=1)
+
+    # Housing companies in these states should not be included in surface area price ceiling calculation
+    for state in [
+        HousingCompanyState.GREATER_THAN_30_YEARS_FREE,
+        HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION,
+        HousingCompanyState.HALF_HITAS,
+        HousingCompanyState.READY_NO_STATISTICS,
+    ]:
+        ApartmentSaleFactory.create(
+            purchase_date=completion_month,
+            purchase_price=50_000,
+            apartment_share_of_housing_company_loans=10_000,
+            apartment__surface_area=10,
+            apartment__completion_date=completion_month,
+            apartment__building__real_estate__housing_company__state=state,
+        )
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing",
+        "message": "No housing companies completed before '2023-02-01' or all have wrong state.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__single(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    completion_month = this_month - relativedelta(years=1)
+
+    # Create necessary indices
+    MarketPriceIndex2005Equal100Factory.create(month=completion_month, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=this_month, value=200)
+
+    # Sale in a finished housing company.
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    ApartmentSaleFactory.create(
+        purchase_date=completion_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+    )
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    #
+    # Since there is only one housing company, the new surface area price ceiling will be
+    # that housing company's average price per square meter.
+    #
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {"month": "2023-02", "value": 12000.0},
+        {"month": "2023-03", "value": 12000.0},
+        {"month": "2023-04", "value": 12000.0},
+    ]
+
+
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__multiple(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    completion_month = this_month - relativedelta(years=1)
+
+    # Create necessary indices
+    MarketPriceIndex2005Equal100Factory.create(month=completion_month, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=this_month, value=200)
+
+    # Sale in a finished housing company.
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    ApartmentSaleFactory.create(
+        purchase_date=completion_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+    )
+
+    # Sale in another finished housing company.
+    # Index adjusted price for the housing company will be: (30_000 + 10_000) / 25 * (200 / 100) = 3_200
+    ApartmentSaleFactory.create(
+        purchase_date=completion_month,
+        purchase_price=30_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=25,
+        apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+    )
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    #
+    # The surface area price ceiling will be the average of the two housing companies average price per square meter:
+    # (12_000 + 3_200) / 2 = 7600
+    #
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {"month": "2023-02", "value": 7600.0},
+        {"month": "2023-03", "value": 7600.0},
+        {"month": "2023-04", "value": 7600.0},
+    ]
+
+
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__missing_indices(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    completion_month = this_month - relativedelta(years=1)
+
+    # Sale in a finished housing company, but indices are missing
+    ApartmentSaleFactory.create(
+        purchase_date=completion_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+    )
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing_values",
+        "fields": [
+            {
+                "field": "non_field_errors",
+                "message": "Post 2011 market price indices missing for months: '2022-02', '2023-02'.",
+            }
+        ],
+        "message": "Missing required indices",
+        "reason": "Conflict",
+        "status": 409,
     }
 
 
