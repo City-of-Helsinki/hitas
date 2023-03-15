@@ -153,6 +153,12 @@ function doesAContainB(A: object, B: object): boolean {
     return true;
 }
 
+const getConditionsOfSaleStatusLabelType = (hasGracePeriod: boolean, sellByDate: string) => {
+    if (new Date() >= new Date(sellByDate)) return "error";
+    else if (hasGracePeriod) return "alert";
+    return "neutral";
+};
+
 export {
     dotted,
     formatAddress,
@@ -165,4 +171,5 @@ export {
     hdsToast,
     today,
     doesAContainB,
+    getConditionsOfSaleStatusLabelType,
 };

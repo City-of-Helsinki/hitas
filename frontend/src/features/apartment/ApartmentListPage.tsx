@@ -2,7 +2,6 @@ import {useState} from "react";
 
 import {IconLock, SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
-
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
     FilterIntegerField,
@@ -12,7 +11,9 @@ import {
     QueryStateHandler,
 } from "../../common/components";
 import FilterCheckboxField from "../../common/components/FilterCheckboxField";
+import {getApartmentStateLabel} from "../../common/localisation";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
+import {formatDate, getConditionsOfSaleStatusLabelType} from "../../common/utils";
 
 const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
     // Combine ownerships into a single formatted string
@@ -44,8 +45,16 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     </div>
                 </div>
                 <div className="state">
-                    {apartment.has_conditions_of_sale ? <IconLock size="s" /> : null}
-                    <StatusLabel>{apartment.state}</StatusLabel>
+                    {apartment.has_conditions_of_sale && apartment.sell_by_date ? (
+                        <StatusLabel
+                            type={getConditionsOfSaleStatusLabelType(
+                                apartment.has_grace_period,
+                                apartment.sell_by_date
+                            )}
+                            iconLeft={<IconLock size="s" />}
+                        />
+                    ) : null}
+                    <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
                 </div>
             </li>
         </Link>
