@@ -55,6 +55,21 @@ class ConditionOfSale(ExternalHitasModel):
     def fulfilled(self) -> Optional[datetime.datetime]:
         return self.deleted  # noqa
 
+    def get_first_purchase_date(self) -> Optional[datetime.date]:
+        """
+        Return the first purchase date of the new apartment.
+        Can be used to determine the sell by date.
+        When apartment was sold after it was completed, the sell by date is calculated based on first sale date.
+        """
+        from hitas.models import ApartmentSale
+
+        return (
+            ApartmentSale.objects.filter(apartment=self.new_ownership.apartment)
+            .order_by("purchase_date")
+            .values_list("purchase_date", flat=True)
+            .first()
+        )
+
     def __str__(self) -> str:
         return (
             f"{self.old_ownership.owner}: {self.old_ownership.apartment} "

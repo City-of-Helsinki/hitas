@@ -241,10 +241,13 @@ class Apartment(ExternalHitasModel):
                 if sell_by_date is None:
                     continue
 
-                # If apartment was first sold after it was completed,
-                # the sell by date is calculated based on first sale date.
-                if cos.first_purchase_date is not None and cos.first_purchase_date > sell_by_date:
-                    sell_by_date = cos.first_purchase_date
+                # If apartment was sold after it was completed, the sell by date is calculated based on first sale date.
+                if hasattr(cos, "first_purchase_date"):
+                    first_purchase_date = cos.first_purchase_date
+                else:
+                    first_purchase_date = cos.get_first_purchase_date()
+                if first_purchase_date is not None and first_purchase_date > sell_by_date:
+                    sell_by_date = first_purchase_date
 
                 # If grace period has been given, it should be included
                 if cos.grace_period == GracePeriod.THREE_MONTHS:
