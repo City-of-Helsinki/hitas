@@ -16,8 +16,9 @@ import {
 import {Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
 import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
 import OwnershipsList from "../../common/components/OwnershipsList";
+import {getIndexType} from "../../common/localisation";
 import {ApartmentSaleSchema, IApartmentDetails, IApartmentMaximumPrice, IApartmentSaleForm} from "../../common/schemas";
-import {formatDate, formatIndex, formatMoney, hdsToast, today} from "../../common/utils";
+import {formatDate, formatMoney, hdsToast, today} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
@@ -209,7 +210,7 @@ const LoadedApartmentSalesPage = ({
                     <p>
                         Enimmäishinnat ovat laskettu{" "}
                         <span>
-                            {` ${formatIndex(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}llä`}
+                            {` ${getIndexType(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}llä`}
                         </span>{" "}
                         ja{" "}
                         <span>

@@ -53,17 +53,6 @@ function formatDate(value: string | null): string {
     return new Date(value).toLocaleDateString("fi-FI");
 }
 
-function formatIndex(indexType: string) {
-    switch (indexType) {
-        case "market_price_index":
-            return "markkinahintaindeksi";
-        case "construction_price_index":
-            return "rakennuskustannusindeksi";
-        case "surface_area_price_ceiling":
-            return "rajaneliöhintaindeksi";
-    }
-}
-
 function validateBusinessId(value: string): boolean {
     // e.g. '1234567-8'
     return !!value.match(/^(\d{7})-(\d)$/);
@@ -170,7 +159,6 @@ export {
     formatOwner,
     formatMoney,
     formatDate,
-    formatIndex,
     validateBusinessId,
     validateSocialSecurityNumber,
     hitasToast,
