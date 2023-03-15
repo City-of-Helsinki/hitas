@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Callable, List, Optional
 
+from hitas.calculations.exceptions import IndexMissingException, InvalidCalculationResultException
 from hitas.calculations.helpers import months_between_dates
 from hitas.calculations.improvements.common import Excess, ImprovementData
 from hitas.calculations.improvements.rules_2011_onwards import calculate_single_housing_company_improvement_2011_onwards
@@ -94,6 +95,9 @@ def calculate_single_apartment_improvement_pre_2011_market_price_index(
     calculation_date_index: Decimal,
     apartment_surface_area: Decimal,
 ) -> ApartmentImprovementCalculationResult:
+    if improvement.completion_date_index is None:
+        raise IndexMissingException(error_code="mpi", date=improvement.completion_date)
+
     # In a few cases the improvement value should be fully accepted without any deductions.
     if improvement.no_deductions:
         index_adjusted = improvement.value * calculation_date_index / improvement.completion_date_index
@@ -237,6 +241,8 @@ def calculate_housing_company_improvements_pre_2011_market_price_index(
     calculation_date_index: Decimal,
     total_surface_area: Decimal,
     apartment_surface_area: Decimal,
+    housing_company_shares_count: int,
+    apartment_shares_count: int,
 ) -> HousingCompanyImprovementsResult:
     def calc_fn(improvement: ImprovementData) -> HousingCompanyImprovementCalculationResult:
         return calculate_single_housing_company_improvement_pre_2011_market_price_index(
@@ -245,6 +251,8 @@ def calculate_housing_company_improvements_pre_2011_market_price_index(
             calculation_date_index=calculation_date_index,
             total_surface_area=total_surface_area,
             apartment_surface_area=apartment_surface_area,
+            housing_company_shares_count=housing_company_shares_count,
+            apartment_shares_count=apartment_shares_count,
         )
 
     return calculate_multiple_housing_company_improvements(improvements, calc_fn, total_surface_area)
@@ -256,7 +264,32 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
     calculation_date_index: Decimal,
     total_surface_area: Decimal,
     apartment_surface_area: Decimal,
+    housing_company_shares_count: int,
+    apartment_shares_count: int,
 ) -> HousingCompanyImprovementCalculationResult:
+    if improvement.completion_date_index is None:
+        raise IndexMissingException(error_code="mpi", date=improvement.completion_date)
+
+    # In a few cases the improvement value should be fully accepted without any deductions.
+    if improvement.no_deductions:
+        if not apartment_shares_count:
+            raise InvalidCalculationResultException(error_code="missing_shares_count")
+
+        index_adjusted = improvement.value * calculation_date_index / improvement.completion_date_index
+        return HousingCompanyImprovementCalculationResult(
+            name=improvement.name,
+            value=improvement.value,
+            completion_date=improvement.completion_date,
+            value_without_excess=index_adjusted,
+            depreciation=ApartmentImprovementCalculationResult.Depreciation(
+                time=HousingCompanyImprovementCalculationResult.Depreciation.DepreciationTime.create(0),
+                amount=Decimal(0),
+            ),
+            accepted_value_for_housing_company=index_adjusted,
+            accepted_value=index_adjusted / housing_company_shares_count * apartment_shares_count,
+            no_deductions=improvement.no_deductions,
+        )
+
     if improvement.completion_date < datetime.date(2010, 1, 1):
         #
         # Calculate the excess

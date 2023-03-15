@@ -371,6 +371,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                     "name": mpi.name,
                     "value": float(mpi.value),
                     "completion_date": mpi.completion_date.strftime("%Y-%m"),
+                    "no_deductions": False,
                 },
             ],
         },
@@ -460,6 +461,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
                     "value": 3456,
                     "name": "market-price-index-improvement",
                     "completion_date": "2022-05",
+                    "no_deductions": False,
                 }
             ],
         },
@@ -1000,7 +1002,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
 def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPIClient):
     ApartmentFactory.create(completion_date=datetime.date(2012, 1, 1))
     ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
-    apartment_just_before_2011 = ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
+    apartment_pre_2011 = ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
     apartment_2009 = ApartmentFactory.create(completion_date=datetime.date(2009, 1, 1))
 
     hc_both_old_and_new = HousingCompanyFactory.create()
@@ -1017,7 +1019,7 @@ def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPICli
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 3, response.json()
-    assert response.json()["contents"][0]["id"] == apartment_just_before_2011.housing_company.uuid.hex
+    assert response.json()["contents"][0]["id"] == apartment_pre_2011.housing_company.uuid.hex
     assert response.json()["contents"][1]["id"] == hc_both_old_and_new.uuid.hex
     assert response.json()["contents"][2]["id"] == apartment_2009.housing_company.uuid.hex
 

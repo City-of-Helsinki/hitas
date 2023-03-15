@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, Date, Float, ForeignKey, ForeignKeyConstraint, Integer, String, Table
 
 from hitas.oracle_migration.oracle_schema.metadata import metadata_obj
 from hitas.oracle_migration.types import (
@@ -242,12 +242,13 @@ market_price_indices = Table(
     Column("C_LISATIETO2", HitasBoolean, nullable=False),
     Column("C_LISATVIITE2", String(10), nullable=False),  # Always 'HITMHIHU'
     Column("C_LISATIETO3", HitasBoolean, nullable=False),
-    Column("C_LISATVIITE3", String(10), nullable=False),  # Always 'HITMHIYH'
+    Column("C_LISATVIITE3", String(10), key="company_additional_info_key", nullable=False),  # Always 'HITMHIYH'
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, key="last_modified", nullable=False),
     Column("D_VIIMVALMPVM", Date, nullable=False),
     Column("N_RAKINDVPVM", Float, nullable=False),
     Column("N_RAKINDLPVM", Float, nullable=False),
+    ForeignKeyConstraint(("company_additional_info_key", "id"), ["HITLISAT.type", "HITLISAT.object_id"]),
 )
 
 company_market_price_indices = Table(

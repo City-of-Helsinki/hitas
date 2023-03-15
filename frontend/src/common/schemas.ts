@@ -78,7 +78,21 @@ const PropertyManagerSchema = object({
     address: AddressSchema,
 });
 
-const ImprovementSchema = object({name: string(), value: number(), completion_date: string()});
+const ImprovementSchema = object({
+    name: string(),
+    value: number(),
+    completion_date: string(),
+});
+const MarketPriceIndexImprovementSchema = ImprovementSchema.and(
+    object({
+        no_deductions: boolean(),
+    })
+);
+const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
+    object({
+        depreciation_percentage: number(), // 0.0 | 2.5 | 10.0
+    })
+);
 
 // ********************************
 // * Housing company schemas
@@ -87,8 +101,6 @@ const ImprovementSchema = object({name: string(), value: number(), completion_da
 const HousingCompanyAreaSchema = object({name: string(), cost_area: number()});
 
 const HousingCompanyStateSchema = z.enum(housingCompanyStates);
-
-const HousingCompanyDetailsName = object({official: string(), display: string()});
 
 const HousingCompanySchema = object({
     id: APIIdString,
@@ -124,7 +136,7 @@ const RealEstateSchema = object({
 
 const HousingCompanyDetailsSchema = object({
     id: APIIdString.optional(),
-    name: HousingCompanyDetailsName,
+    name: object({official: string(), display: string()}),
     business_id: string().nullable(),
     state: HousingCompanyStateSchema,
     address: AddressSchema,
@@ -156,7 +168,7 @@ const HousingCompanyDetailsSchema = object({
         total_surface_area: number(),
     }),
     improvements: object({
-        market_price_index: ImprovementSchema.array(),
+        market_price_index: MarketPriceIndexImprovementSchema.array(),
         construction_price_index: ImprovementSchema.array(),
     }),
 });
@@ -328,17 +340,6 @@ const ApartmentSharesSchema = object({
     total: number(),
 });
 
-const ApartmentMarketPriceIndexImprovementSchema = ImprovementSchema.and(
-    object({
-        no_deductions: boolean(),
-    })
-);
-const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
-    object({
-        depreciation_percentage: number(), // 0.0 | 2.5 | 10.0
-    })
-);
-
 const ApartmentSchema = object({
     id: string().nullable(),
     state: z.enum(apartmentStates),
@@ -368,7 +369,7 @@ const ApartmentDetailsSchema = object({
     ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
-        market_price_index: ApartmentMarketPriceIndexImprovementSchema.array(),
+        market_price_index: MarketPriceIndexImprovementSchema.array(),
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
     links: ApartmentLinkedModelsSchema,
@@ -389,7 +390,7 @@ const ApartmentWritableSchema = object({
     ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
-        market_price_index: ApartmentMarketPriceIndexImprovementSchema.array(),
+        market_price_index: MarketPriceIndexImprovementSchema.array(),
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
 });
@@ -819,7 +820,7 @@ export type IApartmentUnconfirmedMaximumPrice = z.infer<typeof ApartmentUnconfir
 export type IApartmentUnconfirmedMaximumPriceIndices = z.infer<typeof ApartmentUnconfirmedMaximumPriceIndicesSchema>;
 export type IApartmentConfirmedMaximumPrice = z.infer<typeof ApartmentConfirmedMaximumPriceSchema>;
 export type IApartmentPrices = z.infer<typeof ApartmentPricesSchema>;
-export type IApartmentMarketPriceIndexImprovement = z.infer<typeof ApartmentMarketPriceIndexImprovementSchema>;
+export type IMarketPriceIndexImprovement = z.infer<typeof MarketPriceIndexImprovementSchema>;
 export type IApartmentConstructionPriceIndexImprovement = z.infer<
     typeof ApartmentConstructionPriceIndexImprovementSchema
 >;

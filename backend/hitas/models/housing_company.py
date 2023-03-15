@@ -5,11 +5,12 @@ from typing import Optional
 from crum import get_current_user
 from django.conf import settings
 from django.db import models
+from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasModelDecimalField
+from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
 from hitas.models.utils import validate_business_id
 
 
@@ -84,6 +85,16 @@ class HousingCompany(ExternalHitasModel):
     def area_display(self) -> str:
         return f"{self.city}-{self.area}: {self.postal_code.value}"
 
+    @property
+    def total_shares_count(self) -> int:
+        from hitas.models import Apartment
+
+        return (
+            Apartment.objects.filter(building__real_estate__housing_company=self, share_number_start__isnull=False)
+            .annotate(shares_count=F("share_number_end") - F("share_number_start") + 1)
+            .aggregate(sum_shares_count=Sum("shares_count"))["sum_shares_count"]
+        )
+
     def save(self, *args, **kwargs):
         current_user = get_current_user()
         if current_user is not None and current_user.is_authenticated:
@@ -112,7 +123,7 @@ class HousingCompanyWithAnnotations(HousingCompany):
         abstract = True
 
 
-class HousingCompanyMarketPriceImprovement(HitasImprovement):
+class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany", on_delete=models.CASCADE, related_name="market_price_improvements"
     )

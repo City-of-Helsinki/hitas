@@ -358,32 +358,30 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
     bulk_cpi = []
     bulk_mpi = []
 
-    for company_oracle_id, v in converted_data.created_housing_companies_by_oracle_id.items():
+    for company_oracle_id, housing_company in converted_data.created_housing_companies_by_oracle_id.items():
         #
         # Construction price index
         #
-        construction_price_index = connection.execute(
-            select(construction_price_indices)
-            .where(construction_price_indices.c.company_id == company_oracle_id)
-            .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
-        ).first()
-
-        if construction_price_index:
-            cpi_improvements = connection.execute(
-                select(company_construction_price_indices).where(
-                    company_construction_price_indices.c.max_price_index_id == construction_price_index.id
+        cpi_improvements = list(
+            connection.execute(
+                select(construction_price_indices, company_construction_price_indices)
+                .join(
+                    construction_price_indices,
+                    (company_construction_price_indices.c.max_price_index_id == construction_price_indices.c.id),
                 )
-            ).fetchall()
-
-            for cpi_improvement in cpi_improvements:
-                new = HousingCompanyConstructionPriceImprovement(
-                    housing_company=v.value,
-                    name=cpi_improvement["name"],
-                    completion_date=cpi_improvement["completion_date"],
-                    value=cpi_improvement["value"],
-                )
-                bulk_cpi.append(new)
-                count += 1
+                .where(construction_price_indices.c.apartment_id == company_oracle_id)
+                .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
+            )
+        )
+        for cpi_improvement in cpi_improvements:
+            new = HousingCompanyConstructionPriceImprovement(
+                housing_company=housing_company.value,
+                name=cpi_improvement["name"],
+                completion_date=cpi_improvement["completion_date"],
+                value=cpi_improvement["value"],
+            )
+            bulk_cpi.append(new)
+            count += 1
 
         if len(bulk_cpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyConstructionPriceImprovement.objects.bulk_create(bulk_cpi)
@@ -392,28 +390,40 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         #
         # Market price index
         #
-        market_price_index = connection.execute(
-            select(market_price_indices)
-            .where(market_price_indices.c.company_id == company_oracle_id)
-            .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
-        ).first()
-
-        if market_price_index:
-            mpi_improvements = connection.execute(
-                select(company_market_price_indices).where(
-                    company_market_price_indices.c.max_price_index_id == market_price_index.id
+        mpi_improvements = list(
+            connection.execute(
+                select(market_price_indices, company_market_price_indices, additional_infos)
+                .join(
+                    market_price_indices,
+                    (company_market_price_indices.c.max_price_index_id == market_price_indices.c.id),
                 )
-            ).fetchall()
+                .join(additional_infos, isouter=True)
+                .where(market_price_indices.c.apartment_id == company_oracle_id)
+                .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
+            )
+        )
 
-            for mpi_improvement in mpi_improvements:
-                new = HousingCompanyMarketPriceImprovement(
-                    housing_company=v.value,
-                    name=mpi_improvement["name"],
-                    completion_date=mpi_improvement["completion_date"],
-                    value=mpi_improvement["value"],
-                )
-                bulk_mpi.append(new)
-                count += 1
+        for mpi_improvement in mpi_improvements:
+            # Can always be deduced from the improvement name
+            no_deductions = mpi_improvement["name"] in [
+                "Hissien rakentaminen",
+                "Rakennusvirheistä johtuvat korjauskustannukset",
+            ]
+            if no_deductions:
+                improvement_notes = combine_notes(mpi_improvement)
+                if improvement_notes:
+                    housing_company.value.notes = "\n".join([housing_company.value.notes, improvement_notes])
+                    housing_company.value.save()
+
+            new = HousingCompanyMarketPriceImprovement(
+                housing_company=housing_company.value,
+                name=mpi_improvement["name"],
+                completion_date=mpi_improvement["completion_date"],
+                value=mpi_improvement["value"],
+                no_deductions=no_deductions,
+            )
+            bulk_mpi.append(new)
+            count += 1
 
         if len(bulk_mpi) >= BULK_INSERT_THRESHOLD:
             HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
@@ -590,7 +600,7 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
             if (
                 # awdc Improvements do not depreciate
                 new.depreciation_percentage == DepreciationPercentage.ZERO
-                # and us completed at almost the same time as the apartment
+                # and is completed at almost the same time as the apartment
                 and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
                 # and the improvements accepted value should not be less than the original value
                 and cpi_improvement["accepted_value"] > cpi_improvement["value"]

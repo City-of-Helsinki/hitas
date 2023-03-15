@@ -73,13 +73,23 @@ target-version = ["py310"]
 extend-exclude = "migrations"
 
 [tool.coverage.run]
+branch = true
+source = ["."]
 omit = [
-    "*tests*",
+    "*/tests/*",
     "*__init__.py",
     "*/migrations/*",
     "*/venv/*",
     "config/*",
     "manage.py",
+    "*/management/*",
+    "hitas/oracle_migration/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "def __str__",
+    "def __repr__",
 ]
 
 [tool.ruff]

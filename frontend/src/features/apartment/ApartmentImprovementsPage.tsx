@@ -10,13 +10,13 @@ import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,
-    IApartmentMarketPriceIndexImprovement,
     IApartmentWritable,
+    IMarketPriceIndexImprovement,
 } from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
-type IWritableMarketImprovement = Omit<IApartmentMarketPriceIndexImprovement, "value"> & {
+type IWritableMarketImprovement = Omit<IMarketPriceIndexImprovement, "value"> & {
     value: number | null;
     key: string;
     saved: boolean;
@@ -85,9 +85,7 @@ const ApartmentImprovementsPage = () => {
             ...apartmentData,
             // Don't send empty improvements to the API
             improvements: {
-                market_price_index: marketIndexImprovements.filter(
-                    (i) => i.value
-                ) as IApartmentMarketPriceIndexImprovement[],
+                market_price_index: marketIndexImprovements.filter((i) => i.value) as IMarketPriceIndexImprovement[],
                 construction_price_index: constructionIndexImprovements
                     .filter((i) => i.value)
                     .map((i) => {
