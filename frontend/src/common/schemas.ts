@@ -375,6 +375,7 @@ const ApartmentDetailsSchema = object({
     }),
     links: ApartmentLinkedModelsSchema,
     conditions_of_sale: ApartmentConditionOfSaleSchema.array(),
+    sell_by_date: string().nullable(),
 });
 
 const ApartmentWritableSchema = object({

@@ -1,4 +1,4 @@
-import {StatusLabel} from "hds-react";
+import {IconLock, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {EditButton, Heading} from "../../../common/components";
@@ -19,6 +19,12 @@ const ApartmentHeader = ({
                     <span className="name">{apartment.links.housing_company.display_name}</span>
                     <span className="address">{apartment && formatAddress(apartment.address)}</span>
                     <StatusLabel>{apartment.state}</StatusLabel>
+                    {apartment.sell_by_date ? (
+                        <StatusLabel
+                            className="conditions-of-sale-lock"
+                            iconLeft={<IconLock />}
+                        />
+                    ) : null}
                 </Link>
                 {showEditButton ? <EditButton state={{apartment: apartment}} /> : null}
             </Heading>
