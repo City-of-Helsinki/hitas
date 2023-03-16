@@ -6461,6 +6461,7 @@ components:
         - apartment
         - grace_period
         - fulfilled
+        - sell_by_date
       properties:
         id:
           description: ID of this condition of sale
@@ -6482,6 +6483,15 @@ components:
           readOnly: true
           format: date-time
           example: 1985-12-10T00:00:00+00:00
+        sell_by_date:
+          description: |-
+            The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
+            ownership(s). In case of multiple conditions of sale, use the first one in chronological order.
+            The value will be null if there are no current conditions of sale for this apartment's ownerships.
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
 
     ConditionOfSale:
       description: Condition of sale between two ownerships

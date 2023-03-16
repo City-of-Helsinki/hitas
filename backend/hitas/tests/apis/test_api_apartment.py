@@ -671,6 +671,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "id": cos.uuid.hex,
                 "grace_period": str(cos.grace_period.value),
                 "fulfilled": cos.fulfilled,
+                "sell_by_date": str(ap2.completion_date),
                 "apartment": {
                     "id": ap2.uuid.hex,
                     "address": {

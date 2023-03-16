@@ -554,10 +554,15 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
     apartment = serializers.SerializerMethodField()
     grace_period = EnumField(GracePeriod)
     fulfilled = serializers.SerializerMethodField()
+    sell_by_date = serializers.SerializerMethodField()
 
     @staticmethod
     def get_fulfilled(instance: ConditionOfSale) -> Optional[datetime.datetime]:
         return instance.fulfilled
+
+    @staticmethod
+    def get_sell_by_date(instance: ConditionOfSale) -> Optional[datetime.date]:
+        return instance.sell_by_date
 
     def select_ownership(self, instance: ConditionOfSale) -> Ownership:
         if instance.old_ownership.apartment == self.context["apartment"]:
@@ -579,6 +584,7 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
             "apartment",
             "grace_period",
             "fulfilled",
+            "sell_by_date",
         ]
 
 
