@@ -256,6 +256,7 @@ const ApartmentConditionOfSaleSchema = object({
     }),
     grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable(),
+    sell_by_date: string().nullable(), // Read only
 });
 
 const ConditionOfSaleSchema = object({

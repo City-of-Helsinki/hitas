@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -19,7 +19,7 @@ import {
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney, getConditionsOfSaleStatusLabelType} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
@@ -37,7 +37,18 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
                         <Link
                             to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
                         >
-                            {cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                            <StatusLabel
+                                className="conditions-of-sale-lock"
+                                type={
+                                    cos.fulfilled
+                                        ? "neutral"
+                                        : getConditionsOfSaleStatusLabelType(
+                                              cos.grace_period !== "not_given",
+                                              cos.sell_by_date
+                                          )
+                                }
+                                iconLeft={cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                            />
                             {formatAddress(cos.apartment.address)}
                         </Link>
                     </li>

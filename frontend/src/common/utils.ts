@@ -157,7 +157,9 @@ export function doesAContainB(A: object, B: object): boolean {
     return true;
 }
 
-export const getConditionsOfSaleStatusLabelType = (hasGracePeriod: boolean, sellByDate: string) => {
+export const getConditionsOfSaleStatusLabelType = (hasGracePeriod: boolean, sellByDate: string | null) => {
+    if (sellByDate === null) return "neutral";
+
     if (new Date() >= new Date(sellByDate)) return "error";
     else if (hasGracePeriod) return "alert";
     return "neutral";

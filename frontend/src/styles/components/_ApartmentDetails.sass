@@ -75,7 +75,6 @@
         margin-bottom: 0
       svg
         position: relative
-        top: 4px
         margin: 0 10px 0 0
         transition: transform 150ms linear
       .unresolved
@@ -83,7 +82,12 @@
       .resolved
         color: $color-black-30
         text-decoration: line-through
-
+      .conditions-of-sale-lock
+        padding-left: 8px
+        padding-right: 8px
+        margin-right: 0.5em
+        span
+          margin: 0
 
     [class^="Card-module_card"]
       @include flexbox()
