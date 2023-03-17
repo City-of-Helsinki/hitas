@@ -1,22 +1,23 @@
 import datetime
 import logging
 from decimal import Decimal
-from typing import TypedDict
+from typing import Literal, Optional
 
 from dateutil.relativedelta import relativedelta
 
 from hitas.exceptions import ModelConflict
 from hitas.models import HousingCompanyState, SurfaceAreaPriceCeiling
 from hitas.models.housing_company import HousingCompanyWithAnnotations
+from hitas.models.indices import (
+    CalculationData,
+    HousingCompanyData,
+    SurfaceAreaPriceCeilingCalculationData,
+    SurfaceAreaPriceCeilingResult,
+)
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.utils import hitas_calculation_quarter, roundup
 
 logger = logging.getLogger()
-
-
-class SurfaceAreaPriceCeilingResult(TypedDict):
-    month: str  # YearMonth, e.g. "2022-01"
-    value: Decimal
 
 
 def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> list[SurfaceAreaPriceCeilingResult]:
@@ -39,10 +40,12 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
             error_code="missing",
         )
 
-    logger.info("Making index adjustments...")
-    make_index_adjustment_for_housing_companies(housing_companies, calculation_month)
+    unadjusted_prices: dict[str, Optional[Decimal]] = {
+        housing_company.uuid.hex: housing_company.avg_price_per_square_meter for housing_company in housing_companies
+    }
 
-    # TODO: Save housing company details to database (HT-434)
+    logger.info("Making index adjustments...")
+    indices = make_index_adjustment_for_housing_companies(housing_companies, calculation_month)
 
     logger.info(
         f"Setting surface area price ceiling for the next three months "
@@ -50,6 +53,9 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
     )
     total = _calculate_surface_area_price_ceiling_for_housing_companies(housing_companies)
     results = _create_surface_area_price_ceiling_for_next_three_months(calculation_month, total)
+
+    logger.info("Saving calculation data for later use...")
+    _save_calculation_data(calculation_month, housing_companies, indices, unadjusted_prices, results)
 
     logger.info("Surface area price ceiling calculation complete!")
     return results
@@ -75,7 +81,34 @@ def _create_surface_area_price_ceiling_for_next_three_months(
         results.append(
             SurfaceAreaPriceCeilingResult(
                 month=surface_area_price_ceiling.month.isoformat()[:-3],
-                value=surface_area_price_ceiling.value,
+                value=float(surface_area_price_ceiling.value),
             )
         )
     return results
+
+
+def _save_calculation_data(
+    calculation_month: datetime.date,
+    housing_companies: list[HousingCompanyWithAnnotations],
+    indices: dict[Literal["old", "new"], dict[datetime.date, Decimal]],
+    unadjusted_prices: dict[str, Optional[Decimal]],
+    surface_area_price_ceilings: list[SurfaceAreaPriceCeilingResult],
+) -> SurfaceAreaPriceCeilingCalculationData:
+    data = CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name=housing_company.display_name,
+                completion_date=housing_company.completion_date.isoformat(),
+                surface_area=float(housing_company.surface_area),
+                realized_acquisition_price=float(housing_company.realized_acquisition_price),
+                unadjusted_average_price_per_square_meter=float(unadjusted_prices[housing_company.uuid.hex]),
+                adjusted_average_price_per_square_meter=float(housing_company.avg_price_per_square_meter),
+                completion_month_index=float(indices[key][housing_company.completion_month]),
+                calculation_month_index=float(indices[key][calculation_month]),
+            )
+            for housing_company in housing_companies
+            if (key := "old" if housing_company.financing_method.old_hitas_ruleset else "new")
+        ],
+        created_surface_area_price_ceilings=surface_area_price_ceilings,
+    )
+    return SurfaceAreaPriceCeilingCalculationData.objects.create(calculation_month=calculation_month, data=data)

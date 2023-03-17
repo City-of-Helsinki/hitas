@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -68,3 +70,33 @@ class SurfaceAreaPriceCeiling(AbstractIndex):
     class Meta:
         verbose_name = _("Surface area price ceiling")
         verbose_name_plural = _("Surface area price ceiling")
+
+
+class SurfaceAreaPriceCeilingResult(TypedDict):
+    month: str  # YearMonth, e.g. "2022-01"
+    value: float
+
+
+class HousingCompanyData(TypedDict):
+    name: str
+    completion_date: str  # datetime.date.isoformat()
+    surface_area: float
+    realized_acquisition_price: float
+    unadjusted_average_price_per_square_meter: float
+    adjusted_average_price_per_square_meter: float
+    completion_month_index: float
+    calculation_month_index: float
+
+
+class CalculationData(TypedDict):
+    housing_company_data: list[HousingCompanyData]
+    created_surface_area_price_ceilings: list[SurfaceAreaPriceCeilingResult]
+
+
+class SurfaceAreaPriceCeilingCalculationData(models.Model):
+    calculation_month = models.DateField(primary_key=True)
+    data: CalculationData = models.JSONField()
+
+    class Meta:
+        verbose_name = _("Surface area price ceiling calculation data")
+        verbose_name_plural = _("Surface area price ceiling calculation data")

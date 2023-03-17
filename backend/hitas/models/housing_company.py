@@ -117,6 +117,8 @@ class HousingCompany(ExternalHitasModel):
 class HousingCompanyWithAnnotations(HousingCompany):
     completion_date: datetime.date
     completion_month: datetime.date
+    realized_acquisition_price: Optional[Decimal]
+    surface_area: Optional[Decimal]
     avg_price_per_square_meter: Optional[Decimal]
 
     class Meta:
