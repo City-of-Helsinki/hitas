@@ -8,6 +8,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("hitas.urls")),
     path("healthz", HealthCheckView.as_view(), name="health_check"),
+    path("pysocial/", include("social_django.urls", namespace="social")),
+    path("helauth/", include("helusers.urls")),
 ]
 
 if settings.DEBUG_TOOLBAR:
