@@ -10,6 +10,7 @@ services:
       -  ./frontend/example-htpasswd:/usr/share/nginx/.htpasswd:ro
     depends_on:
       - hitas-backend
+    container_name: hitas-frontend
 
   hitas-backend:
     build:
@@ -20,16 +21,17 @@ services:
       DEBUG: "True"
       ALLOWED_HOSTS: "*"
       SECRET_KEY: top-secret-development-key
-      DATABASE_URL: postgres://hitas:hitas@postgres/hitas
+      DATABASE_URL: postgres://hitas:hitas@hitas-db/hitas
       CORS_ALLOWED_ORIGINS: http://localhost:8081,http://localhost:3000
     ports:
       - 8888
       - 8082:8080
     restart: on-failure
     depends_on:
-      - postgres
+      - hitas-postgres
+    container_name: hitas-backend
 
-  postgres:
+  hitas-postgres:
     image: postgres:13
     command: ["postgres", "-c", "log_statement=all"]
     ports:
@@ -38,6 +40,7 @@ services:
       POSTGRES_USER: hitas
       POSTGRES_PASSWORD: hitas
       POSTGRES_DB: hitas
+    container_name: hitas-db
 
   hitas-backend-nginx:
     build:
@@ -47,6 +50,7 @@ services:
       - 8080:80
     depends_on:
       - hitas-backend
+    container_name: hitas-nginx
 
   swagger-editor:
     image: swaggerapi/swagger-editor:v4.6.0
@@ -56,6 +60,7 @@ services:
       - 8090:8080
     volumes:
       - ./backend/openapi.yaml:/swagger/openapi.yaml:ro
+    container_name: hitas-swagger
 
   oracle:
     image: quay.io/maksymbilenko/oracle-12c:latest
@@ -64,3 +69,44 @@ services:
       - 1521:1521
     volumes:
       - ./backend/oracle-data:/u01/app/oracle
+    container_name: hitas-oracle-db
+
+  tunnistamo-postgres:
+    image: postgres:9.6-alpine
+    ports:
+      - "5401:5432"
+    environment:
+      POSTGRES_USER: tunnistamo
+      POSTGRES_PASSWORD: tunnistamo
+      POSTGRES_DB: tunnistamo
+    volumes:
+      - tunnistamo-data-volume:/var/lib/postgresql/data
+    container_name: tunnistamo-db
+
+  tunnistamo-backend:
+    build:
+      context: ./tunnistamo
+      dockerfile: Dockerfile
+      target: development
+    env_file:
+      - tunnistamo/docker-compose.env.yaml
+    environment:
+      DATABASE_URL: postgres://tunnistamo:tunnistamo@tunnistamo-db/tunnistamo
+      DATABASE_HOST: tunnistamo-db.helsinki
+      SKIP_DATABASE_CHECK: 1
+    volumes:
+      - ./tunnistamo:/app
+      - django-media-volume:/var/media/
+    ports:
+      - "8099:8000"
+    depends_on:
+      - tunnistamo-postgres
+    container_name: tunnistamo-backend
+
+volumes:
+  tunnistamo-data-volume:
+  django-media-volume:
+
+networks:
+  default:
+    name: helsinki
