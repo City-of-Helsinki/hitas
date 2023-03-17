@@ -6,7 +6,8 @@ from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 
-# Set up .env
+# ----- ENV Setup --------------------------------------------------------------------------------------
+
 root = environ.Path(__file__) - 2
 assert os.path.exists(root("manage.py"))
 var_root = root("var")
@@ -45,6 +46,9 @@ env = environ.Env(
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
+
+# ----- Basic settings  --------------------------------------------------------------------------------
+
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
@@ -56,10 +60,16 @@ MEDIA_URL = env("MEDIA_URL")
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 UWSGI_WARMUP = env("UWSGI_WARMUP")
 
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+
 # How long to show fulfilled (=deleted) conditions of sale from the endpoints
 SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS: relativedelta = env("SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS")
 
-# Application definition
+# ----- Installed apps ---------------------------------------------------------------------------------
+
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -82,6 +92,8 @@ INSTALLED_APPS = [
     "safedelete",
 ]
 
+# ----- Middleware -------------------------------------------------------------------------------------
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -94,56 +106,13 @@ MIDDLEWARE = [
     "crum.CurrentRequestUserMiddleware",
 ]
 
-DEBUG_TOOLBAR = False
-if DEBUG:
-    try:
-        import debug_toolbar  # noqa
+# ----- Database ---------------------------------------------------------------------------------------
 
-        DEBUG_TOOLBAR = True
-    except ImportError:
-        pass
+DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-    if DEBUG_TOOLBAR:
-        INSTALLED_APPS.append("debug_toolbar")
-        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
-
-        import socket
-
-        hostname, aliases, ips = socket.gethostbyname_ex(socket.gethostname())
-        INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
-
-ROOT_URLCONF = "config.urls"
-WSGI_APPLICATION = "config.wsgi.application"
-
-TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
-
-
-class BearerAuthentication(TokenAuthentication):
-    keyword = "Bearer"
-
-
-REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
-    "COERCE_DECIMAL_TO_STRING": False,
-    "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
-    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "config.settings.BearerAuthentication",  # DEV-tokens
-        "helusers.oidc.ApiTokenAuthentication",  # Helsinki profile-tokens
-    ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-}
-
-if DEBUG:
-    # Enable session authentication for browseable API renderer
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
-        "hitas.types.HitasJSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ]
-else:
-    # Disable browseable API renderer if DEBUG is not set
-    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("hitas.types.HitasJSONRenderer",)
+# ----- Templates --------------------------------------------------------------------------------------
 
 TEMPLATES = [
     {
@@ -166,39 +135,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_EXPOSE_HEADERS = ["Content-Disposition"]
-
-AUTHENTICATION_BACKENDS = [
-    "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
-    "django.contrib.auth.backends.ModelBackend",
-]
-
-AUTH_USER_MODEL = "users.User"
-LOGIN_REDIRECT_URL = "/admin/"
-LOGOUT_REDIRECT_URL = "/admin/login/"
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    "default": env.db("DATABASE_URL"),
-}
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
-
-# Logging
-# https://docs.djangoproject.com/en/3.2/topics/logging/#configuring-logging
+# ----- Logging ----------------------------------------------------------------------------------------
 
 LOGGING = {
     "version": 1,
@@ -218,22 +155,6 @@ LOGGING = {
     },
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
-LANGUAGE_CODE = "fi"
-LANGUAGES = [
-    ("fi", _("Finnish")),
-    ("en", _("English")),
-]
-LOCALE_PATHS = ["./templates/locale"]
-
-TIME_ZONE = "Europe/Helsinki"
-USE_I18N = False
-USE_L10N = True
-USE_TZ = True
-
-
 if env("SENTRY_DSN"):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
@@ -249,6 +170,40 @@ if env("SENTRY_DSN"):
         traces_sample_rate=env("SENTRY_TRACES_SAMPLE_RATE"),
     )
 
+# ----- Internationalization ---------------------------------------------------------------------------
+
+LANGUAGE_CODE = "fi"
+LANGUAGES = [
+    ("fi", _("Finnish")),
+    ("en", _("English")),
+]
+LOCALE_PATHS = ["./templates/locale"]
+TIME_ZONE = "Europe/Helsinki"
+USE_I18N = False
+USE_L10N = True
+USE_TZ = True
+
+# ----- Django Rest Framework --------------------------------------------------------------------------
+
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "hitas.exceptions.exception_handler",
+    "COERCE_DECIMAL_TO_STRING": False,
+    "DEFAULT_FILTER_BACKENDS": ["hitas.views.utils.HitasFilterBackend"],
+    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "config.settings.BearerAuthentication",  # DEV-tokens
+        "helusers.oidc.ApiTokenAuthentication",  # Helsinki profile-tokens
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_RENDERER_CLASSES": ["hitas.types.HitasJSONRenderer"],
+}
+
+if DEBUG:
+    # Enable session authentication for browsable API renderer
+    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"].append("rest_framework.renderers.BrowsableAPIRenderer")
+
+# ----- Authentication settings ------------------------------------------------------------------------
 
 OIDC_API_TOKEN_AUTH = {
     "AUDIENCE": env("OIDC_API_AUDIENCE"),
@@ -267,4 +222,47 @@ SOCIAL_AUTH_TUNNISTAMO_AUTH_EXTRA_ARGUMENTS = {"ui_locales": "fi"}
 HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
 
+AUTHENTICATION_BACKENDS = [
+    "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AUTH_USER_MODEL = "users.User"
+LOGIN_REDIRECT_URL = "/admin/"
+LOGOUT_REDIRECT_URL = "/admin/login/"
+
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+
+
+class BearerAuthentication(TokenAuthentication):
+    keyword = "Bearer"
+
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# ----- Debug toolbar ----------------------------------------------------------------------------------
+
+DEBUG_TOOLBAR = False
+if DEBUG:
+    try:
+        import debug_toolbar  # noqa
+
+        DEBUG_TOOLBAR = True
+    except ImportError:
+        pass
+
+    if DEBUG_TOOLBAR:
+        INSTALLED_APPS.append("debug_toolbar")
+        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+        import socket
+
+        hostname, aliases, ips = socket.gethostbyname_ex(socket.gethostname())
+        INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+
+# ------------------------------------------------------------------------------------------------------
