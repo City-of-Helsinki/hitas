@@ -64,3 +64,56 @@ Git will now automatically look for the file when using `git blame`, no addition
   `poetry run pre-commit install` and updated with `poetry run pre-commit autoupdate`.
 * To skip running hooks during a commit, add a `--no-verify` flag to `git commit`.
 * To run pre-commit on all files, use `poetry run pre-commit run --all-files`
+
+
+## Setting up Tunnistamo for development
+
+> Currently, this only works if you run hitas backend locally. Docker setup has some networking
+> problems which prevent requests from reaching tunnistamo container from hitas backend container.
+
+[Tunnistamo] is set up using [git submodules]. You'll need to fetch the submodule separately
+on git pull or clone by adding the `--recurse-submodules` command line option.
+
+> If you are on Windows, you'll need to change the line-endings on `tunnistamo/manage.py`
+> and `tunnistamo/docker-entrypoint.sh` to `LF`!
+
+In you code editor, you should exclude the `tunnistamo` folder from indexing, so that search and
+refactoring tools won't try to touch files this folder. For example in PyCharm this is done by
+right-clicking on the folder -> `Mark Directory as` -> `Excluded`.
+
+Now make a local config for tunnistamo docker compose:
+
+```shell
+cp tunnistamo/docker-compose.env.yaml.template tunnistamo/docker-compose.env.yaml
+```
+
+Next, create a new OAuth app to GitHub. Go to [Developer settings] -> OAuth Apps -> New OAuthApp.
+Use what ever Application name, Homepage URL, and Application description you want.
+Use http://localhost:8099/accounts/github/login/callback/ for the Authorization callback URL.
+Create a new client secret for the app and copy it to somewhere safe.
+Now, in `tunnistamo/docker-compose.env.yaml`, add `Client ID` and the `Client secret` from your
+GitHub OAuth app to `SOCIAL_AUTH_GITHUB_KEY` and `SOCIAL_AUTH_GITHUB_SECRET` respectively.
+
+You should be set up to re-run docker by running `docker-compose up --build --detach` on the root level.
+This will build the tunnistamo containers using the secrets you provided. Tunnistamo admin interface
+will be running on `localhost:8099/admin`. Log in using the username `admin` and password `admin`.
+
+Modify the default `Project` client in `http://localhost:8099/admin/oidc_provider/client/` with
+the following settings:
+
+- Name: `Hitas`
+  - Just some unique name
+- Redirect URIs: `http://localhost:<port>/pysocial/complete/tunnistamo/`
+  - Change `<port>` to the port you will be running the local backend at, e.g. 8000
+- Client ID: `api.hel.fi/auth/hitas`x
+  - Just some unique name, but it CANNOT have any colons (:) in it!
+  - Should match `SOCIAL_AUTH_TUNNISTAMO_KEY` in `backend/.env`.
+
+Copy the `Client SECRET` to `SOCIAL_AUTH_TUNNISTAMO_SECRET` in `backend/.env`.
+
+Start up the backend server on your local machine on `<port>`. You should now be able
+to log in at `http://localhost:<port>/helauth/login`.
+
+[Tunnistamo]: https://github.com/City-of-Helsinki/tunnistamo
+[git submodules]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+[Developer settings]: https://github.com/settings/developers
