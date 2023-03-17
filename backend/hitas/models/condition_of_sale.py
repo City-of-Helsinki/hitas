@@ -73,13 +73,19 @@ class ConditionOfSale(ExternalHitasModel):
 
     @property
     def sell_by_date(self) -> Optional[datetime.date]:
+        if self.fulfilled:
+            return None
+
         # If the apartment has not been completed, there is no sell by date yet.
         sell_by_date = self.new_ownership.apartment.completion_date
         if sell_by_date is None:
             return None
 
         # If apartment was sold after it was completed, the sell by date is calculated based on first sale date.
-        first_purchase_date = getattr(self, "first_purchase_date", self.get_first_purchase_date())
+        if hasattr(self, "first_purchase_date"):
+            first_purchase_date = self.first_purchase_date
+        else:
+            first_purchase_date = self.get_first_purchase_date()
         if first_purchase_date is not None and first_purchase_date > sell_by_date:
             sell_by_date = first_purchase_date
 
