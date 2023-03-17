@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from django.db.models import F, Min, OuterRef, Prefetch, Subquery, Sum
+from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
@@ -19,7 +19,7 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.utils import validate_business_id
-from hitas.utils import RoundWithPrecision, safe_attrgetter
+from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
@@ -255,7 +255,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
 
 class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
     name = serializers.CharField(source="display_name", max_length=1024)
-    date = serializers.DateField()
 
     class Meta:
         model = HousingCompany
@@ -280,7 +279,10 @@ class HousingCompanyViewSet(HitasModelViewSet):
         return (
             HousingCompany.objects.select_related("postal_code")
             .annotate(
-                date=Min("real_estates__buildings__apartments__completion_date"),
+                date=max_if_all_not_null(
+                    ref="real_estates__buildings__apartments__completion_date",
+                    inf=datetime.date.max,
+                )
             )
             .order_by("-date")
         )
@@ -330,7 +332,10 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 ),
             )
             .annotate(
-                date=Min("real_estates__buildings__apartments__completion_date"),
+                date=max_if_all_not_null(
+                    ref="real_estates__buildings__apartments__completion_date",
+                    inf=datetime.date.max,
+                ),
                 sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
                 sum_acquisition_price=Sum("_acquisition_price"),
                 avg_price_per_square_meter=RoundWithPrecision(
