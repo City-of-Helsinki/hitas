@@ -51,7 +51,6 @@ class BuildingTypeFactory(AbstractCodeFactory):
 class OldHitasFinancingMethodFactory(AbstractCodeFactory):
     class Meta:
         model = FinancingMethod
-        django_get_or_create = ("value",)
 
     value = fuzzy.FuzzyChoice(
         [
@@ -85,7 +84,6 @@ class OldHitasFinancingMethodFactory(AbstractCodeFactory):
 class NewHitasFinancingMethodFactory(AbstractCodeFactory):
     class Meta:
         model = FinancingMethod
-        django_get_or_create = ("value",)
 
     value = fuzzy.FuzzyChoice(
         [
