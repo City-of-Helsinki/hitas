@@ -34,6 +34,14 @@ env = environ.Env(
     SENTRY_SAMPLE_RATE=(float, 1.0),
     SENTRY_TRACES_SAMPLE_RATE=(float, 0.1),
     SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS=(relativedelta_months, relativedelta(months=2)),
+    OIDC_API_AUDIENCE=(str, ""),
+    OIDC_API_AUTHORIZATION_FIELD=(str, ""),
+    OIDC_API_ISSUER=(str, ""),
+    OIDC_API_REQUIRE_SCOPE_FOR_AUTHENTICATION=(bool, False),
+    OIDC_API_SCOPE_PREFIX=(str, None),
+    SOCIAL_AUTH_TUNNISTAMO_KEY=(str, ""),
+    SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT=(str, ""),
+    SOCIAL_AUTH_TUNNISTAMO_SECRET=(str, ""),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -62,6 +70,7 @@ INSTALLED_APPS = [
     "django_jinja",
     "helusers.apps.HelusersConfig",
     "helusers.apps.HelusersAdminConfig",
+    "social_django",
     "users",
     "hitas",
     "nested_inline",
@@ -118,7 +127,10 @@ REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_FILTER_BACKENDS": ("hitas.views.utils.HitasFilterBackend",),
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
-    "DEFAULT_AUTHENTICATION_CLASSES": ["config.settings.BearerAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "config.settings.BearerAuthentication",  # DEV-tokens
+        "helusers.oidc.ApiTokenAuthentication",  # Helsinki profile-tokens
+    ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
@@ -156,7 +168,10 @@ TEMPLATES = [
 
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
-AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
+AUTHENTICATION_BACKENDS = [
+    "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "/admin/"
@@ -233,3 +248,23 @@ if env("SENTRY_DSN"):
         sample_rate=env("SENTRY_SAMPLE_RATE"),
         traces_sample_rate=env("SENTRY_TRACES_SAMPLE_RATE"),
     )
+
+
+OIDC_API_TOKEN_AUTH = {
+    "AUDIENCE": env("OIDC_API_AUDIENCE"),
+    "ISSUER": env.url("OIDC_API_ISSUER"),
+    "API_AUTHORIZATION_FIELD": env("OIDC_API_AUTHORIZATION_FIELD"),
+    "REQUIRE_API_SCOPE_FOR_AUTHENTICATION": env("OIDC_API_REQUIRE_SCOPE_FOR_AUTHENTICATION"),
+    "API_SCOPE_PREFIX": env("OIDC_API_SCOPE_PREFIX"),
+}
+
+SOCIAL_AUTH_TUNNISTAMO_KEY = env("SOCIAL_AUTH_TUNNISTAMO_KEY")
+SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT")
+SOCIAL_AUTH_TUNNISTAMO_SECRET = env("SOCIAL_AUTH_TUNNISTAMO_SECRET")
+SOCIAL_AUTH_TUNNISTAMO_SCOPE = ["ad_groups"]
+SOCIAL_AUTH_TUNNISTAMO_AUTH_EXTRA_ARGUMENTS = {"ui_locales": "fi"}
+
+HELUSERS_PASSWORD_LOGIN_DISABLED = False
+HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
+
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
