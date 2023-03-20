@@ -7,7 +7,8 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
-from hitas.models.external_sales_data import CostAreaData, QuarterData
+from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
+from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult, ThirtyYearRegulationResults
 from hitas.services.thirty_year_regulation import ComparisonData, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.factories import (
@@ -103,7 +104,9 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    with count_queries(10, list_queries_on_failure=True):
+    # 11. Save thirty year regulation results
+    # 12. Save thirty year regulation results' rows
+    with count_queries(12, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -129,8 +132,37 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         skipped=[],
     )
 
+    #
+    # Check that the housing company was freed from regulation
+    #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+
+    #
+    # Check that the regulation results were saved
+    #
+    regulation_results = list(ThirtyYearRegulationResults.objects.all())
+    assert len(regulation_results) == 1
+    assert regulation_results[0].regulation_month == regulation_month
+    assert regulation_results[0].calculation_month == this_month
+    assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
+    assert regulation_results[0].sales_data == FullSalesData(
+        internal={"00001": {"2022Q4": SaleData(sale_count=1, price=49_000)}},
+        external={},
+        price_by_area={"00001": 49_000},
+    )
+
+    result_rows = list(regulation_results[0].rows.all())
+    assert len(result_rows) == 1
+    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].completion_date == regulation_month
+    assert result_rows[0].surface_area == Decimal("10")
+    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
+    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
+    assert result_rows[0].completion_month_index == Decimal("100")
+    assert result_rows[0].calculation_month_index == Decimal("200")
+    assert result_rows[0].regulation_result == RegulationResult.RELEASED_FROM_REGULATION
 
 
 @pytest.mark.django_db
@@ -198,7 +230,9 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    with count_queries(10, list_queries_on_failure=True):
+    # 11. Save thirty year regulation results
+    # 12. Save thirty year regulation results' rows
+    with count_queries(12, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -224,8 +258,37 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
         skipped=[],
     )
 
+    #
+    # Check that the housing company stays regulated
+    #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
+
+    #
+    # Check that the regulation results were saved
+    #
+    regulation_results = list(ThirtyYearRegulationResults.objects.all())
+    assert len(regulation_results) == 1
+    assert regulation_results[0].regulation_month == regulation_month
+    assert regulation_results[0].calculation_month == this_month
+    assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
+    assert regulation_results[0].sales_data == FullSalesData(
+        internal={"00001": {"2022Q4": SaleData(sale_count=1, price=4_900)}},
+        external={},
+        price_by_area={"00001": 4_900},
+    )
+
+    result_rows = list(regulation_results[0].rows.all())
+    assert len(result_rows) == 1
+    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].completion_date == regulation_month
+    assert result_rows[0].surface_area == Decimal("10")
+    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
+    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
+    assert result_rows[0].completion_month_index == Decimal("100")
+    assert result_rows[0].calculation_month_index == Decimal("200")
+    assert result_rows[0].regulation_result == RegulationResult.STAYS_REGULATED
 
 
 @pytest.mark.django_db
@@ -477,8 +540,33 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         skipped=[],
     )
 
+    #
+    # Check that the housing company was freed from regulation
+    #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+
+    #
+    # Check that the regulation results were saved
+    #
+    regulation_results = list(ThirtyYearRegulationResults.objects.all())
+    assert len(regulation_results) == 1
+    assert regulation_results[0].regulation_month == regulation_month
+    assert regulation_results[0].calculation_month == this_month
+    assert regulation_results[0].surface_area_price_ceiling is None
+    assert regulation_results[0].sales_data == FullSalesData(internal={}, external={}, price_by_area={})
+
+    result_rows = list(regulation_results[0].rows.all())
+    assert len(result_rows) == 1
+    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].completion_date == regulation_month
+    assert result_rows[0].surface_area == Decimal("10")
+    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
+    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert result_rows[0].adjusted_average_price_per_square_meter is None
+    assert result_rows[0].completion_month_index is None
+    assert result_rows[0].calculation_month_index is None
+    assert result_rows[0].regulation_result == RegulationResult.AUTOMATICALLY_RELEASED
 
 
 @pytest.mark.django_db
@@ -570,6 +658,9 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         skipped=[],
     )
 
+    #
+    # Check that the first housing company was freed from regulation and the second one stays regulated
+    #
     sale_1.apartment.housing_company.refresh_from_db()
     assert sale_1.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 

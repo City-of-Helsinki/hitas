@@ -1,8 +1,9 @@
 import datetime
+import json
 import logging
 from decimal import Decimal
 from itertools import chain
-from typing import Optional, TypeAlias, TypedDict
+from typing import Iterable, Literal, Optional, TypeAlias, TypedDict
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
@@ -13,6 +14,12 @@ from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import HousingCompany, HousingCompanyState, HousingCompanyWithAnnotations
 from hitas.models.indices import SurfaceAreaPriceCeiling
+from hitas.models.thirty_year_regulation import (
+    FullSalesData,
+    RegulationResult,
+    ThirtyYearRegulationResults,
+    ThirtyYearRegulationResultsRow,
+)
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.utils import business_quarter, hitas_calculation_quarter, roundup, to_quarter
 
@@ -86,6 +93,20 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         logger.info("Updating housing company states...")
         _free_housing_companies_from_regulation(split_housing_companies, results)
 
+        logger.info("Saving regulation results for reporting...")
+        _save_regulation_results(
+            results=results,
+            calculation_month=calculation_month,
+            regulation_month=regulation_month,
+            housing_companies=split_housing_companies,
+            surface_area_price_ceiling=None,
+            unadjusted_prices=None,
+            indices=None,
+            sales_data=None,
+            external_sales_data=None,
+            price_by_area=None,
+        )
+
         logger.info("Regulation check complete!")
         return results
 
@@ -94,8 +115,12 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         f"Proceeding with regulation checks for remaining {len(housing_companies)} housing companies..."
     )
 
+    unadjusted_prices: dict[HousingCompanyUUID, Decimal] = {
+        housing_company.uuid.hex: housing_company.avg_price_per_square_meter for housing_company in housing_companies
+    }
+
     logger.info("Making index adjustments...")
-    make_index_adjustment_for_housing_companies(housing_companies, calculation_month)
+    indices = make_index_adjustment_for_housing_companies(housing_companies, calculation_month)
 
     logger.info(f"Fetching surface area price ceiling for {calculation_month.isoformat()!r}...")
     surface_area_price_ceiling = get_hitas_object_or_404(SurfaceAreaPriceCeiling, month=calculation_month)
@@ -132,6 +157,20 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     logger.info("Updating housing company states...")
     _free_housing_companies_from_regulation(housing_companies, results)
+
+    logger.info("Saving regulation results for reporting...")
+    _save_regulation_results(
+        results=results,
+        calculation_month=calculation_month,
+        regulation_month=regulation_month,
+        housing_companies=housing_companies,
+        surface_area_price_ceiling=surface_area_price_ceiling.value,
+        unadjusted_prices=unadjusted_prices,
+        indices=indices,
+        sales_data=sales_data,
+        external_sales_data=external_sales_data,
+        price_by_area=price_by_area,
+    )
 
     logger.info("Regulation check complete!")
     return results
@@ -371,3 +410,78 @@ def _free_housing_companies_from_regulation(
         housing_company.state = HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
     HousingCompany.objects.bulk_update(housing_companies, fields=["state"])
+
+
+def _save_regulation_results(
+    results: RegulationResults,
+    calculation_month: datetime.date,
+    regulation_month: datetime.date,
+    housing_companies: Iterable[HousingCompanyWithAnnotations],
+    surface_area_price_ceiling: Optional[Decimal],
+    unadjusted_prices: Optional[dict[HousingCompanyUUID, Decimal]],
+    indices: Optional[dict[Literal["old", "new"], dict[datetime.date, Decimal]]],
+    sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],
+    external_sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],
+    price_by_area: Optional[dict[PostalCodeT, Decimal]],
+) -> ThirtyYearRegulationResults:
+    """
+    Save regulation results for reporting.
+    """
+    thirty_year_regulation_results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=calculation_month,
+        regulation_month=regulation_month,
+        surface_area_price_ceiling=surface_area_price_ceiling,
+        sales_data=FullSalesData(
+            # Convert decimals to floats
+            internal=json.loads(json.dumps(sales_data, default=float)) or {},
+            external=json.loads(json.dumps(external_sales_data, default=float)) or {},
+            price_by_area=json.loads(json.dumps(price_by_area, default=float)) or {},
+        ),
+    )
+
+    rows_to_save: list[ThirtyYearRegulationResultsRow] = []
+    for housing_company in housing_companies:
+        # If housing company was released automatically, its prices were never index adjusted.
+        unadjusted_average_price_per_square_meter: Decimal = housing_company.avg_price_per_square_meter
+        adjusted_average_price_per_square_meter: Optional[Decimal] = None
+        if unadjusted_prices is not None and housing_company.uuid.hex in unadjusted_prices:
+            unadjusted_average_price_per_square_meter = unadjusted_prices[housing_company.uuid.hex]
+            adjusted_average_price_per_square_meter = housing_company.avg_price_per_square_meter
+
+        # If housing company was released automatically, its prices were never index adjusted.
+        completion_month_index: Optional[Decimal] = None
+        calculation_month_index: Optional[Decimal] = None
+        key: Literal["old", "new"]
+        key = "old" if housing_company.financing_method.old_hitas_ruleset else "new"  # type: ignore
+        if indices is not None and housing_company.completion_month in indices[key]:
+            completion_month_index = indices[key][housing_company.completion_month]
+            calculation_month_index = indices[key][calculation_month]
+
+        if housing_company.uuid.hex in {result["id"] for result in results["automatically_released"]}:
+            regulation_result = RegulationResult.AUTOMATICALLY_RELEASED
+        elif housing_company.uuid.hex in {result["id"] for result in results["released_from_regulation"]}:
+            regulation_result = RegulationResult.RELEASED_FROM_REGULATION
+        elif housing_company.uuid.hex in {result["id"] for result in results["stays_regulated"]}:
+            regulation_result = RegulationResult.STAYS_REGULATED
+        else:
+            regulation_result = RegulationResult.SKIPPED
+
+        rows_to_save.append(
+            ThirtyYearRegulationResultsRow(
+                parent=thirty_year_regulation_results,
+                housing_company=housing_company,
+                completion_date=housing_company.completion_date,
+                surface_area=housing_company.surface_area,
+                postal_code=housing_company.postal_code.value,
+                realized_acquisition_price=housing_company.realized_acquisition_price,
+                unadjusted_average_price_per_square_meter=unadjusted_average_price_per_square_meter,
+                adjusted_average_price_per_square_meter=adjusted_average_price_per_square_meter,
+                completion_month_index=completion_month_index,
+                calculation_month_index=calculation_month_index,
+                regulation_result=regulation_result,
+            )
+        )
+
+    ThirtyYearRegulationResultsRow.objects.bulk_create(objs=rows_to_save)
+
+    return thirty_year_regulation_results
