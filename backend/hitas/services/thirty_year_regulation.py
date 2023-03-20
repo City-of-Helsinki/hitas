@@ -73,7 +73,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             skipped=[],
         )
 
-    automatically_released = _check_automatic_release(housing_companies)
+    split_housing_companies, automatically_released = _split_automatically_released(housing_companies)
     if not housing_companies:
         logger.info("All housing companies qualify for automatic release.")
         results = RegulationResults(
@@ -82,12 +82,15 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             stays_regulated=[],
             skipped=[],
         )
-        _free_housing_companies_from_regulation(housing_companies, results)
+
+        logger.info("Updating housing company states...")
+        _free_housing_companies_from_regulation(split_housing_companies, results)
+
         logger.info("Regulation check complete!")
         return results
 
     logger.info(
-        f"{len(automatically_released)} housing companies qualify for automatic release. "
+        f"{len(split_housing_companies)} housing companies qualify for automatic release. "
         f"Proceeding with regulation checks for remaining {len(housing_companies)} housing companies..."
     )
 
@@ -125,16 +128,22 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         f"{len(results['skipped'])} could not be checked."
     )
 
+    housing_companies += split_housing_companies
+
+    logger.info("Updating housing company states...")
     _free_housing_companies_from_regulation(housing_companies, results)
 
     logger.info("Regulation check complete!")
     return results
 
 
-def _check_automatic_release(housing_companies: list[HousingCompanyWithAnnotations]) -> list[ComparisonData]:
+def _split_automatically_released(
+    housing_companies: list[HousingCompanyWithAnnotations],
+) -> tuple[list[HousingCompanyWithAnnotations], list[ComparisonData]]:
     """
     Separate out housing companies that are automatically released from regulation.
     """
+    split_housing_companies: list[HousingCompanyWithAnnotations] = []
     automatically_released: list[ComparisonData] = []
     for i, housing_company in enumerate(housing_companies):
         if not housing_company.financing_method.old_hitas_ruleset:
@@ -142,6 +151,7 @@ def _check_automatic_release(housing_companies: list[HousingCompanyWithAnnotatio
                 f"Housing company {housing_company.display_name!r} uses new hitas ruleset. "
                 f"Automatically qualified for release from regulation."
             )
+            split_housing_companies.append(housing_company)
             automatically_released.append(
                 ComparisonData(
                     id=housing_company.uuid.hex,
@@ -153,7 +163,7 @@ def _check_automatic_release(housing_companies: list[HousingCompanyWithAnnotatio
             housing_companies[i] = None
 
     housing_companies[:] = [housing_company for housing_company in housing_companies if housing_company is not None]
-    return automatically_released
+    return split_housing_companies, automatically_released
 
 
 def _get_comparison_values(

@@ -477,6 +477,9 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         skipped=[],
     )
 
+    sale.apartment.housing_company.refresh_from_db()
+    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+
 
 @pytest.mark.django_db
 def test__api__regulation__automatically_release__partial(api_client: HitasAPIClient, freezer):
@@ -566,6 +569,12 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         ],
         skipped=[],
     )
+
+    sale_1.apartment.housing_company.refresh_from_db()
+    assert sale_1.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+
+    sale_2.apartment.housing_company.refresh_from_db()
+    assert sale_2.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
 
 
 @pytest.mark.django_db
