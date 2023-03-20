@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
@@ -54,6 +55,47 @@ class ConditionOfSale(ExternalHitasModel):
     @property
     def fulfilled(self) -> Optional[datetime.datetime]:
         return self.deleted  # noqa
+
+    def get_first_purchase_date(self) -> Optional[datetime.date]:
+        """
+        Return the first purchase date of the new apartment.
+        Can be used to determine the sell by date.
+        When apartment was sold after it was completed, the sell by date is calculated based on first sale date.
+        """
+        from hitas.models import ApartmentSale
+
+        return (
+            ApartmentSale.objects.filter(apartment=self.new_ownership.apartment)
+            .order_by("purchase_date")
+            .values_list("purchase_date", flat=True)
+            .first()
+        )
+
+    @property
+    def sell_by_date(self) -> Optional[datetime.date]:
+        if self.fulfilled:
+            return None
+
+        # If the apartment has not been completed, there is no sell by date yet.
+        sell_by_date = self.new_ownership.apartment.completion_date
+        if sell_by_date is None:
+            return None
+
+        # If apartment was sold after it was completed, the sell by date is calculated based on first sale date.
+        if hasattr(self, "first_purchase_date"):
+            first_purchase_date = self.first_purchase_date
+        else:
+            first_purchase_date = self.get_first_purchase_date()
+        if first_purchase_date is not None and first_purchase_date > sell_by_date:
+            sell_by_date = first_purchase_date
+
+        # If grace period has been given, it should be included
+        if self.grace_period == GracePeriod.THREE_MONTHS:
+            sell_by_date += relativedelta(months=3)
+        elif self.grace_period == GracePeriod.SIX_MONTHS:
+            sell_by_date += relativedelta(months=6)
+
+        return sell_by_date
 
     def __str__(self) -> str:
         return (

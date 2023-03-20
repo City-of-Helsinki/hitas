@@ -4,7 +4,6 @@ from decimal import Decimal
 from itertools import chain
 from typing import Any, Optional
 
-from dateutil.relativedelta import relativedelta
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -233,24 +232,9 @@ class Apartment(ExternalHitasModel):
         for ownership in self.ownerships.all():
             cos: ConditionOfSaleAnnotated
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
-                if cos.fulfilled:
-                    continue
-
-                # If the apartment has not been completed, there is no sell by date yet.
-                sell_by_date = cos.new_ownership.apartment.completion_date
+                sell_by_date = cos.sell_by_date
                 if sell_by_date is None:
                     continue
-
-                # If apartment was first sold after it was completed,
-                # the sell by date is calculated based on first sale date.
-                if cos.first_purchase_date is not None and cos.first_purchase_date > sell_by_date:
-                    sell_by_date = cos.first_purchase_date
-
-                # If grace period has been given, it should be included
-                if cos.grace_period == GracePeriod.THREE_MONTHS:
-                    sell_by_date += relativedelta(months=3)
-                elif cos.grace_period == GracePeriod.SIX_MONTHS:
-                    sell_by_date += relativedelta(months=6)
 
                 sell_by_dates.add(sell_by_date)
 

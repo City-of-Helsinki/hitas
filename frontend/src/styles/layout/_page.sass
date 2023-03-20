@@ -107,30 +107,43 @@ header
 
           .housing-company, .address
             width: 45%
-            margin: 0
             padding-right: 1em
 
           .housing-company
-            font-size: $fontsize-body-s
+            font-size: $fontsize-body-m
             font-weight: 600
             margin: -0.3em 0 0.3em
+            margin-bottom: auto
+
+          .address
+            margin-top: auto
+
+          .street-address
+            font-size: $fontsize-body-m
+
+          .postal-code
+            font-size: $fontsize-body-s
 
           .ownership, .area
             @include flex-grow(1)
+            width: 40%
+            font-size: $fontsize-body-m
 
           .ownership
             color: $color-black-60
             display: inline-block
-            position: relative
             z-index: 10
-            font-size: $fontsize-body-m
             line-height: 1
-            width: 40%
             white-space: nowrap
             overflow: hidden
             text-overflow: ellipsis
             scrollbar-width: none
             scrollbar-color: transparent transparent
+            margin-bottom: auto
+
+          .area
+            font-size: $fontsize-body-m
+            margin-top: auto
 
         &:hover .details .ownership
           overflow-x: auto
@@ -156,8 +169,17 @@ header
 
         .state
           @include flexbox()
-          @include align-items(flex-end)
+          flex-direction: row
+          align-items: center
+          justify-content: right
+          column-gap: 0.4em
           width: 15%
+
+          .sell-by-date
+            display: none
+          .conditions-of-sale:hover > .sell-by-date
+              display: inline-block
+
 .list
 
   &-amount

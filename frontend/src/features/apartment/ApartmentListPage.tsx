@@ -2,7 +2,6 @@ import {useState} from "react";
 
 import {IconLock, SearchInput, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
-
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
     FilterIntegerField,
@@ -12,7 +11,9 @@ import {
     QueryStateHandler,
 } from "../../common/components";
 import FilterCheckboxField from "../../common/components/FilterCheckboxField";
+import {getApartmentStateLabel} from "../../common/localisation";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
+import {formatDate, getConditionsOfSaleStatusLabelType} from "../../common/utils";
 
 const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
     // Combine ownerships into a single formatted string
@@ -25,16 +26,18 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 <div className="number">
                     {apartment.address.stair}
                     {apartment.address.apartment_number}
-                    {apartment.has_conditions_of_sale ? <IconLock /> : null}
                 </div>
                 <div className="details">
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
                     <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="address">
-                        {apartment.address.street_address} {apartment.address.stair}{" "}
-                        {apartment.address.apartment_number}
-                        <br />
-                        {`${apartment.address.postal_code}, ${apartment.address.city}`}
+                        <div className="street-address">
+                            {apartment.address.street_address} {apartment.address.stair}{" "}
+                            {apartment.address.apartment_number}
+                        </div>
+                        <div className="postal-code">
+                            {apartment.address.postal_code}, {apartment.address.city}
+                        </div>
                     </div>
                     <div className="area">
                         {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
@@ -42,7 +45,19 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     </div>
                 </div>
                 <div className="state">
-                    <StatusLabel>{apartment.state}</StatusLabel>
+                    {apartment.has_conditions_of_sale && apartment.sell_by_date ? (
+                        <StatusLabel
+                            className="conditions-of-sale"
+                            type={getConditionsOfSaleStatusLabelType(
+                                apartment.has_grace_period,
+                                apartment.sell_by_date
+                            )}
+                            iconLeft={<IconLock size="s" />}
+                        >
+                            <div className="sell-by-date">{formatDate(apartment.sell_by_date)}</div>
+                        </StatusLabel>
+                    ) : null}
+                    <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
                 </div>
             </li>
         </Link>

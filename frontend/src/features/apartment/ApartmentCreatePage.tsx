@@ -28,6 +28,7 @@ import {
     TextAreaInput,
     TextInput,
 } from "../../common/components/form";
+import {getApartmentStateLabel} from "../../common/localisation";
 import {
     apartmentStates,
     ApartmentWritableFormSchema,
@@ -43,19 +44,6 @@ interface IApartmentState {
     pathname: string;
     state: null | {apartment: IApartmentDetails};
 }
-
-const getApartmentStateLabel = (state) => {
-    switch (state) {
-        case "free":
-            return "Vapaa";
-        case "reserved":
-            return "Varattu";
-        case "sold":
-            return "Myyty";
-        default:
-            return "VIRHE";
-    }
-};
 
 const apartmentStateOptions = apartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};

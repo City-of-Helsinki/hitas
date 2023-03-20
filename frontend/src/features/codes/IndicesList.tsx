@@ -8,35 +8,14 @@ import {FilterTextInputField, FormInputField, QueryStateHandler, SaveButton} fro
 import {IIndex} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
-const indexTypes: {label: string}[] = [
-    {label: "market-price-index"},
-    {label: "market-price-index-2005-equal-100"},
-    {label: "construction-price-index"},
-    {label: "construction-price-index-2005-equal-100"},
-    {label: "surface-area-price-ceiling"},
-    {label: "maximum-price-index"},
+const indexOptions: {label: string; value: string}[] = [
+    {label: "Markkinahintaindeksi 1983", value: "market-price-index"},
+    {label: "Markkinahintaindeksi 2005", value: "market-price-index-2005-equal-100"},
+    {label: "Rakennuskustannusindeksi 1980", value: "construction-price-index"},
+    {label: "Rakennuskustannusindeksi 2005", value: "construction-price-index-2005-equal-100"},
+    {label: "Rajaneliöhinta", value: "surface-area-price-ceiling"},
+    {label: "Luovutushintaindeksi", value: "maximum-price-index"},
 ];
-const getIndexTypeName = (indexType: string): string => {
-    switch (indexType) {
-        case "maximum-price-index":
-            return "Luovutushintaindeksi";
-        case "market-price-index":
-            return "Markkinahintaindeksi 1983";
-        case "market-price-index-2005-equal-100":
-            return "Markkinahintaindeksi 2005";
-        case "construction-price-index":
-            return "Rakennuskustannusindeksi 1980";
-        case "construction-price-index-2005-equal-100":
-            return "Rakennuskustannusindeksi 2005";
-        case "surface-area-price-ceiling":
-            return "Rajaneliöhinta";
-        default:
-            return "VIRHE";
-    }
-};
-const indexOptions = indexTypes.map(({label}) => {
-    return {label: getIndexTypeName(label), value: label};
-});
 
 const IndexListItem = ({month, value, editFn}: {month: string; value: number; editFn}) => (
     <div
@@ -51,7 +30,7 @@ const IndexListItem = ({month, value, editFn}: {month: string; value: number; ed
     </div>
 );
 
-const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
+const LoadedIndexResultsList = ({data, editFn}) => {
     return (
         <div className="results">
             <div className="list-headers">
@@ -72,12 +51,11 @@ const LoadedIndexResultsList = ({data, editFn, currentPage}) => {
     );
 };
 
-const IndexResultList = ({currentPage, setFormData, setCreateDialogOpen, indexType, filterParams}) => {
+const IndexResultList = ({setFormData, setCreateDialogOpen, indexType, filterParams}) => {
     const {data, error, isLoading} = useGetIndicesQuery({
-        indexType: indexType.label,
+        indexType: indexType.value,
         params: {
             ...filterParams,
-            page: currentPage,
             limit: 12,
         },
     });
@@ -98,34 +76,27 @@ const IndexResultList = ({currentPage, setFormData, setCreateDialogOpen, indexTy
                         });
                         setCreateDialogOpen(true);
                     }}
-                    currentPage={currentPage}
                 />
             </QueryStateHandler>
         </div>
     );
 };
 
-const todaysDate = new Date();
-const initialSaveData: IIndex = {
-    indexType: indexTypes[0].label,
-    month: `${todaysDate.getFullYear()}-${("0" + (todaysDate.getMonth() + 1)).slice(-2)}`,
-    value: null,
-};
-
 const IndicesList = (): JSX.Element => {
+    const initialSaveData: IIndex = {
+        indexType: indexOptions[0].value,
+        month: `${new Date().getFullYear()}-${("0" + (new Date().getMonth() + 1)).slice(-2)}`,
+        value: null,
+    };
+
     const [filterParams, setFilterParams] = useState({});
-    const [currentIndexType, setCurrentIndexType] = useState(indexTypes[0]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentIndexType, setCurrentIndexType] = useState(indexOptions[0]);
     const [formData, setFormData] = useImmer(initialSaveData);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const closeModal = () => {
         setFormData(initialSaveData);
         setIsModalOpen(false);
-    };
-    const onSelectionChange = ({value}) => {
-        setCurrentPage(1);
-        setCurrentIndexType(() => ({label: value}));
     };
 
     return (
@@ -134,11 +105,8 @@ const IndicesList = (): JSX.Element => {
                 <Select
                     label="Indeksityyppi"
                     options={indexOptions}
-                    onChange={onSelectionChange}
-                    defaultValue={{
-                        value: indexTypes[0].label,
-                        label: getIndexTypeName(indexTypes[0].label),
-                    }}
+                    onChange={(selected) => setCurrentIndexType(selected)}
+                    defaultValue={indexOptions[0]}
                 />
                 <FilterTextInputField
                     label="Vuosi"
@@ -150,7 +118,6 @@ const IndicesList = (): JSX.Element => {
                 />
             </div>
             <IndexResultList
-                currentPage={currentPage}
                 indexType={currentIndexType}
                 setFormData={setFormData}
                 setCreateDialogOpen={setIsModalOpen}
@@ -181,7 +148,7 @@ const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeMod
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
-            index: indexType.label,
+            index: indexType.value,
             month: formData.month,
         });
     };
@@ -208,7 +175,7 @@ const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeMod
         >
             <Dialog.Header
                 id="index-creation-header"
-                title={"Tallenna " + getIndexTypeName(indexType.label).toLowerCase()}
+                title={`Tallenna ${indexType.label}`}
             />
             <Dialog.Content>
                 <FormInputField

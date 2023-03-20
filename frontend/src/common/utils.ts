@@ -2,7 +2,7 @@ import toast, {ToastOptions} from "react-hot-toast";
 
 import {IAddress, IApartmentAddress, IOwner} from "./schemas";
 
-function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
+export function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
     /*
      Dotted getter and setter
      refs. https://stackoverflow.com/a/6394168/12730861
@@ -23,18 +23,18 @@ function dotted(obj: object, path: string | string[], value?: number | string | 
     else return dotted(obj[path[0]], path.slice(1), value);
 }
 
-function formatAddress(address: IAddress | IApartmentAddress): string {
+export function formatAddress(address: IAddress | IApartmentAddress): string {
     if ("apartment_number" in address) {
         return `${address.street_address} ${address.stair} ${address.apartment_number}, ${address.postal_code}, ${address.city}`;
     }
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 
-function formatOwner(owner: IOwner): string {
+export function formatOwner(owner: IOwner): string {
     return `${owner.name} (${owner.identifier})`;
 }
 
-function formatMoney(value: number | undefined | null, forceDecimals = false): string {
+export function formatMoney(value: number | undefined | null, forceDecimals = false): string {
     if (!value) return "-";
 
     const formatOptions = {
@@ -47,29 +47,18 @@ function formatMoney(value: number | undefined | null, forceDecimals = false): s
     return new Intl.NumberFormat("fi-FI", formatOptions).format(value);
 }
 
-function formatDate(value: string | null): string {
+export function formatDate(value: string | null): string {
     if (value === null) return "-";
 
     return new Date(value).toLocaleDateString("fi-FI");
 }
 
-function formatIndex(indexType: string) {
-    switch (indexType) {
-        case "market_price_index":
-            return "markkinahintaindeksi";
-        case "construction_price_index":
-            return "rakennuskustannusindeksi";
-        case "surface_area_price_ceiling":
-            return "rajaneliöhintaindeksi";
-    }
-}
-
-function validateBusinessId(value: string): boolean {
+export function validateBusinessId(value: string): boolean {
     // e.g. '1234567-8'
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
-function validateSocialSecurityNumber(value: string): boolean {
+export function validateSocialSecurityNumber(value: string): boolean {
     if (value === null) return false;
     if (!value.match(/^(\d{6})([A-FYXWVU+-])(\d{3})([\dA-Z])$/)) {
         return false;
@@ -134,14 +123,18 @@ function validateSocialSecurityNumber(value: string): boolean {
     return checkDigits[Number(value.substring(0, 6) + idNumber) % 31] === checkDigit;
 }
 
-const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
+export const today = () => new Date().toISOString().split("T")[0]; // Today's date in YYYY-MM-DD format
 
 // Toast hook with easier Notification typing
-function hitasToast(message: string | JSX.Element, type?: "success" | "info" | "error" | "alert", opts?: ToastOptions) {
+export function hitasToast(
+    message: string | JSX.Element,
+    type?: "success" | "info" | "error" | "alert",
+    opts?: ToastOptions
+) {
     toast(message, {...opts, className: type});
 }
 
-const hdsToast = {
+export const hdsToast = {
     success: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "success"}),
     info: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
     error: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "error"}),
@@ -150,7 +143,7 @@ const hdsToast = {
 
 // Returns true if obj1 contains the same key/value pairs as obj2. Note that this is non-exclusive, so obj1 doesn't
 // have to be identical to obj2, as it can contain more data than only the ones from obj2.
-function doesAContainB(A: object, B: object): boolean {
+export function doesAContainB(A: object, B: object): boolean {
     const AProps = Object.getOwnPropertyNames(A);
     const BProps = Object.getOwnPropertyNames(B);
     if (AProps.length < BProps.length) {
@@ -164,17 +157,10 @@ function doesAContainB(A: object, B: object): boolean {
     return true;
 }
 
-export {
-    dotted,
-    formatAddress,
-    formatOwner,
-    formatMoney,
-    formatDate,
-    formatIndex,
-    validateBusinessId,
-    validateSocialSecurityNumber,
-    hitasToast,
-    hdsToast,
-    today,
-    doesAContainB,
+export const getConditionsOfSaleStatusLabelType = (hasGracePeriod: boolean, sellByDate: string | null) => {
+    if (sellByDate === null) return "neutral";
+
+    if (new Date() >= new Date(sellByDate)) return "error";
+    else if (hasGracePeriod) return "alert";
+    return "neutral";
 };
