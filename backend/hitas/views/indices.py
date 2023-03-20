@@ -4,6 +4,7 @@ from typing import ClassVar
 from django.db.models import Q
 from rest_framework import mixins, status
 from rest_framework.exceptions import ErrorDetail, ValidationError
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -126,9 +127,9 @@ class ConstructionPriceIndex2005Equal100ViewSet(_AbstractIndicesViewSet):
 class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
     model_class = SurfaceAreaPriceCeiling
 
-    def create(self, request, *args, **kwargs) -> Response:
+    def create(self, request: Request, *args, **kwargs) -> Response:
         try:
-            calculation_date = from_iso_format_or_today_if_none(kwargs.get("calculation_date"))
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
         except ValueError as error:
             raise ValidationError({"calculation_date": str(error)}) from error
 
