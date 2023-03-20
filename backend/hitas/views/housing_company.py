@@ -281,10 +281,11 @@ class HousingCompanyViewSet(HitasModelViewSet):
             .annotate(
                 date=max_if_all_not_null(
                     ref="real_estates__buildings__apartments__completion_date",
-                    inf=datetime.date.max,
+                    max=datetime.date.max,
+                    min=datetime.date.min,
                 )
             )
-            .order_by("-date")
+            .order_by(F("date").desc(nulls_last=False))
         )
 
     def get_detail_queryset(self):
@@ -334,7 +335,8 @@ class HousingCompanyViewSet(HitasModelViewSet):
             .annotate(
                 date=max_if_all_not_null(
                     ref="real_estates__buildings__apartments__completion_date",
-                    inf=datetime.date.max,
+                    max=datetime.date.max,
+                    min=datetime.date.min,
                 ),
                 sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
                 sum_acquisition_price=Sum("_acquisition_price"),

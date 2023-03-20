@@ -53,7 +53,8 @@ def get_completed_housing_companies(
             surface_area=Sum("real_estates__buildings__apartments__surface_area"),
             completion_date=max_if_all_not_null(
                 ref="real_estates__buildings__apartments__completion_date",
-                inf=datetime.date.max,
+                max=datetime.date.max,
+                min=datetime.date.min,
             ),
             completion_month=TruncMonth("completion_date"),
             avg_price_per_square_meter=(

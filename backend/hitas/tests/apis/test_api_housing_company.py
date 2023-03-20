@@ -194,7 +194,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
-    ApartmentFactory.create(
+    hc1_re1_bu1_ap1: Apartment = ApartmentFactory.create(
         building=hc1_re1_bu1,
         completion_date=date(2022, 1, 1),
         surface_area=10.5,
@@ -256,10 +256,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "state": hc1.state.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-        # The date should be '2022-01-01', since there are three or four apartments,
-        # all with completion dates. This can be confirmed by setting up this scenario locally,
-        # but the test fails to calculate this correctly for some reason...
-        "date": None,
+        "date": hc1_re1_bu1_ap1.completion_date.isoformat(),
         "summary": {
             # (100.5+200+300.5+400+500+600.5) = 2101.5
             "realized_acquisition_price": 2101.5,
