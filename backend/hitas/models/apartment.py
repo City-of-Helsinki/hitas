@@ -93,7 +93,7 @@ class Apartment(ExternalHitasModel):
 
         return None
 
-    # 'Luovutushinta' = Ensimmäisen kaupan kauppakirjahinta
+    # 'Ensimmäinen kauppahinta = 'Luovutushinta' = Ensimmäisen kaupan kauppakirjahinta
     @property
     def first_sale_purchase_price(self) -> Optional[Decimal]:
         # Allow caches for the instance
@@ -117,7 +117,7 @@ class Apartment(ExternalHitasModel):
         )
         return self._first_sale_share_of_housing_company_loans
 
-    # 'Viimeisin Kauppakirjahinta'
+    # 'Viimeisin Kauppahinta'
     @property
     def latest_sale_purchase_price(self) -> Optional[Decimal]:
         # Allow caches for the instance
