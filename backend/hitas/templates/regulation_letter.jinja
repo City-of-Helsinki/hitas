@@ -1,0 +1,304 @@
+{% extends "components/base.jinja" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block style %}
+  <style>
+    .todo {
+        color: red;
+    }
+    .spaced tr {
+        padding-bottom: 3px;
+    }
+    .tight tr {
+        padding-bottom: 1px;
+    }
+    .top-alight td {
+        vertical-align: top;
+    }
+    .bottom-alight td {
+        vertical-align: bottom;
+    }
+    .wide td.first-column {
+        width: 300px;
+    }
+    .narrow td.first-column {
+        width: 160px;
+    }
+    td.small-column {
+        width: 110px;
+    }
+    .bordered-header {
+        border-style: solid;
+        border-color: black;
+        border-left: 2px;
+        border-top: 2px;
+        border-right: 4px;
+        border-bottom: 4px;
+    }
+    h2.bordered-header {
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: -5px;
+        margin-left: 100px;
+        margin-right: 100px;
+        margin-bottom: 50px;
+    }
+  </style>
+{% endblock %}
+
+{% set released = results.regulation_result.value in ["released_from_regulation", "released_from_regulation"] %}
+{% set regulated = results.regulation_result.value == "stays_regulated" %}
+
+{% block content %}
+  <h3 style="padding-bottom: 8px;">{{ results.housing_company.display_name }}</h3>
+
+  <h3>HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS</h3>
+
+  <table class="spaced top-alight narrow">
+    <tr>
+      <td class="first-column"><b>Asunto-osakeyhtiö</b></td>
+      <td>{{ results.housing_company.display_name }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Huoneiston osoite</b></td>
+      <td>{{ results.housing_company.street_address }}, {{ results.housing_company.postal_code.value }} {{ results.housing_company.postal_code.city|upper }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Osakenumerot</b></td>
+      <td>{{ results.min_share }} - {{ results.max_share }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Kiinteistötunnukset</b></td>
+      <td>
+        {% for real_estate in results.housing_company.real_estates.all() %}
+          {% if real_estate.property_identifier is not none %}
+            {{ real_estate.property_identifier }}{% if not loop.last %},&nbsp;{% endif %}
+          {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Yhtiön ikä</b></td>
+      <td>Yhtiönne valmistumisesta on kulunut 30 vuotta {{ results.turned_30|format_date }} / {{ results.check_count }}. tarkistus</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Yhtiön keskineliöhinta</b></td>
+      <td>
+        Yhtiönne laskettu keskimääräinen neliöhinta on
+        {{ results.adjusted_average_price_per_square_meter|round|wordify }}
+        ({{ results.adjusted_average_price_per_square_meter|intcomma(0) }})
+        euroa markkinahintaindeksillä laskettuna.
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Rajahinta</b></td>
+      <td>
+        Kaikkien Hitas-yhtiöiden keskimääräinen neliöhinta on
+        {{ results.parent.surface_area_price_ceiling|round|wordify }}
+        ({{ results.parent.surface_area_price_ceiling|intcomma(0) }})
+        euroa. Jos yhtiön keskineliöhinta on alempi kuin rajahinta,
+        niin vertailussa yhtiön neliöhintana käytetään rajahintaa
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Postinumeroalueen keskineliöhinta</b></td>
+      <td>
+        Tilastokeskuksen viimeisimmän 12 kuukauden hintatilaston
+        (täydennettynä Hitas-asuntojen hintatiedoilla) mukaan postinumeroalueen {{ results.postal_code }}
+        asuntojen keskimääräinen neliöhinta on
+        {{ results.parent.sales_data.price_by_area[results.postal_code]|round|wordify }}
+        ({{ results.parent.sales_data.price_by_area[results.postal_code]|intcomma(0) }})
+        euroa.
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Neliöhintojen vertailu</b></td>
+      <td>
+        {% if regulated %}
+          {{ results.housing_company.display_name }} jää enimmäishintojen vertailun perusteella
+          hintasääntelyn vaikutuksen piiriin, koska yhtiön keskineliöhinta alittaa
+          postinumeroalueen kaikkien asuntojen keskineliöhinnan.
+        {% elif released %}
+          {{ results.housing_company.display_name }} vapautuu enimmäishintojen vertailun perusteella
+          hintasääntelystä, koska yhtiön keskineliöhinta ylittää postinumeroalueen kaikkien
+          asuntojen keskineliöhinnan.
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Hintasääntelystä vapautuminen</b></td>
+      <td>
+        {% if regulated %}
+          Yhtiönne voi hakea Hitas-sääntelystä vapautumista
+        {% elif released %}
+          Kun yhtiö on kaupunginvaltuuston 3.6.2009 (136 §) päätöksen perusteella
+          vapautunut hintojen sääntelystä, kaupungin puolesta ei ole estettä sille, että
+          yhtiöjärjestykseen otetut kaupungin lunastusoikeutta koskevat pykälät poistetaan
+          yhtiöjärjestyksestä.
+          <br>
+          <br>
+          Tämän ilmoituksen jälkeen yhtiön asuntojen enimmäishintoja ei enää vahvisteta, eikä
+          tietoja tapahtuneista kaupoista ilmoiteta.
+        {% endif %}
+      </td>
+    </tr>
+    {% if regulated %}
+    <tr>
+      <td class="first-column"><b>Tontin maanvuokra</b></td>
+      <td>
+        Tontin maanvuokraa tarkistetaan hintasääntelystä vapautumisen yhteydessä 0 - 30
+        prosentilla kiinteistölautakunnan erikseen päättämien ohjeiden mukaisesti. Lisätietoja
+        saa kaupunkiympäristön tontit-yksiköstä.
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Hintasääntelyn jatkuminen</b></td>
+      <td>
+          Mikäli yhtiönne ei hae Hitas-sääntelystä vapautumista, hintavertailu tehdään neljä
+          kertaa vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
+          neljännesvuosivertailun jälkeen.
+      </td>
+    {% endif %}
+    </tr>
+    <tr>
+      <td class="first-column"></td>
+      <td>
+        <br>
+        Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
+        <br>
+        Lisätiedot: Saila Kiviniemi, asuntosihteeri, puhelin 310 34154
+        <br>
+      </td>
+    </tr>
+      <tr>
+      <td class="first-column">LIITE</td>
+      <td>
+        Laskelma yhtiön keskineliöhinnoista
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column">TIEDOKSI</td>
+      <td>
+        Kaupunkiympäristön tontit-yksikölle
+      </td>
+    </tr>
+  </table>
+
+  <pdf:nexttemplate name="template_attachment_1" />
+  <pdf:nextpage />
+
+  <h2 class="bordered-header">LASKELMA YHTIÖN KESKINELIÖHINNASTA RAKENNUSKUSTANNUS- JA MARKKINAHINTAINDEKSILLÄ</h2>
+
+  <table class="tight bottom-alight wide">
+    <tr>
+      <td class="first-column"><b>Asunto-osakeyhtiö:</b></td>
+      <td>&nbsp;{{ results.housing_company.display_name }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Yhtiön osoite:</b></td>
+      <td>&nbsp;{{ results.housing_company.street_address }}, {{ results.housing_company.postal_code.value }} {{ results.housing_company.postal_code.city|upper }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Yhtiön osakenumerot:</b></td>
+      <td>&nbsp;{{ results.min_share }} - {{ results.max_share }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Osakkeiden lkm:</b></td>
+      <td>&nbsp;{{ results.share_count }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Asuntojen lkm:</b></td>
+      <td>&nbsp;{{ results.apartment_count }}</td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="tight bottom-alight wide">
+    <tr>
+      <td class="first-column"><b>Hankinta-arvo:</b></td>
+      <td>&nbsp;{{ results.realized_acquisition_price|intcomma }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Pinta-ala m²:</b></td>
+      <td>&nbsp;{{ results.surface_area|intcomma }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Viimeisen vaiheen valmistumispäivä:</b></td>
+      <td>&nbsp;{{ results.completion_date|format_date }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>&#x2022; rakennuskustannushintaindeksi</b></td>
+      <td>&nbsp;{{ results.completion_month_index_cpi|intcomma }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>&#x2022; markkinahintaindeksi</b></td>
+      <td>&nbsp;{{ results.completion_month_index|intcomma }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Laskentapäivä:</b></td>
+      <td>&nbsp;{{ results.parent.calculation_month|format_date }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>&#x2022; rakennuskustannushintaindeksi</b></td>
+      <td>&nbsp;{{ results.calculation_month_index_cpi|intcomma }}</td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>&#x2022; markkinahintaindeksi</b></td>
+      <td>&nbsp;{{ results.calculation_month_index|intcomma }}</td>
+    </tr>
+  </table>
+
+  <br>
+
+  <table class="tight bottom-alight wide">
+    <tr>
+      <td class="first-column"><b>Keskimääräinen neliöhinta rakennuskustannushintaindeksillä euroa/m²</b></td>
+      <td class="small-column"><b>&nbsp;{{ results.average_price_per_square_meter_cpi|intcomma }}</b></td>
+      <td>
+        laskentakaava:
+        <br>
+        ({{ results.calculation_month_index_cpi|intcomma }} / {{ results.completion_month_index_cpi|intcomma }})
+        * ({{ results.realized_acquisition_price|intcomma }} / {{ results.surface_area|intcomma }})
+      </td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Keskimääräinen neliöhinta markkinahintaindeksillä euroa/m²</b></td>
+      <td class="small-column"><b>&nbsp;{{ results.adjusted_average_price_per_square_meter|intcomma }}</b></td>
+      <td>
+        laskentakaava:
+        <br>
+        ({{ results.calculation_month_index|intcomma }} / {{ results.completion_month_index|intcomma }})
+        * ({{ results.realized_acquisition_price|intcomma }} / {{ results.surface_area|intcomma }})
+      </td>
+    </tr>
+  </table>
+
+  <br>
+  <br>
+
+  <table class="spaced bottom-alight wide">
+    <tr>
+      <td class="first-column"><b>NELIÖHINTOJEN VERTAILU</b></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Yhtiön keskineliöhinta euroa/m²</b></td>
+      <td><b>&nbsp;{{ results.adjusted_average_price_per_square_meter|intcomma(0) }}</b></td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Rajahinta euroa/m²</b></td>
+      <td><b>&nbsp;{{ results.parent.surface_area_price_ceiling|intcomma(0) }}</b></td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Postinumeroalueen keskihinta euroa/m²</b></td>
+      <td><b>&nbsp;{{ results.parent.sales_data.price_by_area[results.postal_code]|intcomma(0) }}</b></td>
+    </tr>
+    <tr>
+      <td class="first-column"><b>Hintaero postinumeroalueen neliöhintaan</b><br>(= ero yhtiön keskineliöhintaan tai rajahintaan)</td>
+      <td><b>{% if results.difference > 0 %}&nbsp;{% endif %}{{ results.difference|intcomma(0) }}</b></td>
+    </tr>
+  </table>
+
+
+{% endblock %}

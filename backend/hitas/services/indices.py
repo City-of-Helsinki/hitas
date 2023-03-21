@@ -4,9 +4,16 @@ from decimal import Decimal
 from typing import Literal, Optional
 
 from dateutil.relativedelta import relativedelta
+from django.db.models import Case, OuterRef, Q, Subquery, When
 
 from hitas.exceptions import ModelConflict
-from hitas.models import HousingCompanyState, SurfaceAreaPriceCeiling
+from hitas.models import (
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
+    HousingCompanyState,
+    SurfaceAreaPriceCeiling,
+)
+from hitas.models._base import HitasModelDecimalField
 from hitas.models.housing_company import HousingCompanyWithAnnotations
 from hitas.models.indices import (
     CalculationData,
@@ -112,3 +119,28 @@ def _save_calculation_data(
         created_surface_area_price_ceilings=surface_area_price_ceilings,
     )
     return SurfaceAreaPriceCeilingCalculationData.objects.create(calculation_month=calculation_month, data=data)
+
+
+def subquery_appropriate_cpi(outer_ref: str, financing_method_ref: str) -> Case:
+    """
+    Make a subquery for appropriate construction price index based on housing company's financing method.
+    """
+    return Case(
+        When(
+            condition=Q(**{f"{financing_method_ref}__old_hitas_ruleset": True}),
+            then=(
+                Subquery(
+                    queryset=(ConstructionPriceIndex.objects.filter(month=OuterRef(outer_ref)).values("value")[:1]),
+                    output_field=HitasModelDecimalField(),
+                )
+            ),
+        ),
+        default=(
+            Subquery(
+                queryset=(
+                    ConstructionPriceIndex2005Equal100.objects.filter(month=OuterRef(outer_ref)).values("value")[:1]
+                ),
+                output_field=HitasModelDecimalField(),
+            )
+        ),
+    )

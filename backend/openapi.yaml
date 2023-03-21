@@ -2378,6 +2378,36 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/thirty-year-regulation/reports/regulation-letter:
+    get:
+      description: Download a single housing company's regulation letter as a PDF
+      operationId: read-regulation-letter-pdf
+      tags:
+        - Thirty Year Regulation
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: query
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully downloaded a regulation letter
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   # Property Manager
 
