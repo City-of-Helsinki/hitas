@@ -318,19 +318,19 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         <Tabs.TabPanel>
                             <div className="company-details__tab basic-details">
                                 <div className="row">
-                                    <div>
+                                    <div className="horizontal-detail-field">
                                         <DetailField
-                                            label="Kauppakirjahinta"
+                                            label="Viimeisin kauppahinta"
                                             value={formatMoney(data.prices.latest_sale_purchase_price)}
                                         />
                                     </div>
-                                    <div>
+                                    <div className="horizontal-detail-field">
                                         <DetailField
                                             label="Hankinta-arvo"
                                             value={formatMoney(data.prices.first_sale_acquisition_price)}
                                         />
                                     </div>
-                                    <div>
+                                    <div className="horizontal-detail-field">
                                         <DetailField
                                             label="Valmistumispäivä"
                                             value={formatDate(data.completion_date)}

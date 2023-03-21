@@ -188,17 +188,20 @@
       border-bottom: 1px solid #CCC
       margin-bottom: 1rem
 
-      > div
+      .horizontal-detail-field
         @include flexbox()
+        align-items: center
+        margin-bottom: 1em
+
+        .detail-field-label
+          margin-bottom: 0
 
       .detail-field
         &-label
-          padding-top: 0.25rem
           margin-right: 1rem
 
         &-value
           font-size: $fontsize-heading-m
-          margin-bottom: 1rem
 
     .columns
       @include flexbox()
