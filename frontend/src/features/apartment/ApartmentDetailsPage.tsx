@@ -360,6 +360,14 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                     : "-"
                                             }
                                         />
+                                        <DetailField
+                                            label="Osakkeet"
+                                            value={
+                                                data.shares
+                                                    ? `${data.shares.start} - ${data.shares.end} (${data.shares.total} kpl)`
+                                                    : undefined
+                                            }
+                                        />
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
                                             value={(data.notes as string) || ""}
@@ -367,16 +375,6 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                         />
                                     </div>
                                     <div className="column">
-                                        <DetailField
-                                            label="Osakkeiden lukumäärä"
-                                            value={data.shares ? data.shares.total : 0}
-                                        />
-                                        {data.shares && (
-                                            <DetailField
-                                                label="Osakkeet"
-                                                value={`${data.shares.start} - ${data.shares.end}`}
-                                            />
-                                        )}
                                         <DetailField
                                             label="Luovutushinta"
                                             value={formatMoney(data.prices.first_sale_purchase_price)}
