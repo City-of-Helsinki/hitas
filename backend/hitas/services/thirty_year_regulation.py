@@ -3,7 +3,7 @@ import json
 import logging
 from decimal import Decimal
 from itertools import chain
-from typing import Iterable, Literal, Optional, TypeAlias, TypedDict
+from typing import Iterable, Literal, Optional, TypedDict
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
@@ -16,6 +16,10 @@ from hitas.models.housing_company import HousingCompany, HousingCompanyState, Ho
 from hitas.models.indices import SurfaceAreaPriceCeiling
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
+    HousingCompanyNameT,
+    HousingCompanyUUIDHex,
+    PostalCodeT,
+    QuarterT,
     RegulationResult,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
@@ -25,15 +29,9 @@ from hitas.utils import business_quarter, hitas_calculation_quarter, roundup, to
 
 logger = logging.getLogger()
 
-PostalCodeT: TypeAlias = str
-QuarterT: TypeAlias = str
-HousingCompanyUUID: TypeAlias = str
-HousingCompanyNameT: TypeAlias = str
-ApartmentAddressT: TypeAlias = str
-
 
 class ComparisonData(TypedDict):
-    id: HousingCompanyUUID
+    id: HousingCompanyUUIDHex
     display_name: HousingCompanyNameT
     price: Decimal
     old_ruleset: bool
@@ -115,7 +113,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         f"Proceeding with regulation checks for remaining {len(housing_companies)} housing companies..."
     )
 
-    unadjusted_prices: dict[HousingCompanyUUID, Decimal] = {
+    unadjusted_prices: dict[HousingCompanyUUIDHex, Decimal] = {
         housing_company.uuid.hex: housing_company.avg_price_per_square_meter for housing_company in housing_companies
     }
 
@@ -208,12 +206,12 @@ def _split_automatically_released(
 def _get_comparison_values(
     housing_companies: list[HousingCompanyWithAnnotations],
     surface_area_price_ceiling: Decimal,
-) -> dict[PostalCodeT, dict[HousingCompanyUUID, ComparisonData]]:
+) -> dict[PostalCodeT, dict[HousingCompanyUUIDHex, ComparisonData]]:
     """
     Determine the value, for each housing company, which shall be compared against
     the housing company's postal area's final average price per square meter.
     """
-    comparison_values: dict[PostalCodeT, dict[HousingCompanyUUID, ComparisonData]] = {}
+    comparison_values: dict[PostalCodeT, dict[HousingCompanyUUIDHex, ComparisonData]] = {}
     for housing_company in housing_companies:
         postal_code = housing_company.postal_code.value
         comparison_values.setdefault(postal_code, {})
@@ -332,7 +330,7 @@ def _combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> d
 
 
 def _determine_regulation_need(
-    comparison_values: dict[PostalCodeT, dict[HousingCompanyUUID, ComparisonData]],
+    comparison_values: dict[PostalCodeT, dict[HousingCompanyUUIDHex, ComparisonData]],
     price_by_area: dict[PostalCodeT, Decimal],
 ) -> RegulationResults:
     """
@@ -418,7 +416,7 @@ def _save_regulation_results(
     regulation_month: datetime.date,
     housing_companies: Iterable[HousingCompanyWithAnnotations],
     surface_area_price_ceiling: Optional[Decimal],
-    unadjusted_prices: Optional[dict[HousingCompanyUUID, Decimal]],
+    unadjusted_prices: Optional[dict[HousingCompanyUUIDHex, Decimal]],
     indices: Optional[dict[Literal["old", "new"], dict[datetime.date, Decimal]]],
     sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],
     external_sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],

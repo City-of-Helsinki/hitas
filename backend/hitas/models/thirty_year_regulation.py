@@ -9,10 +9,11 @@ from hitas.models._base import HitasModelDecimalField
 if TYPE_CHECKING:
     from hitas.models.external_sales_data import SaleData
 
-HousingCompanyUUID: TypeAlias = str
-HousingCompanyNameT: TypeAlias = str
-PostalCodeT: TypeAlias = str
-QuarterT: TypeAlias = str
+
+HousingCompanyUUIDHex: TypeAlias = str  # e.g. 'dccd2cbc98264f28b097da8209441bbf'
+HousingCompanyNameT: TypeAlias = str  # e.g. 'Helsingin Rumpupolun palvelutalo'
+PostalCodeT: TypeAlias = str  # e.g. '33850'
+QuarterT: TypeAlias = str  # e.g. '2022Q1'
 
 
 class RegulationResult(Enum):
