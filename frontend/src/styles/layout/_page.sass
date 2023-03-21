@@ -255,12 +255,13 @@ header
 
     .detail-field-label
       display: block
+      margin: $spacing-4-xs 0
       font-size: $fontsize-body-m
-      margin-bottom: $spacing-3-xs
       letter-spacing: 1px
       color: $color-black-50
 
     .detail-field-value
+      margin: $spacing-4-xs 0
       font-size: $fontsize-body-xl
       font-weight: 600
 
@@ -268,13 +269,11 @@ header
         color: $color-black-50
         font-weight: 400
 
-      &:not(:last-child)
-        margin-bottom: $spacing-layout-s
-
     textarea
       font-size: $fontsize-body-m
       width: 100%
       height: 200px
+      resize: none
 
 .list-wrapper--real-estates, .list-wrapper--buildings
   width: 50%

@@ -24,6 +24,9 @@
       padding: $spacing-layout-s
 
       .column
+        @include flexbox()
+        @include flex-flow(column)
+        gap: $spacing-layout-xs
         width: 50%
         border-left: 1px solid #ccc
         padding-left: $spacing-layout-xs

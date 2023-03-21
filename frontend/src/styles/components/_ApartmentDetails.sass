@@ -185,29 +185,24 @@
 
     .row
       @include justify-content(space-between)
-      border-bottom: 1px solid #CCC
-      margin-bottom: 1rem
 
-      .horizontal-detail-field
+      .detail-field-horizontal
         @include flexbox()
+        @include flex-flow(row)
+        gap: $spacing-layout-xs
         align-items: center
-        margin-bottom: 1em
 
-        .detail-field-label
-          margin-bottom: 0
-
-      .detail-field
-        &-label
-          margin-right: 1rem
-
-        &-value
-          font-size: $fontsize-heading-m
+      .detail-field-value
+        font-size: $fontsize-heading-m
 
     .columns
       @include flexbox()
       @include flex-flow(row)
 
       .column
+        @include flexbox()
+        @include flex-flow(column)
+        gap: $spacing-layout-xs
         border: 0
 
         &:first-child

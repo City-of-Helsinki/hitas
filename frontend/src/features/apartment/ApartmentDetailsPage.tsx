@@ -318,40 +318,36 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         <Tabs.TabPanel>
                             <div className="company-details__tab basic-details">
                                 <div className="row">
-                                    <div className="horizontal-detail-field">
-                                        <DetailField
-                                            label="Viimeisin kauppahinta"
-                                            value={formatMoney(data.prices.latest_sale_purchase_price)}
-                                        />
-                                    </div>
-                                    <div className="horizontal-detail-field">
-                                        <DetailField
-                                            label="Hankinta-arvo"
-                                            value={formatMoney(data.prices.first_sale_acquisition_price)}
-                                        />
-                                    </div>
-                                    <div className="horizontal-detail-field">
-                                        <DetailField
-                                            label="Valmistumispäivä"
-                                            value={formatDate(data.completion_date)}
-                                        />
-                                    </div>
+                                    <DetailField
+                                        label="Viimeisin kauppahinta"
+                                        value={formatMoney(data.prices.latest_sale_purchase_price)}
+                                        horizontal
+                                    />
+                                    <DetailField
+                                        label="Hankinta-arvo"
+                                        value={formatMoney(data.prices.first_sale_acquisition_price)}
+                                        horizontal
+                                    />
+                                    <DetailField
+                                        label="Valmistumispäivä"
+                                        value={formatDate(data.completion_date)}
+                                        horizontal
+                                    />
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        <label className="detail-field-label">Omistajat</label>
-                                        {data.ownerships.map((ownership: IOwnership) => (
-                                            <DetailField
-                                                key={ownership.owner.id}
-                                                value={
-                                                    <>
-                                                        {`${ownership.owner.name} (${ownership.owner.identifier})`}
-                                                        <span> {ownership.percentage}%</span>
-                                                    </>
-                                                }
-                                                label=""
-                                            />
-                                        ))}
+                                        <div>
+                                            <label className="detail-field-label">Omistajat</label>
+                                            {data.ownerships.map((ownership: IOwnership) => (
+                                                <div
+                                                    key={ownership.owner.id}
+                                                    className="detail-field-value"
+                                                >
+                                                    {ownership.owner.name} ({ownership.owner.identifier})
+                                                    <span> {ownership.percentage}%</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                         <DetailField
                                             label="Isännöitsijä"
                                             value={housingCompanyData?.property_manager?.name}
@@ -364,11 +360,13 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                     : undefined
                                             }
                                         />
-                                        <label className="detail-field-label">Huomioitavaa</label>
-                                        <textarea
-                                            value={(data.notes as string) || ""}
-                                            readOnly
-                                        />
+                                        <div>
+                                            <label className="detail-field-label">Huomioitavaa</label>
+                                            <textarea
+                                                value={(data.notes as string) || ""}
+                                                readOnly
+                                            />
+                                        </div>
                                     </div>
                                     <div className="column">
                                         <DetailField
