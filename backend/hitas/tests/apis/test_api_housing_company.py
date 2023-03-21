@@ -63,9 +63,13 @@ def test__api__housing_company__list__empty(api_client: HitasAPIClient):
 def test__api__housing_company__list(api_client: HitasAPIClient):
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc2: HousingCompany = HousingCompanyFactory.create()
-    ApartmentFactory.create(building__real_estate__housing_company=hc1, completion_date=date(2020, 1, 1))
-    ap2: Apartment = ApartmentFactory.create(
-        building__real_estate__housing_company=hc1, completion_date=date(2000, 1, 1)
+    ap1: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company=hc1,
+        completion_date=date(2020, 1, 1),
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=hc1,
+        completion_date=date(2000, 1, 1),
     )
 
     response = api_client.get(reverse("hitas:housing-company-list"))
@@ -93,7 +97,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
                 "city": hc1.postal_code.city,
             },
             "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-            "date": str(ap2.completion_date),
+            "date": str(ap1.completion_date),
         },
     ]
     assert response.json()["page"] == {
@@ -190,7 +194,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
-    ApartmentFactory.create(
+    hc1_re1_bu1_ap1: Apartment = ApartmentFactory.create(
         building=hc1_re1_bu1,
         completion_date=date(2022, 1, 1),
         surface_area=10.5,
@@ -199,7 +203,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         sales__purchase_price=100.5,
         sales__apartment_share_of_housing_company_loans=200.0,
     )
-    hc1_re1_bu1_ap2: Apartment = ApartmentFactory.create(
+    ApartmentFactory.create(
         building=hc1_re1_bu1,
         completion_date=date(2020, 1, 1),
         surface_area=20.5,
@@ -225,6 +229,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         ApartmentFactory.create(
             surface_area=50,
             sales=[],
+            completion_date=date(2021, 1, 1),
             additional_work_during_construction=None,
             loans_during_construction=None,
             interest_during_construction_6=None,
@@ -251,7 +256,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "state": hc1.state.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-        "date": str(hc1_re1_bu1_ap2.completion_date),
+        "date": hc1_re1_bu1_ap1.completion_date.isoformat(),
         "summary": {
             # (100.5+200+300.5+400+500+600.5) = 2101.5
             "realized_acquisition_price": 2101.5,
@@ -1018,10 +1023,9 @@ def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPICli
     url = reverse("hitas:housing-company-list") + "?new_hitas=false"
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 3, response.json()
+    assert len(response.json()["contents"]) == 2, response.json()
     assert response.json()["contents"][0]["id"] == apartment_pre_2011.housing_company.uuid.hex
-    assert response.json()["contents"][1]["id"] == hc_both_old_and_new.uuid.hex
-    assert response.json()["contents"][2]["id"] == apartment_2009.housing_company.uuid.hex
+    assert response.json()["contents"][1]["id"] == apartment_2009.housing_company.uuid.hex
 
 
 @pytest.mark.django_db
@@ -1044,9 +1048,10 @@ def test__api__housing_company__filter__new_hitas__true(api_client: HitasAPIClie
     url = reverse("hitas:housing-company-list") + "?new_hitas=true"
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 2, response.json()
+    assert len(response.json()["contents"]) == 3, response.json()
     assert response.json()["contents"][0]["id"] == apartment_2012.housing_company.uuid.hex
     assert response.json()["contents"][1]["id"] == apartment_2011.housing_company.uuid.hex
+    assert response.json()["contents"][2]["id"] == hc_both_old_and_new.uuid.hex
 
 
 @pytest.mark.parametrize(

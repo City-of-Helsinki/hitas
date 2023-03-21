@@ -5,8 +5,8 @@ from typing import Any, Iterable, Optional, overload
 from uuid import UUID
 
 from django.db import models
-from django.db.models import Count, F, Max, Model, OuterRef, Subquery, Value
-from django.db.models.functions import Coalesce, NullIf, Round
+from django.db.models import Case, Count, F, Max, Model, OuterRef, Q, Subquery, Value, When
+from django.db.models.functions import NullIf, Round
 from django.utils import timezone
 
 
@@ -53,16 +53,41 @@ def subquery_first_id(model: type[Model], outer_field: str, order_by: str, **kwa
     )
 
 
-def max_if_all_not_null(ref: str, inf: Any) -> NullIf:
-    """Return the maximum value in the referenced array, but only if the array contains no null values.
+def max_if_all_not_null(ref: str, max: Any, min: Any) -> NullIf:
+    """Return the maximum value in the array referenced by 'ref', but only if the array contains no null values.
 
-    Null values will be converted to the supplied 'inf' value (which should always be the largest value in the array),
-    and if the 'inf' value exists in the array, the aggregation result will be null instead of the 'inf' value.
+    Null values will be converted to the supplied 'max' value (which should always be the largest value in the array).
+    If the 'max' value exists in the array, the aggregation result will be null instead of the 'max' value.
+
+    If 'ref' has empty relations before the target array, these relations will produce nulls in the resulting array.
+    Therefore, replace empty relations with the supplied 'min' value (which should always be the lowest value in
+    the array). If the 'min' values would be the largest value (e.g. there are only empty relations), replace
+    the 'min' value with nulls instead.
 
     :param ref: Reference to an array of items to aggregate.
-    :param inf: Value representing infinity, which will replace nulls, e.g., 'datetime.max'.
+    :param max: Highest possible value, which will replace nulls, e.g., 'datetime.max'.
+    :param min: Lowest possible value, used when there are empty relations, e.g. 'datetime.min'.
     """
-    return NullIf(Max(Coalesce(F(ref), inf)), inf)
+    parent_ref = "__".join(ref.split("__")[:-1])
+    return NullIf(
+        NullIf(
+            Max(
+                Case(
+                    When(
+                        condition=Q(**{f"{parent_ref}__isnull": True}),
+                        then=min,
+                    ),
+                    When(
+                        condition=Q(**{f"{ref}__isnull": True}),
+                        then=max,
+                    ),
+                    default=F(ref),
+                ),
+            ),
+            max,
+        ),
+        min,
+    )
 
 
 def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
