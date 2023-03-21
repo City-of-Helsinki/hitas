@@ -40,7 +40,7 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
 
 
 @pytest.mark.django_db
-def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, freezer):
+def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -115,12 +115,13 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     #
     # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # the company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[
+        released_from_regulation=[],
+        stays_regulated=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -128,15 +129,14 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        stays_regulated=[],
         skipped=[],
     )
 
     #
-    # Check that the housing company was freed from regulation
+    # Check that the housing company stays regulated
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
 
     #
     # Check that the regulation results were saved
@@ -162,11 +162,11 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
     assert result_rows[0].completion_month_index == Decimal("100")
     assert result_rows[0].calculation_month_index == Decimal("200")
-    assert result_rows[0].regulation_result == RegulationResult.RELEASED_FROM_REGULATION
+    assert result_rows[0].regulation_result == RegulationResult.STAYS_REGULATED
 
 
 @pytest.mark.django_db
-def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
+def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -241,13 +241,12 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     #
     # Since the average sales price per square meter for the area in the last year (4_900) is lower than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # the company is released from regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[],
-        stays_regulated=[
+        released_from_regulation=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -255,14 +254,15 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        stays_regulated=[],
         skipped=[],
     )
 
     #
-    # Check that the housing company stays regulated
+    # Check that the housing company was freed from regulation
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
+    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
     #
     # Check that the regulation results were saved
@@ -288,7 +288,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
     assert result_rows[0].completion_month_index == Decimal("100")
     assert result_rows[0].calculation_month_index == Decimal("200")
-    assert result_rows[0].regulation_result == RegulationResult.STAYS_REGULATED
+    assert result_rows[0].regulation_result == RegulationResult.RELEASED_FROM_REGULATION
 
 
 @pytest.mark.django_db
@@ -646,8 +646,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                 old_ruleset=sale_1.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        released_from_regulation=[],
-        stays_regulated=[
+        released_from_regulation=[
             ComparisonData(
                 id=sale_2.apartment.housing_company.uuid.hex,
                 display_name=sale_2.apartment.housing_company.display_name,
@@ -655,17 +654,18 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                 old_ruleset=sale_2.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        stays_regulated=[],
         skipped=[],
     )
 
     #
-    # Check that the first housing company was freed from regulation and the second one stays regulated
+    # Check that the first housing companies were freed from regulation
     #
     sale_1.apartment.housing_company.refresh_from_db()
     assert sale_1.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
     sale_2.apartment.housing_company.refresh_from_db()
-    assert sale_2.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
+    assert sale_2.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
 
 @pytest.mark.django_db
@@ -733,13 +733,12 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     #
     # Since the average sales price per square meter for the area in the last year (49_000) is lower than the
     # housing company's compared value (in this case the index surface area price ceiling of 50_000),
-    # the company will stay regulated.
+    # the company is released from regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[],
-        stays_regulated=[
+        released_from_regulation=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -747,6 +746,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
+        stays_regulated=[],
         skipped=[],
     )
 
@@ -1189,12 +1189,13 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
     #
     # Since the average sales price per square meter for the area in the last year (15_000) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # the company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[
+        released_from_regulation=[],
+        stays_regulated=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -1202,7 +1203,6 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        stays_regulated=[],
         skipped=[],
     )
 
@@ -1279,12 +1279,13 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
     #
     # Since the average sales price per square meter for the area in the last year (23_500) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # the company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[
+        released_from_regulation=[],
+        stays_regulated=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -1292,7 +1293,6 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        stays_regulated=[],
         skipped=[],
     )
 
@@ -1361,12 +1361,13 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
     #
     # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # the company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[
+        released_from_regulation=[],
+        stays_regulated=[
             ComparisonData(
                 id=apartment_1.housing_company.uuid.hex,
                 display_name=apartment_1.housing_company.display_name,
@@ -1374,7 +1375,6 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
                 old_ruleset=apartment_1.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        stays_regulated=[],
         skipped=[],
     )
 
@@ -1697,12 +1697,13 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
     #
     # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # the company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
         automatically_released=[],
-        released_from_regulation=[
+        released_from_regulation=[],
+        stays_regulated=[
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
@@ -1710,7 +1711,6 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
                 old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
             )
         ],
-        stays_regulated=[],
         skipped=[],
     )
 
@@ -1824,7 +1824,8 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
     if is_compared:
         assert response.json() == RegulationResults(
             automatically_released=[],
-            released_from_regulation=[
+            released_from_regulation=[],
+            stays_regulated=[
                 ComparisonData(
                     id=sale.apartment.housing_company.uuid.hex,
                     display_name=sale.apartment.housing_company.display_name,
@@ -1832,7 +1833,6 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
                     old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
                 )
             ],
-            stays_regulated=[],
             skipped=[],
         )
     else:
