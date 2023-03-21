@@ -1,3 +1,5 @@
+import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, TypeAlias, TypedDict
 
 from django.db import models
@@ -47,6 +49,23 @@ class ThirtyYearRegulationResultsRow(models.Model):
         verbose_name_plural = _("Thirty Year Regulation Results Rows")
 
 
+class ThirtyYearRegulationResultsRowWithAnnotations(ThirtyYearRegulationResultsRow):
+    check_count: int
+    min_share: int
+    max_share: int
+    share_count: int
+    apartment_count: int
+    completion_month: datetime.date
+    completion_month_index_cpi: Decimal
+    calculation_month_index_cpi: Decimal
+    average_price_per_square_meter_cpi: Decimal
+    turned_30: datetime.date
+    difference: Decimal
+
+    class Meta:
+        abstract = True
+
+
 class ThirtyYearRegulationResults(models.Model):
     calculation_month = models.DateField()
     regulation_month = models.DateField()
@@ -58,4 +77,4 @@ class ThirtyYearRegulationResults(models.Model):
         verbose_name_plural = _("Thirty Year Regulation Results")
 
     def __str__(self) -> str:
-        return f"Thirty year regulation results for {self.calculation_month.isoformat()!r}"
+        return f"Thirty-year regulation results for {self.calculation_month.isoformat()!r}"

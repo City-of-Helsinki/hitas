@@ -4,12 +4,14 @@ import logging
 from decimal import Decimal
 from itertools import chain
 from typing import Iterable, Literal, Optional, TypedDict
+from uuid import UUID
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
-from django.db.models import F, OuterRef, Q, Subquery
+from django.db.models import Count, F, Max, Min, OuterRef, Q, Subquery
+from django.db.models.functions import TruncMonth
 
-from hitas.exceptions import get_hitas_object_or_404
+from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import HousingCompany, HousingCompanyState, HousingCompanyWithAnnotations
@@ -23,9 +25,11 @@ from hitas.models.thirty_year_regulation import (
     RegulationResult,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
+    ThirtyYearRegulationResultsRowWithAnnotations,
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
-from hitas.utils import business_quarter, hitas_calculation_quarter, roundup, to_quarter
+from hitas.services.indices import subquery_appropriate_cpi
+from hitas.utils import business_quarter, hitas_calculation_quarter, roundup, subquery_count, to_quarter
 
 logger = logging.getLogger()
 
@@ -483,3 +487,50 @@ def _save_regulation_results(
     ThirtyYearRegulationResultsRow.objects.bulk_create(objs=rows_to_save)
 
     return thirty_year_regulation_results
+
+
+def get_thirty_year_regulation_results_for_housing_company(
+    housing_company_uuid: UUID,
+) -> ThirtyYearRegulationResultsRowWithAnnotations:
+    results = (
+        ThirtyYearRegulationResultsRow.objects.select_related(
+            "parent",
+            "housing_company",
+            "housing_company__property_manager",
+            "housing_company__postal_code",
+        )
+        .prefetch_related(
+            "housing_company__real_estates",
+        )
+        .filter(housing_company__uuid=housing_company_uuid)
+        .annotate(
+            check_count=subquery_count(ThirtyYearRegulationResultsRow, "housing_company__uuid"),
+            min_share=Min("housing_company__real_estates__buildings__apartments__share_number_start"),
+            max_share=Max("housing_company__real_estates__buildings__apartments__share_number_end"),
+            share_count=F("max_share") - F("min_share") + 1,
+            apartment_count=Count("housing_company__real_estates__buildings__apartments"),
+            completion_month=TruncMonth("completion_date"),
+            completion_month_index_cpi=subquery_appropriate_cpi(
+                outer_ref="completion_month",
+                financing_method_ref="housing_company__financing_method",
+            ),
+            calculation_month_index_cpi=subquery_appropriate_cpi(
+                outer_ref="parent__calculation_month",
+                financing_method_ref="housing_company__financing_method",
+            ),
+            average_price_per_square_meter_cpi=(
+                F("calculation_month_index_cpi") / F("completion_month_index_cpi") * F("realized_acquisition_price")
+            ),
+        )
+        .order_by("-parent__calculation_month")
+        .first()
+    )
+    if results is None:
+        raise HitasModelNotFound(ThirtyYearRegulationResultsRow)
+
+    results.turned_30 = results.completion_date + relativedelta(years=30)
+    results.difference = results.adjusted_average_price_per_square_meter - Decimal(
+        results.parent.sales_data["price_by_area"][results.postal_code]
+    )
+
+    return results
