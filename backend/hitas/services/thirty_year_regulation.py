@@ -362,17 +362,16 @@ def _determine_regulation_need(
                 results["skipped"].append(comparison_data)
                 continue
 
-            # TODO: Is this off by one?
-            if comparison_value <= postal_code_average_price_per_square_meter:
+            if comparison_value >= postal_code_average_price_per_square_meter:
                 logger.info(
                     f"Housing company {display_name!r} should be released from regulation since: "
-                    f"{comparison_value} <= {postal_code_average_price_per_square_meter}."
+                    f"{comparison_value} >= {postal_code_average_price_per_square_meter}."
                 )
                 results["released_from_regulation"].append(comparison_data)
             else:
                 logger.info(
                     f"Housing company {display_name!r} should stay regulated since: "
-                    f"{comparison_value} > {postal_code_average_price_per_square_meter}."
+                    f"{comparison_value} < {postal_code_average_price_per_square_meter}."
                 )
                 results["stays_regulated"].append(comparison_data)
 
