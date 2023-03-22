@@ -9,6 +9,9 @@ from django.db import models
 from django.db.models import Case, Count, F, Max, Model, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import NullIf, Round
 from django.utils import timezone
+from openpyxl.cell import Cell
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
 
 
 class RoundWithPrecision(Round):
@@ -209,3 +212,34 @@ def roundup(v, precision: int = 2):
 
 def humanize_relativedelta(delta: relativedelta) -> str:
     return f"{delta.years} v {delta.months} kk"
+
+
+def resize_columns(worksheet: Worksheet) -> None:
+    column_widths = []
+    cells: list[Cell]
+    for cells in worksheet.rows:
+        for i, cell in enumerate(cells):
+            length = len(str(cell.value)) + 5
+            if len(column_widths) == i:
+                column_widths.append(length)
+            elif length > column_widths[i]:
+                column_widths[i] = length
+
+    for i, column_width in enumerate(column_widths, 1):
+        worksheet.column_dimensions[get_column_letter(i)].width = column_width
+
+
+def format_sheet(worksheet: Worksheet, formatting_rules: dict[str, dict[str, Any]]) -> None:
+    cell: Cell
+    for column, changes in formatting_rules.items():
+        for key, value in changes.items():
+            for cell in worksheet[column][1:]:
+                if not isinstance(value, dict):
+                    setattr(cell, key, value)
+                    continue
+
+                val = value.get(cell.value)
+                if val is None:
+                    continue
+
+                setattr(cell, key, val)

@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import TruncMonth
 from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font
 from openpyxl.worksheet.worksheet import Worksheet
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
@@ -33,8 +34,10 @@ from hitas.services.housing_company import get_completed_housing_companies, make
 from hitas.services.indices import subquery_appropriate_cpi
 from hitas.utils import (
     business_quarter,
+    format_sheet,
     hitas_calculation_quarter,
     humanize_relativedelta,
+    resize_columns,
     roundup,
     subquery_count,
     to_quarter,
@@ -629,4 +632,30 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
         )
         worksheet.append(data)
 
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            "B": {"number_format": "#,##0.00\\ €"},
+            "D": {"alignment": Alignment(horizontal="right")},
+            "E": {"number_format": "#,##0.00\\ €"},
+            "F": {"number_format": "#,##0.00\\ €"},
+            "G": {"number_format": "#,##0.00\\ \\m\\²"},
+            "H": {"number_format": "#,##0.00\\ €"},
+            "I": {"number_format": "#,##0.00\\ €"},
+            "J": {
+                "alignment": Alignment(horizontal="right"),
+                "font": {
+                    "Ei vapaudu": Font(color="FF0000"),
+                    "Ei voitu määrittää": Font(color="0000FF"),
+                    "Vapautuu": Font(color="00FF00"),
+                },
+            },
+            "K": {"number_format": "DD.MM.YYYY"},
+            "L": {"alignment": Alignment(horizontal="right")},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.auto_filter.ref = worksheet.dimensions
+    worksheet.protection.sheet = True
     return workbook
