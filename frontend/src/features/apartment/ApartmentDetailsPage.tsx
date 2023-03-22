@@ -9,7 +9,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, Divider, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConditionOfSale,
@@ -334,6 +334,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                         horizontal
                                     />
                                 </div>
+                                <Divider size="l" />
                                 <div className="columns">
                                     <div className="column">
                                         <div>
@@ -370,6 +371,17 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                     </div>
                                     <div className="column">
                                         <DetailField
+                                            label="Viimeisin kauppapäivä"
+                                            value={formatDate(data.prices.latest_purchase_date)}
+                                        />
+
+                                        <Divider size="s" />
+
+                                        <DetailField
+                                            label="Ensimmäinen kauppapäivä"
+                                            value={formatDate(data.prices.first_purchase_date)}
+                                        />
+                                        <DetailField
                                             label="Ensimmäinen Kauppahinta"
                                             value={formatMoney(data.prices.first_sale_purchase_price)}
                                         />
@@ -377,13 +389,12 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                             label="Ensisijaislaina"
                                             value={formatMoney(data.prices.first_sale_share_of_housing_company_loans)}
                                         />
+
+                                        <Divider size="s" />
+
                                         <DetailField
-                                            label="Ensimmäinen kauppapäivä"
-                                            value={formatDate(data.prices.first_purchase_date)}
-                                        />
-                                        <DetailField
-                                            label="Viimeisin kauppapäivä"
-                                            value={formatDate(data.prices.latest_purchase_date)}
+                                            label="Rakennusaikaiset lisätyöt"
+                                            value={formatMoney(data.prices.construction.additional_work)}
                                         />
                                         <DetailField
                                             label="Rakennusaikaiset korot (6 %)"
@@ -400,10 +411,6 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                     ? formatMoney(data.prices.construction.interest.rate_14)
                                                     : 0
                                             }
-                                        />
-                                        <DetailField
-                                            label="Rakennusaikaiset lisätyöt"
-                                            value={formatMoney(data.prices.construction.additional_work)}
                                         />
                                         {data.prices.construction.loans ? (
                                             <DetailField
