@@ -17,18 +17,15 @@
         text-decoration: underline
 
     a > span
-        display: inline-block
-        margin-right: $spacing-layout-s
-
-    .conditions-of-sale-lock
-      padding-left: 8px
-      padding-right: 8px
-      display: flex
+      display: inline-block
+      margin-right: $spacing-layout-s
 
     .address
       font-weight: 400
 
     [class^="StatusLabel"]
+      display: flex
+      flex-direction: row
       background-color: var(--color-engel-light)
 
   .apartment-stats
@@ -87,12 +84,10 @@
       .resolved
         color: $color-black-30
         text-decoration: line-through
-      .conditions-of-sale-lock
-        padding-left: 8px
-        padding-right: 8px
-        margin-right: 0.5em
-        span
-          margin: 0
+      a
+        display: flex
+        flex-direction: row
+        align-items: center
 
     [class^="Card-module_card"]
       @include flexbox()
@@ -160,7 +155,7 @@
         right: 2rem
         bottom: 2rem
 
-      .conditions-of-sale
+      .conditions-of-sale-status
         @include flexbox()
 
         .icon-container

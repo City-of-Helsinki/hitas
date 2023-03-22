@@ -175,10 +175,6 @@ header
           column-gap: 0.4em
           width: 15%
 
-          .sell-by-date
-            display: none
-          .conditions-of-sale:hover > .sell-by-date
-              display: inline-block
 
 .list
 
@@ -355,3 +351,17 @@ footer
     margin: $spacing-s 0
   &-l
     margin: $spacing-m 0
+
+.conditions-of-sale-status
+  display: flex
+  flex-direction: row
+  align-items: center
+  padding-left: 8px
+  padding-right: 8px
+  margin-right: 0.5em
+  span
+    margin: 0
+  .sell-by-date
+    display: none
+  &:hover > .sell-by-date
+    display: inline-block

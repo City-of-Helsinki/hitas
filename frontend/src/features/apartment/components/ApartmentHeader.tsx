@@ -22,7 +22,7 @@ const ApartmentHeader = ({
                     <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
                     {apartment.sell_by_date ? (
                         <StatusLabel
-                            className="conditions-of-sale-lock"
+                            className="conditions-of-sale-status"
                             iconLeft={<IconLock />}
                         />
                     ) : null}
