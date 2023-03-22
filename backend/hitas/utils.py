@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Iterable, Optional, overload
 from uuid import UUID
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import Case, Count, F, Max, Model, OuterRef, Q, Subquery, Value, When
 from django.db.models.functions import NullIf, Round
@@ -204,3 +205,7 @@ def roundup(v, precision: int = 2):
     if precision <= 0:
         return v.quantize(Decimal("1"), ROUND_HALF_UP)
     return v.quantize(Decimal("." + "0" * precision), ROUND_HALF_UP)
+
+
+def humanize_relativedelta(delta: relativedelta) -> str:
+    return f"{delta.years} v {delta.months} kk"

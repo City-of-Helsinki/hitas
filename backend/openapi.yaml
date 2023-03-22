@@ -2416,6 +2416,37 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/thirty-year-regulation/reports/download-regulation-results:
+    get:
+      description: Download thirty-year regulation results as an Excel
+      operationId: read-regulation-report-excel
+      tags:
+        - Thirty Year Regulation
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date of the regulation, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully downloaded a regulation report
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Property Manager
 
   /api/v1/property-managers:
