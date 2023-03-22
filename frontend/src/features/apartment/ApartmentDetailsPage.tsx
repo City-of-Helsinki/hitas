@@ -424,6 +424,27 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                 value={formatMoney(data.prices.construction.debt_free_purchase_price)}
                                             />
                                         ) : null}
+
+                                        {data.prices.catalog_purchase_price ||
+                                        data.prices.catalog_share_of_housing_company_loans ? (
+                                            <>
+                                                <Divider size="s" />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon luovutushinta"
+                                                    value={formatMoney(data.prices.catalog_purchase_price)}
+                                                />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon ensisijaislaina"
+                                                    value={formatMoney(
+                                                        data.prices.catalog_share_of_housing_company_loans
+                                                    )}
+                                                />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon Hankinta-arvo"
+                                                    value={formatMoney(data.prices.catalog_acquisition_price)}
+                                                />
+                                            </>
+                                        ) : null}
                                     </div>
                                 </div>
                             </div>
