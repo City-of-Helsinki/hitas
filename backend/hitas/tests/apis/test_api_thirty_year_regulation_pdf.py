@@ -100,21 +100,21 @@ def test__api__regulation__continuation_letter(api_client: HitasAPIClient, freez
         HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS
         Asunto-osakeyhtiö
         {sale.apartment.housing_company.display_name}
-        Huoneiston osoite
+        Yhtiön osoite
         {address}
         Osakenumerot
         {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
         Kiinteistötunnukset
         {sale.apartment.building.real_estate.property_identifier}
         Yhtiön ikä
-        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus
+        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
         Yhtiön keskineliöhinta
         Yhtiönne laskettu keskimääräinen neliöhinta on kaksitoistatuhatta (12 000) euroa
         markkinahintaindeksillä laskettuna.
         Rajahinta
         Kaikkien Hitas-yhtiöiden keskimääräinen neliöhinta on viisituhatta (5 000) euroa. Jos yhtiön
         keskineliöhinta on alempi kuin rajahinta, niin vertailussa yhtiön neliöhintana käytetään
-        rajahintaa
+        rajahintaa.
         Postinumeroalueen
         keskineliöhinta
         Tilastokeskuksen viimeisimmän 12 kuukauden hintatilaston (täydennettynä Hitas-asuntojen
@@ -137,7 +137,7 @@ def test__api__regulation__continuation_letter(api_client: HitasAPIClient, freez
         vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
         neljännesvuosivertailun jälkeen.
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
-        Lisätiedot: Saila Kiviniemi, asuntosihteeri, puhelin 310 34154
+        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
         LIITE
         Laskelma yhtiön keskineliöhinnoista
         TIEDOKSI
@@ -176,9 +176,9 @@ def test__api__regulation__continuation_letter(api_client: HitasAPIClient, freez
         1
 
         Hankinta-arvo:
-        60 000,00
+        60 000
         Pinta-ala m²:
-        10,00
+        10
         Viimeisen vaiheen valmistumispäivä:
         01.02.1993
          rakennuskustannushintaindeksi
@@ -196,12 +196,12 @@ def test__api__regulation__continuation_letter(api_client: HitasAPIClient, freez
         rakennuskustannushintaindeksillä euroa/m²
         0
         laskentakaava:
-        (0 / 0) * (60 000,00 / 10,00)
+        (0 / 0) * (60 000 / 10)
         Keskimääräinen neliöhinta
         markkinahintaindeksillä euroa/m²
-        12 000,00
+        12 000
         laskentakaava:
-        (200,00 / 100,00) * (60 000,00 / 10,00)
+        (200,00 / 100,00) * (60 000 / 10)
 
         NELIÖHINTOJEN VERTAILU
         Yhtiön keskineliöhinta euroa/m²
@@ -294,24 +294,24 @@ def test__api__regulation__release_letter(api_client: HitasAPIClient, freezer):
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
         {sale.apartment.housing_company.display_name}
-        HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS
+        HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYSTÄ VAPAUTUMINEN
         Asunto-osakeyhtiö
         {sale.apartment.housing_company.display_name}
-        Huoneiston osoite
+        Yhtiön osoite
         {address}
         Osakenumerot
         {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
         Kiinteistötunnukset
         {sale.apartment.building.real_estate.property_identifier}
         Yhtiön ikä
-        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus
+        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
         Yhtiön keskineliöhinta
         Yhtiönne laskettu keskimääräinen neliöhinta on kaksitoistatuhatta (12 000) euroa
         markkinahintaindeksillä laskettuna.
         Rajahinta
         Kaikkien Hitas-yhtiöiden keskimääräinen neliöhinta on viisituhatta (5 000) euroa. Jos yhtiön
         keskineliöhinta on alempi kuin rajahinta, niin vertailussa yhtiön neliöhintana käytetään
-        rajahintaa
+        rajahintaa.
         Postinumeroalueen
         keskineliöhinta
         Tilastokeskuksen viimeisimmän 12 kuukauden hintatilaston (täydennettynä Hitas-asuntojen
@@ -329,7 +329,7 @@ def test__api__regulation__release_letter(api_client: HitasAPIClient, freezer):
         Tämän ilmoituksen jälkeen yhtiön asuntojen enimmäishintoja ei enää vahvisteta, eikä tietoja
         tapahtuneista kaupoista ilmoiteta.
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
-        Lisätiedot: Saila Kiviniemi, asuntosihteeri, puhelin 310 34154
+        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
         LIITE
         Laskelma yhtiön keskineliöhinnoista
         TIEDOKSI
@@ -368,9 +368,9 @@ def test__api__regulation__release_letter(api_client: HitasAPIClient, freezer):
         1
 
         Hankinta-arvo:
-        60 000,00
+        60 000
         Pinta-ala m²:
-        10,00
+        10
         Viimeisen vaiheen valmistumispäivä:
         01.02.1993
          rakennuskustannushintaindeksi
@@ -388,12 +388,12 @@ def test__api__regulation__release_letter(api_client: HitasAPIClient, freezer):
         rakennuskustannushintaindeksillä euroa/m²
         0
         laskentakaava:
-        (0 / 0) * (60 000,00 / 10,00)
+        (0 / 0) * (60 000 / 10)
         Keskimääräinen neliöhinta
         markkinahintaindeksillä euroa/m²
-        12 000,00
+        12 000
         laskentakaava:
-        (200,00 / 100,00) * (60 000,00 / 10,00)
+        (200,00 / 100,00) * (60 000 / 10)
 
         NELIÖHINTOJEN VERTAILU
         Yhtiön keskineliöhinta euroa/m²

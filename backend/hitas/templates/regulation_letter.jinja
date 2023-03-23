@@ -52,7 +52,13 @@
 {% block content %}
   <h3 style="padding-bottom: 8px;">{{ results.housing_company.display_name }}</h3>
 
-  <h3>HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS</h3>
+  <h3>
+    {% if regulated %}
+      HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS
+    {% elif released %}
+      HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYSTÄ VAPAUTUMINEN
+    {% endif %}
+  </h3>
 
   <table class="spaced top-alight narrow">
     <tr>
@@ -60,7 +66,7 @@
       <td>{{ results.housing_company.display_name }}</td>
     </tr>
     <tr>
-      <td class="first-column"><b>Huoneiston osoite</b></td>
+      <td class="first-column"><b>Yhtiön osoite</b></td>
       <td>{{ results.housing_company.street_address }}, {{ results.housing_company.postal_code.value }} {{ results.housing_company.postal_code.city|upper }}</td>
     </tr>
     <tr>
@@ -79,7 +85,7 @@
     </tr>
     <tr>
       <td class="first-column"><b>Yhtiön ikä</b></td>
-      <td>Yhtiönne valmistumisesta on kulunut 30 vuotta {{ results.turned_30|format_date }} / {{ results.check_count }}. tarkistus</td>
+      <td>Yhtiönne valmistumisesta on kulunut 30 vuotta {{ results.turned_30|format_date }} / {{ results.check_count }}. tarkistus.</td>
     </tr>
     <tr>
       <td class="first-column"><b>Yhtiön keskineliöhinta</b></td>
@@ -97,7 +103,7 @@
         {{ results.parent.surface_area_price_ceiling|round|wordify }}
         ({{ results.parent.surface_area_price_ceiling|intcomma(0) }})
         euroa. Jos yhtiön keskineliöhinta on alempi kuin rajahinta,
-        niin vertailussa yhtiön neliöhintana käytetään rajahintaa
+        niin vertailussa yhtiön neliöhintana käytetään rajahintaa.
       </td>
     </tr>
     <tr>
@@ -166,7 +172,7 @@
         <br>
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
         <br>
-        Lisätiedot: Saila Kiviniemi, asuntosihteeri, puhelin 310 34154
+        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
         <br>
       </td>
     </tr>
@@ -217,11 +223,11 @@
   <table class="tight bottom-alight wide">
     <tr>
       <td class="first-column"><b>Hankinta-arvo:</b></td>
-      <td>&nbsp;{{ results.realized_acquisition_price|intcomma }}</td>
+      <td>&nbsp;{{ results.realized_acquisition_price|intcomma(0) }}</td>
     </tr>
     <tr>
       <td class="first-column"><b>Pinta-ala m²:</b></td>
-      <td>&nbsp;{{ results.surface_area|intcomma }}</td>
+      <td>&nbsp;{{ results.surface_area|intcomma(0) }}</td>
     </tr>
     <tr>
       <td class="first-column"><b>Viimeisen vaiheen valmistumispäivä:</b></td>
@@ -254,22 +260,22 @@
   <table class="tight bottom-alight wide">
     <tr>
       <td class="first-column"><b>Keskimääräinen neliöhinta rakennuskustannushintaindeksillä euroa/m²</b></td>
-      <td class="small-column"><b>&nbsp;{{ results.average_price_per_square_meter_cpi|intcomma }}</b></td>
+      <td class="small-column"><b>&nbsp;{{ results.average_price_per_square_meter_cpi|intcomma(0) }}</b></td>
       <td>
         laskentakaava:
         <br>
         ({{ results.calculation_month_index_cpi|intcomma }} / {{ results.completion_month_index_cpi|intcomma }})
-        * ({{ results.realized_acquisition_price|intcomma }} / {{ results.surface_area|intcomma }})
+        * ({{ results.realized_acquisition_price|intcomma(0) }} / {{ results.surface_area|intcomma(0) }})
       </td>
     </tr>
     <tr>
       <td class="first-column"><b>Keskimääräinen neliöhinta markkinahintaindeksillä euroa/m²</b></td>
-      <td class="small-column"><b>&nbsp;{{ results.adjusted_average_price_per_square_meter|intcomma }}</b></td>
+      <td class="small-column"><b>&nbsp;{{ results.adjusted_average_price_per_square_meter|intcomma(0) }}</b></td>
       <td>
         laskentakaava:
         <br>
         ({{ results.calculation_month_index|intcomma }} / {{ results.completion_month_index|intcomma }})
-        * ({{ results.realized_acquisition_price|intcomma }} / {{ results.surface_area|intcomma }})
+        * ({{ results.realized_acquisition_price|intcomma(0) }} / {{ results.surface_area|intcomma(0) }})
       </td>
     </tr>
   </table>
