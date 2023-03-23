@@ -3580,6 +3580,70 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /api/v1/indices/surface-area-price-ceiling-calculation-data:
+    get:
+      description: List all stored surface area price ceiling calculation data
+      operationId: list-surface-area-price-ceiling-calculation-data
+      tags:
+        - Indices
+      responses:
+        '200':
+          description: Successfully fetched list of surface area price ceiling calculation data
+          content:
+            application/json:
+              schema:
+                description: Single page of surface area price ceiling calculation data
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of surface area price ceiling calculation data
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/indices/surface-area-price-ceiling-calculation-data/{calculation_month}:
+    get:
+      description: Read a sinlge surface area price ceiling calculation data for the given month
+      operationId: read-surface-area-price-ceiling-calculation-data
+      tags:
+        - Indices
+      parameters:
+        - name: calculation_month
+          required: true
+          in: path
+          description: Calculation month for a surface area price ceiling
+          schema:
+            type: string
+            format: date
+            example: 2023-02-01
+      responses:
+        '200':
+          description: Successfully fetched list of surface area price ceiling calculation data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -7032,6 +7096,89 @@ components:
           description: Does this housing company use the old or the new hitas ruleset?
           type: boolean
           example: false
+
+    SurfaceAreaPriceCeilingCalculationResult:
+      description: Surface area price ceiling calculation
+      type: object
+      additionalProperties: false
+      required:
+        - calculation_month
+        - data
+      properties:
+        calculation_month:
+          description: Surface area price ceiling calculation month
+          type: string
+          format: date
+          example: 2023-02-01
+        data:
+          $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationData'
+
+    SurfaceAreaPriceCeilingCalculationData:
+      description: Surface area price ceiling calculation data
+      type: object
+      additionalProperties: false
+      required:
+        - housing_company_data
+        - created_surface_area_price_ceilings
+      properties:
+        housing_company_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationHousingCompanyData'
+        created_surface_area_price_ceilings:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/Index'
+
+    SurfaceAreaPriceCeilingCalculationHousingCompanyData:
+      description: Surface area price ceiling calculation data
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - completion_date
+        - surface_area
+        - realized_acquisition_price
+        - unadjusted_average_price_per_square_meter
+        - adjusted_average_price_per_square_meter
+        - completion_month_index
+        - calculation_month_index
+      properties:
+        name:
+          description: Housing company's display name
+          type: string
+          example: Taloyhtiö Helmi
+        completion_date:
+          description: Housing company completion date
+          type: string
+          format: date
+          example: 1999-12-31
+        surface_area:
+          description: Housing company surface area
+          type: number
+          example: 59.6
+        realized_acquisition_price:
+          description: Housing company realized acquisition price
+          type: number
+          example: 60000.0
+        unadjusted_average_price_per_square_meter:
+          description: Average price per square meter before index adjustment
+          type: number
+          example: 6000.0
+        adjusted_average_price_per_square_meter:
+          description: Average price per square meter after index adjustment
+          type: number
+          example: 12000.0
+        completion_month_index:
+          description: Market price index for the month the housing company was completed
+          type: number
+          example: 100.0
+        calculation_month_index:
+          description: Market price index for the month the calculation was made
+          type: number
+          example: 200.0
 
     # Errors
 

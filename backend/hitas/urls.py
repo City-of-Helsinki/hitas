@@ -34,6 +34,11 @@ router.register(
     basename="surface-area-price-ceiling",
 )
 router.register(
+    r"indices/surface-area-price-ceiling-calculation-data",
+    views.SurfaceAreaPriceCeilingCalculationDataViewSet,
+    basename="surface-area-price-ceiling-calculation-data",
+)
+router.register(
     r"external-sales-data",
     views.ExternalSalesDataView,
     basename="external-sales-data",
