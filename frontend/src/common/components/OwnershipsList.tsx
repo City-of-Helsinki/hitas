@@ -1,15 +1,11 @@
 import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
-import {Control, useFieldArray, useWatch} from "react-hook-form";
+import {useFieldArray} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
 import {useGetOwnersQuery} from "../../app/services";
 import {IOwner, IOwnership} from "../schemas";
 import {formatOwner} from "../utils";
 import {NumberInput, RelatedModelInput} from "./form";
-
-type FormValues = {
-    ownerships: IOwnership[];
-};
 
 const OwnershipsList = ({
     formOwnershipsList,
@@ -25,21 +21,11 @@ const OwnershipsList = ({
         control: formObject.control,
         rules: {required: "Kauppatapahtumassa täytyy olla ainakin yksi omistajuus!"},
     });
-    const getTotal = (payload) => {
-        let sum = 0;
-        for (const item of payload) {
-            sum = sum + (Number.isNaN(item.percentage) ? 0 : item.percentage);
-        }
-        return sum;
-    };
 
     // Ownerships
     const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
 
-    function TotalAmount({control}: {control: Control<FormValues>}) {
-        const ownershipValues = useWatch({control, name: "ownerships"});
-        return <span>{getTotal(ownershipValues)}</span>;
-    }
+    formObject.register("ownerships");
 
     return (
         <div>
@@ -49,9 +35,7 @@ const OwnershipsList = ({
                         <li>
                             <legend className="ownership-headings">
                                 <span>Omistaja *</span>
-                                <span>
-                                    Omistajuusprosentti (<TotalAmount control={formObject.control} /> / 100%) *
-                                </span>
+                                <span>Osuus *</span>
                             </legend>
                         </li>
                         {fields.map((field, index) => (
