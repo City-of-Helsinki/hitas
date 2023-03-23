@@ -31,7 +31,7 @@ class ThirtyYearRegulationView(ViewSet):
     @action(
         methods=["GET"],
         detail=False,
-        url_path=r"reports/regulation-letter",
+        url_path=r"reports/download-regulation-letter",
         url_name="letter",
     )
     def regulation_letter(self, request: Request, *args, **kwargs) -> HttpResponse:
