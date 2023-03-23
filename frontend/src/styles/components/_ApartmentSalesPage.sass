@@ -8,16 +8,23 @@
     text-overflow: ellipsis
     span
       font-size: $fontsize-heading-s
-  .field-sets
+
+  .fieldsets
     display: grid
     grid-template-columns: 55% 45%
     gap: 1em
+    // the fieldset headers for HDS Fieldset components
+    legend[class*="hds"]
+      background-color: $color-engel-medium-light
+      padding: $spacing-s
+      margin-left: calc(var(--spacing-s) * -1)
     fieldset
       position: relative
       background-color: $color-engel-medium-light
       padding: $spacing-s
       width: 100%
       grid-column: 1
+      // "Kaupan tiedot" & "Enimmäishintalaskelma" cards (left side)
       .max-prices
         .row--buttons
           margin-bottom: 0
@@ -31,48 +38,36 @@
           span
             font-weight: bold
             font-size: $fontsize-body-xl
-          &.expired span
-            color: $color-black-40 !important
-            text-decoration: line-through
         .error-text
           margin: -1rem 0 0
+          svg
+            vertical-align: bottom
+            margin-right: $spacing-2-xs
+        &.expired .fieldset--max-prices__value span
+          color: $color-black-40 !important
+          text-decoration: line-through
+      .row
+        gap: 2em
+        > div
+          width: 50%
+          position: relative
+        &--prompt
+          flex-flow: column nowrap
+          p span
+            font-weight: bold
+
+      // "Omistajuudet" card (right side)
       &.ownerships-fieldset
         grid-row: 1 / span 2
         grid-column: 2
         @include flexbox()
         @include flex-flow(column nowrap)
         @include justify-content(space-between)
+        &.error > legend
+          color: $color-error
         .error-text
           text-align: center
           margin-bottom: $spacing-s
-    legend[class*="hds"]
-      background-color: $color-engel-medium-light
-      padding: $spacing-s
-      margin-left: calc(var(--spacing-s) * -1)
-    .row
-      gap: 2em
-      > div
-        width: 50%
-        position: relative
-      .error-message
-        height: 28px
-        line-height: 1
-        svg
-          position: absolute
-          right: 1rem
-          top: 2.5rem
-          transform: translateY(2px)
-      &--prompt
-        flex-flow: column nowrap
-        p span
-          font-weight: bold
-    .input-field--invalid input
-      color: $color-error
-    [class*="toggleButtonContainerInlineVariant"]
-      @include justify-content(flex-end)
-      margin-bottom: $spacing-xs
-      button
-        margin-right: $spacing-s
     .ownerships-list
       margin-top: 0
       legend
@@ -92,7 +87,12 @@
       > div > [class*="icon_hds"]
         margin-top: 10px
         cursor: pointer
+
+  // Form styles
   input
-    margin-bottom: 10px
-  .input-field--date button
-      transform: translateY(-5px)
+    margin-bottom: 4px
+  .input-field
+    &--invalid input
+      color: $color-error
+    &--date button
+        transform: translateY(-5px)
