@@ -3,21 +3,24 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
+import {ReactNode} from "react";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface ConfirmDialogModalProps {
     data?;
-    modalText: string;
-    successText: string;
+    modalText?: string | ReactNode;
+    modalHeader?: string;
+    successText?: string;
     error?: FetchBaseQueryError | SerializedError | undefined;
     linkURL?: string;
     linkText?: string;
     buttonText?: string;
-    isLoading: boolean;
-    isVisible: boolean;
-    setIsVisible;
-    confirmAction;
-    cancelAction;
+    isLoading?: boolean;
+    isVisible?: boolean;
+    setIsVisible?;
+    confirmAction?;
+    cancelAction?;
+    children?: React.ReactNode;
 }
 
 const ActionFailed = ({error, setIsVisible}) => {
@@ -64,6 +67,7 @@ const ActionSuccess = ({successText, linkURL, linkText}) => {
 
 const ConfirmDialogModal = ({
     data,
+    modalHeader = "Vahvista toiminto",
     modalText,
     successText,
     linkURL,
@@ -75,25 +79,50 @@ const ConfirmDialogModal = ({
     setIsVisible,
     confirmAction,
     cancelAction,
+    children,
 }: ConfirmDialogModalProps) => {
+    const DefaultDialogContent = () => (
+        <>
+            <Dialog.Content>
+                <p>{modalText}</p>
+                <div className="row row--buttons">
+                    <Button
+                        theme="black"
+                        variant="secondary"
+                        onClick={cancelAction}
+                    >
+                        Peruuta
+                    </Button>
+                    <Button
+                        theme="black"
+                        onClick={() => {
+                            confirmAction();
+                        }}
+                    >
+                        {buttonText}
+                    </Button>
+                </div>
+            </Dialog.Content>
+        </>
+    );
     return (
         <Dialog
             id="confirmation-modal"
             closeButtonLabelText="args.closeButtonLabelText"
             aria-labelledby="confirm-modal"
-            isOpen={isVisible}
+            isOpen={isVisible || false}
             close={() => setIsVisible(false)}
             boxShadow
         >
             <Dialog.Header
                 id="confirmation-modal__header"
-                title="Vahvista toiminto"
+                title={modalHeader}
             />
             {error ? (
                 <QueryStateHandler
                     data={data}
                     error={error}
-                    isLoading={isLoading}
+                    isLoading={isLoading || false}
                     errorComponent={
                         <ActionFailed
                             error={error}
@@ -108,26 +137,7 @@ const ConfirmDialogModal = ({
                     />
                 </QueryStateHandler>
             ) : (
-                <Dialog.Content>
-                    <p>{modalText}</p>
-                    <div className="row row--buttons">
-                        <Button
-                            theme="black"
-                            variant="secondary"
-                            onClick={cancelAction}
-                        >
-                            Peruuta
-                        </Button>
-                        <Button
-                            theme="black"
-                            onClick={() => {
-                                confirmAction();
-                            }}
-                        >
-                            {buttonText}
-                        </Button>
-                    </div>
-                </Dialog.Content>
+                children ?? <DefaultDialogContent />
             )}
         </Dialog>
     );
