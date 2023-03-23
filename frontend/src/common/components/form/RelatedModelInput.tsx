@@ -78,7 +78,7 @@ const RelatedModelInput = ({
 
     const handleKeyDown = (e) => {
         // Make other key presses than Tab (and Shift+Tab) open the modal
-        if (e.code !== ("Tab" || "Shift")) {
+        if (e.code !== "Tab" && !e.shiftKey) {
             e.preventDefault();
             openModal();
         }

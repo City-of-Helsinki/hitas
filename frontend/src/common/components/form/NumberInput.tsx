@@ -6,6 +6,7 @@ interface FormNumberInputProps extends FormInputProps {
     unit?: string;
     fractionDigits?: number;
     field?: object;
+    registerOptions?;
 }
 
 const NumberInput = ({
@@ -17,13 +18,14 @@ const NumberInput = ({
     required,
     invalid,
     formObject,
+    registerOptions,
     ...rest
 }: FormNumberInputProps) => {
     const {
         register,
         formState: {errors},
     } = formObject;
-    const formNumber = register(name, {valueAsNumber: true});
+    const formNumber = register(name, {valueAsNumber: true, ...registerOptions});
 
     // TODO?: Format the value to only accept numbers (and a fraction)
 
