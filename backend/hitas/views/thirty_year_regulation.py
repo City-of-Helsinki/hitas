@@ -42,7 +42,12 @@ class ThirtyYearRegulationView(ViewSet):
         except TypeError as error:
             raise ValidationError({"housing_company_id": "This field is mandatory and cannot be null."}) from error
 
-        results = get_thirty_year_regulation_results_for_housing_company(housing_company_uuid)
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        results = get_thirty_year_regulation_results_for_housing_company(housing_company_uuid, calculation_date)
 
         if results.regulation_result == RegulationResult.SKIPPED:
             raise ModelConflict(

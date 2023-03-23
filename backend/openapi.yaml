@@ -2392,6 +2392,13 @@ paths:
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date for the report, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
       responses:
         '200':
           description: Successfully downloaded a regulation letter

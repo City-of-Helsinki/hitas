@@ -491,6 +491,7 @@ def _save_regulation_results(
 
 def get_thirty_year_regulation_results_for_housing_company(
     housing_company_uuid: UUID,
+    calculation_date: datetime.date,
 ) -> ThirtyYearRegulationResultsRowWithAnnotations:
     results = (
         ThirtyYearRegulationResultsRow.objects.select_related(
@@ -501,9 +502,16 @@ def get_thirty_year_regulation_results_for_housing_company(
         .prefetch_related(
             "housing_company__real_estates",
         )
-        .filter(housing_company__uuid=housing_company_uuid)
+        .filter(
+            housing_company__uuid=housing_company_uuid,
+            parent__calculation_month=hitas_calculation_quarter(calculation_date),
+        )
         .annotate(
-            check_count=subquery_count(ThirtyYearRegulationResultsRow, "housing_company__uuid"),
+            check_count=subquery_count(
+                ThirtyYearRegulationResultsRow,
+                "housing_company__uuid",
+                parent__calculation_month__lte=hitas_calculation_quarter(calculation_date),
+            ),
             min_share=Min("housing_company__real_estates__buildings__apartments__share_number_start"),
             max_share=Max("housing_company__real_estates__buildings__apartments__share_number_end"),
             share_count=F("max_share") - F("min_share") + 1,
