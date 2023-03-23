@@ -28,18 +28,57 @@ export const errorMessages = {
     required: "Pakollinen kenttä!",
     postalCodeFormat: "Virheellinen postinumero!",
     stringLength: "Liian lyhyt arvo!",
+    stringMin: "Liian vähän kirjaimia!",
+    stringMax: "Liian monta kirjainta!",
     numberLength: "Liian lyhyt arvo!",
     numberType: "Arvon pitää olla numero!",
+    numberMin: "Liian pieni arvo",
+    numberMax: "Liian suuri arvo",
     numberPositive: "Arvo ei voi olla alle 0!",
-    numberMax: "Arvo liian suuri!",
     dateFormat: "Virheellinen päivämäärä!",
+    dateMin: "Liian aikainen päivämäärä!",
+    dateMax: "",
+    noOwnerships: "Asunnolla täytyy olla omistaja",
     priceMin: "Kauppahinta ei saa olla tyhjä!",
-    priceMax: "Kauppahinta ei saa ylittää 999 999 €!",
-    loanShareMin: "Lainaosuus ei voi olla alle 0 €!",
-    emailValid: "Ole hyvä ja anna oikea sähköpostiosoite!",
+    priceMax: "Kauppahinta ei saa ylittää 999 999 €",
+    loanShareMin: "Lainaosuus ei voi olla alle 0 €",
+    emailInvalid: "Virheellinen sähköpostiosoite",
+    urlInvalid: "Virheellinen www-osoite",
     APIIdMin: "Serverin palauttamassa id-arvossa liian vähän merkkejä!",
     APIIdMax: "Serverin palauttamassa id-arvossa on liian monta merkkiä!",
+    overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
+    loanShareChanged: "Lainaosuus muuttunut laskelmasta",
 };
+
+const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
+    let returnValue = {message: ctx.defaultError};
+    if (issue.code === z.ZodIssueCode.invalid_type) {
+        if (issue.expected === "number") {
+            returnValue = {message: errorMessages.numberType};
+        }
+    }
+    if (issue.code === z.ZodIssueCode.too_small || issue.code === z.ZodIssueCode.too_big) {
+        const isMin = issue.code === z.ZodIssueCode.too_small;
+        if (issue.type !== "set" && issue.type !== "array") {
+            returnValue = {
+                message: `${errorMessages[`${issue.type + isMin ? "Min" : "Max"}`]} (${
+                    isMin ? `min ${issue.minimum}` : `max ${issue.maximum}`
+                })`,
+            };
+        }
+    }
+    if (issue.code === z.ZodIssueCode.invalid_string) {
+        if (issue.validation !== "uuid") {
+            returnValue = {message: errorMessages[`${issue.validation}Invalid`]};
+        }
+    }
+    if (issue.code === z.ZodIssueCode.invalid_date) {
+        returnValue = {message: errorMessages.dateFormat};
+    }
+    return returnValue;
+};
+
+z.setErrorMap(customErrorMap);
 
 // ********************************
 // * Basic/primitive schemas
@@ -219,7 +258,7 @@ const ownerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
-    email: string({required_error: errorMessages.required}).email(errorMessages.emailValid).nullable(),
+    email: string({required_error: errorMessages.required}).email(errorMessages.emailInvalid).nullable(),
 });
 
 const ownershipSchema = object({
@@ -423,13 +462,13 @@ const ApartmentSaleFormSchema = object({
         .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
     purchase_price: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .gt(0, errorMessages.priceMin)
+        .positive(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
-        .nullable(),
+        .nullish(),
     apartment_share_of_housing_company_loans: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.loanShareMin)
-        .nullable(),
+        .gte(0, errorMessages.loanShareMin)
+        .nullish(),
     exclude_from_statistics: boolean().optional(),
 });
 
