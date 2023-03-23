@@ -821,7 +821,7 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
     response: HttpResponse = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
-    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=True)
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
     worksheet: Worksheet = workbook.worksheets[0]
 
     assert list(worksheet.values) == [
@@ -852,6 +852,20 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
             "Ei vapaudu",
             datetime.datetime(1993, 2, 1, 0, 0),
             "30 v 0 kk",
+        ),
+        (
+            None,
+            "=SUM(B2:B2)",
+            "=SUM(C2:C2)",
+            None,
+            "=SUM(E2:E2)",
+            "=SUM(F2:F2)",
+            "=SUM(G2:G2)",
+            "=SUM(H2:H2)",
+            "=SUM(I2:I2)",
+            None,
+            None,
+            None,
         ),
     ]
 

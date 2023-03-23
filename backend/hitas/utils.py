@@ -232,14 +232,23 @@ def resize_columns(worksheet: Worksheet) -> None:
 def format_sheet(worksheet: Worksheet, formatting_rules: dict[str, dict[str, Any]]) -> None:
     cell: Cell
     for column, changes in formatting_rules.items():
+        is_cell = len(column) == 2
         for key, value in changes.items():
+            if is_cell:
+                _set_cell_attribute(worksheet[column], key, value)
+                continue
+
             for cell in worksheet[column][1:]:
-                if not isinstance(value, dict):
-                    setattr(cell, key, value)
-                    continue
+                _set_cell_attribute(cell, key, value)
 
-                val = value.get(cell.value)
-                if val is None:
-                    continue
 
-                setattr(cell, key, val)
+def _set_cell_attribute(cell: Cell, key: str, value: Any) -> None:
+    if not isinstance(value, dict):
+        setattr(cell, key, value)
+        return
+
+    val = value.get(cell.value)
+    if val is None:
+        return
+
+    setattr(cell, key, val)

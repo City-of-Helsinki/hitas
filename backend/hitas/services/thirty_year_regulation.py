@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import TruncMonth
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font
+from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
@@ -632,9 +632,31 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
         )
         worksheet.append(data)
 
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    worksheet.append(
+        ReportColumns(
+            display_name="",
+            acquisition_price=f"=SUM(B2:B{last_row})",
+            apartment_count=f"=SUM(C2:C{last_row})",
+            indices="",
+            change=f"=SUM(E2:E{last_row})",
+            adjusted_acquisition_price=f"=SUM(F2:F{last_row})",
+            surface_area=f"=SUM(G2:G{last_row})",
+            price_per_square_meter=f"=SUM(H2:H{last_row})",
+            postal_code_price=f"=SUM(I2:I{last_row})",
+            state="",
+            completion_date="",
+            age="",
+        )
+    )
+
     format_sheet(
         worksheet,
         formatting_rules={
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
             "B": {"number_format": "#,##0.00\\ €"},
             "D": {"alignment": Alignment(horizontal="right")},
             "E": {"number_format": "#,##0.00\\ €"},
@@ -656,6 +678,5 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     )
 
     resize_columns(worksheet)
-    worksheet.auto_filter.ref = worksheet.dimensions
     worksheet.protection.sheet = True
     return workbook
