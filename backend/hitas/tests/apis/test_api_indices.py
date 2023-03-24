@@ -1,9 +1,13 @@
 import datetime
+from io import BytesIO
 from itertools import product
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.http import HttpResponse
 from django.urls import reverse
+from openpyxl import Workbook, load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
 from hitas.models import ApartmentSale, HousingCompanyState
@@ -551,4 +555,145 @@ def test__api__indices__delete(api_client: HitasAPIClient, index):
         "message": "Method not allowed",
         "reason": "Method Not Allowed",
         "status": 405,
+    }
+
+
+# Reports
+
+
+@pytest.mark.django_db
+def test__api__indices__surface_area_price_ceiling__report(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+
+    data = CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name="Foo",
+                completion_date="2022-02-01",
+                surface_area=10.0,
+                realized_acquisition_price=60_000.0,
+                unadjusted_average_price_per_square_meter=6_000.0,
+                adjusted_average_price_per_square_meter=12_000.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+            HousingCompanyData(
+                name="Bar",
+                completion_date="2022-02-01",
+                surface_area=25.0,
+                realized_acquisition_price=40_000.0,
+                unadjusted_average_price_per_square_meter=1_600.0,
+                adjusted_average_price_per_square_meter=3_200.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+        ],
+        created_surface_area_price_ceilings=[
+            SurfaceAreaPriceCeilingResult(month="2023-02", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-03", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-04", value=7_600.0),
+        ],
+    )
+
+    SurfaceAreaPriceCeilingCalculationData.objects.create(data=data, calculation_month=this_month)
+
+    url = reverse("hitas:surface-area-price-ceiling-results")
+
+    response: HttpResponse = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Yhtiö",
+            "Hankinta-arvo",
+            "Indeksit",
+            "Muutos",
+            "Takistettu hinta",
+            "Pinta-ala",
+            "E-hinta/m²",
+        ),
+        (
+            "Foo",
+            60000,
+            "100.0/200.0",
+            60000,
+            120000,
+            10,
+            12000,
+        ),
+        (
+            "Bar",
+            40000,
+            "100.0/200.0",
+            40000,
+            80000,
+            25,
+            3200,
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Summa",
+            "=SUM(B2:B3)",
+            None,
+            "=SUM(D2:D3)",
+            "=SUM(E2:E3)",
+            "=SUM(F2:F3)",
+            "=SUM(G2:G3)",
+        ),
+        (
+            "Keskiarvo",
+            "=AVERAGE(B2:B3)",
+            None,
+            "=AVERAGE(D2:D3)",
+            "=AVERAGE(E2:E3)",
+            "=AVERAGE(F2:F3)",
+            "=AVERAGE(G2:G3)",
+        ),
+        (
+            "Mediaani",
+            "=MEDIAN(B2:B3)",
+            None,
+            "=MEDIAN(D2:D3)",
+            "=MEDIAN(E2:E3)",
+            "=MEDIAN(F2:F3)",
+            "=MEDIAN(G2:G3)",
+        ),
+        (
+            "Rajaneliöhinta",
+            7600,
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__indices__surface_area_price_ceiling__no_regulation_data(api_client: HitasAPIClient):
+    url = reverse("hitas:surface-area-price-ceiling-results")
+
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "surface_area_price_ceiling_calculation_data_not_found",
+        "message": "Surface area price ceiling calculation data not found",
+        "reason": "Not Found",
+        "status": 404,
     }

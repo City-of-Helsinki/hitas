@@ -1,12 +1,15 @@
 import datetime
 import logging
 from decimal import Decimal
-from typing import Literal, Optional
+from typing import Literal, NamedTuple, Optional
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Case, OuterRef, Q, Subquery, When
+from openpyxl.styles import Alignment, Border, Side
+from openpyxl.workbook import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
-from hitas.exceptions import ModelConflict
+from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
@@ -22,9 +25,19 @@ from hitas.models.indices import (
     SurfaceAreaPriceCeilingResult,
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
-from hitas.utils import hitas_calculation_quarter, roundup
+from hitas.utils import format_sheet, hitas_calculation_quarter, resize_columns, roundup
 
 logger = logging.getLogger()
+
+
+class ReportColumns(NamedTuple):
+    display_name: str
+    acquisition_price: Decimal | str
+    indices: str
+    change: Decimal | str
+    adjusted_acquisition_price: Decimal | str
+    surface_area: Decimal | str
+    price_per_square_meter: Decimal | str
 
 
 def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> list[SurfaceAreaPriceCeilingResult]:
@@ -144,3 +157,119 @@ def subquery_appropriate_cpi(outer_ref: str, financing_method_ref: str) -> Case:
             )
         ),
     )
+
+
+def get_surface_area_price_ceiling_results(calculation_date: datetime.date) -> SurfaceAreaPriceCeilingCalculationData:
+    try:
+        return SurfaceAreaPriceCeilingCalculationData.objects.get(
+            calculation_month=hitas_calculation_quarter(calculation_date),
+        )
+    except SurfaceAreaPriceCeilingCalculationData.DoesNotExist as error:
+        raise HitasModelNotFound(SurfaceAreaPriceCeilingCalculationData) from error
+
+
+def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeilingCalculationData) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    columns = ReportColumns(
+        display_name="Yhtiö",
+        acquisition_price="Hankinta-arvo",
+        indices="Indeksit",
+        change="Muutos",
+        adjusted_acquisition_price="Takistettu hinta",
+        surface_area="Pinta-ala",
+        price_per_square_meter="E-hinta/m²",
+    )
+    worksheet.append(columns)
+
+    for housing_company in results.data["housing_company_data"]:
+        unadjusted = Decimal(housing_company["unadjusted_average_price_per_square_meter"])
+        adjusted = Decimal(housing_company["adjusted_average_price_per_square_meter"])
+        surface_area = Decimal(housing_company["surface_area"])
+        data = ReportColumns(
+            display_name=housing_company["name"],
+            acquisition_price=Decimal(housing_company["realized_acquisition_price"]),
+            indices=f"{housing_company['completion_month_index']}/{housing_company['calculation_month_index']}",
+            change=(adjusted * surface_area) - (unadjusted * surface_area),
+            adjusted_acquisition_price=adjusted * surface_area,
+            surface_area=surface_area,
+            price_per_square_meter=adjusted,
+        )
+        worksheet.append(data)
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(
+        ReportColumns(
+            display_name="",
+            acquisition_price="",
+            indices="",
+            change="",
+            adjusted_acquisition_price="",
+            surface_area="",
+            price_per_square_meter="",
+        )
+    )
+
+    summary_start = worksheet.max_row + 1
+    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
+    for title, formula in summary_rows.items():
+        worksheet.append(
+            ReportColumns(
+                display_name=title,
+                acquisition_price=f"={formula}(B2:B{last_row})",
+                indices="",
+                change=f"={formula}(D2:D{last_row})",
+                adjusted_acquisition_price=f"={formula}(E2:E{last_row})",
+                surface_area=f"={formula}(F2:F{last_row})",
+                price_per_square_meter=f"={formula}(G2:G{last_row})",
+            )
+        )
+    summary_end = worksheet.max_row
+
+    worksheet.append(
+        ReportColumns(
+            display_name="Rajaneliöhinta",
+            acquisition_price=Decimal(results.data["created_surface_area_price_ceilings"][0]["value"]),
+            indices="",
+            change="",
+            adjusted_acquisition_price="",
+            surface_area="",
+            price_per_square_meter="",
+        )
+    )
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFG"},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFG"},
+            # Align the summary titles to the right
+            **{
+                f"A{summary_start + i}": {"alignment": Alignment(horizontal="right")}
+                for i in range(0, len(summary_rows) + 1)  # additional +1 for "Rajaneliöhinta" row
+            },
+            # Add border to the end of the summary row
+            **{f"{letter}{summary_end}": {"border": Border(bottom=Side(style="thin"))} for letter in "BCDEFG"},
+            # Last summary row needs both underline and alignment
+            f"A{summary_end}": {
+                "border": Border(bottom=Side(style="thin")),
+                "alignment": Alignment(horizontal="right"),
+            },
+            "B": {"number_format": "#,##0.00\\ €"},
+            "C": {"alignment": Alignment(horizontal="right")},
+            "D": {"number_format": "#,##0.00\\ €"},
+            "E": {"number_format": "#,##0.00\\ €"},
+            "F": {"number_format": "#,##0.00\\ \\m\\²"},
+            "G": {"number_format": "#,##0.00\\ €"},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
