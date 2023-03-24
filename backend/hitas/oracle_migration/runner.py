@@ -950,7 +950,7 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             apartment=apartment,
             notification_date=oracle_apartment["first_purchase_date"],
             purchase_date=oracle_apartment["first_purchase_date"],
-            purchase_price=oracle_apartment["purchase_price"],
+            purchase_price=oracle_apartment["debt_free_purchase_price"],
             apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
             exclude_from_statistics=False,
         )
