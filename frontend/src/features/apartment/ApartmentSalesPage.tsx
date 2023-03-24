@@ -145,7 +145,10 @@ const LoadedApartmentSalesPage = ({
 
     // Handle "calculate maximum price"-button press
     const handleCalculateButton = () => {
-        if (saleForm.getValues("purchase_date") && saleForm.getValues("apartment_share_of_housing_company_loans")) {
+        if (
+            saleForm.getValues("purchase_date") &&
+            !isNaN(Number(saleForm.getValues("apartment_share_of_housing_company_loans")))
+        ) {
             // Validate relevant fields for the calculation
             if (errors.purchase_date || errors.apartment_share_of_housing_company_loans) {
                 if (errors.purchase_date)
@@ -335,16 +338,19 @@ const LoadedApartmentSalesPage = ({
                 </div>
                 <div className="row row--prompt">
                     <p>
-                        Enimmäishinnat ovat laskettu{" "}
+                        Enimmäishinnat on laskettu{" "}
                         <span>
                             {` ${getIndexType(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}llä`}
                         </span>{" "}
-                        ja{" "}
+                        sekä{" "}
                         <span>
-                            {formatMoney(
-                                maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
-                                    .apartment_share_of_housing_company_loans
-                            )}
+                            {maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
+                                .apartment_share_of_housing_company_loans === 0
+                                ? "0 €"
+                                : formatMoney(
+                                      maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
+                                          .apartment_share_of_housing_company_loans
+                                  )}
                         </span>{" "}
                         lainaosuudella.{" "}
                     </p>
@@ -383,7 +389,7 @@ const LoadedApartmentSalesPage = ({
                     onClick={handleCalculateButton}
                     disabled={
                         !saleForm.getValues("purchase_date") ||
-                        !saleForm.getValues("apartment_share_of_housing_company_loans")
+                        isNaN(Number(saleForm.getValues("apartment_share_of_housing_company_loans")))
                     }
                 >
                     Tee enimmäishintalaskelma
@@ -391,55 +397,6 @@ const LoadedApartmentSalesPage = ({
             </div>
         );
     };
-
-    const Dialogs = () => (
-        <>
-            <Dialog
-                id="maximum-price-confirmation-modal"
-                closeButtonLabelText=""
-                aria-labelledby=""
-                isOpen={isModalVisible}
-                close={() => setIsModalVisible(false)}
-                boxShadow
-            >
-                <Dialog.Header
-                    id="maximum-price-confirmation-modal-header"
-                    title="Vahvistetaanko enimmäishintalaskelma?"
-                />
-                <QueryStateHandler
-                    data={maxPriceData}
-                    error={maxPriceError}
-                    isLoading={isMaxPriceLoading}
-                    errorComponent={
-                        <MaximumPriceModalError
-                            error={maxPriceError}
-                            setIsModalVisible={setIsModalVisible}
-                        />
-                    }
-                >
-                    <MaximumPriceModalContent
-                        calculation={maxPriceData as IApartmentMaximumPrice}
-                        apartment={apartment}
-                        setIsModalVisible={setIsModalVisible}
-                    />
-                </QueryStateHandler>
-            </Dialog>
-            <ConfirmDialogModal
-                successText="Kauppa tallennettu varoituksesta huolimatta"
-                isLoading={isLoading}
-                isVisible={isWarningModalVisible}
-                setIsVisible={setIsWarningModalVisible}
-                modalText="Haluatko tallentaa kaupan vaikka kauppahinta ylittää laskelman enimmäishinnan?"
-                modalHeader="Vahvista kaupan tallennus"
-                cancelAction={() => {
-                    setIsWarningModalVisible(false);
-                    setFocus("purchase_price");
-                }}
-                confirmAction={handleWarningDialogAction}
-                buttonText="Vahvista tallennus"
-            />
-        </>
-    );
 
     return (
         <div className="view--apartment-conditions-of-sale">
@@ -531,7 +488,50 @@ const LoadedApartmentSalesPage = ({
                     disabled={!isDirty || isSavingDisabled}
                 />
             </div>
-            <Dialogs />
+            <Dialog
+                id="maximum-price-confirmation-modal"
+                closeButtonLabelText=""
+                aria-labelledby=""
+                isOpen={isModalVisible}
+                close={() => setIsModalVisible(false)}
+                boxShadow
+            >
+                <Dialog.Header
+                    id="maximum-price-confirmation-modal-header"
+                    title="Vahvistetaanko enimmäishintalaskelma?"
+                />
+                <QueryStateHandler
+                    data={maxPriceData}
+                    error={maxPriceError}
+                    isLoading={isMaxPriceLoading}
+                    errorComponent={
+                        <MaximumPriceModalError
+                            error={maxPriceError}
+                            setIsModalVisible={setIsModalVisible}
+                        />
+                    }
+                >
+                    <MaximumPriceModalContent
+                        calculation={maxPriceData as IApartmentMaximumPrice}
+                        apartment={apartment}
+                        setIsModalVisible={setIsModalVisible}
+                    />
+                </QueryStateHandler>
+            </Dialog>
+            <ConfirmDialogModal
+                successText="Kauppa tallennettu varoituksesta huolimatta"
+                isLoading={isLoading}
+                isVisible={isWarningModalVisible}
+                setIsVisible={setIsWarningModalVisible}
+                modalText="Haluatko tallentaa kaupan vaikka kauppahinta ylittää laskelman enimmäishinnan?"
+                modalHeader="Vahvista kaupan tallennus"
+                cancelAction={() => {
+                    setIsWarningModalVisible(false);
+                    setFocus("purchase_price");
+                }}
+                confirmAction={handleWarningDialogAction}
+                buttonText="Vahvista tallennus"
+            />
         </div>
     );
 };
