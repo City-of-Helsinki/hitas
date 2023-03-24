@@ -1,7 +1,9 @@
 from io import BytesIO
+from tempfile import NamedTemporaryFile
 from typing import Any, Literal, Optional, Protocol, TypeAlias
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpResponse
 from openpyxl.cell import Cell
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils import column_index_from_string
@@ -10,6 +12,17 @@ from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.parsers import BaseParser
 from rest_framework.serializers import Serializer
+
+
+def get_excel_response(filename: str, excel: Workbook) -> HttpResponse:
+    with NamedTemporaryFile() as tmp:
+        excel.save(tmp.name)
+        tmp.seek(0)
+        data: bytes = tmp.read()
+
+    response = HttpResponse(data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    return response
 
 
 class _ExcelParser(BaseParser):

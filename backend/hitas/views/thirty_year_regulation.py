@@ -11,10 +11,13 @@ from rest_framework.viewsets import ViewSet
 from hitas.exceptions import ModelConflict
 from hitas.models.thirty_year_regulation import RegulationResult
 from hitas.services.thirty_year_regulation import (
+    build_thirty_year_regulation_report_excel,
+    get_thirty_year_regulation_results,
     get_thirty_year_regulation_results_for_housing_company,
     perform_thirty_year_regulation,
 )
 from hitas.utils import from_iso_format_or_today_if_none
+from hitas.views.utils.excel import get_excel_response
 from hitas.views.utils.pdf import get_pdf_response
 
 
@@ -59,3 +62,20 @@ class ThirtyYearRegulationView(ViewSet):
         choice = "jatkumisesta" if results.regulation_result == RegulationResult.STAYS_REGULATED else "pättymisestä"
         filename = f"Tiedote sääntelyn {choice} - {results.housing_company.display_name}.pdf"
         return get_pdf_response(filename=filename, template="regulation_letter.jinja", context=context)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path=r"reports/download-regulation-results",
+        url_name="results",
+    )
+    def regulation_results(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        results = get_thirty_year_regulation_results(calculation_date)
+        workbook = build_thirty_year_regulation_report_excel(results)
+        filename = f"30v vertailun tulokset ({results.calculation_month.isoformat()}).xlsx"
+        return get_excel_response(filename=filename, excel=workbook)

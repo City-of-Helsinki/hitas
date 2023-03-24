@@ -3,13 +3,16 @@ import json
 import logging
 from decimal import Decimal
 from itertools import chain
-from typing import Iterable, Literal, Optional, TypedDict
+from typing import Iterable, Literal, NamedTuple, Optional, TypedDict
 from uuid import UUID
 
 from dateutil.relativedelta import relativedelta
 from django.db import models
-from django.db.models import Count, F, Max, Min, OuterRef, Q, Subquery
+from django.db.models import Count, F, Max, Min, OuterRef, Prefetch, Q, Subquery
 from django.db.models.functions import TruncMonth
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Border, Font, Side
+from openpyxl.worksheet.worksheet import Worksheet
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
 from hitas.models.apartment_sale import ApartmentSale
@@ -29,7 +32,16 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.services.indices import subquery_appropriate_cpi
-from hitas.utils import business_quarter, hitas_calculation_quarter, roundup, subquery_count, to_quarter
+from hitas.utils import (
+    business_quarter,
+    format_sheet,
+    hitas_calculation_quarter,
+    humanize_relativedelta,
+    resize_columns,
+    roundup,
+    subquery_count,
+    to_quarter,
+)
 
 logger = logging.getLogger()
 
@@ -46,6 +58,21 @@ class RegulationResults(TypedDict):
     released_from_regulation: list[ComparisonData]
     stays_regulated: list[ComparisonData]
     skipped: list[ComparisonData]
+
+
+class ReportColumns(NamedTuple):
+    display_name: str
+    acquisition_price: Decimal | str
+    apartment_count: int | str
+    indices: str
+    change: Decimal | str
+    adjusted_acquisition_price: Decimal | str
+    surface_area: Decimal | str
+    price_per_square_meter: Decimal | str
+    postal_code_price: Decimal | str
+    state: str
+    completion_date: datetime.date | str
+    age: str
 
 
 def perform_thirty_year_regulation(calculation_date: datetime.date) -> RegulationResults:
@@ -488,6 +515,23 @@ def _save_regulation_results(
     return thirty_year_regulation_results
 
 
+def get_thirty_year_regulation_results(calculation_date: datetime.date) -> ThirtyYearRegulationResults:
+    try:
+        return ThirtyYearRegulationResults.objects.prefetch_related(
+            Prefetch(
+                "rows",
+                ThirtyYearRegulationResultsRow.objects.prefetch_related(
+                    "housing_company",
+                    "housing_company__postal_code",
+                ).annotate(
+                    apartment_count=Count("housing_company__real_estates__buildings__apartments"),
+                ),
+            ),
+        ).get(calculation_month=hitas_calculation_quarter(calculation_date))
+    except ThirtyYearRegulationResults.DoesNotExist as error:
+        raise HitasModelNotFound(ThirtyYearRegulationResults) from error
+
+
 def get_thirty_year_regulation_results_for_housing_company(
     housing_company_uuid: UUID,
     calculation_date: datetime.date,
@@ -540,3 +584,128 @@ def get_thirty_year_regulation_results_for_housing_company(
     )
 
     return results
+
+
+def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResults) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    columns = ReportColumns(
+        display_name="Yhtiö",
+        acquisition_price="Hankinta-arvo",
+        apartment_count="Huoneistoja",
+        indices="Indeksit",
+        change="Muutos",
+        adjusted_acquisition_price="Takistettu hinta",
+        surface_area="Pinta-ala",
+        price_per_square_meter="E-hinta/m²",
+        postal_code_price="Postinumerohinta",
+        state="Tila",
+        completion_date="Valmistumispäivä",
+        age="Yhtiön ikä",
+    )
+    worksheet.append(columns)
+
+    for row in results.rows.all():
+        data = ReportColumns(
+            display_name=row.housing_company.display_name,
+            acquisition_price=row.realized_acquisition_price,
+            apartment_count=row.apartment_count,
+            indices=f"{row.completion_month_index}/{row.calculation_month_index}",
+            change=(
+                (row.adjusted_average_price_per_square_meter * row.surface_area)
+                - (row.unadjusted_average_price_per_square_meter * row.surface_area)
+            ),
+            adjusted_acquisition_price=row.adjusted_average_price_per_square_meter * row.surface_area,
+            surface_area=row.surface_area,
+            price_per_square_meter=row.adjusted_average_price_per_square_meter,
+            postal_code_price=row.parent.sales_data["price_by_area"][row.postal_code],
+            state=(
+                "Ei vapaudu"
+                if row.regulation_result == RegulationResult.STAYS_REGULATED
+                else "Ei voitu määrittää"
+                if row.regulation_result == RegulationResult.SKIPPED
+                else "Vapautuu"
+            ),
+            completion_date=row.completion_date,
+            age=humanize_relativedelta(relativedelta(results.calculation_month, row.completion_date)),
+        )
+        worksheet.append(data)
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(
+        ReportColumns(
+            display_name="",
+            acquisition_price="",
+            apartment_count="",
+            indices="",
+            change="",
+            adjusted_acquisition_price="",
+            surface_area="",
+            price_per_square_meter="",
+            postal_code_price="",
+            state="",
+            completion_date="",
+            age="",
+        )
+    )
+
+    summary_start = worksheet.max_row + 1
+    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
+    for title, formula in summary_rows.items():
+        worksheet.append(
+            ReportColumns(
+                display_name=title,
+                acquisition_price=f"={formula}(B2:B{last_row})",
+                apartment_count=f"={formula}(C2:C{last_row})",
+                indices="",
+                change=f"={formula}(E2:E{last_row})",
+                adjusted_acquisition_price=f"={formula}(F2:F{last_row})",
+                surface_area=f"={formula}(G2:G{last_row})",
+                price_per_square_meter=f"={formula}(H2:H{last_row})",
+                postal_code_price=f"={formula}(I2:I{last_row})",
+                state="",
+                completion_date="",
+                age="",
+            )
+        )
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            # Align the summary titles to the right
+            **{
+                f"A{summary_start + i}": {"alignment": Alignment(horizontal="right")}
+                for i in range(0, len(summary_rows))
+            },
+            "B": {"number_format": "#,##0.00\\ €"},
+            "D": {"alignment": Alignment(horizontal="right")},
+            "E": {"number_format": "#,##0.00\\ €"},
+            "F": {"number_format": "#,##0.00\\ €"},
+            "G": {"number_format": "#,##0.00\\ \\m\\²"},
+            "H": {"number_format": "#,##0.00\\ €"},
+            "I": {"number_format": "#,##0.00\\ €"},
+            "J": {
+                "alignment": Alignment(horizontal="right"),
+                # Change the font color depending on the text in the field
+                "font": {
+                    "Ei vapaudu": Font(color="FF0000"),  # red
+                    "Vapautuu": Font(color="00FF00"),  # green
+                    "Ei voitu määrittää": Font(color="0000FF"),  # blue
+                },
+            },
+            "K": {"number_format": "DD.MM.YYYY"},
+            "L": {"alignment": Alignment(horizontal="right")},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
