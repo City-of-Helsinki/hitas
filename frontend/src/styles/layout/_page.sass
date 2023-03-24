@@ -175,10 +175,6 @@ header
           column-gap: 0.4em
           width: 15%
 
-          .sell-by-date
-            display: none
-          .conditions-of-sale:hover > .sell-by-date
-              display: inline-block
 
 .list
 
@@ -255,12 +251,13 @@ header
 
     .detail-field-label
       display: block
+      margin: $spacing-4-xs 0
       font-size: $fontsize-body-m
-      margin-bottom: $spacing-3-xs
       letter-spacing: 1px
       color: $color-black-50
 
     .detail-field-value
+      margin: $spacing-4-xs 0
       font-size: $fontsize-body-xl
       font-weight: 600
 
@@ -268,13 +265,11 @@ header
         color: $color-black-50
         font-weight: 400
 
-      &:not(:last-child)
-        margin-bottom: $spacing-layout-s
-
     textarea
       font-size: $fontsize-body-m
       width: 100%
       height: 200px
+      resize: none
 
 .list-wrapper--real-estates, .list-wrapper--buildings
   width: 50%
@@ -343,3 +338,30 @@ header
 
 footer
   width: 100%
+
+.divider-horizontal
+  &:before
+    border-top: 1px solid $color-black-20
+    content: ""
+    display: block
+    height: 1px
+  &-s
+    margin: $spacing-xs 0
+  &-m
+    margin: $spacing-s 0
+  &-l
+    margin: $spacing-m 0
+
+.conditions-of-sale-status
+  display: flex
+  flex-direction: row
+  align-items: center
+  padding-left: 8px
+  padding-right: 8px
+  margin-right: 0.5em
+  span
+    margin: 0
+  .sell-by-date
+    display: none
+  &:hover > .sell-by-date
+    display: inline-block

@@ -1,5 +1,6 @@
 import ConfirmDialogModal from "./ConfirmDialogModal";
 import DetailField from "./DetailField";
+import Divider from "./Divider";
 import EditButton from "./EditButton";
 import FilterCheckboxField from "./FilterCheckboxField";
 import FilterComboboxField from "./FilterComboboxField";
@@ -20,6 +21,7 @@ import SaveDialogModal from "./SaveDialogModal";
 export {
     ConfirmDialogModal,
     DetailField,
+    Divider,
     EditButton,
     FilterCheckboxField,
     FilterComboboxField,

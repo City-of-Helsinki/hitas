@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, IconLockOpen, StatusLabel, Tabs} from "hds-react";
+import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {
@@ -9,7 +9,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {DetailField, Divider, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
 import {
     IApartmentConditionOfSale,
@@ -19,8 +19,9 @@ import {
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney, getConditionsOfSaleStatusLabelType} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
+import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (
@@ -37,18 +38,7 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
                         <Link
                             to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
                         >
-                            <StatusLabel
-                                className="conditions-of-sale-lock"
-                                type={
-                                    cos.fulfilled
-                                        ? "neutral"
-                                        : getConditionsOfSaleStatusLabelType(
-                                              cos.grace_period !== "not_given",
-                                              cos.sell_by_date
-                                          )
-                                }
-                                iconLeft={cos.fulfilled ? <IconLockOpen /> : <IconLock />}
-                            />
+                            <ConditionsOfSaleStatus conditionOfSale={cos} />
                             {formatAddress(cos.apartment.address)}
                         </Link>
                     </li>
@@ -318,80 +308,83 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                         <Tabs.TabPanel>
                             <div className="company-details__tab basic-details">
                                 <div className="row">
-                                    <div>
-                                        <DetailField
-                                            label="Kauppakirjahinta"
-                                            value={formatMoney(data.prices.latest_sale_purchase_price)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <DetailField
-                                            label="Hankinta-arvo"
-                                            value={formatMoney(data.prices.first_sale_acquisition_price)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <DetailField
-                                            label="Valmistumispäivä"
-                                            value={formatDate(data.completion_date)}
-                                        />
-                                    </div>
+                                    <DetailField
+                                        label="Viimeisin kauppahinta"
+                                        value={formatMoney(data.prices.latest_sale_purchase_price)}
+                                        horizontal
+                                    />
+                                    <DetailField
+                                        label="Hankinta-arvo"
+                                        value={formatMoney(data.prices.first_sale_acquisition_price)}
+                                        horizontal
+                                    />
+                                    <DetailField
+                                        label="Valmistumispäivä"
+                                        value={formatDate(data.completion_date)}
+                                        horizontal
+                                    />
                                 </div>
+                                <Divider size="l" />
                                 <div className="columns">
                                     <div className="column">
-                                        <label className="detail-field-label">Omistajat</label>
-                                        {data.ownerships.map((ownership: IOwnership) => (
-                                            <DetailField
-                                                key={ownership.owner.id}
-                                                value={
-                                                    <>
-                                                        {`${ownership.owner.name} (${ownership.owner.identifier})`}
-                                                        <span> {ownership.percentage}%</span>
-                                                    </>
-                                                }
-                                                label=""
-                                            />
-                                        ))}
+                                        <div>
+                                            <label className="detail-field-label">Omistajat</label>
+                                            {data.ownerships.map((ownership: IOwnership) => (
+                                                <div
+                                                    key={ownership.owner.id}
+                                                    className="detail-field-value"
+                                                >
+                                                    {ownership.owner.name} ({ownership.owner.identifier})
+                                                    <span> {ownership.percentage}%</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                         <DetailField
                                             label="Isännöitsijä"
+                                            value={housingCompanyData?.property_manager?.name}
+                                        />
+                                        <DetailField
+                                            label="Osakkeet"
                                             value={
-                                                housingCompanyData && housingCompanyData.property_manager
-                                                    ? housingCompanyData.property_manager.name
-                                                    : "-"
+                                                data.shares
+                                                    ? `${data.shares.start} - ${data.shares.end} (${data.shares.total} kpl)`
+                                                    : undefined
                                             }
                                         />
-                                        <label className="detail-field-label">Huomioitavaa</label>
-                                        <textarea
-                                            value={(data.notes as string) || ""}
-                                            readOnly
-                                        />
+                                        <div>
+                                            <label className="detail-field-label">Huomioitavaa</label>
+                                            <textarea
+                                                value={(data.notes as string) || ""}
+                                                readOnly
+                                            />
+                                        </div>
                                     </div>
                                     <div className="column">
                                         <DetailField
-                                            label="Osakkeiden lukumäärä"
-                                            value={data.shares ? data.shares.total : 0}
+                                            label="Viimeisin kauppapäivä"
+                                            value={formatDate(data.prices.latest_purchase_date)}
                                         />
-                                        {data.shares && (
-                                            <DetailField
-                                                label="Osakkeet"
-                                                value={`${data.shares.start} - ${data.shares.end}`}
-                                            />
-                                        )}
+
+                                        <Divider size="s" />
+
                                         <DetailField
-                                            label="Luovutushinta"
+                                            label="Ensimmäinen kauppapäivä"
+                                            value={formatDate(data.prices.first_purchase_date)}
+                                        />
+                                        <DetailField
+                                            label="Ensimmäinen Kauppahinta"
                                             value={formatMoney(data.prices.first_sale_purchase_price)}
                                         />
                                         <DetailField
                                             label="Ensisijaislaina"
                                             value={formatMoney(data.prices.first_sale_share_of_housing_company_loans)}
                                         />
+
+                                        <Divider size="s" />
+
                                         <DetailField
-                                            label="Ensimmäinen kauppapäivä"
-                                            value={formatDate(data.prices.first_purchase_date)}
-                                        />
-                                        <DetailField
-                                            label="Viimeisin kauppapäivä"
-                                            value={formatDate(data.prices.latest_purchase_date)}
+                                            label="Rakennusaikaiset lisätyöt"
+                                            value={formatMoney(data.prices.construction.additional_work)}
                                         />
                                         <DetailField
                                             label="Rakennusaikaiset korot (6 %)"
@@ -409,10 +402,6 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                     : 0
                                             }
                                         />
-                                        <DetailField
-                                            label="Rakennusaikaiset lisätyöt"
-                                            value={formatMoney(data.prices.construction.additional_work)}
-                                        />
                                         {data.prices.construction.loans ? (
                                             <DetailField
                                                 label="Rakennusaikaiset lainat"
@@ -424,6 +413,27 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                                 label="Luovutushinta (RA)"
                                                 value={formatMoney(data.prices.construction.debt_free_purchase_price)}
                                             />
+                                        ) : null}
+
+                                        {data.prices.catalog_purchase_price ||
+                                        data.prices.catalog_share_of_housing_company_loans ? (
+                                            <>
+                                                <Divider size="s" />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon luovutushinta"
+                                                    value={formatMoney(data.prices.catalog_purchase_price)}
+                                                />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon ensisijaislaina"
+                                                    value={formatMoney(
+                                                        data.prices.catalog_share_of_housing_company_loans
+                                                    )}
+                                                />
+                                                <DetailField
+                                                    label="Myyntihintaluettelon Hankinta-arvo"
+                                                    value={formatMoney(data.prices.catalog_acquisition_price)}
+                                                />
+                                            </>
                                         ) : null}
                                     </div>
                                 </div>

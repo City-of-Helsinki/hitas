@@ -85,11 +85,13 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                             `${data.property_manager.name} (${data.property_manager.email})`
                                         }
                                     />
-                                    <label className="detail-field-label">Huomioitavaa</label>
-                                    <textarea
-                                        readOnly
-                                        value={data.notes || ""}
-                                    />
+                                    <div>
+                                        <label className="detail-field-label">Huomioitavaa</label>
+                                        <textarea
+                                            readOnly
+                                            value={data.notes || ""}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </Tabs.TabPanel>
