@@ -2,7 +2,9 @@ import datetime
 from typing import ClassVar
 
 from django.db.models import Q
+from django.http import HttpResponse
 from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -18,7 +20,11 @@ from hitas.models import (
     SurfaceAreaPriceCeiling,
 )
 from hitas.models.indices import AbstractIndex
-from hitas.services.indices import calculate_surface_area_price_ceiling
+from hitas.services.indices import (
+    build_surface_area_price_ceiling_report_excel,
+    calculate_surface_area_price_ceiling,
+    get_surface_area_price_ceiling_results,
+)
 from hitas.utils import from_iso_format_or_today_if_none
 from hitas.views.utils import (
     HitasDecimalField,
@@ -27,6 +33,7 @@ from hitas.views.utils import (
     HitasModelMixin,
     HitasModelSerializer,
 )
+from hitas.views.utils.excel import get_excel_response
 from hitas.views.utils.serializers import YearMonthSerializer
 
 
@@ -135,3 +142,20 @@ class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
 
         result = calculate_surface_area_price_ceiling(calculation_date)
         return Response(data=result, status=status.HTTP_200_OK)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path=r"reports/download-surface-area-price-ceiling-results",
+        url_name="results",
+    )
+    def surface_area_price_ceiling_results(self, request: Request, *args, **kwargs) -> HttpResponse:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        results = get_surface_area_price_ceiling_results(calculation_date)
+        workbook = build_surface_area_price_ceiling_report_excel(results)
+        filename = f"Rajaneliöhinnan laskentaraportti ({results.calculation_month.isoformat()}).xlsx"
+        return get_excel_response(filename=filename, excel=workbook)
