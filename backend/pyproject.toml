@@ -47,6 +47,7 @@ openapi-core = "^0.16"
 testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
 django-debug-toolbar = "^3.6.0"
 pre-commit = "^3"
+pypdf = "^3.6.0"
 
 [tool.poetry.group.migration]
 optional = true

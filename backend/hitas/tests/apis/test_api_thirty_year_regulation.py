@@ -3,12 +3,16 @@ from decimal import Decimal
 
 import pytest
 from dateutil.relativedelta import relativedelta
-from django.urls import reverse
 from rest_framework import status
+from rest_framework.reverse import reverse
 
 from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
-from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult, ThirtyYearRegulationResults
+from hitas.models.thirty_year_regulation import (
+    FullSalesData,
+    RegulationResult,
+    ThirtyYearRegulationResults,
+)
 from hitas.services.thirty_year_regulation import ComparisonData, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.factories import (
