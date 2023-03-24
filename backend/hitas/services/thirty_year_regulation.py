@@ -635,28 +635,34 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     last_row = worksheet.max_row
     worksheet.auto_filter.ref = worksheet.dimensions
 
-    worksheet.append(
-        ReportColumns(
-            display_name="",
-            acquisition_price=f"=SUM(B2:B{last_row})",
-            apartment_count=f"=SUM(C2:C{last_row})",
-            indices="",
-            change=f"=SUM(E2:E{last_row})",
-            adjusted_acquisition_price=f"=SUM(F2:F{last_row})",
-            surface_area=f"=SUM(G2:G{last_row})",
-            price_per_square_meter=f"=SUM(H2:H{last_row})",
-            postal_code_price=f"=SUM(I2:I{last_row})",
-            state="",
-            completion_date="",
-            age="",
+    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
+    for title, formula in summary_rows.items():
+        worksheet.append(
+            ReportColumns(
+                display_name=title,
+                acquisition_price=f"={formula}(B2:B{last_row})",
+                apartment_count=f"={formula}(C2:C{last_row})",
+                indices="",
+                change=f"={formula}(E2:E{last_row})",
+                adjusted_acquisition_price=f"={formula}(F2:F{last_row})",
+                surface_area=f"={formula}(G2:G{last_row})",
+                price_per_square_meter=f"={formula}(H2:H{last_row})",
+                postal_code_price=f"={formula}(I2:I{last_row})",
+                state="",
+                completion_date="",
+                age="",
+            )
         )
-    )
 
     format_sheet(
         worksheet,
         formatting_rules={
             **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
             **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            **{
+                f"A{last_row + i}": {"alignment": Alignment(horizontal="right")}
+                for i in range(1, len(summary_rows) + 1)
+            },
             "B": {"number_format": "#,##0.00\\ €"},
             "D": {"alignment": Alignment(horizontal="right")},
             "E": {"number_format": "#,##0.00\\ €"},
