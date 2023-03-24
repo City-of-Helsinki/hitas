@@ -635,6 +635,25 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     last_row = worksheet.max_row
     worksheet.auto_filter.ref = worksheet.dimensions
 
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(
+        ReportColumns(
+            display_name="",
+            acquisition_price="",
+            apartment_count="",
+            indices="",
+            change="",
+            adjusted_acquisition_price="",
+            surface_area="",
+            price_per_square_meter="",
+            postal_code_price="",
+            state="",
+            completion_date="",
+            age="",
+        )
+    )
+
+    summary_start = worksheet.max_row + 1
     summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
     for title, formula in summary_rows.items():
         worksheet.append(
@@ -657,11 +676,14 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     format_sheet(
         worksheet,
         formatting_rules={
+            # Add a border to the header row
             **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            # Add a border to the last data row
             **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            # Align the summary titles to the right
             **{
-                f"A{last_row + i}": {"alignment": Alignment(horizontal="right")}
-                for i in range(1, len(summary_rows) + 1)
+                f"A{summary_start + i}": {"alignment": Alignment(horizontal="right")}
+                for i in range(0, len(summary_rows))
             },
             "B": {"number_format": "#,##0.00\\ €"},
             "D": {"alignment": Alignment(horizontal="right")},
@@ -672,10 +694,11 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
             "I": {"number_format": "#,##0.00\\ €"},
             "J": {
                 "alignment": Alignment(horizontal="right"),
+                # Change the font color depending on the text in the field
                 "font": {
-                    "Ei vapaudu": Font(color="FF0000"),
-                    "Ei voitu määrittää": Font(color="0000FF"),
-                    "Vapautuu": Font(color="00FF00"),
+                    "Ei vapaudu": Font(color="FF0000"),  # red
+                    "Vapautuu": Font(color="00FF00"),  # green
+                    "Ei voitu määrittää": Font(color="0000FF"),  # blue
                 },
             },
             "K": {"number_format": "DD.MM.YYYY"},
