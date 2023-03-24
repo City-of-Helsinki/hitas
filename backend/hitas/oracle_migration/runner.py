@@ -362,6 +362,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         #
         # Construction price index
         #
+        # Get all improvements from all maximum price calculations.
         cpi_improvements = list(
             connection.execute(
                 select(construction_price_indices, company_construction_price_indices)
@@ -369,10 +370,15 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
                     construction_price_indices,
                     (company_construction_price_indices.c.max_price_index_id == construction_price_indices.c.id),
                 )
-                .where(construction_price_indices.c.apartment_id == company_oracle_id)
+                .where(construction_price_indices.c.company_id == company_oracle_id)
                 .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
             )
         )
+        # Filter improvements to only the latest max price calculation.
+        cpi_improvements = [
+            i for i in cpi_improvements if i.max_price_index_id == cpi_improvements[0].max_price_index_id
+        ]
+
         for cpi_improvement in cpi_improvements:
             new = HousingCompanyConstructionPriceImprovement(
                 housing_company=housing_company.value,
@@ -390,6 +396,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         #
         # Market price index
         #
+        # Get all improvements from all maximum price calculations.
         mpi_improvements = list(
             connection.execute(
                 select(market_price_indices, company_market_price_indices, additional_infos)
@@ -398,10 +405,14 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
                     (company_market_price_indices.c.max_price_index_id == market_price_indices.c.id),
                 )
                 .join(additional_infos, isouter=True)
-                .where(market_price_indices.c.apartment_id == company_oracle_id)
+                .where(market_price_indices.c.company_id == company_oracle_id)
                 .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
             )
         )
+        # Filter improvements to only the latest max price calculation.
+        mpi_improvements = [
+            i for i in mpi_improvements if i.max_price_index_id == mpi_improvements[0].max_price_index_id
+        ]
 
         for mpi_improvement in mpi_improvements:
             # Can always be deduced from the improvement name
