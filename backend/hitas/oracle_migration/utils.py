@@ -14,7 +14,18 @@ TZ = pytz.timezone("Europe/Helsinki")
 
 
 def str_to_year_month(value: str) -> datetime.date:
-    return datetime.datetime.strptime(value, "%Y%m").date()
+    def parse_date(value: str):
+        return datetime.datetime.strptime(value, "%Y%m").date()
+
+    try:
+        return parse_date(value)
+    except ValueError:
+        # If an invalid value is given, try to make sense of the value.
+        # These are required due for the oracle migration.
+        if value[-1:-2] == "00":
+            return parse_date(value[:4] + "01")
+        elif len(value) == 4:
+            return parse_date(value + "01")
 
 
 def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
