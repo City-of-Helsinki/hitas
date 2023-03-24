@@ -120,7 +120,7 @@ class ConvertedData:
     developers_by_code_number: Dict[str, Developer] = None
     financing_methods_by_code_number: Dict[str, FinancingMethod] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
-    apartment_types_by_code_numer: Dict[str, ApartmentType] = None
+    apartment_types_by_code_number: Dict[str, ApartmentType] = None
 
     owners: Dict[OwnerKey, Owner] = None
 
@@ -187,7 +187,7 @@ def run(
             converted_data.financing_methods_by_code_number = create_codes(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
-            converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
+            converted_data.apartment_types_by_code_number = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Indices
             create_indices(codebooks_by_id["HITASEHIND"], MaximumPriceIndex)
@@ -498,7 +498,7 @@ def create_apartments(
         new = Apartment()
         new.building = building
         new.state = ApartmentState.SOLD
-        new.apartment_type = converted_data.apartment_types_by_code_numer[apartment["apartment_type_code"]]
+        new.apartment_type = converted_data.apartment_types_by_code_number[apartment["apartment_type_code"]]
         new.surface_area = apartment["surface_area"]
         new.street_address = apartment["street_address"]
         new.apartment_number = apartment["apartment_number"]
@@ -944,12 +944,15 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             )
         )
 
-    def create_sale_for_original_ownership(oracle_apartment, update_ownerships) -> None:
+    def create_sale_for_original_ownership(oracle_apartment, update_ownerships, use_completion_date=False) -> None:
         """Create a sale for an apartment that is never sold and still held by the original owner"""
+        purchase_date = (
+            oracle_apartment["first_purchase_date"] if not use_completion_date else oracle_apartment["completion_date"]
+        )
         sale = ApartmentSale(
             apartment=apartment,
-            notification_date=oracle_apartment["first_purchase_date"],
-            purchase_date=oracle_apartment["first_purchase_date"],
+            notification_date=purchase_date,
+            purchase_date=purchase_date,
             purchase_price=oracle_apartment["debt_free_purchase_price"],
             apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
             exclude_from_statistics=False,
@@ -1022,20 +1025,50 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
     for apartment_oracle_id, apartment in converted_data.apartments_by_oracle_id.items():
         oracle_apartment = get_oracle_apartment(apartment_oracle_id)
 
-        # Edge case, skip importing sales.
-        # These are apartments with missing data, incomplete apartments or rented apartments.
+        # Apartment is missing 'first_purchase_date' so it shouldn't be sold, but there are some edge cases.
         if not oracle_apartment["first_purchase_date"]:
+            if apartment.ownerships.count():
+                if not oracle_apartment["completion_date"]:
+                    print("Error! Apartment", oracle_apartment, "has owners, but no sale date or completion date.")
+                # Apartment is owned by someone, so it must have been sold, but is missing all sales data.
+                # Assume apartment was sold on the date it was completed
+                elif not oracle_apartment["latest_purchase_date"]:
+                    create_sale_for_original_ownership(
+                        oracle_apartment=oracle_apartment,
+                        update_ownerships=True,
+                        use_completion_date=True,
+                    )
+                    count += 1
+                    continue
+                # Apartment has an owner and a later sale, but is missing the original sale information.
+                # Create the original sale without creating owners (as they are unknown).
+                else:
+                    create_sale_for_original_ownership(
+                        oracle_apartment=oracle_apartment,
+                        update_ownerships=False,
+                        use_completion_date=True,
+                    )
+                    count += 1
+                    continue
+
+            # Apartment has not been sold ever. Update its catalog prices instead of creating sales
+            apartment.catalog_purchase_price = oracle_apartment["debt_free_purchase_price"]
+            apartment.catalog_primary_loan_amount = oracle_apartment["primary_loan_amount"]
+            apartment.save()
             continue
 
-        # Apartment has been bought, but never resold.
-        # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
-        if oracle_apartment["first_purchase_date"] and not oracle_apartment["latest_purchase_date"]:
-            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=True)
-            count += 1
-            continue
-        else:
-            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=False)
-            count += 1
+        elif oracle_apartment["first_purchase_date"]:
+            # Apartment has been bought, but never resold.
+            # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
+            if not oracle_apartment["latest_purchase_date"]:
+                create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=True)
+                count += 1
+                continue
+            # Apartment has at least one re-sale.
+            # Create the original sale without ownerships (as they are unknown).
+            else:
+                create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=False)
+                count += 1
 
         created_apartment_sales: dict[str, set[OwnerKey]] = {}  # Keep track of owners in this apartments sales
         current_owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
