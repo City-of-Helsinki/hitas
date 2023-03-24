@@ -308,7 +308,7 @@ hitas_monitoring = Table(
     Column("D_LASKPVM", Date, key="calculation_date"),
     Column("KG_EHIND", Integer, key="max_price_index_id", nullable=False),  # Actually FK to max price calculation table
     Column("D_ILMPVM", Date, key="notification_date", nullable=False),
-    Column("C_MYYJA", String(250), nullable=False),
+    Column("C_MYYJA", String(250), key="seller_name", nullable=False),
     Column("N_EHINTA", Integer, key="maximum_price", nullable=False),
     Column("N_KAUPHINTA", Integer, key="purchase_price", nullable=False),
     Column("D_KAUPPVM", Date, key="purchase_date"),

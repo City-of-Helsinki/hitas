@@ -1085,6 +1085,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             ):
                 continue
 
+            # When the seller is the same as the buyer, the sale can be skipped because it makes no sense.
+            if sale["seller_name"] == sale["buyer_name_1"] and sale["buyer_name_2"] is None:
+                continue
+
             # Special logic for the last active calculation if its missing data.
             if sale["monitoring_state"] == ApartmentSaleMonitoringState.ACTIVE.value and not sale["purchase_date"]:
                 # Check if the calculation was at valid the last time apartment was sold.
@@ -1142,7 +1146,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
 
                 # Check for duplicate owners, we don't want to create multiple sales to the same set of owners
                 if owner_keys in created_apartment_sales.values():
-                    print("Duplicate sale detected:", apartment_oracle_id, sale["id"])
+                    # When there are two sales with the same owner, assume the one without calculation_date is invalid
+                    if sale["calculation_date"] is None:
+                        continue
+                    print(f"Duplicate sale detected: ap: {apartment_oracle_id} sale: {sale['id']}, owners {owner_keys}")
                     continue
 
                 # If the sale buyers are the same as apartment current owners, this is the latest sale for the apartment
