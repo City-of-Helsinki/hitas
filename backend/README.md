@@ -68,8 +68,24 @@ Git will now automatically look for the file when using `git blame`, no addition
 
 ## Setting up Tunnistamo for development
 
+### Using remote Tunnistamo backend
+
+> You'll need a Microsoft account linked to the Helsinki City Active Directory to use this method.
+> If you are a developer for Hitas, you should be in the Active Directory.
+
+From [Azure Pipelines] -> Pipelines -> Library -> `hitastj-api-development`, copy
+`SOCIAL_AUTH_TUNNISTAMO_SECRET` to the same key in `backend/.env`. Make sure `OIDC_API_ISSUER`
+and `SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT` are both `https://tunnistamo.test.hel.ninja/openid`
+in `backend/.env`. Reboot the backend.
+
+You should now be able to log in at `http://localhost:<port>/helauth/login`, where `<port>`
+must be either 8080 or 8000. Other ports will not work, since only these ports have been
+configured at Tunnistamo's side.
+
+### Using local Tunnistamo backend
+
 > Currently, this only works if you run hitas backend locally. Docker setup has some networking
-> problems which prevent requests from reaching tunnistamo container from hitas backend container.
+> problems which prevent requests from reaching Tunnistamo container from Hitas backend container.
 
 [Tunnistamo] is set up using [git submodules]. You'll need to fetch the submodule separately
 on git pull or clone by adding the `--recurse-submodules` command line option.
@@ -81,7 +97,7 @@ In you code editor, you should exclude the `tunnistamo` folder from indexing, so
 refactoring tools won't try to touch files this folder. For example in PyCharm this is done by
 right-clicking on the folder -> `Mark Directory as` -> `Excluded`.
 
-Now make a local config for tunnistamo docker compose:
+Now make a local config for Tunnistamo docker compose:
 
 ```shell
 cp tunnistamo/docker-compose.env.yaml.template tunnistamo/docker-compose.env.yaml
@@ -94,9 +110,10 @@ Create a new client secret for the app and copy it to somewhere safe.
 Now, in `tunnistamo/docker-compose.env.yaml`, add `Client ID` and the `Client secret` from your
 GitHub OAuth app to `SOCIAL_AUTH_GITHUB_KEY` and `SOCIAL_AUTH_GITHUB_SECRET` respectively.
 
-You should be set up to re-run docker by running `docker-compose up --build --detach` on the root level.
-This will build the tunnistamo containers using the secrets you provided. Tunnistamo admin interface
-will be running on `localhost:8099/admin`. Log in using the username `admin` and password `admin`.
+You should be set up to re-run docker with `docker-compose --profile tunnistamo up --build --detach`
+on the root level. This will build the Tunnistamo containers using the secrets you provided.
+Tunnistamo admin interface will be running on `localhost:8099/admin`.
+Log in using the username `admin` and password `admin`.
 
 Modify the default `Project` client in `http://localhost:8099/admin/oidc_provider/client/` with
 the following settings:
@@ -105,11 +122,13 @@ the following settings:
   - Just some unique name
 - Redirect URIs: `http://localhost:<port>/pysocial/complete/tunnistamo/`
   - Change `<port>` to the port you will be running the local backend at, e.g. 8000
-- Client ID: `api.hel.fi/auth/hitas`x
+- Client ID: `hitas-django-admin-ui-dev`
   - Just some unique name, but it CANNOT have any colons (:) in it!
   - Should match `SOCIAL_AUTH_TUNNISTAMO_KEY` in `backend/.env`.
 
 Copy the `Client SECRET` to `SOCIAL_AUTH_TUNNISTAMO_SECRET` in `backend/.env`.
+Change `OIDC_API_ISSUER` and `SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT`
+to `http://localhost:8099/openid` in `backend/.env`.
 
 Start up the backend server on your local machine on `<port>`. You should now be able
 to log in at `http://localhost:<port>/helauth/login`.
@@ -117,3 +136,4 @@ to log in at `http://localhost:<port>/helauth/login`.
 [Tunnistamo]: https://github.com/City-of-Helsinki/tunnistamo
 [git submodules]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
 [Developer settings]: https://github.com/settings/developers
+[Azure Pipelines]: https://dev.azure.com/City-of-Helsinki/hitastj

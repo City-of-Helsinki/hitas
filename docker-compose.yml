@@ -76,6 +76,8 @@ services:
     container_name: hitas-oracle-db
 
   tunnistamo-postgres:
+    profiles:
+      - tunnistamo
     image: postgres:9.6-alpine
     ports:
       - "5401:5432"
@@ -88,6 +90,8 @@ services:
     container_name: tunnistamo-db
 
   tunnistamo-backend:
+    profiles:
+      - tunnistamo
     build:
       context: ./tunnistamo
       dockerfile: Dockerfile
