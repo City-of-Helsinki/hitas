@@ -940,6 +940,15 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             connection.execute(
                 select(hitas_monitoring)
                 .where(hitas_monitoring.c.apartment_id == apartment_oracle_id)
+                .where(
+                    hitas_monitoring.c.monitoring_state.in_(
+                        (
+                            ApartmentSaleMonitoringState.ACTIVE.value,
+                            ApartmentSaleMonitoringState.COMPLETE.value,
+                            ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                        )
+                    )
+                )
                 .order_by(asc(hitas_monitoring.c.purchase_date), asc(hitas_monitoring.c.id))
             )
         )
