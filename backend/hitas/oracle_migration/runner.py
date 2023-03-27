@@ -1132,8 +1132,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     purchase_date=sale["purchase_date"],
                     purchase_price=sale["purchase_price"],
                     apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
-                    exclude_from_statistics=sale["monitoring_state"]
-                    == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                    exclude_from_statistics=(
+                        sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value
+                        or sale["purchase_price"] == 0
+                    ),
                 )
 
                 buyers = get_or_create_buyers(sale)
