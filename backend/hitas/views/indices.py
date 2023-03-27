@@ -3,7 +3,7 @@ from typing import ClassVar
 
 from django.db.models import Q
 from django.http import HttpResponse
-from rest_framework import mixins, status
+from rest_framework import mixins, serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.request import Request
@@ -19,7 +19,7 @@ from hitas.models import (
     MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
-from hitas.models.indices import AbstractIndex
+from hitas.models.indices import AbstractIndex, SurfaceAreaPriceCeilingCalculationData
 from hitas.services.indices import (
     build_surface_area_price_ceiling_report_excel,
     calculate_surface_area_price_ceiling,
@@ -159,3 +159,60 @@ class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
         workbook = build_surface_area_price_ceiling_report_excel(results)
         filename = f"Rajaneliöhinnan laskentaraportti ({results.calculation_month.isoformat()}).xlsx"
         return get_excel_response(filename=filename, excel=workbook)
+
+
+class CreatedSAPCSerializer(serializers.Serializer):
+    month = serializers.DateField()
+    value = HitasDecimalField()
+
+
+class HousingCompanyDataSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    completion_date = serializers.DateField()
+    surface_area = HitasDecimalField()
+    realized_acquisition_price = HitasDecimalField()
+    unadjusted_average_price_per_square_meter = HitasDecimalField()
+    adjusted_average_price_per_square_meter = HitasDecimalField()
+    completion_month_index = HitasDecimalField()
+    calculation_month_index = HitasDecimalField()
+
+
+class CalculationDataSerializer(serializers.Serializer):
+    housing_company_data = HousingCompanyDataSerializer(many=True)
+    created_surface_area_price_ceilings = CreatedSAPCSerializer(many=True)
+
+
+class SurfaceAreaPriceCeilingCalculationDataSerializer(HitasModelSerializer):
+    calculation_month = serializers.DateField()
+    data = CalculationDataSerializer()
+
+    class Meta:
+        model = SurfaceAreaPriceCeilingCalculationData
+        fields = [
+            "calculation_month",
+            "data",
+        ]
+
+
+class SurfaceAreaPriceCeilingCalculationDataViewSet(
+    HitasModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet,
+):
+    serializer_class = SurfaceAreaPriceCeilingCalculationDataSerializer
+    lookup_field = "calculation_month"
+
+    def get_default_queryset(self):
+        return SurfaceAreaPriceCeilingCalculationData.objects.order_by("-calculation_month")
+
+    def get_object(self):
+        try:
+            self.kwargs["calculation_month"] = datetime.date.fromisoformat(self.kwargs["calculation_month"])
+        except (KeyError, ValueError):
+            raise ValidationError(
+                detail={"calculation_month": "Field has to be a valid month in format 'yyyy-mm'."},
+                code="invalid",
+            )
+
+        return super().get_object()

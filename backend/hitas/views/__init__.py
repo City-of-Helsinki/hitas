@@ -13,6 +13,7 @@ from hitas.views.indices import (
     MarketPriceIndex2005Equal100ViewSet,
     MarketPriceIndexViewSet,
     MaximumPriceIndexViewSet,
+    SurfaceAreaPriceCeilingCalculationDataViewSet,
     SurfaceAreaPriceCeilingViewSet,
 )
 from hitas.views.owner import OwnerViewSet

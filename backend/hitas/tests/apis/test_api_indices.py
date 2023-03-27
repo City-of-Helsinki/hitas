@@ -6,7 +6,8 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse
 from django.urls import reverse
-from openpyxl import Workbook, load_workbook
+from openpyxl.reader.excel import load_workbook
+from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
@@ -697,3 +698,134 @@ def test__api__indices__surface_area_price_ceiling__no_regulation_data(api_clien
         "reason": "Not Found",
         "status": 404,
     }
+
+
+# Surface area price ceiling calculation data
+
+
+@pytest.mark.django_db
+def test__api__indices__surface_area_price_ceiling_calculation_data__empty(api_client: HitasAPIClient):
+    url = reverse("hitas:surface-area-price-ceiling-calculation-data-list")
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "contents": [],
+        "page": {
+            "size": 0,
+            "current_page": 1,
+            "total_items": 0,
+            "total_pages": 1,
+            "links": {
+                "next": None,
+                "previous": None,
+            },
+        },
+    }
+
+
+@pytest.mark.django_db
+def test__api__indices__surface_area_price_ceiling_calculation_data__list(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+
+    data = CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name="Foo",
+                completion_date="2022-02-01",
+                surface_area=10.0,
+                realized_acquisition_price=60_000.0,
+                unadjusted_average_price_per_square_meter=6_000.0,
+                adjusted_average_price_per_square_meter=12_000.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+            HousingCompanyData(
+                name="Bar",
+                completion_date="2022-02-01",
+                surface_area=25.0,
+                realized_acquisition_price=40_000.0,
+                unadjusted_average_price_per_square_meter=1_600.0,
+                adjusted_average_price_per_square_meter=3_200.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+        ],
+        created_surface_area_price_ceilings=[
+            SurfaceAreaPriceCeilingResult(month="2023-02", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-03", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-04", value=7_600.0),
+        ],
+    )
+
+    SurfaceAreaPriceCeilingCalculationData.objects.create(data=data, calculation_month=this_month)
+
+    url = reverse("hitas:surface-area-price-ceiling-calculation-data-list")
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["contents"] == [
+        {"calculation_month": this_month.isoformat(), "data": data},
+    ]
+    assert response.json()["page"] == {
+        "size": 1,
+        "current_page": 1,
+        "total_items": 1,
+        "total_pages": 1,
+        "links": {
+            "next": None,
+            "previous": None,
+        },
+    }
+
+
+@pytest.mark.django_db
+def test__api__indices__surface_area_price_ceiling_calculation_data__retrieve(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+
+    data = CalculationData(
+        housing_company_data=[
+            HousingCompanyData(
+                name="Foo",
+                completion_date="2022-02-01",
+                surface_area=10.0,
+                realized_acquisition_price=60_000.0,
+                unadjusted_average_price_per_square_meter=6_000.0,
+                adjusted_average_price_per_square_meter=12_000.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+            HousingCompanyData(
+                name="Bar",
+                completion_date="2022-02-01",
+                surface_area=25.0,
+                realized_acquisition_price=40_000.0,
+                unadjusted_average_price_per_square_meter=1_600.0,
+                adjusted_average_price_per_square_meter=3_200.0,
+                completion_month_index=100.0,
+                calculation_month_index=200.0,
+            ),
+        ],
+        created_surface_area_price_ceilings=[
+            SurfaceAreaPriceCeilingResult(month="2023-02", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-03", value=7_600.0),
+            SurfaceAreaPriceCeilingResult(month="2023-04", value=7_600.0),
+        ],
+    )
+
+    SurfaceAreaPriceCeilingCalculationData.objects.create(data=data, calculation_month=this_month)
+
+    url = reverse(
+        "hitas:surface-area-price-ceiling-calculation-data-detail",
+        kwargs={"calculation_month": this_month.isoformat()},
+    )
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {"calculation_month": this_month.isoformat(), "data": data}
