@@ -131,7 +131,10 @@ def _save_calculation_data(
         ],
         created_surface_area_price_ceilings=surface_area_price_ceilings,
     )
-    return SurfaceAreaPriceCeilingCalculationData.objects.create(calculation_month=calculation_month, data=data)
+    return SurfaceAreaPriceCeilingCalculationData.objects.update_or_create(
+        calculation_month=calculation_month,
+        defaults={"data": data},
+    )
 
 
 def subquery_appropriate_cpi(outer_ref: str, financing_method_ref: str) -> Case:
