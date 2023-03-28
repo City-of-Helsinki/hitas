@@ -121,11 +121,18 @@ const LoadedApartmentSalesPage = ({
             if (!data.ownerships.length) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
+                    message: errorMessages.ownershipPercent,
+                });
+            }
+            const total = {value: 0};
+            data.ownerships.forEach((ownership) => (total.value += ownership.percentage));
+            if (total.value !== 100) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
                     message: errorMessages.noOwnerships,
                 });
             }
         });
-        // formSchema.final = formSchema.target?.refine((data) => data.ownerships.length);
         return zodResolver(refinedData)(data, context, {...options, mode: "sync"});
     };
     const saleForm = useForm({
@@ -206,7 +213,7 @@ const LoadedApartmentSalesPage = ({
         });
     };
     const onInvalidSubmit = (errors) => {
-        if (errors.purchase_price.type === "custom" && warningsGiven.purchase_price) {
+        if (errors.purchase_price?.type === "custom" && warningsGiven.purchase_price) {
             setWarningsGiven((prevState) => {
                 return {...prevState, purchase_price: false};
             });
@@ -235,6 +242,7 @@ const LoadedApartmentSalesPage = ({
     };
     const hasValidOwnerships = !ownershipErrors.percentage && !ownershipErrors.noOwners;
     const purchasePrice = watch("purchase_price");
+    watch(["purchase_date", "notification_date"]);
     const loanShare = watch("apartment_share_of_housing_company_loans");
 
     const hasCalculation = !!maxPriceCalculation || !!maxPriceData;
@@ -336,6 +344,7 @@ const LoadedApartmentSalesPage = ({
                         <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
                     </div>
                 </div>
+
                 <div className="row row--prompt">
                     <p>
                         Enimmäishinnat on laskettu{" "}
@@ -450,6 +459,7 @@ const LoadedApartmentSalesPage = ({
                         />
                     </form>
                 </Fieldset>
+
                 <Fieldset
                     heading={`Enimmäishintalaskelma ${
                         maxPriceCalculation
@@ -480,6 +490,7 @@ const LoadedApartmentSalesPage = ({
                     />
                 </Fieldset>
             </div>
+
             <div className="row row--buttons">
                 <NavigateBackButton />
                 <SaveButton
@@ -488,6 +499,7 @@ const LoadedApartmentSalesPage = ({
                     disabled={!isDirty || isSavingDisabled}
                 />
             </div>
+
             <Dialog
                 id="maximum-price-confirmation-modal"
                 closeButtonLabelText=""
@@ -518,6 +530,7 @@ const LoadedApartmentSalesPage = ({
                     />
                 </QueryStateHandler>
             </Dialog>
+
             <ConfirmDialogModal
                 successText="Kauppa tallennettu varoituksesta huolimatta"
                 isLoading={isLoading}
@@ -537,7 +550,7 @@ const LoadedApartmentSalesPage = ({
 };
 
 const MaxPriceCalculationLoader = ({apartment}) => {
-    const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
+    const hasValidCalculation = !!apartment.prices.maximum_prices.confirmed?.valid.is_valid;
 
     const {data, error, isLoading} = useGetApartmentMaximumPriceQuery({
         housingCompanyId: apartment.links.housing_company.id,
@@ -552,30 +565,27 @@ const MaxPriceCalculationLoader = ({apartment}) => {
         </>
     );
 
-    if (hasValidCalculation) {
-        return (
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <SalesHeading />
-                <LoadedApartmentSalesPage
-                    maxPriceCalculation={data as IApartmentMaximumPrice}
-                    apartment={apartment}
-                />
-            </QueryStateHandler>
-        );
-    } else
-        return (
-            <>
-                <SalesHeading />
-                <LoadedApartmentSalesPage
-                    maxPriceCalculation={null}
-                    apartment={apartment}
-                />
-            </>
-        );
+    return hasValidCalculation ? (
+        <QueryStateHandler
+            data={data}
+            error={error}
+            isLoading={isLoading}
+        >
+            <SalesHeading />
+            <LoadedApartmentSalesPage
+                maxPriceCalculation={data as IApartmentMaximumPrice}
+                apartment={apartment}
+            />
+        </QueryStateHandler>
+    ) : (
+        <>
+            <SalesHeading />
+            <LoadedApartmentSalesPage
+                maxPriceCalculation={null}
+                apartment={apartment}
+            />
+        </>
+    );
 };
 
 const ApartmentSalesPage = () => {
