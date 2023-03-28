@@ -99,7 +99,6 @@ const LoadedApartmentSalesPage = ({
     const formOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
 
     const [warningsGiven, setWarningsGiven] = useState({purchase_price: false, has_loan_share_changed: false});
-    // const isUnderMaxPrice = (data) => Number(data.purchase_price ?? data) <= Number(maxPrices.maximumPrice);
 
     // React hook form
     const resolver = (data, context, options) => {
@@ -125,7 +124,6 @@ const LoadedApartmentSalesPage = ({
                 });
             }
         });
-        // formSchema.final = formSchema.target?.refine((data) => data.ownerships.length);
         return zodResolver(refinedData)(data, context, {...options, mode: "sync"});
     };
     const saleForm = useForm({
@@ -187,7 +185,7 @@ const LoadedApartmentSalesPage = ({
         saveConfirmedSale(saleForm.getValues(), apartment);
     };
 
-    // Handle sale form submi
+    // Handle sale form submit button
     const saveConfirmedSale = (data, apartment) => {
         setIsWarningModalVisible(() => false);
         saveSale({
@@ -299,15 +297,6 @@ const LoadedApartmentSalesPage = ({
         }).then(() => updateMaxPrices());
     };
 
-    // TODO: show user a dialog window asking to confirm saving an "invalid" sale
-    /*
-    useEffect(() => {
-        const isPriceOK = purchasePrice <= (maxPrices.maximumPrice as number);
-        if (!allowedErrors.purchase_price && !isPriceOK) {
-            setError("purchase_price", {type: "custom", message: errorMessages.overMaxPrice}, {shouldFocus: true});
-        }
-    }, [purchasePrice, maxPrices.maximumPrice, allowedErrors.purchase_price, setError]);
-*/
     // *************************
     // * Functional components *
     // *************************

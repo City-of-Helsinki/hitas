@@ -27,8 +27,6 @@ const NumberInput = ({
     } = formObject;
     const formNumber = register(name, {valueAsNumber: true, ...registerOptions});
 
-    // TODO?: Format the value to only accept numbers (and a fraction)
-
     const handleWheel = (e) => {
         if (document.activeElement === e.target) {
             e.target.blur();
