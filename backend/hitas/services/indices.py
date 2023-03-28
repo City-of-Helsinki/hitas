@@ -113,7 +113,7 @@ def _save_calculation_data(
     indices: dict[Literal["old", "new"], dict[datetime.date, Decimal]],
     unadjusted_prices: dict[str, Optional[Decimal]],
     surface_area_price_ceilings: list[SurfaceAreaPriceCeilingResult],
-) -> SurfaceAreaPriceCeilingCalculationData:
+) -> tuple[SurfaceAreaPriceCeilingCalculationData, bool]:
     data = CalculationData(
         housing_company_data=[
             HousingCompanyData(

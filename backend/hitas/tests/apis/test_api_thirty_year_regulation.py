@@ -108,9 +108,10 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    # 11. Save thirty year regulation results
-    # 12. Save thirty year regulation results' rows
-    with count_queries(12, list_queries_on_failure=True):
+    # 11. Select thirty year regulation results for update
+    # 12. Save thirty year regulation results
+    # 13. Save thirty year regulation results' rows
+    with count_queries(13, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -234,9 +235,10 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    # 11. Save thirty year regulation results
-    # 12. Save thirty year regulation results' rows
-    with count_queries(12, list_queries_on_failure=True):
+    # 11. Select thirty year regulation results for update
+    # 12. Save thirty year regulation results
+    # 13. Save thirty year regulation results' rows
+    with count_queries(13, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
