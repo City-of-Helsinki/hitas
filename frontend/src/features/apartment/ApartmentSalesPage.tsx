@@ -235,6 +235,7 @@ const LoadedApartmentSalesPage = ({
     };
     const hasValidOwnerships = !ownershipErrors.percentage && !ownershipErrors.noOwners;
     const purchasePrice = watch("purchase_price");
+    watch(["purchase_date", "notification_date"]);
     const loanShare = watch("apartment_share_of_housing_company_loans");
 
     const hasCalculation = !!maxPriceCalculation || !!maxPriceData;
