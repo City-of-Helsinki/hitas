@@ -17934,21 +17934,55 @@
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-02-01",
     "fields": {
-      "value": "4621.00"
+      "value": "1127.00"
     }
   },
   {
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-03-01",
     "fields": {
-      "value": "4621.00"
+      "value": "1127.00"
     }
   },
   {
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-04-01",
     "fields": {
-      "value": "4621.00"
+      "value": "1127.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceilingcalculationdata",
+    "pk": "2023-02-01",
+    "fields": {
+      "data": {
+        "housing_company_data": [
+          {
+            "name": "Helsingin Rumpupolun palvelutalo",
+            "surface_area": 60,
+            "completion_date": "2014-06-02",
+            "completion_month_index": 450.5,
+            "calculation_month_index": 554.1,
+            "realized_acquisition_price": 55000,
+            "adjusted_average_price_per_square_meter": 1127.47,
+            "unadjusted_average_price_per_square_meter": 916.6666666666666
+          }
+        ],
+        "created_surface_area_price_ceilings": [
+          {
+            "month": "2023-02",
+            "value": 1127
+          },
+          {
+            "month": "2023-03",
+            "value": 1127
+          },
+          {
+            "month": "2023-04",
+            "value": 1127
+          }
+        ]
+      }
     }
   },
   {
@@ -17998,7 +18032,7 @@
     "pk": "09a0a600-a62d-44bd-b9ef-ab446eeccb28",
     "fields": {
       "password": "pbkdf2_sha256$260000$xvX96pF721GWiJFcQY1WXC$JENWBbbMKKhn1hLvUKXyJqgmNschtW4+MpNk55x71rs=",
-      "last_login": "2022-12-27T09:10:04.543Z",
+      "last_login": "2023-03-28T11:58:09.455Z",
       "is_superuser": true,
       "username": "hitas",
       "first_name": "",
