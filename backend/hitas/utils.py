@@ -13,6 +13,8 @@ from openpyxl.cell import Cell
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
+from hitas.models._base import HitasModelDecimalField
+
 
 class RoundWithPrecision(Round):
     """Implement round from Django 4.0
@@ -252,3 +254,14 @@ def _set_cell_attribute(cell: Cell, key: str, value: Any) -> None:
         return
 
     setattr(cell, key, val)
+
+
+class SQSum(Subquery):
+    """Refs. (https://stackoverflow.com/a/58001368)"""
+
+    template = "(SELECT SUM(%(sum_field)s) FROM (%(subquery)s) _sum)"
+    output_field = HitasModelDecimalField()
+
+    def __init__(self, queryset, output_field=None, *, sum_field="", **extra):
+        extra["sum_field"] = sum_field
+        super().__init__(queryset, output_field, **extra)

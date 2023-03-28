@@ -43,7 +43,7 @@ def get_completed_housing_companies(
         )
         .alias(
             _first_sale_prices=subquery_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
-            _catalog_prices=aggregate_catalog_prices_where_no_sales("real_estates__buildings__apartments__"),
+            _catalog_prices=aggregate_catalog_prices_where_no_sales(),
         )
         .annotate(
             realized_acquisition_price=ExpressionWrapper(
