@@ -120,6 +120,14 @@ const LoadedApartmentSalesPage = ({
             if (!data.ownerships.length) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
+                    message: errorMessages.ownershipPercent,
+                });
+            }
+            const total = {value: 0};
+            data.ownerships.forEach((ownership) => (total.value += ownership.percentage));
+            if (total.value !== 100) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
                     message: errorMessages.noOwnerships,
                 });
             }
@@ -205,7 +213,7 @@ const LoadedApartmentSalesPage = ({
         });
     };
     const onInvalidSubmit = (errors) => {
-        if (errors.purchase_price.type === "custom" && warningsGiven.purchase_price) {
+        if (errors.purchase_price?.type === "custom" && warningsGiven.purchase_price) {
             setWarningsGiven((prevState) => {
                 return {...prevState, purchase_price: false};
             });
