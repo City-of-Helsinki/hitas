@@ -120,7 +120,7 @@ class ConvertedData:
     developers_by_code_number: Dict[str, Developer] = None
     financing_methods_by_code_number: Dict[str, FinancingMethod] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
-    apartment_types_by_code_numer: Dict[str, ApartmentType] = None
+    apartment_types_by_code_number: Dict[str, ApartmentType] = None
 
     owners: Dict[OwnerKey, Owner] = None
 
@@ -187,7 +187,7 @@ def run(
             converted_data.financing_methods_by_code_number = create_codes(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
-            converted_data.apartment_types_by_code_numer = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
+            converted_data.apartment_types_by_code_number = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Indices
             create_indices(codebooks_by_id["HITASEHIND"], MaximumPriceIndex)
@@ -362,6 +362,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         #
         # Construction price index
         #
+        # Get all improvements from all maximum price calculations.
         cpi_improvements = list(
             connection.execute(
                 select(construction_price_indices, company_construction_price_indices)
@@ -369,10 +370,15 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
                     construction_price_indices,
                     (company_construction_price_indices.c.max_price_index_id == construction_price_indices.c.id),
                 )
-                .where(construction_price_indices.c.apartment_id == company_oracle_id)
+                .where(construction_price_indices.c.company_id == company_oracle_id)
                 .order_by(desc(construction_price_indices.c.calculation_date), desc(construction_price_indices.c.id))
             )
         )
+        # Filter improvements to only the latest max price calculation.
+        cpi_improvements = [
+            i for i in cpi_improvements if i.max_price_index_id == cpi_improvements[0].max_price_index_id
+        ]
+
         for cpi_improvement in cpi_improvements:
             new = HousingCompanyConstructionPriceImprovement(
                 housing_company=housing_company.value,
@@ -390,6 +396,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
         #
         # Market price index
         #
+        # Get all improvements from all maximum price calculations.
         mpi_improvements = list(
             connection.execute(
                 select(market_price_indices, company_market_price_indices, additional_infos)
@@ -398,10 +405,14 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
                     (company_market_price_indices.c.max_price_index_id == market_price_indices.c.id),
                 )
                 .join(additional_infos, isouter=True)
-                .where(market_price_indices.c.apartment_id == company_oracle_id)
+                .where(market_price_indices.c.company_id == company_oracle_id)
                 .order_by(desc(market_price_indices.c.calculation_date), desc(market_price_indices.c.id))
             )
         )
+        # Filter improvements to only the latest max price calculation.
+        mpi_improvements = [
+            i for i in mpi_improvements if i.max_price_index_id == mpi_improvements[0].max_price_index_id
+        ]
 
         for mpi_improvement in mpi_improvements:
             # Can always be deduced from the improvement name
@@ -487,7 +498,7 @@ def create_apartments(
         new = Apartment()
         new.building = building
         new.state = ApartmentState.SOLD
-        new.apartment_type = converted_data.apartment_types_by_code_numer[apartment["apartment_type_code"]]
+        new.apartment_type = converted_data.apartment_types_by_code_number[apartment["apartment_type_code"]]
         new.surface_area = apartment["surface_area"]
         new.street_address = apartment["street_address"]
         new.apartment_number = apartment["apartment_number"]
@@ -929,17 +940,29 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             connection.execute(
                 select(hitas_monitoring)
                 .where(hitas_monitoring.c.apartment_id == apartment_oracle_id)
+                .where(
+                    hitas_monitoring.c.monitoring_state.in_(
+                        (
+                            ApartmentSaleMonitoringState.ACTIVE.value,
+                            ApartmentSaleMonitoringState.COMPLETE.value,
+                            ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                        )
+                    )
+                )
                 .order_by(asc(hitas_monitoring.c.purchase_date), asc(hitas_monitoring.c.id))
             )
         )
 
-    def create_sale_for_original_ownership(oracle_apartment, update_ownerships) -> None:
+    def create_sale_for_original_ownership(oracle_apartment, update_ownerships, use_completion_date=False) -> None:
         """Create a sale for an apartment that is never sold and still held by the original owner"""
+        purchase_date = (
+            oracle_apartment["first_purchase_date"] if not use_completion_date else oracle_apartment["completion_date"]
+        )
         sale = ApartmentSale(
             apartment=apartment,
-            notification_date=oracle_apartment["first_purchase_date"],
-            purchase_date=oracle_apartment["first_purchase_date"],
-            purchase_price=oracle_apartment["purchase_price"],
+            notification_date=purchase_date,
+            purchase_date=purchase_date,
+            purchase_price=oracle_apartment["debt_free_purchase_price"],
             apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
             exclude_from_statistics=False,
         )
@@ -1011,20 +1034,50 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
     for apartment_oracle_id, apartment in converted_data.apartments_by_oracle_id.items():
         oracle_apartment = get_oracle_apartment(apartment_oracle_id)
 
-        # Edge case, skip importing sales.
-        # These are apartments with missing data, incomplete apartments or rented apartments.
+        # Apartment is missing 'first_purchase_date' so it shouldn't be sold, but there are some edge cases.
         if not oracle_apartment["first_purchase_date"]:
+            if apartment.ownerships.count():
+                if not oracle_apartment["completion_date"]:
+                    print("Error! Apartment", oracle_apartment, "has owners, but no sale date or completion date.")
+                # Apartment is owned by someone, so it must have been sold, but is missing all sales data.
+                # Assume apartment was sold on the date it was completed
+                elif not oracle_apartment["latest_purchase_date"]:
+                    create_sale_for_original_ownership(
+                        oracle_apartment=oracle_apartment,
+                        update_ownerships=True,
+                        use_completion_date=True,
+                    )
+                    count += 1
+                    continue
+                # Apartment has an owner and a later sale, but is missing the original sale information.
+                # Create the original sale without creating owners (as they are unknown).
+                else:
+                    create_sale_for_original_ownership(
+                        oracle_apartment=oracle_apartment,
+                        update_ownerships=False,
+                        use_completion_date=True,
+                    )
+                    count += 1
+                    continue
+
+            # Apartment has not been sold ever. Update its catalog prices instead of creating sales
+            apartment.catalog_purchase_price = oracle_apartment["debt_free_purchase_price"]
+            apartment.catalog_primary_loan_amount = oracle_apartment["primary_loan_amount"]
+            apartment.save()
             continue
 
-        # Apartment has been bought, but never resold.
-        # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
-        if oracle_apartment["first_purchase_date"] and not oracle_apartment["latest_purchase_date"]:
-            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=True)
-            count += 1
-            continue
-        else:
-            create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=False)
-            count += 1
+        elif oracle_apartment["first_purchase_date"]:
+            # Apartment has been bought, but never resold.
+            # All necessary data to create a sale is in apartment fields (and no sales records should even exist).
+            if not oracle_apartment["latest_purchase_date"]:
+                create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=True)
+                count += 1
+                continue
+            # Apartment has at least one re-sale.
+            # Create the original sale without ownerships (as they are unknown).
+            else:
+                create_sale_for_original_ownership(oracle_apartment=oracle_apartment, update_ownerships=False)
+                count += 1
 
         created_apartment_sales: dict[str, set[OwnerKey]] = {}  # Keep track of owners in this apartments sales
         current_owner_keys = {OwnerKey(o.owner.identifier, o.owner.name) for o in apartment.ownerships.all()}
@@ -1039,6 +1092,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             if sale["monitoring_state"] != ApartmentSaleMonitoringState.ACTIVE.value and (
                 not sale["purchase_date"] or not sale["buyer_name_1"] or sale["buyer_name_1"] == "Ei tiedossa"
             ):
+                continue
+
+            # When the seller is the same as the buyer, the sale can be skipped because it makes no sense.
+            if sale["seller_name"] == sale["buyer_name_1"] and sale["buyer_name_2"] is None:
                 continue
 
             # Special logic for the last active calculation if its missing data.
@@ -1075,8 +1132,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     purchase_date=sale["purchase_date"],
                     purchase_price=sale["purchase_price"],
                     apartment_share_of_housing_company_loans=sale["apartment_share_of_housing_company_loans"],
-                    exclude_from_statistics=sale["monitoring_state"]
-                    == ApartmentSaleMonitoringState.RELATIVE_SALE.value,
+                    exclude_from_statistics=(
+                        sale["monitoring_state"] == ApartmentSaleMonitoringState.RELATIVE_SALE.value
+                        or sale["purchase_price"] == 0
+                    ),
                 )
 
                 buyers = get_or_create_buyers(sale)
@@ -1098,7 +1157,10 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
 
                 # Check for duplicate owners, we don't want to create multiple sales to the same set of owners
                 if owner_keys in created_apartment_sales.values():
-                    print("Duplicate sale detected:", apartment_oracle_id, sale["id"])
+                    # When there are two sales with the same owner, assume the one without calculation_date is invalid
+                    if sale["calculation_date"] is None:
+                        continue
+                    print(f"Duplicate sale detected: ap: {apartment_oracle_id} sale: {sale['id']}, owners {owner_keys}")
                     continue
 
                 # If the sale buyers are the same as apartment current owners, this is the latest sale for the apartment
