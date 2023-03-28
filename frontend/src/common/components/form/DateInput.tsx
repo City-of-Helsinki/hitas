@@ -1,6 +1,7 @@
 import {format, parse} from "date-fns";
 import {DateInput as HDSDateInput} from "hds-react";
 
+import {useEffect} from "react";
 import {FormInputProps} from "./";
 
 interface DateInputProps extends FormInputProps {
@@ -9,11 +10,12 @@ interface DateInputProps extends FormInputProps {
 }
 
 const DateInput = ({id, name, label, required, maxDate, minDate, formObject}: DateInputProps) => {
-    const hdsFormat = "dd.MM.yyyy";
+    const hdsFormat = "d.M.yyyy";
     const apiFormat = "yyyy-MM-dd";
 
     const {
         register,
+        resetField,
         formState: {errors},
     } = formObject;
     const formDate = register(name);
@@ -42,6 +44,10 @@ const DateInput = ({id, name, label, required, maxDate, minDate, formObject}: Da
             formObject.setValue(formDate.name, newValue, true);
         }
     };
+
+    // react-hook-form forces the initial value into the field without formatting.
+    // This is a small hack to refresh the component to apply date formatting.
+    useEffect(() => resetField(formDate.name), [resetField, formDate.name]);
 
     return (
         <div className={`input-field input-field--date${required ? " input-field--required" : ""}`}>
