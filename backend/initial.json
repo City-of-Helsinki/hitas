@@ -417,8 +417,8 @@
       "name": "Officiis architecto numquam maxime.",
       "completion_date": "2011-03-01",
       "value": "20697.00",
-      "apartment": 1,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 1
     }
   },
   {
@@ -430,8 +430,8 @@
       "name": "Consectetur architecto ipsa quas debitis.",
       "completion_date": "2011-12-01",
       "value": "65252.00",
-      "apartment": 2,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 2
     }
   },
   {
@@ -443,8 +443,8 @@
       "name": "Ab quibusdam soluta laudantium eveniet inventore fugiat.",
       "completion_date": "2011-09-01",
       "value": "15030.00",
-      "apartment": 2,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 2
     }
   },
   {
@@ -456,8 +456,8 @@
       "name": "Dolor fugiat dolores quo quae.",
       "completion_date": "2014-07-01",
       "value": "7568.00",
-      "apartment": 3,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 3
     }
   },
   {
@@ -469,8 +469,8 @@
       "name": "Fugit ratione distinctio voluptate iste facilis similique.",
       "completion_date": "2016-08-01",
       "value": "6599.00",
-      "apartment": 4,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 4
     }
   },
   {
@@ -482,8 +482,8 @@
       "name": "Ab explicabo debitis adipisci unde facilis.",
       "completion_date": "2017-11-01",
       "value": "34980.00",
-      "apartment": 5,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 5
     }
   },
   {
@@ -495,8 +495,8 @@
       "name": "Dolorum ratione unde.",
       "completion_date": "2012-07-01",
       "value": "11651.00",
-      "apartment": 6,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 6
     }
   },
   {
@@ -508,6 +508,7 @@
       "name": "Sequi neque ut velit sint libero nihil.",
       "completion_date": "2012-10-01",
       "value": "85990.00",
+      "no_deductions": false,
       "apartment": 6
     }
   },
@@ -520,8 +521,8 @@
       "name": "Incidunt asperiores repellat quisquam quibusdam.",
       "completion_date": "2020-11-01",
       "value": "96998.00",
-      "apartment": 6,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 6
     }
   },
   {
@@ -533,8 +534,8 @@
       "name": "Illum recusandae ducimus libero quas sed.",
       "completion_date": "2012-07-01",
       "value": "75447.00",
-      "apartment": 7,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 7
     }
   },
   {
@@ -546,8 +547,8 @@
       "name": "Consequatur natus culpa molestiae voluptate distinctio.",
       "completion_date": "2020-06-01",
       "value": "10604.00",
-      "apartment": 7,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 7
     }
   },
   {
@@ -559,8 +560,8 @@
       "name": "Nemo magni mollitia sint numquam quas unde.",
       "completion_date": "2015-01-01",
       "value": "62621.00",
-      "apartment": 8,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 8
     }
   },
   {
@@ -572,8 +573,8 @@
       "name": "Enim perspiciatis sequi dolorum ab.",
       "completion_date": "2019-03-01",
       "value": "22659.00",
-      "apartment": 8,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 8
     }
   },
   {
@@ -585,8 +586,68 @@
       "name": "Commodi repudiandae recusandae nam.",
       "completion_date": "2016-02-01",
       "value": "51857.00",
-      "apartment": 8,
-      "no_deductions": false
+      "no_deductions": false,
+      "apartment": 8
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "b637e121-fcd5-4de4-8ee3-4abfa907d0f5",
+      "apartment": 1,
+      "notification_date": "2014-06-02",
+      "purchase_date": "2014-06-02",
+      "purchase_price": "11000.00",
+      "apartment_share_of_housing_company_loans": "44000.00",
+      "exclude_from_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "d4226a59-8f6c-4273-b6e4-aa02a5d07a50",
+      "apartment": 1,
+      "notification_date": "2015-06-02",
+      "purchase_date": "2015-06-02",
+      "purchase_price": "22000.00",
+      "apartment_share_of_housing_company_loans": "0.00",
+      "exclude_from_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 3,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "3298a8bc-cec0-44a1-a2e5-7b843fb4ba63",
+      "apartment": 2,
+      "notification_date": "2022-12-06",
+      "purchase_date": "2022-12-06",
+      "purchase_price": "198680.00",
+      "apartment_share_of_housing_company_loans": "15222953.00",
+      "exclude_from_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 4,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "ee0e3665-0913-4bd0-b1e8-e842906b5cae",
+      "apartment": 2,
+      "notification_date": "2022-12-15",
+      "purchase_date": "2022-12-15",
+      "purchase_price": "143535.00",
+      "apartment_share_of_housing_company_loans": "0.00",
+      "exclude_from_statistics": false
     }
   },
   {
@@ -6334,6 +6395,13 @@
   },
   {
     "model": "hitas.constructionpriceindex",
+    "pk": "2022-10-01",
+    "fields": {
+      "value": "364.60"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
     "pk": "2022-11-01",
     "fields": {
       "value": "370.00"
@@ -6351,6 +6419,27 @@
     "pk": "2023-01-01",
     "fields": {
       "value": "370.00"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-02-01",
+    "fields": {
+      "value": "364.80"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-03-01",
+    "fields": {
+      "value": "364.80"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-04-01",
+    "fields": {
+      "value": "364.80"
     }
   },
   {
@@ -7873,6 +7962,27 @@
     }
   },
   {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-02-01",
+    "fields": {
+      "value": "149.30"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-03-01",
+    "fields": {
+      "value": "149.30"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-04-01",
+    "fields": {
+      "value": "149.30"
+    }
+  },
+  {
     "model": "hitas.developer",
     "pk": 5,
     "fields": {
@@ -9343,8 +9453,8 @@
       "name": "Rem inventore aperiam odio voluptate quidem.",
       "completion_date": "2015-10-28",
       "value": "16124.00",
-      "housing_company": 1,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 1
     }
   },
   {
@@ -9356,8 +9466,8 @@
       "name": "Dignissimos dolores temporibus facilis.",
       "completion_date": "2017-09-22",
       "value": "8767.00",
-      "housing_company": 1,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 1
     }
   },
   {
@@ -9369,8 +9479,8 @@
       "name": "Ipsam explicabo praesentium ducimus quas ab repellendus.",
       "completion_date": "2017-12-15",
       "value": "87670.00",
-      "housing_company": 2,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 2
     }
   },
   {
@@ -9382,8 +9492,8 @@
       "name": "Nulla quia quam iusto quos at quia.",
       "completion_date": "2020-07-19",
       "value": "90306.00",
-      "housing_company": 3,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 3
     }
   },
   {
@@ -9395,8 +9505,8 @@
       "name": "Suscipit laudantium nesciunt.",
       "completion_date": "2015-02-22",
       "value": "91049.00",
-      "housing_company": 4,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 4
     }
   },
   {
@@ -9408,8 +9518,8 @@
       "name": "Labore odio in.",
       "completion_date": "2020-12-30",
       "value": "52437.00",
-      "housing_company": 5,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 5
     }
   },
   {
@@ -9421,8 +9531,8 @@
       "name": "Quo ipsam animi voluptatem necessitatibus minus perspiciatis reprehenderit.",
       "completion_date": "2015-07-28",
       "value": "83605.00",
-      "housing_company": 5,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 5
     }
   },
   {
@@ -9434,8 +9544,8 @@
       "name": "Quo error eveniet quis esse illo doloremque.",
       "completion_date": "2016-05-09",
       "value": "78534.00",
-      "housing_company": 6,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 6
     }
   },
   {
@@ -9447,8 +9557,8 @@
       "name": "Praesentium praesentium est illo minus ad.",
       "completion_date": "2011-03-22",
       "value": "11299.00",
-      "housing_company": 7,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 7
     }
   },
   {
@@ -9460,8 +9570,8 @@
       "name": "Cum quia amet deserunt voluptate.",
       "completion_date": "2014-09-25",
       "value": "99019.00",
-      "housing_company": 7,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 7
     }
   },
   {
@@ -9473,8 +9583,8 @@
       "name": "Ab neque adipisci.",
       "completion_date": "2016-06-12",
       "value": "26177.00",
-      "housing_company": 7,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 7
     }
   },
   {
@@ -9486,8 +9596,8 @@
       "name": "Iure libero et reiciendis eius.",
       "completion_date": "2020-10-01",
       "value": "52257.00",
-      "housing_company": 8,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 8
     }
   },
   {
@@ -9499,8 +9609,8 @@
       "name": "Inventore reiciendis cumque illum ratione aspernatur corrupti.",
       "completion_date": "2018-01-09",
       "value": "25121.00",
-      "housing_company": 8,
-      "no_deductions": false
+      "no_deductions": false,
+      "housing_company": 8
     }
   },
   {
@@ -13263,6 +13373,27 @@
     }
   },
   {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-02-01",
+    "fields": {
+      "value": "554.10"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-03-01",
+    "fields": {
+      "value": "554.10"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-04-01",
+    "fields": {
+      "value": "554.10"
+    }
+  },
+  {
     "model": "hitas.marketpriceindex2005equal100",
     "pk": "2005-05-01",
     "fields": {
@@ -14754,6 +14885,27 @@
     }
   },
   {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-02-01",
+    "fields": {
+      "value": "179.60"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-03-01",
+    "fields": {
+      "value": "179.60"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-04-01",
+    "fields": {
+      "value": "179.60"
+    }
+  },
+  {
     "model": "hitas.owner",
     "pk": 1,
     "fields": {
@@ -14877,62 +15029,6 @@
       "valid_identifier": false,
       "email": null,
       "bypass_conditions_of_sale": false
-    }
-  },
-  {
-    "model": "hitas.apartmentsale",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 1,
-      "notification_date": "2014-06-02",
-      "purchase_date": "2014-06-02",
-      "purchase_price": "11000.00",
-      "apartment_share_of_housing_company_loans": "44000.00",
-      "exclude_from_statistics": false
-    }
-  },
-  {
-    "model": "hitas.apartmentsale",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 1,
-      "notification_date": "2015-06-02",
-      "purchase_date": "2015-06-02",
-      "purchase_price": "22000.00",
-      "apartment_share_of_housing_company_loans": "0.00",
-      "exclude_from_statistics": false
-    }
-  },
-  {
-    "model": "hitas.apartmentsale",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 2,
-      "notification_date": "2022-12-06",
-      "purchase_date": "2022-12-06",
-      "purchase_price": "198680.00",
-      "apartment_share_of_housing_company_loans": "15222953.00",
-      "exclude_from_statistics": false
-    }
-  },
-  {
-    "model": "hitas.apartmentsale",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "apartment": 2,
-      "notification_date": "2022-12-15",
-      "purchase_date": "2022-12-15",
-      "purchase_price": "143535.00",
-      "apartment_share_of_housing_company_loans": "0.00",
-      "exclude_from_statistics": false
     }
   },
   {
@@ -15163,8 +15259,8 @@
       "deleted_by_cascade": false,
       "uuid": "a20254d4-b3ea-4f25-a509-f4f081d9e446",
       "housing_company": 1,
-      "property_identifier": "091-020-0015-0003",
-      "street_address": "Fakestreet 123"
+      "street_address": "Fakestreet 123",
+      "property_identifier": "091-020-0015-0003"
     }
   },
   {
@@ -15175,8 +15271,8 @@
       "deleted_by_cascade": false,
       "uuid": "5a62b822-5ee2-40ce-aa6e-49644f77ec45",
       "housing_company": 2,
-      "property_identifier": "6535-9995-1426-4929",
-      "street_address": "Betleheminkuja 300"
+      "street_address": "Betleheminkuja 300",
+      "property_identifier": "6535-9995-1426-4929"
     }
   },
   {
@@ -15187,8 +15283,8 @@
       "deleted_by_cascade": false,
       "uuid": "6a21e0f1-9ad5-49f8-8f0a-94a096a5eac4",
       "housing_company": 3,
-      "property_identifier": "4510-9520-6441-3392",
-      "street_address": "Malminkartanonbulevardi 575"
+      "street_address": "Malminkartanonbulevardi 575",
+      "property_identifier": "4510-9520-6441-3392"
     }
   },
   {
@@ -15199,8 +15295,8 @@
       "deleted_by_cascade": false,
       "uuid": "4a8e7cf0-3a7e-45cb-a4fe-a3285799dafa",
       "housing_company": 4,
-      "property_identifier": "2059-2641-8704-8619",
-      "street_address": "Uurtajanpolku 782"
+      "street_address": "Uurtajanpolku 782",
+      "property_identifier": "2059-2641-8704-8619"
     }
   },
   {
@@ -15211,8 +15307,8 @@
       "deleted_by_cascade": false,
       "uuid": "91d5c926-f0fc-4ed0-91d8-160ae87b11bb",
       "housing_company": 5,
-      "property_identifier": "3032-1618-8490-9881",
-      "street_address": "Willebrandinbulevardi 4"
+      "street_address": "Willebrandinbulevardi 4",
+      "property_identifier": "3032-1618-8490-9881"
     }
   },
   {
@@ -15223,8 +15319,8 @@
       "deleted_by_cascade": false,
       "uuid": "367aeceb-6c52-49b9-8f87-d24b3e738927",
       "housing_company": 6,
-      "property_identifier": "4669-9138-2027-5229",
-      "street_address": "Niitynperänkuja 74"
+      "street_address": "Niitynperänkuja 74",
+      "property_identifier": "4669-9138-2027-5229"
     }
   },
   {
@@ -15235,8 +15331,8 @@
       "deleted_by_cascade": false,
       "uuid": "e487b17e-13e0-49dc-8c4c-034b7a875ebb",
       "housing_company": 7,
-      "property_identifier": "6911-0472-5072-1192",
-      "street_address": "Orisaarenbulevardi 48"
+      "street_address": "Orisaarenbulevardi 48",
+      "property_identifier": "6911-0472-5072-1192"
     }
   },
   {
@@ -15247,8 +15343,8 @@
       "deleted_by_cascade": false,
       "uuid": "5ff86872-53a3-48f9-8dfb-656171ce3315",
       "housing_company": 8,
-      "property_identifier": "8440-9485-1889-1839",
-      "street_address": "Fabianinbulevardi 461"
+      "street_address": "Fabianinbulevardi 461",
+      "property_identifier": "8440-9485-1889-1839"
     }
   },
   {
@@ -17832,6 +17928,27 @@
     "pk": "2023-01-01",
     "fields": {
       "value": "4880.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-02-01",
+    "fields": {
+      "value": "4621.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-03-01",
+    "fields": {
+      "value": "4621.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-04-01",
+    "fields": {
+      "value": "4621.00"
     }
   },
   {
