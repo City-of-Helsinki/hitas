@@ -69,7 +69,7 @@ class ReportColumns(NamedTuple):
     adjusted_acquisition_price: Decimal | str
     surface_area: Decimal | str
     price_per_square_meter: Decimal | str
-    postal_code_price: Decimal | str
+    postal_code_price: Decimal | str | None
     state: str
     completion_date: datetime.date | str
     age: str
@@ -455,17 +455,22 @@ def _save_regulation_results(
     """
     Save regulation results for reporting.
     """
-    thirty_year_regulation_results = ThirtyYearRegulationResults.objects.create(
+    thirty_year_regulation_results, created = ThirtyYearRegulationResults.objects.update_or_create(
         calculation_month=calculation_month,
-        regulation_month=regulation_month,
-        surface_area_price_ceiling=surface_area_price_ceiling,
-        sales_data=FullSalesData(
-            # Convert decimals to floats
-            internal=json.loads(json.dumps(sales_data, default=float)) or {},
-            external=json.loads(json.dumps(external_sales_data, default=float)) or {},
-            price_by_area=json.loads(json.dumps(price_by_area, default=float)) or {},
-        ),
+        defaults={
+            "regulation_month": regulation_month,
+            "surface_area_price_ceiling": surface_area_price_ceiling,
+            "sales_data": FullSalesData(
+                # Convert decimals to floats
+                internal=json.loads(json.dumps(sales_data, default=float)) or {},
+                external=json.loads(json.dumps(external_sales_data, default=float)) or {},
+                price_by_area=json.loads(json.dumps(price_by_area, default=float)) or {},
+            ),
+        },
     )
+
+    if not created:
+        ThirtyYearRegulationResultsRow.objects.filter(parent=thirty_year_regulation_results).delete()
 
     rows_to_save: list[ThirtyYearRegulationResultsRow] = []
     for housing_company in housing_companies:
@@ -523,9 +528,11 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                 ThirtyYearRegulationResultsRow.objects.prefetch_related(
                     "housing_company",
                     "housing_company__postal_code",
-                ).annotate(
+                )
+                .annotate(
                     apartment_count=Count("housing_company__real_estates__buildings__apartments"),
-                ),
+                )
+                .order_by("regulation_result", "completion_date"),
             ),
         ).get(calculation_month=hitas_calculation_quarter(calculation_date))
     except ThirtyYearRegulationResults.DoesNotExist as error:
@@ -580,7 +587,7 @@ def get_thirty_year_regulation_results_for_housing_company(
 
     results.turned_30 = results.completion_date + relativedelta(years=30)
     results.difference = results.adjusted_average_price_per_square_meter - Decimal(
-        results.parent.sales_data["price_by_area"][results.postal_code]
+        results.parent.sales_data["price_by_area"].get(results.postal_code, 0)
     )
 
     return results
@@ -619,7 +626,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
             adjusted_acquisition_price=row.adjusted_average_price_per_square_meter * row.surface_area,
             surface_area=row.surface_area,
             price_per_square_meter=row.adjusted_average_price_per_square_meter,
-            postal_code_price=row.parent.sales_data["price_by_area"][row.postal_code],
+            postal_code_price=row.parent.sales_data["price_by_area"].get(row.postal_code),
             state=(
                 "Ei vapaudu"
                 if row.regulation_result == RegulationResult.STAYS_REGULATED

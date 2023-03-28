@@ -67,7 +67,7 @@ class ThirtyYearRegulationResultsRowWithAnnotations(ThirtyYearRegulationResultsR
 
 
 class ThirtyYearRegulationResults(models.Model):
-    calculation_month = models.DateField()
+    calculation_month = models.DateField(unique=True)
     regulation_month = models.DateField()
     surface_area_price_ceiling = HitasModelDecimalField(null=True)
     sales_data: FullSalesData = models.JSONField()

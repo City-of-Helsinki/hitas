@@ -234,7 +234,7 @@ def resize_columns(worksheet: Worksheet) -> None:
 def format_sheet(worksheet: Worksheet, formatting_rules: dict[str, dict[str, Any]]) -> None:
     cell: Cell
     for column, changes in formatting_rules.items():
-        is_cell = len(column) == 2
+        is_cell = any(num in column for num in "0123456789")
         for key, value in changes.items():
             if is_cell:
                 _set_cell_attribute(worksheet[column], key, value)
