@@ -13,12 +13,12 @@ import {
     useGetApartmentDetailQuery,
     useGetApartmentMaximumPriceQuery,
     useSaveApartmentMaximumPriceMutation,
-} from "../../app/services";
-import {Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
-import ConfirmDialogModal from "../../common/components/ConfirmDialogModal";
-import {Checkbox, DateInput, NumberInput} from "../../common/components/form";
-import OwnershipsList from "../../common/components/OwnershipsList";
-import {getIndexType} from "../../common/localisation";
+} from "../../../app/services";
+import {Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../../common/components";
+import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
+import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
+import OwnershipsList from "../../../common/components/OwnershipsList";
+import {getIndexType} from "../../../common/localisation";
 import {
     ApartmentSaleFormSchema,
     ApartmentSaleSchema,
@@ -26,10 +26,10 @@ import {
     IApartmentDetails,
     IApartmentMaximumPrice,
     IApartmentSaleForm,
-} from "../../common/schemas";
-import {formatDate, formatMoney, hdsToast, today} from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
-import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
+} from "../../../common/schemas";
+import {formatDate, formatMoney, hdsToast, today} from "../../../common/utils";
+import ApartmentHeader from "../components/ApartmentHeader";
+import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
@@ -572,7 +572,7 @@ const MaxPriceCalculationLoader = ({apartment}) => {
     );
 };
 
-const ApartmentSalesPage = () => {
+const ApartmentNewSalePage = () => {
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery({
         housingCompanyId: params.housingCompanyId as string,
@@ -592,4 +592,4 @@ const ApartmentSalesPage = () => {
     );
 };
 
-export default ApartmentSalesPage;
+export default ApartmentNewSalePage;
