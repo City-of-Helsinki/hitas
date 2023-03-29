@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
-import {Button, Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
+import {Dialog, Fieldset} from "hds-react";
 import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
@@ -10,7 +10,6 @@ import {NavigateBackButton, QueryStateHandler, SaveButton} from "../../../common
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
 import OwnershipsList from "../../../common/components/OwnershipsList";
-import {getIndexType} from "../../../common/localisation";
 import {
     ApartmentSaleFormSchema,
     ApartmentSaleSchema,
@@ -19,8 +18,10 @@ import {
     IApartmentMaximumPrice,
     IApartmentSaleForm,
 } from "../../../common/schemas";
-import {formatDate, formatMoney, hdsToast, today} from "../../../common/utils";
+import {formatDate, hdsToast, today} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
+import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
+import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 import MaximumPriceModalError from "./MaximumPriceModalError";
 
 const LoadedApartmentSalesPage = ({
@@ -280,95 +281,6 @@ const LoadedApartmentSalesPage = ({
     // * Functional components *
     // *************************
 
-    // Element to display when there is a valid maximum price calculation for the apartment
-    const MaximumPriceCalculationExists = ({maxPriceCalculation}) => {
-        return (
-            <div className={`max-prices${hasLoanValueChanged ? " expired" : ""}`}>
-                <div className="row row--max-prices">
-                    <div className="fieldset--max-prices__value">
-                        <legend>Enimmäishinta (€)</legend>
-                        <span
-                            className={
-                                purchasePrice > (maxPrices.maximumPrice as number) && !warningsGiven.purchase_price
-                                    ? "error-text"
-                                    : ""
-                            }
-                        >
-                            {formatMoney(maxPrices.maximumPrice as number)}
-                        </span>
-                    </div>
-                    <div className="fieldset--max-prices__value">
-                        <legend>Enimmäishinta per m² (€)</legend>
-                        <span>{formatMoney(maxPrices.maxPricePerSquare)}</span>
-                    </div>
-                    <div className="fieldset--max-prices__value">
-                        <legend>Velaton enimmäishinta (€)</legend>
-                        <span>{formatMoney(maxPrices.debtFreePurchasePrice)}</span>
-                    </div>
-                </div>
-
-                <div className="row row--prompt">
-                    <p>
-                        Enimmäishinnat on laskettu{" "}
-                        <span>
-                            {` ${getIndexType(maxPriceData ? maxPriceData.index : maxPriceCalculation.index)}llä`}
-                        </span>{" "}
-                        sekä{" "}
-                        <span>
-                            {maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
-                                .apartment_share_of_housing_company_loans === 0
-                                ? "0 €"
-                                : formatMoney(
-                                      maxPriceCalculation?.calculations[maxPriceCalculation.index].calculation_variables
-                                          .apartment_share_of_housing_company_loans
-                                  )}
-                        </span>{" "}
-                        lainaosuudella.{" "}
-                    </p>
-                    {!!hasLoanValueChanged && (
-                        <p className="error-text">
-                            <IconAlertCircleFill />
-                            <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
-                            <span> tee uusi enimmäishintalaskelma</span>.
-                        </p>
-                    )}
-                    <Button
-                        theme="black"
-                        variant={hasLoanValueChanged ? "primary" : "secondary"}
-                        onClick={handleCalculateButton}
-                        disabled={!isCalculationFormValid().success}
-                    >
-                        Tee uusi enimmäishintalaskelma
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
-    // Element to display when there is no valid maximum price calculation for the apartment
-    // TODO: Will this ever be shown? If some sort of calculation will be generated if there is none, we should never end up showing this element.
-    const MaximumPriceCalculationMissing = () => {
-        return (
-            <div className="row row--prompt">
-                <p>
-                    Asunnosta ei ole vahvistettua enimmäishintalaskelmaa, tai se ei ole enää voimassa. Syötä{" "}
-                    <span>kauppakirjan päivämäärä</span> sekä <span>yhtiön lainaosuus</span>, ja tee sitten uusi
-                    enimmäishintalaskelma saadaksesi asunnon enimmäishinnat kauppaa varten.
-                </p>
-                <Button
-                    theme="black"
-                    onClick={handleCalculateButton}
-                    disabled={
-                        !saleForm.getValues("purchase_date") ||
-                        isNaN(Number(saleForm.getValues("apartment_share_of_housing_company_loans")))
-                    }
-                >
-                    Tee enimmäishintalaskelma
-                </Button>
-            </div>
-        );
-    };
-
     return (
         <div className="view--apartment-conditions-of-sale">
             <div className="fieldsets">
@@ -432,9 +344,21 @@ const LoadedApartmentSalesPage = ({
                     } *`}
                 >
                     {maxPriceCalculation ? (
-                        <MaximumPriceCalculationExists maxPriceCalculation={maxPriceCalculation} />
+                        <MaximumPriceCalculationExists
+                            maxPriceCalculation={maxPriceCalculation}
+                            hasLoanValueChanged={hasLoanValueChanged}
+                            purchasePrice={purchasePrice}
+                            maxPrices={maxPrices}
+                            warningsGiven={warningsGiven}
+                            maxPriceData={maxPriceData}
+                            handleCalculateButton={handleCalculateButton}
+                            isCalculationFormValid={isCalculationFormValid}
+                        />
                     ) : (
-                        <MaximumPriceCalculationMissing />
+                        <MaximumPriceCalculationMissing
+                            handleCalculateButton={handleCalculateButton}
+                            saleForm={saleForm}
+                        />
                     )}
                 </Fieldset>
                 <Fieldset
