@@ -3825,6 +3825,7 @@ components:
         - id
         - name
         - state
+        - hitas_type
       properties:
         id:
           description: Housing company ID
@@ -3838,6 +3839,8 @@ components:
           maxLength: 1024
         state:
           $ref: '#/components/schemas/HousingCompanyState'
+        hitas_type:
+          $ref: '#/components/schemas/HitasType'
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -3878,6 +3881,7 @@ components:
         - id
         - name
         - state
+        - hitas_type
         - real_estates
         - summary
         - improvements
@@ -6313,6 +6317,35 @@ components:
           description: Code number
           type: string
           example: 001
+
+    HitasType:
+      description: |-
+        Housing company hitas types
+
+        Can have the following values:
+        - non_hitas
+        - hitas_1
+        - hitas_2
+        - hitas_1_no_interest
+        - hitas_2_no_interest
+        - new_hitas_1
+        - new_hitas_2
+        - half_hitas
+        - rental_hitas_1
+        - rental_hitas_2
+      type: string
+      example: hitas_1
+      x-extensible-enum:
+        - non_hitas
+        - hitas_1
+        - hitas_2
+        - hitas_1_no_interest
+        - hitas_2_no_interest
+        - new_hitas_1
+        - new_hitas_2
+        - half_hitas
+        - rental_hitas_1
+        - rental_hitas_2
 
     ReadOnlyPropertyManager:
       description: Read-only Property manager information

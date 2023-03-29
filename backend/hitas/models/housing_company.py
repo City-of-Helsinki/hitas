@@ -33,6 +33,66 @@ class HousingCompanyState(Enum):
         READY_NO_STATISTICS = _("Ready, no statistics")
 
 
+class HitasType(Enum):
+    # Vanhat säännöt, Ei sisällytetä tilastoihin
+    NON_HITAS = "non_hitas"
+    # Vanhat säännöt
+    HITAS_I = "hitas_1"
+    # Vanhat säännöt
+    HITAS_II = "hitas_2"
+    # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa
+    HITAS_I_NO_INTEREST = "hitas_1_no_interest"
+    # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa
+    HITAS_II_NO_INTEREST = "hitas_2_no_interest"
+    # Uudet säännöt, (Ei ole rakennusaikaista korkoa)
+    NEW_HITAS_I = "new_hitas_1"
+    # Uudet säännöt, (Ei ole rakennusaikaista korkoa)
+    NEW_HITAS_II = "new_hitas_2"
+    # Puoli-Hitas, Ei sisällytetä tilastoihin
+    HALF_HITAS = "half_hitas"
+    # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa, Ei sisällytetä tilastoihin
+    RENTAL_HITAS_I = "rental_hitas_1"
+    # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa, Ei sisällytetä tilastoihin
+    RENTAL_HITAS_II = "rental_hitas_2"
+
+    class Labels:
+        NON_HITAS = _("Ei Hitas")
+        HITAS_I = _("Hitas I")
+        HITAS_II = _("Hitas II")
+        HITAS_I_NO_INTEREST = _("Hitas I, Ei korkoja")
+        HITAS_II_NO_INTEREST = _("Hitas II, Ei korkoja")
+        NEW_HITAS_I = _("Uusi Hitas I")
+        NEW_HITAS_II = _("Uusi Hitas II")
+        HALF_HITAS = _("Puolihitas")
+        RENTAL_HITAS_I = _("Vuokratalo Hitas I")
+        RENTAL_HITAS_II = _("Vuokratalo Hitas II")
+
+    @classmethod
+    def new_hitas_ruleset(cls) -> list["HitasType"]:
+        return [  # type: ignore
+            cls.NEW_HITAS_I,
+            cls.NEW_HITAS_II,
+        ]
+
+    @classmethod
+    def skip_from_statistics(cls) -> list["HitasType"]:
+        return [  # type: ignore
+            cls.NON_HITAS,
+            cls.HALF_HITAS,
+            cls.RENTAL_HITAS_I,
+            cls.RENTAL_HITAS_II,
+        ]
+
+    @classmethod
+    def no_interest(cls) -> list["HitasType"]:
+        return [  # type: ignore
+            cls.HITAS_I_NO_INTEREST,
+            cls.HITAS_II_NO_INTEREST,
+            cls.RENTAL_HITAS_I,
+            cls.RENTAL_HITAS_II,
+        ]
+
+
 # Taloyhtiö / "Osakeyhtiö"
 class HousingCompany(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -53,6 +113,7 @@ class HousingCompany(ExternalHitasModel):
 
     building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
     financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
+    hitas_type = EnumField(HitasType, max_length=20)
     property_manager = models.ForeignKey(
         "PropertyManager", on_delete=models.PROTECT, related_name="housing_companies", null=True
     )

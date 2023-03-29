@@ -23,6 +23,7 @@ from hitas.models import (
     PropertyManager,
     RealEstate,
 )
+from hitas.models.housing_company import HitasType
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -79,6 +80,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "id": hc2.uuid.hex,
             "name": hc2.display_name,
             "state": hc2.state.value,
+            "hitas_type": hc2.hitas_type.value,
             "address": {
                 "street_address": hc2.street_address,
                 "postal_code": hc2.postal_code.value,
@@ -91,6 +93,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "id": hc1.uuid.hex,
             "name": hc1.display_name,
             "state": hc1.state.value,
+            "hitas_type": hc1.hitas_type.value,
             "address": {
                 "street_address": hc1.street_address,
                 "postal_code": hc1.postal_code.value,
@@ -254,6 +257,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "business_id": hc1.business_id,
         "name": {"display": hc1.display_name, "official": hc1.official_name},
         "state": hc1.state.value,
+        "hitas_type": hc1.hitas_type.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": hc1_re1_bu1_ap1.completion_date.isoformat(),
@@ -447,6 +451,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
         "state": "not_ready",
+        "hitas_type": "hitas_1",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
             "construction_price_index": [
@@ -558,6 +563,7 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         "fields": [
             {"field": "name", "message": "This field is mandatory and cannot be null."},
             {"field": "state", "message": "This field is mandatory and cannot be null."},
+            {"field": "hitas_type", "message": "This field is mandatory and cannot be null."},
             {"field": "address", "message": "This field is mandatory and cannot be null."},
             {"field": "financing_method", "message": "This field is mandatory and cannot be null."},
             {"field": "building_type", "message": "This field is mandatory and cannot be null."},
@@ -750,6 +756,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
         "state": HousingCompanyState.LESS_THAN_30_YEARS.value,
+        "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
             "construction_price_index": [
@@ -826,6 +833,7 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
         "state": hc.state.value,
+        "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
             "construction_price_index": list(
@@ -880,6 +888,7 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
         "state": hc.state.value,
+        "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
             "construction_price_index": list(map(improvement_to_dict, [cpi1, cpi2])),
@@ -916,6 +925,7 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
         "state": hc.state.value,
+        "hitas_type": HitasType.HITAS_I.value,
         "improvements": {
             "construction_price_index": [],
             "market_price_index": [],

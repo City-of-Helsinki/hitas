@@ -19,6 +19,7 @@ from hitas.models import (
     HousingCompanyState,
     RealEstate,
 )
+from hitas.models.housing_company import HitasType
 from hitas.models.utils import validate_business_id
 from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
 from hitas.views.codes import (
@@ -139,6 +140,7 @@ class HousingCompanyImprovementSerializer(serializers.Serializer):
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
+    hitas_type = HitasEnumField(enum=HitasType)
     business_id = ValueOrNullField(allow_null=True, required=False)
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
@@ -234,6 +236,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "business_id",
             "name",
             "state",
+            "hitas_type",
             "address",
             "area",
             "date",
@@ -259,7 +262,15 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
 
     class Meta:
         model = HousingCompany
-        fields = ["id", "name", "state", "address", "area", "date"]
+        fields = [
+            "id",
+            "name",
+            "state",
+            "hitas_type",
+            "address",
+            "area",
+            "date",
+        ]
 
 
 class HousingCompanyViewSet(HitasModelViewSet):
