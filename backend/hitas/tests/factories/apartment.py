@@ -15,9 +15,9 @@ from hitas.models import (
     ApartmentSale,
 )
 from hitas.models.apartment import ApartmentState, DepreciationPercentage
+from hitas.models.housing_company import HitasType
 from hitas.tests.factories._base import AbstractImprovementFactory
 from hitas.tests.factories.apartment_sale import ApartmentSaleFactory
-from hitas.tests.factories.codes import OldHitasFinancingMethodFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     MarketPriceIndex2005Equal100Factory,
@@ -87,7 +87,9 @@ def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> Apa
         kwargs["calculation_date"] = FuzzyDate(date(2015, 1, 1)).fuzz()
 
     if kwargs["calculation_date"] < date(2011, 1, 1):
-        kwargs["apartment__building__real_estate__housing_company__financing_method"] = OldHitasFinancingMethodFactory()
+        kwargs["apartment__building__real_estate__housing_company__hitas_type"] = HitasType.HITAS_I
+    else:
+        kwargs["apartment__building__real_estate__housing_company__hitas_type"] = HitasType.NEW_HITAS_I
 
     # Create indices for `calculate_max_price`
     if create_indices:

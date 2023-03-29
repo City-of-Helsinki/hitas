@@ -22,6 +22,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
 from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.housing_company import HitasType
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
@@ -817,7 +818,9 @@ def _test_max_prices(
         surface_area=50 if not null_values else None,
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
-        building__real_estate__housing_company__financing_method__old_hitas_ruleset=old_hitas_ruleset,
+        building__real_estate__housing_company__hitas_type=(
+            HitasType.HITAS_I if old_hitas_ruleset else HitasType.NEW_HITAS_I
+        ),
         sales=[],
     )
 

@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 
 from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
+from hitas.models.housing_company import HitasType
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
@@ -18,8 +19,6 @@ from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.factories import (
     ApartmentFactory,
     ApartmentSaleFactory,
-    NewHitasFinancingMethodFactory,
-    OldHitasFinancingMethodFactory,
 )
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
@@ -66,7 +65,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -131,7 +130,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         skipped=[],
@@ -193,7 +192,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -257,7 +256,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         stays_regulated=[],
@@ -320,7 +319,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -370,7 +369,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         stays_regulated=[],
@@ -394,7 +393,7 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -433,7 +432,7 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -471,7 +470,7 @@ def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasA
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -514,7 +513,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=False,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -538,7 +537,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         released_from_regulation=[],
@@ -598,7 +597,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method=NewHitasFinancingMethodFactory(),
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
     # This housing company will be checked, since it is using the old hitas ruleset
@@ -609,7 +608,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -649,7 +648,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                 id=sale_1.apartment.housing_company.uuid.hex,
                 display_name=sale_1.apartment.housing_company.display_name,
                 price=Decimal("0"),
-                old_ruleset=sale_1.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale_1.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         released_from_regulation=[
@@ -657,7 +656,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                 id=sale_2.apartment.housing_company.uuid.hex,
                 display_name=sale_2.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale_2.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale_2.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         stays_regulated=[],
@@ -699,7 +698,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -749,7 +748,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("50000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         stays_regulated=[],
@@ -780,7 +779,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -827,7 +826,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
     )
@@ -856,7 +855,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -903,7 +902,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
     )
@@ -932,7 +931,7 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -980,7 +979,7 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
     )
@@ -1009,7 +1008,7 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1057,7 +1056,7 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
     )
@@ -1086,7 +1085,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1134,7 +1133,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
     )
@@ -1163,7 +1162,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1206,7 +1205,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         skipped=[],
@@ -1236,7 +1235,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1296,7 +1295,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         skipped=[],
@@ -1326,7 +1325,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
         surface_area=10,
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
         sales=[],
     )
@@ -1378,7 +1377,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
                 id=apartment_1.housing_company.uuid.hex,
                 display_name=apartment_1.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=apartment_1.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=apartment_1.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         skipped=[],
@@ -1406,7 +1405,7 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
         surface_area=10,
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
         sales=[],
     )
@@ -1455,7 +1454,7 @@ def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freeze
         surface_area=10,
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
         sales=[],
     )
@@ -1504,7 +1503,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
         apartment__surface_area=None,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1554,7 +1553,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
         apartment__surface_area=0,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1601,7 +1600,7 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
         surface_area=None,
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
         sales=[],
     )
@@ -1653,7 +1652,7 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -1714,7 +1713,7 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
                 price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
         skipped=[],
@@ -1792,7 +1791,7 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=state,
     )
 
@@ -1836,7 +1835,7 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
                     id=sale.apartment.housing_company.uuid.hex,
                     display_name=sale.apartment.housing_company.display_name,
                     price=Decimal("12000.0"),
-                    old_ruleset=sale.apartment.housing_company.financing_method.old_hitas_ruleset,
+                    old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
                 )
             ],
             skipped=[],

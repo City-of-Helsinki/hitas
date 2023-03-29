@@ -13,6 +13,7 @@ from hitas.models import (
     HousingCompanyMarketPriceImprovement,
     Ownership,
 )
+from hitas.models.housing_company import HitasType
 from hitas.tests.apis.apartment_max_price.utils import assert_created, assert_id
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -21,7 +22,6 @@ from hitas.tests.factories import (
     ApartmentMarketPriceImprovementFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
-    OldHitasFinancingMethodFactory,
     OwnershipFactory,
 )
 from hitas.tests.factories.indices import (
@@ -43,6 +43,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         share_number_end=20784,
         sales__purchase_price=80350,
         sales__apartment_share_of_housing_company_loans=119150,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
@@ -257,6 +258,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         share_number_end=142,
         sales__purchase_price=139706,
         sales__apartment_share_of_housing_company_loans=80955,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
@@ -445,7 +447,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         surface_area=54.5,
         share_number_start=1,
         share_number_end=2,
-        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         sales__purchase_price=104693.0,
         sales__apartment_share_of_housing_company_loans=18480.0,
     )
@@ -725,7 +727,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         surface_area=45.5,
         share_number_start=19717,
         share_number_end=20188,
-        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         sales__purchase_price=52738.0,
         sales__apartment_share_of_housing_company_loans=123192.0,
     )
@@ -978,7 +980,7 @@ def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasA
         surface_area=10,
         share_number_start=100,
         share_number_end=200,
-        building__real_estate__housing_company__financing_method=OldHitasFinancingMethodFactory(),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         sales__purchase_price=100000,
         sales__apartment_share_of_housing_company_loans=0,
     )
@@ -1112,6 +1114,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         share_number_end=601,
         sales__purchase_price=107753,
         sales__apartment_share_of_housing_company_loans=61830,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
@@ -1263,6 +1266,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
 def test__api__apartment_max_price__no_sales_on_apartment__post_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2012, 1, 13),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # Create necessary indices
@@ -1294,6 +1298,7 @@ def test__api__apartment_max_price__no_sales_on_apartment__pre_2011(api_client: 
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2009, 1, 13),
         sales=[],
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
     )
 
     # Create necessary indices

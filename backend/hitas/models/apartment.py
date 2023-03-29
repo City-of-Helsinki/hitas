@@ -197,7 +197,7 @@ class Apartment(ExternalHitasModel):
 
     @property
     def old_hitas_ruleset(self) -> bool:
-        return self.housing_company.financing_method.old_hitas_ruleset
+        return self.housing_company.hitas_type.old_hitas_ruleset
 
     @property
     def address(self) -> str:

@@ -93,7 +93,7 @@ def make_index_adjustment_for_housing_companies(
     logger.info("All indices found, continuing adjustments...")
     missing_prices: list[HousingCompanyNameT] = []
     for housing_company in housing_companies:
-        if housing_company.financing_method.old_hitas_ruleset:
+        if housing_company.hitas_type.old_hitas_ruleset:
             calculation_month_index = indices["old"][calculation_month]
             completion_month_index = indices["old"][housing_company.completion_month]
         else:
@@ -133,7 +133,7 @@ def _get_indices_for_adjustment(
     months_new: set[datetime.date] = set()
 
     for housing_company in housing_companies:
-        if housing_company.financing_method.old_hitas_ruleset:
+        if housing_company.hitas_type.old_hitas_ruleset:
             months_old.add(housing_company.completion_month)
         else:
             months_new.add(housing_company.completion_month)

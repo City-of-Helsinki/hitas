@@ -12,6 +12,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
 from hitas.models import ApartmentSale, HousingCompanyState
+from hitas.models.housing_company import HitasType
 from hitas.models.indices import (
     CalculationData,
     HousingCompanyData,
@@ -255,6 +256,7 @@ def test__api__indices__create__surface_area_price_ceiling__single(api_client: H
         apartment_share_of_housing_company_loans=10_000,
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -318,6 +320,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
         apartment_share_of_housing_company_loans=10_000,
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -329,6 +332,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
         apartment_share_of_housing_company_loans=10_000,
         apartment__surface_area=25,
         apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -397,6 +401,7 @@ def test__api__indices__create__surface_area_price_ceiling__missing_indices(api_
         apartment_share_of_housing_company_loans=10_000,
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 

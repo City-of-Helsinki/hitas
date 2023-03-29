@@ -43,6 +43,7 @@ from hitas.models.apartment import (
     DepreciationPercentage,
 )
 from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.housing_company import HitasType
 from hitas.models.ownership import OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import (
     subquery_first_purchase_date,
@@ -789,7 +790,9 @@ class ApartmentViewSet(HitasModelViewSet):
         if issubclass(table, MarketPriceIndex):
             interest = Case(
                 When(
-                    condition=Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=True),
+                    condition=~Q(
+                        building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
+                    ),
                     then=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
                 ),
                 default=0,
@@ -799,7 +802,9 @@ class ApartmentViewSet(HitasModelViewSet):
             interest = Case(
                 # Check for exceptions where old ruleset is not used
                 When(
-                    condition=Q(building__real_estate__housing_company__financing_method__old_hitas_ruleset=False),
+                    condition=Q(
+                        building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
+                    ),
                     then=0,
                 ),
                 When(

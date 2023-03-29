@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment
+from hitas.models.housing_company import HitasType
 from hitas.tests.apis.apartment_max_price.utils import create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
@@ -72,7 +73,9 @@ from hitas.utils import monthify, this_month
 )
 @pytest.mark.django_db
 def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, data, fields):
-    a: Apartment = ApartmentFactory.create()
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
 
     response = api_client.post(
         reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
@@ -106,6 +109,7 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, d
 def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str, error_msg: str):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2014, 8, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     HousingCompanyConstructionPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
@@ -150,7 +154,9 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
 
 @pytest.mark.django_db
 def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
-    a: Apartment = ApartmentFactory.create()
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
 
     create_necessary_indices(completion_month=monthify(a.completion_date), calculation_month=this_month())
 
@@ -175,7 +181,10 @@ def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
 @pytest.mark.parametrize("date", ["", None])
 @pytest.mark.django_db
 def test__api__apartment_max_price__missing_date(api_client: HitasAPIClient, date):
-    a: Apartment = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
+    a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2011, 1, 1),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
     create_necessary_indices(completion_month=monthify(a.completion_date), calculation_month=this_month())
 
     data = {
