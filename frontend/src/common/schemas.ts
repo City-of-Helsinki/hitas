@@ -40,13 +40,14 @@ export const errorMessages = {
     dateMax: "Liian myöhäinen päivämäärä",
     noOwnerships: "Asunnolla täytyy olla omistaja",
     ownershipPercent: "Asunnon omistajuusprosentin tulee olla yhteensä 100%",
+    ownershipDuplicate: "Samaa henkilöä ei voi valita useaan kertaan",
     priceMin: "Kauppahinta ei saa olla tyhjä",
     priceMax: "Kauppahinta ei saa ylittää 999 999 €",
     loanShareMin: "Lainaosuus ei voi olla alle 0 €",
     emailInvalid: "Virheellinen sähköpostiosoite",
     urlInvalid: "Virheellinen www-osoite",
-    APIIdMin: "Serverin palauttamassa id-arvossa liian vähän merkkejä",
-    APIIdMax: "Serverin palauttamassa id-arvossa on liian monta merkkiä",
+    APIIdMin: "Rajapinnan palauttamassa ID-arvossa liian vähän merkkejä",
+    APIIdMax: "Rajapinnan palauttamassa ID-arvossa on liian monta merkkiä",
     overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
     loanShareChanged: "Lainaosuus muuttunut laskelmasta",
 };
@@ -473,10 +474,63 @@ const ApartmentSaleFormSchema = object({
     exclude_from_statistics: boolean().optional(),
 });
 
+// Writable list of ownerships
+const OwnershipsListSchema = object({
+    owner: object({id: APIIdString.optional().or(z.literal(""))}),
+    percentage: number(),
+})
+    .array()
+    .superRefine((elements, ctx) => {
+        // Can't have an empty ownerships list
+        if (!elements.length) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.noOwnerships,
+            });
+            return;
+        }
+
+        // Check for duplicates
+        const ownerIds = elements.filter((e) => e.owner.id).map((e) => e.owner.id);
+        if (ownerIds.length !== new Set(ownerIds).size) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.ownershipDuplicate,
+            });
+        }
+
+        // Prevent empty fields
+        if (elements.filter((e) => !e.owner.id).length) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Tyhjä omistaja kenttä",
+            });
+            return;
+        }
+        if (elements.filter((e) => !e.percentage).length) {
+            console.log(elements.filter((e) => !e.percentage));
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Prosenttikentän arvo on 0",
+            });
+            return;
+        }
+
+        // Sum of percentages must be 100
+        const percentages = elements.map((e) => e.percentage);
+        const percentagesSum = percentages.reduce((a, b) => a + b, 0);
+        if (percentagesSum !== 0 && percentagesSum !== 100) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.ownershipPercent,
+            });
+        }
+    });
+
 const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
     object({
         id: string().optional(),
-        ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
+        ownerships: OwnershipsListSchema,
     })
 );
 
@@ -850,6 +904,7 @@ export {
     ownerAPISchema,
     ownershipsSchema,
     ApartmentSaleSchema,
+    OwnershipsListSchema,
 };
 
 // Types (i.e. models)

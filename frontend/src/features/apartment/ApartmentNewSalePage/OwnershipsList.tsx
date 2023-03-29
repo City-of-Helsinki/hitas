@@ -1,36 +1,34 @@
-import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
+import {Button, Fieldset, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
 import {useFieldArray} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
 import {useGetOwnersQuery} from "../../../app/services";
 import {NumberInput, RelatedModelInput} from "../../../common/components/form";
-import {IOwner, IOwnership} from "../../../common/schemas";
+import {IOwner, OwnershipsListSchema} from "../../../common/schemas";
 import {formatOwner} from "../../../common/utils";
 
-const OwnershipsList = ({
-    formOwnershipsList,
-    noOwnersError = false,
-    formObject,
-}: {
-    formOwnershipsList: IOwnership[];
-    noOwnersError?: boolean;
-    formObject?;
-}) => {
+const OwnershipsList = ({formObject}) => {
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,
         rules: {required: "Kauppatapahtumassa täytyy olla ainakin yksi omistajuus!"},
     });
-
-    // Ownerships
-    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
-
     formObject.register("ownerships");
 
+    // Blank Ownership. This is appended to the list when user clicks "New ownership"
+    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
+
+    const ownerships = formObject.getValues("ownerships");
+    const formErrors = OwnershipsListSchema.safeParse(formObject.getValues("ownerships"));
+    const isFormInvalid = !formErrors.success;
+
     return (
-        <div>
+        <Fieldset
+            className={`ownerships-fieldset ${isFormInvalid ? "error" : ""}`}
+            heading="Omistajuudet *"
+        >
             <ul className="ownerships-list">
-                {formOwnershipsList.length ? (
+                {ownerships.length ? (
                     <>
                         <li>
                             <legend className="ownership-headings">
@@ -74,7 +72,7 @@ const OwnershipsList = ({
                     </>
                 ) : (
                     <div
-                        className={noOwnersError ? "error-text" : ""}
+                        className={isFormInvalid ? "error-text" : ""}
                         style={{textAlign: "center"}}
                     >
                         <IconAlertCircleFill />
@@ -83,17 +81,24 @@ const OwnershipsList = ({
                     </div>
                 )}
             </ul>
+            {!formErrors.success && formErrors.error ? (
+                <>
+                    {formErrors.error.issues.map((e) => (
+                        <span key={`${e.code}-${e.message}`}>{e.message}</span>
+                    ))}
+                </>
+            ) : null}
             <div className="row row--buttons">
                 <Button
                     iconLeft={<IconPlus />}
-                    variant={formOwnershipsList.length > 0 ? "secondary" : "primary"}
+                    variant={ownerships.length > 0 ? "secondary" : "primary"}
                     theme="black"
                     onClick={() => append(emptyOwnership)}
                 >
                     Lisää omistajuus
                 </Button>
             </div>
-        </div>
+        </Fieldset>
     );
 };
 

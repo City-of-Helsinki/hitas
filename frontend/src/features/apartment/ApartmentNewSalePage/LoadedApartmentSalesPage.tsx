@@ -16,6 +16,7 @@ import {
     IApartmentDetails,
     IApartmentMaximumPrice,
     IApartmentSaleForm,
+    OwnershipsListSchema,
 } from "../../../common/schemas";
 import {formatDate, hdsToast, today} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
@@ -87,20 +88,6 @@ const LoadedApartmentSalesPage = ({
                     code: z.ZodIssueCode.custom,
                     path: ["apartment_share_of_company_loans"],
                     message: errorMessages.loanShareChanged,
-                });
-            }
-            if (!data.ownerships.length) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: errorMessages.ownershipPercent,
-                });
-            }
-            const total = {value: 0};
-            data.ownerships.forEach((ownership) => (total.value += ownership.percentage));
-            if (total.value !== 100) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: errorMessages.noOwnerships,
                 });
             }
         });
@@ -195,7 +182,7 @@ const LoadedApartmentSalesPage = ({
         console.warn(errors);
     };
     const onValidSubmit = (data) => {
-        if (hasValidOwnerships) saveConfirmedSale(saleForm.getValues(), apartment);
+        if (isOwnershipListFormValid) saveConfirmedSale(saleForm.getValues(), apartment);
         else setIsWarningModalVisible(true);
     };
 
@@ -203,16 +190,6 @@ const LoadedApartmentSalesPage = ({
     // * Validation *
     // **************
 
-    // TODO: Initial check for an existing calculation and its validity
-
-    // Ownership errors
-    const ownershipPercentage = {total: 0};
-    saleForm.getValues("ownerships").forEach((ownership) => (ownershipPercentage.total += ownership.percentage ?? 0));
-    const ownershipErrors = {
-        percentage: ownershipPercentage.total !== 100,
-        noOwners: saleForm.getValues("ownerships").length === 0,
-    };
-    const hasValidOwnerships = !ownershipErrors.percentage && !ownershipErrors.noOwners;
     const purchasePrice = watch("purchase_price");
     watch(["purchase_date", "notification_date"]);
     const loanShare = watch("apartment_share_of_housing_company_loans");
@@ -227,6 +204,9 @@ const LoadedApartmentSalesPage = ({
         });
     };
 
+    // Check if the parts of the sale form needed for a max price calculation are currently valid
+    const isOwnershipListFormValid = OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success;
+
     // Check if the loan share value is the same as in the calculation
     const hasLoanValueChanged =
         loanShare !==
@@ -239,7 +219,7 @@ const LoadedApartmentSalesPage = ({
         purchasePrice > 999999 ||
         !!hasLoanValueChanged ||
         !hasCalculation ||
-        !hasValidOwnerships;
+        !isOwnershipListFormValid;
 
     // *************************
     // * Max price calculation *
@@ -361,20 +341,7 @@ const LoadedApartmentSalesPage = ({
                         />
                     )}
                 </Fieldset>
-                <Fieldset
-                    className={
-                        ownershipErrors.percentage || ownershipErrors.noOwners
-                            ? "ownerships-fieldset error"
-                            : "ownerships-fieldset"
-                    }
-                    heading="Omistajuudet *"
-                >
-                    <OwnershipsList
-                        formOwnershipsList={formOwnershipsList}
-                        noOwnersError={ownershipErrors.noOwners}
-                        formObject={saleForm}
-                    />
-                </Fieldset>
+                <OwnershipsList formObject={saleForm} />
             </div>
 
             <div className="row row--buttons">
