@@ -2,10 +2,10 @@ import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react"
 import {useFieldArray} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
-import {useGetOwnersQuery} from "../../app/services";
-import {IOwner, IOwnership} from "../schemas";
-import {formatOwner} from "../utils";
-import {NumberInput, RelatedModelInput} from "./form";
+import {useGetOwnersQuery} from "../../../app/services";
+import {NumberInput, RelatedModelInput} from "../../../common/components/form";
+import {IOwner, IOwnership} from "../../../common/schemas";
+import {formatOwner} from "../../../common/utils";
 
 const OwnershipsList = ({
     formOwnershipsList,

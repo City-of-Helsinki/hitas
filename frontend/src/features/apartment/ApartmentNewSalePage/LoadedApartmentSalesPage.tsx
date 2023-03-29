@@ -9,7 +9,6 @@ import {useCreateSaleMutation, useSaveApartmentMaximumPriceMutation} from "../..
 import {NavigateBackButton, QueryStateHandler, SaveButton} from "../../../common/components";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
-import OwnershipsList from "../../../common/components/OwnershipsList";
 import {
     ApartmentSaleFormSchema,
     ApartmentSaleSchema,
@@ -23,6 +22,7 @@ import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdo
 import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
 import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 import MaximumPriceModalError from "./MaximumPriceModalError";
+import OwnershipsList from "./OwnershipsList";
 
 const LoadedApartmentSalesPage = ({
     apartment,
