@@ -273,15 +273,13 @@ const ApartmentCreatePage = () => {
                                 formObject={formObject}
                             />
                             <RelatedModelInput
-                                name="type.id"
                                 label="Asuntotyyppi"
-                                fieldPath="type.id"
-                                placeholder={state?.apartment.type !== null ? state?.apartment.type.value : ""}
+                                required
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
-                                getRelatedModelLabel={(obj: ICode) => obj.value}
                                 formObject={formObject}
-                                required
+                                formObjectFieldPath="type"
+                                formatFormObjectValue={(obj: ICode) => (obj.id ? obj.value : "")}
                             />
                         </div>
                         <div className="row">

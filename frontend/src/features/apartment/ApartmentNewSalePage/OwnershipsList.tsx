@@ -45,20 +45,13 @@ const OwnershipsList = ({
                             >
                                 <div className="owner">
                                     <RelatedModelInput
-                                        name={`ownerships.${index}.owner.id`}
-                                        fieldPath="owner.id"
+                                        label="Omistaja"
+                                        required
                                         queryFunction={useGetOwnersQuery}
                                         relatedModelSearchField="name"
-                                        getRelatedModelLabel={(obj) => formatOwner(obj)}
                                         formObject={formObject}
-                                        placeholder={
-                                            formObject.getValues(`ownerships.${index}.owner.name`)
-                                                ? `${formObject.getValues(
-                                                      `ownerships.${index}.owner.name`
-                                                  )} (${formObject.getValues(`ownerships.${index}.owner.identifier`)})`
-                                                : ""
-                                        }
-                                        required
+                                        formObjectFieldPath={`ownerships.${index}.owner`}
+                                        formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
                                     />
                                 </div>
                                 <div className="percentage">
