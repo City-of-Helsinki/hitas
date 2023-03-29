@@ -454,19 +454,18 @@ def test__api__external_sales_data__create__invalid_data(api_client: HitasAPICli
 @pytest.mark.django_db
 def test__api__external_sales_data__retrieve(api_client: HitasAPIClient):
     data = ExternalSalesDataType(
-        calculation_quarter="2022Q4",
         quarter_1=QuarterData(quarter="2022Q1", areas=[CostAreaData(postal_code="00000", sale_count=1, price=2)]),
         quarter_2=QuarterData(quarter="2022Q2", areas=[CostAreaData(postal_code="00000", sale_count=3, price=4)]),
         quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
         quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
     )
-    ExternalSalesData.objects.create(**data)
+    ExternalSalesData.objects.create(calculation_quarter="2022Q4", **data)
 
     url = reverse("hitas:external-sales-data-detail", args=["2022Q4"])
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == data
+    assert response.json() == {**{"calculation_quarter": "2022Q4"}, **data}
 
 
 @pytest.mark.django_db

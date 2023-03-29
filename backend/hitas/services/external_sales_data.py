@@ -18,7 +18,6 @@ def remove_unused_areas(data: "CostAreaSalesCatalogData") -> None:
 
 def create_external_sales_data(data: "CostAreaSalesCatalogData") -> ExternalSalesData:
     sales_data = ExternalSalesDataType(
-        calculation_quarter=data["quarter_4"],
         quarter_1=QuarterData(quarter="", areas=[]),
         quarter_2=QuarterData(quarter="", areas=[]),
         quarter_3=QuarterData(quarter="", areas=[]),
@@ -26,7 +25,7 @@ def create_external_sales_data(data: "CostAreaSalesCatalogData") -> ExternalSale
     )
 
     quarter: Literal["quarter_1", "quarter_2", "quarter_3", "quarter_4"]
-    for quarter in ["quarter_1", "quarter_2", "quarter_3", "quarter_4"]:
+    for quarter in sales_data:
         sales_data[quarter]["quarter"] = data[quarter]
         for cost_area in data["areas"]:
             # Do not add cost area to quarter if values don't exist
@@ -43,4 +42,4 @@ def create_external_sales_data(data: "CostAreaSalesCatalogData") -> ExternalSale
                 )
             )
 
-    return ExternalSalesData.objects.create(**sales_data)
+    return ExternalSalesData.objects.update_or_create(calculation_quarter=data["quarter_4"], defaults=sales_data)[0]
