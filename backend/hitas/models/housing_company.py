@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from types import DynamicClassAttribute
 from typing import Optional
 
 from crum import get_current_user
@@ -67,15 +68,35 @@ class HitasType(Enum):
         RENTAL_HITAS_I = _("Vuokratalo Hitas I")
         RENTAL_HITAS_II = _("Vuokratalo Hitas II")
 
+    @DynamicClassAttribute
+    def new_hitas_ruleset(self) -> bool:
+        return self in HitasType.with_new_hitas_ruleset()
+
+    @DynamicClassAttribute
+    def old_hitas_ruleset(self) -> bool:
+        return self not in HitasType.with_new_hitas_ruleset()
+
+    @DynamicClassAttribute
+    def exclude_from_statistics(self) -> bool:
+        return self in HitasType.with_exclude_from_statistics()
+
+    @DynamicClassAttribute
+    def include_in_statistics(self) -> bool:
+        return self not in HitasType.with_exclude_from_statistics()
+
+    @DynamicClassAttribute
+    def no_interest(self) -> bool:
+        return self in HitasType.with_no_interest()
+
     @classmethod
-    def new_hitas_ruleset(cls) -> list["HitasType"]:
+    def with_new_hitas_ruleset(cls) -> list["HitasType"]:
         return [  # type: ignore
             cls.NEW_HITAS_I,
             cls.NEW_HITAS_II,
         ]
 
     @classmethod
-    def skip_from_statistics(cls) -> list["HitasType"]:
+    def with_exclude_from_statistics(cls) -> list["HitasType"]:
         return [  # type: ignore
             cls.NON_HITAS,
             cls.HALF_HITAS,
@@ -84,7 +105,7 @@ class HitasType(Enum):
         ]
 
     @classmethod
-    def no_interest(cls) -> list["HitasType"]:
+    def with_no_interest(cls) -> list["HitasType"]:
         return [  # type: ignore
             cls.HITAS_I_NO_INTEREST,
             cls.HITAS_II_NO_INTEREST,
@@ -113,7 +134,7 @@ class HousingCompany(ExternalHitasModel):
 
     building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
     financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
-    hitas_type = EnumField(HitasType, max_length=20)
+    hitas_type: HitasType = EnumField(HitasType, max_length=20)
     property_manager = models.ForeignKey(
         "PropertyManager", on_delete=models.PROTECT, related_name="housing_companies", null=True
     )

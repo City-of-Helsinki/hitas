@@ -54,9 +54,9 @@ class HitasTypeViewSet(ViewSet):
             {
                 "name": hitas_type.value,
                 "label": hitas_type.label,
-                "old_ruleset": hitas_type not in HitasType.new_hitas_ruleset(),
-                "skip_from_statistics": hitas_type in HitasType.skip_from_statistics(),
-                "no_interest": hitas_type in HitasType.no_interest(),
+                "old_ruleset": hitas_type.old_hitas_ruleset,
+                "skip_from_statistics": hitas_type.exclude_from_statistics,
+                "no_interest": hitas_type.no_interest,
             }
             for hitas_type in HitasType
         ]
