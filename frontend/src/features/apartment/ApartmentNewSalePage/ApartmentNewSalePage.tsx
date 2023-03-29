@@ -1,10 +1,14 @@
 import {useParams} from "react-router-dom";
 import {useGetApartmentDetailQuery} from "../../../app/services";
-import {QueryStateHandler} from "../../../common/components";
+import {Heading, QueryStateHandler} from "../../../common/components";
 import {IApartmentDetails} from "../../../common/schemas";
+import ApartmentHeader from "../components/ApartmentHeader";
 import {MaximumPriceCalculationLoader} from "./MaximumPriceCalculationLoader";
 
 const ApartmentNewSalePage = () => {
+    // Main Apartment New Sale container.
+    // Loads the Apartment data before rendering anything.
+
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery({
         housingCompanyId: params.housingCompanyId as string,
@@ -18,6 +22,8 @@ const ApartmentNewSalePage = () => {
                 error={error}
                 isLoading={isLoading}
             >
+                <ApartmentHeader apartment={data as IApartmentDetails} />
+                <Heading type="main">Kauppatapahtuma</Heading>
                 <MaximumPriceCalculationLoader apartment={data as IApartmentDetails} />
             </QueryStateHandler>
         </div>

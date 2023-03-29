@@ -1,7 +1,6 @@
 import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
-import {Heading, QueryStateHandler} from "../../../common/components";
+import {QueryStateHandler} from "../../../common/components";
 import {IApartmentMaximumPrice} from "../../../common/schemas";
-import ApartmentHeader from "../components/ApartmentHeader";
 import LoadedApartmentSalesPage from "./LoadedApartmentSalesPage";
 
 export const MaximumPriceCalculationLoader = ({apartment}) => {
@@ -14,17 +13,6 @@ export const MaximumPriceCalculationLoader = ({apartment}) => {
         {skip: !apartment.prices.maximum_prices.confirmed?.valid.is_valid}
     );
 
-    const ApartmentSalesPageContent = () => (
-        <>
-            <ApartmentHeader apartment={apartment} />
-            <Heading type="main">Kauppatapahtuma</Heading>
-            <LoadedApartmentSalesPage
-                maxPriceCalculation={data ? (data as IApartmentMaximumPrice) : null}
-                apartment={apartment}
-            />
-        </>
-    );
-
     const hasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
     return hasValidCalculation ? (
         <QueryStateHandler
@@ -32,9 +20,15 @@ export const MaximumPriceCalculationLoader = ({apartment}) => {
             error={error}
             isLoading={isLoading}
         >
-            <ApartmentSalesPageContent />
+            <LoadedApartmentSalesPage
+                maxPriceCalculation={data ? (data as IApartmentMaximumPrice) : null}
+                apartment={apartment}
+            />
         </QueryStateHandler>
     ) : (
-        <ApartmentSalesPageContent />
+        <LoadedApartmentSalesPage
+            maxPriceCalculation={null}
+            apartment={apartment}
+        />
     );
 };
