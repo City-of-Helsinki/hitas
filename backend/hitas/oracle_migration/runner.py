@@ -46,10 +46,15 @@ from hitas.models import (
     RealEstate,
     SurfaceAreaPriceCeiling,
 )
+from hitas.models.housing_company import HitasType
 from hitas.models.indices import AbstractIndex
 from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
-from hitas.oracle_migration.financing_types import format_financing_method
+from hitas.oracle_migration.financing_types import (
+    FINANCING_METHOD_TO_HITAS_TYPE_MAP,
+    format_financing_method,
+    strip_financing_method_id,
+)
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
 from hitas.oracle_migration.oracle_schema import (
     additional_infos,
@@ -119,6 +124,7 @@ class ConvertedData:
     building_types_by_code_number: Dict[str, BuildingType] = None
     developers_by_code_number: Dict[str, Developer] = None
     financing_methods_by_code_number: Dict[str, FinancingMethod] = None
+    hitas_types_by_code_number: Dict[str, HitasType] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
     apartment_types_by_code_number: Dict[str, ApartmentType] = None
 
@@ -187,6 +193,8 @@ def run(
             converted_data.financing_methods_by_code_number = create_codes(
                 codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
             )
+            converted_data.hitas_types_by_code_number = create_hitas_types(codebooks_by_id["RAHMUOTO"])
+
             converted_data.apartment_types_by_code_number = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
 
             # Indices
@@ -321,6 +329,7 @@ def create_housing_companies(
         new.developer = converted_data.developers_by_code_number[hc["developer_code"]]
         new.postal_code = converted_data.postal_codes_by_postal_code[hc["postal_code_code"]]
         new.financing_method = converted_data.financing_methods_by_code_number[hc["financing_method_code"]]
+        new.hitas_type = converted_data.hitas_types_by_code_number[hc["financing_method_code"]]
         new.property_manager = converted_data.property_managers_by_oracle_id[hc["property_manager_id"]]
         new.last_modified_by = converted_data.users_by_username.get(hc["last_modified_by"])
 
@@ -928,6 +937,17 @@ def create_codes(
         new.save()
 
     return retval
+
+
+def create_hitas_types(financing_methods: List[LegacyRow]) -> dict[str, HitasType]:
+    hitas_types_by_code_number: dict[str, HitasType] = {}
+
+    for financing_method in financing_methods:
+        financing_method_name = strip_financing_method_id(financing_method["value"])
+        hitas_type = FINANCING_METHOD_TO_HITAS_TYPE_MAP[financing_method_name]
+        hitas_types_by_code_number[financing_method["code_id"]] = hitas_type
+
+    return hitas_types_by_code_number
 
 
 def create_apartment_sales(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
