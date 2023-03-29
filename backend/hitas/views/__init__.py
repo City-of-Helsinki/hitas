@@ -6,7 +6,7 @@ from hitas.views.building import BuildingViewSet
 from hitas.views.codes import ApartmentTypeViewSet, BuildingTypeViewSet, DeveloperViewSet, FinancingMethodViewSet
 from hitas.views.condition_of_sale import ConditionOfSaleViewSet
 from hitas.views.external_sales_data import ExternalSalesDataView
-from hitas.views.housing_company import HousingCompanyViewSet
+from hitas.views.housing_company import HitasTypeViewSet, HousingCompanyViewSet
 from hitas.views.indices import (
     ConstructionPriceIndex2005Equal100ViewSet,
     ConstructionPriceIndexViewSet,

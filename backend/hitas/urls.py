@@ -50,6 +50,7 @@ router.register(r"financing-methods", views.FinancingMethodViewSet, basename="fi
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
 router.register(r"developers", views.DeveloperViewSet, basename="developer")
 router.register(r"apartment-types", views.ApartmentTypeViewSet, basename="apartment-type")
+router.register(r"hitas-types", views.HitasTypeViewSet, basename="hitas-type")
 
 # Nested routers
 housing_company_router = NestedSimpleRouter(router, r"housing-companies", lookup="housing_company")

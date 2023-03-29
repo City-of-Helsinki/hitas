@@ -5,8 +5,11 @@ from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
 from django.db.models.functions import Round
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
 from hitas.exceptions import ModelConflict
 from hitas.models import (
@@ -43,6 +46,21 @@ from hitas.views.utils import (
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.serializers import YearMonthSerializer
+
+
+class HitasTypeViewSet(ViewSet):
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        data = [
+            {
+                "name": hitas_type.value,
+                "label": hitas_type.label,
+                "old_ruleset": hitas_type not in HitasType.new_hitas_ruleset(),
+                "skip_from_statistics": hitas_type in HitasType.skip_from_statistics(),
+                "no_interest": hitas_type in HitasType.no_interest(),
+            }
+            for hitas_type in HitasType
+        ]
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class HousingCompanyFilterSet(HitasFilterSet):

@@ -3461,6 +3461,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/hitas-types:
+    get:
+      description: Fetch hitas types
+      operationId: list-hitas-types
+      tags:
+        - Hitas types
+      responses:
+        '200':
+          description: Successfully fetched list of hitas types
+          content:
+            application/json:
+              schema:
+                description: List of hitas types
+                type: array
+                items:
+                  $ref: '#/components/schemas/HitasTypeItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Indices
 
   /api/v1/indices/{index}:
@@ -3917,6 +3938,8 @@ components:
           example: 1234567-1
         state:
           $ref: '#/components/schemas/HousingCompanyState'
+        hitas_type:
+          $ref: '#/components/schemas/HitasType'
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -6317,6 +6340,36 @@ components:
           description: Code number
           type: string
           example: 001
+
+    HitasTypeItem:
+      description: Hitas type
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - label
+        - old_ruleset
+        - skip_from_statistics
+        - no_interest
+      properties:
+        name:
+          $ref: '#/components/schemas/HitasType'
+        label:
+          description: Readable name of the Hitas type
+          type: string
+          example: Hitas I
+        old_ruleset:
+          description: Hitas type follows old Hitas ruleset
+          type: boolean
+          example: false
+        skip_from_statistics:
+          description: Housing companies with this Hitas type should be excluded from statistics
+          type: boolean
+          example: false
+        no_interest:
+          description: Housing companies with this Hitas type should not include interest in max price calculation
+          type: boolean
+          example: false
 
     HitasType:
       description: |-

@@ -1117,3 +1117,85 @@ def test__api__housing_company__filter__invalid_data(api_client: HitasAPIClient,
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+# Hitas type tests
+
+
+@pytest.mark.django_db
+def test__api__hitas_type(api_client: HitasAPIClient):
+    url = reverse("hitas:hitas-type-list")
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {
+            "label": "Ei Hitas",
+            "name": "non_hitas",
+            "no_interest": False,
+            "old_ruleset": True,
+            "skip_from_statistics": True,
+        },
+        {
+            "label": "Hitas I",
+            "name": "hitas_1",
+            "no_interest": False,
+            "old_ruleset": True,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Hitas II",
+            "name": "hitas_2",
+            "no_interest": False,
+            "old_ruleset": True,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Hitas I, Ei korkoja",
+            "name": "hitas_1_no_interest",
+            "no_interest": True,
+            "old_ruleset": True,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Hitas II, Ei korkoja",
+            "name": "hitas_2_no_interest",
+            "no_interest": True,
+            "old_ruleset": True,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Uusi Hitas I",
+            "name": "new_hitas_1",
+            "no_interest": False,
+            "old_ruleset": False,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Uusi Hitas II",
+            "name": "new_hitas_2",
+            "no_interest": False,
+            "old_ruleset": False,
+            "skip_from_statistics": False,
+        },
+        {
+            "label": "Puolihitas",
+            "name": "half_hitas",
+            "no_interest": False,
+            "old_ruleset": True,
+            "skip_from_statistics": True,
+        },
+        {
+            "label": "Vuokratalo Hitas I",
+            "name": "rental_hitas_1",
+            "no_interest": True,
+            "old_ruleset": True,
+            "skip_from_statistics": True,
+        },
+        {
+            "label": "Vuokratalo Hitas II",
+            "name": "rental_hitas_2",
+            "no_interest": True,
+            "old_ruleset": True,
+            "skip_from_statistics": True,
+        },
+    ]
