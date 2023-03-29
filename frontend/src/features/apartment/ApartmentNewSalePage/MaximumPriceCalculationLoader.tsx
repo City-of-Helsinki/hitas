@@ -5,11 +5,14 @@ import ApartmentHeader from "../components/ApartmentHeader";
 import LoadedApartmentSalesPage from "./LoadedApartmentSalesPage";
 
 export const MaximumPriceCalculationLoader = ({apartment}) => {
-    const {data, error, isLoading} = useGetApartmentMaximumPriceQuery({
-        housingCompanyId: apartment.links.housing_company.id,
-        apartmentId: apartment.id,
-        priceId: apartment.prices.maximum_prices.confirmed?.id as string,
-    });
+    const {data, error, isLoading} = useGetApartmentMaximumPriceQuery(
+        {
+            housingCompanyId: apartment.links.housing_company.id,
+            apartmentId: apartment.id,
+            priceId: apartment.prices.maximum_prices.confirmed?.id as string,
+        },
+        {skip: !apartment.prices.maximum_prices.confirmed?.valid.is_valid}
+    );
 
     const ApartmentSalesPageContent = () => (
         <>
