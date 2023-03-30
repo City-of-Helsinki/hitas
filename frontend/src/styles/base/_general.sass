@@ -50,6 +50,17 @@ ul, ol
       color: $color-engel-medium-light
       --spinner-color: $color-engel-medium-light
 
+[class^="view--"]
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  flex-grow: 1
+  > .spinner-wrap
+    flex-grow: 1
+    [class*="LoadingSpinner-module_loadingSpinner"]
+      --spinner-size: 12rem
+      --spinner-color: var(--color-engel)
+      --spinner-thickness: 1.4rem
+
 .query-handler-error
   @include flexbox()
   @include flex-flow(column)
