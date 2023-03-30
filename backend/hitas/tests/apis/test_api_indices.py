@@ -11,8 +11,8 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
-from hitas.models import ApartmentSale, HousingCompanyState
-from hitas.models.housing_company import HitasType
+from hitas.models import ApartmentSale
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.indices import (
     CalculationData,
     HousingCompanyData,
@@ -192,26 +192,24 @@ def test__api__indices__create__surface_area_price_ceiling__empty(api_client: Hi
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
         "error": "missing",
-        "message": "No housing companies completed before '2023-02-01' or all have wrong state.",
+        "message": "No regulated housing companies completed before '2023-02-01'.",
         "reason": "Conflict",
         "status": 409,
     }
 
 
 @pytest.mark.django_db
-def test__api__indices__create__surface_area_price_ceiling__wrong_state(api_client: HitasAPIClient, freezer):
+def test__api__indices__create__surface_area_price_ceiling__wrong_status(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
     this_month = day.date()
     completion_month = this_month - relativedelta(years=1)
 
-    # Housing companies in these states should not be included in surface area price ceiling calculation
-    for state in [
-        HousingCompanyState.GREATER_THAN_30_YEARS_FREE,
-        HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION,
-        HousingCompanyState.HALF_HITAS,
-        HousingCompanyState.READY_NO_STATISTICS,
+    # Housing companies in these regulation statuses should not be included in surface area price ceiling calculation
+    for regulation_status in [
+        RegulationStatus.RELEASED_BY_HITAS,
+        RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
     ]:
         ApartmentSaleFactory.create(
             purchase_date=completion_month,
@@ -219,7 +217,7 @@ def test__api__indices__create__surface_area_price_ceiling__wrong_state(api_clie
             apartment_share_of_housing_company_loans=10_000,
             apartment__surface_area=10,
             apartment__completion_date=completion_month,
-            apartment__building__real_estate__housing_company__state=state,
+            apartment__building__real_estate__housing_company__regulation_status=regulation_status,
         )
 
     url = reverse("hitas:surface-area-price-ceiling-list")
@@ -230,7 +228,7 @@ def test__api__indices__create__surface_area_price_ceiling__wrong_state(api_clie
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
         "error": "missing",
-        "message": "No housing companies completed before '2023-02-01' or all have wrong state.",
+        "message": "No regulated housing companies completed before '2023-02-01'.",
         "reason": "Conflict",
         "status": 409,
     }
@@ -257,7 +255,7 @@ def test__api__indices__create__surface_area_price_ceiling__single(api_client: H
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:surface-area-price-ceiling-list")
@@ -321,7 +319,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Sale in another finished housing company.
@@ -333,7 +331,7 @@ def test__api__indices__create__surface_area_price_ceiling__multiple(api_client:
         apartment__surface_area=25,
         apartment__completion_date=completion_month,
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:surface-area-price-ceiling-list")
@@ -402,7 +400,7 @@ def test__api__indices__create__surface_area_price_ceiling__missing_indices(api_
         apartment__surface_area=10,
         apartment__completion_date=completion_month,
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:surface-area-price-ceiling-list")
