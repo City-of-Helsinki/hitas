@@ -80,6 +80,7 @@ from hitas.oracle_migration.utils import (
     combine_notes,
     date_to_datetime,
     format_building_type,
+    housing_company_regulation_status_from,
     housing_company_state_from,
     str_to_year_month,
     turn_off_auto_now,
@@ -317,6 +318,8 @@ def create_housing_companies(
         new.official_name = hc["official_name"]
         new.display_name = hc["display_name"]
         new.state = housing_company_state_from(hc["state_code"])
+        new.exclude_from_statistics = False  # Can be set in the new system
+        new.regulation_status = housing_company_regulation_status_from(hc["state_code"])
         new.business_id = ""
         new.street_address = hc["address"]
         new.acquisition_price = hc["acquisition_price"]
