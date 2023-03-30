@@ -69,19 +69,25 @@
       margin: 0
       padding: 0
       a:hover
-        text-decoration: underline
-        svg
-          transform: scale(1.2)
+        .address
+          text-decoration: underline
       .unresolved a:hover
         color: $color-black
       .resolved a:hover
         color: $color-black-50
       h3
-        margin-bottom: 0
+        margin: $spacing-2-xs 0
+      [class*="hds-status-label-icon"]
+        margin-right: -4px
       svg
         position: relative
         margin: 0 10px 0 0
         transition: transform 150ms linear
+      li
+        margin-bottom: 5px
+        &:not(:first-child)
+          h3
+            margin-top: 1rem
       .unresolved
         color: $color-black-60
       .resolved
@@ -106,9 +112,10 @@
         font-size: $fontsize-heading-m
         font-weight: 700
         margin-bottom: 0.5rem
-
         &:last-of-type
           margin-top: $spacing-l
+        &--conditions-of-sale
+          margin-top: $spacing-2-xs !important
 
       .unconfirmed-prices
         @include flexbox()
