@@ -95,6 +95,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
+                        disabled={!apartment.ownerships.length}
                     >
                         Muokkaa myyntiehtoja
                     </Button>
@@ -111,7 +112,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     ))}
                 </ul>
             ) : (
-                <span>Ei myyntiehtoja.</span>
+                <span className="no-conditions">Ei myyntiehtoja.</span>
             )}
         </Card>
     );
