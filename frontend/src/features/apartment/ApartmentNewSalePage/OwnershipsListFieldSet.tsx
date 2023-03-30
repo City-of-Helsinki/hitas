@@ -7,7 +7,7 @@ import {NumberInput, RelatedModelInput} from "../../../common/components/form";
 import {IOwner, OwnershipsListSchema} from "../../../common/schemas";
 import {formatOwner} from "../../../common/utils";
 
-const OwnershipsList = ({formObject}) => {
+const OwnershipsListFieldSet = ({formObject}) => {
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,
@@ -102,4 +102,4 @@ const OwnershipsList = ({formObject}) => {
     );
 };
 
-export default OwnershipsList;
+export default OwnershipsListFieldSet;

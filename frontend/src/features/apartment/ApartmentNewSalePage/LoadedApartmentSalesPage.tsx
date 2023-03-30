@@ -18,12 +18,11 @@ import {
     IApartmentSaleForm,
     OwnershipsListSchema,
 } from "../../../common/schemas";
-import {formatDate, hdsToast, today} from "../../../common/utils";
+import {hdsToast, today} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
-import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
-import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
+import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import MaximumPriceModalError from "./MaximumPriceModalError";
-import OwnershipsList from "./OwnershipsList";
+import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
 const LoadedApartmentSalesPage = ({
     apartment,
@@ -319,34 +318,19 @@ const LoadedApartmentSalesPage = ({
                     </form>
                 </Fieldset>
 
-                <Fieldset
-                    heading={`Enimmäishintalaskelma ${
-                        maxPriceCalculation
-                            ? `(vahvistettu ${formatDate(
-                                  apartment.prices.maximum_prices.confirmed?.confirmed_at as string
-                              )})`
-                            : ""
-                    } *`}
-                >
-                    {maxPriceCalculation ? (
-                        <MaximumPriceCalculationExists
-                            maxPriceCalculation={maxPriceCalculation}
-                            hasLoanValueChanged={hasLoanValueChanged}
-                            purchasePrice={purchasePrice}
-                            maxPrices={maxPrices}
-                            warningsGiven={warningsGiven}
-                            maxPriceData={maxPriceData}
-                            handleCalculateButton={handleCalculateButton}
-                            isCalculationFormValid={isCalculationFormValid}
-                        />
-                    ) : (
-                        <MaximumPriceCalculationMissing
-                            handleCalculateButton={handleCalculateButton}
-                            saleForm={saleForm}
-                        />
-                    )}
-                </Fieldset>
-                <OwnershipsList formObject={saleForm} />
+                <MaximumPriceCalculationFieldSet
+                    apartment={apartment}
+                    maxPriceCalculation={maxPriceCalculation}
+                    hasLoanValueChanged={hasLoanValueChanged}
+                    purchasePrice={purchasePrice}
+                    maxPrices={maxPrices}
+                    warningsGiven={warningsGiven}
+                    maxPriceData={maxPriceData}
+                    handleCalculateButton={handleCalculateButton}
+                    isCalculationFormValid={isCalculationFormValid}
+                    saleForm={saleForm}
+                />
+                <OwnershipsListFieldSet formObject={saleForm} />
             </div>
 
             <div className="row row--buttons">
