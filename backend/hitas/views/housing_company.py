@@ -1,8 +1,10 @@
 import datetime
 from typing import Any, Dict, Optional
 
+from dateutil.relativedelta import relativedelta
 from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
 from django.db.models.functions import Round
+from django.utils import timezone
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers, status
@@ -159,6 +161,8 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
     hitas_type = HitasEnumField(enum=HitasType)
+    over_thirty_years_old = serializers.SerializerMethodField()
+    completed = serializers.SerializerMethodField()
     business_id = ValueOrNullField(allow_null=True, required=False)
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
@@ -247,6 +251,19 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "datetime": obj.last_modified_datetime,
         }
 
+    @staticmethod
+    def get_over_thirty_years_old(obj: HousingCompany) -> bool:
+        date: Optional[datetime.date] = getattr(obj, "date", None)
+        if date is None:
+            return False
+
+        return relativedelta(timezone.now().date(), date).years >= 30
+
+    @staticmethod
+    def get_completed(obj: HousingCompany) -> bool:
+        date: Optional[datetime.date] = getattr(obj, "date", None)
+        return date is not None
+
     class Meta:
         model = HousingCompany
         fields = [
@@ -255,6 +272,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "name",
             "state",
             "hitas_type",
+            "exclude_from_statistics",
+            "regulation_status",
+            "over_thirty_years_old",
+            "completed",
             "address",
             "area",
             "date",
@@ -285,6 +306,10 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
             "name",
             "state",
             "hitas_type",
+            "exclude_from_statistics",
+            "regulation_status",
+            "over_thirty_years_old",
+            "completed",
             "address",
             "area",
             "date",

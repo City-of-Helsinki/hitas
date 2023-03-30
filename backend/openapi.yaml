@@ -3847,6 +3847,10 @@ components:
         - name
         - state
         - hitas_type
+        - exclude_from_statistics
+        - regulation_status
+        - over_thirty_years_old
+        - completed
       properties:
         id:
           description: Housing company ID
@@ -3862,6 +3866,20 @@ components:
           $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
+        exclude_from_statistics:
+          description: Should this housing company's apartments' sales be excluded from statistics?
+          type: boolean
+          example: false
+        regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
+        over_thirty_years_old:
+          description: Is this housing company over 30 year old?
+          type: boolean
+          example: false
+        completed:
+          description: Is this housing company completed?
+          type: boolean
+          example: false
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -3940,6 +3958,20 @@ components:
           $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
+        exclude_from_statistics:
+          description: Should this housing company's apartments' sales be excluded from statistics?
+          type: boolean
+          example: false
+        regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
+        over_thirty_years_old:
+          description: Is this housing company over 30 year old?
+          type: boolean
+          example: false
+        completed:
+          description: Is this housing company completed?
+          type: boolean
+          example: false
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -6481,6 +6513,21 @@ components:
           example: 127.12
         valid_until:
           $ref: '#/components/schemas/YearMonth'
+
+    RegulationStatus:
+      description: |-
+        Housing company regulation state
+
+        Can have the following values:
+        - regulated
+        - released_by_hitas
+        - released_by_plot_department
+      type: string
+      example: regulated
+      x-extensible-enum:
+        - regulated
+        - released_by_hitas
+        - released_by_plot_department
 
     HousingCompanyState:
       description: |-
