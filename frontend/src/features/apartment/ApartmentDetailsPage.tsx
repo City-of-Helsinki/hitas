@@ -30,19 +30,36 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
                 {conditionsOfSale[0].owner.name} ({conditionsOfSale[0].owner.identifier})
             </h3>
             <ul>
-                {conditionsOfSale.map((cos) => (
-                    <li
-                        key={cos.id}
-                        className={cos.fulfilled ? "resolved" : "unresolved"}
-                    >
-                        <Link
-                            to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
+                {conditionsOfSale
+                    .filter((cos) => !cos.fulfilled)
+                    .map((cos) => (
+                        <li
+                            key={cos.id}
+                            className="unresolved"
                         >
-                            <ConditionsOfSaleStatus conditionOfSale={cos} />
-                            {formatAddress(cos.apartment.address)}
-                        </Link>
-                    </li>
-                ))}
+                            <Link
+                                to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
+                            >
+                                <ConditionsOfSaleStatus conditionOfSale={cos} />
+                                <span className="address">{formatAddress(cos.apartment.address)}</span>
+                            </Link>
+                        </li>
+                    ))}
+                {conditionsOfSale
+                    .filter((cos) => cos.fulfilled)
+                    .map((cos) => (
+                        <li
+                            key={cos.id}
+                            className="resolved"
+                        >
+                            <Link
+                                to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
+                            >
+                                <ConditionsOfSaleStatus conditionOfSale={cos} />
+                                <span className="address">{formatAddress(cos.apartment.address)}</span>
+                            </Link>
+                        </li>
+                    ))}
             </ul>
         </li>
     );
