@@ -38,7 +38,7 @@ const LoadedApartmentSalesPage = ({
     // We need a reference to the formik form-element, to be able to dispatch a submit event dynamically
     const formRef = useRef<HTMLFormElement | null>(null);
     // Queries and mutations
-    const [saveSale, {error, isLoading}] = useCreateSaleMutation();
+    const [createSale, {isLoading: isCreateSaleLoading}] = useCreateSaleMutation();
     const [saveMaximumPrice, {data: maxPriceData, error: maxPriceError, isLoading: isMaxPriceLoading}] =
         useSaveApartmentMaximumPriceMutation();
 
@@ -155,22 +155,27 @@ const LoadedApartmentSalesPage = ({
     // Handle sale form submit button
     const saveConfirmedSale = (data, apartment) => {
         setIsWarningModalVisible(() => false);
-        saveSale({
+        createSale({
             data: data,
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
-        }).then(() => {
-            if (error) {
-                hdsToast.error("Kaupan tallentaminen epäonnistui.");
-            } else {
+        })
+            .unwrap()
+            .then((payload) => {
                 hdsToast.success("Kauppa tallennettu onnistuneesti!");
-                if (data.conditions_of_sale_created) {
+                if (payload.conditions_of_sale_created) {
                     hdsToast.info("Asunnolle luotiin myyntiehtoja.");
                 }
                 navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
-            }
-        });
+            })
+            .catch((error) => {
+                hdsToast.error("Kaupan tallentaminen epäonnistui!");
+                error.data.fields.forEach((field) =>
+                    saleForm.setError(field.field, {type: "custom", message: field.message})
+                );
+            });
     };
+
     const onInvalidSubmit = (errors) => {
         if (errors.purchase_price?.type === "custom" && warningsGiven.purchase_price) {
             setWarningsGiven((prevState) => {
@@ -348,7 +353,7 @@ const LoadedApartmentSalesPage = ({
                 <NavigateBackButton />
                 <SaveButton
                     onClick={handleSaveButtonClick}
-                    isLoading={isLoading}
+                    isLoading={isCreateSaleLoading}
                     disabled={!isDirty || isSavingDisabled}
                 />
             </div>
@@ -386,7 +391,7 @@ const LoadedApartmentSalesPage = ({
 
             <ConfirmDialogModal
                 successText="Kauppa tallennettu varoituksesta huolimatta"
-                isLoading={isLoading}
+                isLoading={isCreateSaleLoading}
                 isVisible={isWarningModalVisible}
                 setIsVisible={setIsWarningModalVisible}
                 modalText="Haluatko tallentaa kaupan vaikka kauppahinta ylittää laskelman enimmäishinnan?"
