@@ -454,6 +454,7 @@ const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
     })
 );
 
+// Writable Apartment Sale Form
 const ApartmentSaleFormSchema = object({
     key: string().optional(),
     notification_date: z
@@ -464,7 +465,7 @@ const ApartmentSaleFormSchema = object({
         .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
     purchase_price: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.priceMin)
+        .nonnegative(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
         .nullish(),
     apartment_share_of_housing_company_loans: z
@@ -508,7 +509,6 @@ const OwnershipsListSchema = object({
             return;
         }
         if (elements.filter((e) => !e.percentage).length) {
-            console.log(elements.filter((e) => !e.percentage));
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: "Prosenttikentän arvo on 0",
@@ -527,12 +527,37 @@ const OwnershipsListSchema = object({
         }
     });
 
-const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
-    object({
-        id: string().optional(),
-        ownerships: OwnershipsListSchema,
-    })
-);
+// Apartment Sale Form that can be submitted.
+// Other validations still need to be done, but those are out of scope for this schema.
+const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({purchase_price: true})
+    .and(
+        object({
+            id: string().optional(),
+            purchase_price: z
+                .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+                .nonnegative(errorMessages.priceMin)
+                .max(999999, errorMessages.priceMax),
+            ownerships: OwnershipsListSchema,
+        })
+    )
+    .superRefine((data, ctx) => {
+        // Price can be zero, but it can't be nullish.
+        if (data.purchase_price === undefined || data.purchase_price === null) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["purchase_price"],
+                message: errorMessages.required,
+            });
+        }
+        // Price can be zero only if sale is excluded from statistics.
+        if (data.exclude_from_statistics === false && data.purchase_price === 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["purchase_price"],
+                message: errorMessages.required,
+            });
+        }
+    });
 
 const ApartmentSaleCreatedSchema = object({
     id: string(),

@@ -9,26 +9,14 @@ import {useCreateSaleMutation} from "../../../app/services";
 import {NavigateBackButton, SaveButton} from "../../../common/components";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
-import {
-    ApartmentSaleSchema,
-    errorMessages,
-    IApartmentDetails,
-    IApartmentSaleForm,
-    OwnershipsListSchema,
-} from "../../../common/schemas";
+import {ApartmentSaleSchema, errorMessages, IApartmentDetails, IApartmentSaleForm} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
-    const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
     const navigate = useNavigate();
-    // We need a reference to the formik form-element, to be able to dispatch a submit event dynamically
-    const formRef = useRef<HTMLFormElement | null>(null);
-    // Queries and mutations
-    const [createSale, {isLoading: isCreateSaleLoading}] = useCreateSaleMutation();
 
-    //  Maximum price calculation variables
     const [maximumPrices, setMaximumPrices] = useState<
         | undefined
         | {
@@ -40,9 +28,10 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
           }
     >();
 
-    // *********************************
-    // * Form data, schema & variables *
-    // *********************************
+    // ************************
+    // * Form data and schema *
+    // ************************
+
     const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
         purchase_date: "",
@@ -50,63 +39,104 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         apartment_share_of_housing_company_loans: maximumPrices?.apartmentShareOfHousingCompanyLoans ?? null,
         exclude_from_statistics: false,
     };
-    const formOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
+    const initialFormOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
 
-    const [warningsGiven, setWarningsGiven] = useState({purchase_price: false, has_loan_share_changed: false});
+    // ApartmentSaleSchema with additional validation related to maximum price calculation
+    const RefinedApartmentSaleSchema: ZodSchema = ApartmentSaleSchema.superRefine((data, ctx) => {
+        // Sale can't be made without a confirmed maximum price calculation.
+        if (maximumPrices === undefined) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["maximum_price_calculation"],
+                message: "Enimmäishintalaskelma puuttuu.",
+            });
+            return;
+        }
+        // The apartment share of housing company loans must match the maximum price calculations.
+        if (data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["apartment_share_of_company_loans"],
+                message: errorMessages.loanShareChanged,
+            });
+        }
+    });
 
-    // React hook form
     const resolver = (data, context, options) => {
-        const refinedData: ZodSchema = ApartmentSaleSchema.superRefine((data, ctx) => {
-            if ((data.purchase_price as number) > (maxPrices.maximumPrice as number) && !warningsGiven.purchase_price) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["purchase_price"],
-                    message: errorMessages.overMaxPrice,
-                });
-            }
-            if (hasLoanValueChanged) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["apartment_share_of_company_loans"],
-                    message: errorMessages.loanShareChanged,
-                });
-            }
-        });
-        return zodResolver(refinedData)(data, context, {...options, mode: "sync"});
+        return zodResolver(
+            RefinedApartmentSaleSchema.superRefine((data, ctx) => {
+                // Price can not be bigger than the maximum price calculations maximum price.
+                if (
+                    !warningsGiven.purchase_price &&
+                    (!maximumPrices || data.purchase_price > maximumPrices.maximumPrice)
+                ) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["purchase_price"],
+                        message: errorMessages.overMaxPrice,
+                    });
+                }
+            })
+        )(data, context, {...options, mode: "sync"});
     };
+
     const saleForm = useForm({
-        defaultValues: {...initialFormData, ownerships: formOwnershipsList},
+        defaultValues: {...initialFormData, ownerships: initialFormOwnershipsList},
         mode: "all",
         resolver: resolver,
     });
 
-    const {
-        setFocus,
-        watch,
-        formState: {isDirty, errors},
-    } = saleForm;
+    saleForm.watch([
+        "purchase_price",
+        "purchase_date",
+        "notification_date",
+        "apartment_share_of_housing_company_loans",
+    ]);
 
-    // ********************************
-    // * Button / UI-element handlers *
-    // ********************************
+    // ***********************
+    // * Creating a new sale *
+    // ***********************
 
+    const [createSale, {isLoading: isCreateSaleLoading}] = useCreateSaleMutation();
 
-    // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
+    // Certain form errors should be able to be ignored.
+    const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+    const noWarningsGiven = {purchase_price: false};
+    const [warningsGiven, setWarningsGiven] = useState(noWarningsGiven);
+
+    const closeWarningsModal = () => {
+        setWarningsGiven(noWarningsGiven);
+        setIsWarningModalVisible(false);
+    };
+
+    // We need a reference to the form-element to be able to dispatch a submit event dynamically
+    const formRef = useRef<HTMLFormElement | null>(null);
     const handleSaveButtonClick = () => {
+        // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
 
-    // Handle warning dialog confirm action
-    const handleWarningDialogAction = () => {
-        setWarningsGiven((prev) => {
-            return {...prev, purchase_price: true};
-        });
-        saveConfirmedSale(saleForm.getValues(), apartment);
+    // Sale form was submitted without any errors
+    const onSaleFormSubmitValid = () => {
+        // Proceed to creating the sale.
+        createApartmentSale(saleForm.getValues(), apartment);
     };
 
-    // Handle sale form submit button
-    const saveConfirmedSale = (data, apartment) => {
-        setIsWarningModalVisible(() => false);
+    // Sale form was submitted with errors
+    const onSaleFormSubmitInvalid = (errors) => {
+        // If errors only include ones that can be ignored, show a warning modal and continue creation process
+        if (errors.purchase_price && errors.purchase_price.type === z.ZodIssueCode.custom) {
+            setIsWarningModalVisible(true);
+            setWarningsGiven((prev) => ({...prev, purchase_price: true}));
+        } else {
+            hdsToast.error(`Virhe luodessa asunnon kauppaa! ${errors}`);
+        }
+    };
+
+    // Send a request to the API to create a sale
+    const createApartmentSale = (data, apartment) => {
+        if (isWarningModalVisible) closeWarningsModal();
+
         createSale({
             data: data,
             apartmentId: apartment.id,
@@ -128,48 +158,27 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             });
     };
 
-    const onInvalidSubmit = (errors) => {
-        if (errors.purchase_price?.type === "custom" && warningsGiven.purchase_price) {
-            setWarningsGiven((prevState) => {
-                return {...prevState, purchase_price: false};
-            });
-            saveConfirmedSale(saleForm.getValues(), apartment);
-        }
-        setIsWarningModalVisible(true);
-        console.warn(errors);
-    };
-    const onValidSubmit = (data) => {
-        if (isOwnershipListFormValid) saveConfirmedSale(saleForm.getValues(), apartment);
-        else setIsWarningModalVisible(true);
-    };
-
     // **************
     // * Validation *
     // **************
-
-    watch(["purchase_price", "purchase_date", "notification_date", "apartment_share_of_housing_company_loans"]);
 
     // Check if the parts of the sale form needed for a max price calculation are currently valid
     const hasLoanValueChanged =
         maximumPrices !== undefined &&
         saleForm.getValues("apartment_share_of_housing_company_loans") !==
             maximumPrices.apartmentShareOfHousingCompanyLoans;
-    const isOwnershipListFormValid = OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success;
 
     // Disable the saving button when the form has errors or when there is no valid calculation
-    const isSavingDisabled = false; // FIXME
-
-    // *************************
-    // * Functional components *
-    // *************************
+    const isSavingDisabled =
+        maximumPrices === undefined || !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
 
     return (
         <div className="view--apartment-conditions-of-sale">
             <div className="fieldsets">
-                <Fieldset heading={warningsGiven.purchase_price ? "Kaupan tiedot *" : "Kaupan tiedot"}>
+                <Fieldset heading="Kaupan tiedot *">
                     <form
                         ref={formRef}
-                        onSubmit={saleForm.handleSubmit(onValidSubmit, onInvalidSubmit)}
+                        onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
                     >
                         <div className="row">
                             <DateInput
@@ -229,7 +238,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 <SaveButton
                     onClick={handleSaveButtonClick}
                     isLoading={isCreateSaleLoading}
-                    disabled={!isDirty || isSavingDisabled}
+                    disabled={isSavingDisabled}
                 />
             </div>
 
@@ -238,13 +247,10 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 isLoading={isCreateSaleLoading}
                 isVisible={isWarningModalVisible}
                 setIsVisible={setIsWarningModalVisible}
-                modalText="Haluatko tallentaa kaupan vaikka kauppahinta ylittää laskelman enimmäishinnan?"
+                modalText="Kauppahinta ylittää laskelman enimmäishinnan. Haluatko varmasti tallentaa kaupan?"
                 modalHeader="Vahvista kaupan tallennus"
-                cancelAction={() => {
-                    setIsWarningModalVisible(false);
-                    setFocus("purchase_price");
-                }}
-                confirmAction={handleWarningDialogAction}
+                cancelAction={closeWarningsModal}
+                confirmAction={handleSaveButtonClick}
                 buttonText="Vahvista tallennus"
             />
         </div>
