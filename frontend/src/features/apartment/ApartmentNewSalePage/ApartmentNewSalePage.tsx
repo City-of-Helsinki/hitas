@@ -3,7 +3,7 @@ import {useGetApartmentDetailQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
 import {IApartmentDetails} from "../../../common/schemas";
 import ApartmentHeader from "../components/ApartmentHeader";
-import {MaximumPriceCalculationLoader} from "./MaximumPriceCalculationLoader";
+import LoadedApartmentSalesPage from "./LoadedApartmentSalesPage";
 
 const ApartmentNewSalePage = () => {
     // Main Apartment New Sale container.
@@ -24,7 +24,7 @@ const ApartmentNewSalePage = () => {
             >
                 <ApartmentHeader apartment={data as IApartmentDetails} />
                 <Heading type="main">Kauppatapahtuma</Heading>
-                <MaximumPriceCalculationLoader apartment={data as IApartmentDetails} />
+                <LoadedApartmentSalesPage apartment={data as IApartmentDetails} />
             </QueryStateHandler>
         </div>
     );
