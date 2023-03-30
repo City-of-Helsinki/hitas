@@ -196,8 +196,8 @@
   .conditions-of-sale-headers
     position: relative
     display: grid
-    grid-template-columns: auto 300px 150px 100px
-    gap: 1em
+    grid-template-columns: auto 500px 150px 100px
+    gap: $spacing-layout-2-xs
     grid-row: 1
     height: $spacing-layout-s
     font-size: $fontsize-body-s
@@ -210,13 +210,13 @@
     padding: $spacing-layout-s
     background: $color-engel-medium-light
     display: grid
-    grid-template-rows: 32px auto
+    grid-template-rows: $spacing-layout-2-xs auto
     grid-template-columns: 100%
     row-gap: 1em
     &-item
       background: white
       display: grid
-      grid-template-columns: auto 300px 150px 100px
+      grid-template-columns: auto 500px 150px 100px
       gap: 1em
       height: $spacing-layout-m
       @include align-items(center)

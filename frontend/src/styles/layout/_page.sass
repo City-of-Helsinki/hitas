@@ -353,15 +353,33 @@ footer
     margin: $spacing-m 0
 
 .conditions-of-sale-status
-  display: flex
+  @include flexbox()
   flex-direction: row
-  align-items: center
-  padding-left: 8px
-  padding-right: 8px
+  @include justify-content(center)
+  @include align-items(center)
+  //padding-left: 8px
+  //padding-right: 8px
   margin-right: 0.5em
   span
     margin: 0
+    svg
+      margin: 0 !important
+  [class*="hds-status-label-icon"]
+    width: 24px
+    opacity: 1
+    transition: width 200ms 100ms, opacity 100ms
   .sell-by-date
-    display: none
-  &:hover > .sell-by-date
-    display: inline-block
+    overflow: hidden
+    width: 0px
+    opacity: 0
+    text-align: center
+    transition: width 200ms 100ms, opacity 200ms
+  &:hover
+    [class*="hds-status-label-icon"]
+      width: 0px
+      opacity: 0
+      transition: width 100ms, opacity 100ms
+    .sell-by-date
+      width: 74px
+      opacity: 1
+      transition: width 200ms, opacity 200ms 100ms
