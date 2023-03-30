@@ -24,8 +24,11 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
         <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
             <li className="results-list__item results-list__item--apartment">
                 <div className="number">
-                    {apartment.address.stair}
-                    {apartment.address.apartment_number}
+                    <span className="stair-and-number">
+                        {apartment.address.stair}
+                        {apartment.address.apartment_number}
+                    </span>
+                    <ConditionsOfSaleStatus apartment={apartment} />
                 </div>
                 <div className="details">
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
@@ -45,7 +48,6 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     </div>
                 </div>
                 <div className="state">
-                    <ConditionsOfSaleStatus apartment={apartment} />
                     <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
                 </div>
             </li>
