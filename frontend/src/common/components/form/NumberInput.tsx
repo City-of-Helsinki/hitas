@@ -20,9 +20,11 @@ const NumberInput = ({
 }: FormNumberInputProps) => {
     const {
         register,
+        watch,
         formState: {errors},
     } = formObject;
     const formNumber = register(name, {valueAsNumber: true});
+    watch(name);
 
     const handleWheel = (e) => {
         if (document.activeElement === e.target) {
@@ -37,14 +39,14 @@ const NumberInput = ({
     return (
         <div className={`input-field input-field--number${required ? " input-field--required" : ""}`}>
             <HDSNumberInput
-                type="number"
-                label={label ?? ""}
                 id={name}
-                name={formNumber.name}
+                label={label ?? ""}
+                ref={formNumber.ref}
+                type="number"
                 unit={unit}
+                name={formNumber.name}
                 onChange={formNumber.onChange}
                 onBlur={formNumber.onBlur}
-                ref={formNumber.ref}
                 onWheel={handleWheel}
                 errorText={!!errors[formNumber.name] && errors[formNumber.name].message}
                 invalid={invalid ?? !!errors[formNumber.name]}
