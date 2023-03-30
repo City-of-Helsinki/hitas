@@ -57,8 +57,8 @@ class ApartmentFactory(DjangoModelFactory):
             return
 
         if extracted is None:
-            kwargs.setdefault("ownerships", [])  # prevents infinite recursion
-            extracted = [ApartmentSaleFactory.create(apartment=self, **kwargs)]
+            kwargs.setdefault("apartment", self)
+            extracted = [ApartmentSaleFactory.create(**kwargs)]
 
         for ownership in extracted:
             self.sales.add(ownership)

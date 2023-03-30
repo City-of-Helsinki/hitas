@@ -45,21 +45,20 @@ def test__api__apartment_sale__list__empty(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__list(api_client: HitasAPIClient):
-    ownership: Ownership = OwnershipFactory.create(apartment__sales=[])
-    sale: ApartmentSale = ApartmentSaleFactory.create(ownerships=[ownership])
+    ownership: Ownership = OwnershipFactory.create()
 
     url = reverse(
         "hitas:apartment-sale-list",
         kwargs={
-            "housing_company_uuid": sale.apartment.housing_company.uuid.hex,
-            "apartment_uuid": sale.apartment.uuid.hex,
+            "housing_company_uuid": ownership.sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": ownership.sale.apartment.uuid.hex,
         },
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["contents"] == [
         {
-            "id": sale.uuid.hex,
+            "id": ownership.sale.uuid.hex,
             "ownerships": [
                 {
                     "owner": {
@@ -71,11 +70,11 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
                     "percentage": float(ownership.percentage),
                 }
             ],
-            "notification_date": sale.notification_date.isoformat(),
-            "purchase_date": sale.purchase_date.isoformat(),
-            "purchase_price": float(sale.purchase_price),
-            "apartment_share_of_housing_company_loans": float(sale.apartment_share_of_housing_company_loans),
-            "exclude_from_statistics": sale.exclude_from_statistics,
+            "notification_date": ownership.sale.notification_date.isoformat(),
+            "purchase_date": ownership.sale.purchase_date.isoformat(),
+            "purchase_price": float(ownership.sale.purchase_price),
+            "apartment_share_of_housing_company_loans": float(ownership.sale.apartment_share_of_housing_company_loans),
+            "exclude_from_statistics": ownership.sale.exclude_from_statistics,
         }
     ]
     assert response.json()["page"] == {
@@ -94,9 +93,8 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
 def test__api__apartment_sale__list__dont_include_sales_for_other_apartments(api_client: HitasAPIClient):
     apartment: Apartment = ApartmentFactory.create(sales=[])
 
-    # Sales for some other apartment
-    ownership: Ownership = OwnershipFactory.create(apartment__sales=[])
-    ApartmentSaleFactory.create(ownerships=[ownership])
+    # Sale for some other apartment
+    ApartmentSaleFactory.create()
 
     url = reverse(
         "hitas:apartment-sale-list",
@@ -561,9 +559,9 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     owner_3: Owner = OwnerFactory.create()
-    ownership_1: Ownership = OwnershipFactory.create(owner=owner_1, apartment=apartment, percentage=60.0)
-    ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, apartment=apartment, percentage=40.0)
-    ApartmentSaleFactory.create(apartment=apartment, ownerships=[ownership_1, ownership_2])
+    sale: ApartmentSale = ApartmentSaleFactory.create(apartment=apartment, ownerships=[])
+    OwnershipFactory.create(sale=sale, owner=owner_1, apartment=apartment, percentage=60.0)
+    OwnershipFactory.create(sale=sale, owner=owner_2, apartment=apartment, percentage=40.0)
 
     apartment_sales_pre = list(apartment.sales.all())
     apartment_ownerships_pre = list(apartment.ownerships.all())
@@ -661,17 +659,14 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(api_client: HitasAPIClient):
-    owner: Owner = OwnerFactory.create()
-    old_apartment: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=old_apartment, owner=owner)
-
+    old_ownership: Ownership = OwnershipFactory.create()
     new_apartment: Apartment = ApartmentFactory.create(completion_date=None, sales=[])
 
     data = {
         "ownerships": [
             {
                 "owner": {
-                    "id": owner.uuid.hex,
+                    "id": old_ownership.owner.uuid.hex,
                 },
                 "percentage": 100.0,
             },
@@ -707,7 +702,7 @@ def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(a
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
     assert len(conditions_of_sale) == 1
     assert conditions_of_sale[0].new_ownership.apartment == new_apartment
-    assert conditions_of_sale[0].old_ownership.apartment == old_apartment
+    assert conditions_of_sale[0].old_ownership.apartment == old_ownership.apartment
 
     url_2 = reverse(
         "hitas:apartment-sale-detail",
@@ -786,9 +781,7 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
     owner_2: Owner = OwnerFactory.create()
 
     # One owner has an old apartment
-    old_apartment: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=old_apartment, owner=owner_1)
-
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
     new_apartment: Apartment = ApartmentFactory.create(completion_date=None, sales=[])
 
     data = {
@@ -837,7 +830,7 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
     assert len(conditions_of_sale) == 1
     assert conditions_of_sale[0].new_ownership.apartment == new_apartment
-    assert conditions_of_sale[0].old_ownership.apartment == old_apartment
+    assert conditions_of_sale[0].old_ownership.apartment == old_ownership.apartment
 
     url_2 = reverse(
         "hitas:apartment-sale-detail",
@@ -855,9 +848,7 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
 @pytest.mark.django_db
 def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create()
-    old_apartment: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=old_apartment, owner=owner)
-
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner)
     new_apartment: Apartment = ApartmentFactory.create(sales=[])
 
     assert new_apartment.is_new is True
@@ -902,7 +893,7 @@ def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(a
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
     assert len(conditions_of_sale) == 1
     assert conditions_of_sale[0].new_ownership.apartment == new_apartment
-    assert conditions_of_sale[0].old_ownership.apartment == old_apartment
+    assert conditions_of_sale[0].old_ownership.apartment == old_ownership.apartment
 
     new_apartment.refresh_from_db()
     assert new_apartment.is_new is False
@@ -965,6 +956,8 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
     assert new_apartment.first_purchase_date is not None
     assert new_apartment.latest_purchase_date is None
 
+    data["purchase_date"] = "2023-02-01"
+
     # Second sale sets 'latest_purchase_date'
     response_2 = api_client.post(url_1, data=data, format="json")
     response_data_2 = response_2.json()
@@ -975,8 +968,8 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
 
     sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
     assert len(sales) == 2
-    assert sales[0].uuid.hex == response_data_1["id"]
-    assert sales[1].uuid.hex == response_data_2["id"]
+    assert sales[0].uuid.hex == response_data_2["id"]
+    assert sales[1].uuid.hex == response_data_1["id"]
 
     new_apartment = Apartment.objects.get(id=new_apartment.id)
     assert new_apartment.first_purchase_date is not None
