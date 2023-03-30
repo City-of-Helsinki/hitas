@@ -1217,3 +1217,18 @@ def test__api__hitas_type(api_client: HitasAPIClient):
             "skip_from_statistics": True,
         },
     ]
+
+
+# Regulation status tests
+
+
+@pytest.mark.django_db
+def test__api__regulation_status(api_client: HitasAPIClient):
+    url = reverse("hitas:regulation-status-list")
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {"label": "Regulated", "name": "regulated"},
+        {"label": "Released by Hitas", "name": "released_by_hitas"},
+        {"label": "Released by Plot Department", "name": "released_by_plot_department"},
+    ]

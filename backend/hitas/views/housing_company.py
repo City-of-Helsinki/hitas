@@ -24,7 +24,7 @@ from hitas.models import (
     HousingCompanyState,
     RealEstate,
 )
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.utils import validate_business_id
 from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
 from hitas.views.codes import (
@@ -61,6 +61,18 @@ class HitasTypeViewSet(ViewSet):
                 "no_interest": hitas_type.no_interest,
             }
             for hitas_type in HitasType
+        ]
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class RegulationStatusViewSet(ViewSet):
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        data = [
+            {
+                "name": regulation_status.value,
+                "label": regulation_status.label,
+            }
+            for regulation_status in RegulationStatus
         ]
         return Response(data=data, status=status.HTTP_200_OK)
 

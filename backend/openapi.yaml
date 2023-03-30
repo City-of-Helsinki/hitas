@@ -3482,6 +3482,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/regulation-statuses:
+    get:
+      description: Fetch regulation statuses
+      operationId: list-regulation-status
+      tags:
+        - Regulation statuses
+      responses:
+        '200':
+          description: Successfully fetched list of regulation statuses
+          content:
+            application/json:
+              schema:
+                description: List of hitas types
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegulationStatusItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Indices
 
   /api/v1/indices/{index}:
@@ -6514,6 +6535,21 @@ components:
         valid_until:
           $ref: '#/components/schemas/YearMonth'
 
+    RegulationStatusItem:
+      description: Regulation status
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - label
+      properties:
+        name:
+          $ref: '#/components/schemas/RegulationStatus'
+        label:
+          description: Readable name of the Regulation status
+          type: string
+          example: Released by Hitas
+
     RegulationStatus:
       description: |-
         Housing company regulation state
@@ -6523,7 +6559,7 @@ components:
         - released_by_hitas
         - released_by_plot_department
       type: string
-      example: regulated
+      example: released_by_hitas
       x-extensible-enum:
         - regulated
         - released_by_hitas
