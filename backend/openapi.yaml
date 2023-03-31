@@ -6346,13 +6346,13 @@ components:
       type: object
       additionalProperties: false
       required:
-        - name
+        - value
         - label
         - old_ruleset
         - skip_from_statistics
         - no_interest
       properties:
-        name:
+        value:
           $ref: '#/components/schemas/HitasType'
         label:
           description: Readable name of the Hitas type

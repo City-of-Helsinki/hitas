@@ -52,7 +52,7 @@ class HitasTypeViewSet(ViewSet):
     def list(self, request: Request, *args, **kwargs) -> Response:
         data = [
             {
-                "name": hitas_type.value,
+                "value": hitas_type.value,
                 "label": hitas_type.label,
                 "old_ruleset": hitas_type.old_hitas_ruleset,
                 "skip_from_statistics": hitas_type.exclude_from_statistics,
