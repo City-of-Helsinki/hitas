@@ -7,6 +7,7 @@ import {QueryStateHandler} from "../index";
 const RelatedModelTextInput = ({
     label,
     required,
+    disabled,
     formObject,
     formObjectFieldPath,
     formatFormObjectValue,
@@ -34,6 +35,7 @@ const RelatedModelTextInput = ({
             name={formObjectFieldPath}
             label={label}
             required={required}
+            disabled={disabled}
             value={formatFormObjectValue(fieldValue)}
             onClick={openModal}
             onKeyDown={(e) => handleKeyDown(e)}
@@ -141,6 +143,7 @@ const RelatedModelModal = ({
 interface RelatedModelInputProps {
     label?: string;
     required?: boolean;
+    disabled?: boolean;
 
     queryFunction;
     relatedModelSearchField: string;
@@ -157,6 +160,7 @@ interface RelatedModelInputProps {
 const RelatedModelInput = ({
     label,
     required,
+    disabled,
 
     queryFunction,
     relatedModelSearchField,
@@ -176,6 +180,7 @@ const RelatedModelInput = ({
             <RelatedModelTextInput
                 label={label}
                 required={required}
+                disabled={disabled}
                 formObject={formObject}
                 formObjectFieldPath={formObjectFieldPath}
                 formatFormObjectValue={formatFormObjectValue}

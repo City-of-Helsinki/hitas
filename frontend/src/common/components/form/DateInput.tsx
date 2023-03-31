@@ -9,7 +9,7 @@ interface DateInputProps extends FormInputProps {
     minDate?: Date;
 }
 
-const DateInput = ({id, name, label, required, maxDate, minDate, formObject}: DateInputProps) => {
+const DateInput = ({id, name, label, required, maxDate, minDate, formObject, disabled}: DateInputProps) => {
     const hdsFormat = "d.M.yyyy";
     const apiFormat = "yyyy-MM-dd";
 
@@ -66,6 +66,7 @@ const DateInput = ({id, name, label, required, maxDate, minDate, formObject}: Da
                 required={required}
                 maxDate={maxDate}
                 minDate={minDate}
+                disabled={disabled}
             />
         </div>
     );

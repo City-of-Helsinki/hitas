@@ -172,6 +172,9 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     const isSavingDisabled =
         maximumPrices === undefined || !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
 
+    // Disable all fields not related to creating a calculation when it's missing
+    const isMaximumPriceCalculationMissing = maximumPrices === undefined;
+
     return (
         <div className="view--apartment-conditions-of-sale">
             <div className="fieldsets">
@@ -186,6 +189,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 label="Ilmoituspäivämäärä"
                                 formObject={saleForm}
                                 maxDate={new Date()}
+                                disabled={isMaximumPriceCalculationMissing}
                                 required
                             />
                             <DateInput
@@ -204,6 +208,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                     formObject={saleForm}
                                     unit="€"
                                     fractionDigits={2}
+                                    disabled={isMaximumPriceCalculationMissing}
                                     required
                                 />
                             </div>
@@ -221,6 +226,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                             name="exclude_from_statistics"
                             label="Ei tilastoihin (esim. sukulaiskauppa)"
                             formObject={saleForm}
+                            disabled={isMaximumPriceCalculationMissing}
                         />
                     </form>
                 </Fieldset>
@@ -230,7 +236,10 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                     setMaximumPrices={setMaximumPrices}
                     saleForm={saleForm}
                 />
-                <OwnershipsListFieldSet formObject={saleForm} />
+                <OwnershipsListFieldSet
+                    formObject={saleForm}
+                    disabled={isMaximumPriceCalculationMissing}
+                />
             </div>
 
             <div className="row row--buttons">

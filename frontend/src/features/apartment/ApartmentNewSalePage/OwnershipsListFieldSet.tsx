@@ -7,7 +7,7 @@ import {NumberInput, RelatedModelInput} from "../../../common/components/form";
 import {IOwner, OwnershipsListSchema} from "../../../common/schemas";
 import {formatOwner} from "../../../common/utils";
 
-const OwnershipsListFieldSet = ({formObject}) => {
+const OwnershipsListFieldSet = ({formObject, disabled}) => {
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,
@@ -50,6 +50,7 @@ const OwnershipsListFieldSet = ({formObject}) => {
                                         formObject={formObject}
                                         formObjectFieldPath={`ownerships.${index}.owner`}
                                         formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
+                                        disabled={disabled}
                                     />
                                 </div>
                                 <div className="percentage">
@@ -58,13 +59,14 @@ const OwnershipsListFieldSet = ({formObject}) => {
                                         fractionDigits={2}
                                         formObject={formObject}
                                         required
+                                        disabled={disabled}
                                     />
                                     <span>%</span>
                                 </div>
-                                <div className="icon--remove">
+                                <div className={`icon--remove${disabled ? " disabled" : ""}`}>
                                     <IconCrossCircle
                                         size="m"
-                                        onClick={() => remove(index)}
+                                        onClick={() => (disabled ? null : remove(index))}
                                     />
                                 </div>
                             </li>
@@ -94,6 +96,7 @@ const OwnershipsListFieldSet = ({formObject}) => {
                     variant={ownerships.length > 0 ? "secondary" : "primary"}
                     theme="black"
                     onClick={() => append(emptyOwnership)}
+                    disabled={disabled}
                 >
                     Lisää omistajuus
                 </Button>
