@@ -470,7 +470,13 @@ def _save_regulation_results(
     )
 
     if not created:
-        ThirtyYearRegulationResultsRow.objects.filter(parent=thirty_year_regulation_results).delete()
+        # Retain regulation results in this calculation month for released housing companies,
+        # as those will not have been part of subsequent regulation checks, but should still show up
+        # in this calculation month's regulation results.
+        ThirtyYearRegulationResultsRow.objects.filter(
+            Q(parent=thirty_year_regulation_results),
+            ~Q(housing_company__state=HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE),
+        ).delete()
 
     rows_to_save: list[ThirtyYearRegulationResultsRow] = []
     for housing_company in housing_companies:

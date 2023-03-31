@@ -5,7 +5,7 @@ from typing import Literal
 from _decimal import Decimal
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Q, Sum
-from django.db.models.functions import Coalesce, NullIf, TruncMonth
+from django.db.models.functions import Coalesce, NullIf, Round, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 from typing_extensions import TypeAlias
@@ -50,7 +50,7 @@ def get_completed_housing_companies(
                 Coalesce(Sum("_first_sale_prices"), 0) + F("_catalog_prices"),
                 output_field=HitasModelDecimalField(),
             ),
-            surface_area=Sum("real_estates__buildings__apartments__surface_area"),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
             completion_date=max_if_all_not_null(
                 ref="real_estates__buildings__apartments__completion_date",
                 max=datetime.date.max,

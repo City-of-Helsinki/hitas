@@ -19,7 +19,6 @@ class QuarterData(TypedDict):
 
 
 class ExternalSalesDataType(TypedDict):
-    calculation_quarter: str
     quarter_1: QuarterData
     quarter_2: QuarterData
     quarter_3: QuarterData

@@ -2,6 +2,7 @@ import datetime
 from typing import Any, Dict, Optional
 
 from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models.functions import Round
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers
@@ -338,7 +339,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                     max=datetime.date.max,
                     min=datetime.date.min,
                 ),
-                sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
+                sum_surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
                 sum_acquisition_price=Sum("_acquisition_price"),
                 avg_price_per_square_meter=RoundWithPrecision(
                     F("sum_acquisition_price") / F("sum_surface_area"),
