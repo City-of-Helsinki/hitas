@@ -197,27 +197,30 @@ class HousingCompany(ExternalHitasModel):
         )
 
     @property
-    def over_thirty_years_old(self) -> bool:
+    def is_over_thirty_years_old(self) -> bool:
         from hitas.models import Apartment
 
-        completion_dates: list[datetime.date | None] = Apartment.objects.filter(
-            building__real_estate__housing_company=self
-        ).values_list("completion_date", flat=True)
-
-        if None in completion_dates:
+        newest_apartment: Optional[Apartment] = (
+            Apartment.objects.filter(building__real_estate__housing_company=self).order_by("-completion_date").first()
+        )
+        if not newest_apartment:
+            return False
+        if newest_apartment.completion_date is None:
             return False
 
-        return relativedelta(timezone.now().date(), max(completion_dates)).years >= 30
+        return relativedelta(timezone.now().date(), newest_apartment.completion_date).years >= 30
 
     @property
-    def completed(self) -> bool:
+    def is_completed(self) -> bool:
         from hitas.models import Apartment
 
-        completion_dates: list[datetime.date | None] = Apartment.objects.filter(
-            building__real_estate__housing_company=self
-        ).values_list("completion_date", flat=True)
+        newest_apartment: Optional[Apartment] = (
+            Apartment.objects.filter(building__real_estate__housing_company=self).order_by("-completion_date").first()
+        )
+        if not newest_apartment:
+            return False
 
-        return None not in completion_dates
+        return bool(newest_apartment.completion_date)
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()
