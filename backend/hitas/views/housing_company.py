@@ -5,8 +5,11 @@ from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
 from django.db.models.functions import Round
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
 from hitas.exceptions import ModelConflict
 from hitas.models import (
@@ -19,6 +22,7 @@ from hitas.models import (
     HousingCompanyState,
     RealEstate,
 )
+from hitas.models.housing_company import HitasType
 from hitas.models.utils import validate_business_id
 from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
 from hitas.views.codes import (
@@ -42,6 +46,21 @@ from hitas.views.utils import (
 )
 from hitas.views.utils.merge import merge_model
 from hitas.views.utils.serializers import YearMonthSerializer
+
+
+class HitasTypeViewSet(ViewSet):
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        data = [
+            {
+                "value": hitas_type.value,
+                "label": hitas_type.label,
+                "old_ruleset": hitas_type.old_hitas_ruleset,
+                "skip_from_statistics": hitas_type.exclude_from_statistics,
+                "no_interest": hitas_type.no_interest,
+            }
+            for hitas_type in HitasType
+        ]
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class HousingCompanyFilterSet(HitasFilterSet):
@@ -139,6 +158,7 @@ class HousingCompanyImprovementSerializer(serializers.Serializer):
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     state = HitasEnumField(enum=HousingCompanyState)
+    hitas_type = HitasEnumField(enum=HitasType)
     business_id = ValueOrNullField(allow_null=True, required=False)
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
@@ -234,6 +254,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "business_id",
             "name",
             "state",
+            "hitas_type",
             "address",
             "area",
             "date",
@@ -259,7 +280,15 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
 
     class Meta:
         model = HousingCompany
-        fields = ["id", "name", "state", "address", "area", "date"]
+        fields = [
+            "id",
+            "name",
+            "state",
+            "hitas_type",
+            "address",
+            "area",
+            "date",
+        ]
 
 
 class HousingCompanyViewSet(HitasModelViewSet):

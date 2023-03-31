@@ -6,6 +6,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment, ApartmentMaximumPriceCalculation, HousingCompany
+from hitas.models.housing_company import HitasType
 from hitas.tests.apis.apartment_max_price.utils import assert_created, create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentFactory, HousingCompanyFactory, OwnershipFactory
@@ -16,6 +17,7 @@ from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFact
 def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(apartment=a, percentage=100)
 
@@ -168,6 +170,7 @@ def test__api__apartment_max_price__confirm__migrated(api_client: HitasAPIClient
 def test__api__apartment_max_price__confirm__incorrect_housing_company_uuid(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     other_hc: HousingCompany = HousingCompanyFactory.create()
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
@@ -193,6 +196,7 @@ def test__api__apartment_max_price__confirm__incorrect_housing_company_uuid(api_
 def test__api__apartment_max_price__confirm__nonexistent_housing_company_uuid(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None, apartment=a
@@ -217,6 +221,7 @@ def test__api__apartment_max_price__confirm__nonexistent_housing_company_uuid(ap
 def test__api__apartment_max_price__confirm__incorrect_apartment_id(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None, apartment=a
@@ -242,6 +247,7 @@ def test__api__apartment_max_price__confirm__incorrect_apartment_id(api_client: 
 def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None, apartment=a
@@ -266,6 +272,7 @@ def test__api__apartment_max_price__confirm__nonexistent_apartment_id(api_client
 def test__api__apartment_max_price__confirm__nonexistent_calculation_id(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None, apartment=a)
 
@@ -288,6 +295,7 @@ def test__api__apartment_max_price__confirm__nonexistent_calculation_id(api_clie
 def test__api__apartment_max_price__confirm__invalid_id(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None, apartment=a)
     mpc2: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(confirmed_at=None)

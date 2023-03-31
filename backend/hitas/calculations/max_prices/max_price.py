@@ -109,7 +109,7 @@ def calculate_max_price(
     # Select calculator
     if (
         apartment.completion_date >= datetime.date(2011, 1, 1)
-        and not apartment.housing_company.financing_method.old_hitas_ruleset
+        and not apartment.housing_company.hitas_type.old_hitas_ruleset
     ):
         max_price_calculator = Rules2011Onwards()
         new_hitas_rules = True

@@ -17,7 +17,7 @@ from hitas.models import (
     SurfaceAreaPriceCeiling,
 )
 from hitas.models._base import HitasModelDecimalField
-from hitas.models.housing_company import HousingCompanyWithAnnotations
+from hitas.models.housing_company import HitasType, HousingCompanyWithAnnotations
 from hitas.models.indices import (
     CalculationData,
     HousingCompanyData,
@@ -127,7 +127,7 @@ def _save_calculation_data(
                 calculation_month_index=float(indices[key][calculation_month]),
             )
             for housing_company in housing_companies
-            if (key := "old" if housing_company.financing_method.old_hitas_ruleset else "new")
+            if (key := "old" if housing_company.hitas_type.old_hitas_ruleset else "new")
         ],
         created_surface_area_price_ceilings=surface_area_price_ceilings,
     )
@@ -137,13 +137,13 @@ def _save_calculation_data(
     )
 
 
-def subquery_appropriate_cpi(outer_ref: str, financing_method_ref: str) -> Case:
+def subquery_appropriate_cpi(outer_ref: str, housing_company_ref: str) -> Case:
     """
     Make a subquery for appropriate construction price index based on housing company's financing method.
     """
     return Case(
         When(
-            condition=Q(**{f"{financing_method_ref}__old_hitas_ruleset": True}),
+            condition=~Q(**{f"{housing_company_ref}__hitas_type__in": HitasType.with_new_hitas_ruleset()}),
             then=(
                 Subquery(
                     queryset=(ConstructionPriceIndex.objects.filter(month=OuterRef(outer_ref)).values("value")[:1]),

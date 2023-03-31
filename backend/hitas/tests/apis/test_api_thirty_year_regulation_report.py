@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 
 from hitas.models import ApartmentSale, HousingCompanyState
+from hitas.models.housing_company import HitasType
 from hitas.models.thirty_year_regulation import (
     RegulationResult,
     ThirtyYearRegulationResults,
@@ -40,7 +41,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -237,7 +238,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -430,7 +431,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -653,7 +654,7 @@ def test__api__regulation_letter__no_regulation_data(api_client: HitasAPIClient,
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -724,7 +725,7 @@ def test__api__regulation_letter__regulation_skipped(api_client: HitasAPIClient,
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 
@@ -787,7 +788,7 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
         apartment__surface_area=10,
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__financing_method__old_hitas_ruleset=True,
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
     )
 

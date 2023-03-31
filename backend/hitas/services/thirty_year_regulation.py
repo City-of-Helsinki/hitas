@@ -214,7 +214,7 @@ def _split_automatically_released(
     split_housing_companies: list[HousingCompanyWithAnnotations] = []
     automatically_released: list[ComparisonData] = []
     for i, housing_company in enumerate(housing_companies):
-        if not housing_company.financing_method.old_hitas_ruleset:
+        if not housing_company.hitas_type.old_hitas_ruleset:
             logger.info(
                 f"Housing company {housing_company.display_name!r} uses new hitas ruleset. "
                 f"Automatically qualified for release from regulation."
@@ -225,7 +225,7 @@ def _split_automatically_released(
                     id=housing_company.uuid.hex,
                     display_name=housing_company.display_name,
                     price=Decimal("0"),  # Index adjusted price not calculate yet
-                    old_ruleset=housing_company.financing_method.old_hitas_ruleset,
+                    old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
                 )
             )
             housing_companies[i] = None
@@ -250,7 +250,7 @@ def _get_comparison_values(
             id=housing_company.uuid.hex,
             display_name=housing_company.display_name,
             price=max((housing_company.avg_price_per_square_meter, surface_area_price_ceiling)),
-            old_ruleset=housing_company.financing_method.old_hitas_ruleset,
+            old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
         )
 
     return comparison_values
@@ -491,7 +491,7 @@ def _save_regulation_results(
         completion_month_index: Optional[Decimal] = None
         calculation_month_index: Optional[Decimal] = None
         key: Literal["old", "new"]
-        key = "old" if housing_company.financing_method.old_hitas_ruleset else "new"  # type: ignore
+        key = "old" if housing_company.hitas_type.old_hitas_ruleset else "new"  # type: ignore
         if indices is not None and housing_company.completion_month in indices[key]:
             completion_month_index = indices[key][housing_company.completion_month]
             calculation_month_index = indices[key][calculation_month]
@@ -575,11 +575,11 @@ def get_thirty_year_regulation_results_for_housing_company(
             completion_month=TruncMonth("completion_date"),
             completion_month_index_cpi=subquery_appropriate_cpi(
                 outer_ref="completion_month",
-                financing_method_ref="housing_company__financing_method",
+                housing_company_ref="housing_company",
             ),
             calculation_month_index_cpi=subquery_appropriate_cpi(
                 outer_ref="parent__calculation_month",
-                financing_method_ref="housing_company__financing_method",
+                housing_company_ref="housing_company",
             ),
             average_price_per_square_meter_cpi=(
                 F("calculation_month_index_cpi") / F("completion_month_index_cpi") * F("realized_acquisition_price")
