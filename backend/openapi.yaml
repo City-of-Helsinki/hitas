@@ -6540,10 +6540,10 @@ components:
       type: object
       additionalProperties: false
       required:
-        - name
+        - value
         - label
       properties:
-        name:
+        value:
           $ref: '#/components/schemas/RegulationStatus'
         label:
           description: Readable name of the Regulation status

@@ -69,7 +69,7 @@ class RegulationStatusViewSet(ViewSet):
     def list(self, request: Request, *args, **kwargs) -> Response:
         data = [
             {
-                "name": regulation_status.value,
+                "value": regulation_status.value,
                 "label": regulation_status.label,
             }
             for regulation_status in RegulationStatus

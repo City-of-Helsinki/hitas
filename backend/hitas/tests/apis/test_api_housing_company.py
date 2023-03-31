@@ -1228,7 +1228,7 @@ def test__api__regulation_status(api_client: HitasAPIClient):
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == [
-        {"label": "Regulated", "name": "regulated"},
-        {"label": "Released by Hitas", "name": "released_by_hitas"},
-        {"label": "Released by Plot Department", "name": "released_by_plot_department"},
+        {"label": "Regulated", "value": "regulated"},
+        {"label": "Released by Hitas", "value": "released_by_hitas"},
+        {"label": "Released by Plot Department", "value": "released_by_plot_department"},
     ]
