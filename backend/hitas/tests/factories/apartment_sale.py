@@ -29,7 +29,9 @@ class ApartmentSaleFactory(DjangoModelFactory):
             return
 
         if extracted is None:
-            extracted = [OwnershipFactory.create(apartment=self.apartment, apartment__sales=self, **kwargs)]
+            kwargs.setdefault("sale", self)
+            kwargs.setdefault("apartment", self.apartment)
+            extracted = [OwnershipFactory.create(**kwargs)]
 
         for ownership in extracted:
             self.ownerships.add(ownership)

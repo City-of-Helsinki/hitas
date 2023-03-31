@@ -9,6 +9,7 @@ from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
+    ApartmentSale,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
     Ownership,
@@ -20,6 +21,7 @@ from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
     ApartmentMarketPriceImprovementFactory,
+    ApartmentSaleFactory,
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
     OwnershipFactory,
@@ -41,8 +43,7 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         surface_area=30.0,
         share_number_start=18402,
         share_number_end=20784,
-        sales__purchase_price=80350,
-        sales__apartment_share_of_housing_company_loans=119150,
+        sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
@@ -56,8 +57,15 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
     mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=75.2)
-    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=24.8)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=80350,
+        apartment_share_of_housing_company_loans=119150,
+        ownerships=[],
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=75.2, sale=sale)
+    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=24.8, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=129.29)
@@ -256,8 +264,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         surface_area=48.0,
         share_number_start=1,
         share_number_end=142,
-        sales__purchase_price=139706,
-        sales__apartment_share_of_housing_company_loans=80955,
+        sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
@@ -271,7 +278,14 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
     mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=139706,
+        apartment_share_of_housing_company_loans=80955,
+        ownerships=[],
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=123.5)
@@ -447,18 +461,17 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         surface_area=54.5,
         share_number_start=1,
         share_number_end=2,
+        sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        sales__purchase_price=104693.0,
-        sales__apartment_share_of_housing_company_loans=18480.0,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         surface_area=3336,
-        sales__purchase_price=0.0,
-        sales__apartment_share_of_housing_company_loans=0.0,
         share_number_start=3,
         share_number_end=4,
+        sales__purchase_price=0.0,
+        sales__apartment_share_of_housing_company_loans=0.0,
     )
 
     mpi_ap_improvement: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(
@@ -477,8 +490,15 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     mpi_hc_improvement3: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=2000, completion_date=datetime.date(2004, 10, 1), no_deductions=True
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
-    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=104693.0,
+        apartment_share_of_housing_company_loans=18480.0,
+        ownerships=[],
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0, sale=sale)
+    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=244.9)
@@ -727,9 +747,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         surface_area=45.5,
         share_number_start=19717,
         share_number_end=20188,
+        sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        sales__purchase_price=52738.0,
-        sales__apartment_share_of_housing_company_loans=123192.0,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
@@ -768,7 +787,13 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         depreciation_percentage=Decimal("10.0"),
     )
 
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0)
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=52738.0,
+        apartment_share_of_housing_company_loans=123192.0,
+        ownerships=[],
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=296.10)
@@ -1112,13 +1137,19 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         surface_area=48.5,
         share_number_start=504,
         share_number_end=601,
-        sales__purchase_price=107753,
-        sales__apartment_share_of_housing_company_loans=61830,
+        sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=107753,
+        apartment_share_of_housing_company_loans=61830,
+        ownerships=[],
+    )
+    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=115.9)
