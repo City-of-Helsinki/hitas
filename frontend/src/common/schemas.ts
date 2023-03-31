@@ -472,7 +472,7 @@ const ApartmentSaleFormSchema = object({
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .gte(0, errorMessages.loanShareMin)
         .nullish(),
-    exclude_from_statistics: boolean().optional(),
+    exclude_from_statistics: boolean(),
 });
 
 // Writable list of ownerships
@@ -550,11 +550,11 @@ const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({purchase_price: true})
             });
         }
         // Price can be zero only if sale is excluded from statistics.
-        if (data.exclude_from_statistics === false && data.purchase_price === 0) {
+        if (!data.exclude_from_statistics && data.purchase_price === 0) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["purchase_price"],
-                message: errorMessages.required,
+                message: "Pakollinen jos kauppa tilastoidaan.",
             });
         }
     });

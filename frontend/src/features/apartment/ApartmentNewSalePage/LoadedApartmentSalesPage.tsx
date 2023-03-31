@@ -86,13 +86,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         resolver: resolver,
     });
 
-    saleForm.watch([
-        "purchase_price",
-        "purchase_date",
-        "notification_date",
-        "apartment_share_of_housing_company_loans",
-    ]);
-
     // ***********************
     // * Creating a new sale *
     // ***********************
@@ -226,6 +219,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                             name="exclude_from_statistics"
                             label="Ei tilastoihin (esim. sukulaiskauppa)"
                             formObject={saleForm}
+                            triggerField="purchase_price"
                             disabled={isMaximumPriceCalculationMissing}
                         />
                     </form>
