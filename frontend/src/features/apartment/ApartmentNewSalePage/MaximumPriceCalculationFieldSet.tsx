@@ -24,7 +24,7 @@ const MaximumPriceCalculationFieldSet = ({apartment, setMaximumPrices, saleForm}
             apartmentId: apartment.id,
             priceId: apartment.prices.maximum_prices.confirmed?.id as string,
         },
-        {skip: !apartmentHasValidCalculation}
+        {skip: !apartment.prices.maximum_prices.confirmed?.id}
     );
 
     const [
@@ -37,6 +37,12 @@ const MaximumPriceCalculationFieldSet = ({apartment, setMaximumPrices, saleForm}
     ] = useSaveApartmentMaximumPriceMutation();
 
     const handleSetMaxPrices = (calculation: IApartmentMaximumPrice) => {
+        // If created maximum price calculation is already expired, clear the state
+        if (new Date(calculation.valid_until) < new Date()) {
+            setMaximumPrices(undefined);
+            return;
+        }
+
         const indexVariables = calculation.calculations[calculation.index].calculation_variables;
         setMaximumPrices({
             maximumPrice: calculation.maximum_price,
