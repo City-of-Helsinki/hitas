@@ -3482,6 +3482,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/regulation-statuses:
+    get:
+      description: Fetch regulation statuses
+      operationId: list-regulation-status
+      tags:
+        - Regulation statuses
+      responses:
+        '200':
+          description: Successfully fetched list of regulation statuses
+          content:
+            application/json:
+              schema:
+                description: List of hitas types
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegulationStatusItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Indices
 
   /api/v1/indices/{index}:
@@ -3847,6 +3868,10 @@ components:
         - name
         - state
         - hitas_type
+        - exclude_from_statistics
+        - regulation_status
+        - over_thirty_years_old
+        - completed
       properties:
         id:
           description: Housing company ID
@@ -3862,6 +3887,20 @@ components:
           $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
+        exclude_from_statistics:
+          description: Should this housing company's apartments' sales be excluded from statistics?
+          type: boolean
+          example: false
+        regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
+        over_thirty_years_old:
+          description: Is this housing company over 30 year old?
+          type: boolean
+          example: false
+        completed:
+          description: Is this housing company completed?
+          type: boolean
+          example: false
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -3940,6 +3979,20 @@ components:
           $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
+        exclude_from_statistics:
+          description: Should this housing company's apartments' sales be excluded from statistics?
+          type: boolean
+          example: false
+        regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
+        over_thirty_years_old:
+          description: Is this housing company over 30 year old?
+          type: boolean
+          example: false
+        completed:
+          description: Is this housing company completed?
+          type: boolean
+          example: false
         address:
           $ref: '#/components/schemas/HitasHousingCompanyAddress'
         area:
@@ -6481,6 +6534,36 @@ components:
           example: 127.12
         valid_until:
           $ref: '#/components/schemas/YearMonth'
+
+    RegulationStatusItem:
+      description: Regulation status
+      type: object
+      additionalProperties: false
+      required:
+        - value
+        - label
+      properties:
+        value:
+          $ref: '#/components/schemas/RegulationStatus'
+        label:
+          description: Readable name of the Regulation status
+          type: string
+          example: Released by Hitas
+
+    RegulationStatus:
+      description: |-
+        Housing company regulation state
+
+        Can have the following values:
+        - regulated
+        - released_by_hitas
+        - released_by_plot_department
+      type: string
+      example: released_by_hitas
+      x-extensible-enum:
+        - regulated
+        - released_by_hitas
+        - released_by_plot_department
 
     HousingCompanyState:
       description: |-

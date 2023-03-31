@@ -13,7 +13,6 @@ from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
-    HousingCompanyState,
     SurfaceAreaPriceCeiling,
 )
 from hitas.models._base import HitasModelDecimalField
@@ -48,15 +47,12 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
     logger.info("Fetching housing companies...")
     housing_companies = get_completed_housing_companies(
         completion_month=calculation_month,
-        states=[
-            HousingCompanyState.LESS_THAN_30_YEARS,
-            HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE,
-        ],
+        include_excluded_from_statistics=True,
     )
 
     if not housing_companies:
         raise ModelConflict(
-            f"No housing companies completed before {calculation_date.isoformat()!r} or all have wrong state.",
+            f"No regulated housing companies completed before {calculation_date.isoformat()!r}.",
             error_code="missing",
         )
 

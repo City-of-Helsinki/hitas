@@ -12,7 +12,7 @@ from hitas.models import (
     HousingCompanyState,
     RealEstate,
 )
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.tests.factories._base import AbstractImprovementFactory
 
 
@@ -24,6 +24,8 @@ class HousingCompanyFactory(DjangoModelFactory):
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
     state = fuzzy.FuzzyChoice(state[0] for state in HousingCompanyState.choices())
     hitas_type = fuzzy.FuzzyChoice(state[0] for state in HitasType.choices())
+    exclude_from_statistics = False
+    regulation_status = RegulationStatus.REGULATED
     business_id = factory.Faker("company_business_id")
     street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")

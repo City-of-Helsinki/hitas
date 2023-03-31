@@ -9,6 +9,7 @@ from sqlalchemy.engine import LegacyRow
 
 from hitas.models import BuildingType, HousingCompanyState
 from hitas.models.apartment import DepreciationPercentage
+from hitas.models.housing_company import RegulationStatus
 
 TZ = pytz.timezone("Europe/Helsinki")
 
@@ -78,6 +79,18 @@ def housing_company_state_from(code: str) -> HousingCompanyState:
             return HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION
         case "005":
             return HousingCompanyState.HALF_HITAS
+
+
+def housing_company_regulation_status_from(code: str) -> RegulationStatus:
+    # These are hardcoded as the code number (C_KOODISTOID) and
+    # the name (C_NAME) are the only ones that can be used to
+    # identify these types
+    if code == "003":
+        return RegulationStatus.RELEASED_BY_HITAS
+    if code == "004":
+        return RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT
+
+    return RegulationStatus.REGULATED
 
 
 class ApartmentSaleMonitoringState(Enum):

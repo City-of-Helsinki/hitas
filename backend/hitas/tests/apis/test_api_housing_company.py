@@ -61,7 +61,10 @@ def test__api__housing_company__list__empty(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__housing_company__list(api_client: HitasAPIClient):
+def test__api__housing_company__list(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc2: HousingCompany = HousingCompanyFactory.create()
     ap1: Apartment = ApartmentFactory.create(
@@ -81,6 +84,10 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "name": hc2.display_name,
             "state": hc2.state.value,
             "hitas_type": hc2.hitas_type.value,
+            "completed": False,
+            "over_thirty_years_old": False,
+            "exclude_from_statistics": hc2.exclude_from_statistics,
+            "regulation_status": hc2.regulation_status.value,
             "address": {
                 "street_address": hc2.street_address,
                 "postal_code": hc2.postal_code.value,
@@ -94,6 +101,10 @@ def test__api__housing_company__list(api_client: HitasAPIClient):
             "name": hc1.display_name,
             "state": hc1.state.value,
             "hitas_type": hc1.hitas_type.value,
+            "completed": True,
+            "over_thirty_years_old": False,
+            "exclude_from_statistics": hc1.exclude_from_statistics,
+            "regulation_status": hc1.regulation_status.value,
             "address": {
                 "street_address": hc1.street_address,
                 "postal_code": hc1.postal_code.value,
@@ -193,7 +204,10 @@ def test__api__housing_company__list__paging__too_high(api_client: HitasAPIClien
 
 @pytest.mark.parametrize("apt_with_null_prices", [False, True])
 @pytest.mark.django_db
-def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_null_prices: bool):
+def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_null_prices: bool, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
     hc1: HousingCompany = HousingCompanyFactory.create()
     hc1_re1: RealEstate = RealEstateFactory.create(housing_company=hc1)
     hc1_re1_bu1: Building = BuildingFactory.create(real_estate=hc1_re1)
@@ -258,6 +272,10 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "name": {"display": hc1.display_name, "official": hc1.official_name},
         "state": hc1.state.value,
         "hitas_type": hc1.hitas_type.value,
+        "completed": True,
+        "exclude_from_statistics": False,
+        "over_thirty_years_old": False,
+        "regulation_status": hc1.regulation_status.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
         "date": hc1_re1_bu1_ap1.completion_date.isoformat(),
@@ -1198,4 +1216,19 @@ def test__api__hitas_type(api_client: HitasAPIClient):
             "old_ruleset": True,
             "skip_from_statistics": True,
         },
+    ]
+
+
+# Regulation status tests
+
+
+@pytest.mark.django_db
+def test__api__regulation_status(api_client: HitasAPIClient):
+    url = reverse("hitas:regulation-status-list")
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {"label": "Regulated", "value": "regulated"},
+        {"label": "Released by Hitas", "value": "released_by_hitas"},
+        {"label": "Released by Plot Department", "value": "released_by_plot_department"},
     ]

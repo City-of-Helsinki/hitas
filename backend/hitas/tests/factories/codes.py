@@ -13,7 +13,6 @@ faker = Faker(locale="fi_FI")
 
 class AbstractCodeFactory(DjangoModelFactory):
     class Meta:
-        django_get_or_create = ("value",)
         abstract = True
 
     value = None
@@ -54,7 +53,6 @@ class OldHitasFinancingMethodFactory(AbstractCodeFactory):
 
     value = fuzzy.FuzzyChoice(
         [
-            "Tuntematon",
             "vapaarahoitteinen, Hitas I",
             "vapaarahoitteinen, Hitas II",
             "HK valtion laina, Hitas I",
@@ -87,7 +85,6 @@ class NewHitasFinancingMethodFactory(AbstractCodeFactory):
 
     value = fuzzy.FuzzyChoice(
         [
-            "Tuntematon",
             "Uusi Hitas I (vapaarahoitteinen)",
             "Uusi Hitas II (vapaarahoitteinen)",
         ]

@@ -4,16 +4,16 @@ from typing import Literal
 
 from _decimal import Decimal
 from django.db import models
-from django.db.models import ExpressionWrapper, F, Q, Sum
+from django.db.models import ExpressionWrapper, F, Q, QuerySet, Sum
 from django.db.models.functions import Coalesce, NullIf, Round, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 from typing_extensions import TypeAlias
 
 from hitas.exceptions import MissingValues
-from hitas.models import Apartment, HousingCompany, HousingCompanyState, MarketPriceIndex, MarketPriceIndex2005Equal100
+from hitas.models import Apartment, HousingCompany, MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models._base import HitasModelDecimalField
-from hitas.models.housing_company import HousingCompanyWithAnnotations
+from hitas.models.housing_company import HousingCompanyWithAnnotations, RegulationStatus
 from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, subquery_first_sale_acquisition_price
 from hitas.utils import max_if_all_not_null, roundup
 
@@ -26,12 +26,12 @@ ApartmentAddressT: TypeAlias = str
 
 def get_completed_housing_companies(
     completion_month: datetime.date,
-    states: list[HousingCompanyState],
+    include_excluded_from_statistics: bool = False,
 ) -> list[HousingCompanyWithAnnotations]:
     """
     Get all housing companies completed before the given month (YYYY-MM-01) which are in the given states.
     """
-    housing_companies: list[HousingCompanyWithAnnotations] = list(
+    housing_company_queryset: QuerySet[HousingCompanyWithAnnotations] = (
         HousingCompany.objects.select_related(
             "postal_code",
             "financing_method",
@@ -65,11 +65,14 @@ def get_completed_housing_companies(
         )
         .filter(
             completion_date__lte=completion_month,
-            state__in=states,
+            regulation_status=RegulationStatus.REGULATED,
         )
-        .all()
     )
 
+    if not include_excluded_from_statistics:
+        housing_company_queryset = housing_company_queryset.filter(exclude_from_statistics=False)
+
+    housing_companies = list(housing_company_queryset)
     if not housing_companies:
         return []
 

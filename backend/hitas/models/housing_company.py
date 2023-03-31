@@ -4,9 +4,11 @@ from types import DynamicClassAttribute
 from typing import Optional
 
 from crum import get_current_user
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.db.models import F, Sum
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
@@ -114,6 +116,17 @@ class HitasType(Enum):
         ]
 
 
+class RegulationStatus(Enum):
+    REGULATED = "regulated"
+    RELEASED_BY_HITAS = "released_by_hitas"
+    RELEASED_BY_PLOT_DEPARTMENT = "released_by_plot_department"
+
+    class Labels:
+        REGULATED = _("Regulated")
+        RELEASED_BY_HITAS = _("Released by Hitas")
+        RELEASED_BY_PLOT_DEPARTMENT = _("Released by Plot Department")
+
+
 # Taloyhtiö / "Osakeyhtiö"
 class HousingCompany(ExternalHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -123,7 +136,13 @@ class HousingCompany(ExternalHitasModel):
     # More human-friendly housing company name
     display_name = models.CharField(max_length=1024, unique=True)
 
+    # [DEPREKOITU] 'Yhtiön tila'
     state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
+    # "Näkyvätkö yhtiön asuntojen kaupat tilastoissa?"
+    exclude_from_statistics = models.BooleanField(default=False)
+    # "Ei vapautunut / Vapautunut kenen toimesta?"
+    regulation_status = EnumField(RegulationStatus, default=RegulationStatus.REGULATED, max_length=27)
+
     # Business ID / 'y-tunnus'
     business_id = models.CharField(
         max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-1"), null=True
@@ -176,6 +195,32 @@ class HousingCompany(ExternalHitasModel):
             .annotate(shares_count=F("share_number_end") - F("share_number_start") + 1)
             .aggregate(sum_shares_count=Sum("shares_count"))["sum_shares_count"]
         )
+
+    @property
+    def is_over_thirty_years_old(self) -> bool:
+        from hitas.models import Apartment
+
+        newest_apartment: Optional[Apartment] = (
+            Apartment.objects.filter(building__real_estate__housing_company=self).order_by("-completion_date").first()
+        )
+        if not newest_apartment:
+            return False
+        if newest_apartment.completion_date is None:
+            return False
+
+        return relativedelta(timezone.now().date(), newest_apartment.completion_date).years >= 30
+
+    @property
+    def is_completed(self) -> bool:
+        from hitas.models import Apartment
+
+        newest_apartment: Optional[Apartment] = (
+            Apartment.objects.filter(building__real_estate__housing_company=self).order_by("-completion_date").first()
+        )
+        if not newest_apartment:
+            return False
+
+        return bool(newest_apartment.completion_date)
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()

@@ -8,7 +8,7 @@ from rest_framework.reverse import reverse
 
 from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
@@ -16,10 +16,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.thirty_year_regulation import ComparisonData, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
-from hitas.tests.factories import (
-    ApartmentFactory,
-    ApartmentSaleFactory,
-)
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -66,14 +63,14 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -141,6 +138,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
+    assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
 
     #
     # Check that the regulation results were saved
@@ -193,14 +191,14 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -268,6 +266,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
     # Check that the regulation results were saved
@@ -320,14 +319,14 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -394,7 +393,7 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:thirty-year-regulation-list")
@@ -433,7 +432,7 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Create necessary indices
@@ -471,7 +470,7 @@ def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasA
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -514,7 +513,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Create necessary external sales data (no external sales)
@@ -550,6 +549,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     #
     sale.apartment.housing_company.refresh_from_db()
     assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
     # Check that the regulation results were saved
@@ -598,7 +598,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
     # This housing company will be checked, since it is using the old hitas ruleset
     sale_2: ApartmentSale = ApartmentSaleFactory.create(
@@ -609,14 +609,14 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -668,9 +668,11 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     #
     sale_1.apartment.housing_company.refresh_from_db()
     assert sale_1.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+    assert sale_1.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     sale_2.apartment.housing_company.refresh_from_db()
     assert sale_2.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
+    assert sale_2.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
 @pytest.mark.django_db
@@ -699,14 +701,14 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -780,14 +782,14 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -856,14 +858,14 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year, but it is in a half-hitas housing company
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.HALF_HITAS,
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -932,7 +934,7 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year, but it is in a housing company that should not be
@@ -940,7 +942,8 @@ def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(ap
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.READY_NO_STATISTICS,
+        building__real_estate__housing_company__exclude_from_statistics=True,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1009,14 +1012,14 @@ def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistic
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1086,14 +1089,14 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month - relativedelta(years=1),
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month - relativedelta(years=1),  # first sale, not counted
     )
 
@@ -1163,7 +1166,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Create necessary external sales data
@@ -1236,14 +1239,14 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1326,7 +1329,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales=[],
     )
 
@@ -1334,7 +1337,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
     apartment_2: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1406,7 +1409,7 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales=[],
     )
 
@@ -1455,7 +1458,7 @@ def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freeze
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales=[],
     )
 
@@ -1504,7 +1507,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:thirty-year-regulation-list")
@@ -1554,7 +1557,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     url = reverse("hitas:thirty-year-regulation-list")
@@ -1601,7 +1604,7 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
         completion_date=regulation_month,
         building__real_estate__housing_company__postal_code__value="00001",
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales=[],
     )
 
@@ -1653,14 +1656,14 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1732,7 +1735,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
@@ -1758,19 +1761,20 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
 
 
 @pytest.mark.parametrize(
-    ["state", "is_compared"],
+    ["regulation_status", "is_compared"],
     [
-        [HousingCompanyState.NOT_READY, False],
-        [HousingCompanyState.LESS_THAN_30_YEARS, True],
-        [HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE, True],
-        [HousingCompanyState.GREATER_THAN_30_YEARS_FREE, False],
-        [HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION, False],
-        [HousingCompanyState.HALF_HITAS, False],
-        [HousingCompanyState.READY_NO_STATISTICS, True],
+        [RegulationStatus.REGULATED, True],
+        [RegulationStatus.RELEASED_BY_HITAS, False],
+        [RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT, False],
     ],
 )
 @pytest.mark.django_db
-def test__api__regulation__housing_company_state(api_client: HitasAPIClient, freezer, state, is_compared):
+def test__api__regulation__housing_company_regulation_status(
+    api_client: HitasAPIClient,
+    regulation_status: RegulationStatus,
+    is_compared: bool,
+    freezer,
+):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -1792,14 +1796,14 @@ def test__api__regulation__housing_company_state(api_client: HitasAPIClient, fre
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__state=state,
+        apartment__building__real_estate__housing_company__regulation_status=regulation_status,
     )
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__state=HousingCompanyState.LESS_THAN_30_YEARS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 

@@ -17,7 +17,13 @@ from openpyxl.worksheet.worksheet import Worksheet
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
-from hitas.models.housing_company import HousingCompany, HousingCompanyState, HousingCompanyWithAnnotations
+from hitas.models.housing_company import (
+    HitasType,
+    HousingCompany,
+    HousingCompanyState,
+    HousingCompanyWithAnnotations,
+    RegulationStatus,
+)
 from hitas.models.indices import SurfaceAreaPriceCeiling
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
@@ -91,14 +97,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     logger.info(f"Checking regulation need for housing companies completed before {regulation_month.isoformat()!r}...")
 
     logger.info("Fetching housing companies...")
-    housing_companies = get_completed_housing_companies(
-        completion_month=regulation_month,
-        states=[
-            HousingCompanyState.LESS_THAN_30_YEARS,
-            HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE,
-            HousingCompanyState.READY_NO_STATISTICS,
-        ],
-    )
+    housing_companies = get_completed_housing_companies(completion_month=regulation_month)
     if not housing_companies:
         logger.info("No housing companies to check regulation for.")
         logger.info("Regulation check complete!")
@@ -287,17 +286,12 @@ def _get_sales_data(
         )
         .filter(
             ~Q(id__in=F("_first_sale_id")),
+            ~Q(apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS),
             purchase_date__gte=from_,
             purchase_date__lt=to_,
             exclude_from_statistics=False,
-            # TODO: apartment__building__real_estate__housing_company__exclude_from_statistics=False,
+            apartment__building__real_estate__housing_company__exclude_from_statistics=False,
             apartment__building__real_estate__housing_company__postal_code__value__in=postal_codes,
-            apartment__building__real_estate__housing_company__state__in=[
-                HousingCompanyState.LESS_THAN_30_YEARS,
-                HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE,
-                HousingCompanyState.GREATER_THAN_30_YEARS_FREE,
-                HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION,
-            ],
         )
         .all()
     )
@@ -432,12 +426,14 @@ def _free_housing_companies_from_regulation(
     }
     for housing_company in housing_companies:
         if housing_company.uuid.hex not in housing_company_uuids:
+            housing_company.regulation_status = RegulationStatus.REGULATED
             housing_company.state = HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
             continue
 
+        housing_company.regulation_status = RegulationStatus.RELEASED_BY_HITAS
         housing_company.state = HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
-    HousingCompany.objects.bulk_update(housing_companies, fields=["state"])
+    HousingCompany.objects.bulk_update(housing_companies, fields=["state", "regulation_status"])
 
 
 def _save_regulation_results(
@@ -475,7 +471,7 @@ def _save_regulation_results(
         # in this calculation month's regulation results.
         ThirtyYearRegulationResultsRow.objects.filter(
             Q(parent=thirty_year_regulation_results),
-            ~Q(housing_company__state=HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE),
+            ~Q(housing_company__regulation_status=RegulationStatus.REGULATED),
         ).delete()
 
     rows_to_save: list[ThirtyYearRegulationResultsRow] = []
