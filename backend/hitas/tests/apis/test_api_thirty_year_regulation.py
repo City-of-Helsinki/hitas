@@ -70,6 +70,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -198,6 +199,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -326,6 +328,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -616,6 +619,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -708,6 +712,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -789,6 +794,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00002",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -911,161 +917,6 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 
 
 @pytest.mark.django_db
-def test__api__regulation__no_sales_data_for_postal_code__ready_no_statistics(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
-
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
-
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
-
-    # Apartment where sales happened in the previous year, but it is in a housing company that should not be
-    # included in statistics, so its sales do not affect postal code average square price calculation
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__exclude_from_statistics=True,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
-
-    # Sale in the previous year
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
-
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
-
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.get(url)
-
-    #
-    # Since postal code average square price does not exist, the housing company cannot be regulated,
-    # and thus is not in either of the lists.
-    #
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == RegulationResults(
-        automatically_released=[],
-        released_from_regulation=[],
-        stays_regulated=[],
-        skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-            )
-        ],
-    )
-
-
-@pytest.mark.django_db
-def test__api__regulation__no_sales_data_for_postal_code__exclude_from_statistics(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
-
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
-
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
-
-    # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
-
-    # Sale in the previous year, but it is excluded from statistics
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
-        purchase_price=40_000,
-        exclude_from_statistics=True,
-        apartment_share_of_housing_company_loans=9_000,
-    )
-
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
-
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.get(url)
-
-    #
-    # Since postal code average square price does not exist, the housing company cannot be regulated,
-    # and thus is not in either of the lists.
-    #
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == RegulationResults(
-        automatically_released=[],
-        released_from_regulation=[],
-        stays_regulated=[],
-        skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-            )
-        ],
-    )
-
-
-@pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
@@ -1096,6 +947,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month - relativedelta(years=1),
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month - relativedelta(years=1),  # first sale, not counted
     )
@@ -1105,7 +957,6 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         apartment=apartment,
         purchase_date=previous_year_last_month - relativedelta(years=1) + relativedelta(days=1),
         purchase_price=40_000,
-        exclude_from_statistics=True,
         apartment_share_of_housing_company_loans=9_000,
     )
 
@@ -1246,6 +1097,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -1337,6 +1189,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
     apartment_2: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -1633,7 +1486,86 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
 
 
 @pytest.mark.django_db
-def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClient, freezer):
+def test__api__regulation__exclude_from_statistics__housing_company(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    previous_year_last_month = this_month - relativedelta(months=2)
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Create necessary indices
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    # Sale for the apartment in a housing company that will be under regulation checking
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    # Apartment where sales happened in the previous year, but it is in a housing company that should not be
+    # included in statistics, so its sales do not affect postal code average square price calculation
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__exclude_from_statistics=True,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year
+    ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+    # Create necessary external sales data (no external sales)
+    ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(previous_year_last_month),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list")
+
+    response = api_client.get(url)
+
+    #
+    # Since postal code average square price does not exist, the housing company cannot be regulated,
+    # and thus is not in either of the lists.
+    #
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+            )
+        ],
+    )
+
+
+@pytest.mark.django_db
+def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -1663,6 +1595,85 @@ def test__api__regulation__exclude_sale_from_statistics(api_client: HitasAPIClie
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year, but it is excluded from statistics
+    ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=40_000,
+        exclude_from_statistics=True,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+    # Create necessary external sales data (no external sales)
+    ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(previous_year_last_month),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list")
+
+    response = api_client.get(url)
+
+    #
+    # Since postal code average square price does not exist, the housing company cannot be regulated,
+    # and thus is not in either of the lists.
+    #
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+            )
+        ],
+    )
+
+
+@pytest.mark.django_db
+def test__api__regulation__exclude_from_statistics__sale__partial(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    previous_year_last_month = this_month - relativedelta(months=2)
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Create necessary indices
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    # Sale for the apartment in a housing company that will be under regulation checking
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    # Apartment where sales happened in the previous year
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -1735,6 +1746,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
@@ -1803,6 +1815,7 @@ def test__api__regulation__housing_company_regulation_status(
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
         building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
