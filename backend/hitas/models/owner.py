@@ -1,8 +1,16 @@
+from typing import Optional, TypedDict
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import ExternalHitasModel
 from hitas.models.utils import check_business_id, check_social_security_number
+
+
+class OwnerT(TypedDict):
+    name: Optional[str]
+    identifier: Optional[str]
+    email: Optional[str]
 
 
 class Owner(ExternalHitasModel):
@@ -22,7 +30,7 @@ class Owner(ExternalHitasModel):
         ordering = ["id"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"

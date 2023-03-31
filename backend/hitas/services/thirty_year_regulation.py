@@ -3,7 +3,7 @@ import json
 import logging
 from decimal import Decimal
 from itertools import chain
-from typing import Iterable, Literal, NamedTuple, Optional, TypedDict
+from typing import TYPE_CHECKING, Iterable, Literal, NamedTuple, Optional, TypedDict
 from uuid import UUID
 
 from dateutil.relativedelta import relativedelta
@@ -38,6 +38,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.services.indices import subquery_appropriate_cpi
+from hitas.services.owner import obfuscate_owners_without_regulated_apartments
 from hitas.utils import (
     business_quarter,
     format_sheet,
@@ -48,6 +49,9 @@ from hitas.utils import (
     subquery_count,
     to_quarter,
 )
+
+if TYPE_CHECKING:
+    from hitas.models.owner import OwnerT
 
 logger = logging.getLogger()
 
@@ -64,6 +68,7 @@ class RegulationResults(TypedDict):
     released_from_regulation: list[ComparisonData]
     stays_regulated: list[ComparisonData]
     skipped: list[ComparisonData]
+    obfuscated_owners: list["OwnerT"]
 
 
 class ReportColumns(NamedTuple):
@@ -106,6 +111,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             released_from_regulation=[],
             stays_regulated=[],
             skipped=[],
+            obfuscated_owners=[],
         )
 
     split_housing_companies, automatically_released = _split_automatically_released(housing_companies)
@@ -116,10 +122,13 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             released_from_regulation=[],
             stays_regulated=[],
             skipped=[],
+            obfuscated_owners=[],
         )
 
         logger.info("Updating housing company states...")
         _free_housing_companies_from_regulation(split_housing_companies, results)
+
+        results["obfuscated_owners"] = obfuscate_owners_without_regulated_apartments()
 
         logger.info("Saving regulation results for reporting...")
         _save_regulation_results(
@@ -185,6 +194,8 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     logger.info("Updating housing company states...")
     _free_housing_companies_from_regulation(housing_companies, results)
+
+    results["obfuscated_owners"] = obfuscate_owners_without_regulated_apartments()
 
     logger.info("Saving regulation results for reporting...")
     _save_regulation_results(
@@ -367,6 +378,7 @@ def _determine_regulation_need(
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[],
     )
 
     for postal_code, comparison_data_by_housing_company in comparison_values.items():
