@@ -155,6 +155,7 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
 @pytest.mark.django_db
 def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2011, 1, 1),
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
