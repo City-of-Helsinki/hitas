@@ -2,18 +2,32 @@ import {Checkbox as HDSCheckbox} from "hds-react";
 
 import {FormInputProps} from "./";
 
-const Checkbox = ({name, id = name, label, required, formObject, ...rest}: FormInputProps) => {
-    const formCheckbox = formObject.register(name);
-    const handleChange = (e) => {
+const Checkbox = ({
+    name,
+    id = name,
+    label,
+    required,
+    formObject,
+    triggerField,
+    ...rest
+}: FormInputProps & {triggerField?: string}) => {
+    const {register} = formObject;
+    const formCheckbox = register(name);
+
+    const handleChange = () => {
         formObject.setValue(formCheckbox.name, !formObject.getValues(formCheckbox.name), {shouldValidate: true});
+        if (triggerField) {
+            formObject.trigger(triggerField);
+        }
     };
+
     return (
         <HDSCheckbox
             id={id}
             name={name}
             label={`${label}${required ? " *" : ""}`}
             checked={formObject.getValues(formCheckbox.name)}
-            onChange={(e) => handleChange(e)}
+            onChange={handleChange}
             onBlur={formCheckbox.onBlur}
             ref={formCheckbox.ref}
             style={{

@@ -25,21 +25,62 @@ const CostAreas = ["1", "2", "3", "4"] as const;
 // ********************************
 
 export const errorMessages = {
-    required: "Pakollinen kenttä!",
-    postalCodeFormat: "Virheellinen postinumero!",
-    stringLength: "Liian lyhyt arvo!",
-    numberLength: "Liian lyhyt arvo!",
-    numberType: "Arvon pitää olla numero!",
-    numberPositive: "Arvo ei voi olla alle 0!",
-    numberMax: "Arvo liian suuri!",
-    dateFormat: "Virheellinen päivämäärä!",
-    priceMin: "Kauppahinta ei saa olla tyhjä!",
-    priceMax: "Kauppahinta ei saa ylittää 999 999 €!",
-    loanShareMin: "Lainaosuus ei voi olla alle 0 €!",
-    emailValid: "Ole hyvä ja anna oikea sähköpostiosoite!",
-    APIIdMin: "Serverin palauttamassa id-arvossa liian vähän merkkejä!",
-    APIIdMax: "Serverin palauttamassa id-arvossa on liian monta merkkiä!",
+    required: "Pakollinen kenttä",
+    postalCodeFormat: "Virheellinen postinumero",
+    stringLength: "Liian lyhyt arvo",
+    stringMin: "Liian vähän kirjaimia",
+    stringMax: "Liian monta kirjainta",
+    numberLength: "Liian lyhyt arvo",
+    numberType: "Arvon pitää olla numero",
+    numberMin: "Liian pieni arvo",
+    numberMax: "Liian suuri arvo",
+    numberPositive: "Arvo ei voi olla alle 0",
+    dateFormat: "Virheellinen päivämäärä",
+    dateMin: "Liian aikainen päivämäärä",
+    dateMax: "Liian myöhäinen päivämäärä",
+    noOwnerships: "Asunnolla täytyy olla omistaja",
+    ownershipPercent: "Asunnon omistajuusprosentin tulee olla yhteensä 100%",
+    ownershipDuplicate: "Samaa henkilöä ei voi valita useaan kertaan",
+    priceMin: "Kauppahinta ei saa olla tyhjä",
+    priceMax: "Kauppahinta ei saa ylittää 999 999 €",
+    loanShareMin: "Lainaosuus ei voi olla alle 0 €",
+    emailInvalid: "Virheellinen sähköpostiosoite",
+    urlInvalid: "Virheellinen www-osoite",
+    APIIdMin: "Rajapinnan palauttamassa ID-arvossa liian vähän merkkejä",
+    APIIdMax: "Rajapinnan palauttamassa ID-arvossa on liian monta merkkiä",
+    overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
+    loanShareChanged: "Lainaosuus muuttunut laskelmasta",
 };
+
+const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
+    let returnValue = {message: ctx.defaultError};
+    if (issue.code === z.ZodIssueCode.invalid_type) {
+        if (issue.expected === "number") {
+            returnValue = {message: errorMessages.numberType};
+        }
+    }
+    if (issue.code === z.ZodIssueCode.too_small || issue.code === z.ZodIssueCode.too_big) {
+        const isMin = issue.code === z.ZodIssueCode.too_small;
+        if (issue.type !== "set" && issue.type !== "array") {
+            returnValue = {
+                message: `${errorMessages[`${issue.type + isMin ? "Min" : "Max"}`]} (${
+                    isMin ? `min ${issue.minimum}` : `max ${issue.maximum}`
+                })`,
+            };
+        }
+    }
+    if (issue.code === z.ZodIssueCode.invalid_string) {
+        if (issue.validation !== "uuid") {
+            returnValue = {message: errorMessages[`${issue.validation}Invalid`]};
+        }
+    }
+    if (issue.code === z.ZodIssueCode.invalid_date) {
+        returnValue = {message: errorMessages.dateFormat};
+    }
+    return returnValue;
+};
+
+z.setErrorMap(customErrorMap);
 
 // ********************************
 // * Basic/primitive schemas
@@ -219,7 +260,7 @@ const ownerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
-    email: string({required_error: errorMessages.required}).email(errorMessages.emailValid).nullable(),
+    email: string({required_error: errorMessages.required}).email(errorMessages.emailInvalid).nullable(),
 });
 
 const ownershipSchema = object({
@@ -413,6 +454,7 @@ const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
     })
 );
 
+// Writable Apartment Sale Form
 const ApartmentSaleFormSchema = object({
     key: string().optional(),
     notification_date: z
@@ -423,22 +465,99 @@ const ApartmentSaleFormSchema = object({
         .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
     purchase_price: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .gt(0, errorMessages.priceMin)
+        .nonnegative(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
-        .nullable(),
+        .nullish(),
     apartment_share_of_housing_company_loans: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.loanShareMin)
-        .nullable(),
-    exclude_from_statistics: boolean().optional(),
+        .gte(0, errorMessages.loanShareMin)
+        .nullish(),
+    exclude_from_statistics: boolean(),
 });
 
-const ApartmentSaleSchema = ApartmentSaleFormSchema.and(
-    object({
-        id: string().optional(),
-        ownerships: object({owner: object({id: APIIdString}), percentage: number()}).array(),
-    })
-);
+// Writable list of ownerships
+const OwnershipsListSchema = object({
+    owner: object({id: APIIdString.optional().or(z.literal(""))}),
+    percentage: number(),
+})
+    .array()
+    .superRefine((elements, ctx) => {
+        // Can't have an empty ownerships list
+        if (!elements.length) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.noOwnerships,
+            });
+            return;
+        }
+
+        // Check for duplicates
+        const ownerIds = elements.filter((e) => e.owner.id).map((e) => e.owner.id);
+        if (ownerIds.length !== new Set(ownerIds).size) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.ownershipDuplicate,
+            });
+        }
+
+        // Prevent empty fields
+        if (elements.filter((e) => !e.owner.id).length) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Tyhjä omistaja kenttä",
+            });
+            return;
+        }
+        if (elements.filter((e) => !e.percentage).length) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Prosenttikentän arvo on 0",
+            });
+            return;
+        }
+
+        // Sum of percentages must be 100
+        const percentages = elements.map((e) => e.percentage);
+        const percentagesSum = percentages.reduce((a, b) => a + b, 0);
+        if (percentagesSum !== 0 && percentagesSum !== 100) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: errorMessages.ownershipPercent,
+            });
+        }
+    });
+
+// Apartment Sale Form that can be submitted.
+// Other validations still need to be done, but those are out of scope for this schema.
+const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({purchase_price: true})
+    .and(
+        object({
+            id: string().optional(),
+            purchase_price: z
+                .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+                .nonnegative(errorMessages.priceMin)
+                .max(999999, errorMessages.priceMax),
+            ownerships: OwnershipsListSchema,
+        })
+    )
+    .superRefine((data, ctx) => {
+        // Price can be zero, but it can't be nullish.
+        if (data.purchase_price === undefined || data.purchase_price === null) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["purchase_price"],
+                message: errorMessages.required,
+            });
+        }
+        // Price can be zero only if sale is excluded from statistics.
+        if (!data.exclude_from_statistics && data.purchase_price === 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["purchase_price"],
+                message: "Pakollinen jos kauppa tilastoidaan.",
+            });
+        }
+    });
 
 const ApartmentSaleCreatedSchema = object({
     id: string(),
@@ -810,6 +929,7 @@ export {
     ownerAPISchema,
     ownershipsSchema,
     ApartmentSaleSchema,
+    OwnershipsListSchema,
 };
 
 // Types (i.e. models)

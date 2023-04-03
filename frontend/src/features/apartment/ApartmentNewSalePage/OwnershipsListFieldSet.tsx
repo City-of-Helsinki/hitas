@@ -1,57 +1,39 @@
-import {Button, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
-import {Control, useFieldArray, useWatch} from "react-hook-form";
+import {Button, Fieldset, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
+import {useFieldArray} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
-import {useGetOwnersQuery} from "../../app/services";
-import {IOwner, IOwnership} from "../schemas";
-import {formatOwner} from "../utils";
-import {NumberInput, RelatedModelInput} from "./form";
+import {useGetOwnersQuery} from "../../../app/services";
+import {NumberInput, RelatedModelInput} from "../../../common/components/form";
+import {IOwner, OwnershipsListSchema} from "../../../common/schemas";
+import {formatOwner} from "../../../common/utils";
 
-type FormValues = {
-    ownerships: IOwnership[];
-};
-
-const OwnershipsList = ({
-    formOwnershipsList,
-    noOwnersError = false,
-    formObject,
-}: {
-    formOwnershipsList: IOwnership[];
-    noOwnersError?: boolean;
-    formObject?;
-}) => {
+const OwnershipsListFieldSet = ({formObject, disabled}) => {
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,
         rules: {required: "Kauppatapahtumassa täytyy olla ainakin yksi omistajuus!"},
     });
-    const getTotal = (payload) => {
-        let sum = 0;
-        for (const item of payload) {
-            sum = sum + (Number.isNaN(item.percentage) ? 0 : item.percentage);
-        }
-        return sum;
-    };
+    formObject.register("ownerships");
 
-    // Ownerships
+    // Blank Ownership. This is appended to the list when user clicks "New ownership"
     const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
 
-    function TotalAmount({control}: {control: Control<FormValues>}) {
-        const ownershipValues = useWatch({control, name: "ownerships"});
-        return <span>{getTotal(ownershipValues)}</span>;
-    }
+    const ownerships = formObject.getValues("ownerships");
+    const formErrors = OwnershipsListSchema.safeParse(formObject.getValues("ownerships"));
+    const isFormInvalid = !formErrors.success;
 
     return (
-        <div>
+        <Fieldset
+            className={`ownerships-fieldset ${isFormInvalid ? "error" : ""}`}
+            heading="Omistajuudet *"
+        >
             <ul className="ownerships-list">
-                {formOwnershipsList.length ? (
+                {ownerships.length ? (
                     <>
                         <li>
                             <legend className="ownership-headings">
                                 <span>Omistaja *</span>
-                                <span>
-                                    Omistajuusprosentti (<TotalAmount control={formObject.control} /> / 100%) *
-                                </span>
+                                <span>Osuus *</span>
                             </legend>
                         </li>
                         {fields.map((field, index) => (
@@ -61,20 +43,14 @@ const OwnershipsList = ({
                             >
                                 <div className="owner">
                                     <RelatedModelInput
-                                        name={`ownerships.${index}.owner.id`}
-                                        fieldPath="owner.id"
+                                        label="Omistaja"
+                                        required
                                         queryFunction={useGetOwnersQuery}
                                         relatedModelSearchField="name"
-                                        getRelatedModelLabel={(obj) => formatOwner(obj)}
                                         formObject={formObject}
-                                        placeholder={
-                                            formObject.getValues(`ownerships.${index}.owner.name`)
-                                                ? `${formObject.getValues(
-                                                      `ownerships.${index}.owner.name`
-                                                  )} (${formObject.getValues(`ownerships.${index}.owner.identifier`)})`
-                                                : ""
-                                        }
-                                        required
+                                        formObjectFieldPath={`ownerships.${index}.owner`}
+                                        formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
+                                        disabled={disabled}
                                     />
                                 </div>
                                 <div className="percentage">
@@ -83,13 +59,14 @@ const OwnershipsList = ({
                                         fractionDigits={2}
                                         formObject={formObject}
                                         required
+                                        disabled={disabled}
                                     />
                                     <span>%</span>
                                 </div>
-                                <div className="icon--remove">
+                                <div className={`icon--remove${disabled ? " disabled" : ""}`}>
                                     <IconCrossCircle
                                         size="m"
-                                        onClick={() => remove(index)}
+                                        onClick={() => (disabled ? null : remove(index))}
                                     />
                                 </div>
                             </li>
@@ -97,7 +74,7 @@ const OwnershipsList = ({
                     </>
                 ) : (
                     <div
-                        className={noOwnersError ? "error-text" : ""}
+                        className={isFormInvalid ? "error-text" : ""}
                         style={{textAlign: "center"}}
                     >
                         <IconAlertCircleFill />
@@ -106,18 +83,26 @@ const OwnershipsList = ({
                     </div>
                 )}
             </ul>
+            {!formErrors.success && formErrors.error ? (
+                <>
+                    {formErrors.error.issues.map((e) => (
+                        <span key={`${e.code}-${e.message}`}>{e.message}</span>
+                    ))}
+                </>
+            ) : null}
             <div className="row row--buttons">
                 <Button
                     iconLeft={<IconPlus />}
-                    variant={formOwnershipsList.length > 0 ? "secondary" : "primary"}
+                    variant={ownerships.length > 0 ? "secondary" : "primary"}
                     theme="black"
                     onClick={() => append(emptyOwnership)}
+                    disabled={disabled}
                 >
                     Lisää omistajuus
                 </Button>
             </div>
-        </div>
+        </Fieldset>
     );
 };
 
-export default OwnershipsList;
+export default OwnershipsListFieldSet;

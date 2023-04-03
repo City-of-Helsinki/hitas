@@ -454,7 +454,7 @@ const MaximumPriceModalContent = ({
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
         });
-        setIsModalVisible(true);
+        if (!location.pathname.endsWith("sales")) setIsModalVisible(true);
     };
 
     useEffect(() => {

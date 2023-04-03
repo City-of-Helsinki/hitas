@@ -22,3 +22,11 @@ input, input + label::before
   --toggle-button-unselected-color: var(--color-black-60)
   &:focus::after
     border-color: $color-black-80 !important
+
+div .disabled
+  background-color: var(--input-background-disabled)
+  border-color: var(--input-border-color-disabled)
+  color: var(--input-color-disabled)
+  cursor: not-allowed
+  *
+    cursor: not-allowed !important

@@ -10,7 +10,6 @@ interface FormNumberInputProps extends FormInputProps {
 
 const NumberInput = ({
     name,
-    id = name,
     label = "",
     unit,
     fractionDigits = 0,
@@ -21,11 +20,11 @@ const NumberInput = ({
 }: FormNumberInputProps) => {
     const {
         register,
+        watch,
         formState: {errors},
     } = formObject;
     const formNumber = register(name, {valueAsNumber: true});
-
-    // TODO?: Format the value to only accept numbers (and a fraction)
+    watch(name);
 
     const handleWheel = (e) => {
         if (document.activeElement === e.target) {
@@ -40,14 +39,14 @@ const NumberInput = ({
     return (
         <div className={`input-field input-field--number${required ? " input-field--required" : ""}`}>
             <HDSNumberInput
-                type="number"
+                id={name}
                 label={label ?? ""}
-                id={id || name}
-                name={formNumber.name}
+                ref={formNumber.ref}
+                type="number"
                 unit={unit}
+                name={formNumber.name}
                 onChange={formNumber.onChange}
                 onBlur={formNumber.onBlur}
-                ref={formNumber.ref}
                 onWheel={handleWheel}
                 errorText={!!errors[formNumber.name] && errors[formNumber.name].message}
                 invalid={invalid ?? !!errors[formNumber.name]}

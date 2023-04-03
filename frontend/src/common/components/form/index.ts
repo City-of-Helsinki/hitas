@@ -14,6 +14,7 @@ export type FormInputProps = {
     label?: string;
     required?: boolean;
     invalid?: boolean;
+    errorText?: string;
     key?: string;
     tooltipText?: string;
     placeholder?;
