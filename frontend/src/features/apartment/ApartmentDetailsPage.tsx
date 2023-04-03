@@ -30,36 +30,19 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
                 {conditionsOfSale[0].owner.name} ({conditionsOfSale[0].owner.identifier})
             </h3>
             <ul>
-                {conditionsOfSale
-                    .filter((cos) => !cos.fulfilled)
-                    .map((cos) => (
-                        <li
-                            key={cos.id}
-                            className="unresolved"
+                {conditionsOfSale.map((cos) => (
+                    <li
+                        key={cos.id}
+                        className={cos.fulfilled ? "resolved" : "unresolved"}
+                    >
+                        <Link
+                            to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
                         >
-                            <Link
-                                to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
-                            >
-                                <ConditionsOfSaleStatus conditionOfSale={cos} />
-                                <span className="address">{formatAddress(cos.apartment.address)}</span>
-                            </Link>
-                        </li>
-                    ))}
-                {conditionsOfSale
-                    .filter((cos) => cos.fulfilled)
-                    .map((cos) => (
-                        <li
-                            key={cos.id}
-                            className="resolved"
-                        >
-                            <Link
-                                to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
-                            >
-                                <ConditionsOfSaleStatus conditionOfSale={cos} />
-                                <span className="address">{formatAddress(cos.apartment.address)}</span>
-                            </Link>
-                        </li>
-                    ))}
+                            <ConditionsOfSaleStatus conditionOfSale={cos} />
+                            <span className="address">{formatAddress(cos.apartment.address)}</span>
+                        </Link>
+                    </li>
+                ))}
             </ul>
         </li>
     );
@@ -79,6 +62,15 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
         }
         return acc;
     }, {});
+    // Order owners with unfulfilled conditions of sale first.
+    // When owners have the same amount of unfulfilled conditions of sale, owners with more total COS are last.
+    const sortedKeys = Object.keys(groupedConditionsOfSale).sort((a, b) => {
+        const diff =
+            groupedConditionsOfSale[b].filter((cos) => !cos.fulfilled).length -
+            groupedConditionsOfSale[a].filter((cos) => !cos.fulfilled).length;
+        if (diff !== 0) return diff;
+        return groupedConditionsOfSale[a].length - groupedConditionsOfSale[b].length;
+    });
 
     return (
         <Card>
@@ -104,10 +96,15 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
             <label className="card-heading card-heading--conditions-of-sale">Myyntiehdot</label>
             {Object.keys(groupedConditionsOfSale).length ? (
                 <ul>
-                    {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
+                    {sortedKeys.map((ownerId) => (
                         <SingleApartmentConditionOfSale
                             key={ownerId}
-                            conditionsOfSale={cos}
+                            conditionsOfSale={
+                                // Sort owners conditions of sale by unfulfilled first
+                                groupedConditionsOfSale[ownerId].sort((a, b) =>
+                                    !!a.fulfilled === !!b.fulfilled ? 0 : a.fulfilled ? 1 : -1
+                                )
+                            }
                         />
                     ))}
                 </ul>
