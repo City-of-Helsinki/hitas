@@ -4,8 +4,7 @@ import uuid
 from typing import Any, Dict, Optional
 
 from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
-from django.db.models.expressions import RawSQL
-from django.db.models.functions import Round, TruncMonth
+from django.db.models.functions import Coalesce, Round, TruncMonth
 from django.utils import timezone
 
 from hitas.calculations.exceptions import InvalidCalculationResultException
@@ -29,12 +28,13 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
-from hitas.utils import monthify, safe_attrgetter
+from hitas.services.apartment import subquery_first_sale_acquisition_price
+from hitas.utils import SQSum, monthify, safe_attrgetter
 
 
 def create_max_price_calculation(
-    housing_company_uuid: str,
-    apartment_uuid: str,
+    housing_company_uuid: uuid.UUID,
+    apartment_uuid: uuid.UUID,
     calculation_date: Optional[datetime.date],
     apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: Optional[datetime.date],
@@ -233,8 +233,8 @@ def calculate_max_price(
 
 
 def fetch_apartment(
-    housing_company_uuid: str,
-    apartment_uuid: str,
+    housing_company_uuid: uuid.UUID,
+    apartment_uuid: uuid.UUID,
     calculation_date: Optional[datetime.date],
 ) -> ApartmentWithAnnotationsMaxPrice:
     return (
@@ -415,64 +415,38 @@ def fetch_apartment(
                 output_field=HitasModelDecimalField(null=True),
             ),
             surface_area_price_ceiling=Round(F("surface_area_price_ceiling_m2") * F("surface_area")),
-            realized_housing_company_acquisition_price=RawSQL(
-                sql=(
-                    """
-                    SELECT
-                        COALESCE (
-                            SUM(
-                                (
-                                    SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
-                                    FROM hitas_apartmentsale AS aps
-                                    WHERE aps.apartment_id = a.id
-                                    GROUP BY aps.purchase_date
-                                    ORDER BY aps.purchase_date
-                                    LIMIT 1
-                                )
-                            ),
-                            0.0
-                        )
-                    FROM hitas_apartment AS a
-                        INNER JOIN hitas_building AS b ON (a.building_id = b.id)
-                        INNER JOIN hitas_realestate AS r ON (r.id = b.real_estate_id)
-                        INNER JOIN hitas_housingcompany AS hc ON (hc.id = r.housing_company_id)
-                        WHERE (
-                            hc.id = hitas_housingcompany.id
-                        )
-                    """
-                ),
-                params=(),
-                output_field=HitasModelDecimalField(),
+            realized_housing_company_acquisition_price=(
+                Coalesce(
+                    SQSum(
+                        queryset=(
+                            Apartment.objects.filter(
+                                building__real_estate__housing_company__uuid=housing_company_uuid,
+                            ).annotate(
+                                _price=subquery_first_sale_acquisition_price("id"),
+                            )
+                        ),
+                        sum_field="_price",
+                    ),
+                    0.0,
+                    output_field=HitasModelDecimalField(),
+                )
             ),
-            completion_date_realized_housing_company_acquisition_price=RawSQL(
-                sql=(
-                    """
-                    SELECT
-                        COALESCE (
-                            SUM(
-                                (
-                                    SELECT SUM(aps.purchase_price + aps.apartment_share_of_housing_company_loans)
-                                    FROM hitas_apartmentsale AS aps
-                                    WHERE aps.apartment_id = a.id
-                                    GROUP BY aps.purchase_date
-                                    ORDER BY aps.purchase_date
-                                    LIMIT 1
-                                )
-                            ),
-                            0.0
-                        )
-                    FROM hitas_apartment AS a
-                        INNER JOIN hitas_building AS b ON (a.building_id = b.id)
-                        INNER JOIN hitas_realestate AS r ON (r.id = b.real_estate_id)
-                        INNER JOIN hitas_housingcompany AS hc ON (hc.id = r.housing_company_id)
-                        WHERE (
-                            hc.id = hitas_housingcompany.id
-                            AND a.completion_date = hitas_apartment.completion_date
-                        )
-                    """
-                ),
-                params=(),
-                output_field=HitasModelDecimalField(),
+            completion_date_realized_housing_company_acquisition_price=(
+                Coalesce(
+                    SQSum(
+                        queryset=(
+                            Apartment.objects.filter(
+                                building__real_estate__housing_company__uuid=housing_company_uuid,
+                                completion_date=OuterRef("completion_date"),
+                            ).annotate(
+                                _price=subquery_first_sale_acquisition_price("id"),
+                            )
+                        ),
+                        sum_field="_price",
+                    ),
+                    0.0,
+                    output_field=HitasModelDecimalField(),
+                )
             ),
         )
         .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)

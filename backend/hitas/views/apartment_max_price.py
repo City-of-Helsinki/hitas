@@ -32,8 +32,8 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
         # Calculate max price
         max_prices = create_max_price_calculation(
-            housing_company_uuid=kwargs["housing_company_uuid"],
-            apartment_uuid=kwargs["apartment_uuid"],
+            housing_company_uuid=uuid.UUID(hex=kwargs["housing_company_uuid"]),
+            apartment_uuid=uuid.UUID(hex=kwargs["apartment_uuid"]),
             calculation_date=calculation_date,
             apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
             apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
