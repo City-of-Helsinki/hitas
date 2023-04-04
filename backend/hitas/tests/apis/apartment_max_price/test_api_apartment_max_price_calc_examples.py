@@ -1359,3 +1359,64 @@ def test__api__apartment_max_price__no_sales_on_apartment__pre_2011(api_client: 
         "reason": "Conflict",
         "status": 409,
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__missing_property_manager(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        additional_work_during_construction=0,
+        completion_date=datetime.date(2019, 11, 27),
+        surface_area=30.0,
+        share_number_start=18402,
+        share_number_end=20784,
+        sales=[],
+        building__real_estate__housing_company__property_manager=None,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    # Create another apartment with rest of the surface area
+    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
+
+    HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+    HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+    )
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=a,
+        purchase_price=80350,
+        apartment_share_of_housing_company_loans=119150,
+        ownerships=[],
+    )
+    OwnershipFactory.create(apartment=a, percentage=75.2, sale=sale)
+    OwnershipFactory.create(apartment=a, percentage=24.8, sale=sale)
+
+    # Create necessary apartment's completion date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=129.29)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=167.9)
+
+    # Create necessary calculation date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
+
+    # Create necessary improvement's completion date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=129.20)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=171.0)
+
+    data = {
+        "calculation_date": "2022-07-05",
+        "apartment_share_of_housing_company_loans": 2500,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    assert response.json()["housing_company"]["property_manager"] == {"name": "", "street_address": ""}
