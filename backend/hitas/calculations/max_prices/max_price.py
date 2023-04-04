@@ -3,7 +3,7 @@ import datetime
 import uuid
 from typing import Any, Dict, Optional
 
-from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models import Case, F, OuterRef, Prefetch, Q, Subquery, Sum, When
 from django.db.models.functions import Coalesce, Round, TruncMonth
 from django.utils import timezone
 
@@ -422,7 +422,14 @@ def fetch_apartment(
                             Apartment.objects.filter(
                                 building__real_estate__housing_company__uuid=housing_company_uuid,
                             ).annotate(
-                                _price=subquery_first_sale_acquisition_price("id"),
+                                _price=Case(
+                                    When(
+                                        condition=Q(sales__isnull=True),
+                                        then=Sum(F("catalog_purchase_price") + F("catalog_primary_loan_amount")),
+                                    ),
+                                    default=subquery_first_sale_acquisition_price("id"),
+                                    output_field=HitasModelDecimalField(),
+                                ),
                             )
                         ),
                         sum_field="_price",
@@ -439,7 +446,14 @@ def fetch_apartment(
                                 building__real_estate__housing_company__uuid=housing_company_uuid,
                                 completion_date=OuterRef("completion_date"),
                             ).annotate(
-                                _price=subquery_first_sale_acquisition_price("id"),
+                                _price=Case(
+                                    When(
+                                        condition=Q(sales__isnull=True),
+                                        then=Sum(F("catalog_purchase_price") + F("catalog_primary_loan_amount")),
+                                    ),
+                                    default=subquery_first_sale_acquisition_price("id"),
+                                    output_field=HitasModelDecimalField(),
+                                ),
                             )
                         ),
                         sum_field="_price",
