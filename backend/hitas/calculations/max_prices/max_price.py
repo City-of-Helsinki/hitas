@@ -15,7 +15,6 @@ from hitas.models import (
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
-    ApartmentSale,
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
     HousingCompany,
@@ -28,7 +27,11 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
-from hitas.services.apartment import subquery_first_sale_acquisition_price
+from hitas.services.apartment import (
+    subquery_first_sale_acquisition_price,
+    subquery_first_sale_loan_amount,
+    subquery_first_sale_purchase_price,
+)
 from hitas.utils import SQSum, monthify, safe_attrgetter
 
 
@@ -325,22 +328,8 @@ def fetch_apartment(
             ),
         )
         .annotate(
-            _first_sale_purchase_price=Subquery(
-                queryset=(
-                    ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                    .order_by("purchase_date", "id")
-                    .values_list("purchase_price", flat=True)[:1]
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            _first_sale_share_of_housing_company_loans=Subquery(
-                queryset=(
-                    ApartmentSale.objects.filter(apartment_id=OuterRef("id"))
-                    .order_by("purchase_date", "id")
-                    .values_list("apartment_share_of_housing_company_loans", flat=True)[:1]
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
+            _first_sale_purchase_price=subquery_first_sale_purchase_price("id"),
+            _first_sale_share_of_housing_company_loans=subquery_first_sale_loan_amount("id"),
             completion_month=TruncMonth("completion_date"),
             calculation_date_cpi=Subquery(
                 queryset=(
