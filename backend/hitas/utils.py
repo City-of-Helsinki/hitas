@@ -50,11 +50,11 @@ def subquery_count(model: type[Model], outer_field: str, **kwargs) -> Subquery:
     )
 
 
-def subquery_first_id(model: type[Model], outer_field: str, order_by: str, **kwargs) -> Subquery:
+def subquery_first_id(model: type[Model], outer_field: str, order_by: list[str], **kwargs) -> Subquery:
     """Selects the first row on the model (with references to outer_field) based on the given ordering."""
     return Subquery(
         model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
-        .order_by(order_by)
+        .order_by(*order_by)
         .values_list("id", flat=True)[:1]
     )
 

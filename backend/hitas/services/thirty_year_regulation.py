@@ -289,7 +289,7 @@ def _get_sales_data(
             _first_sale_id=Subquery(
                 queryset=(
                     ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
-                    .order_by("purchase_date")
+                    .order_by("purchase_date", "id")
                     .values_list("id", flat=True)[:1]
                 ),
                 output_field=models.IntegerField(null=True),

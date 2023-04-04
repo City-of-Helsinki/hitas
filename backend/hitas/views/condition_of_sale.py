@@ -103,7 +103,7 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
                     # Limit the fetched sales to only the first sale,
                     # as we only need that to figure out if the apartment is new
                     ApartmentSale.objects.filter(
-                        id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="purchase_date"),
+                        id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
                     ),
                 ),
             ).filter(uuid__in=owner_uuids)

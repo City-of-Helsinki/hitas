@@ -13,13 +13,13 @@ from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
-from hitas.models.apartment_sale import ApartmentSale, ApartmentSaleWithAnnotations
+from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.condition_of_sale import ConditionOfSaleAnnotated, GracePeriod
 from hitas.models.housing_company import HousingCompany
 from hitas.models.ownership import Ownership, OwnershipLike
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
-from hitas.utils import subquery_count
+from hitas.utils import subquery_first_id
 
 
 class ApartmentState(Enum):
@@ -124,12 +124,11 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_sale_purchase_price"):
             return self._latest_sale_purchase_price
 
-        latest_sale = self.latest_sale_with_sale_count
+        latest_sale = self.latest_sale
         self._latest_sale_purchase_price = None
         if latest_sale is None:
             return None
-        if latest_sale.sale_count < 2:
-            return None
+
         self._latest_sale_purchase_price = latest_sale.purchase_price
         return self._latest_sale_purchase_price
 
@@ -140,12 +139,11 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_sale_share_of_housing_company_loans"):
             return self._latest_sale_share_of_housing_company_loans
 
-        latest_sale = self.latest_sale_with_sale_count
+        latest_sale = self.latest_sale
         self._latest_sale_share_of_housing_company_loans = None
         if latest_sale is None:
             return None
-        if latest_sale.sale_count < 2:
-            return None
+
         self._latest_sale_share_of_housing_company_loans = latest_sale.apartment_share_of_housing_company_loans
         return self._latest_sale_share_of_housing_company_loans
 
@@ -167,12 +165,11 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_purchase_date"):
             return self._latest_purchase_date
 
-        latest_sale = self.latest_sale_with_sale_count
+        latest_sale = self.latest_sale
         self._latest_purchase_date = None
         if latest_sale is None:
             return None
-        if latest_sale.sale_count < 2:
-            return None
+
         self._latest_purchase_date = latest_sale.purchase_date
         return self._latest_purchase_date
 
@@ -256,16 +253,16 @@ class Apartment(ExternalHitasModel):
 
     @cached_property
     def first_sale(self) -> Optional[ApartmentSale]:
-        return self.sales.order_by("purchase_date").first()
+        return self.sales.order_by("purchase_date", "id").first()
 
     @cached_property
-    def latest_sale_with_sale_count(self) -> Optional[ApartmentSaleWithAnnotations]:
-        """Get the latest sale for this apartment, with the total number of sales annotated."""
+    def latest_sale(self) -> Optional[ApartmentSale]:
         return (
-            self.sales.annotate(
-                sale_count=subquery_count(ApartmentSale, "apartment_id"),
+            self.sales.exclude(
+                # First sale should not be the latest sale
+                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
             )
-            .order_by("purchase_date")
+            .order_by("-purchase_date", "-id")
             .last()
         )
 

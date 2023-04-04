@@ -391,7 +391,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 _acquisition_price=Subquery(
                     queryset=(
                         ApartmentSale.objects.filter(apartment_id=OuterRef("real_estates__buildings__apartments__id"))
-                        .order_by("purchase_date")
+                        .order_by("purchase_date", "id")
                         .annotate(
                             _acquisition_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans"))
                         )
