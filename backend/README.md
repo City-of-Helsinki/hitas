@@ -73,7 +73,17 @@ Git will now automatically look for the file when using `git blame`, no addition
 > You'll need a Microsoft account linked to the Helsinki City Active Directory to use this method.
 > If you are a developer for Hitas, you should be in the Active Directory.
 
-From [Azure Pipelines] -> Pipelines -> Library -> `hitastj-api-development`, copy
+The setup requires Tunnistamo [git submodule] to be present, even though it is not used with the
+remote setup. You'll need to init git submodules with `git submodule update --init` and then
+fetch the submodule with `git pull --recurse-submodules`.
+
+Now make a local config for Tunnistamo docker compose:
+
+```shell
+cp tunnistamo/docker-compose.env.yaml.template tunnistamo/docker-compose.env.yaml
+```
+
+Next, from [Azure Pipelines] -> Pipelines -> Library -> `hitastj-api-development`, copy
 `SOCIAL_AUTH_TUNNISTAMO_SECRET` to the same key in `backend/.env`. Make sure `OIDC_API_ISSUER`
 and `SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT` are both `https://tunnistamo.test.hel.ninja/openid`
 in `backend/.env`. Reboot the backend.
@@ -87,8 +97,8 @@ configured at Tunnistamo's side.
 > Currently, this only works if you run hitas backend locally. Docker setup has some networking
 > problems which prevent requests from reaching Tunnistamo container from Hitas backend container.
 
-[Tunnistamo] is set up using [git submodules]. You'll need to fetch the submodule separately
-on git pull or clone by adding the `--recurse-submodules` command line option.
+[Tunnistamo] is set up using a [git submodule]. You'll need to init git submodules with
+`git submodule update --init` and then fetch the submodule with `git pull --recurse-submodules`.
 
 > If you are on Windows, you'll need to change the line-endings on `tunnistamo/manage.py`
 > and `tunnistamo/docker-entrypoint.sh` to `LF`!
@@ -134,6 +144,6 @@ Start up the backend server on your local machine on `<port>`. You should now be
 to log in at `http://localhost:<port>/helauth/login`.
 
 [Tunnistamo]: https://github.com/City-of-Helsinki/tunnistamo
-[git submodules]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+[git submodule]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
 [Developer settings]: https://github.com/settings/developers
 [Azure Pipelines]: https://dev.azure.com/City-of-Helsinki/hitastj
