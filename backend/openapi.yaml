@@ -2359,7 +2359,7 @@ paths:
             example: 2023-01-01
       responses:
         '200':
-          description: Successfully performed thrity year regulation for housing companies
+          description: Successfully performed thirty-year regulation for housing companies
           content:
             application/json:
               schema:
@@ -7211,6 +7211,8 @@ components:
         - automatically_released
         - released_from_regulation
         - stays_regulated
+        - skipped
+        - obfuscated_owners
       properties:
         automatically_released:
           description: Housing Companies that are release from regulation automatically.
@@ -7232,6 +7234,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ThirtyYearRegulationData'
+        obfuscated_owners:
+          description: Owners that have been obfuscated due to no longer owning any regulated apartments
+          type: array
+          items:
+            $ref: '#/components/schemas/ObfuscatedOwner'
 
     ThirtyYearRegulationData:
       description: Thirty year regulation data for a checked housing company
@@ -7265,6 +7272,32 @@ components:
           description: Does this housing company use the old or the new hitas ruleset?
           type: boolean
           example: false
+
+    ObfuscatedOwner:
+      description: Owner that has been obfuscated due to no longer owning any regulated apartments
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - identifier
+        - email
+      properties:
+        name:
+          description: Name of this owner
+          type: string
+          nullable: true
+          example: Martti Virtanen
+        identifier:
+          description: Identifier (social security number, business id, etc) of this owner
+          type: string
+          nullable: true
+          example: 260969-420B
+        email:
+          description: Email for this owner
+          type: string
+          nullable: true
+          example: martti.virtanen@example.com
+
 
     SurfaceAreaPriceCeilingCalculationResult:
       description: Surface area price ceiling calculation

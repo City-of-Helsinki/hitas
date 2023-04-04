@@ -9,6 +9,7 @@ from rest_framework.reverse import reverse
 from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
 from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.owner import Owner, OwnerT
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
@@ -36,6 +37,7 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -105,10 +107,11 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    # 11. Select thirty year regulation results for update
-    # 12. Save thirty year regulation results
-    # 13. Save thirty year regulation results' rows
-    with count_queries(13, list_queries_on_failure=True):
+    # 11. Search for owners to be obfuscated (none found)
+    # 12. Select thirty year regulation results for update
+    # 13. Save thirty year regulation results
+    # 14. Save thirty year regulation results' rows
+    with count_queries(14, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -132,6 +135,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
             )
         ],
         skipped=[],
+        obfuscated_owners=[],
     )
 
     #
@@ -195,6 +199,8 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
+    owner: Owner = sale.ownerships.first().owner
+
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
@@ -234,10 +240,12 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # 8. Fetch hitas sales
     # 9. Fetch external sales data
     # 10. Set housing companies' states
-    # 11. Select thirty year regulation results for update
-    # 12. Save thirty year regulation results
-    # 13. Save thirty year regulation results' rows
-    with count_queries(13, list_queries_on_failure=True):
+    # 11. Search for owners to be obfuscated
+    # 12. Obfuscate owners without any regulated apartments
+    # 13. Select thirty year regulation results for update
+    # 14. Save thirty year regulation results
+    # 15. Save thirty year regulation results' rows
+    with count_queries(15, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -261,6 +269,13 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         ],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner.name,
+                identifier=owner.identifier,
+                email=owner.email,
+            ),
+        ],
     )
 
     #
@@ -324,6 +339,8 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
+    owner: Owner = sale.ownerships.first().owner
+
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
@@ -376,6 +393,13 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         ],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner.name,
+                identifier=owner.identifier,
+                email=owner.email,
+            ),
+        ],
     )
 
 
@@ -519,6 +543,8 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
+    owner: Owner = sale.ownerships.first().owner
+
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
         calculation_quarter=to_quarter(previous_year_last_month),
@@ -545,6 +571,13 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner.name,
+                identifier=owner.identifier,
+                email=owner.email,
+            ),
+        ],
     )
 
     #
@@ -615,6 +648,9 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
+    owner_1: Owner = sale_1.ownerships.first().owner
+    owner_2: Owner = sale_2.ownerships.first().owner
+
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
         completion_date=previous_year_last_month,
@@ -665,6 +701,18 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         ],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner_1.name,
+                identifier=owner_1.identifier,
+                email=owner_1.email,
+            ),
+            OwnerT(
+                name=owner_2.name,
+                identifier=owner_2.identifier,
+                email=owner_2.email,
+            ),
+        ],
     )
 
     #
@@ -707,6 +755,8 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
+
+    owner: Owner = sale.ownerships.first().owner
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
@@ -760,6 +810,13 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         ],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner.name,
+                identifier=owner.identifier,
+                email=owner.email,
+            ),
+        ],
     )
 
 
@@ -837,6 +894,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
+        obfuscated_owners=[],
     )
 
 
@@ -913,6 +971,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
+        obfuscated_owners=[],
     )
 
 
@@ -990,6 +1049,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
+        obfuscated_owners=[],
     )
 
 
@@ -1063,6 +1123,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
             )
         ],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -1154,6 +1215,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
             )
         ],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -1237,6 +1299,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
             )
         ],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -1561,6 +1624,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
+        obfuscated_owners=[],
     )
 
 
@@ -1639,6 +1703,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
             )
         ],
+        obfuscated_owners=[],
     )
 
 
@@ -1731,6 +1796,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
             )
         ],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -1769,6 +1835,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[],
+        obfuscated_owners=[],
     )
 
 
@@ -1856,6 +1923,7 @@ def test__api__regulation__housing_company_regulation_status(
                 )
             ],
             skipped=[],
+            obfuscated_owners=[],
         )
     else:
         assert response.json() == RegulationResults(
@@ -1863,4 +1931,5 @@ def test__api__regulation__housing_company_regulation_status(
             released_from_regulation=[],
             stays_regulated=[],
             skipped=[],
+            obfuscated_owners=[],
         )
