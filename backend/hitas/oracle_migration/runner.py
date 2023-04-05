@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, TypeVar
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.db import connection as django_connection
-from django.db.models import Max
+from django.db.models import Max, OuterRef, Prefetch, Subquery
 from django.utils import timezone
 from safedelete import HARD_DELETE
 from sqlalchemy import asc, create_engine, desc, func
@@ -250,6 +250,9 @@ def run(
 
             # Apartment sales history
             create_apartment_sales(connection, converted_data)
+
+            # Remove apartments owned by housing companies
+            remove_apartments_owned_by_housing_companies()
 
     MigrationDone.objects.create()
 
@@ -1234,3 +1237,47 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
         Ownership.objects.bulk_create(bulk_ownerships)
 
     print(f"Loaded {count} apartment sales.\n")
+
+
+def remove_apartments_owned_by_housing_companies() -> None:
+    ownerships = (
+        Ownership.objects.select_related(
+            "owner",
+            "sale__apartment",
+        )
+        .prefetch_related(
+            # Prefetch only the last sale
+            Prefetch(
+                "sale__apartment__sales",
+                ApartmentSale.objects.filter(
+                    id__in=Subquery(
+                        ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
+                        .order_by("-purchase_date", "-id")
+                        .values_list("id", flat=True)[:1]
+                    )
+                ),
+            ),
+        )
+        .filter(
+            owner__name__in=[
+                "Yhtiön hallinnassa",
+                "TYhtiön hallinnassa",
+                "Yhtiön omistuksessa",
+                "Taloyhtiön hallintaan jäävä huoneisto",
+                "Huoltomiehen asunto",
+                "Talonmiehen asunto",
+                "( Talonmies )",
+                "Talonmies",
+            ],
+        )
+        .all()
+    )
+    to_remove: set[Apartment] = set()
+    for ownership in ownerships:
+        if ownership.sale.apartment.sales.all()[0] == ownership.sale:
+            to_remove.add(ownership.apartment)
+
+    for apartment in to_remove:
+        apartment.delete(force_policy=HARD_DELETE)
+
+    print(f"Deleted {len(to_remove)} apartments owned by housing companies.\n")
