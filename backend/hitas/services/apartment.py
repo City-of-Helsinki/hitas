@@ -23,7 +23,7 @@ def prefetch_first_sale(lookup_prefix: str = "", ignore: Collection[int] = ()) -
             id__in=Subquery(
                 ApartmentSale.objects.filter(apartment_id=OuterRef("apartment_id"))
                 .exclude(id__in=ignore)
-                .order_by("purchase_date")
+                .order_by("purchase_date", "id")
                 .values_list("id", flat=True)[:1]
             )
         ),
@@ -34,7 +34,7 @@ def subquery_first_sale_acquisition_price(outer_ref: str) -> Subquery:
     return Subquery(
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
-            .order_by("purchase_date")
+            .order_by("purchase_date", "id")
             .annotate(_first_sale_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans")))
             .values_list("_first_sale_price", flat=True)[:1]
         ),
@@ -46,7 +46,7 @@ def subquery_first_sale_purchase_price(outer_ref: str) -> Subquery:
     return Subquery(
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
-            .order_by("purchase_date")
+            .order_by("purchase_date", "id")
             .values_list("purchase_price", flat=True)[:1]
         ),
         output_field=HitasModelDecimalField(null=True),
@@ -57,7 +57,7 @@ def subquery_first_sale_loan_amount(outer_ref: str) -> Subquery:
     return Subquery(
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
-            .order_by("purchase_date")
+            .order_by("purchase_date", "id")
             .values_list("apartment_share_of_housing_company_loans", flat=True)[:1]
         ),
         output_field=HitasModelDecimalField(null=True),
@@ -69,9 +69,10 @@ def subquery_latest_sale_purchase_price(outer_ref: str) -> Subquery:
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
             .exclude(
-                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
+                # First sale should not be the latest sale
+                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
             )
-            .order_by("-purchase_date")
+            .order_by("-purchase_date", "-id")
             .values_list("purchase_price", flat=True)[:1]
         ),
         output_field=HitasModelDecimalField(null=True),
@@ -82,7 +83,7 @@ def subquery_first_purchase_date(outer_ref: str) -> Subquery:
     return Subquery(
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
-            .order_by("purchase_date")
+            .order_by("purchase_date", "id")
             .values_list("purchase_date", flat=True)[:1]
         ),
         output_field=models.DateField(null=True),
@@ -94,9 +95,10 @@ def subquery_latest_purchase_date(outer_ref: str) -> Subquery:
         queryset=(
             ApartmentSale.objects.filter(apartment_id=OuterRef(outer_ref))
             .exclude(
-                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by="-purchase_date"),
+                # First sale should not be the latest sale
+                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
             )
-            .order_by("-purchase_date")
+            .order_by("-purchase_date", "-id")
             .values_list("purchase_date", flat=True)[:1]
         ),
         output_field=models.DateField(null=True),

@@ -66,7 +66,7 @@ class ConditionOfSale(ExternalHitasModel):
 
         return (
             ApartmentSale.objects.filter(apartment=self.new_ownership.apartment)
-            .order_by("purchase_date")
+            .order_by("purchase_date", "id")
             .values_list("purchase_date", flat=True)
             .first()
         )
