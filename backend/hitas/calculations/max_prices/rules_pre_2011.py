@@ -50,6 +50,8 @@ class RulesPre2011(CalculatorRules):
             raise InvalidCalculationResultException(
                 error_code="missing_completion_date_realized_housing_company_acquisition_price"
             )
+        if not apartment.first_sale_acquisition_price:
+            raise InvalidCalculationResultException(error_code="missing_first_sale")
 
         housing_company_index_adjusted_acquisition_price = (
             apartment.completion_date_realized_housing_company_acquisition_price
