@@ -29,7 +29,7 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
-from hitas.utils import monthify
+from hitas.utils import monthify, safe_attrgetter
 
 
 def create_max_price_calculation(
@@ -216,8 +216,16 @@ def calculate_max_price(
             "official_name": apartment.housing_company.official_name,
             "archive_id": apartment.housing_company.id,
             "property_manager": {
-                "name": apartment.housing_company.property_manager.name,
-                "street_address": apartment.housing_company.property_manager.street_address,
+                "name": safe_attrgetter(
+                    apartment.housing_company,
+                    "property_manager.name",
+                    default="",
+                ),
+                "street_address": safe_attrgetter(
+                    apartment.housing_company,
+                    "property_manager.street_address",
+                    default="",
+                ),
             },
         },
         "additional_info": additional_info,
