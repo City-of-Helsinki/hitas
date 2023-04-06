@@ -30,6 +30,13 @@
 
     [class^="StatusLabel"]
       background-color: var(--color-engel-light)
+      // cancel the hover effect, as we don't have a date to display
+      &:hover
+        width: auto
+        opacity: 1
+        [class*="hds-status-label-icon"]
+          width: auto
+          opacity: 1
 
   .apartment-stats
     @include flexbox()
