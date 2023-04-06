@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from hitas.views.health import HealthCheckView
+from users.views import UserInfoView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -10,6 +11,7 @@ urlpatterns = [
     path("healthz", HealthCheckView.as_view(), name="health_check"),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("helusers.urls")),
+    path("helauth/userinfo/", UserInfoView.as_view(), name="userinfo"),
 ]
 
 if settings.DEBUG_TOOLBAR:
