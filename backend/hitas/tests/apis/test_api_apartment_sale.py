@@ -852,11 +852,21 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(api_client: HitasAPIClient):
-    owner: Owner = OwnerFactory.create()
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner)
-    new_apartment: Apartment = ApartmentFactory.create(sales=[])
+def test__api__apartment_sale__create__new_apartment__is_new_before_cos_fulfilled(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
 
+    owner: Owner = OwnerFactory.create()
+    old_apartment: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2022, 1, 1),
+        sales__purchase_date=datetime.date(2022, 1, 1),
+        sales__ownerships__owner=owner,
+    )
+    new_apartment: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2022, 1, 1),
+        sales=[],
+    )
+
+    assert old_apartment.is_new is False
     assert new_apartment.is_new is True
 
     data = {
@@ -899,10 +909,12 @@ def test__api__apartment_sale__create__new_apartment__no_longer_new_after_sold(a
     conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
     assert len(conditions_of_sale) == 1
     assert conditions_of_sale[0].new_ownership.apartment == new_apartment
-    assert conditions_of_sale[0].old_ownership.apartment == old_ownership.apartment
+    assert conditions_of_sale[0].old_ownership.apartment == old_apartment
 
-    new_apartment.refresh_from_db()
-    assert new_apartment.is_new is False
+    # Apartment is new after the first sale until the condition of sale created with it is fulfilled
+    assert Apartment.objects.get(id=new_apartment.id).is_new is True
+    conditions_of_sale[0].delete()
+    assert Apartment.objects.get(id=new_apartment.id).is_new is False
 
     url_2 = reverse(
         "hitas:apartment-sale-detail",

@@ -215,6 +215,11 @@ class Apartment(ExternalHitasModel):
         if first_sale.purchase_date > today:
             return True
 
+        # If the apartment has any conditions of sale (where it is considered the new apartment)
+        # on the first sale that have not been fulfilled, the apartment is still new.
+        if any(ownership.conditions_of_sale_new.exists() for ownership in first_sale.ownerships.all()):
+            return True
+
         # Otherwise the apartment old.
         return False
 

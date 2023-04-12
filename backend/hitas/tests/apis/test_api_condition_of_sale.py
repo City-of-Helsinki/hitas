@@ -1048,6 +1048,52 @@ def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPICl
     assert len(conditions_of_sale) == 0
 
 
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__apartment_new_due_to_condition_of_sale(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
+    # given:
+    # - An owner with ownerships to two new apartments and one old apartment
+    # - One new apartment is completed and the other is not
+    # - There is already a condition of sale between the completed new apartment and the old apartment
+    owner: Owner = OwnerFactory.create()
+    new_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+    )
+    new_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    ConditionOfSaleFactory.create(new_ownership=new_ownership_1, old_ownership=old_ownership)
+
+    # when:
+    # - New conditions of sale are created for this owner as a household
+    data = {"household": [owner.uuid.hex]}
+    url = reverse("hitas:conditions-of-sale-list")
+    response = api_client.post(url, data=data, format="json")
+
+    # then:
+    # - The response contains three conditions of sale
+    # - The database contains three conditions of sale
+    # - The conditions of sale are between old ownership and the two new ownerships
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 3, response.json()
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 3
+    assert conditions_of_sale[0].new_ownership == new_ownership_1
+    assert conditions_of_sale[0].old_ownership == old_ownership
+    assert conditions_of_sale[1].new_ownership == new_ownership_1
+    assert conditions_of_sale[1].old_ownership == new_ownership_2
+    assert conditions_of_sale[2].new_ownership == new_ownership_2
+    assert conditions_of_sale[2].old_ownership == old_ownership
+
+
 # Update tests
 
 

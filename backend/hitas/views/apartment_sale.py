@@ -69,6 +69,8 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
         try:
             apartment: Apartment = Apartment.objects.prefetch_related(
                 prefetch_first_sale(),
+                "sales__ownerships",
+                "sales__ownerships__conditions_of_sale_new",
             ).get(uuid=apartment_uuid)
         except Apartment.DoesNotExist as error:
             raise HitasModelNotFound(model=Apartment) from error
@@ -104,6 +106,8 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                 # Ignore the sale we just created so that apartments sold for the first time
                 # after they have been completed are treated as new at this moment.
                 prefetch_first_sale(lookup_prefix="ownerships__sale__apartment__", ignore=[instance.id]),
+                "ownerships__sale__apartment__sales__ownerships",
+                "ownerships__sale__apartment__sales__ownerships__conditions_of_sale_new",
             )
             for owner in owners:
                 cos = create_conditions_of_sale(owners=[owner])

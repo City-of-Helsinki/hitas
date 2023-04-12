@@ -98,6 +98,8 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
             Owner.objects.prefetch_related(
                 Prefetch("ownerships", Ownership.objects.select_related("sale__apartment")),
                 prefetch_first_sale(lookup_prefix="ownerships__sale__apartment__"),
+                "ownerships__sale__apartment__sales__ownerships",
+                "ownerships__sale__apartment__sales__ownerships__conditions_of_sale_new",
             ).filter(uuid__in=owner_uuids)
         )
 
