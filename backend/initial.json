@@ -612,7 +612,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "d4226a59-8f6c-4273-b6e4-aa02a5d07a50",
-      "apartment": 1,
+      "apartment": 2,
       "notification_date": "2015-06-02",
       "purchase_date": "2015-06-02",
       "purchase_price": "22000.00",
@@ -627,7 +627,7 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "3298a8bc-cec0-44a1-a2e5-7b843fb4ba63",
-      "apartment": 2,
+      "apartment": 3,
       "notification_date": "2022-12-06",
       "purchase_date": "2022-12-06",
       "purchase_price": "198680.00",
@@ -642,10 +642,25 @@
       "deleted": null,
       "deleted_by_cascade": false,
       "uuid": "ee0e3665-0913-4bd0-b1e8-e842906b5cae",
-      "apartment": 2,
+      "apartment": 4,
       "notification_date": "2022-12-15",
       "purchase_date": "2022-12-15",
       "purchase_price": "143535.00",
+      "apartment_share_of_housing_company_loans": "0.00",
+      "exclude_from_statistics": false
+    }
+  },
+  {
+    "model": "hitas.apartmentsale",
+    "pk": 5,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "623679c6-7dfc-4e49-ba77-a84f62384404",
+      "apartment": 4,
+      "notification_date": "2021-12-15",
+      "purchase_date": "2021-12-15",
+      "purchase_price": "140005.00",
       "apartment_share_of_housing_company_loans": "0.00",
       "exclude_from_statistics": false
     }
@@ -15045,9 +15060,8 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 1,
       "owner": 1,
-      "sale": 2,
+      "sale": 1,
       "percentage": "100.00"
     }
   },
@@ -15057,9 +15071,8 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 2,
       "owner": 2,
-      "sale": 4,
+      "sale": 2,
       "percentage": "100.00"
     }
   },
@@ -15069,10 +15082,9 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 3,
       "owner": 3,
-      "sale": null,
-      "percentage": "100.00"
+      "sale": 3,
+      "percentage": "50.00"
     }
   },
   {
@@ -15081,9 +15093,8 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 4,
       "owner": 4,
-      "sale": null,
+      "sale": 3,
       "percentage": "50.00"
     }
   },
@@ -15093,10 +15104,9 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 5,
       "owner": 5,
-      "sale": null,
-      "percentage": "100.00"
+      "sale": 4,
+      "percentage": "30.00"
     }
   },
   {
@@ -15105,10 +15115,9 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 6,
       "owner": 6,
-      "sale": null,
-      "percentage": "100.00"
+      "sale": 4,
+      "percentage": "30.00"
     }
   },
   {
@@ -15117,10 +15126,9 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 7,
       "owner": 7,
-      "sale": null,
-      "percentage": "100.00"
+      "sale": 4,
+      "percentage": "40.00"
     }
   },
   {
@@ -15129,10 +15137,9 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 8,
       "owner": 8,
-      "sale": null,
-      "percentage": "100.00"
+      "sale": 5,
+      "percentage": "50.00"
     }
   },
   {
@@ -15141,9 +15148,8 @@
     "fields": {
       "deleted": null,
       "deleted_by_cascade": false,
-      "apartment": 4,
       "owner": 9,
-      "sale": null,
+      "sale": 5,
       "percentage": "50.00"
     }
   },
