@@ -28,21 +28,18 @@ class IsNewParams(NamedTuple):
             "Not completed": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=None,
-                    sales=[],
                 ),
                 is_new=True,
             ),
             "Completed in the future": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=datetime.date(2024, 1, 1),
-                    sales=[],
                 ),
                 is_new=True,
             ),
             "Completed in the past, no sales": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=datetime.date(2022, 1, 1),
-                    sales=[],
                 ),
                 is_new=True,
             ),
@@ -90,8 +87,8 @@ def test__properties__apartment__is_new(config: ApartmentConfig, is_new: bool, f
     freezer.move_to("2023-01-01 00:00:00+00:00")
 
     apartment: Apartment = ApartmentFactory.create(completion_date=config.completion_date, sales=[])
-    for sale in config.sales:
-        ApartmentSaleFactory.create(apartment=apartment, purchase_date=sale.purchase_date)
+    for sale_config in config.sales:
+        ApartmentSaleFactory.create(apartment=apartment, purchase_date=sale_config.purchase_date)
 
     assert apartment.is_new == is_new
 

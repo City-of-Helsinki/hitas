@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Any, NamedTuple, TypedDict
 
@@ -7,8 +8,9 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
-from hitas.models import ConditionOfSale, Owner, Ownership
-from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
+from hitas.models.owner import Owner
+from hitas.models.ownership import Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import (
     ConditionOfSaleFactory,
@@ -405,12 +407,21 @@ def test__api__condition_of_sale__retrieve__invalid_id(api_client: HitasAPIClien
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__single(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__single(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and one old apartment
     owner: Owner = OwnerFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner, sale=None)
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner)
+    new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -431,7 +442,9 @@ def test__api__condition_of_sale__create__single(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__no_ownerships(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__no_ownerships(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with no ownerships
     owner: Owner = OwnerFactory.create()
@@ -452,12 +465,22 @@ def test__api__condition_of_sale__create__no_ownerships(api_client: HitasAPIClie
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__no_new_apartments(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__no_new_apartments(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with no ownerships to new apartments
     owner: Owner = OwnerFactory.create()
-    OwnershipFactory.create(owner=owner)
-    OwnershipFactory.create(owner=owner)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -475,14 +498,27 @@ def test__api__condition_of_sale__create__no_new_apartments(api_client: HitasAPI
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__some_already_exist(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__some_already_exist(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and two old apartment
     # - A condition of sale already exists between one new and old apartment, but not the other
     owner: Owner = OwnerFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner, sale=None)
-    old_ownership_1: Ownership = OwnershipFactory.create(owner=owner)
-    old_ownership_2: Ownership = OwnershipFactory.create(owner=owner)
+    new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
+    old_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    old_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_1)
 
     # when:
@@ -506,14 +542,27 @@ def test__api__condition_of_sale__create__some_already_exist(api_client: HitasAP
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__all_already_exist(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__all_already_exist(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and two old apartment
     # - Conditions of sale already exists between the new and both old apartments
     owner: Owner = OwnerFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner, sale=None)
-    old_ownership_1: Ownership = OwnershipFactory.create(owner=owner)
-    old_ownership_2: Ownership = OwnershipFactory.create(owner=owner)
+    new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
+    old_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    old_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_1)
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_2)
 
@@ -538,16 +587,23 @@ def test__api__condition_of_sale__create__all_already_exist(api_client: HitasAPI
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__has_sales__in_the_future(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__has_sales__in_the_future(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and two old apartment
     # - the new apartment has apartment sales in the future (apartment is still new)
     owner: Owner = OwnerFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(
         owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=timezone.now() + relativedelta(days=1),
     )
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner)
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -568,16 +624,23 @@ def test__api__condition_of_sale__create__has_sales__in_the_future(api_client: H
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__has_sales__in_the_past(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__has_sales__in_the_past(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and two old apartment
     # - the new apartment has apartment sales in the past (apartment is no longer new)
     owner: Owner = OwnerFactory.create()
     OwnershipFactory.create(
         owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=timezone.now() - relativedelta(days=1),
     )
-    OwnershipFactory.create(owner=owner)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -595,11 +658,17 @@ def test__api__condition_of_sale__create__has_sales__in_the_past(api_client: Hit
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__only_one_old_apartment(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__only_one_old_apartment(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to a single old apartment
     owner: Owner = OwnerFactory.create()
-    OwnershipFactory.create(owner=owner)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -617,11 +686,16 @@ def test__api__condition_of_sale__create__only_one_old_apartment(api_client: Hit
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__only_one_new_apartment(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__only_one_new_apartment(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to a single new apartment
     owner: Owner = OwnerFactory.create()
-    OwnershipFactory.create(owner=owner, sale=None)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household
@@ -639,15 +713,24 @@ def test__api__condition_of_sale__create__only_one_new_apartment(api_client: Hit
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__household_of_two__one_has_new(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__household_of_two__one_has_new(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - Two owners:
     #   - Owner 1 has a single ownership to an old apartment
     #   - Owner 2 has a single ownership to a new apartment
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner_2, sale=None)
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=None,
+    )
 
     # when:
     # - New conditions of sale are created for these two owners as a household
@@ -669,16 +752,28 @@ def test__api__condition_of_sale__create__household_of_two__one_has_new(api_clie
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__household_of_two__both_have_new(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__household_of_two__both_have_new(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - Two owners:
     #   - Owner 1 has an ownership to an old apartment and a new apartment
     #   - Owner 2 has a single ownership to a new apartment
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_1, sale=None)
-    new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, sale=None)
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    new_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=None,
+    )
+    new_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=None,
+    )
 
     # when:
     # - New conditions of sale are created for these two owners as a household
@@ -706,16 +801,28 @@ def test__api__condition_of_sale__create__household_of_two__both_have_new(api_cl
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - Two owners:
     #   - Owner 1 has a single ownership to an old apartment
     #   - Owner 2 has two ownerships to two new apartments
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_2, sale=None)
-    new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_2, sale=None)
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    new_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=None,
+    )
+    new_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=None,
+    )
 
     # when:
     # - New conditions of sale are created for these two owners as a household
@@ -744,15 +851,25 @@ def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__household_of_two__neither_have_new(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__household_of_two__neither_have_new(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - Two owners:
     #   - Owner 1 has a single ownership to an old apartment
     #   - Owner 2 has a single ownership to an old apartment
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    OwnershipFactory.create(owner=owner_1)
-    OwnershipFactory.create(owner=owner_2)
+    OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for these two owners as a household
@@ -770,7 +887,9 @@ def test__api__condition_of_sale__create__household_of_two__neither_have_new(api
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__two_households(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__two_households(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - Three owners:
     #   - Owner 1 has a single ownership to an old apartment
@@ -779,9 +898,19 @@ def test__api__condition_of_sale__create__two_households(api_client: HitasAPICli
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     owner_3: Owner = OwnerFactory.create()
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    new_ownership_1: Ownership = OwnershipFactory.create(owner=owner_2, sale=None)
-    new_ownership_2: Ownership = OwnershipFactory.create(owner=owner_3, sale=None)
+    old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    new_ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__completion_date=None,
+    )
+    new_ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner_3,
+        sale__apartment__completion_date=None,
+    )
 
     # when:
     # - New conditions of sale are created for Owner 1 and Owner 2 as a household
@@ -887,13 +1016,22 @@ def test__api__condition_of_sale__create__additional_ownerships__invalid(
 
 
 @pytest.mark.django_db
-def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPIClient):
+def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
     # given:
     # - An owner with ownerships to one new and one old apartment
     # - Owner set to bypass conditions of sale (e.g. Helsinki city)
     owner: Owner = OwnerFactory.create(bypass_conditions_of_sale=True)
-    OwnershipFactory.create(owner=owner, sale=None)
-    OwnershipFactory.create(owner=owner)
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+    )
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
 
     # when:
     # - New conditions of sale are created for this owner as a household

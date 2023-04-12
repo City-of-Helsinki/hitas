@@ -44,14 +44,15 @@ from hitas.models.apartment import (
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
-from hitas.models.ownership import OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import (
-    subquery_first_purchase_date,
-    subquery_first_sale_loan_amount,
-    subquery_first_sale_purchase_price,
-    subquery_latest_purchase_date,
-    subquery_latest_sale_purchase_price,
+    get_first_sale_purchase_date,
+    get_first_sale_loan_amount,
+    get_first_sale_purchase_price,
+    get_latest_sale_purchase_date,
+    get_latest_sale_purchase_price,
+    prefetch_latest_sale,
 )
+
 from hitas.services.condition_of_sale import condition_of_sale_queryset
 from hitas.utils import RoundWithPrecision, check_for_overlap, this_month, valid_uuid
 from hitas.services.validation import lookup_model_id_by_uuid
@@ -76,13 +77,23 @@ from hitas.views.utils.serializers import ApartmentHitasAddressSerializer, ReadO
 
 class ApartmentFilterSet(HitasFilterSet):
     housing_company_name = HitasCharFilter(
-        field_name="building__real_estate__housing_company__display_name", lookup_expr="icontains"
+        field_name="building__real_estate__housing_company__display_name",
+        lookup_expr="icontains",
     )
-    street_address = HitasCharFilter(lookup_expr="icontains")
-    postal_code = HitasPostalCodeFilter(field_name="building__real_estate__housing_company__postal_code__value")
-    owner_name = HitasCharFilter(field_name="ownerships__owner__name", lookup_expr="icontains")
+    street_address = HitasCharFilter(
+        lookup_expr="icontains",
+    )
+    postal_code = HitasPostalCodeFilter(
+        field_name="building__real_estate__housing_company__postal_code__value",
+    )
+    owner_name = HitasCharFilter(
+        field_name="sales__ownerships__owner__name",
+        lookup_expr="icontains",
+    )
     owner_identifier = HitasCharFilter(
-        field_name="ownerships__owner__identifier", lookup_expr="icontains", max_length=11
+        field_name="sales__ownerships__owner__identifier",
+        lookup_expr="icontains",
+        max_length=11,
     )
     has_conditions_of_sale = BooleanFilter()
 
@@ -598,7 +609,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     rooms = ValueOrNullField(required=False, allow_null=True)
     shares = SharesSerializer(source="*", required=False, allow_null=True)
     prices = PricesSerializer(source="*", required=False, allow_null=True)
-    ownerships = OwnershipSerializer(many=True)
+    ownerships = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
     building = ReadOnlyBuildingSerializer(write_only=True)
     improvements = ApartmentImprovementSerializer(source="*")
@@ -606,10 +617,19 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     sell_by_date = serializers.SerializerMethodField()
 
     @staticmethod
+    def get_ownerships(instance: Apartment) -> list[dict[str, Any]]:
+        ownerships: list[dict[str, Any]] = []
+        for sale in instance.sales.all():  # only first sale prefetched
+            for ownership in sale.ownerships.all():
+                ownerships.append(OwnershipSerializer(instance=ownership).data)
+        return ownerships
+
+    @staticmethod
     def get_conditions_of_sale(instance: Apartment) -> list[dict[str, Any]]:
         conditions_of_sale: list[ConditionOfSale] = [
             cos
-            for ownership in instance.ownerships.all()
+            for sale in instance.sales.all()  # only first sale prefetched
+            for ownership in sale.ownerships.all()
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all())
         ]
 
@@ -639,24 +659,11 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         return building
 
-    def validate_ownerships(self, ownerships: list[OwnershipLike]) -> list[OwnershipLike]:
-        if not ownerships:
-            return ownerships
-
-        if len(ownerships) != len({ownership["owner"] for ownership in ownerships}):
-            raise ValidationError("All ownerships must be for different owners.")
-
-        check_ownership_percentages(ownerships)
-        return ownerships
-
     def create(self, validated_data: dict[str, Any]) -> Apartment:
-        ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().create(validated_data)
-
-        Ownership.objects.bulk_create((Ownership(apartment=instance, **ownership) for ownership in ownerships))
 
         for improvement in mpi:
             ApartmentMarketPriceImprovement.objects.create(apartment=instance, **improvement)
@@ -666,23 +673,10 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return instance
 
     def update(self, instance: Apartment, validated_data: dict[str, Any]) -> Apartment:
-        ownerships: list[OwnershipLike] = validated_data.pop("ownerships")
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
         instance: Apartment = super().update(instance, validated_data)
-
-        new_ownerships: list[Ownership] = []
-        current_filter = Q()
-        for ownership in ownerships:
-            new_ownerships.append(Ownership(apartment=instance, **ownership))
-            current_filter |= Q(owner=ownership["owner"]) & Q(percentage=ownership["percentage"])
-
-        # If given ownerships are not exactly the same as the previous ones,
-        # or there are no previous ownerships, create new ownerships
-        if instance.ownerships.exclude(current_filter).exists() or not instance.ownerships.exists():
-            instance.ownerships.all().delete()
-            Ownership.objects.bulk_create(objs=new_ownerships)
 
         # Improvements
         merge_model(
@@ -843,16 +837,17 @@ class ApartmentViewSet(HitasModelViewSet):
     def get_base_queryset():
         return (
             Apartment.objects.prefetch_related(
+                prefetch_latest_sale(include_first_sale=True),
                 Prefetch(
-                    "ownerships",
+                    "sales__ownerships",
                     Ownership.objects.select_related("owner"),
                 ),
                 Prefetch(
-                    "ownerships__conditions_of_sale_new",
+                    "sales__ownerships__conditions_of_sale_new",
                     condition_of_sale_queryset(),
                 ),
                 Prefetch(
-                    "ownerships__conditions_of_sale_old",
+                    "sales__ownerships__conditions_of_sale_old",
                     condition_of_sale_queryset(),
                 ),
             )
@@ -866,12 +861,12 @@ class ApartmentViewSet(HitasModelViewSet):
             .alias(
                 number_of_conditions_of_sale=(
                     Count(
-                        "ownerships__conditions_of_sale_new",
-                        filter=Q(ownerships__conditions_of_sale_new__deleted__isnull=True),
+                        "sales__ownerships__conditions_of_sale_new",
+                        filter=Q(sales__ownerships__conditions_of_sale_new__deleted__isnull=True),
                     )
                     + Count(
-                        "ownerships__conditions_of_sale_old",
-                        filter=Q(ownerships__conditions_of_sale_old__deleted__isnull=True),
+                        "sales__ownerships__conditions_of_sale_old",
+                        filter=Q(sales__ownerships__conditions_of_sale_old__deleted__isnull=True),
                     )
                 ),
             )
@@ -891,11 +886,11 @@ class ApartmentViewSet(HitasModelViewSet):
 
     def get_detail_queryset(self):
         return self.get_list_queryset().annotate(
-            _first_sale_purchase_price=subquery_first_sale_purchase_price("id"),
-            _first_sale_share_of_housing_company_loans=subquery_first_sale_loan_amount("id"),
-            _first_purchase_date=subquery_first_purchase_date("id"),
-            _latest_sale_purchase_price=subquery_latest_sale_purchase_price("id"),
-            _latest_purchase_date=subquery_latest_purchase_date("id"),
+            _first_sale_purchase_price=get_first_sale_purchase_price("id"),
+            _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
+            _first_purchase_date=get_first_sale_purchase_date("id"),
+            _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
+            _latest_purchase_date=get_latest_sale_purchase_date("id"),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
             cpi=self.select_index(ConstructionPriceIndex),
             cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),

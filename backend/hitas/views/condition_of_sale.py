@@ -8,10 +8,12 @@ from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
-from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.apartment import Apartment
+from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
+from hitas.models.owner import Owner
+from hitas.models.ownership import Ownership
+from hitas.services.apartment import prefetch_first_sale
 from hitas.services.condition_of_sale import condition_of_sale_queryset, create_conditions_of_sale
-from hitas.utils import subquery_first_id
 from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
@@ -94,18 +96,8 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
         # conditions of sale between their ownerships
         owners = list(
             Owner.objects.prefetch_related(
-                Prefetch(
-                    "ownerships",
-                    Ownership.objects.select_related("apartment"),
-                ),
-                Prefetch(
-                    "ownerships__apartment__sales",
-                    # Limit the fetched sales to only the first sale,
-                    # as we only need that to figure out if the apartment is new
-                    ApartmentSale.objects.filter(
-                        id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
-                    ),
-                ),
+                Prefetch("ownerships", Ownership.objects.select_related("sale__apartment")),
+                prefetch_first_sale(lookup_prefix="ownerships__sale__apartment__"),
             ).filter(uuid__in=owner_uuids)
         )
 

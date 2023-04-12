@@ -95,7 +95,7 @@ def test_obfuscate_owners_without_regulated_apartments__housing_company_regulati
     regulation_status, obfuscated
 ):
     ownership: Ownership = OwnershipFactory.create(
-        apartment__building__real_estate__housing_company__regulation_status=regulation_status,
+        sale__apartment__building__real_estate__housing_company__regulation_status=regulation_status,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()
@@ -114,10 +114,10 @@ def test_obfuscate_owners_without_regulated_apartments__housing_company_regulati
 @pytest.mark.django_db
 def test_obfuscate_owners_without_regulated_apartments__one_owns_regulated():
     ownership: Ownership = OwnershipFactory.create(
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
     )
     OwnershipFactory.create(
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()
@@ -132,14 +132,14 @@ def test_obfuscate_owners_without_regulated_apartments__one_owns_regulated():
 @pytest.mark.django_db
 def test_obfuscate_owners_without_regulated_apartments__one_owns_one_regulated_and_one_released():
     ownership_1: Ownership = OwnershipFactory.create(
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
     )
     ownership_2: Ownership = OwnershipFactory.create(
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
     OwnershipFactory.create(
         owner=ownership_1.owner,
-        apartment__building__real_estate__housing_company=ownership_2.apartment.housing_company,
+        sale__apartment__building__real_estate__housing_company=ownership_2.apartment.housing_company,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()

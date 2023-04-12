@@ -9,7 +9,7 @@ from hitas.models import Apartment, ApartmentMaximumPriceCalculation, HousingCom
 from hitas.models.housing_company import HitasType
 from hitas.tests.apis.apartment_max_price.utils import assert_created, create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentFactory, HousingCompanyFactory, OwnershipFactory
+from hitas.tests.factories import ApartmentFactory, HousingCompanyFactory
 from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
 
 
@@ -19,7 +19,6 @@ def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
         completion_date=datetime.date(2019, 11, 27),
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
-    OwnershipFactory.create(apartment=a, percentage=100)
 
     create_necessary_indices(
         completion_month=datetime.date(2019, 11, 1),

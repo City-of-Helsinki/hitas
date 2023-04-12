@@ -6,12 +6,14 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models import Apartment, ConditionOfSale, HousingCompany, Owner, Ownership
-from hitas.models.apartment import ApartmentState
-from hitas.models.condition_of_sale import GracePeriod
+from hitas.models.apartment import Apartment, ApartmentSale, ApartmentState, HousingCompany
+from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
+from hitas.models.owner import Owner
+from hitas.models.ownership import Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.factories import (
     ApartmentFactory,
+    ApartmentSaleFactory,
     ConditionOfSaleFactory,
     HousingCompanyFactory,
     OwnerFactory,
@@ -44,16 +46,18 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     ap2: Apartment = ApartmentFactory.create(apartment_number=2, sales=[])
     hc1: HousingCompany = ap1.housing_company
     hc2: HousingCompany = ap2.housing_company
-    o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
-    o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50)
+    sale: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, ownerships=[])
+    o1: Ownership = OwnershipFactory.create(sale=sale, percentage=50)
+    o2: Ownership = OwnershipFactory.create(sale=sale, percentage=50)
 
     # Database queries performed:
     # 1. Pagination count query
     # 2. Fetch apartment
-    # 3. Join ownerships
-    # 4. Join conditions of sale where one of the ownerships is a "new ownership"
-    # 5. Join conditions of sale where one of the ownerships is an "old ownership"
-    with count_queries(5, list_queries_on_failure=True):
+    # 3. Join first sale
+    # 4. Join ownerships on first sale
+    # 5. Join conditions of sale where one of the ownerships is a "new ownership"
+    # 6. Join conditions of sale where one of the ownerships is an "old ownership"
+    with count_queries(6, list_queries_on_failure=True):
         response = api_client.get(reverse("hitas:apartment-list"))
 
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -184,28 +188,26 @@ def test__api__apartment__list(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
-    ap1: Apartment = ApartmentFactory.create(
-        apartment_number=1,
-        completion_date=date(2022, 1, 1),
-    )
-    ap2: Apartment = ApartmentFactory.create(
-        apartment_number=2,
-        completion_date=date(2023, 1, 1),
-        sales=[],
-    )
     owner: Owner = OwnerFactory.create()
-    o1: Ownership = OwnershipFactory.create(owner=owner, apartment=ap1, percentage=50)
-    OwnershipFactory.create(apartment=ap1, percentage=50)
-    o2: Ownership = OwnershipFactory.create(owner=owner, apartment=ap2)
+    ap1: Apartment = ApartmentFactory.create(apartment_number=1, completion_date=date(2022, 1, 1), sales=[])
+    ap2: Apartment = ApartmentFactory.create(apartment_number=2, completion_date=date(2023, 1, 1), sales=[])
+
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, purchase_date=date(2022, 1, 1), ownerships=[])
+    o1: Ownership = OwnershipFactory.create(owner=owner, sale=sale_1, percentage=50)
+    OwnershipFactory.create(sale=sale_1, percentage=50)
+
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(apartment=ap2, purchase_date=date(2022, 1, 1), ownerships=[])
+    o2: Ownership = OwnershipFactory.create(owner=owner, sale=sale_2)
     ConditionOfSaleFactory.create(new_ownership=o2, old_ownership=o1, grace_period=GracePeriod.THREE_MONTHS)
 
     # Database queries performed:
     # 1. Pagination count query
     # 2. Fetch apartment
-    # 3. Join ownerships
-    # 4. Join conditions of sale where one of the ownerships is a "new ownership"
-    # 5. Join conditions of sale where one of the ownerships is an "old ownership"
-    with count_queries(5, list_queries_on_failure=True):
+    # 3. Join first sale
+    # 4. Join ownerships on first sale
+    # 5. Join conditions of sale where one of the ownerships is a "new ownership"
+    # 6. Join conditions of sale where one of the ownerships is an "old ownership"
+    with count_queries(6, list_queries_on_failure=True):
         response = api_client.get(reverse("hitas:apartment-list"))
 
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -246,20 +248,23 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
         state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
     )
     ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__name="Megatron Opetimus Prime")
-    OwnershipFactory.create(apartment__state=ApartmentState.FREE, owner__identifier="010199-123A")
+    OwnershipFactory.create(sale__apartment__state=ApartmentState.FREE, owner__name="Megatron Opetimus Prime")
+    OwnershipFactory.create(sale__apartment__state=ApartmentState.FREE, owner__identifier="010199-123A")
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
     old_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, sales=[])
-    ConditionOfSaleFactory(new_ownership__apartment=new_apartment_1, old_ownership__apartment=old_apartment_1)
+    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, completion_date=None)
+    ConditionOfSaleFactory(
+        new_ownership=new_apartment_1.first_sale().ownerships.first(),
+        old_ownership=old_apartment_1.first_sale().ownerships.first(),
+    )
 
     old_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, sales=[])
+    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, completion_date=None)
     cos: ConditionOfSale = ConditionOfSaleFactory(
-        new_ownership__apartment=new_apartment_2,
-        old_ownership__apartment=old_apartment_2,
+        new_ownership=new_apartment_2.first_sale().ownerships.first(),
+        old_ownership=old_apartment_2.first_sale().ownerships.first(),
     )
     cos.delete()  # fulfill condition of sale
 
