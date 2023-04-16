@@ -231,7 +231,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 },
             ],
         }),
-        removeRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
+        deleteRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${id}`,
                 method: "DELETE",
@@ -251,7 +251,7 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
-        removeBuilding: builder.mutation<IBuilding, {id: string; housingCompanyId: string; realEstateId: string}>({
+        deleteBuilding: builder.mutation<IBuilding, {id: string; housingCompanyId: string; realEstateId: string}>({
             query: ({id, housingCompanyId, realEstateId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings/${id}`,
                 method: "DELETE",
@@ -298,7 +298,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 return [];
             },
         }),
-        removeApartment: builder.mutation<
+        deleteApartment: builder.mutation<
             IApartmentDetails,
             {
                 id: string | undefined;
@@ -390,11 +390,11 @@ export const {useGetHousingCompanyDetailQuery, useGetApartmentDetailQuery, useGe
 export const {
     useSaveHousingCompanyMutation,
     useCreateRealEstateMutation,
-    useRemoveRealEstateMutation,
+    useDeleteRealEstateMutation,
     useCreateBuildingMutation,
-    useRemoveBuildingMutation,
+    useDeleteBuildingMutation,
     useSaveApartmentMutation,
-    useRemoveApartmentMutation,
+    useDeleteApartmentMutation,
     useCreateOwnerMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,

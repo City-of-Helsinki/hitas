@@ -7,10 +7,10 @@ import {useNavigate, useParams} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
 
 import {
+    useDeleteApartmentMutation,
     useGetApartmentDetailQuery,
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
-    useRemoveApartmentMutation,
     useSaveApartmentMutation,
 } from "../../app/services";
 import {
@@ -107,8 +107,8 @@ const LoadedApartmentCreatePage = ({
     const navigate = useNavigate();
 
     const [saveApartment, {data: saveData, error: saveError, isLoading: isSaveLoading}] = useSaveApartmentMutation();
-    const [removeApartment, {data: removeData, error: removeError, isLoading: isRemoveLoading}] =
-        useRemoveApartmentMutation();
+    const [deleteApartment, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteApartmentMutation();
 
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions = housingCompany.real_estates.flatMap((realEstate) => {
@@ -169,7 +169,7 @@ const LoadedApartmentCreatePage = ({
     };
 
     const handleConfirmedRemove = () => {
-        removeApartment({
+        deleteApartment({
             id: apartment?.id,
             housingCompanyId: housingCompany.id,
         });
@@ -178,14 +178,14 @@ const LoadedApartmentCreatePage = ({
     // Handle remove flow
     useEffect(() => {
         if (isEditPage) {
-            if (!isRemoveLoading && !removeError && removeData === null) {
+            if (!isDeleteLoading && !deleteError && deleteData === null) {
                 hitasToast("Asunto poistettu onnistuneesti!");
                 navigate(`/housing-companies/${housingCompany.id}`);
-            } else if (removeError) {
+            } else if (deleteError) {
                 setIsRemoveModalVisible(true);
             }
         }
-    }, [isRemoveLoading, removeError, removeData, navigate, isEditPage, housingCompany.id]);
+    }, [isDeleteLoading, deleteError, deleteData, navigate, isEditPage, housingCompany.id]);
 
     // Handle saving flow when editing
     useEffect(() => {
@@ -357,7 +357,7 @@ const LoadedApartmentCreatePage = ({
                 {isEditPage && (
                     <RemoveButton
                         onClick={() => setIsRemoveModalVisible(true)}
-                        isLoading={isRemoveLoading}
+                        isLoading={isDeleteLoading}
                     />
                 )}
                 <SaveButton
@@ -373,9 +373,9 @@ const LoadedApartmentCreatePage = ({
                 buttonText="Poista"
                 isVisible={isRemoveModalVisible}
                 setIsVisible={setIsRemoveModalVisible}
-                data={removeData}
-                error={removeError}
-                isLoading={isRemoveLoading}
+                data={deleteData}
+                error={deleteError}
+                isLoading={isDeleteLoading}
                 confirmAction={handleConfirmedRemove}
                 cancelAction={() => setIsRemoveModalVisible(false)}
             />
