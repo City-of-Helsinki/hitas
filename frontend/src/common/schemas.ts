@@ -386,8 +386,8 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
 });
 
 const ApartmentSharesSchema = object({
-    start: number().nullable(),
-    end: number().nullable(),
+    start: number().positive().nullish().or(z.nan()),
+    end: number().positive().nullish().or(z.nan()),
     total: number(),
 });
 

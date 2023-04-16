@@ -97,6 +97,26 @@ const convertApartmentDetailToWritable = (apartment: IApartmentDetails): IApartm
     };
 };
 
+const formatApartmentFormDataForSubmit = (apartment, data): IApartmentWritable => {
+    const formOwnershipsList = apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
+
+    return {
+        ...data,
+        // Copy street_address from selected building
+        address: {...data.address, street_address: data.building.label},
+        building: {id: data.building.value},
+
+        // Clean away ownership items that don't have an owner selected
+        ownerships: formOwnershipsList.filter((o) => o.owner.id),
+
+        // Clean share fields
+        shares: {
+            start: data.shares?.start ?? null,
+            end: data.shares?.end ?? null,
+        },
+    };
+};
+
 const LoadedApartmentCreatePage = ({
     housingCompany,
     apartment,
@@ -129,21 +149,7 @@ const LoadedApartmentCreatePage = ({
     });
 
     const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
-        const formattedFormData: IApartmentWritable = {
-            ...data,
-            // Copy street_address from selected building
-            address: {...data.address, street_address: data.building.label},
-            building: {id: data.building.value},
-
-            // Clean away ownership items that don't have an owner selected
-            ownerships: formOwnershipsList.filter((o) => o.owner.id),
-
-            // Clean share fields
-            shares: {
-                start: formObject.getValues("shares.start") ?? null,
-                end: formObject.getValues("shares.end") ?? null,
-            },
-        };
+        const formattedFormData = formatApartmentFormDataForSubmit(apartment, data);
 
         saveApartment({
             data: formattedFormData,
@@ -155,8 +161,6 @@ const LoadedApartmentCreatePage = ({
             setIsEndModalVisible(true);
         }
     };
-
-    const formOwnershipsList = apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
 
     // Flags
     const isEditPage = !!apartment;
