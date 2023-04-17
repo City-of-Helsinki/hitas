@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
@@ -40,7 +40,7 @@ import {
     ICode,
     IHousingCompanyDetails,
 } from "../../common/schemas";
-import {hitasToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
 const apartmentStateOptions = apartmentStates.map((state) => {
@@ -130,6 +130,11 @@ const LoadedApartmentCreatePage = ({
     const [deleteApartment, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
         useDeleteApartmentMutation();
 
+    // Flags
+    const isEditPage = !!apartment;
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions = housingCompany.real_estates.flatMap((realEstate) => {
         return realEstate.buildings.map((building) => {
@@ -139,7 +144,6 @@ const LoadedApartmentCreatePage = ({
 
     // Form
     const initialFormData: IApartmentWritableForm = getInitialFormData(apartment, buildingOptions);
-
     const formRef = useRef<HTMLFormElement | null>(null);
     const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
@@ -147,7 +151,6 @@ const LoadedApartmentCreatePage = ({
         reValidateMode: "onBlur",
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
-
     const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
         const formattedFormData = formatApartmentFormDataForSubmit(apartment, data);
 
@@ -155,53 +158,47 @@ const LoadedApartmentCreatePage = ({
             data: formattedFormData,
             id: apartment?.id,
             housingCompanyId: housingCompany.id,
-        });
-
-        if (!isEditPage) {
-            setIsEndModalVisible(true);
-        }
+        })
+            .unwrap()
+            .then((payload) => {
+                hdsToast.success("Asunto tallennettu onnistuneesti!");
+                if (!isEditPage) {
+                    setIsEndModalVisible(true);
+                } else {
+                    navigate(`/housing-companies/${housingCompany.id}/apartments/${payload.id}`);
+                }
+            })
+            .catch(() => {
+                hdsToast.error("Asunnon tallentaminen epäonnistui!");
+                setIsEndModalVisible(true);
+            });
     };
 
-    // Flags
-    const isEditPage = !!apartment;
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
-
     // Event handlers
-    const handleSubmitButtonClick = () => {
+    const handleFormSubmit = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
 
     const handleConfirmedRemove = () => {
+        if (!isEditPage) {
+            hdsToast.error("Et voi poistaa tallentamatonta asuntoa :D");
+            return;
+        }
+
         deleteApartment({
             id: apartment?.id,
             housingCompanyId: housingCompany.id,
-        });
-    };
-
-    // Handle remove flow
-    useEffect(() => {
-        if (isEditPage) {
-            if (!isDeleteLoading && !deleteError && deleteData === null) {
-                hitasToast("Asunto poistettu onnistuneesti!");
+        })
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Asunto poistettu onnistuneesti!");
                 navigate(`/housing-companies/${housingCompany.id}`);
-            } else if (deleteError) {
+            })
+            .catch(() => {
+                hdsToast.error("Virhe poistaessa asuntoa!");
                 setIsRemoveModalVisible(true);
-            }
-        }
-    }, [isDeleteLoading, deleteError, deleteData, navigate, isEditPage, housingCompany.id]);
-
-    // Handle saving flow when editing
-    useEffect(() => {
-        if (isEditPage) {
-            if (!isSaveLoading && !saveError && saveData && saveData.id) {
-                hitasToast("Asunto tallennettu onnistuneesti!");
-                navigate(`/housing-companies/${saveData.links.housing_company.id}/apartments/${saveData.id}`);
-            } else if (saveError) {
-                setIsEndModalVisible(true);
-            }
-        }
-    }, [isSaveLoading, saveError, saveData, navigate, isEditPage]);
+            });
+    };
 
     return (
         <>
@@ -365,7 +362,7 @@ const LoadedApartmentCreatePage = ({
                     />
                 )}
                 <SaveButton
-                    onClick={handleSubmitButtonClick}
+                    onClick={handleFormSubmit}
                     isLoading={isSaveLoading}
                 />
             </div>
