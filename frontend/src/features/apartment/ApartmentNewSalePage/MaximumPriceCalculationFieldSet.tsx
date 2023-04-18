@@ -46,7 +46,6 @@ const MaximumPriceCalculationFieldSet = ({apartment, setMaximumPrices, saleForm}
         const indexVariables = calculation.calculations[calculation.index].calculation_variables;
         setMaximumPrices({
             maximumPrice: calculation.maximum_price,
-            maxPricePerSquare: calculation.maximum_price_per_square,
             debtFreePurchasePrice: indexVariables.debt_free_price,
             apartmentShareOfHousingCompanyLoans: indexVariables.apartment_share_of_housing_company_loans,
             index: calculation.index,

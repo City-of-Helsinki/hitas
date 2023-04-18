@@ -21,7 +21,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         | undefined
         | {
               maximumPrice: number;
-              maxPricePerSquare: number;
               debtFreePurchasePrice: number;
               apartmentShareOfHousingCompanyLoans: number;
               index: string;
