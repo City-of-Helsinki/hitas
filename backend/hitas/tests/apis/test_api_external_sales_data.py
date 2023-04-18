@@ -448,6 +448,58 @@ def test__api__external_sales_data__create__invalid_data(api_client: HitasAPICli
     }
 
 
+@pytest.mark.django_db
+def test__api__external_sales_data__exists(api_client: HitasAPIClient):
+    data = ExternalSalesDataType(
+        quarter_1=QuarterData(quarter="2022Q1", areas=[CostAreaData(postal_code="00000", sale_count=1, price=2)]),
+        quarter_2=QuarterData(quarter="2022Q2", areas=[CostAreaData(postal_code="00000", sale_count=3, price=4)]),
+        quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
+        quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
+    )
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+
+    url = reverse("hitas:external-sales-data-list")
+    content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    postal_codes = [
+        "00180",
+        "00220",
+        "00280",
+        "00300",
+        "00310",
+        "00540",
+        "00570",
+        "00580",
+        "00590",
+        "00650",
+        "00680",
+        "00690",
+        "00850",
+        "00870",
+    ]
+
+    for postal_code in postal_codes:
+        HousingCompanyFactory.create(postal_code__value=postal_code)
+
+    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    data = path.read_bytes()
+
+    response = api_client.post(
+        url,
+        data=data,
+        content_type=content_type,
+        openapi_validate_request=False,  # cannot validate requests with bytes
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "unique",
+        "message": "External sales data already exists for '2023Q1'",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
 # Retrieve tests
 
 
