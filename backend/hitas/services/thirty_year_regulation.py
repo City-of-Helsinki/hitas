@@ -56,11 +56,27 @@ if TYPE_CHECKING:
 logger = logging.getLogger()
 
 
+class AddressInfo(TypedDict):
+    street_address: str
+    postal_code: str
+    city: str
+
+
+class PropertyManagerInfo(TypedDict):
+    id: str
+    name: str
+    email: str
+    address: AddressInfo
+
+
 class ComparisonData(TypedDict):
     id: HousingCompanyUUIDHex
     display_name: HousingCompanyNameT
+    address: AddressInfo
     price: Decimal
     old_ruleset: bool
+    completion_date: datetime.date | str
+    property_manager: PropertyManagerInfo
 
 
 class RegulationResults(TypedDict):
@@ -234,8 +250,24 @@ def _split_automatically_released(
                 ComparisonData(
                     id=housing_company.uuid.hex,
                     display_name=housing_company.display_name,
+                    address=AddressInfo(
+                        street_address=housing_company.street_address,
+                        postal_code=housing_company.postal_code.value,
+                        city=housing_company.postal_code.city,
+                    ),
                     price=Decimal("0"),  # Index adjusted price not calculate yet
                     old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
+                    completion_date=housing_company.completion_date,
+                    property_manager=PropertyManagerInfo(
+                        id=housing_company.property_manager.uuid.hex,
+                        name=housing_company.property_manager.name,
+                        email=housing_company.property_manager.email,
+                        address=AddressInfo(
+                            street_address=housing_company.property_manager.street_address,
+                            postal_code=housing_company.property_manager.postal_code,
+                            city=housing_company.property_manager.city,
+                        ),
+                    ),
                 )
             )
             housing_companies[i] = None
@@ -259,8 +291,24 @@ def _get_comparison_values(
         comparison_values[postal_code][housing_company.uuid.hex] = ComparisonData(
             id=housing_company.uuid.hex,
             display_name=housing_company.display_name,
+            address=AddressInfo(
+                street_address=housing_company.street_address,
+                postal_code=housing_company.postal_code.value,
+                city=housing_company.postal_code.city,
+            ),
             price=max((housing_company.avg_price_per_square_meter, surface_area_price_ceiling)),
             old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
+            completion_date=housing_company.completion_date,
+            property_manager=PropertyManagerInfo(
+                id=housing_company.property_manager.uuid.hex,
+                name=housing_company.property_manager.name,
+                email=housing_company.property_manager.email,
+                address=AddressInfo(
+                    street_address=housing_company.property_manager.street_address,
+                    postal_code=housing_company.property_manager.postal_code,
+                    city=housing_company.property_manager.city,
+                ),
+            ),
         )
 
     return comparison_values

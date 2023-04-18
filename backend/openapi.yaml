@@ -7258,6 +7258,8 @@ components:
           description: Housing company's display name
           type: string
           example: Taloyhtiö Helmi
+        address:
+          $ref: '#/components/schemas/HitasHousingCompanyAddress'
         price:
           description: |-
             Average price per square meter for all apartments in the housing company,
@@ -7272,6 +7274,13 @@ components:
           description: Does this housing company use the old or the new hitas ruleset?
           type: boolean
           example: false
+        completion_date:
+          description: Housing company completion date
+          type: string
+          format: date
+          example: 2023-02-01
+        property_manager:
+          $ref: '#/components/schemas/ReadOnlyPropertyManager'
 
     ObfuscatedOwner:
       description: Owner that has been obfuscated due to no longer owning any regulated apartments
@@ -7297,7 +7306,6 @@ components:
           type: string
           nullable: true
           example: martti.virtanen@example.com
-
 
     SurfaceAreaPriceCeilingCalculationResult:
       description: Surface area price ceiling calculation

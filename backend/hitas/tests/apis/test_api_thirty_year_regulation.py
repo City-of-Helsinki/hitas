@@ -15,7 +15,7 @@ from hitas.models.thirty_year_regulation import (
     RegulationResult,
     ThirtyYearRegulationResults,
 )
-from hitas.services.thirty_year_regulation import ComparisonData, RegulationResults
+from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
@@ -130,8 +130,24 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         skipped=[],
@@ -263,8 +279,24 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         stays_regulated=[],
@@ -387,8 +419,24 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         stays_regulated=[],
@@ -564,8 +612,24 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         released_from_regulation=[],
@@ -687,16 +751,48 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
             ComparisonData(
                 id=sale_1.apartment.housing_company.uuid.hex,
                 display_name=sale_1.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale_1.apartment.housing_company.street_address,
+                    postal_code=sale_1.apartment.housing_company.postal_code.value,
+                    city=sale_1.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("0"),
                 old_ruleset=sale_1.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale_1.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale_1.apartment.housing_company.property_manager.name,
+                    email=sale_1.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale_1.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale_1.apartment.housing_company.property_manager.postal_code,
+                        city=sale_1.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         released_from_regulation=[
             ComparisonData(
                 id=sale_2.apartment.housing_company.uuid.hex,
                 display_name=sale_2.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale_2.apartment.housing_company.street_address,
+                    postal_code=sale_2.apartment.housing_company.postal_code.value,
+                    city=sale_2.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale_2.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale_2.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale_2.apartment.housing_company.property_manager.name,
+                    email=sale_2.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale_2.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale_2.apartment.housing_company.property_manager.postal_code,
+                        city=sale_2.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         stays_regulated=[],
@@ -804,8 +900,24 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("50000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         stays_regulated=[],
@@ -890,8 +1002,24 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         obfuscated_owners=[],
@@ -967,8 +1095,24 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         obfuscated_owners=[],
@@ -1045,8 +1189,24 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         obfuscated_owners=[],
@@ -1118,8 +1278,24 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         skipped=[],
@@ -1210,8 +1386,24 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         skipped=[],
@@ -1294,8 +1486,24 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
             ComparisonData(
                 id=apartment_1.housing_company.uuid.hex,
                 display_name=apartment_1.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=apartment_1.housing_company.street_address,
+                    postal_code=apartment_1.housing_company.postal_code.value,
+                    city=apartment_1.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=apartment_1.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=apartment_1.housing_company.property_manager.uuid.hex,
+                    name=apartment_1.housing_company.property_manager.name,
+                    email=apartment_1.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=apartment_1.housing_company.property_manager.street_address,
+                        postal_code=apartment_1.housing_company.property_manager.postal_code,
+                        city=apartment_1.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         skipped=[],
@@ -1620,8 +1828,24 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         obfuscated_owners=[],
@@ -1699,8 +1923,24 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         obfuscated_owners=[],
@@ -1791,8 +2031,24 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
             ComparisonData(
                 id=sale.apartment.housing_company.uuid.hex,
                 display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
                 price=Decimal("12000.0"),
                 old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
             )
         ],
         skipped=[],
@@ -1918,8 +2174,24 @@ def test__api__regulation__housing_company_regulation_status(
                 ComparisonData(
                     id=sale.apartment.housing_company.uuid.hex,
                     display_name=sale.apartment.housing_company.display_name,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.street_address,
+                        postal_code=sale.apartment.housing_company.postal_code.value,
+                        city=sale.apartment.housing_company.postal_code.city,
+                    ),
                     price=Decimal("12000.0"),
                     old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                    completion_date=regulation_month.isoformat(),
+                    property_manager=PropertyManagerInfo(
+                        id=sale.apartment.housing_company.property_manager.uuid.hex,
+                        name=sale.apartment.housing_company.property_manager.name,
+                        email=sale.apartment.housing_company.property_manager.email,
+                        address=AddressInfo(
+                            street_address=sale.apartment.housing_company.property_manager.street_address,
+                            postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                            city=sale.apartment.housing_company.property_manager.city,
+                        ),
+                    ),
                 )
             ],
             skipped=[],
