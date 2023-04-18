@@ -14,7 +14,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
+from hitas.exceptions import HitasModelNotFound, ModelConflict, get_hitas_object_or_404
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import (
@@ -114,6 +114,8 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     calculation_month = hitas_calculation_quarter(calculation_date)
     regulation_month = calculation_month - relativedelta(years=30)
+
+    check_existing_regulation_data(calculation_month)
 
     logger.info(f"Checking regulation need for housing companies completed before {regulation_month.isoformat()!r}...")
 
@@ -229,6 +231,22 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     logger.info("Regulation check complete!")
     return results
+
+
+def check_existing_regulation_data(calculation_month: datetime.date) -> None:
+    """
+    Check if there is already regulation results for this hitas quarter.
+    Allow re-check only if there are skipped housing companies.
+    """
+    result_rows = ThirtyYearRegulationResultsRow.objects.filter(parent__calculation_month=calculation_month).all()
+    if not result_rows.exists() or any(row.regulation_result == RegulationResult.SKIPPED for row in result_rows):
+        return
+
+    raise ModelConflict(
+        "Previous regulation exists, and none of the housing companies were skipped. "
+        "Cannot re-check regulation for this quarter.",
+        error_code="unique",
+    )
 
 
 def _split_automatically_released(

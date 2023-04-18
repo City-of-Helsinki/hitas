@@ -50,7 +50,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
     this_month = day.date()
     regulation_month = this_month - relativedelta(years=30)
 
-    # Sale in a housing company that will be included in the regulation data
+    # Sale in a housing company that already has regulation data
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
@@ -193,21 +193,22 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
     url = reverse("hitas:thirty-year-regulation-list") + "?check=true"
 
-    # 1. Fetch housing companies
-    # 2. Prefetch real estates for housing companies
-    # 3. Prefetch buildings for real estates
-    # 4. Prefetch apartments for buildings
-    # 5. Fetch apartments with missing prices
-    # 6. Fetch market price indices
-    # 7. Fetch surface area price ceiling
-    # 8. Fetch hitas sales
-    # 9. Fetch external sales data
-    # 10. Set housing companies' states
-    # 11. Search for owners to be obfuscated (none found)
-    # 12. Select thirty year regulation results for update
-    # 13. Save thirty year regulation results
-    # 14. Save thirty year regulation results' rows
-    with count_queries(14, list_queries_on_failure=True):
+    # 1. Check for previous regulation results
+    # 2. Fetch housing companies
+    # 3. Prefetch real estates for housing companies
+    # 4. Prefetch buildings for real estates
+    # 5. Prefetch apartments for buildings
+    # 6. Fetch apartments with missing prices
+    # 7. Fetch market price indices
+    # 8. Fetch surface area price ceiling
+    # 9. Fetch hitas sales
+    # 10. Fetch external sales data
+    # 11. Set housing companies' states
+    # 12. Search for owners to be obfuscated (none found)
+    # 13. Select thirty year regulation results for update
+    # 14. Save thirty year regulation results
+    # 15. Save thirty year regulation results' rows
+    with count_queries(15, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -342,22 +343,23 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     url = reverse("hitas:thirty-year-regulation-list") + "?check=true"
 
-    # 1. Fetch housing companies
-    # 2. Prefetch real estates for housing companies
-    # 3. Prefetch buildings for real estates
-    # 4. Prefetch apartments for buildings
-    # 5. Fetch apartments with missing prices
-    # 6. Fetch market price indices
-    # 7. Fetch surface area price ceiling
-    # 8. Fetch hitas sales
-    # 9. Fetch external sales data
-    # 10. Set housing companies' states
-    # 11. Search for owners to be obfuscated
-    # 12. Obfuscate owners without any regulated apartments
-    # 13. Select thirty year regulation results for update
-    # 14. Save thirty year regulation results
-    # 15. Save thirty year regulation results' rows
-    with count_queries(15, list_queries_on_failure=True):
+    # 1. Check for previous regulation results
+    # 2. Fetch housing companies
+    # 3. Prefetch real estates for housing companies
+    # 4. Prefetch buildings for real estates
+    # 5. Prefetch apartments for buildings
+    # 6. Fetch apartments with missing prices
+    # 7. Fetch market price indices
+    # 8. Fetch surface area price ceiling
+    # 9. Fetch hitas sales
+    # 10. Fetch external sales data
+    # 11. Set housing companies' states
+    # 12. Search for owners to be obfuscated
+    # 13. Obfuscate owners without any regulated apartments
+    # 14. Select thirty year regulation results for update
+    # 15. Save thirty year regulation results
+    # 16. Save thirty year regulation results' rows
+    with count_queries(16, list_queries_on_failure=True):
         response = api_client.get(url)
 
     #
@@ -2301,3 +2303,139 @@ def test__api__regulation__housing_company_regulation_status(
             skipped=[],
             obfuscated_owners=[],
         )
+
+
+@pytest.mark.django_db
+def test__api__regulation__regulation_already_made(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Sale in a housing company that already has regulation data
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=this_month,
+        regulation_month=regulation_month,
+        surface_area_price_ceiling=Decimal("5000"),
+        sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+    )
+    ThirtyYearRegulationResultsRow.objects.create(
+        parent=results,
+        housing_company=sale.apartment.housing_company,
+        completion_date=regulation_month,
+        surface_area=10,
+        postal_code="00001",
+        realized_acquisition_price=Decimal("60000.0"),
+        unadjusted_average_price_per_square_meter=Decimal("6000.0"),
+        adjusted_average_price_per_square_meter=Decimal("12000.0"),
+        completion_month_index=Decimal("100"),
+        calculation_month_index=Decimal("200"),
+        regulation_result=RegulationResult.STAYS_REGULATED,
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list") + "?check=true"
+
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "unique",
+        "message": (
+            "Previous regulation exists, and none of the housing companies were skipped. "
+            "Cannot re-check regulation for this quarter."
+        ),
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__regulation__regulation_already_made__skipped(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    previous_year_last_month = this_month - relativedelta(months=2)
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Sale in a housing company that will be under regulation checking, and already has regulation data
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=this_month,
+        regulation_month=regulation_month,
+        surface_area_price_ceiling=Decimal("5000"),
+        sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+    )
+    ThirtyYearRegulationResultsRow.objects.create(
+        parent=results,
+        housing_company=sale.apartment.housing_company,
+        completion_date=regulation_month,
+        surface_area=10,
+        postal_code="00001",
+        realized_acquisition_price=Decimal("60000.0"),
+        unadjusted_average_price_per_square_meter=Decimal("6000.0"),
+        adjusted_average_price_per_square_meter=Decimal("12000.0"),
+        completion_month_index=Decimal("100"),
+        calculation_month_index=Decimal("200"),
+        regulation_result=RegulationResult.SKIPPED,
+    )
+
+    # Create necessary indices
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    # Apartment where sales happened in the previous year
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year, which affect the average price per square meter
+    ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+    # Create necessary external sales data (no external sales)
+    ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(previous_year_last_month),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list") + "?check=true"
+
+    response = api_client.get(url)
+
+    # Regulation is allowed to complete
+    assert response.status_code == status.HTTP_200_OK, response.json()
