@@ -35,17 +35,20 @@ export default function QueryStateHandler({
             </p>
         );
     }
-    return error ? (
-        errorComponent
-    ) : isLoading ? (
-        <div className="spinner-wrap">
-            <div className="spinner-container">
-                <LoadingSpinner />
+
+    if (error) {
+        return errorComponent;
+    } else if (isLoading) {
+        return (
+            <div className="spinner-wrap">
+                <div className="spinner-container">
+                    <LoadingSpinner />
+                </div>
             </div>
-        </div>
-    ) : data && (!("contents" in data) || data.contents.length) ? (
-        <>{children}</>
-    ) : (
-        <p>Ei tuloksia</p>
-    );
+        );
+    } else if (data && (!("contents" in data) || data.contents.length)) {
+        return <>{children}</>;
+    } else {
+        return <p>Ei tuloksia</p>;
+    }
 }
