@@ -23,7 +23,9 @@ const ApartmentNewSalePage = () => {
                 isLoading={isLoading}
             >
                 <ApartmentHeader apartment={data as IApartmentDetails} />
-                <Heading type="main">Kauppatapahtuma</Heading>
+                <Heading type="main">
+                    {data && data.prices.first_purchase_date ? "Kauppatapahtuma" : "Uudiskohteen kauppa"}
+                </Heading>
                 <LoadedApartmentSalesPage apartment={data as IApartmentDetails} />
             </QueryStateHandler>
         </div>
