@@ -12,6 +12,7 @@ from hitas.exceptions import ModelConflict
 from hitas.models.thirty_year_regulation import RegulationResult
 from hitas.services.thirty_year_regulation import (
     build_thirty_year_regulation_report_excel,
+    convert_thirty_year_regulation_results_to_comparison_data,
     get_thirty_year_regulation_results,
     get_thirty_year_regulation_results_for_housing_company,
     perform_thirty_year_regulation,
@@ -28,7 +29,14 @@ class ThirtyYearRegulationView(ViewSet):
         except ValueError as error:
             raise ValidationError({"calculation_date": str(error)}) from error
 
-        results = perform_thirty_year_regulation(calculation_date)
+        check = request.query_params.get("check", 0) in ("True", "true", "1", 1)
+
+        if check:
+            results = perform_thirty_year_regulation(calculation_date)
+        else:
+            data = get_thirty_year_regulation_results(calculation_date)
+            results = convert_thirty_year_regulation_results_to_comparison_data(data)
+
         return Response(data=results, status=status.HTTP_200_OK)
 
     @action(

@@ -590,6 +590,7 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                 ThirtyYearRegulationResultsRow.objects.prefetch_related(
                     "housing_company",
                     "housing_company__postal_code",
+                    "housing_company__property_manager",
                 )
                 .annotate(
                     apartment_count=Count("housing_company__real_estates__buildings__apartments"),
@@ -778,3 +779,55 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     resize_columns(worksheet)
     worksheet.protection.sheet = True
     return workbook
+
+
+def convert_thirty_year_regulation_results_to_comparison_data(
+    results: ThirtyYearRegulationResults,
+) -> RegulationResults:
+    regulation_results = RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+    for row in results.rows.all():
+        column: dict[
+            RegulationResult,
+            Literal["automatically_released", "released_from_regulation", "stays_regulated", "skipped"],
+        ]
+        column = {
+            RegulationResult.AUTOMATICALLY_RELEASED: "automatically_released",
+            RegulationResult.RELEASED_FROM_REGULATION: "released_from_regulation",
+            RegulationResult.STAYS_REGULATED: "stays_regulated",
+            RegulationResult.SKIPPED: "skipped",
+        }
+
+        regulation_results[column[row.regulation_result]].append(
+            ComparisonData(
+                id=row.housing_company.uuid.hex,
+                display_name=row.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=row.housing_company.street_address,
+                    postal_code=row.housing_company.postal_code.value,
+                    city=row.housing_company.postal_code.city,
+                ),
+                price=max(
+                    (row.adjusted_average_price_per_square_meter or 0), (results.surface_area_price_ceiling or 0)
+                ),
+                old_ruleset=row.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=row.completion_date,
+                property_manager=PropertyManagerInfo(
+                    id=row.housing_company.property_manager.uuid.hex,
+                    name=row.housing_company.property_manager.name,
+                    email=row.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=row.housing_company.property_manager.street_address,
+                        postal_code=row.housing_company.property_manager.postal_code,
+                        city=row.housing_company.property_manager.city,
+                    ),
+                ),
+            )
+        )
+
+    return regulation_results

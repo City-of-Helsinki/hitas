@@ -2345,18 +2345,28 @@ paths:
   /api/v1/thirty-year-regulation:
 
     get:
-      description: Check housing companies over 30 years old whether they should be released from hitas regulation or not.
-      operationId: check-regulation
+      description: >-
+        If 'check' parameter is 'true', check housing companies over 30 years old
+        whether they should be released from Hitas regulation or not.
+        Otherwise, try to fetch existing regulation results.
+      operationId: read-or-check-regulation
       tags:
         - Thirty Year Regulation
       parameters:
         - name: calculation_date
           required: false
           in: query
-          description: Calculation date, use current date if not given
+          description: Calculation date, use current date if not given.
           schema:
             type: string
             example: 2023-01-01
+        - name: check
+          required: false
+          in: query
+          description: If set to 'true', check regulation instead of fetching existing regulation data.
+          schema:
+            type: string
+            example: true
       responses:
         '200':
           description: Successfully performed thirty-year regulation for housing companies
