@@ -10,6 +10,10 @@
     font-size: $fontsize-heading-s
     border: 0
 
+    div
+      display: flex
+      flex-direction: row
+
     a
       @include align-items(center)
       display: inherit
@@ -18,6 +22,9 @@
 
     a > span
       display: inline-block
+      margin-right: $spacing-layout-s
+
+    span:not([class*="status-label"])
       margin-right: $spacing-layout-s
 
     .address
