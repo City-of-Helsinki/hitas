@@ -53,7 +53,7 @@ def test__api__external_sales_data__create(api_client: HitasAPIClient):
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [
@@ -118,7 +118,7 @@ def test__api__external_sales_data__create(api_client: HitasAPIClient):
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.django_db
@@ -138,7 +138,7 @@ def test__api__external_sales_data__create__missing_postal_codes(api_client: Hit
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [],
@@ -159,7 +159,7 @@ def test__api__external_sales_data__create__missing_postal_codes(api_client: Hit
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.django_db
@@ -199,7 +199,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [],
@@ -220,7 +220,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.parametrize(
@@ -459,12 +459,12 @@ def test__api__external_sales_data__retrieve(api_client: HitasAPIClient):
         quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
         quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
     )
-    ExternalSalesData.objects.create(calculation_quarter="2022Q4", **data)
-    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-01-01"
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {**{"calculation_quarter": "2022Q4"}, **data}
+    assert response.json() == {**{"calculation_quarter": "2023Q1"}, **data}
 
 
 @pytest.mark.django_db
@@ -475,8 +475,8 @@ def test__api__external_sales_data__retrieve__wrong_date(api_client: HitasAPICli
         quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
         quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
     )
-    ExternalSalesData.objects.create(calculation_quarter="2022Q4", **data)
-    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2024-01-01"
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2024-02-01"
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
@@ -490,7 +490,7 @@ def test__api__external_sales_data__retrieve__wrong_date(api_client: HitasAPICli
 
 @pytest.mark.django_db
 def test__api__external_sales_data__retrieve__not_found(api_client: HitasAPIClient):
-    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-01-01"
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

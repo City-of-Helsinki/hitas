@@ -1,5 +1,6 @@
 import datetime
 import operator
+import re
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any, Iterable, Optional, overload
 from uuid import UUID
@@ -159,6 +160,20 @@ def to_quarter(date: datetime.date) -> str:
     if date.month in (10, 11, 12):
         return f"{date.year}Q4"
     raise NotImplementedError
+
+
+def from_quarter(quarter: str) -> datetime.date:
+    """Get business quarter as a date from string."""
+    result = re.match(r"(?P<year>\d{4})Q(?P<quarter>[1234])", quarter)
+    if result is None:
+        raise ValueError(f"{quarter!r} is not a valid quarter.")
+
+    year = result.group("year")
+    number = result.group("quarter")
+    number_to_month = {"1": 1, "2": 4, "3": 7, "4": 10}
+    month = number_to_month[number]
+
+    return datetime.date(year=int(year), month=month, day=1)
 
 
 def from_iso_format_or_today_if_none(date: Optional[str]) -> datetime.date:
