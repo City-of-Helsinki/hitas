@@ -2271,6 +2271,36 @@ paths:
 
   /api/v1/external-sales-data:
 
+    get:
+      description: Read external sales data for the quarter
+      operationId: read-external-sales-data
+      tags:
+        - External Sales Data
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date the Excel is needed for, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully read external sales data for the quarter
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ExternalSalesData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
     post:
       description: Read cost area sales catalog from statistics center to external sales data
       operationId: create-external-sales-data
@@ -2305,38 +2335,6 @@ paths:
           $ref: '#/components/responses/NotAcceptableExcel'
         '415':
           $ref: '#/components/responses/UnsupportedMediaTypeExcel'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/external-sales-data/{quarter}:
-
-    get:
-      description: Read external sales data for the quarter
-      operationId: read-external-sales-data
-      tags:
-        - External Sales Data
-      parameters:
-        - name: quarter
-          required: true
-          in: path
-          description: Calculation quarter
-          schema:
-            type: string
-            example: 2022Q1
-      responses:
-        '200':
-          description: Successfully read external sales data for the quarter
-          content:
-            application/json:
-              schema:
-                additionalProperties: false
-                $ref: '#/components/schemas/ExternalSalesData'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 

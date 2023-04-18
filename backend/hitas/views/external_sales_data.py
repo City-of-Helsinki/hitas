@@ -1,8 +1,10 @@
 from typing import Optional, TypedDict
 
+from dateutil.relativedelta import relativedelta
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import serializers, status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -10,6 +12,7 @@ from hitas.exceptions import HitasModelNotFound
 from hitas.models import ExternalSalesData
 from hitas.services.external_sales_data import create_external_sales_data, remove_unused_areas
 from hitas.services.validation import validate_postal_code, validate_quarter
+from hitas.utils import business_quarter, from_iso_format_or_today_if_none, to_quarter
 from hitas.views.utils.excel import NewExcelParser, OldExcelParser, parse_sheet
 from hitas.views.utils.fields import IntegerOrEmpty
 
@@ -121,8 +124,15 @@ class ExternalSalesDataView(ViewSet):
         data = ExternalSalesDataSerializer(sales_data).data
         return Response(data=data, status=status.HTTP_201_CREATED)
 
-    def retrieve(self, request, *args, **kwargs) -> Response:
-        quarter: str = kwargs["pk"]
+    def list(self, request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        calculation_quarter = business_quarter(calculation_date)
+        quarter = to_quarter(calculation_quarter - relativedelta(months=3))
+
         try:
             sales_data = ExternalSalesData.objects.get(calculation_quarter=quarter)
         except ExternalSalesData.DoesNotExist as error:
