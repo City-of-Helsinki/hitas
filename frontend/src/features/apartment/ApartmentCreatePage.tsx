@@ -47,6 +47,56 @@ const apartmentStateOptions = apartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};
 });
 
+const ApartmentDeleteButton = ({apartment}) => {
+    const navigate = useNavigate();
+
+    const [deleteApartment, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteApartmentMutation();
+
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+    if (!apartment) return null;
+
+    const handleConfirmedDeleteAction = () => {
+        deleteApartment({
+            id: apartment.id,
+            housingCompanyId: apartment.links.housing_company.id,
+        })
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Asunto poistettu onnistuneesti!");
+                navigate(`/housing-companies/${apartment.links.housing_company.id}`);
+            })
+            .catch(() => {
+                hdsToast.error("Virhe poistaessa asuntoa!");
+                setIsDeleteModalVisible(true);
+            });
+    };
+
+    return (
+        <>
+            <RemoveButton
+                onClick={() => setIsDeleteModalVisible(true)}
+                isLoading={isDeleteLoading}
+            />
+            <ConfirmDialogModal
+                linkText="Palaa asuntoyhtiön sivulle"
+                linkURL={`/housing-companies/${apartment.links.housing_company.id}`}
+                modalText="Haluatko varmasti poistaa asunnon?"
+                successText="Asunto poistettu"
+                buttonText="Poista"
+                isVisible={isDeleteModalVisible}
+                setIsVisible={setIsDeleteModalVisible}
+                data={deleteData}
+                error={deleteError}
+                isLoading={isDeleteLoading}
+                confirmAction={handleConfirmedDeleteAction}
+                cancelAction={() => setIsDeleteModalVisible(false)}
+            />
+        </>
+    );
+};
+
 const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm => {
     if (apartment) {
         return convertApartmentDetailToWritable(apartment);
@@ -127,13 +177,10 @@ const LoadedApartmentCreatePage = ({
     const navigate = useNavigate();
 
     const [saveApartment, {data: saveData, error: saveError, isLoading: isSaveLoading}] = useSaveApartmentMutation();
-    const [deleteApartment, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
-        useDeleteApartmentMutation();
 
     // Flags
     const isEditPage = !!apartment;
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
 
     // Get all buildings that belong to HousingCompany from RealEstates
     const buildingOptions = housingCompany.real_estates.flatMap((realEstate) => {
@@ -177,27 +224,6 @@ const LoadedApartmentCreatePage = ({
     // Event handlers
     const handleFormSubmit = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
-
-    const handleConfirmedRemove = () => {
-        if (!isEditPage) {
-            hdsToast.error("Et voi poistaa tallentamatonta asuntoa :D");
-            return;
-        }
-
-        deleteApartment({
-            id: apartment?.id,
-            housingCompanyId: housingCompany.id,
-        })
-            .unwrap()
-            .then(() => {
-                hdsToast.success("Asunto poistettu onnistuneesti!");
-                navigate(`/housing-companies/${housingCompany.id}`);
-            })
-            .catch(() => {
-                hdsToast.error("Virhe poistaessa asuntoa!");
-                setIsRemoveModalVisible(true);
-            });
     };
 
     return (
@@ -355,31 +381,12 @@ const LoadedApartmentCreatePage = ({
             </form>
             <div className="row row--buttons">
                 <NavigateBackButton />
-                {isEditPage && (
-                    <RemoveButton
-                        onClick={() => setIsRemoveModalVisible(true)}
-                        isLoading={isDeleteLoading}
-                    />
-                )}
+                {isEditPage && <ApartmentDeleteButton apartment={apartment} />}
                 <SaveButton
                     onClick={handleFormSubmit}
                     isLoading={isSaveLoading}
                 />
             </div>
-            <ConfirmDialogModal
-                linkText="Palaa asuntoyhtiön sivulle"
-                linkURL={`/housing-companies/${housingCompany.id}`}
-                modalText="Haluatko varmasti poistaa asunnon?"
-                successText="Asunto poistettu"
-                buttonText="Poista"
-                isVisible={isRemoveModalVisible}
-                setIsVisible={setIsRemoveModalVisible}
-                data={deleteData}
-                error={deleteError}
-                isLoading={isDeleteLoading}
-                confirmAction={handleConfirmedRemove}
-                cancelAction={() => setIsRemoveModalVisible(false)}
-            />
             <SaveDialogModal
                 linkText="Asunnon sivulle"
                 baseURL={`/housing-companies/${housingCompany.id}/apartments/`}
