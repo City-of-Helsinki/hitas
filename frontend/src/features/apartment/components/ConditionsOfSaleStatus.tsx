@@ -14,8 +14,6 @@ type IConditionsOfSaleStatus =
       };
 
 const ConditionsOfSaleStatus = ({apartment, conditionOfSale}: IConditionsOfSaleStatus) => {
-    if ((conditionOfSale && !conditionOfSale?.sell_by_date) || (apartment && !apartment?.sell_by_date)) return null;
-
     let sellByDate;
     let hasGracePeriod;
     let fulfilled;
