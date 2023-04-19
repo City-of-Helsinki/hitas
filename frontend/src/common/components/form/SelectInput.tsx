@@ -53,13 +53,12 @@ const Select = ({
                 />
             ) : (
                 <>
-                    <legend style={{fontWeight: required ? "bold" : "normal"}}>{label + (required ? " *" : "")}</legend>
                     <HDSSelect
                         {...inputProps}
-                        label=""
+                        label={`${label}${required ? " *" : ""}`}
                         onChange={handleChange}
                         invalid={invalid ?? !!fieldError}
-                        required={required}
+                        required={true}
                     />
                     {!!fieldError && <p className="text-input_hds-text-input__error-text">{fieldError.message}</p>}
                 </>
