@@ -19,7 +19,8 @@ export function dotted(obj: object, path: string | string[], value?: number | st
     if (typeof path == "string") return dotted(obj, path.split("."), value);
     else if (path.length === 1 && value !== undefined) return (obj[path[0]] = value);
     else if (path.length === 0) return obj;
-    else if (path.length && obj === null) return null; // Don't crash hard when there is path left and obj is null
+    else if (path.length && (obj === null || obj === undefined))
+        return null; // Don't crash hard when there is path left and obj is null
     else return dotted(obj[path[0]], path.slice(1), value);
 }
 

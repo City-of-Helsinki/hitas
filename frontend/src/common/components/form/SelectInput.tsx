@@ -1,5 +1,6 @@
 import {Combobox, Select as HDSSelect} from "hds-react";
 
+import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
 interface SelectProps extends FormInputProps {
@@ -25,6 +26,7 @@ const Select = ({
     const {
         formState: {errors},
     } = formObject;
+    const fieldError = dotted(errors, name);
     const inputProps = {
         label: label,
         required: required,
@@ -35,6 +37,7 @@ const Select = ({
         selectedItemRemoveButtonAriaLabel: "Poista",
         ...rest,
     };
+
     const handleChange = (newValue: {label?: string; value?: string}) => {
         if (newValue) {
             formObject.setValue(name, newValue, true);
@@ -55,10 +58,10 @@ const Select = ({
                         {...inputProps}
                         label=""
                         onChange={handleChange}
-                        invalid={invalid ?? !!errors[name]}
+                        invalid={invalid ?? !!fieldError}
                         required={required}
                     />
-                    {errors[name] && <p className="text-input_hds-text-input__error-text">{errors[name].message}</p>}
+                    {!!fieldError && <p className="text-input_hds-text-input__error-text">{fieldError.message}</p>}
                 </>
             )}
         </div>

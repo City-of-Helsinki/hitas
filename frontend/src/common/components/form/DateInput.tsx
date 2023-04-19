@@ -2,6 +2,7 @@ import {format, parse} from "date-fns";
 import {DateInput as HDSDateInput} from "hds-react";
 
 import {useEffect} from "react";
+import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
 interface DateInputProps extends FormInputProps {
@@ -19,6 +20,7 @@ const DateInput = ({id, name, label, required, maxDate, minDate, formObject, dis
         formState: {errors},
     } = formObject;
     const formDate = register(name);
+    const fieldError = dotted(errors, formDate.name);
 
     const getValue = (): string => {
         // Try to convert Hitas API format to HDS date format
@@ -61,8 +63,8 @@ const DateInput = ({id, name, label, required, maxDate, minDate, formObject, dis
                 onBlur={formDate.handleBlur}
                 ref={formDate.ref}
                 value={getValue() ?? ""}
-                errorText={errors[formDate.name] && errors[formDate.name].message}
-                invalid={!!errors[formDate.name]}
+                errorText={!!fieldError && fieldError.message}
+                invalid={!!fieldError}
                 required={required}
                 maxDate={maxDate}
                 minDate={minDate}
