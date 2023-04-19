@@ -26,7 +26,8 @@ const RelatedModelTextInput = ({
     };
 
     const clearFieldValue = () => {
-        formObject.setValue(formObjectFieldPath, "");
+        formObject.watch(formObjectFieldPath);
+        formObject.setValue(formObjectFieldPath, null);
     };
 
     return (
@@ -41,7 +42,7 @@ const RelatedModelTextInput = ({
             onKeyDown={(e) => handleKeyDown(e)}
             buttonIcon={isFieldClearable ? <IconCrossCircle /> : <IconSearch />}
             onButtonClick={isFieldClearable ? clearFieldValue : openModal}
-            errorText={errors[formObjectFieldPath]}
+            errorText={errors[formObjectFieldPath] && errors[formObjectFieldPath].message}
             invalid={!!errors[formObjectFieldPath]}
         />
     );
