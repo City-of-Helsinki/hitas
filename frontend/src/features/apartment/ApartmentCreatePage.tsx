@@ -103,7 +103,7 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
     } else {
         return {
             state: "free",
-            type: {id: null},
+            type: null,
             surface_area: null,
             rooms: null,
             shares: {start: null, end: null},
@@ -294,12 +294,11 @@ const LoadedApartmentCreatePage = ({
                             />
                             <RelatedModelInput
                                 label="Asuntotyyppi"
-                                required
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
                                 formObject={formObject}
                                 formObjectFieldPath="type"
-                                formatFormObjectValue={(obj: ICode) => (obj.id ? obj.value : "")}
+                                formatFormObjectValue={(obj: ICode) => (obj?.id ? obj.value : "")}
                             />
                         </div>
                         <div className="row">

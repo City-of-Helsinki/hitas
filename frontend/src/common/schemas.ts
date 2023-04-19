@@ -431,7 +431,7 @@ const ApartmentDetailsSchema = object({
 const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
     state: z.enum(apartmentStates).nullable(),
-    type: object({id: string().nullable()}),
+    type: object({id: string()}).nullable(),
     surface_area: number().nullable(),
     rooms: number().nullable(),
     shares: ApartmentSharesSchema.omit({total: true}),
