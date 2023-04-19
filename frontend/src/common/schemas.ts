@@ -179,7 +179,7 @@ const RealEstateSchema = object({
 });
 
 const HousingCompanyDetailsSchema = object({
-    id: APIIdString.optional(),
+    id: APIIdString,
     name: object({official: string(), display: string()}),
     business_id: string().nullable(),
     state: HousingCompanyStateSchema,
@@ -218,7 +218,6 @@ const HousingCompanyDetailsSchema = object({
 });
 
 const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
-    id: true,
     name: true,
     business_id: true,
     state: true,
@@ -230,6 +229,7 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     improvements: true,
 }).merge(
     object({
+        id: APIIdString.optional(),
         financing_method: object({id: string()}),
         building_type: object({id: string()}),
         developer: object({id: string()}),

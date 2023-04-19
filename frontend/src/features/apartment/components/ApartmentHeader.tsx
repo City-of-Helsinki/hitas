@@ -42,7 +42,7 @@ const ApartmentHeader = ({
                         />
                     ) : null}
                 </div>
-                {showEditButton ? <EditButton state={{apartment: apartment}} /> : null}
+                {showEditButton ? <EditButton /> : null}
             </Heading>
         </div>
     );
