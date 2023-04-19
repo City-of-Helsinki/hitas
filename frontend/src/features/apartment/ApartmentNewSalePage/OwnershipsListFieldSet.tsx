@@ -16,7 +16,7 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
     formObject.register("ownerships");
 
     // Blank Ownership. This is appended to the list when user clicks "New ownership"
-    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 0};
+    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 100};
 
     const ownerships = formObject.getValues("ownerships");
     const formErrors = OwnershipsListSchema.safeParse(formObject.getValues("ownerships"));
