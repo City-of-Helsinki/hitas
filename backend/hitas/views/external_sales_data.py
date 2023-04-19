@@ -1,5 +1,6 @@
 from typing import Optional, TypedDict
 
+from dateutil.relativedelta import relativedelta
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import serializers, status
@@ -11,7 +12,12 @@ from hitas.exceptions import HitasModelNotFound
 from hitas.models import ExternalSalesData
 from hitas.services.external_sales_data import create_external_sales_data, remove_unused_areas
 from hitas.services.validation import validate_postal_code, validate_quarter
-from hitas.utils import business_quarter, from_iso_format_or_today_if_none, hitas_calculation_quarter, to_quarter
+from hitas.utils import (
+    business_quarter,
+    from_iso_format_or_today_if_none,
+    hitas_calculation_quarter,
+    to_quarter,
+)
 from hitas.views.utils.excel import NewExcelParser, OldExcelParser, parse_sheet
 from hitas.views.utils.fields import IntegerOrEmpty
 
@@ -117,6 +123,15 @@ class ExternalSalesDataView(ViewSet):
             extra_serializer=CostAreaSalesCatalogExtraSerializer,
             row_post_validators=[],
         )
+
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        quarter = to_quarter(business_quarter(hitas_calculation_quarter(calculation_date)) - relativedelta(months=3))
+        if sheet_data["quarter_4"] != quarter:
+            raise ValidationError({"calculation_date": "Given Excel is not for this Hitas quarter."})
 
         remove_unused_areas(sheet_data)
         sales_data = create_external_sales_data(sheet_data)

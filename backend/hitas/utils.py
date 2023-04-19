@@ -151,6 +151,7 @@ def hitas_calculation_quarter(date: datetime.date) -> datetime.date:
 
 
 def to_quarter(date: datetime.date) -> str:
+    """Get business quarter as a string from a date."""
     if date.month in (1, 2, 3):
         return f"{date.year}Q1"
     if date.month in (4, 5, 6):
