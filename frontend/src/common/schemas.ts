@@ -93,6 +93,17 @@ const APIIdString = string().min(32, errorMessages.APIIdMin).max(32, errorMessag
 
 const addAPIId = (zodObject) => zodObject.merge(APIIdString);
 
+const nullishNumber = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+    .nonnegative(errorMessages.numberPositive)
+    .nullish();
+
+const writableRequiredNumber = number({
+    invalid_type_error: errorMessages.required,
+    required_error: errorMessages.required,
+})
+    .nonnegative(errorMessages.numberPositive)
+    .optional(); // allow undefined but no null
+
 const CodeSchema = object({
     id: APIIdString,
     value: string(),
@@ -245,8 +256,8 @@ const ApartmentAddressSchema = object({
     street_address: string(),
     postal_code: string().optional(),
     city: string().optional(), // Read only
-    apartment_number: number().nullable(),
-    floor: number().nullable(),
+    apartment_number: writableRequiredNumber,
+    floor: nullishNumber,
     stair: string().min(1, "Pakollinen kenttä!"),
 });
 
@@ -354,13 +365,13 @@ const ApartmentPricesSchema = object({
     catalog_share_of_housing_company_loans: number().nullable(), // Read only
     catalog_acquisition_price: number().nullable(), // Read only. (purchase_price + share_of_hosing_company_loans)
     construction: object({
-        loans: number().nullable(),
-        additional_work: number().nullable(),
+        loans: nullishNumber,
+        additional_work: nullishNumber,
         interest: object({
-            rate_6: number().nullish(),
-            rate_14: number().nullish(),
+            rate_6: nullishNumber,
+            rate_14: nullishNumber,
         }).optional(),
-        debt_free_purchase_price: number().nullable(),
+        debt_free_purchase_price: nullishNumber,
     }),
     maximum_prices: object({
         // Read only
@@ -386,8 +397,8 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
 });
 
 const ApartmentSharesSchema = object({
-    start: number().positive().nullish().or(z.nan()),
-    end: number().positive().nullish().or(z.nan()),
+    start: nullishNumber,
+    end: nullishNumber,
     total: number(),
 });
 
@@ -432,8 +443,8 @@ const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
     state: z.enum(apartmentStates).nullable(),
     type: object({id: string()}).nullable(),
-    surface_area: number().nullable(),
-    rooms: number().nullable(),
+    surface_area: nullishNumber,
+    rooms: nullishNumber,
     shares: ApartmentSharesSchema.omit({total: true}),
     address: ApartmentAddressSchema,
     prices: ApartmentWritablePricesSchema,

@@ -16,11 +16,13 @@ const DateInput = ({id, name, label, required, maxDate, minDate, formObject, dis
 
     const {
         register,
+        watch,
         resetField,
         formState: {errors},
     } = formObject;
-    const formDate = register(name);
+    const formDate = register(name, {setValueAs: (value) => (value === "" ? null : value)});
     const fieldError = dotted(errors, formDate.name);
+    watch(name);
 
     const getValue = (): string => {
         // Try to convert Hitas API format to HDS date format

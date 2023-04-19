@@ -108,7 +108,7 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
             rooms: null,
             shares: {start: null, end: null},
             address: {
-                apartment_number: null,
+                apartment_number: undefined,
                 floor: null,
                 stair: "",
             },
