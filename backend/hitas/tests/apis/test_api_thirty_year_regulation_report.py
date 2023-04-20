@@ -710,66 +710,6 @@ def test__api__regulation_letter__id_missing(api_client: HitasAPIClient, freezer
     }
 
 
-@pytest.mark.django_db
-def test__api__regulation_letter__regulation_skipped(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
-
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
-
-    result = ThirtyYearRegulationResults.objects.create(
-        regulation_month=datetime.datetime(1993, 2, 1),
-        calculation_month=datetime.date(2023, 2, 1),
-        surface_area_price_ceiling=Decimal("5000.00"),
-        sales_data={
-            "external": {},
-            "internal": {"00001": {"2022Q4": {"price": 4900.0, "sale_count": 1}}},
-            "price_by_area": {"00001": 4900.0},
-        },
-    )
-
-    ThirtyYearRegulationResultsRow.objects.create(
-        parent=result,
-        housing_company=sale.apartment.housing_company,
-        completion_date=datetime.date(1993, 2, 1),
-        surface_area=Decimal("10.00"),
-        postal_code="00001",
-        realized_acquisition_price=Decimal("60000.00"),
-        unadjusted_average_price_per_square_meter=Decimal("6000.00"),
-        adjusted_average_price_per_square_meter=Decimal("12000.00"),
-        completion_month_index=Decimal("100.00"),
-        calculation_month_index=Decimal("200.00"),
-        regulation_result=RegulationResult.SKIPPED,
-    )
-
-    url = (
-        reverse("hitas:thirty-year-regulation-letter")
-        + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
-    )
-
-    response = api_client.get(url)
-
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
-    assert response.json() == {
-        "error": "invalid",
-        "message": "Cannot download PDF since regulation for this housing company was skipped.",
-        "reason": "Conflict",
-        "status": 409,
-    }
-
-
 # Regulation Excel report
 
 
