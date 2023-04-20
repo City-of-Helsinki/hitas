@@ -29,14 +29,18 @@ class ThirtyYearRegulationView(ViewSet):
         except ValueError as error:
             raise ValidationError({"calculation_date": str(error)}) from error
 
-        check = request.query_params.get("check", 0) in ("True", "true", "1", 1)
+        data = get_thirty_year_regulation_results(calculation_date)
+        results = convert_thirty_year_regulation_results_to_comparison_data(data)
 
-        if check:
-            results = perform_thirty_year_regulation(calculation_date)
-        else:
-            data = get_thirty_year_regulation_results(calculation_date)
-            results = convert_thirty_year_regulation_results_to_comparison_data(data)
+        return Response(data=results, status=status.HTTP_200_OK)
 
+    def create(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.data.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        results = perform_thirty_year_regulation(calculation_date)
         return Response(data=results, status=status.HTTP_200_OK)
 
     @action(

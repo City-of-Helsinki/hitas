@@ -2343,13 +2343,9 @@ paths:
   # Thirty Year Regulation
 
   /api/v1/thirty-year-regulation:
-
     get:
-      description: >-
-        If 'check' parameter is 'true', check housing companies over 30 years old
-        whether they should be released from Hitas regulation or not.
-        Otherwise, try to fetch existing regulation results.
-      operationId: read-or-check-regulation
+      description: Try to fetch existing thirty-year regulation results.
+      operationId: read-thirty-year-regulation
       tags:
         - Thirty Year Regulation
       parameters:
@@ -2360,13 +2356,42 @@ paths:
           schema:
             type: string
             example: 2023-01-01
-        - name: check
-          required: false
-          in: query
-          description: If set to 'true', check regulation instead of fetching existing regulation data.
-          schema:
-            type: string
-            example: true
+      responses:
+        '200':
+          description: Successfully read thirty-year regulation results
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ThirtyYearRegulationResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Perform thirty-year regulation for housing companies
+      operationId: perform-thirty-year-regulation
+      tags:
+        - Thirty Year Regulation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Thirty-year regulation information
+              type: object
+              additionalProperties: false
+              properties:
+                calculation_date:
+                  description: Calculation date, use current date if not given.
+                  type: string
+                  example: 2023-01-01
       responses:
         '200':
           description: Successfully performed thirty-year regulation for housing companies
