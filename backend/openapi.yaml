@@ -2271,6 +2271,36 @@ paths:
 
   /api/v1/external-sales-data:
 
+    get:
+      description: Read external sales data for the quarter
+      operationId: read-external-sales-data
+      tags:
+        - External Sales Data
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date the Excel is needed for, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully read external sales data for the quarter
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/ExternalSalesData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
     post:
       description: Read cost area sales catalog from statistics center to external sales data
       operationId: create-external-sales-data
@@ -2303,34 +2333,39 @@ paths:
           $ref: '#/components/responses/NotFound'
         '406':
           $ref: '#/components/responses/NotAcceptableExcel'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '415':
           $ref: '#/components/responses/UnsupportedMediaTypeExcel'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/external-sales-data/{quarter}:
+  # Thirty Year Regulation
 
+  /api/v1/thirty-year-regulation:
     get:
-      description: Read external sales data for the quarter
-      operationId: read-external-sales-data
+      description: Try to fetch existing thirty-year regulation results.
+      operationId: read-thirty-year-regulation
       tags:
-        - External Sales Data
+        - Thirty Year Regulation
       parameters:
-        - name: quarter
-          required: true
-          in: path
-          description: Calculation quarter
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date, use current date if not given.
           schema:
             type: string
-            example: 2022Q1
+            example: 2023-01-01
       responses:
         '200':
-          description: Successfully read external sales data for the quarter
+          description: Successfully read thirty-year regulation results
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ExternalSalesData'
+                $ref: '#/components/schemas/ThirtyYearRegulationResults'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2340,23 +2375,23 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  # Thirty Year Regulation
-
-  /api/v1/thirty-year-regulation:
-
-    get:
-      description: Check housing companies over 30 years old whether they should be released from hitas regulation or not.
-      operationId: check-regulation
+    post:
+      description: Perform thirty-year regulation for housing companies
+      operationId: perform-thirty-year-regulation
       tags:
         - Thirty Year Regulation
-      parameters:
-        - name: calculation_date
-          required: false
-          in: query
-          description: Calculation date, use current date if not given
-          schema:
-            type: string
-            example: 2023-01-01
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Thirty-year regulation information
+              type: object
+              additionalProperties: false
+              properties:
+                calculation_date:
+                  description: Calculation date, use current date if not given.
+                  type: string
+                  example: 2023-01-01
       responses:
         '200':
           description: Successfully performed thirty-year regulation for housing companies
@@ -7306,6 +7341,8 @@ components:
           description: Housing company's display name
           type: string
           example: Taloyhtiö Helmi
+        address:
+          $ref: '#/components/schemas/HitasHousingCompanyAddress'
         price:
           description: |-
             Average price per square meter for all apartments in the housing company,
@@ -7320,6 +7357,13 @@ components:
           description: Does this housing company use the old or the new hitas ruleset?
           type: boolean
           example: false
+        completion_date:
+          description: Housing company completion date
+          type: string
+          format: date
+          example: 2023-02-01
+        property_manager:
+          $ref: '#/components/schemas/ReadOnlyPropertyManager'
 
     ObfuscatedOwner:
       description: Owner that has been obfuscated due to no longer owning any regulated apartments
@@ -7345,7 +7389,6 @@ components:
           type: string
           nullable: true
           example: martti.virtanen@example.com
-
 
     SurfaceAreaPriceCeilingCalculationResult:
       description: Surface area price ceiling calculation

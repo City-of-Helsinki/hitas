@@ -35,6 +35,7 @@ def get_completed_housing_companies(
         HousingCompany.objects.select_related(
             "postal_code",
             "financing_method",
+            "property_manager",
         )
         .prefetch_related(
             "real_estates",

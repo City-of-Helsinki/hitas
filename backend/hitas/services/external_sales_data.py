@@ -1,7 +1,12 @@
 from typing import TYPE_CHECKING, Literal, Optional
 
+from dateutil.relativedelta import relativedelta
+from django.db import IntegrityError
+
+from hitas.exceptions import ModelConflict
 from hitas.models.external_sales_data import CostAreaData, ExternalSalesData, ExternalSalesDataType, QuarterData
 from hitas.models.postal_code import HitasPostalCode
+from hitas.utils import from_quarter, to_quarter
 
 if TYPE_CHECKING:
     from hitas.views.external_sales_data import CostAreaSalesCatalogData
@@ -42,4 +47,12 @@ def create_external_sales_data(data: "CostAreaSalesCatalogData") -> ExternalSale
                 )
             )
 
-    return ExternalSalesData.objects.update_or_create(calculation_quarter=data["quarter_4"], defaults=sales_data)[0]
+    calculation_quarter = to_quarter(from_quarter(data["quarter_4"]) + relativedelta(months=3))
+
+    try:
+        return ExternalSalesData.objects.create(calculation_quarter=calculation_quarter, **sales_data)
+    except IntegrityError as error:
+        raise ModelConflict(
+            f"External sales data already exists for {calculation_quarter!r}",
+            error_code="unique",
+        ) from error

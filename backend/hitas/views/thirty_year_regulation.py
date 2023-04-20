@@ -8,10 +8,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from hitas.exceptions import ModelConflict
 from hitas.models.thirty_year_regulation import RegulationResult
 from hitas.services.thirty_year_regulation import (
     build_thirty_year_regulation_report_excel,
+    convert_thirty_year_regulation_results_to_comparison_data,
     get_thirty_year_regulation_results,
     get_thirty_year_regulation_results_for_housing_company,
     perform_thirty_year_regulation,
@@ -25,6 +25,17 @@ class ThirtyYearRegulationView(ViewSet):
     def list(self, request: Request, *args, **kwargs) -> Response:
         try:
             calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        data = get_thirty_year_regulation_results(calculation_date)
+        results = convert_thirty_year_regulation_results_to_comparison_data(data)
+
+        return Response(data=results, status=status.HTTP_200_OK)
+
+    def create(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.data.get("calculation_date"))
         except ValueError as error:
             raise ValidationError({"calculation_date": str(error)}) from error
 
@@ -51,12 +62,6 @@ class ThirtyYearRegulationView(ViewSet):
             raise ValidationError({"calculation_date": str(error)}) from error
 
         results = get_thirty_year_regulation_results_for_housing_company(housing_company_uuid, calculation_date)
-
-        if results.regulation_result == RegulationResult.SKIPPED:
-            raise ModelConflict(
-                "Cannot download PDF since regulation for this housing company was skipped.",
-                error_code="invalid",
-            )
 
         context = {"results": results}
         choice = "jatkumisesta" if results.regulation_result == RegulationResult.STAYS_REGULATED else "pättymisestä"

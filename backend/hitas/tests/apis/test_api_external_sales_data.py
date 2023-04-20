@@ -18,7 +18,7 @@ from hitas.tests.factories import HitasPostalCodeFactory, HousingCompanyFactory
 
 @pytest.mark.django_db
 def test__api__external_sales_data__create(api_client: HitasAPIClient):
-    url = reverse("hitas:external-sales-data-list")
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     postal_codes = [
@@ -53,7 +53,7 @@ def test__api__external_sales_data__create(api_client: HitasAPIClient):
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [
@@ -118,12 +118,12 @@ def test__api__external_sales_data__create(api_client: HitasAPIClient):
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.django_db
 def test__api__external_sales_data__create__missing_postal_codes(api_client: HitasAPIClient):
-    url = reverse("hitas:external-sales-data-list")
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
@@ -138,7 +138,7 @@ def test__api__external_sales_data__create__missing_postal_codes(api_client: Hit
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [],
@@ -159,12 +159,12 @@ def test__api__external_sales_data__create__missing_postal_codes(api_client: Hit
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.django_db
 def test__api__external_sales_data__create__postal_codes_not_on_housing_companies(api_client: HitasAPIClient):
-    url = reverse("hitas:external-sales-data-list")
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     postal_codes = [
@@ -199,7 +199,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
 
     assert response.status_code == status.HTTP_201_CREATED, response.json()
     assert response.json() == {
-        "calculation_quarter": "2022Q4",
+        "calculation_quarter": "2023Q1",
         "quarter_1": {
             "quarter": "2022Q1",
             "areas": [],
@@ -220,7 +220,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
 
     sales_data = list(ExternalSalesData.objects.all())
     assert len(sales_data) == 1
-    assert sales_data[0].calculation_quarter == "2022Q4"
+    assert sales_data[0].calculation_quarter == "2023Q1"
 
 
 @pytest.mark.parametrize(
@@ -396,7 +396,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
 )
 @pytest.mark.django_db
 def test__api__external_sales_data__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
-    url = reverse("hitas:external-sales-data-list")
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
     postal_codes = [
@@ -448,6 +448,108 @@ def test__api__external_sales_data__create__invalid_data(api_client: HitasAPICli
     }
 
 
+@pytest.mark.django_db
+def test__api__external_sales_data__exists(api_client: HitasAPIClient):
+    data = ExternalSalesDataType(
+        quarter_1=QuarterData(quarter="2022Q1", areas=[CostAreaData(postal_code="00000", sale_count=1, price=2)]),
+        quarter_2=QuarterData(quarter="2022Q2", areas=[CostAreaData(postal_code="00000", sale_count=3, price=4)]),
+        quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
+        quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
+    )
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
+    content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    postal_codes = [
+        "00180",
+        "00220",
+        "00280",
+        "00300",
+        "00310",
+        "00540",
+        "00570",
+        "00580",
+        "00590",
+        "00650",
+        "00680",
+        "00690",
+        "00850",
+        "00870",
+    ]
+
+    for postal_code in postal_codes:
+        HousingCompanyFactory.create(postal_code__value=postal_code)
+
+    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    data = path.read_bytes()
+
+    response = api_client.post(
+        url,
+        data=data,
+        content_type=content_type,
+        openapi_validate_request=False,  # cannot validate requests with bytes
+    )
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "unique",
+        "message": "External sales data already exists for '2023Q1'",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__external_sales_data__wrong_calculation_date(api_client: HitasAPIClient):
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2022-02-01"
+    content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    postal_codes = [
+        "00180",
+        "00220",
+        "00280",
+        "00300",
+        "00310",
+        "00540",
+        "00570",
+        "00580",
+        "00590",
+        "00650",
+        "00680",
+        "00690",
+        "00850",
+        "00870",
+    ]
+
+    for postal_code in postal_codes:
+        HousingCompanyFactory.create(postal_code__value=postal_code)
+
+    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    data = path.read_bytes()
+
+    response = api_client.post(
+        url,
+        data=data,
+        content_type=content_type,
+        openapi_validate_request=False,  # cannot validate requests with bytes
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "calculation_date",
+                "message": "Given Excel is not for this Hitas quarter.",
+            },
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Retrieve tests
 
 
@@ -459,18 +561,38 @@ def test__api__external_sales_data__retrieve(api_client: HitasAPIClient):
         quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
         quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
     )
-    ExternalSalesData.objects.create(calculation_quarter="2022Q4", **data)
-
-    url = reverse("hitas:external-sales-data-detail", args=["2022Q4"])
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == {**{"calculation_quarter": "2022Q4"}, **data}
+    assert response.json() == {**{"calculation_quarter": "2023Q1"}, **data}
+
+
+@pytest.mark.django_db
+def test__api__external_sales_data__retrieve__wrong_date(api_client: HitasAPIClient):
+    data = ExternalSalesDataType(
+        quarter_1=QuarterData(quarter="2022Q1", areas=[CostAreaData(postal_code="00000", sale_count=1, price=2)]),
+        quarter_2=QuarterData(quarter="2022Q2", areas=[CostAreaData(postal_code="00000", sale_count=3, price=4)]),
+        quarter_3=QuarterData(quarter="2022Q3", areas=[CostAreaData(postal_code="00000", sale_count=5, price=6)]),
+        quarter_4=QuarterData(quarter="2022Q4", areas=[CostAreaData(postal_code="00000", sale_count=7, price=8)]),
+    )
+    ExternalSalesData.objects.create(calculation_quarter="2023Q1", **data)
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2024-02-01"
+    response = api_client.get(url, format="json")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
+    assert response.json() == {
+        "error": "external_sales_data_not_found",
+        "message": "External sales data not found",
+        "reason": "Not Found",
+        "status": 404,
+    }
 
 
 @pytest.mark.django_db
 def test__api__external_sales_data__retrieve__not_found(api_client: HitasAPIClient):
-    url = reverse("hitas:external-sales-data-detail", args=["2022Q4"])
+    url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     response = api_client.get(url, format="json")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()

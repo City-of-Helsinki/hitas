@@ -22,7 +22,6 @@ class RegulationResult(Enum):
     AUTOMATICALLY_RELEASED = "automatically_released"
     RELEASED_FROM_REGULATION = "released_from_regulation"
     STAYS_REGULATED = "stays_regulated"
-    SKIPPED = "skipped"
 
 
 class FullSalesData(TypedDict):

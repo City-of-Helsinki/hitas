@@ -14,7 +14,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
+from hitas.exceptions import HitasModelNotFound, ModelConflict, get_hitas_object_or_404
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import (
@@ -56,11 +56,27 @@ if TYPE_CHECKING:
 logger = logging.getLogger()
 
 
+class AddressInfo(TypedDict):
+    street_address: str
+    postal_code: str
+    city: str
+
+
+class PropertyManagerInfo(TypedDict):
+    id: str
+    name: str
+    email: str
+    address: AddressInfo
+
+
 class ComparisonData(TypedDict):
     id: HousingCompanyUUIDHex
     display_name: HousingCompanyNameT
+    address: AddressInfo
     price: Decimal
     old_ruleset: bool
+    completion_date: datetime.date | str
+    property_manager: PropertyManagerInfo
 
 
 class RegulationResults(TypedDict):
@@ -98,6 +114,8 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     calculation_month = hitas_calculation_quarter(calculation_date)
     regulation_month = calculation_month - relativedelta(years=30)
+
+    check_existing_regulation_data(calculation_month)
 
     logger.info(f"Checking regulation need for housing companies completed before {regulation_month.isoformat()!r}...")
 
@@ -181,13 +199,25 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
 
     logger.info("Determining regulation need for housing companies...")
     results = _determine_regulation_need(comparison_values, price_by_area)
+
+    if results["skipped"]:
+        logger.info(
+            f"{len(results['skipped'])} housing companies could not be checked. Regulation could not be completed."
+        )
+        return RegulationResults(
+            automatically_released=[],
+            released_from_regulation=[],
+            stays_regulated=[],
+            skipped=results["skipped"],
+            obfuscated_owners=[],
+        )
+
     results["automatically_released"] += automatically_released
 
     logger.info(
         f"{len(results['automatically_released'])} housing companies are released from regulation automatically, "
         f"{len(results['released_from_regulation'])} are released after regulation checks, "
-        f"{len(results['stays_regulated'])} stay regulated, "
-        f"{len(results['skipped'])} could not be checked."
+        f"{len(results['stays_regulated'])} stay regulated."
     )
 
     housing_companies += split_housing_companies
@@ -215,6 +245,18 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     return results
 
 
+def check_existing_regulation_data(calculation_month: datetime.date) -> None:
+    """
+    Check if there is already regulation results for this hitas quarter.
+    Do not allow re-regulation for a given quarter.
+    """
+    if ThirtyYearRegulationResults.objects.filter(calculation_month=calculation_month).exists():
+        raise ModelConflict(
+            "Previous regulation exists. Cannot re-check regulation for this quarter.",
+            error_code="unique",
+        )
+
+
 def _split_automatically_released(
     housing_companies: list[HousingCompanyWithAnnotations],
 ) -> tuple[list[HousingCompanyWithAnnotations], list[ComparisonData]]:
@@ -234,8 +276,24 @@ def _split_automatically_released(
                 ComparisonData(
                     id=housing_company.uuid.hex,
                     display_name=housing_company.display_name,
+                    address=AddressInfo(
+                        street_address=housing_company.street_address,
+                        postal_code=housing_company.postal_code.value,
+                        city=housing_company.postal_code.city,
+                    ),
                     price=Decimal("0"),  # Index adjusted price not calculate yet
                     old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
+                    completion_date=housing_company.completion_date,
+                    property_manager=PropertyManagerInfo(
+                        id=housing_company.property_manager.uuid.hex,
+                        name=housing_company.property_manager.name,
+                        email=housing_company.property_manager.email,
+                        address=AddressInfo(
+                            street_address=housing_company.property_manager.street_address,
+                            postal_code=housing_company.property_manager.postal_code,
+                            city=housing_company.property_manager.city,
+                        ),
+                    ),
                 )
             )
             housing_companies[i] = None
@@ -259,8 +317,24 @@ def _get_comparison_values(
         comparison_values[postal_code][housing_company.uuid.hex] = ComparisonData(
             id=housing_company.uuid.hex,
             display_name=housing_company.display_name,
+            address=AddressInfo(
+                street_address=housing_company.street_address,
+                postal_code=housing_company.postal_code.value,
+                city=housing_company.postal_code.city,
+            ),
             price=max((housing_company.avg_price_per_square_meter, surface_area_price_ceiling)),
             old_ruleset=housing_company.hitas_type.old_hitas_ruleset,
+            completion_date=housing_company.completion_date,
+            property_manager=PropertyManagerInfo(
+                id=housing_company.property_manager.uuid.hex,
+                name=housing_company.property_manager.name,
+                email=housing_company.property_manager.email,
+                address=AddressInfo(
+                    street_address=housing_company.property_manager.street_address,
+                    postal_code=housing_company.property_manager.postal_code,
+                    city=housing_company.property_manager.city,
+                ),
+            ),
         )
 
     return comparison_values
@@ -477,14 +551,9 @@ def _save_regulation_results(
         },
     )
 
+    # Regulations are immutable, so they shouldn't be overridden.
     if not created:
-        # Retain regulation results in this calculation month for released housing companies,
-        # as those will not have been part of subsequent regulation checks, but should still show up
-        # in this calculation month's regulation results.
-        ThirtyYearRegulationResultsRow.objects.filter(
-            Q(parent=thirty_year_regulation_results),
-            ~Q(housing_company__regulation_status=RegulationStatus.REGULATED),
-        ).delete()
+        raise ModelConflict("Regulation results already exist for this month.", error_code="unique")
 
     rows_to_save: list[ThirtyYearRegulationResultsRow] = []
     for housing_company in housing_companies:
@@ -508,10 +577,8 @@ def _save_regulation_results(
             regulation_result = RegulationResult.AUTOMATICALLY_RELEASED
         elif housing_company.uuid.hex in {result["id"] for result in results["released_from_regulation"]}:
             regulation_result = RegulationResult.RELEASED_FROM_REGULATION
-        elif housing_company.uuid.hex in {result["id"] for result in results["stays_regulated"]}:
-            regulation_result = RegulationResult.STAYS_REGULATED
         else:
-            regulation_result = RegulationResult.SKIPPED
+            regulation_result = RegulationResult.STAYS_REGULATED
 
         rows_to_save.append(
             ThirtyYearRegulationResultsRow(
@@ -542,6 +609,7 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                 ThirtyYearRegulationResultsRow.objects.prefetch_related(
                     "housing_company",
                     "housing_company__postal_code",
+                    "housing_company__property_manager",
                 )
                 .annotate(
                     apartment_count=Count("housing_company__real_estates__buildings__apartments"),
@@ -641,13 +709,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
             surface_area=row.surface_area,
             price_per_square_meter=row.adjusted_average_price_per_square_meter,
             postal_code_price=row.parent.sales_data["price_by_area"].get(row.postal_code),
-            state=(
-                "Ei vapaudu"
-                if row.regulation_result == RegulationResult.STAYS_REGULATED
-                else "Ei voitu määrittää"
-                if row.regulation_result == RegulationResult.SKIPPED
-                else "Vapautuu"
-            ),
+            state=("Ei vapaudu" if row.regulation_result == RegulationResult.STAYS_REGULATED else "Vapautuu"),
             completion_date=row.completion_date,
             age=humanize_relativedelta(relativedelta(results.calculation_month, row.completion_date)),
         )
@@ -719,7 +781,6 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
                 "font": {
                     "Ei vapaudu": Font(color="FF0000"),  # red
                     "Vapautuu": Font(color="00FF00"),  # green
-                    "Ei voitu määrittää": Font(color="0000FF"),  # blue
                 },
             },
             "K": {"number_format": "DD.MM.YYYY"},
@@ -730,3 +791,54 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     resize_columns(worksheet)
     worksheet.protection.sheet = True
     return workbook
+
+
+def convert_thirty_year_regulation_results_to_comparison_data(
+    results: ThirtyYearRegulationResults,
+) -> RegulationResults:
+    regulation_results = RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+    for row in results.rows.all():
+        column: dict[
+            RegulationResult,
+            Literal["automatically_released", "released_from_regulation", "stays_regulated"],
+        ]
+        column = {
+            RegulationResult.AUTOMATICALLY_RELEASED: "automatically_released",
+            RegulationResult.RELEASED_FROM_REGULATION: "released_from_regulation",
+            RegulationResult.STAYS_REGULATED: "stays_regulated",
+        }
+
+        regulation_results[column[row.regulation_result]].append(
+            ComparisonData(
+                id=row.housing_company.uuid.hex,
+                display_name=row.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=row.housing_company.street_address,
+                    postal_code=row.housing_company.postal_code.value,
+                    city=row.housing_company.postal_code.city,
+                ),
+                price=max(
+                    (row.adjusted_average_price_per_square_meter or 0), (results.surface_area_price_ceiling or 0)
+                ),
+                old_ruleset=row.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=row.completion_date,
+                property_manager=PropertyManagerInfo(
+                    id=row.housing_company.property_manager.uuid.hex,
+                    name=row.housing_company.property_manager.name,
+                    email=row.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=row.housing_company.property_manager.street_address,
+                        postal_code=row.housing_company.property_manager.postal_code,
+                        city=row.housing_company.property_manager.city,
+                    ),
+                ),
+            )
+        )
+
+    return regulation_results
