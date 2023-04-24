@@ -145,6 +145,7 @@ def run(
     truncate: bool,
     truncate_only: bool,
     minimal_dataset: bool,
+    regulated_only: bool,
 ) -> None:
     if debug:
         logging.basicConfig()
@@ -214,7 +215,7 @@ def run(
 
             # Housing companies
             converted_data.created_housing_companies_by_oracle_id = create_housing_companies(
-                connection, converted_data, minimal_dataset
+                connection, converted_data, minimal_dataset, regulated_only
             )
 
             # Housing company improvements
@@ -301,16 +302,18 @@ def create_indices(codes: List[LegacyRow], model_class: type[AbstractIndex]) -> 
 
 
 def create_housing_companies(
-    connection: Connection, converted_data: ConvertedData, minimal_dataset: bool
+    connection: Connection, converted_data: ConvertedData, minimal_dataset: bool, regulated_only: bool
 ) -> dict[int, CreatedHousingCompany]:
     def fetch_housing_companies():
         command = select(companies, additional_infos).join(additional_infos, isouter=True)
         if minimal_dataset:
             # Only migrate a pre-specified set of housing companies e.g. for a testing environment
             print("Running migration with a minimal housing company dataset.")
-            command = command.where(
-                companies.c.id.in_((441, 461, 468, 504, 514, 657, 658, 659, 696, 709, 763, 779, 805))
-            )
+            ids = (441, 461, 468, 504, 514, 657, 658, 659, 696, 709, 763, 779, 805)
+            command = command.where(companies.c.id.in_(ids))
+        if regulated_only:
+            print("Running migration with only regulated housing companies.")
+            command = command.where(companies.c.state_code.in_(("001", "002")))
         return connection.execute(command).fetchall()
 
     housing_companies_by_id = {}
