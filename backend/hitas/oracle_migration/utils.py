@@ -1,5 +1,7 @@
+import sys
 import datetime
-from typing import Optional, Type
+from functools import wraps
+from typing import Optional, Type, ParamSpec, TypeVar, Callable
 
 import pytz
 from django.db import models
@@ -12,6 +14,8 @@ from hitas.models.apartment import DepreciationPercentage
 from hitas.models.housing_company import RegulationStatus
 
 TZ = pytz.timezone("Europe/Helsinki")
+T = TypeVar("T")
+P = ParamSpec("P")
 
 
 def str_to_year_month(value: str) -> datetime.date:
@@ -106,3 +110,24 @@ class ApartmentSaleMonitoringState(Enum):
         CANCELLED = _("cancelled")
         COMPLETE = _("complete")
         RELATIVE_SALE = _("relative_sale")
+
+
+def prints_to_file(file: str, mode: str = "w") -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """Print to the given file instead of stdout for debugging purposes."""
+
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            with open(file, mode=mode) as f:
+                try:
+                    orig_stdout = sys.stdout
+                    sys.stdout = f
+                    val = func(*args, **kwargs)
+                finally:
+                    sys.stdout = orig_stdout
+
+            return val
+
+        return wrapper
+
+    return decorator
