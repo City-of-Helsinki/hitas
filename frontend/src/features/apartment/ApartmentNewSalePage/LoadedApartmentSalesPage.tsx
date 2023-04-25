@@ -11,22 +11,37 @@ import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
 import {ApartmentSaleSchema, errorMessages, IApartmentDetails, IApartmentSaleForm} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
+import ApartmentCatalogPrices from "./ApartmentCatalogPrices";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
     const navigate = useNavigate();
 
+    const isApartmentFirstSale = !apartment.prices.first_purchase_date;
+    const hasValidCatalogPrices =
+        apartment.prices.catalog_purchase_price !== null &&
+        apartment.prices.catalog_share_of_housing_company_loans !== null &&
+        apartment.prices.catalog_acquisition_price !== null;
+
     const [maximumPrices, setMaximumPrices] = useState<
         | undefined
         | {
               maximumPrice: number;
-              maxPricePerSquare: number;
               debtFreePurchasePrice: number;
               apartmentShareOfHousingCompanyLoans: number;
               index: string;
           }
-    >();
+    >(
+        isApartmentFirstSale && hasValidCatalogPrices
+            ? {
+                  maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
+                  debtFreePurchasePrice: apartment.prices.catalog_acquisition_price ?? 0,
+                  apartmentShareOfHousingCompanyLoans: apartment.prices.catalog_share_of_housing_company_loans ?? 0,
+                  index: "",
+              }
+            : undefined
+    );
 
     // ************************
     // * Form data and schema *
@@ -35,46 +50,71 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
         purchase_date: "",
-        purchase_price: maximumPrices?.maximumPrice ?? null,
-        apartment_share_of_housing_company_loans: maximumPrices?.apartmentShareOfHousingCompanyLoans ?? null,
+        purchase_price: isApartmentFirstSale && hasValidCatalogPrices ? apartment.prices.catalog_purchase_price : null,
+        apartment_share_of_housing_company_loans:
+            isApartmentFirstSale && hasValidCatalogPrices
+                ? apartment.prices.catalog_share_of_housing_company_loans
+                : null,
         exclude_from_statistics: false,
     };
     const initialFormOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
 
+    // Hard Errors
     // ApartmentSaleSchema with additional validation related to maximum price calculation
     const RefinedApartmentSaleSchema: ZodSchema = ApartmentSaleSchema.superRefine((data, ctx) => {
-        // Sale can't be made without a confirmed maximum price calculation.
-        if (maximumPrices === undefined) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["maximum_price_calculation"],
-                message: "Enimmäishintalaskelma puuttuu.",
-            });
-            return;
-        }
-        // The apartment share of housing company loans must match the maximum price calculations.
-        if (data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["apartment_share_of_company_loans"],
-                message: errorMessages.loanShareChanged,
-            });
+        if (!isApartmentFirstSale) {
+            // Sale can't be made without a confirmed maximum price calculation.
+            if (maximumPrices === undefined) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["maximum_price_calculation"],
+                    message: "Enimmäishintalaskelma puuttuu.",
+                });
+                return;
+            }
+            // The apartment share of housing company loans must match the maximum price calculations.
+            if (data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["apartment_share_of_company_loans"],
+                    message: errorMessages.loanShareChanged,
+                });
+            }
         }
     });
 
+    // Soft Errors
     const resolver = (data, context, options) => {
         return zodResolver(
             RefinedApartmentSaleSchema.superRefine((data, ctx) => {
-                // Price can not be bigger than the maximum price calculations maximum price.
-                if (
-                    !warningsGiven.purchase_price &&
-                    (!maximumPrices || data.purchase_price > maximumPrices.maximumPrice)
-                ) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ["purchase_price"],
-                        message: errorMessages.overMaxPrice,
-                    });
+                if (!isApartmentFirstSale) {
+                    // Price can not be bigger than the maximum price calculations maximum price.
+                    if (
+                        !warningsGiven.purchase_price &&
+                        (!maximumPrices || data.purchase_price > maximumPrices.maximumPrice)
+                    ) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            path: ["purchase_price"],
+                            message: errorMessages.overMaxPrice,
+                        });
+                    }
+                } else {
+                    // We should show a warning and ask for confirmation if catalog prices are missing
+                    if (
+                        !warningsGiven.catalog_acquisition_price &&
+                        (!hasValidCatalogPrices ||
+                            (apartment.prices.catalog_acquisition_price !== null &&
+                                (data.purchase_price + data.apartment_share_of_housing_company_loans >
+                                    apartment.prices.catalog_acquisition_price ||
+                                    data.purchase_price + data.apartment_share_of_housing_company_loans <
+                                        apartment.prices.catalog_acquisition_price)))
+                    ) {
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            path: ["catalog_acquisition_price"],
+                        });
+                    }
                 }
             })
         )(data, context, {...options, mode: "sync"});
@@ -94,11 +134,13 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
 
     // Certain form errors should be able to be ignored.
     const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
-    const noWarningsGiven = {purchase_price: false};
+    const noWarningsGiven = {purchase_price: false, catalog_acquisition_price: false};
     const [warningsGiven, setWarningsGiven] = useState(noWarningsGiven);
+    const [warningMessage, setWarningMessage] = useState("");
 
     const closeWarningsModal = () => {
         setWarningsGiven(noWarningsGiven);
+        setWarningMessage("");
         setIsWarningModalVisible(false);
     };
 
@@ -121,9 +163,35 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         if (errors.purchase_price && errors.purchase_price.type === z.ZodIssueCode.custom) {
             setIsWarningModalVisible(true);
             setWarningsGiven((prev) => ({...prev, purchase_price: true}));
+            setWarningMessage("Kauppahinta ylittää laskelman enimmäishinnan.");
+        } else if (
+            errors.catalog_acquisition_price &&
+            errors.catalog_acquisition_price.type === z.ZodIssueCode.custom
+        ) {
+            setIsWarningModalVisible(true);
+            setWarningsGiven((prev) => ({...prev, catalog_acquisition_price: true}));
+            setWarningMessage(getCatalogPriceError());
         } else {
-            hdsToast.error(`Virhe luodessa asunnon kauppaa! ${errors}`);
+            hdsToast.error(`Virhe luodessa asunnon kauppaa!`);
+            // eslint-disable-next-line no-console
+            console.error(errors);
         }
+    };
+
+    const getCatalogPriceError = () => {
+        const acquisitionPrice =
+            saleForm.getValues("purchase_price") + saleForm.getValues("apartment_share_of_housing_company_loans");
+
+        if (!hasValidCatalogPrices) {
+            return errorMessages.catalogPricesMissing;
+        } else if (apartment.prices.catalog_acquisition_price !== null) {
+            if (acquisitionPrice > apartment.prices.catalog_acquisition_price) {
+                return errorMessages.catalogOverMaxPrice;
+            } else if (acquisitionPrice < apartment.prices.catalog_acquisition_price) {
+                return errorMessages.catalogUnderMaxPrice;
+            }
+        }
+        return "";
     };
 
     // Send a request to the API to create a sale
@@ -157,16 +225,18 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
 
     // Check if the parts of the sale form needed for a max price calculation are currently valid
     const hasLoanValueChanged =
+        !isApartmentFirstSale &&
         maximumPrices !== undefined &&
         saleForm.getValues("apartment_share_of_housing_company_loans") !==
             maximumPrices.apartmentShareOfHousingCompanyLoans;
 
     // Disable the saving button when the form has errors or when there is no valid calculation
-    const isSavingDisabled =
-        maximumPrices === undefined || !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
+    const isSavingDisabled = isApartmentFirstSale
+        ? !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success
+        : maximumPrices === undefined || !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
 
-    // Disable all fields not related to creating a calculation when it's missing
-    const isMaximumPriceCalculationMissing = maximumPrices === undefined;
+    // Disable all fields not related to creating a calculation when it's missing (Does not apply for first sales)
+    const isMaximumPriceCalculationMissing = !isApartmentFirstSale && maximumPrices === undefined;
 
     return (
         <div className="view--apartment-conditions-of-sale">
@@ -225,11 +295,18 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                     </form>
                 </Fieldset>
 
-                <MaximumPriceCalculationFieldSet
-                    apartment={apartment}
-                    setMaximumPrices={setMaximumPrices}
-                    saleForm={saleForm}
-                />
+                {isApartmentFirstSale ? (
+                    <ApartmentCatalogPrices
+                        apartment={apartment}
+                        errorMessage={getCatalogPriceError()}
+                    />
+                ) : (
+                    <MaximumPriceCalculationFieldSet
+                        apartment={apartment}
+                        setMaximumPrices={setMaximumPrices}
+                        saleForm={saleForm}
+                    />
+                )}
                 <OwnershipsListFieldSet
                     formObject={saleForm}
                     disabled={isMaximumPriceCalculationMissing}
@@ -250,7 +327,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 isLoading={isCreateSaleLoading}
                 isVisible={isWarningModalVisible}
                 setIsVisible={setIsWarningModalVisible}
-                modalText="Kauppahinta ylittää laskelman enimmäishinnan. Haluatko varmasti tallentaa kaupan?"
+                modalText={`${warningMessage} Haluatko varmasti tallentaa kaupan?`}
                 modalHeader="Vahvista kaupan tallennus"
                 cancelAction={closeWarningsModal}
                 confirmAction={handleSaveButtonClick}

@@ -22,8 +22,20 @@
       padding: $spacing-s
       width: 100%
       grid-column: 1
+
+      .row
+        gap: 2em
+        > div
+          width: 50%
+          position: relative
+        p span
+          font-weight: bold
+
       // "Kaupan tiedot" & "Enimmäishintalaskelma" cards (left side)
       .max-prices
+        display: flex
+        flex-flow: column nowrap
+        gap: 1em
         .row--buttons
           margin-bottom: 0
           button
@@ -37,22 +49,13 @@
             font-weight: bold
             font-size: $fontsize-body-xl
         .error-text
-          margin: -1rem 0 0
           svg
             vertical-align: bottom
             margin-right: $spacing-2-xs
+
         &.expired .fieldset--max-prices__value span
           color: $color-black-40 !important
           text-decoration: line-through
-      .row
-        gap: 2em
-        > div
-          width: 50%
-          position: relative
-        &--prompt
-          flex-flow: column nowrap
-          p span
-            font-weight: bold
 
       // "Omistajuudet" card (right side)
       &.ownerships-fieldset

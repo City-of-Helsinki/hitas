@@ -50,6 +50,9 @@ export const errorMessages = {
     APIIdMax: "Rajapinnan palauttamassa ID-arvossa on liian monta merkkiä",
     overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
     loanShareChanged: "Lainaosuus muuttunut laskelmasta",
+    catalogOverMaxPrice: "Kauppahinta ylittää myyntihintaluettelon hinnan",
+    catalogUnderMaxPrice: "Kauppahinta alittaa myyntihintaluettelon hinnan",
+    catalogPricesMissing: "Myyntihintaluettelon hinnat puuttuvat",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -349,7 +352,7 @@ const ApartmentPricesSchema = object({
     latest_purchase_date: string().nullable(), // Read only
     catalog_purchase_price: number().nullable(), // Read only
     catalog_share_of_housing_company_loans: number().nullable(), // Read only
-    catalog_acquisition_price: number().nullable(), // Read only
+    catalog_acquisition_price: number().nullable(), // Read only. (purchase_price + share_of_hosing_company_loans)
     construction: object({
         loans: number().nullable(),
         additional_work: number().nullable(),

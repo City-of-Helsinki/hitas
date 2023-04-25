@@ -45,33 +45,33 @@ const MaximumPriceCalculationExists = ({
                 </div>
             </div>
 
-            <div className="row row--prompt">
-                <p>
-                    Enimmäishinnat on laskettu
-                    <span>{` ${getIndexType(maximumPrices.index)}llä`}</span> sekä{" "}
-                    <span>
-                        {maximumPrices.apartmentShareOfHousingCompanyLoans === 0
-                            ? "0 €"
-                            : formatMoney(maximumPrices.apartmentShareOfHousingCompanyLoans)}
-                    </span>{" "}
-                    lainaosuudella.
+            <p>
+                Enimmäishinnat on laskettu
+                <span>{` ${getIndexType(maximumPrices.index)}llä`}</span> sekä{" "}
+                <span>
+                    {maximumPrices.apartmentShareOfHousingCompanyLoans === 0
+                        ? "0 €"
+                        : formatMoney(maximumPrices.apartmentShareOfHousingCompanyLoans)}
+                </span>{" "}
+                lainaosuudella.
+            </p>
+
+            {hasLoanValueChanged && (
+                <p className="error-text">
+                    <IconAlertCircleFill />
+                    <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
+                    <span> tee uusi enimmäishintalaskelma</span>.
                 </p>
-                {hasLoanValueChanged && (
-                    <p className="error-text">
-                        <IconAlertCircleFill />
-                        <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
-                        <span> tee uusi enimmäishintalaskelma</span>.
-                    </p>
-                )}
-                <Button
-                    theme="black"
-                    variant={hasLoanValueChanged ? "primary" : "secondary"}
-                    onClick={handleCalculateButton}
-                    disabled={!isCalculationFormValid}
-                >
-                    Luo uusi enimmäishintalaskelma
-                </Button>
-            </div>
+            )}
+
+            <Button
+                theme="black"
+                variant={hasLoanValueChanged ? "primary" : "secondary"}
+                onClick={handleCalculateButton}
+                disabled={!isCalculationFormValid}
+            >
+                Luo uusi enimmäishintalaskelma
+            </Button>
         </div>
     );
 };
