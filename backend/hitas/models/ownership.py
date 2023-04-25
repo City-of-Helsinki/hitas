@@ -61,6 +61,10 @@ class Ownership(HitasModel):
     def apartment(self) -> Optional["Apartment"]:
         return getattr(getattr(self, "sale", None), "apartment", None)
 
+    @property
+    def active(self) -> bool:
+        return self.deleted is None  # noqa
+
     def __str__(self):
         return f"{self.owner}, {self.apartment}"
 

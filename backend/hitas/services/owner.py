@@ -18,7 +18,6 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
                         "owner",
                         "sale__apartment__building__real_estate__housing_company",
                     )
-                    # TODO: Change ownerships to be removed on sale so that his works like it should
                     .filter(
                         owner__id=OuterRef("id"),
                         sale__apartment__building__real_estate__housing_company__regulation_status=(

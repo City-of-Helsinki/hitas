@@ -656,7 +656,7 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
     # Old ownership released, new one is maintained
     owner_1.refresh_from_db()
     ownerships_post = list(owner_1.ownerships.all())
-    assert len(ownerships_post) == 2
+    assert len(ownerships_post) == 1
     assert ownerships_post[0].id == new_ownership.id
 
     condition_of_sale.refresh_from_db()
@@ -992,6 +992,54 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
     new_apartment = Apartment.objects.get(id=new_apartment.id)
     assert new_apartment.first_purchase_date is not None
     assert new_apartment.latest_purchase_date is not None
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__second_sale_older_than_first(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(sales=[])
+    owner: Owner = OwnerFactory.create()
+
+    # Latest sale, which is later than the sale we are about to create
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=datetime.date(2023, 2, 1),
+    )
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    url = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+
+    # There are now two sales
+    sales: list[ApartmentSale] = list(ApartmentSale.objects.all())
+    assert len(sales) == 2
+
+    # Old sale is still the only one with active ownerships
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 1
+    assert ownerships[0].sale == sale
 
 
 # Update tests
