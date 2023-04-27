@@ -40,7 +40,7 @@ import {
     ICode,
     IHousingCompanyDetails,
 } from "../../common/schemas";
-import {hdsToast} from "../../common/utils";
+import {hdsToast, isEmpty} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
 const apartmentStateOptions = apartmentStates.map((state) => {
@@ -198,6 +198,16 @@ const LoadedApartmentCreatePage = ({
         reValidateMode: "onBlur",
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
+
+    // Set errors returned from the API for form fields
+    const setAPIErrorsForFormFields = (error) => {
+        if (error?.data?.fields) {
+            for (const fieldError of error.data.fields) {
+                formObject.setError(fieldError.field, {type: "custom", message: fieldError.message});
+            }
+        }
+    };
+
     const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
         const formattedFormData = formatApartmentFormDataForSubmit(apartment, data);
 
@@ -215,9 +225,10 @@ const LoadedApartmentCreatePage = ({
                     navigate(`/housing-companies/${housingCompany.id}/apartments/${payload.id}`);
                 }
             })
-            .catch(() => {
+            .catch((error) => {
                 hdsToast.error("Asunnon tallentaminen epäonnistui!");
                 setIsEndModalVisible(true);
+                setAPIErrorsForFormFields(error);
             });
     };
 

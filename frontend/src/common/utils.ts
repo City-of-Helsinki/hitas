@@ -157,3 +157,8 @@ export function doesAContainB(A: object, B: object): boolean {
     }
     return true;
 }
+
+export function isEmpty(obj: object | undefined | null): boolean {
+    if (obj === undefined || obj === null) return true;
+    return Object.keys(obj).length === 0;
+}
