@@ -120,7 +120,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     />
                                     <DetailField
                                         label="Vapautumispäivä"
-                                        value={formatDate(data.legacy_release_date)}
+                                        value={formatDate(data.release_date)}
                                     />
                                     <DetailField
                                         label="Rakennuttaja"

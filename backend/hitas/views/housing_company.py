@@ -26,6 +26,7 @@ from hitas.models import (
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.utils import validate_business_id
+from hitas.services.housing_company import get_regulation_release_date
 from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
@@ -189,6 +190,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     archive_id = serializers.IntegerField(source="id", read_only=True)
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
+    release_date = serializers.SerializerMethodField()
     improvements = HousingCompanyImprovementSerializer(source="*")
 
     def create(self, validated_data):
@@ -242,6 +244,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     def get_date(obj: HousingCompany) -> Optional[datetime.date]:
         """SerializerMethodField is used instead of DateField due to date being an annotated value"""
         return getattr(obj, "date", None)
+
+    @staticmethod
+    def get_release_date(obj: HousingCompany) -> Optional[datetime.date]:
+        return obj.release_date
 
     @staticmethod
     def get_summary(obj: HousingCompany) -> Dict[str, int]:
@@ -301,7 +307,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "sales_price_catalogue_confirmation_date",
             "notes",
             "archive_id",
-            "legacy_release_date",
+            "release_date",
             "last_modified",
             "summary",
             "improvements",
@@ -416,6 +422,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                     - F("real_estates__buildings__apartments__share_number_start")
                     + 1
                 ),
+                _release_date=get_regulation_release_date("id"),
             )
         )
 

@@ -222,6 +222,23 @@ class HousingCompany(ExternalHitasModel):
 
         return bool(newest_apartment.completion_date)
 
+    @property
+    def release_date(self) -> Optional[datetime.date]:
+        # Legacy release date overrides dynamic release date from regulation model
+        _release_date: Optional[datetime.date] = self.legacy_release_date
+        if _release_date:
+            self._release_date = _release_date
+            return self._release_date
+
+        # Allow caches for the instance
+        if hasattr(self, "_release_date"):
+            return self._release_date
+
+        from hitas.services.housing_company import get_regulation_release_date
+
+        self._release_date = get_regulation_release_date(self.id)
+        return self._release_date
+
     def save(self, *args, **kwargs):
         current_user = get_current_user()
         if current_user is not None and current_user.is_authenticated:
