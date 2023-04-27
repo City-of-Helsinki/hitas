@@ -34,7 +34,7 @@ export const errorMessages = {
     numberType: "Arvon pitää olla numero",
     numberMin: "Liian pieni arvo",
     numberMax: "Liian suuri arvo",
-    numberPositive: "Arvo ei voi olla alle 0",
+    numberPositive: "Arvon täytyy olla positiivinen luku",
     dateFormat: "Virheellinen päivämäärä",
     dateMin: "Liian aikainen päivämäärä",
     dateMax: "Liian myöhäinen päivämäärä",
@@ -53,6 +53,8 @@ export const errorMessages = {
     catalogOverMaxPrice: "Kauppahinta ylittää myyntihintaluettelon hinnan",
     catalogUnderMaxPrice: "Kauppahinta alittaa myyntihintaluettelon hinnan",
     catalogPricesMissing: "Myyntihintaluettelon hinnat puuttuvat",
+    sharesEmpty: "Toinen osakekenttä on tyhjä",
+    sharesStartGreaterThanEnd: "Osakkeiden lopun on oltava suurempi kuin alun",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -397,8 +399,12 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
 });
 
 const ApartmentSharesSchema = object({
-    start: nullishNumber,
-    end: nullishNumber,
+    start: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+        .positive(errorMessages.numberPositive)
+        .nullish(),
+    end: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+        .positive(errorMessages.numberPositive)
+        .nullish(),
     total: number(),
 });
 

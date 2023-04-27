@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
@@ -34,6 +34,7 @@ import {getApartmentStateLabel} from "../../common/localisation";
 import {
     apartmentStates,
     ApartmentWritableFormSchema,
+    errorMessages,
     IApartmentDetails,
     IApartmentWritable,
     IApartmentWritableForm,
@@ -106,7 +107,7 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
             type: null,
             surface_area: null,
             rooms: null,
-            shares: {start: null, end: null},
+            shares: {start: undefined, end: undefined},
             address: {
                 apartment_number: undefined,
                 floor: null,
@@ -141,7 +142,9 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
 const convertApartmentDetailToWritable = (apartment: IApartmentDetails): IApartmentWritableForm => {
     return {
         ...apartment,
-        shares: apartment.shares || {start: null, end: null},
+        shares: apartment.shares
+            ? {start: apartment.shares.start, end: apartment.shares.end}
+            : {start: undefined, end: undefined},
         building: {label: apartment.links.building.street_address, value: apartment.links.building.id},
         ownerships: [], // Stored in a separate state, not needed here
     };
@@ -194,8 +197,6 @@ const LoadedApartmentCreatePage = ({
     const formRef = useRef<HTMLFormElement | null>(null);
     const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
-        mode: "all",
-        reValidateMode: "onBlur",
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
 
@@ -232,10 +233,63 @@ const LoadedApartmentCreatePage = ({
             });
     };
 
+    const handleValidateShares = (start, end) => {
+        // Form-level validation for shares
+        if (start === null && end === null) {
+            formObject.clearErrors("shares");
+        }
+        // If either start or end is null, we have an error
+        else if (!start) {
+            formObject.setError("shares.start", {type: "custom", message: errorMessages.sharesEmpty});
+        } else if (!end) {
+            formObject.setError("shares.end", {type: "custom", message: errorMessages.sharesEmpty});
+        }
+        // If start is greater than end, we have an error
+        else if (start && end && start >= end) {
+            formObject.setError("shares.start", {type: "custom", message: errorMessages.sharesStartGreaterThanEnd});
+            formObject.setError("shares.end", {type: "custom", message: errorMessages.sharesStartGreaterThanEnd});
+        } else {
+            // If we got so far, there were no errors, clear any remaining shares errors away.
+            formObject.clearErrors("shares");
+        }
+    };
+
     // Event handlers
     const handleFormSubmit = () => {
+        // Recursively find the first error in the form (The error may be nested, e.g. shares.start)
+        const getFirstError = (errors, _fullPath = "") => {
+            if (isEmpty(errors)) return null;
+            const firstKey = Object.keys(errors)[0];
+            const firstError = errors[firstKey];
+            if (firstError.type) {
+                return `${_fullPath}${firstKey}`;
+            }
+            return getFirstError(firstError, `${_fullPath}${firstKey}.`);
+        };
+
+        // Validate shares
+        handleValidateShares(formObject.getValues("shares.start"), formObject.getValues("shares.end"));
+
+        // If there are errors, set focus to the first error field
+        const firstError = getFirstError(formObject.formState.errors);
+        if (firstError && firstError !== "root") {
+            formObject.setFocus(firstError);
+            return; // Don't submit the form if there are errors
+        }
+
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
+
+    const watch = formObject.watch;
+    useEffect(() => {
+        const subscription = watch((value, {name}) => {
+            if (name === "shares.start" || name === "shares.end") {
+                handleValidateShares(value?.shares?.start, value.shares?.end);
+            }
+        });
+        return () => subscription.unsubscribe();
+        // eslint-disable-next-line
+    }, [watch]);
 
     return (
         <>
