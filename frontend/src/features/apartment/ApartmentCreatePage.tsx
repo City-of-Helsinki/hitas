@@ -4,7 +4,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useNavigate, useParams} from "react-router-dom";
-import {v4 as uuidv4} from "uuid";
 
 import {
     useDeleteApartmentMutation,
@@ -129,7 +128,6 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
                 buildingOptions.length === 1
                     ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
                     : {label: "", value: ""},
-            ownerships: [],
             improvements: {
                 market_price_index: [],
                 construction_price_index: [],
@@ -146,21 +144,15 @@ const convertApartmentDetailToWritable = (apartment: IApartmentDetails): IApartm
             ? {start: apartment.shares.start, end: apartment.shares.end}
             : {start: undefined, end: undefined},
         building: {label: apartment.links.building.street_address, value: apartment.links.building.id},
-        ownerships: [], // Stored in a separate state, not needed here
     };
 };
 
 const formatApartmentFormDataForSubmit = (apartment, data): IApartmentWritable => {
-    const formOwnershipsList = apartment !== undefined ? apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
-
     return {
         ...data,
         // Copy street_address from selected building
         address: {...data.address, street_address: data.building.label},
         building: {id: data.building.value},
-
-        // Clean away ownership items that don't have an owner selected
-        ownerships: formOwnershipsList.filter((o) => o.owner.id),
 
         // Clean share fields
         shares: {

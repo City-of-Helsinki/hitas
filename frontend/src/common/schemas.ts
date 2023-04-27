@@ -456,7 +456,6 @@ const ApartmentWritableSchema = object({
     prices: ApartmentWritablePricesSchema,
     completion_date: string().nullish(),
     building: object({id: string()}),
-    ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
         market_price_index: MarketPriceIndexImprovementSchema.array(),
