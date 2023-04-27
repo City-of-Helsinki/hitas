@@ -119,8 +119,8 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                         value={formatDate(data.sales_price_catalogue_confirmation_date)}
                                     />
                                     <DetailField
-                                        label="Ilmoituspäivä"
-                                        value={formatDate(data.notification_date)}
+                                        label="Vapautumispäivä"
+                                        value={formatDate(data.legacy_release_date)}
                                     />
                                     <DetailField
                                         label="Rakennuttaja"

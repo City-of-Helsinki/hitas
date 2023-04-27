@@ -301,7 +301,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "sales_price_catalogue_confirmation_date",
             "notes",
             "archive_id",
-            "notification_date",
+            "legacy_release_date",
             "last_modified",
             "summary",
             "improvements",

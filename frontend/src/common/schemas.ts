@@ -193,7 +193,7 @@ const HousingCompanyDetailsSchema = object({
     acquisition_price: number(),
     primary_loan: number().optional(),
     sales_price_catalogue_confirmation_date: string().nullable(),
-    notification_date: string().nullable(),
+    legacy_release_date: string().nullable(),
     archive_id: number(),
     notes: string().nullable(),
     last_modified: object({

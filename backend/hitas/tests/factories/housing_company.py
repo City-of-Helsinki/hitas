@@ -36,7 +36,7 @@ class HousingCompanyFactory(DjangoModelFactory):
     acquisition_price = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
     primary_loan = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
-    notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))
+    legacy_release_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     notes = factory.Faker("text")
     last_modified_datetime = fuzzy.FuzzyDate(date(2010, 1, 1))
     last_modified_by = factory.SubFactory("hitas.tests.factories.UserFactory")

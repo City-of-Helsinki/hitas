@@ -165,8 +165,8 @@ class HousingCompany(ExternalHitasModel):
     primary_loan = HitasModelDecimalField(null=True, blank=True)
     # 'Myyntihintaluettelon vahvistamispäivä'
     sales_price_catalogue_confirmation_date = models.DateField(null=True, blank=True)
-    # 'ilmoituspäivä'
-    notification_date = models.DateField(null=True, blank=True)
+    # 'Sääntelystä vapautumispäivä (LEGACY)'
+    legacy_release_date = models.DateField(null=True, blank=True)
 
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)

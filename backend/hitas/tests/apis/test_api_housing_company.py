@@ -375,7 +375,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),
         "notes": hc1.notes,
         "archive_id": hc1.id,
-        "notification_date": str(hc1.notification_date),
+        "legacy_release_date": str(hc1.legacy_release_date),
         "last_modified": {
             "datetime": hc1.last_modified_datetime.isoformat().replace("+00:00", "Z"),
             "user": {
