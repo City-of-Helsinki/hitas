@@ -189,6 +189,7 @@ const LoadedApartmentCreatePage = ({
     const formRef = useRef<HTMLFormElement | null>(null);
     const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
+        mode: "onBlur",
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
 
@@ -407,6 +408,8 @@ const LoadedApartmentCreatePage = ({
                                 options={apartmentStateOptions}
                                 defaultValue={{label: "Vapaa", value: "free"}}
                                 formObject={formObject}
+                                required
+                                setDirectValue
                             />
                             <DateInput
                                 label="Valmistumispäivä"

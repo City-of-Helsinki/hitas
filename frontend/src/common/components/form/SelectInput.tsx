@@ -10,6 +10,7 @@ interface SelectProps extends FormInputProps {
         value: string;
     }[];
     searchable?: boolean;
+    setDirectValue?: boolean;
 }
 
 const Select = ({
@@ -20,6 +21,7 @@ const Select = ({
     defaultValue,
     formObject,
     searchable = false,
+    setDirectValue = false, // If true, set the `value` of the option, otherwise sets the whole option object
     ...rest
 }: SelectProps) => {
     formObject.register(name);
@@ -40,7 +42,11 @@ const Select = ({
 
     const handleChange = (newValue: {label?: string; value?: string}) => {
         if (newValue) {
-            formObject.setValue(name, newValue, true);
+            if (setDirectValue) {
+                formObject.setValue(name, newValue.value);
+            } else {
+                formObject.setValue(name, newValue);
+            }
         } else if (!required) formObject.setValue(name, null);
     };
 
@@ -55,7 +61,7 @@ const Select = ({
                 <>
                     <HDSSelect
                         {...inputProps}
-                        label={`${label}${required ? " *" : ""}`}
+                        label={label}
                         onChange={handleChange}
                         invalid={invalid ?? !!fieldError}
                         required={true}
