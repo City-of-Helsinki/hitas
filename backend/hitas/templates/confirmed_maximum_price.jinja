@@ -137,6 +137,13 @@
     <p class="plain-text">Enimmäishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi julkaistaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1. 11.</p>
     <p class="plain-text">Kaupungilla on yhtiöjärjestykseen perustuva oikeus lunastaa huoneiston hallintaan oikeuttavat osakkeet kaupan tapahduttua. Hitas-asunto voidaan myydä vain luonnolliselle henkilölle (ei yritykselle).</p>
     <p class="plain-text">Enimmäishintalaskelma on tulostettu Hitas-rekisteristä ja perustuu huoneiston ja yhtiön tietoihin.</p>
+
+    {% if maximum_price_calculation.json.additional_info %}
+        <p class="plain-text" style="font-size: 9pt">
+            {{ maximum_price_calculation.json.additional_info }}
+        </p>
+    {% endif %}
+
     <p class="plain-text">Lisätiedot: Maija Meikäläinen, suunnittelija, puhelin 310 00000</p>
 
     <br>
