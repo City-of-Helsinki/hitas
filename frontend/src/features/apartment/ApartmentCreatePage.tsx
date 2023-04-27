@@ -335,16 +335,6 @@ const LoadedApartmentCreatePage = ({
             >
                 <div className="field-sets">
                     <Fieldset heading="">
-                        <div className="input-field">
-                            <TextInput
-                                name="housing_company"
-                                id="input-housing_company.name"
-                                label="Asunto-osakeyhtiö"
-                                value={housingCompany.name.display}
-                                formObject={formObject}
-                                disabled
-                            />
-                        </div>
                         <div className="row">
                             <Select
                                 label="Rakennus"
