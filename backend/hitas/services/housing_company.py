@@ -1,20 +1,20 @@
 import datetime
 import logging
-from typing import Literal
+from decimal import Decimal
+from typing import Literal, TypeAlias
 
-from _decimal import Decimal
 from django.db import models
 from django.db.models import ExpressionWrapper, F, Q, QuerySet, Sum
 from django.db.models.functions import Coalesce, NullIf, Round, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
-from typing_extensions import TypeAlias
 
 from hitas.exceptions import MissingValues
-from hitas.models import Apartment, HousingCompany, MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models._base import HitasModelDecimalField
-from hitas.models.housing_company import HousingCompanyWithAnnotations, RegulationStatus
-from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, subquery_first_sale_acquisition_price
+from hitas.models.apartment import Apartment
+from hitas.models.housing_company import HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
+from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
+from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, get_first_sale_acquisition_price
 from hitas.utils import max_if_all_not_null, roundup
 
 logger = logging.getLogger()
@@ -43,7 +43,7 @@ def get_completed_housing_companies(
             "real_estates__buildings__apartments",
         )
         .alias(
-            _first_sale_prices=subquery_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
+            _first_sale_prices=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
             _catalog_prices=aggregate_catalog_prices_where_no_sales(),
         )
         .annotate(

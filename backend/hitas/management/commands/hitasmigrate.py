@@ -40,6 +40,11 @@ class Command(BaseCommand):
             action="store_true",
             help="Only migrate a pre-specified set of housing companies e.g. for a testing environment",
         )
+        parser.add_argument(
+            "--regulated-only",
+            action="store_true",
+            help="Only migrate a regulated housing companies for testing purposes",
+        )
 
     def handle(self, *args, **options) -> None:
         if sys.platform.startswith("darwin"):  # MacOS
@@ -75,4 +80,5 @@ class Command(BaseCommand):
             options["truncate"],
             options["truncate_only"],
             options["minimal_dataset"],
+            options["regulated_only"],
         )

@@ -3,7 +3,7 @@ from typing import Iterable, NamedTuple, Optional
 
 import pytest
 
-from hitas.models import Apartment, ApartmentSale
+from hitas.models import Apartment, ApartmentSale, ConditionOfSale
 from hitas.tests.apis.helpers import parametrize_helper
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 
@@ -15,6 +15,8 @@ class SaleConfig(NamedTuple):
 class ApartmentConfig(NamedTuple):
     completion_date: Optional[datetime.date] = None
     sales: Iterable[SaleConfig] = ()
+    conditions_of_sale_new: bool = False
+    conditions_of_sale_old: bool = False
 
 
 class IsNewParams(NamedTuple):
@@ -28,21 +30,18 @@ class IsNewParams(NamedTuple):
             "Not completed": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=None,
-                    sales=[],
                 ),
                 is_new=True,
             ),
             "Completed in the future": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=datetime.date(2024, 1, 1),
-                    sales=[],
                 ),
                 is_new=True,
             ),
             "Completed in the past, no sales": IsNewParams(
                 config=ApartmentConfig(
                     completion_date=datetime.date(2022, 1, 1),
-                    sales=[],
                 ),
                 is_new=True,
             ),
@@ -82,6 +81,30 @@ class IsNewParams(NamedTuple):
                 ),
                 is_new=False,
             ),
+            "Completed, sales in the past, has conditions of sale where new": IsNewParams(
+                config=ApartmentConfig(
+                    completion_date=datetime.date(2022, 1, 1),
+                    sales=[
+                        SaleConfig(
+                            purchase_date=datetime.date(2022, 1, 1),
+                        ),
+                    ],
+                    conditions_of_sale_new=True,
+                ),
+                is_new=True,
+            ),
+            "Completed, sales in the past, has conditions of sale where old": IsNewParams(
+                config=ApartmentConfig(
+                    completion_date=datetime.date(2022, 1, 1),
+                    sales=[
+                        SaleConfig(
+                            purchase_date=datetime.date(2022, 1, 1),
+                        ),
+                    ],
+                    conditions_of_sale_old=True,
+                ),
+                is_new=False,
+            ),
         },
     ),
 )
@@ -90,8 +113,22 @@ def test__properties__apartment__is_new(config: ApartmentConfig, is_new: bool, f
     freezer.move_to("2023-01-01 00:00:00+00:00")
 
     apartment: Apartment = ApartmentFactory.create(completion_date=config.completion_date, sales=[])
-    for sale in config.sales:
-        ApartmentSaleFactory.create(apartment=apartment, purchase_date=sale.purchase_date)
+    for sale_config in config.sales:
+        ApartmentSaleFactory.create(apartment=apartment, purchase_date=sale_config.purchase_date)
+
+    if config.conditions_of_sale_new:
+        sale: ApartmentSale = ApartmentSaleFactory.create()
+        ConditionOfSale.objects.create(
+            new_ownership=apartment.first_sale().ownerships.first(),
+            old_ownership=sale.ownerships.first(),
+        )
+
+    if config.conditions_of_sale_old:
+        sale: ApartmentSale = ApartmentSaleFactory.create()
+        ConditionOfSale.objects.create(
+            new_ownership=sale.ownerships.first(),
+            old_ownership=apartment.first_sale().ownerships.first(),
+        )
 
     assert apartment.is_new == is_new
 

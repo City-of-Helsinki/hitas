@@ -64,8 +64,8 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         apartment_share_of_housing_company_loans=119150,
         ownerships=[],
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=75.2, sale=sale)
-    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=24.8, sale=sale)
+    o1: Ownership = OwnershipFactory.create(percentage=75.2, sale=sale)
+    o2: Ownership = OwnershipFactory.create(percentage=24.8, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=129.29)
@@ -285,7 +285,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         apartment_share_of_housing_company_loans=80955,
         ownerships=[],
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
+    o1: Ownership = OwnershipFactory.create(percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=123.5)
@@ -497,8 +497,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         apartment_share_of_housing_company_loans=18480.0,
         ownerships=[],
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0, sale=sale)
-    o2: Ownership = OwnershipFactory.create(apartment=a, percentage=50.0, sale=sale)
+    o1: Ownership = OwnershipFactory.create(percentage=50.0, sale=sale)
+    o2: Ownership = OwnershipFactory.create(percentage=50.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2003, 5, 1), value=244.9)
@@ -793,7 +793,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         apartment_share_of_housing_company_loans=123192.0,
         ownerships=[],
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
+    o1: Ownership = OwnershipFactory.create(percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=296.10)
@@ -1149,7 +1149,7 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         apartment_share_of_housing_company_loans=61830,
         ownerships=[],
     )
-    o1: Ownership = OwnershipFactory.create(apartment=a, percentage=100.0, sale=sale)
+    o1: Ownership = OwnershipFactory.create(percentage=100.0, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2012, 1, 1), value=115.9)
@@ -1510,8 +1510,8 @@ def test__api__apartment_max_price__missing_property_manager(api_client: HitasAP
         apartment_share_of_housing_company_loans=119150,
         ownerships=[],
     )
-    OwnershipFactory.create(apartment=a, percentage=75.2, sale=sale)
-    OwnershipFactory.create(apartment=a, percentage=24.8, sale=sale)
+    OwnershipFactory.create(percentage=75.2, sale=sale)
+    OwnershipFactory.create(percentage=24.8, sale=sale)
 
     # Create necessary apartment's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=129.29)

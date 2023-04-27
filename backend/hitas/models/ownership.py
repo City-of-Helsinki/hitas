@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, TypedDict, Union
+from typing import TYPE_CHECKING, Iterable, Optional, TypedDict, Union
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -10,19 +10,14 @@ from safedelete import SOFT_DELETE_CASCADE
 from hitas.models._base import HitasModel, HitasModelDecimalField
 
 if TYPE_CHECKING:
-    from hitas.models import Owner
+    from hitas.models.apartment import Apartment
+    from hitas.models.owner import Owner
 
 
 # 'Omistajuus'
 class Ownership(HitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-    apartment = models.ForeignKey(
-        "Apartment",
-        on_delete=models.CASCADE,
-        related_name="ownerships",
-        editable=False,
-    )
     owner = models.ForeignKey(
         "Owner",
         on_delete=models.PROTECT,
@@ -31,10 +26,9 @@ class Ownership(HitasModel):
     )
     sale = models.ForeignKey(
         "ApartmentSale",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="ownerships",
-        default=None,
-        null=True,
+        editable=False,
     )
     conditions_of_sale = models.ManyToManyField(
         "self",
@@ -57,11 +51,19 @@ class Ownership(HitasModel):
         ordering = ["id"]
         constraints = [
             models.UniqueConstraint(
-                name="%(app_label)s_%(class)s_single_ownership_for_apartment_per_owner",
-                fields=("apartment", "owner"),
+                name="%(app_label)s_%(class)s_single_ownership_for_sale_per_owner",
+                fields=("sale", "owner"),
                 condition=models.Q(deleted__isnull=True),
             )
         ]
+
+    @property
+    def apartment(self) -> Optional["Apartment"]:
+        return getattr(getattr(self, "sale", None), "apartment", None)
+
+    @property
+    def active(self) -> bool:
+        return self.deleted is None  # noqa
 
     def __str__(self):
         return f"{self.owner}, {self.apartment}"

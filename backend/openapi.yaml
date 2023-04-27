@@ -4501,6 +4501,7 @@ components:
         ownerships:
           description: List of apartment's ownerships
           type: array
+          readOnly: true
           items:
             $ref: '#/components/schemas/Ownership'
         links:

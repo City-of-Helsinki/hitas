@@ -114,13 +114,16 @@
         </tr>
     </table>
     <table>
-        {% for ownership in apartment.ownerships.all() %}
-            <tr>
-                <td class="first-column">{% if loop.index == 1 %}<b>Omistaja ja omistusosuus (%)</b>{% endif %}</td>
-                <td>{{ ownership.owner.name }}</td>
-                <td>{{ ownership.percentage }}</td>
-            </tr>
-        {% endfor %}
+        {% set latest_sale = apartment.latest_sale(include_first_sale=True) %}
+        {% if latest_sale is not none %}
+          {% for ownership in latest_sale.ownerships.all() %}
+              <tr>
+                  <td class="first-column">{% if loop.index == 1 %}<b>Omistaja ja omistusosuus (%)</b>{% endif %}</td>
+                  <td>{{ ownership.owner.name }}</td>
+                  <td>{{ ownership.percentage }}</td>
+              </tr>
+          {% endfor %}
+        {% endif %}
     </table>
 
     <br>

@@ -35,7 +35,6 @@ from hitas.tests.factories import (
     HousingCompanyFactory,
     HousingCompanyMarketPriceImprovementFactory,
     OldHitasFinancingMethodFactory,
-    OwnershipFactory,
     PropertyManagerFactory,
     RealEstateFactory,
 )
@@ -974,8 +973,7 @@ def test__api__housing_company__delete__with_references(api_client: HitasAPIClie
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     bu: Building = BuildingFactory.create(real_estate=re)
-    a: Apartment = ApartmentFactory.create(building=bu)
-    OwnershipFactory.create(apartment=a)
+    ApartmentFactory.create(building=bu)
 
     url = reverse("hitas:housing-company-detail", kwargs={"uuid": hc.uuid.hex})
 

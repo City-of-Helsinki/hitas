@@ -30,7 +30,6 @@ class ApartmentSaleFactory(DjangoModelFactory):
 
         if extracted is None:
             kwargs.setdefault("sale", self)
-            kwargs.setdefault("apartment", self.apartment)
             extracted = [OwnershipFactory.create(**kwargs)]
 
         for ownership in extracted:

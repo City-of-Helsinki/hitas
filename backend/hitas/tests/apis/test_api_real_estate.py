@@ -2,13 +2,12 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, Building, HousingCompany, RealEstate
+from hitas.models import Building, HousingCompany, RealEstate
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
     BuildingFactory,
     HousingCompanyFactory,
-    OwnershipFactory,
     RealEstateFactory,
 )
 
@@ -265,8 +264,7 @@ def test__api__real_estate__delete(api_client: HitasAPIClient):
 def test__api__real_estate__delete__with_references(api_client: HitasAPIClient):
     re: RealEstate = RealEstateFactory.create()
     bu: Building = BuildingFactory.create(real_estate=re)
-    a: Apartment = ApartmentFactory.create(building=bu)
-    OwnershipFactory.create(apartment=a)
+    ApartmentFactory.create(building=bu)
 
     url = reverse(
         "hitas:real-estate-detail", kwargs={"housing_company_uuid": re.housing_company.uuid.hex, "uuid": re.uuid.hex}

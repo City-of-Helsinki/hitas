@@ -49,14 +49,9 @@ class OwnershipFactory(DjangoModelFactory):
     class Meta:
         model = Ownership
 
-    apartment = factory.SubFactory(
-        "hitas.tests.factories.ApartmentFactory",
-        sales=factory.LazyAttribute(lambda _: []),  # prevents another sale from being created
-    )
     owner = factory.SubFactory("hitas.tests.factories.OwnerFactory")
     sale = factory.SubFactory(
         "hitas.tests.factories.ApartmentSaleFactory",
         ownerships=factory.LazyAttribute(lambda _: []),  # prevents another ownership from being created
-        apartment=factory.LazyAttribute(lambda self: self.factory_parent.apartment),
     )
     percentage = 100

@@ -12,6 +12,7 @@ from hitas.models import (
     Apartment,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
+    ApartmentSale,
     ApartmentType,
     Building,
     ConditionOfSale,
@@ -23,7 +24,7 @@ from hitas.models import (
 from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
-from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper, parametrize_invalid_foreign_key
+from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
     ApartmentFactory,
@@ -82,18 +83,19 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     b: Building = BuildingFactory.create(real_estate=re)
-    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales__ownerships=[])
+    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales=[])
     ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2, sales=[])
 
-    o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50, sale=ap1.first_sale)
-    o2: Ownership = OwnershipFactory.create(apartment=ap1, percentage=50, sale=ap1.first_sale)
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, ownerships=[])
+    o1: Ownership = OwnershipFactory.create(percentage=50, sale=sale_1)
+    o2: Ownership = OwnershipFactory.create(percentage=50, sale=sale_1)
 
-    ap3: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2022, 1, 1),
-        sales__purchase_date=datetime.date(2022, 2, 1),
-        sales__ownerships__owner=o2.owner,
+    ap3: Apartment = ApartmentFactory.create(completion_date=datetime.date(2022, 1, 1), sales=[])
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=ap3, purchase_date=datetime.date(2022, 2, 1), ownerships=[]
     )
-    o3: Ownership = ap3.first_sale.ownerships.first()
+    o3: Ownership = OwnershipFactory.create(owner=o2.owner, percentage=100, sale=sale_2)
+
     ConditionOfSaleFactory.create(
         new_ownership=o3,
         old_ownership=o2,
@@ -169,7 +171,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 },
                 "has_conditions_of_sale": True,
                 "has_grace_period": False,
-                "sell_by_date": str(ap3.first_sale.purchase_date),
+                "sell_by_date": str(sale_2.purchase_date),
             },
             {
                 "id": ap2.uuid.hex,
@@ -237,12 +239,14 @@ def test__api__apartment__list__those_with_conditions_of_sale_come_first(api_cli
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     b: Building = BuildingFactory.create(real_estate=re)
-    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales__ownerships=[])
-    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2)
-    ap3: Apartment = ApartmentFactory.create(building=b, apartment_number=3)
+    ap1: Apartment = ApartmentFactory.create(building=b, apartment_number=1, sales=[])
+    ap2: Apartment = ApartmentFactory.create(building=b, apartment_number=2, sales=[])
+    ap3: Apartment = ApartmentFactory.create(building=b, apartment_number=3, sales=[])
 
-    o1: Ownership = OwnershipFactory.create(apartment=ap1, percentage=100, sale=ap1.first_sale)
-    o2: Ownership = OwnershipFactory.create(apartment=ap3, owner=o1.owner, percentage=100, sale=ap3.first_sale)
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(apartment=ap1, ownerships=[])
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(apartment=ap3, ownerships=[])
+    o1: Ownership = OwnershipFactory.create(percentage=100, sale=sale_1)
+    o2: Ownership = OwnershipFactory.create(owner=o1.owner, percentage=100, sale=sale_2)
 
     ConditionOfSaleFactory.create(
         new_ownership=o2,
@@ -345,8 +349,8 @@ def test__api__apartment__list__fulfilled_not_listed(api_client: HitasAPIClient,
     new_apartment: Apartment = ApartmentFactory.create(sales=[])
     old_apartment: Apartment = ApartmentFactory.create()
     cos: ConditionOfSale = ConditionOfSaleFactory.create(
-        new_ownership__apartment=new_apartment,
-        old_ownership__apartment=old_apartment,
+        new_ownership__sale__apartment=new_apartment,
+        old_ownership__sale__apartment=old_apartment,
     )
     cos.delete()
 
@@ -388,7 +392,7 @@ class GracePeriodTestArgs(NamedTuple):
 def test__api__apartment__list__sell_by_date(api_client: HitasAPIClient, grace_period, sell_by_date):
     old_ownership: Ownership = OwnershipFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(
-        apartment__completion_date=datetime.date(2023, 1, 1),
+        sale__apartment__completion_date=datetime.date(2023, 1, 1),
         sale__purchase_date=datetime.date(2023, 1, 1),
     )
 
@@ -433,11 +437,11 @@ def test__api__apartment__list__sell_by_date(api_client: HitasAPIClient, grace_p
 def test__api__apartment__list__sell_by_date__multiple(api_client: HitasAPIClient, grace_period, sell_by_date):
     old_ownership: Ownership = OwnershipFactory.create()
     new_ownership_1: Ownership = OwnershipFactory.create(
-        apartment__completion_date=datetime.date(2023, 1, 1),
+        sale__apartment__completion_date=datetime.date(2023, 1, 1),
         sale__purchase_date=datetime.date(2023, 1, 1),
     )
     new_ownership_2: Ownership = OwnershipFactory.create(
-        apartment__completion_date=datetime.date(2023, 3, 1),
+        sale__apartment__completion_date=datetime.date(2023, 3, 1),
         sale__purchase_date=datetime.date(2023, 3, 1),
     )
 
@@ -472,7 +476,7 @@ def test__api__apartment__list__sell_by_date__first_sale_after_completion(api_cl
 
     old_ownerships: Ownership = OwnershipFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(
-        apartment__completion_date=completion_date,
+        sale__apartment__completion_date=completion_date,
         sale__purchase_date=first_sale_date,
     )
 
@@ -505,10 +509,13 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         completion_date=datetime.date(2011, 1, 1),
         additional_work_during_construction=4999.9,
         surface_area=50.5,
-        sales__purchase_price=80000.1,
-        sales__apartment_share_of_housing_company_loans=15000.3,
-        sales__ownerships__owner=owner,
+        sales=[],
     )
+    ap2: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        sales=[],
+    )
+
     hc: HousingCompany = ap1.housing_company
     cpi: ApartmentConstructionPriceImprovement = ApartmentConstructionPriceImprovementFactory.create(apartment=ap1)
     mpi: ApartmentMarketPriceImprovement = ApartmentMarketPriceImprovementFactory.create(apartment=ap1)
@@ -522,13 +529,20 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     MarketPriceIndex2005Equal100Factory.create(month=now, value=250.5)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000.5)
 
-    ap2: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2020, 1, 1),
-        sales__purchase_date=datetime.date(2021, 1, 1),
-        sales__ownerships__owner=owner,
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=ap1,
+        purchase_price=80000.1,
+        apartment_share_of_housing_company_loans=15000.3,
+        ownerships=[],
     )
-    os1: Ownership = ap1.first_sale.ownerships.first()
-    os2: Ownership = ap2.first_sale.ownerships.first()
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=ap2,
+        purchase_date=datetime.date(2021, 1, 1),
+        ownerships=[],
+    )
+
+    os1: Ownership = OwnershipFactory.create(sale=sale_1, owner=owner, percentage=100)
+    os2: Ownership = OwnershipFactory.create(sale=sale_2, owner=owner, percentage=100)
     cos: ConditionOfSale = ConditionOfSaleFactory.create(
         new_ownership=os2,
         old_ownership=os1,
@@ -677,7 +691,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 "id": cos.uuid.hex,
                 "grace_period": str(cos.grace_period.value),
                 "fulfilled": cos.fulfilled,
-                "sell_by_date": str(ap2.first_sale.purchase_date),
+                "sell_by_date": str(sale_2.purchase_date),
                 "apartment": {
                     "id": ap2.uuid.hex,
                     "address": {
@@ -701,7 +715,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                 },
             }
         ],
-        "sell_by_date": str(ap2.first_sale.purchase_date),
+        "sell_by_date": str(sale_2.purchase_date),
     }
 
 
@@ -1142,8 +1156,6 @@ def test__api__apartment__invalid_housing_company_id(api_client: HitasAPIClient)
 
 def get_apartment_create_data(building: Building) -> dict[str, Any]:
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
-    owner1: Owner = OwnerFactory.create()
-    owner2: Owner = OwnerFactory.create()
 
     data = {
         "state": ApartmentState.SOLD.value,
@@ -1177,16 +1189,6 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
                 "additional_work": 456.4,
             },
         },
-        "ownerships": [
-            {
-                "owner": {"id": owner1.uuid.hex},
-                "percentage": 50,
-            },
-            {
-                "owner": {"id": owner2.uuid.hex},
-                "percentage": 50,
-            },
-        ],
         "improvements": {
             "construction_price_index": [
                 {
@@ -1247,7 +1249,6 @@ def get_minimal_apartment_data(data):
             },
         },
         "completion_date": None,
-        "ownerships": [],
         "notes": None,
         "improvements": {
             "market_price_index": [],
@@ -1280,7 +1281,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
 
     ap = Apartment.objects.first()
     assert response.json()["id"] == ap.uuid.hex
-    assert len(response.json()["ownerships"]) == (0 if data_extent == "nulled" else 2)
+    assert len(response.json()["ownerships"]) == 0
 
     get_response = api_client.get(
         reverse(
@@ -1380,448 +1381,429 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
 
 
 @pytest.mark.parametrize(
-    "invalid_data,fields",
-    [
-        *parametrize_invalid_foreign_key("type", nullable=True),
-        *parametrize_invalid_foreign_key("building"),
-        (
-            {"state": ""},
-            [{"field": "state", "message": "This field is mandatory and cannot be blank."}],
-        ),
-        (
-            {"state": "invalid_state"},
-            [
-                {
-                    "field": "state",
-                    "message": "Unsupported value 'invalid_state'. Supported values are: ['free', 'reserved', 'sold'].",
-                }
-            ],
-        ),
-        (
-            {"surface_area": "foo"},
-            [{"field": "surface_area", "message": "A valid number is required."}],
-        ),
-        (
-            {"surface_area": -1},
-            [{"field": "surface_area", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
-            {"shares": {"start": "foo"}},
-            [
-                {"field": "shares.start", "message": "A valid integer is required."},
-                {"field": "shares.end", "message": "This field is mandatory and cannot be null."},
-            ],
-        ),
-        (
-            {"shares": {"end": "foo"}},
-            [
-                {"field": "shares.start", "message": "This field is mandatory and cannot be null."},
-                {"field": "shares.end", "message": "A valid integer is required."},
-            ],
-        ),
-        (
-            {"shares": {"start": 100}},
-            [{"field": "shares.end", "message": "This field is mandatory and cannot be null."}],
-        ),
-        (
-            {"shares": {"start": None, "end": 100}},
-            [
-                {
-                    "field": "shares.start",
-                    "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'.",
-                },
-                {"field": "shares.end", "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'."},
-            ],
-        ),
-        (
-            {"shares": {"start": 100, "end": 50}},
-            [{"field": "shares.start", "message": "'shares.start' must not be greater than 'shares.end'."}],
-        ),
-        (
-            {"shares": {"start": 0, "end": 0}},
-            [
-                {"field": "shares.start", "message": "Ensure this value is greater than or equal to 1."},
-                {"field": "shares.end", "message": "Ensure this value is greater than or equal to 1."},
-            ],
-        ),
-        ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be null."}]),
-        (
-            {
-                "address": {
-                    "street_address": None,
-                    "apartment_number": None,
-                    "stair": None,
-                }
-            },
-            [
-                {"field": "address.street_address", "message": "This field is mandatory and cannot be null."},
-                {"field": "address.apartment_number", "message": "This field is mandatory and cannot be null."},
-                {"field": "address.stair", "message": "This field is mandatory and cannot be null."},
-            ],
-        ),
-        (
-            {
-                "address": {
-                    "street_address": "",
-                    "apartment_number": "",
-                    "stair": "",
-                }
-            },
-            [
-                {"field": "address.street_address", "message": "This field is mandatory and cannot be blank."},
-                {"field": "address.apartment_number", "message": "A valid integer is required."},
-                {"field": "address.stair", "message": "This field is mandatory and cannot be blank."},
-            ],
-        ),
-        (
-            {
-                "address": {
-                    "street_address": "test",
-                    "apartment_number": "foo",
-                    "stair": "1",
-                }
-            },
-            [{"field": "address.apartment_number", "message": "A valid integer is required."}],
-        ),
-        (
-            {
-                "address": {
-                    "street_address": "test",
-                    "apartment_number": -1,
-                    "stair": "1",
-                }
-            },
-            [{"field": "address.apartment_number", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
-            {"prices": {"construction": {"loans": -1}}},
-            [{"field": "prices.construction.loans", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
-            {"prices": {"construction": {"interest": -1}}},
-            [{"field": "prices.construction.interest", "message": "Invalid data. Expected a dictionary, but got int."}],
-        ),
-        (
-            {"prices": {"construction": {"interest": {"rate_6": -1, "rate_14": 1}}}},
-            [
-                {
-                    "field": "prices.construction.interest.rate_6",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                }
-            ],
-        ),
-        (
-            {"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": -1}}}},
-            [
-                {
-                    "field": "prices.construction.interest.rate_14",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                }
-            ],
-        ),
-        (
-            {"prices": {"construction": {"interest": {"rate_6": None, "rate_14": 1}}}},
-            [
-                {
-                    "field": "prices.construction.interest.rate_6",
-                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
-                },
-                {
-                    "field": "prices.construction.interest.rate_14",
-                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
-                },
-            ],
-        ),
-        (
-            {"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": None}}}},
-            [
-                {
-                    "field": "prices.construction.interest.rate_6",
-                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
-                },
-                {
-                    "field": "prices.construction.interest.rate_14",
-                    "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
-                },
-            ],
-        ),
-        (
-            {"prices": {"construction": {"interest": {"rate_6": 100, "rate_14": 10}}}},
-            [
-                {
-                    "field": "prices.construction.interest.rate_6",
-                    "message": "'rate_6' must not be greater than 'rate_14'.",
-                },
-            ],
-        ),
-        (
-            {"prices": {"construction": {"debt_free_purchase_price": -1}}},
-            [
-                {
-                    "field": "prices.construction.debt_free_purchase_price",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                }
-            ],
-        ),
-        (
-            {"prices": {"construction": {"additional_work": -1}}},
-            [
-                {
-                    "field": "prices.construction.additional_work",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                }
-            ],
-        ),
-        ({"ownerships": None}, [{"field": "ownerships", "message": "This field is mandatory and cannot be null."}]),
-        (
-            {
-                "ownerships": [
+    **parametrize_helper(
+        {
+            "type dict not str": InvalidInput(
+                invalid_data={"type": "foo"},
+                fields=[
+                    {"field": "type", "message": "Invalid data. Expected a dictionary, but got str."},
+                ],
+            ),
+            "type dict missing id": InvalidInput(
+                invalid_data={"type": {}},
+                fields=[
+                    {"field": "type.id", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "type dict id null": InvalidInput(
+                invalid_data={"type": {"id": None}},
+                fields=[
+                    {"field": "type.id", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "type dict id blank": InvalidInput(
+                invalid_data={"type": {"id": ""}},
+                fields=[
+                    {"field": "type.id", "message": "This field is mandatory and cannot be blank."},
+                ],
+            ),
+            "type dict id not found": InvalidInput(
+                invalid_data={"type": {"id": "foo"}},
+                fields=[
+                    {"field": "type.id", "message": "Object does not exist with given id 'foo'."},
+                ],
+            ),
+            "building dict not str": InvalidInput(
+                invalid_data={"building": "foo"},
+                fields=[
+                    {"field": "building", "message": "Invalid data. Expected a dictionary, but got str."},
+                ],
+            ),
+            "building dict missing id": InvalidInput(
+                invalid_data={"building": {}},
+                fields=[
+                    {"field": "building.id", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "building dict id null": InvalidInput(
+                invalid_data={"building": {"id": None}},
+                fields=[
+                    {"field": "building.id", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "building dict id blank": InvalidInput(
+                invalid_data={"building": {"id": ""}},
+                fields=[
+                    {"field": "building.id", "message": "This field is mandatory and cannot be blank."},
+                ],
+            ),
+            "building dict id not found": InvalidInput(
+                invalid_data={"building": {"id": "foo"}},
+                fields=[
+                    {"field": "building.id", "message": "Object does not exist with given id 'foo'."},
+                ],
+            ),
+            "building null": InvalidInput(
+                invalid_data={"building": None},
+                fields=[
+                    {"field": "building", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "state blank": InvalidInput(
+                invalid_data={"state": ""},
+                fields=[
+                    {"field": "state", "message": "This field is mandatory and cannot be blank."},
+                ],
+            ),
+            "state invalid": InvalidInput(
+                invalid_data={"state": "invalid_state"},
+                fields=[
                     {
-                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "percentage": 100,
+                        "field": "state",
+                        "message": (
+                            "Unsupported value 'invalid_state'. Supported values are: ['free', 'reserved', 'sold']."
+                        ),
+                    }
+                ],
+            ),
+            "surface_area not a number": InvalidInput(
+                invalid_data={"surface_area": "foo"},
+                fields=[
+                    {"field": "surface_area", "message": "A valid number is required."},
+                ],
+            ),
+            "surface_area less than 0": InvalidInput(
+                invalid_data={"surface_area": -1},
+                fields=[
+                    {"field": "surface_area", "message": "Ensure this value is greater than or equal to 0."},
+                ],
+            ),
+            "shares start not a number": InvalidInput(
+                invalid_data={"shares": {"start": "foo"}},
+                fields=[
+                    {"field": "shares.start", "message": "A valid integer is required."},
+                    {"field": "shares.end", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "shares end not a number": InvalidInput(
+                invalid_data={"shares": {"end": "foo"}},
+                fields=[
+                    {"field": "shares.start", "message": "This field is mandatory and cannot be null."},
+                    {"field": "shares.end", "message": "A valid integer is required."},
+                ],
+            ),
+            "shares end missing": InvalidInput(
+                invalid_data={"shares": {"start": 100}},
+                fields=[
+                    {"field": "shares.end", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "both shares end and start required": InvalidInput(
+                invalid_data={"shares": {"start": None, "end": 100}},
+                fields=[
+                    {
+                        "field": "shares.start",
+                        "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'.",
                     },
                     {
-                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "percentage": 50,
+                        "field": "shares.end",
+                        "message": "Both 'shares.start' and 'shares.end' must be given or be 'null'.",
                     },
-                ]
-            },
-            [
-                {
-                    "field": "ownerships.percentage",
-                    "message": "Ownership percentage of all ownerships combined must"
-                    " be equal to 100. Given sum was 150.00.",
-                }
-            ],
-        ),
-        (
-            {
-                "ownerships": [
+                ],
+            ),
+            "shares end must be greater than shares start": InvalidInput(
+                invalid_data={"shares": {"start": 100, "end": 50}},
+                fields=[
+                    {"field": "shares.start", "message": "'shares.start' must not be greater than 'shares.end'."},
+                ],
+            ),
+            "shares start and end must be greater than 0": InvalidInput(
+                invalid_data={"shares": {"start": 0, "end": 0}},
+                fields=[
+                    {"field": "shares.start", "message": "Ensure this value is greater than or equal to 1."},
+                    {"field": "shares.end", "message": "Ensure this value is greater than or equal to 1."},
+                ],
+            ),
+            "address null": InvalidInput(
+                invalid_data={"address": None},
+                fields=[
+                    {"field": "address", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "address dict items null": InvalidInput(
+                invalid_data={
+                    "address": {
+                        "street_address": None,
+                        "apartment_number": None,
+                        "stair": None,
+                    }
+                },
+                fields=[
+                    {"field": "address.street_address", "message": "This field is mandatory and cannot be null."},
+                    {"field": "address.apartment_number", "message": "This field is mandatory and cannot be null."},
+                    {"field": "address.stair", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "address dict items empty": InvalidInput(
+                invalid_data={
+                    "address": {
+                        "street_address": "",
+                        "apartment_number": "",
+                        "stair": "",
+                    }
+                },
+                fields=[
+                    {"field": "address.street_address", "message": "This field is mandatory and cannot be blank."},
+                    {"field": "address.apartment_number", "message": "A valid integer is required."},
+                    {"field": "address.stair", "message": "This field is mandatory and cannot be blank."},
+                ],
+            ),
+            "apartment number not a number": InvalidInput(
+                invalid_data={
+                    "address": {
+                        "street_address": "test",
+                        "apartment_number": "foo",
+                        "stair": "1",
+                    }
+                },
+                fields=[
+                    {"field": "address.apartment_number", "message": "A valid integer is required."},
+                ],
+            ),
+            "apartment number less than 0": InvalidInput(
+                invalid_data={
+                    "address": {
+                        "street_address": "test",
+                        "apartment_number": -1,
+                        "stair": "1",
+                    }
+                },
+                fields=[
                     {
-                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "percentage": 10,
+                        "field": "address.apartment_number",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "construction loan amount less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"loans": -1}}},
+                fields=[
+                    {
+                        "field": "prices.construction.loans",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "construction interest less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": -1}}},
+                fields=[
+                    {
+                        "field": "prices.construction.interest",
+                        "message": "Invalid data. Expected a dictionary, but got int.",
+                    },
+                ],
+            ),
+            "construction interest rate 6% less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_6": -1, "rate_14": 1}}}},
+                fields=[
+                    {
+                        "field": "prices.construction.interest.rate_6",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "construction interest rate 14% less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": -1}}}},
+                fields=[
+                    {
+                        "field": "prices.construction.interest.rate_14",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "construction interest rate 6% null": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_6": None, "rate_14": 1}}}},
+                fields=[
+                    {
+                        "field": "prices.construction.interest.rate_6",
+                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
                     },
                     {
-                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "percentage": 10,
+                        "field": "prices.construction.interest.rate_14",
+                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
                     },
-                ]
-            },
-            [
-                {
-                    "field": "ownerships.percentage",
-                    "message": "Ownership percentage of all ownerships combined must"
-                    " be equal to 100. Given sum was 20.00.",
-                }
-            ],
-        ),
-        (
-            {
-                "ownerships": [
+                ],
+            ),
+            "construction interest rate 14% null": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": None}}}},
+                fields=[
                     {
-                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "percentage": 100,
+                        "field": "prices.construction.interest.rate_6",
+                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
                     },
                     {
-                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "percentage": 0,
+                        "field": "prices.construction.interest.rate_14",
+                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
                     },
-                ]
-            },
-            [
-                {
-                    "field": "ownerships.percentage",
-                    "message": "Ownership percentage must be greater than 0 and less than"
-                    " or equal to 100. Given value was 0.00.",
-                }
-            ],
-        ),
-        (
-            {
-                "ownerships": [
+                ],
+            ),
+            "construction interest rate 6% greater than 14%": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_6": 100, "rate_14": 10}}}},
+                fields=[
                     {
-                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "percentage": 200,
+                        "field": "prices.construction.interest.rate_6",
+                        "message": "'rate_6' must not be greater than 'rate_14'.",
                     },
+                ],
+            ),
+            "construction debt_free_purchase_price less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"debt_free_purchase_price": -1}}},
+                fields=[
                     {
-                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "percentage": -100,
-                    },
-                ]
-            },
-            [{"field": "ownerships.percentage", "message": "Ensure this value is greater than or equal to 0."}],
-        ),
-        (
-            {
-                "ownerships": [
+                        "field": "prices.construction.debt_free_purchase_price",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "construction additional work less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"additional_work": -1}}},
+                fields=[
                     {
-                        "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                        "percentage": "foo",
-                    },
+                        "field": "prices.construction.additional_work",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    }
+                ],
+            ),
+            "improvements null": InvalidInput(
+                invalid_data={"improvements": None},
+                fields=[
+                    {"field": "improvements", "message": "This field is mandatory and cannot be null."},
+                ],
+            ),
+            "improvements dict empty": InvalidInput(
+                invalid_data={"improvements": {}},
+                fields=[
                     {
-                        "owner": {"id": "0001e769ae2d40b9ae56ebd615e919d3"},
-                        "percentage": "baz",
-                    },
-                ]
-            },
-            [
-                {"field": "ownerships.percentage", "message": "A valid number is required."},
-                {"field": "ownerships.percentage", "message": "A valid number is required."},
-            ],
-        ),
-        (
-            {
-                "ownerships": [
-                    {
-                        "owner": {"id": "foo"},
-                        "percentage": 50,
+                        "field": "improvements.market_price_index",
+                        "message": "This field is mandatory and cannot be null.",
                     },
                     {
-                        "owner": {"id": None},
-                        "percentage": 30,
+                        "field": "improvements.construction_price_index",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                ],
+            ),
+            "market_price_index item empty": InvalidInput(
+                invalid_data={
+                    "improvements": {
+                        "market_price_index": [{}],
+                        "construction_price_index": [],
+                    }
+                },
+                fields=[
+                    {
+                        "field": "improvements.market_price_index.name",
+                        "message": "This field is mandatory and cannot be null.",
                     },
                     {
-                        "owner": {"id": "27771d28e27145caa7efbd99d2e40601"},
-                        "percentage": 20,
+                        "field": "improvements.market_price_index.completion_date",
+                        "message": "This field is mandatory and cannot be null.",
                     },
-                ]
-            },
-            [
-                {
-                    "field": "ownerships.owner.id",
-                    "message": "Object does not exist with given id 'foo'.",
+                    {
+                        "field": "improvements.market_price_index.value",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                ],
+            ),
+            "market_price_index item data invalid": InvalidInput(
+                invalid_data={
+                    "improvements": {
+                        "market_price_index": [
+                            {
+                                "name": "",
+                                "completion_date": "2022-01-01",
+                                "value": -1,
+                            }
+                        ],
+                        "construction_price_index": [],
+                    }
                 },
-                {
-                    "field": "ownerships.owner.id",
-                    "message": "This field is mandatory and cannot be null.",
+                fields=[
+                    {
+                        "field": "improvements.market_price_index.name",
+                        "message": "This field is mandatory and cannot be blank.",
+                    },
+                    {
+                        "field": "improvements.market_price_index.completion_date",
+                        "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                    },
+                    {
+                        "field": "improvements.market_price_index.value",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    },
+                ],
+            ),
+            "construction_price_index item empty": InvalidInput(
+                invalid_data={
+                    "improvements": {
+                        "market_price_index": [],
+                        "construction_price_index": [{}],
+                    }
                 },
-                {
-                    "field": "ownerships.owner.id",
-                    "message": "Object does not exist with given id '27771d28e27145caa7efbd99d2e40601'.",
+                fields=[
+                    {
+                        "field": "improvements.construction_price_index.name",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.completion_date",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.value",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.depreciation_percentage",
+                        "message": "This field is mandatory and cannot be null.",
+                    },
+                ],
+            ),
+            "construction_price_index item data invalid": InvalidInput(
+                invalid_data={
+                    "improvements": {
+                        "market_price_index": [],
+                        "construction_price_index": [
+                            {
+                                "name": "",
+                                "completion_date": "2022-01-01",
+                                "value": -1,
+                                "depreciation_percentage": 8.0,
+                            }
+                        ],
+                    }
                 },
-            ],
-        ),
-        ({"improvements": None}, [{"field": "improvements", "message": "This field is mandatory and cannot be null."}]),
-        (
-            {"improvements": {}},
-            [
-                {"field": "improvements.market_price_index", "message": "This field is mandatory and cannot be null."},
-                {
-                    "field": "improvements.construction_price_index",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-            ],
-        ),
-        (
-            {
-                "improvements": {
-                    "market_price_index": [{}],
-                    "construction_price_index": [],
-                }
-            },
-            [
-                {
-                    "field": "improvements.market_price_index.name",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-                {
-                    "field": "improvements.market_price_index.completion_date",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-                {
-                    "field": "improvements.market_price_index.value",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-            ],
-        ),
-        (
-            {
-                "improvements": {
-                    "market_price_index": [
-                        {
-                            "name": "",
-                            "completion_date": "2022-01-01",
-                            "value": -1,
-                        }
-                    ],
-                    "construction_price_index": [],
-                }
-            },
-            [
-                {
-                    "field": "improvements.market_price_index.name",
-                    "message": "This field is mandatory and cannot be blank.",
-                },
-                {
-                    "field": "improvements.market_price_index.completion_date",
-                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
-                },
-                {
-                    "field": "improvements.market_price_index.value",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                },
-            ],
-        ),
-        (
-            {
-                "improvements": {
-                    "market_price_index": [],
-                    "construction_price_index": [{}],
-                }
-            },
-            [
-                {
-                    "field": "improvements.construction_price_index.name",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-                {
-                    "field": "improvements.construction_price_index.completion_date",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-                {
-                    "field": "improvements.construction_price_index.value",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-                {
-                    "field": "improvements.construction_price_index.depreciation_percentage",
-                    "message": "This field is mandatory and cannot be null.",
-                },
-            ],
-        ),
-        (
-            {
-                "improvements": {
-                    "market_price_index": [],
-                    "construction_price_index": [
-                        {
-                            "name": "",
-                            "completion_date": "2022-01-01",
-                            "value": -1,
-                            "depreciation_percentage": 8.0,
-                        }
-                    ],
-                }
-            },
-            [
-                {
-                    "field": "improvements.construction_price_index.name",
-                    "message": "This field is mandatory and cannot be blank.",
-                },
-                {
-                    "field": "improvements.construction_price_index.completion_date",
-                    "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
-                },
-                {
-                    "field": "improvements.construction_price_index.value",
-                    "message": "Ensure this value is greater than or equal to 0.",
-                },
-                {
-                    "field": "improvements.construction_price_index.depreciation_percentage",
-                    "message": "Unsupported value '8.0'. Supported values are: [0.0, 2.5, 10.0].",
-                },
-            ],
-        ),
-    ],
+                fields=[
+                    {
+                        "field": "improvements.construction_price_index.name",
+                        "message": "This field is mandatory and cannot be blank.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.completion_date",
+                        "message": "Date has wrong format. Use one of these formats instead: YYYY-MM.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.value",
+                        "message": "Ensure this value is greater than or equal to 0.",
+                    },
+                    {
+                        "field": "improvements.construction_price_index.depreciation_percentage",
+                        "message": "Unsupported value '8.0'. Supported values are: [0.0, 2.5, 10.0].",
+                    },
+                ],
+            ),
+        }
+    )
 )
 @pytest.mark.django_db
 def test__api__apartment__create__invalid_data(api_client: HitasAPIClient, invalid_data, fields):
@@ -1999,9 +1981,8 @@ def test__api__apartment__create__overlapping_shares(
 
 
 @pytest.mark.django_db
-def test__api__apartment__update__clear_ownerships_and_improvements(api_client: HitasAPIClient):
+def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient):
     ap: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=ap)
     ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
     ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
@@ -2033,7 +2014,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
         },
         "notes": "Test Notes",
         "building": {"id": ap.building.uuid.hex},
-        "ownerships": [],
         "completion_date": None,
         "improvements": {
             "construction_price_index": [],
@@ -2067,7 +2047,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
     assert ap.notes == data["notes"]
-    assert ap.ownerships.count() == 0
     assert ap.construction_price_improvements.count() == 0
     assert ap.market_price_improvements.count() == 0
 
@@ -2075,86 +2054,6 @@ def test__api__apartment__update__clear_ownerships_and_improvements(api_client: 
         reverse(
             "hitas:apartment-detail",
             args=[ap.housing_company.uuid.hex, ap.uuid.hex],
-        )
-    )
-    assert response.json() == get_response.json()
-
-
-@pytest.mark.parametrize(
-    "owner_data",
-    [
-        [
-            {
-                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "percentage": 100,
-            }
-        ],
-        [
-            {
-                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "percentage": 50,
-            },
-            {
-                "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
-                "percentage": 50,
-            },
-        ],
-        [
-            {
-                "owner": {"id": "2fe3789b72f24456950e39d06ee9977a"},
-                "percentage": 33.33,
-            },
-            {
-                "owner": {"id": "697d6ef6fb8f4fc386a42aa9fd57eac3"},
-                "percentage": 33.33,
-            },
-            {
-                "owner": {"id": "2b44c90e8e0448a3b75399e66a220a1d"},
-                "percentage": 33.34,
-            },
-        ],
-    ],
-)
-@pytest.mark.django_db
-def test__api__apartment__update__update_owner(api_client: HitasAPIClient, owner_data: list):
-    ap: Apartment = ApartmentFactory.create()
-    b: Building = ap.building
-    OwnershipFactory.create(apartment=ap)
-    OwnerFactory.create(uuid=uuid.UUID("2fe3789b-72f2-4456-950e-39d06ee9977a"))
-    OwnerFactory.create(uuid=uuid.UUID("697d6ef6-fb8f-4fc3-86a4-2aa9fd57eac3"))
-    OwnerFactory.create(uuid=uuid.UUID("2b44c90e-8e04-48a3-b753-99e66a220a1d"))
-
-    data = ApartmentDetailSerializer(ap).data
-    del data["id"]
-    del data["type"]["value"]
-    del data["type"]["description"]
-    del data["type"]["code"]
-    del data["shares"]["total"]
-    del data["address"]["postal_code"]
-    del data["address"]["city"]
-    del data["links"]
-    del data["conditions_of_sale"]
-    del data["sell_by_date"]
-    data["ownerships"] = owner_data
-    data["building"] = {"id": b.uuid.hex}
-
-    response = api_client.put(
-        reverse(
-            "hitas:apartment-detail",
-            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
-        ),
-        data=data,
-        format="json",
-    )
-    assert response.status_code == status.HTTP_200_OK, response.json()
-
-    ap.refresh_from_db()
-    assert ap.ownerships.all().count() == len(owner_data)
-
-    get_response = api_client.get(
-        reverse(
-            "hitas:apartment-detail",
-            args=[b.real_estate.housing_company.uuid.hex, ap.uuid.hex],
         )
     )
     assert response.json() == get_response.json()
@@ -2278,7 +2177,7 @@ def test__api__apartment__update__overlapping_shares(
     del data["links"]
     del data["conditions_of_sale"]
     del data["sell_by_date"]
-    data["ownerships"] = []
+    del data["ownerships"]
     data["building"] = {"id": building_1.uuid.hex}
     data["shares"]["start"] = 20
     data["shares"]["end"] = 100
@@ -2325,7 +2224,6 @@ def test__api__apartment__delete(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__delete__with_references(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create()
-    OwnershipFactory.create(apartment=a)
 
     url = reverse(
         "hitas:apartment-detail",

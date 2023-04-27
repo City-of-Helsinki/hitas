@@ -2,12 +2,11 @@ import uuid
 from datetime import date
 from decimal import Decimal
 from itertools import chain
-from typing import Any, Optional
+from typing import Optional
 
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
@@ -16,7 +15,6 @@ from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarket
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.condition_of_sale import ConditionOfSaleAnnotated, GracePeriod
 from hitas.models.housing_company import HousingCompany
-from hitas.models.ownership import Ownership, OwnershipLike
 from hitas.models.postal_code import HitasPostalCode
 from hitas.types import HitasEncoder
 from hitas.utils import subquery_first_id
@@ -100,7 +98,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_first_sale_purchase_price"):
             return self._first_sale_purchase_price
 
-        first_sale = self.first_sale
+        first_sale = self.first_sale()
         self._first_sale_purchase_price = first_sale.purchase_price if first_sale is not None else None
         return self._first_sale_purchase_price
 
@@ -111,7 +109,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_first_sale_share_of_housing_company_loans"):
             return self._first_sale_share_of_housing_company_loans
 
-        first_sale = self.first_sale
+        first_sale = self.first_sale()
         self._first_sale_share_of_housing_company_loans = (
             first_sale.apartment_share_of_housing_company_loans if first_sale is not None else None
         )
@@ -124,7 +122,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_sale_purchase_price"):
             return self._latest_sale_purchase_price
 
-        latest_sale = self.latest_sale
+        latest_sale = self.latest_sale()
         self._latest_sale_purchase_price = None
         if latest_sale is None:
             return None
@@ -139,7 +137,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_sale_share_of_housing_company_loans"):
             return self._latest_sale_share_of_housing_company_loans
 
-        latest_sale = self.latest_sale
+        latest_sale = self.latest_sale()
         self._latest_sale_share_of_housing_company_loans = None
         if latest_sale is None:
             return None
@@ -154,7 +152,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_first_purchase_date"):
             return self._first_purchase_date
 
-        first_sale = self.first_sale
+        first_sale = self.first_sale()
         self._first_purchase_date = first_sale.purchase_date if first_sale is not None else None
         return self._first_purchase_date
 
@@ -165,7 +163,7 @@ class Apartment(ExternalHitasModel):
         if hasattr(self, "_latest_purchase_date"):
             return self._latest_purchase_date
 
-        latest_sale = self.latest_sale
+        latest_sale = self.latest_sale()
         self._latest_purchase_date = None
         if latest_sale is None:
             return None
@@ -204,16 +202,26 @@ class Apartment(ExternalHitasModel):
     def is_new(self) -> bool:
         """Is this apartment considered new for the purposes of creating conditions of sale?"""
         today = timezone.now().date()
+        # If the apartment completion date is not known, or in the future, the apartment is new.
         if self.completion_date is None or self.completion_date > today:
             return True
 
-        # Fetch all sales to take advantage of prefetch cache.
-        # Sort the sales to be sure we select the first sale in case prefetch cache has some other sorting.
-        sales = sorted(self.sales.all(), key=lambda sale: sale.purchase_date)
-        if not sales:
+        # If the apartment has not been sold, the apartment is new.
+        first_sale = self.first_sale()
+        if first_sale is None:
             return True
 
-        return sales[0].purchase_date > today
+        # If the first sale is in the future, the apartment is still new.
+        if first_sale.purchase_date > today:
+            return True
+
+        # If the apartment has any conditions of sale (where it is considered the new apartment)
+        # on the first sale that have not been fulfilled, the apartment is still new.
+        if any(ownership.conditions_of_sale_new.exists() for ownership in first_sale.ownerships.all()):
+            return True
+
+        # Otherwise the apartment old.
+        return False
 
     @property
     def sell_by_date(self):
@@ -226,7 +234,11 @@ class Apartment(ExternalHitasModel):
         """
         sell_by_dates: set[date] = set()
 
-        for ownership in self.ownerships.all():
+        latest_sale = self.latest_sale(include_first_sale=True)
+        if latest_sale is None:
+            return None
+
+        for ownership in latest_sale.ownerships.all():
             cos: ConditionOfSaleAnnotated
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
                 sell_by_date = cos.sell_by_date
@@ -243,7 +255,11 @@ class Apartment(ExternalHitasModel):
 
     @property
     def has_grace_period(self) -> bool:
-        for ownership in self.ownerships.all():
+        latest_sale = self.latest_sale(include_first_sale=True)
+        if latest_sale is None:
+            return False
+
+        for ownership in latest_sale.ownerships.all():
             for cos in chain(ownership.conditions_of_sale_new.all(), ownership.conditions_of_sale_old.all()):
                 if cos.fulfilled:
                     continue
@@ -251,27 +267,42 @@ class Apartment(ExternalHitasModel):
                     return True
         return False
 
-    @cached_property
     def first_sale(self) -> Optional[ApartmentSale]:
-        return self.sales.order_by("purchase_date", "id").first()
+        # Allow caches for the instance
+        if hasattr(self, "_first_sale"):
+            return self._first_sale
 
-    @cached_property
-    def latest_sale(self) -> Optional[ApartmentSale]:
-        return (
-            self.sales.exclude(
-                # First sale should not be the latest sale
-                id__in=subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"]),
+        # Use prefetched sale if available
+        if self.sales.field.related_query_name() in getattr(self, "_prefetched_objects_cache", {}):
+            self._first_sale = self.sales.first()
+        else:
+            self._first_sale = self.sales.order_by("purchase_date", "id").first()
+
+        return self._first_sale
+
+    def latest_sale(self, include_first_sale: bool = False) -> Optional[ApartmentSale]:
+        # Allow caches for the instance
+        if hasattr(self, "_latest_sale"):
+            return self._latest_sale
+
+        # Use prefetched sale if available
+        if self.sales.field.related_query_name() in getattr(self, "_prefetched_objects_cache", {}):
+            self._latest_sale = self.sales.first()
+        else:
+            self._latest_sale = (
+                self.sales.exclude(
+                    id__in=(
+                        ()
+                        if include_first_sale
+                        # First sale should not be the latest sale in some cases
+                        else subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"])
+                    ),
+                )
+                .order_by("-purchase_date", "-id")
+                .first()
             )
-            .order_by("-purchase_date", "-id")
-            .last()
-        )
 
-    def change_ownerships(self, ownership_data: list[OwnershipLike], **kwargs: Any) -> list[Ownership]:
-        # Mark current ownerships for the apartment as "past"
-        Ownership.objects.filter(apartment=self).delete()
-
-        # Replace with the new ownerships
-        return Ownership.objects.bulk_create([Ownership(apartment=self, **kwargs, **entry) for entry in ownership_data])
+        return self._latest_sale
 
     class Meta:
         verbose_name = _("Apartment")

@@ -28,9 +28,10 @@ from hitas.models import (
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 from hitas.services.apartment import (
-    subquery_first_sale_acquisition_price,
-    subquery_first_sale_loan_amount,
-    subquery_first_sale_purchase_price,
+    get_first_sale_acquisition_price,
+    get_first_sale_loan_amount,
+    get_first_sale_purchase_price,
+    prefetch_latest_sale,
 )
 from hitas.utils import SQSum, monthify, safe_attrgetter
 
@@ -212,7 +213,8 @@ def calculate_max_price(
             },
             "ownerships": [
                 {"percentage": ownership.percentage, "name": ownership.owner.name}
-                for ownership in apartment.ownerships.all()
+                for sale in apartment.sales.all()  # only the latest sale prefetched, or empty if no sales
+                for ownership in sale.ownerships.all()
             ],
         },
         "housing_company": {
@@ -250,8 +252,9 @@ def fetch_apartment(
             "building__real_estate__housing_company__postal_code",
         )
         .prefetch_related(
+            prefetch_latest_sale(include_first_sale=True),
             Prefetch(
-                "ownerships",
+                "sales__ownerships",
                 Ownership.objects.select_related("owner"),
             ),
             Prefetch(
@@ -328,8 +331,8 @@ def fetch_apartment(
             ),
         )
         .annotate(
-            _first_sale_purchase_price=subquery_first_sale_purchase_price("id"),
-            _first_sale_share_of_housing_company_loans=subquery_first_sale_loan_amount("id"),
+            _first_sale_purchase_price=get_first_sale_purchase_price("id"),
+            _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
             completion_month=TruncMonth("completion_date"),
             calculation_date_cpi=Subquery(
                 queryset=(
@@ -416,7 +419,7 @@ def fetch_apartment(
                                         condition=Q(sales__isnull=True),
                                         then=Sum(F("catalog_purchase_price") + F("catalog_primary_loan_amount")),
                                     ),
-                                    default=subquery_first_sale_acquisition_price("id"),
+                                    default=get_first_sale_acquisition_price("id"),
                                     output_field=HitasModelDecimalField(),
                                 ),
                             )
@@ -440,7 +443,7 @@ def fetch_apartment(
                                         condition=Q(sales__isnull=True),
                                         then=Sum(F("catalog_purchase_price") + F("catalog_primary_loan_amount")),
                                     ),
-                                    default=subquery_first_sale_acquisition_price("id"),
+                                    default=get_first_sale_acquisition_price("id"),
                                     output_field=HitasModelDecimalField(),
                                 ),
                             )
