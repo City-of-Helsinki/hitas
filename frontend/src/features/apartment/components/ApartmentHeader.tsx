@@ -25,6 +25,7 @@ const ApartmentHeader = ({
                             {apartment.links.housing_company.display_name} {isApartmentSubPage}
                         </span>
                     </Link>
+                    <span className="unselectable">|</span>
                     {isApartmentSubPage ? (
                         <Link
                             to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}
