@@ -55,6 +55,8 @@ export const errorMessages = {
     catalogPricesMissing: "Myyntihintaluettelon hinnat puuttuvat",
     sharesEmpty: "Toinen osakekenttä on tyhjä",
     sharesStartGreaterThanEnd: "Osakkeiden lopun on oltava suurempi kuin alun",
+    constructionInterestEmpty: "Toinen korkokenttä on tyhjä",
+    constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -97,6 +99,13 @@ const addAPIId = (zodObject) => zodObject.merge(APIIdString);
 
 const nullishNumber = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
     .nonnegative(errorMessages.numberPositive)
+    .nullish();
+
+const nullishPositiveNumber = number({
+    invalid_type_error: errorMessages.numberType,
+    required_error: errorMessages.required,
+})
+    .positive(errorMessages.numberPositive)
     .nullish();
 
 const writableRequiredNumber = number({
@@ -399,12 +408,8 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
 });
 
 const ApartmentSharesSchema = object({
-    start: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.numberPositive)
-        .nullish(),
-    end: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.numberPositive)
-        .nullish(),
+    start: nullishPositiveNumber,
+    end: nullishPositiveNumber,
     total: number(),
 });
 

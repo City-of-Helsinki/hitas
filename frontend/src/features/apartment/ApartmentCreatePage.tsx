@@ -117,8 +117,8 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
                 construction: {
                     loans: null,
                     interest: {
-                        rate_6: null,
-                        rate_14: null,
+                        rate_6: undefined,
+                        rate_14: undefined,
                     },
                     debt_free_purchase_price: null,
                     additional_work: null,
@@ -246,6 +246,39 @@ const LoadedApartmentCreatePage = ({
         }
     };
 
+    const handleValidateInterestDuringConstructionRates = (rate6, rate14) => {
+        // Form-level validation for interest rates during construction
+        if (rate6 === null && rate14 === null) {
+            formObject.clearErrors("prices.construction.interest");
+        }
+        // If either interest rate is null, we have an error
+        else if (!rate6 && rate6 !== 0) {
+            formObject.setError("prices.construction.interest.rate_6", {
+                type: "custom",
+                message: errorMessages.constructionInterestEmpty,
+            });
+        } else if (!rate14 && rate14 !== 0) {
+            formObject.setError("prices.construction.interest.rate_14", {
+                type: "custom",
+                message: errorMessages.constructionInterestEmpty,
+            });
+        }
+        // If 6% is greater than 14%, we have an error
+        else if (rate6 && rate14 && rate6 >= rate14) {
+            formObject.setError("prices.construction.interest.rate_6", {
+                type: "custom",
+                message: errorMessages.constructionInterest6GreaterThan14,
+            });
+            formObject.setError("prices.construction.interest.rate_14", {
+                type: "custom",
+                message: errorMessages.constructionInterest6GreaterThan14,
+            });
+        } else {
+            // If we got so far, there were no errors, clear any remaining interest rate errors away.
+            formObject.clearErrors("prices.construction.interest");
+        }
+    };
+
     // Event handlers
     const handleFormSubmit = () => {
         // Recursively find the first error in the form (The error may be nested, e.g. shares.start)
@@ -259,8 +292,10 @@ const LoadedApartmentCreatePage = ({
             return getFirstError(firstError, `${_fullPath}${firstKey}.`);
         };
 
-        // Validate shares
-        handleValidateShares(formObject.getValues("shares.start"), formObject.getValues("shares.end"));
+        handleValidateShares(...formObject.getValues(["shares.start", "shares.end"]));
+        handleValidateInterestDuringConstructionRates(
+            ...formObject.getValues(["prices.construction.interest.rate_6", "prices.construction.interest.rate_14"])
+        );
 
         // If there are errors, set focus to the first error field
         const firstError = getFirstError(formObject.formState.errors);
@@ -277,6 +312,13 @@ const LoadedApartmentCreatePage = ({
         const subscription = watch((value, {name}) => {
             if (name === "shares.start" || name === "shares.end") {
                 handleValidateShares(value?.shares?.start, value.shares?.end);
+            }
+
+            if (name === "prices.construction.interest.rate_6" || name === "prices.construction.interest.rate_14") {
+                handleValidateInterestDuringConstructionRates(
+                    value?.prices?.construction?.interest?.rate_6,
+                    value?.prices?.construction?.interest?.rate_14
+                );
             }
         });
         return () => subscription.unsubscribe();
