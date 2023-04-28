@@ -57,7 +57,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     # 4. Join ownerships on first sale
     # 5. Join conditions of sale where one of the ownerships is a "new ownership"
     # 6. Join conditions of sale where one of the ownerships is an "old ownership"
-    with count_queries(6, list_queries_on_failure=True):
+    with count_queries(6):
         response = api_client.get(reverse("hitas:apartment-list"))
 
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -207,7 +207,7 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
     # 4. Join ownerships on first sale
     # 5. Join conditions of sale where one of the ownerships is a "new ownership"
     # 6. Join conditions of sale where one of the ownerships is an "old ownership"
-    with count_queries(6, list_queries_on_failure=True):
+    with count_queries(6):
         response = api_client.get(reverse("hitas:apartment-list"))
 
     assert response.status_code == status.HTTP_200_OK, response.json()

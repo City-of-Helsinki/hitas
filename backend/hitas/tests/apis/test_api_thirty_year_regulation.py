@@ -218,7 +218,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # 18. Select current thirty year regulation result rows for audit log update
     # 19. TODO: ???
     # 20. TODO: ???
-    with count_queries(20, list_queries_on_failure=True):
+    with count_queries(20):
         response = api_client.post(url, data={}, format="json")
 
     #
@@ -375,7 +375,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # 20. Select current thirty year regulation result rows for audit log update
     # 21. TODO: ???
     # 22. TODO: ???
-    with count_queries(22, list_queries_on_failure=True):
+    with count_queries(22):
         response = api_client.post(url, data={}, format="json")
 
     #

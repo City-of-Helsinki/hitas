@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from typing import Any, NamedTuple, Optional, TypedDict, TypeVar
 
 import pytest
+import sqlparse
 import yaml
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
@@ -190,7 +191,7 @@ def parametrize_helper(__tests: dict[str, T], /) -> ParametrizeArgs:
 
 
 @contextmanager
-def count_queries(expected: int, *, list_queries_on_failure: bool = False):
+def count_queries(expected: int, *, list_queries_on_failure: bool = True, count_audit_log: bool = False):
     orig_debug = settings.DEBUG
     try:
         settings.DEBUG = True
@@ -203,12 +204,24 @@ def count_queries(expected: int, *, list_queries_on_failure: bool = False):
             and not query["sql"].startswith("SAVEPOINT")
             and not query["sql"].startswith("RELEASE SAVEPOINT")
         ]
+        if not count_audit_log:
+            database_queries = [
+                sql
+                for sql in database_queries
+                # audit log also tries to fetch django content types for its deletion rules
+                if not any(table in sql for table in ["auditlog_logentry", "django_content_type"])
+            ]
+
         number_of_queries = len(database_queries)
         if number_of_queries != expected:
             msg = f"Unexpected database query count, {number_of_queries} instead of {expected}."
             if list_queries_on_failure:
-                hints = "\n- ".join(database_queries)
-                msg += f" Queries:\n- {hints}"
+                msg += " Queries:\n"
+                for index, query in enumerate(database_queries):
+                    msg += (
+                        f"{index + 1}) ---------------------------------------------------------------------------\n"
+                        f"{sqlparse.format(query, reindent=True)}\n"
+                    )
             pytest.fail(msg)
     finally:
         connection.queries_log.clear()
