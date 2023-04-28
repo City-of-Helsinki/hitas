@@ -1,11 +1,12 @@
 from django.contrib import admin
 
+from hitas.admin.audit_log import AuditLogHistoryAdminMixin
 from hitas.models import Owner
 from hitas.models.ownership import Ownership
 
 
 @admin.register(Owner)
-class OwnerAdmin(admin.ModelAdmin):
+class OwnerAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
     list_display = [
         "name",
         "email",
@@ -17,7 +18,7 @@ class OwnerAdmin(admin.ModelAdmin):
 
 
 @admin.register(Ownership)
-class OwnershipAdmin(admin.ModelAdmin):
+class OwnershipAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
     list_display = [
         "apartment",
         "owner",
