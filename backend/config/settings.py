@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "helusers.apps.HelusersConfig",
     "helusers.apps.HelusersAdminConfig",
     "social_django",
+    "auditlog",
     "users",
     "hitas",
     "nested_inline",
@@ -104,6 +105,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "crum.CurrentRequestUserMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 # ----- Database ---------------------------------------------------------------------------------------
