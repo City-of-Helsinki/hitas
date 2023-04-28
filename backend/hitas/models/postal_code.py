@@ -1,3 +1,4 @@
+from auditlog.registry import auditlog
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -20,3 +21,6 @@ class HitasPostalCode(ExternalHitasModel):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk}:{self.value}>"
+
+
+auditlog.register(HitasPostalCode)

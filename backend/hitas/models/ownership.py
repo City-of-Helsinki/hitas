@@ -1,6 +1,7 @@
 from decimal import Decimal
 from typing import TYPE_CHECKING, Iterable, Optional, TypedDict, Union
 
+from auditlog.registry import auditlog
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -101,3 +102,6 @@ def check_ownership_percentages(ownerships: Iterable[Union[Ownership, OwnershipL
                 )
             }
         )
+
+
+auditlog.register(Ownership)

@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, TypeAlias, TypedDict
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
@@ -77,3 +78,7 @@ class ThirtyYearRegulationResults(models.Model):
 
     def __str__(self) -> str:
         return f"Thirty-year regulation results for {self.calculation_month.isoformat()!r}"
+
+
+auditlog.register(ThirtyYearRegulationResultsRow)
+auditlog.register(ThirtyYearRegulationResults)

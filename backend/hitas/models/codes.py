@@ -1,3 +1,4 @@
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -56,3 +57,9 @@ class ApartmentType(AbstractCode):
     class Meta(AbstractCode.Meta):
         verbose_name = _("Apartment type")
         verbose_name_plural = _("Apartment types")
+
+
+auditlog.register(BuildingType)
+auditlog.register(FinancingMethod)
+auditlog.register(Developer)
+auditlog.register(ApartmentType)

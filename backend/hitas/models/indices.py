@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+from auditlog.registry import auditlog
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -100,3 +101,12 @@ class SurfaceAreaPriceCeilingCalculationData(models.Model):
     class Meta:
         verbose_name = _("Surface area price ceiling calculation data")
         verbose_name_plural = _("Surface area price ceiling calculation data")
+
+
+auditlog.register(MaximumPriceIndex)
+auditlog.register(MarketPriceIndex)
+auditlog.register(MarketPriceIndex2005Equal100)
+auditlog.register(ConstructionPriceIndex)
+auditlog.register(ConstructionPriceIndex2005Equal100)
+auditlog.register(SurfaceAreaPriceCeiling)
+auditlog.register(SurfaceAreaPriceCeilingCalculationData)

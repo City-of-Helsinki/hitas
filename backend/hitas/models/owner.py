@@ -1,5 +1,6 @@
 from typing import Optional, TypedDict
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -34,3 +35,6 @@ class Owner(ExternalHitasModel):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
+
+
+auditlog.register(Owner)

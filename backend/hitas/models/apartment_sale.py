@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -45,3 +46,6 @@ class ApartmentSaleWithAnnotations(ApartmentSale):
 
     class Meta:
         abstract = True
+
+
+auditlog.register(ApartmentSale)

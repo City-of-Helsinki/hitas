@@ -1,5 +1,6 @@
 from typing import TypedDict
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -40,3 +41,6 @@ class ExternalSalesData(models.Model):
     class Meta:
         verbose_name = _("External sales data")
         verbose_name_plural = _("External sales datas")
+
+
+auditlog.register(ExternalSalesData)

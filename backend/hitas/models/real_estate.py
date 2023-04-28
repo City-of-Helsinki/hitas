@@ -1,3 +1,4 @@
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
@@ -38,3 +39,6 @@ class RealEstate(ExternalHitasModel):
 
     def __str__(self):
         return self.property_identifier
+
+
+auditlog.register(RealEstate)

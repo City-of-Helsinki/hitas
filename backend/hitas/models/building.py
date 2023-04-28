@@ -1,3 +1,4 @@
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
@@ -39,3 +40,6 @@ class Building(ExternalHitasModel):
 
     def __str__(self):
         return self.street_address
+
+
+auditlog.register(Building)

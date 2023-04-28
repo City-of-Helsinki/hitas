@@ -3,6 +3,7 @@ from decimal import Decimal
 from types import DynamicClassAttribute
 from typing import Optional
 
+from auditlog.registry import auditlog
 from crum import get_current_user
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -279,3 +280,8 @@ class HousingCompanyConstructionPriceImprovement(HitasImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany", on_delete=models.CASCADE, related_name="construction_price_improvements"
     )
+
+
+auditlog.register(HousingCompany)
+auditlog.register(HousingCompanyMarketPriceImprovement)
+auditlog.register(HousingCompanyConstructionPriceImprovement)
