@@ -38,7 +38,7 @@ class RealEstate(ExternalHitasModel):
         ordering = ["id"]
 
     def __str__(self):
-        return self.property_identifier
+        return str(self.property_identifier)
 
 
 auditlog.register(RealEstate)

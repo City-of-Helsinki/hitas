@@ -433,12 +433,6 @@ class ApartmentMaximumPriceCalculation(models.Model):
         verbose_name = _("Apartment maximum price calculation")
         verbose_name_plural = _("Apartment maximum price calculations")
 
-    def __str__(self):
-        return f"{self.apartment}, created: {self.created_at}, confirmed: {self.confirmed_at}"
-
-    def __repr__(self) -> str:
-        return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
-
 
 auditlog.register(Apartment)
 auditlog.register(ApartmentMarketPriceImprovement)

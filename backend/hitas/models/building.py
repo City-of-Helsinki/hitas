@@ -39,7 +39,7 @@ class Building(ExternalHitasModel):
         ordering = ["id"]
 
     def __str__(self):
-        return self.street_address
+        return str(self.street_address)
 
 
 auditlog.register(Building)

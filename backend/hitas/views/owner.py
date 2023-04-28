@@ -1,11 +1,16 @@
-from typing import Optional
+from typing import Any, Optional
 
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from hitas.models import Owner, Ownership
-from hitas.models.utils import check_business_id, check_social_security_number
+from hitas.models.utils import (
+    check_business_id,
+    check_social_security_number,
+)
+from hitas.services.owner import log_access_if_owner_has_non_disclosure
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
@@ -50,7 +55,13 @@ class OwnerViewSet(HitasModelViewSet):
     serializer_class = OwnerSerializer
     model_class = Owner
 
-    def destroy(self, request, *args, **kwargs):
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        instance: Owner = self.get_object()
+        log_access_if_owner_has_non_disclosure(instance)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         instance: Owner = self.get_object()
 
         number_of_ownerships = Ownership.objects.filter(owner__id=instance.id).count()

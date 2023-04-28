@@ -8,6 +8,7 @@ from django.db.models.functions import Coalesce
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
 from hitas.models.apartment_sale import ApartmentSale
+from hitas.services.owner import log_access_if_owner_has_non_disclosure
 from hitas.utils import SQSum, subquery_first_id
 
 
@@ -206,3 +207,10 @@ def aggregate_catalog_prices_where_no_sales() -> Coalesce:
         0,
         output_field=HitasModelDecimalField(),
     )
+
+
+def check_current_owners_for_non_disclosure(apartment: Apartment) -> None:
+    sale = apartment.latest_sale(include_first_sale=True)
+    if sale is not None:
+        for ownership in sale.ownerships.all():
+            log_access_if_owner_has_non_disclosure(ownership.owner)

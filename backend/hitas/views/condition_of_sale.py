@@ -3,9 +3,11 @@ import uuid
 from typing import Any, Optional
 
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch
+from django.db.models import Prefetch, QuerySet
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 
 from hitas.models.apartment import Apartment
@@ -14,6 +16,7 @@ from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
 from hitas.services.apartment import prefetch_first_sale
 from hitas.services.condition_of_sale import condition_of_sale_queryset, create_conditions_of_sale
+from hitas.services.owner import log_access_if_owner_has_non_disclosure
 from hitas.views.utils import ApartmentHitasAddressSerializer, HitasModelSerializer, HitasModelViewSet, UUIDField
 
 
@@ -131,3 +134,29 @@ class ConditionOfSaleViewSet(HitasModelViewSet):
 
     def get_queryset(self):
         return condition_of_sale_queryset()
+
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        cos: ConditionOfSale = self.get_object()
+        log_access_if_owner_has_non_disclosure(cos.old_ownership.owner)
+        log_access_if_owner_has_non_disclosure(cos.new_ownership.owner)
+        serializer = self.get_serializer(cos)
+        return Response(serializer.data)
+
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        queryset: QuerySet[ConditionOfSale] = self.filter_queryset(self.get_queryset())
+
+        page: Optional[list[ConditionOfSale]] = self.paginate_queryset(queryset)
+        if page is not None:
+            for cos in page:
+                log_access_if_owner_has_non_disclosure(cos.old_ownership.owner)
+                log_access_if_owner_has_non_disclosure(cos.new_ownership.owner)
+
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        for cos in queryset:
+            log_access_if_owner_has_non_disclosure(cos.old_ownership.owner)
+            log_access_if_owner_has_non_disclosure(cos.new_ownership.owner)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

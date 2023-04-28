@@ -6,7 +6,7 @@ from typing import Any, Dict, Iterable, Optional, Union
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Prefetch, Q, QuerySet
 from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
 from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
 from django.http import HttpResponse
@@ -17,6 +17,7 @@ from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from hitas.calculations.exceptions import IndexMissingException
@@ -44,6 +45,7 @@ from hitas.models.apartment import (
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
+from hitas.services.owner import log_access_if_owner_has_non_disclosure
 from hitas.services.apartment import (
     get_first_sale_purchase_date,
     get_first_sale_loan_amount,
@@ -51,6 +53,7 @@ from hitas.services.apartment import (
     get_latest_sale_purchase_date,
     get_latest_sale_purchase_price,
     prefetch_latest_sale,
+    check_current_owners_for_non_disclosure,
 )
 
 from hitas.services.condition_of_sale import condition_of_sale_queryset
@@ -942,3 +945,26 @@ class ApartmentViewSet(HitasModelViewSet):
         filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
         context = {"maximum_price_calculation": mpc}
         return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
+
+    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        apartment: Apartment = self.get_object()
+        check_current_owners_for_non_disclosure(apartment)
+        serializer = self.get_serializer(apartment)
+        return Response(serializer.data)
+
+    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        queryset: QuerySet[Apartment] = self.filter_queryset(self.get_queryset())
+
+        page: Optional[list[Apartment]] = self.paginate_queryset(queryset)
+        if page is not None:
+            for apartment in page:
+                check_current_owners_for_non_disclosure(apartment)
+
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        for apartment in queryset:
+            check_current_owners_for_non_disclosure(apartment)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

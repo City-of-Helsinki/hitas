@@ -46,3 +46,10 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
         )
 
     return obfuscated_owners
+
+
+def log_access_if_owner_has_non_disclosure(owner: Owner) -> None:
+    """Log access to owner info if they have a non-disclosure agreement."""
+    # TODO: This will be implemented later.
+    #  if owner.non_disclosure:
+    #      accessed.send(owner.__class__, instance=owner)
