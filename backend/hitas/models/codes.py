@@ -3,10 +3,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
-class AbstractCode(ExternalHitasModel):
+class AbstractCode(ExternalSafeDeleteHitasModel):
     value = models.CharField(max_length=1024)
     description = models.TextField(blank=True)
 

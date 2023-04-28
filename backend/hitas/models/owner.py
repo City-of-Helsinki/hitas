@@ -4,7 +4,7 @@ from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 from hitas.models.utils import check_business_id, check_social_security_number
 
 
@@ -14,7 +14,7 @@ class OwnerT(TypedDict):
     email: Optional[str]
 
 
-class Owner(ExternalHitasModel):
+class Owner(ExternalSafeDeleteHitasModel):
     name = models.CharField(max_length=256, blank=True, null=True)
     identifier = models.CharField(max_length=11, blank=True, null=True)
     valid_identifier = models.BooleanField(default=False)

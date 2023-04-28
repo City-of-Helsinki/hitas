@@ -4,11 +4,11 @@ from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalHitasModel, HitasModelDecimalField
+from hitas.models._base import ExternalSafeDeleteHitasModel, HitasModelDecimalField
 
 
 # 'Asunnon myyntitapahtuma' / 'Kauppakirja' / 'Uusi myynti'
-class ApartmentSale(ExternalHitasModel):
+class ApartmentSale(ExternalSafeDeleteHitasModel):
     apartment = models.ForeignKey("Apartment", related_name="sales", on_delete=models.CASCADE)
 
     # "Ilmoituspäivä"

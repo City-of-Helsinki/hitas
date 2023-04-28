@@ -4,12 +4,12 @@ from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models import HitasPostalCode
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 from hitas.models.utils import validate_property_id
 
 
 # Kiinteistö
-class RealEstate(ExternalHitasModel):
+class RealEstate(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")

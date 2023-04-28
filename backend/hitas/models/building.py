@@ -3,13 +3,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 from hitas.models.postal_code import HitasPostalCode
 from hitas.models.utils import validate_building_id
 
 
 # Rakennus
-class Building(ExternalHitasModel):
+class Building(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     real_estate = models.ForeignKey("RealEstate", on_delete=models.PROTECT, related_name="buildings")

@@ -2,11 +2,11 @@ from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
 # Isännöitsijä
-class PropertyManager(ExternalHitasModel):
+class PropertyManager(ExternalSafeDeleteHitasModel):
     name = models.CharField(max_length=1024)
     email = models.EmailField()
     street_address = models.CharField(max_length=1024)

@@ -4,6 +4,8 @@ from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from hitas.models._base import HitasModel
+
 
 class SaleData(TypedDict):
     sale_count: int
@@ -26,7 +28,7 @@ class ExternalSalesDataType(TypedDict):
     quarter_4: QuarterData
 
 
-class ExternalSalesData(models.Model):
+class ExternalSalesData(HitasModel):
     """Data pulled from tilastokeskus excel for surface area price ceiling calculation"""
 
     calculation_quarter = models.CharField(primary_key=True, max_length=6)

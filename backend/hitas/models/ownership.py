@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from safedelete import SOFT_DELETE_CASCADE
 
-from hitas.models._base import HitasModel, HitasModelDecimalField
+from hitas.models._base import HitasModelDecimalField, HitasSafeDeleteModel
 
 if TYPE_CHECKING:
     from hitas.models.apartment import Apartment
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 # 'Omistajuus'
-class Ownership(HitasModel):
+class Ownership(HitasSafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     owner = models.ForeignKey(

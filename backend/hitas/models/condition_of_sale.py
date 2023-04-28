@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
 class GracePeriod(Enum):
@@ -22,7 +22,7 @@ class GracePeriod(Enum):
 
 
 # 'Myyntiehto'
-class ConditionOfSale(ExternalHitasModel):
+class ConditionOfSale(ExternalSafeDeleteHitasModel):
     new_ownership = models.ForeignKey(
         "Ownership",
         related_name="conditions_of_sale_new",

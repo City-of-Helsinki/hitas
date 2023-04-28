@@ -208,12 +208,17 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # 8. Fetch surface area price ceiling
     # 9. Fetch hitas sales
     # 10. Fetch external sales data
-    # 11. Set housing companies' states
-    # 12. Search for owners to be obfuscated (none found)
-    # 13. Select thirty year regulation results for update
-    # 14. Save thirty year regulation results
-    # 15. Save thirty year regulation results' rows
-    with count_queries(15, list_queries_on_failure=True):
+    # 11. Fetch housing companies for audit log update
+    # 12. Set housing companies' states
+    # 13. Search for owners to be obfuscated (none found)
+    # 14. Select thirty year regulation results for update
+    # 15. Save thirty year regulation results
+    # 16. Fetch current thirty year regulation result row ids
+    # 17. Save thirty year regulation results' rows
+    # 18. Select current thirty year regulation result rows for audit log update
+    # 19. TODO: ???
+    # 20. TODO: ???
+    with count_queries(20, list_queries_on_failure=True):
         response = api_client.post(url, data={}, format="json")
 
     #
@@ -358,13 +363,19 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # 8. Fetch surface area price ceiling
     # 9. Fetch hitas sales
     # 10. Fetch external sales data
-    # 11. Set housing companies' states
-    # 12. Search for owners to be obfuscated
-    # 13. Obfuscate owners without any regulated apartments
-    # 14. Select thirty year regulation results for update
-    # 15. Save thirty year regulation results
-    # 16. Save thirty year regulation results' rows
-    with count_queries(16, list_queries_on_failure=True):
+    # 11. Fetch housing companies for audit log update
+    # 12. Set housing companies' states
+    # 13. Search for owners to be obfuscated
+    # 14. Fetch owners for audit log update
+    # 15. Obfuscate owners without any regulated apartments
+    # 16. Select thirty year regulation results for update
+    # 17. Save thirty year regulation results
+    # 18. Fetch current thirty year regulation result row ids
+    # 19. Save thirty year regulation results' rows
+    # 20. Select current thirty year regulation result rows for audit log update
+    # 21. TODO: ???
+    # 22. TODO: ???
+    with count_queries(22, list_queries_on_failure=True):
         response = api_client.post(url, data={}, format="json")
 
     #

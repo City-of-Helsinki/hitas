@@ -14,7 +14,12 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
+from hitas.models._base import (
+    ExternalSafeDeleteHitasModel,
+    HitasImprovement,
+    HitasMarketPriceImprovement,
+    HitasModelDecimalField,
+)
 from hitas.models.utils import validate_business_id
 
 
@@ -129,7 +134,7 @@ class RegulationStatus(Enum):
 
 
 # Taloyhtiö / "Osakeyhtiö"
-class HousingCompany(ExternalHitasModel):
+class HousingCompany(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     # Official spelling of the housing company name
