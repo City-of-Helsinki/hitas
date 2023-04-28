@@ -124,10 +124,10 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
                     additional_work: null,
                 },
             },
-            building:
-                buildingOptions.length === 1
-                    ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
-                    : {label: "", value: ""},
+            // The first building in the list is selected by default
+            building: buildingOptions.length
+                ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
+                : {label: "", value: ""},
             improvements: {
                 market_price_index: [],
                 construction_price_index: [],
