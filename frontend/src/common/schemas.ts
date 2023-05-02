@@ -6,16 +6,6 @@ import {boolean, literal, number, object, string, z} from "zod";
 
 export const apartmentStates = ["free", "reserved", "sold"] as const;
 
-export const housingCompanyStates = [
-    "not_ready",
-    "lt_30_years",
-    "gt_30_years_not_free",
-    "gt_30_years_free",
-    "gt_30_years_plot_department_notification",
-    "half_hitas",
-    "ready_no_statistics",
-] as const;
-
 export const housingCompanyHitasTypes = [
     "non_hitas",
     "hitas_1",
@@ -205,13 +195,11 @@ const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
 const HousingCompanyAreaSchema = object({name: string(), cost_area: number()});
 
 const HousingCompanyHitasTypeSchema = z.enum(housingCompanyHitasTypes);
-const HousingCompanyStateSchema = z.enum(housingCompanyStates);
 const HousingCompanyRegulationStatusSchema = z.enum(housingCompanyRegulationStatus);
 
 const HousingCompanySchema = object({
     id: APIIdString,
     name: string(),
-    state: HousingCompanyStateSchema,
     hitas_type: HousingCompanyHitasTypeSchema,
     exclude_from_statistics: boolean(),
     regulation_status: HousingCompanyRegulationStatusSchema,
@@ -249,7 +237,6 @@ const HousingCompanyDetailsSchema = object({
     id: APIIdString,
     business_id: string().nullable(),
     name: object({official: string(), display: string()}),
-    state: HousingCompanyStateSchema,
     hitas_type: HousingCompanyHitasTypeSchema,
     exclude_from_statistics: boolean(),
     regulation_status: HousingCompanyRegulationStatusSchema,
@@ -292,7 +279,6 @@ const HousingCompanyDetailsSchema = object({
 const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     name: true,
     business_id: true,
-    state: true,
     address: true,
     acquisition_price: true,
     primary_loan: true,

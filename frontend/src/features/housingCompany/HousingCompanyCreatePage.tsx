@@ -13,9 +13,7 @@ import {
     useSaveHousingCompanyMutation,
 } from "../../app/services";
 import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
-import {getHousingCompanyStateName} from "../../common/localisation";
 import {
-    housingCompanyStates,
     ICode,
     IHousingCompanyDetails,
     IHousingCompanyWritable,
@@ -55,7 +53,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   notes: "",
                   primary_loan: undefined,
                   property_manager: null,
-                  state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
                   improvements: {
                       market_price_index: [],
@@ -69,10 +66,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     const handleSaveButtonClicked = () => {
         saveHousingCompany({data: formData, id: state?.housingCompany.id});
     };
-
-    const stateOptions = housingCompanyStates.map((state) => {
-        return {label: getHousingCompanyStateName(state), value: state};
-    });
 
     // Navigate user directly to detail page of the just created Housing Company
     useEffect(() => {
@@ -133,17 +126,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             queryFunction={useGetPostalCodesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: IPostalCode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="select"
-                            label="Tila"
-                            fieldPath="state"
-                            options={stateOptions}
-                            defaultValue={{label: "Ei valmis", value: "not_ready"}}
                             required
                             formData={formData}
                             setFormData={setFormData}
