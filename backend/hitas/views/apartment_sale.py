@@ -1,18 +1,15 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models import Prefetch, prefetch_related_objects
 from rest_framework import serializers
-from rest_framework.request import Request
-from rest_framework.response import Response
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models.apartment import Apartment, ApartmentSale
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import get_latest_sale_purchase_date, prefetch_first_sale
 from hitas.services.condition_of_sale import create_conditions_of_sale
-from hitas.services.owner import log_access_if_owner_has_non_disclosure
 from hitas.services.validation import lookup_id_to_uuid, lookup_model_id_by_uuid
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
@@ -166,29 +163,3 @@ class ApartmentSaleViewSet(HitasModelViewSet):
                 Ownership.objects.select_related("owner"),
             ),
         ).filter(apartment_id=apartment_id)
-
-    def retrieve(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        sale: ApartmentSale = self.get_object()
-        for ownership in sale.ownerships.all():
-            log_access_if_owner_has_non_disclosure(ownership.owner)
-        serializer = self.get_serializer(sale)
-        return Response(serializer.data)
-
-    def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        queryset: QuerySet[ApartmentSale] = self.filter_queryset(self.get_queryset())
-
-        page: Optional[list[ApartmentSale]] = self.paginate_queryset(queryset)
-        if page is not None:
-            for sale in page:
-                for ownership in sale.ownerships.all():
-                    log_access_if_owner_has_non_disclosure(ownership.owner)
-
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        for sale in queryset:
-            for ownership in sale.ownerships.all():
-                log_access_if_owner_has_non_disclosure(ownership.owner)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)

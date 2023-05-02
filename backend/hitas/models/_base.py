@@ -30,7 +30,35 @@ class AuditableUpdateMixin:
 
         objs: dict[int, Model] = {obj.pk: obj for obj in self.all()}
 
-        # Convert Cast-ed Case-statements from 'bulk_update' to plain values
+        # Convert Cast-ed Case-statements from 'bulk_update' to plain values.
+        # 'bulk_update' calls this method with 'kwargs' like this:
+        #
+        # {
+        #   "field_1": Cast(
+        #     Case(
+        #       When(pk=1, then=Value(1)),
+        #       When(pk=2, then=Value(2)),
+        #       default=None,
+        #     ),
+        #     output_field=IntegerField(),
+        #   ),
+        #   "field_2": Cast(
+        #     Case(
+        #       When(pk=1, then=Value("foo")),
+        #       When(pk=2, then=Value("bar")),
+        #       default=None,
+        #     ),
+        #     output_field=CharField(),
+        #   ),
+        # }
+        #
+        # This needs to be converted to 'changes' like this:
+        #
+        # {
+        #   1: {"field_1": (objs[1].field_1, 1), "field_2": (objs[1].field_2, "foo")},
+        #   2: {"field_1": (objs[2].field_1, 2), "field_2": (objs[2].field_2, "bar")},
+        # }
+        #
         if any(isinstance(value, Cast) for value in kwargs.values()):
             changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]] = {}
             for key, value in kwargs.items():
@@ -114,10 +142,22 @@ class AuditableDeleteForceMixin:
         return ret
 
 
+class PostFetchQuerySetMixin:
+    """Patch QuerySet so that results can be modified right after they are fetched."""
+
+    def _fetch_all(self):
+        if self._result_cache is None:
+            results: list[Model] = list(self._iterable_class(self))
+            self._result_cache = self.model.post_fetch_hook(results)
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_objects()
+
+
 class HitasQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
     AuditableDeleteMixin,
+    PostFetchQuerySetMixin,
     QuerySet,
 ):
     pass
@@ -127,7 +167,14 @@ class HitasManager(BaseManager.from_queryset(HitasQuerySet)):
     pass
 
 
-class HitasModel(Model):
+class PostFetchModelMixin:
+    @classmethod
+    def post_fetch_hook(cls: type[TModel], results: list[TModel]) -> list[TModel]:
+        """Implement this method to modify queryset results after they are fetched."""
+        return results
+
+
+class HitasModel(PostFetchModelMixin, Model):
     """
     Model with bulk auditing capabilities.
     """
@@ -136,6 +183,9 @@ class HitasModel(Model):
 
     class Meta:
         abstract = True
+        # Django knows to use our custom QuerySet
+        # for related managers based on this setting.
+        base_manager_name = "objects"
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk}>"
@@ -145,6 +195,7 @@ class HitasSafeDeleteQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
     AuditableDeleteForceMixin,
+    PostFetchQuerySetMixin,
     SafeDeleteQueryset,
 ):
     pass
@@ -162,7 +213,7 @@ class HitasSafeDeleteDeletedManager(SafeDeleteDeletedManager):
     _queryset_class = HitasSafeDeleteQuerySet
 
 
-class HitasSafeDeleteModel(SafeDeleteModel):
+class HitasSafeDeleteModel(PostFetchModelMixin, SafeDeleteModel):
     """
     Abstract model for Hitas entities without an externally visible ID
     """
@@ -173,6 +224,11 @@ class HitasSafeDeleteModel(SafeDeleteModel):
 
     class Meta:
         abstract = True
+        # Django knows to use our custom QuerySet
+        # for related managers based on this setting.
+        # Base manager needs to be the all_object manager
+        # so that safe-delete is able to do its magic.
+        base_manager_name = "all_objects"
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk}>"
