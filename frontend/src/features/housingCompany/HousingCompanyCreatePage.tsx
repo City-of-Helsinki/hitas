@@ -7,7 +7,6 @@ import {useImmer} from "use-immer";
 import {
     useGetBuildingTypesQuery,
     useGetDevelopersQuery,
-    useGetFinancingMethodsQuery,
     useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
@@ -45,7 +44,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   building_type: {id: ""},
                   business_id: "",
                   developer: {id: ""},
-                  financing_method: {id: ""},
                   name: {
                       display: "",
                       official: "",
@@ -177,19 +175,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         />
                     </div>
                     <div className="row">
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Rahoitusmuoto"
-                            fieldPath="financing_method.id"
-                            placeholder={state?.housingCompany.financing_method.value}
-                            queryFunction={useGetFinancingMethodsQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
                         <FormInputField
                             inputType="relatedModel"
                             label="Talotyyppi"

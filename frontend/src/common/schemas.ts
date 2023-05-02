@@ -246,7 +246,6 @@ const HousingCompanyDetailsSchema = object({
     area: HousingCompanyAreaSchema,
     date: string().nullable(),
     real_estates: RealEstateSchema.array(),
-    financing_method: CodeSchema,
     building_type: CodeSchema,
     developer: CodeSchema,
     property_manager: PropertyManagerSchema.nullable(),
@@ -288,7 +287,6 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
 }).merge(
     object({
         id: APIIdString.optional(),
-        financing_method: object({id: string()}),
         building_type: object({id: string()}),
         developer: object({id: string()}),
         property_manager: object({id: string()}).nullable(),

@@ -148,10 +148,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                 </div>
                                 <div className="column">
                                     <DetailField
-                                        label="Rahoitusmuoto"
-                                        value={data.financing_method.value}
-                                    />
-                                    <DetailField
                                         label="Talotyyppi"
                                         value={housingCompany.building_type.value}
                                     />
