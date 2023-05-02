@@ -44,6 +44,10 @@ const App = (): JSX.Element => {
                         label="Koodisto"
                         path="codes"
                     />
+                    <NavItem
+                        label="Toiminnot"
+                        path="functions"
+                    />
                 </Navigation.Row>
             </Navigation>
 

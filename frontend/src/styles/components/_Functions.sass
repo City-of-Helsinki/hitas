@@ -1,0 +1,74 @@
+@use "../imports" as *
+
+.view--functions
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  @include flex-grow(1)
+  [class^="Tabs-module"]
+    [class*="tablistBar"]
+      background-color: white
+      padding: 0
+    [class*="active"]
+      background-color: $codes-background-color
+      span
+        font-weight: 700
+        &:before
+          display: none
+
+  [class^="Tabs-module_tabs"]
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    @include flex-grow(1)
+    > [id^="tab-"]
+      @include flexbox()
+      padding: 0
+      > div
+        @include flex-grow(1)
+
+  label
+    font-weight: 700
+
+  &__price-ceiling-per-square
+    padding: $spacing-m
+    background: $color-black-10
+    .calculate-button
+      margin: -10px 0
+      min-height: auto
+      span
+        @include flexbox()
+        @include flex-flow(row nowrap)
+        @include align-items(center)
+        height: 38px
+        margin: 0
+        padding: 7px 0
+      &:not(:disabled):hover
+        background-color: black
+        color: white
+    .results-list
+      margin-bottom: $spacing-m
+      &__item
+        @include align-items(center)
+    form
+      @include flexbox()
+      @include justify-content(center)
+      @include align-items(center)
+      > div
+        @include flexbox()
+        @include justify-content(space-between)
+        @include align-items(center)
+      .input-field--dropdown
+        width: 200px
+        margin: 0 $spacing-xs 0 0
+      legend
+        margin-bottom: $spacing-2-xs
+      > button
+        margin-top: $spacing-2-xs
+
+  &__thirty-year-regulation
+    flex-grow: 1
+    .regulation, .companies
+      padding: $spacing-m
+      background-color: $color-engel-medium-light
+    .regulation
+      background: $color-black-10
+      margin-bottom: $spacing-m
