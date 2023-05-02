@@ -278,6 +278,9 @@ const HousingCompanyDetailsSchema = object({
 const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     name: true,
     business_id: true,
+    hitas_type: true,
+    exclude_from_statistics: true,
+    regulation_status: true,
     address: true,
     acquisition_price: true,
     primary_loan: true,
