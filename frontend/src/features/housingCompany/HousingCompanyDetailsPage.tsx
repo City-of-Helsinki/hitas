@@ -8,13 +8,13 @@ import {IHousingCompanyDetails} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
-const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => {
+const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const params = useParams() as {readonly housingCompanyId: string};
     return (
         <>
             <Heading>
-                {data.name.display}
-                <EditButton state={{housingCompany: data}} />
+                {housingCompany.name.display}
+                <EditButton state={{housingCompany: housingCompany}} />
             </Heading>
             <div className="company-status">
                 <StatusLabel>Vapautunut 1.6.2022 ({getHousingCompanyStateName(data.state)})</StatusLabel>
@@ -32,34 +32,35 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                 <div className="column">
                                     <DetailField
                                         label="Yhtiön hakunimi"
-                                        value={data.name.display}
+                                        value={housingCompany.name.display}
                                     />
                                     <DetailField
                                         label="Yhtiön virallinen nimi"
-                                        value={data.name.official}
+                                        value={housingCompany.name.official}
                                     />
                                     <DetailField
                                         label="Virallinen osoite"
-                                        value={formatAddress(data.address)}
+                                        value={formatAddress(housingCompany.address)}
                                     />
                                     <DetailField
                                         label="Alue"
-                                        value={`${data.area.name}: ${data.area.cost_area}`}
+                                        value={`${housingCompany.area.name}: ${housingCompany.area.cost_area}`}
                                     />
                                     <DetailField
                                         label="Valmistumispäivä"
-                                        value={formatDate(data.date)}
+                                        value={formatDate(housingCompany.date)}
                                     />
                                     <DetailField
                                         label="Hankinta-arvo"
-                                        value={formatMoney(data.acquisition_price)}
+                                        value={formatMoney(housingCompany.acquisition_price)}
                                     />
                                     <DetailField
                                         label="Toteutunut hankinta-arvo"
                                         value={
                                             <>
-                                                {formatMoney(data.summary.realized_acquisition_price)}
-                                                {data.summary.realized_acquisition_price > data.acquisition_price && (
+                                                {formatMoney(housingCompany.summary.realized_acquisition_price)}
+                                                {housingCompany.summary.realized_acquisition_price >
+                                                    housingCompany.acquisition_price && (
                                                     <span style={{color: "var(--color-error)"}}>
                                                         {" "}
                                                         - ylittää hankinta-arvon!
@@ -70,26 +71,31 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     />
                                     <DetailField
                                         label="Ensisijaislaina"
-                                        value={formatMoney(data.primary_loan)}
+                                        value={formatMoney(housingCompany.primary_loan)}
                                     />
                                     <DetailField
                                         label="Keskineliöhinta"
-                                        value={`${data.summary?.average_price_per_square_meter} €/m²`}
+                                        value={`${housingCompany.summary?.average_price_per_square_meter} €/m²`}
                                     />
                                 </div>
                                 <div className="column">
                                     <DetailField
                                         label="Isännöitsijä"
                                         value={
-                                            data.property_manager &&
-                                            `${data.property_manager.name} (${data.property_manager.email})`
+                                            housingCompany.property_manager &&
+                                            `${housingCompany.property_manager.name}
+                                            ${
+                                                housingCompany.property_manager.email
+                                                    ? `(${housingCompany.property_manager.email})`
+                                                    : ""
+                                            }`
                                         }
                                     />
                                     <div>
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
                                             readOnly
-                                            value={data.notes || ""}
+                                            value={housingCompany.notes || ""}
                                         />
                                     </div>
                                 </div>
@@ -100,11 +106,11 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                 <div className="column">
                                     <DetailField
                                         label="Y-tunnus"
-                                        value={data.business_id}
+                                        value={housingCompany.business_id}
                                     />
                                     <DetailField
                                         label="Osakkeiden lukumäärä"
-                                        value={`${data.summary?.total_shares} kpl`}
+                                        value={`${housingCompany.summary?.total_shares} kpl`}
                                     />
                                     <DetailField
                                         label="Huoneistojen lukumäärä"
@@ -112,19 +118,19 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     />
                                     <DetailField
                                         label="Huoneistojen pinta-ala"
-                                        value={`${data.summary?.total_surface_area} m²`}
+                                        value={`${housingCompany.summary?.total_surface_area} m²`}
                                     />
                                     <DetailField
                                         label="Myyntihintaluettelon vahvistamispäivä"
-                                        value={formatDate(data.sales_price_catalogue_confirmation_date)}
+                                        value={formatDate(housingCompany.sales_price_catalogue_confirmation_date)}
                                     />
                                     <DetailField
                                         label="Vapautumispäivä"
-                                        value={formatDate(data.release_date)}
+                                        value={formatDate(housingCompany.release_date)}
                                     />
                                     <DetailField
                                         label="Rakennuttaja"
-                                        value={data.developer.value}
+                                        value={housingCompany.developer.value}
                                     />
                                 </div>
                                 <div className="column">
@@ -134,11 +140,11 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                                     />
                                     <DetailField
                                         label="Talotyyppi"
-                                        value={data.building_type.value}
+                                        value={housingCompany.building_type.value}
                                     />
                                     <DetailField
                                         label="Yhtiön arkistotunnus"
-                                        value={data.archive_id}
+                                        value={housingCompany.archive_id}
                                     />
                                 </div>
                             </div>
@@ -149,7 +155,7 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                     </Tabs>
                 </div>
                 <ImprovementsTable
-                    data={data}
+                    data={housingCompany}
                     title="Yhtiökohtaiset parannukset"
                     editableType="housingCompany"
                 />
@@ -159,12 +165,12 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                             <span>Kiinteistöt</span>
                             <EditButton
                                 pathname="real-estates"
-                                state={{housingCompany: data}}
+                                state={{housingCompany: housingCompany}}
                             />
                         </Heading>
 
                         <ul className="detail-list__list">
-                            {data.real_estates.map((realEstate) => (
+                            {housingCompany.real_estates.map((realEstate) => (
                                 <li
                                     className="detail-list__list-item"
                                     key={`real-estate-${realEstate.id}`}
@@ -180,11 +186,11 @@ const LoadedHousingCompanyDetails = ({data}: {data: IHousingCompanyDetails}) => 
                             <span>Rakennukset</span>
                             <EditButton
                                 pathname="buildings"
-                                state={{housingCompany: data}}
+                                state={{housingCompany: housingCompany}}
                             />
                         </Heading>
                         <ul className="detail-list__list">
-                            {data.real_estates.flatMap((realEstate) => {
+                            {housingCompany.real_estates.flatMap((realEstate) => {
                                 return realEstate.buildings.map((building) => (
                                     <li
                                         className="detail-list__list-item"
@@ -232,7 +238,7 @@ const HousingCompanyDetailsPage = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedHousingCompanyDetails data={data as IHousingCompanyDetails} />
+                <LoadedHousingCompanyDetails housingCompany={data as IHousingCompanyDetails} />
             </QueryStateHandler>
         </div>
     );
