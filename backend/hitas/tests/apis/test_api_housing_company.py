@@ -24,6 +24,12 @@ from hitas.models import (
     RealEstate,
 )
 from hitas.models.housing_company import HitasType
+from hitas.models.thirty_year_regulation import (
+    FullSalesData,
+    RegulationResult,
+    ThirtyYearRegulationResults,
+    ThirtyYearRegulationResultsRow,
+)
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -375,7 +381,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "sales_price_catalogue_confirmation_date": str(hc1.sales_price_catalogue_confirmation_date),
         "notes": hc1.notes,
         "archive_id": hc1.id,
-        "notification_date": str(hc1.notification_date),
+        "release_date": hc1.legacy_release_date,
         "last_modified": {
             "datetime": hc1.last_modified_datetime.isoformat().replace("+00:00", "Z"),
             "user": {
@@ -423,6 +429,71 @@ def test__api__housing_company__retrieve_rounding(api_client: HitasAPIClient):
     response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["summary"]["average_price_per_square_meter"] == 2.5  # ((1 + 2) + (1 + 1)) / (1 + 1)
+
+
+@pytest.mark.django_db
+def test__api__housing_company__retrieve__release_date__legacy(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(legacy_release_date=date(2022, 1, 1))
+
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[housing_company.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["release_date"] == date(2022, 1, 1).isoformat()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__retrieve__release_date__regulation(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+    results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=date(2022, 1, 1),
+        regulation_month=date(2000, 1, 1),
+        surface_area_price_ceiling=Decimal("5000"),
+        sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+    )
+    ThirtyYearRegulationResultsRow.objects.create(
+        parent=results,
+        housing_company=housing_company,
+        completion_date=date(2001, 1, 1),
+        surface_area=10,
+        postal_code="00001",
+        realized_acquisition_price=Decimal("60000.0"),
+        unadjusted_average_price_per_square_meter=Decimal("6000.0"),
+        adjusted_average_price_per_square_meter=Decimal("12000.0"),
+        completion_month_index=Decimal("100"),
+        calculation_month_index=Decimal("200"),
+        regulation_result=RegulationResult.RELEASED_FROM_REGULATION,
+    )
+
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[housing_company.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["release_date"] == date(2022, 1, 1).isoformat()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__retrieve__release_date__regulation__dont_count_if_stays(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+    results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=date(2022, 1, 1),
+        regulation_month=date(2000, 1, 1),
+        surface_area_price_ceiling=Decimal("5000"),
+        sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+    )
+    ThirtyYearRegulationResultsRow.objects.create(
+        parent=results,
+        housing_company=housing_company,
+        completion_date=date(2001, 1, 1),
+        surface_area=10,
+        postal_code="00001",
+        realized_acquisition_price=Decimal("60000.0"),
+        unadjusted_average_price_per_square_meter=Decimal("6000.0"),
+        adjusted_average_price_per_square_meter=Decimal("12000.0"),
+        completion_month_index=Decimal("100"),
+        calculation_month_index=Decimal("200"),
+        regulation_result=RegulationResult.STAYS_REGULATED,
+    )
+
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[housing_company.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["release_date"] is None
 
 
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])

@@ -165,8 +165,8 @@ class HousingCompany(ExternalHitasModel):
     primary_loan = HitasModelDecimalField(null=True, blank=True)
     # 'Myyntihintaluettelon vahvistamispäivä'
     sales_price_catalogue_confirmation_date = models.DateField(null=True, blank=True)
-    # 'ilmoituspäivä'
-    notification_date = models.DateField(null=True, blank=True)
+    # 'Sääntelystä vapautumispäivä (LEGACY)'
+    legacy_release_date = models.DateField(null=True, blank=True)
 
     notes = models.TextField(blank=True)
     last_modified_datetime = models.DateTimeField(auto_now=True)
@@ -221,6 +221,23 @@ class HousingCompany(ExternalHitasModel):
             return False
 
         return bool(newest_apartment.completion_date)
+
+    @property
+    def release_date(self) -> Optional[datetime.date]:
+        # Legacy release date overrides dynamic release date from regulation model
+        _release_date: Optional[datetime.date] = self.legacy_release_date
+        if _release_date:
+            self._release_date = _release_date
+            return self._release_date
+
+        # Allow caches for the instance
+        if hasattr(self, "_release_date"):
+            return self._release_date
+
+        from hitas.services.housing_company import get_regulation_release_date
+
+        self._release_date = get_regulation_release_date(self.id)
+        return self._release_date
 
     def save(self, *args, **kwargs):
         current_user = get_current_user()

@@ -1,10 +1,10 @@
 import datetime
 import logging
 from decimal import Decimal
-from typing import Literal, TypeAlias
+from typing import Literal, Optional, TypeAlias, overload
 
 from django.db import models
-from django.db.models import ExpressionWrapper, F, Q, QuerySet, Sum
+from django.db.models import ExpressionWrapper, F, OuterRef, Q, QuerySet, Subquery, Sum
 from django.db.models.functions import Coalesce, NullIf, Round, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -14,6 +14,7 @@ from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
 from hitas.models.housing_company import HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
+from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRow
 from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, get_first_sale_acquisition_price
 from hitas.utils import max_if_all_not_null, roundup
 
@@ -223,3 +224,32 @@ def _validate_prices_and_surface_areas(housing_companies: list[HousingCompanyWit
             errors.append(msg)
 
         raise MissingValues(missing=errors, message="Missing apartment details")
+
+
+@overload
+def get_regulation_release_date(apartment_id: str) -> Subquery:
+    ...
+
+
+@overload
+def get_regulation_release_date(apartment_id: int) -> Optional[datetime.date]:
+    ...
+
+
+def get_regulation_release_date(housing_company_id: str | int):
+    subquery = isinstance(housing_company_id, str)
+    queryset: QuerySet[Optional[datetime.date]] = (
+        ThirtyYearRegulationResultsRow.objects.filter(
+            housing_company=OuterRef(housing_company_id) if subquery else housing_company_id,
+            regulation_result__in=(
+                RegulationResult.AUTOMATICALLY_RELEASED,
+                RegulationResult.RELEASED_FROM_REGULATION,
+            ),
+        )
+        .select_related("parent")
+        .order_by("-parent__calculation_month")
+        .values_list("parent__calculation_month", flat=True)
+    )
+    if subquery:
+        return Subquery(queryset=queryset[:1], output_field=models.DateField(null=True))
+    return queryset.first()

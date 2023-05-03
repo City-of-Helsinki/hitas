@@ -4160,8 +4160,8 @@ components:
           type: string
           format: date
           nullable: true
-        notification_date:
-          description: Notification date
+        release_date:
+          description: Regulation release date
           type: string
           format: date
           nullable: true

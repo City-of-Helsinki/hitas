@@ -59,7 +59,7 @@ companies = Table(
     Column("C_SAANNOSTELY", HitasBoolean, nullable=False),
     Column("C_HITVAPKOODI", String(16), key="state_codebook", nullable=False),  # Always 'HITVAPAUTUS'
     Column("C_HITVAPTYYP", String(12), key="state_code", nullable=False),
-    Column("D_HITVAPILMPVM", HitasAnonymizedMonthAndDay, key="notification_date"),
+    Column("D_HITVAPILMPVM", HitasAnonymizedMonthAndDay, key="legacy_release_date"),
     Column("N_MHINDKESKIHINTA", Integer, nullable=False),
     Column("N_RAKINDKESKIHINTA", Integer, nullable=False),
     Column("C_DIAARINRO", String(10)),

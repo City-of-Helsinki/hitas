@@ -10,6 +10,7 @@ from django.utils import timezone
 from hitas.calculations.exceptions import InvalidCalculationResultException
 from hitas.calculations.max_prices.rules_2011_onwards import Rules2011Onwards
 from hitas.calculations.max_prices.rules_pre_2011 import RulesPre2011
+from hitas.exceptions import ModelConflict
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -48,6 +49,12 @@ def create_max_price_calculation(
     # Fetch apartment
     #
     apartment = fetch_apartment(housing_company_uuid, apartment_uuid, calculation_date)
+
+    if apartment.housing_company.release_date is not None:
+        raise ModelConflict(
+            "Cannot create max price calculations for apartments in non-regulated housing companies.",
+            error_code="invalid",
+        )
 
     raise_missing_value_errors(apartment)
 

@@ -343,7 +343,7 @@ def create_housing_companies(
         new.acquisition_price = hc["acquisition_price"]
         new.primary_loan = hc["primary_loan"]
         new.sales_price_catalogue_confirmation_date = date_to_datetime(hc["sales_price_catalogue_confirmation_date"])
-        new.notification_date = date_to_datetime(hc["notification_date"])
+        new.legacy_release_date = date_to_datetime(hc["legacy_release_date"])
         new.notes = combine_notes(hc)
         new.last_modified_datetime = date_to_datetime(hc["last_modified"])
         new.building_type = converted_data.building_types_by_code_number[hc["building_type_code"]]
