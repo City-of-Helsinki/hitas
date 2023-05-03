@@ -4,6 +4,7 @@ import environ
 from dateutil.relativedelta import relativedelta
 from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
+from helusers import defaults
 from rest_framework.authentication import TokenAuthentication
 
 # ----- ENV Setup --------------------------------------------------------------------------------------
@@ -43,6 +44,7 @@ env = environ.Env(
     SOCIAL_AUTH_TUNNISTAMO_KEY=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_SECRET=(str, ""),
+    SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, ["localhost:3000"]),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -64,6 +66,7 @@ ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+CORS_ALLOW_CREDENTIALS = True
 
 # How long to show fulfilled (=deleted) conditions of sale from the endpoints
 SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS: relativedelta = env("SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS")
@@ -194,15 +197,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "config.settings.BearerAuthentication",  # DEV-tokens
-        "helusers.oidc.ApiTokenAuthentication",  # Helsinki profile-tokens
+        "rest_framework.authentication.SessionAuthentication",  # Helsinki profile sessions
     ],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": ["hitas.types.HitasJSONRenderer"],
 }
 
 if DEBUG:
-    # Enable session authentication for browsable API renderer
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"].append("rest_framework.authentication.SessionAuthentication")
+    # Enable browsable API renderer
     REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"].append("rest_framework.renderers.BrowsableAPIRenderer")
 
 # ----- Authentication settings ------------------------------------------------------------------------
@@ -220,6 +222,8 @@ SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("SOCIAL_AUTH_TUNNISTAMO_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_SCOPE = ["ad_groups"]
 SOCIAL_AUTH_TUNNISTAMO_AUTH_EXTRA_ARGUMENTS = {"ui_locales": "fi"}
+SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
+SOCIAL_AUTH_TUNNISTAMO_PIPELINE = defaults.SOCIAL_AUTH_PIPELINE
 
 HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
