@@ -27,6 +27,12 @@ ul, ol
       .results &
         --spinner-size: 12rem
         --spinner-thickness: 1.4rem
+  &-wrap-color
+    @extend .spinner-wrap
+    [class*="LoadingSpinner-module_loadingSpinner"]
+      opacity: 0.8
+      --spinner-color: var(--color-black-20)
+
 [class^="view--"]
   @include flexbox()
   @include flex-flow(column nowrap)

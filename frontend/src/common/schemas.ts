@@ -179,6 +179,12 @@ const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     })
 );
 
+const UserInfoSchema = object({
+    first_name: string(),
+    last_name: string(),
+    email: string(),
+});
+
 // ********************************
 // * Housing company schemas
 // ********************************
@@ -962,6 +968,7 @@ const IndexQuerySchema = object({
 export {
     AddressSchema,
     PostalCodeSchema,
+    UserInfoSchema,
     HousingCompanySchema,
     BuildingWritableSchema,
     HousingCompanyWritableSchema,
@@ -1043,6 +1050,7 @@ export type IOwnership = z.infer<typeof ownershipSchema>;
 
 // Query/list responses & paging
 export type PageInfo = z.infer<typeof PageInfoSchema>;
+export type IUserInfoResponse = z.infer<typeof UserInfoSchema>;
 export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
 export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;

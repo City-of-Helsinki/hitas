@@ -1,8 +1,6 @@
-import {Provider} from "react-redux";
 import {Navigate, Route, Routes} from "react-router-dom";
-
 import App from "./app/App";
-import {store} from "./app/store";
+import LogoutCallback from "./common/components/LogoutCallback";
 import {
     ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
@@ -30,11 +28,7 @@ export default function Router() {
         <Routes>
             <Route
                 path="/"
-                element={
-                    <Provider store={store}>
-                        <App />
-                    </Provider>
-                }
+                element={<App />}
             >
                 <Route path="housing-companies">
                     <Route
@@ -130,19 +124,29 @@ export default function Router() {
                     path="functions"
                     element={<Functions />}
                 />
-                <Route
-                    index
-                    element={<Navigate to="/housing-companies" />}
-                />
-                <Route
-                    path="*"
-                    element={
+            </Route>
+            <Route
+                path="/logout"
+                element={
+                    <App isContentProtected={false}>
+                        <LogoutCallback />
+                    </App>
+                }
+            />
+            <Route
+                index
+                element={<Navigate to="/housing-companies" />}
+            />
+            <Route
+                path="*"
+                element={
+                    <App isContentProtected={false}>
                         <main style={{padding: "1rem"}}>
                             <h1>Päädyit tyhjälle sivulle. Ole hyvä ja tarkista osoite!</h1>
                         </main>
-                    }
-                />
-            </Route>
+                    </App>
+                }
+            />
         </Routes>
     );
 }
