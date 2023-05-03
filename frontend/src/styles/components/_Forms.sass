@@ -30,3 +30,14 @@ div .disabled
   cursor: not-allowed
   *
     cursor: not-allowed !important
+
+[class*="FileInput-module"]
+  button:not(:disabled)
+    color: black
+    border-color: black
+
+#file-input-list
+  margin: $spacing-2-xs 0 $spacing-s 0
+  li
+    background-color: $color-engel-light
+    width: auto !important

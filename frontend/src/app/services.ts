@@ -14,6 +14,7 @@ import {
     ICodeResponse,
     IConditionOfSale,
     ICreateConditionOfSale,
+    IExternalSalesDataResponse,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
@@ -200,6 +201,12 @@ const detailApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices/${priceId}`,
             }),
         }),
+        getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({
+            query: (params: {calculation_date: string}) => ({
+                url: "external-sales-data",
+                params: params,
+            }),
+        }),
     }),
 });
 
@@ -367,6 +374,15 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
         }),
+        saveExternalSalesData: builder.mutation({
+            query: (arg) => ({
+                url: "external-sales-data",
+                method: "POST",
+                body: arg.data,
+                params: {calculation_date: arg.calculation_date},
+                headers: {"Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+            }),
+        }),
     }),
 });
 
@@ -384,8 +400,12 @@ export const {
     useGetFinancingMethodsQuery,
 } = listApi;
 
-export const {useGetHousingCompanyDetailQuery, useGetApartmentDetailQuery, useGetApartmentMaximumPriceQuery} =
-    detailApi;
+export const {
+    useGetHousingCompanyDetailQuery,
+    useGetApartmentDetailQuery,
+    useGetApartmentMaximumPriceQuery,
+    useGetExternalSalesDataQuery,
+} = detailApi;
 
 export const {
     useSaveHousingCompanyMutation,
@@ -400,4 +420,5 @@ export const {
     useSaveIndexMutation,
     useCreateSaleMutation,
     useCreateConditionOfSaleMutation,
+    useSaveExternalSalesDataMutation,
 } = mutationApi;

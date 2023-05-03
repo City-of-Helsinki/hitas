@@ -408,3 +408,18 @@ footer
       width: 74px
       opacity: 1
       transition: width 200ms, opacity 200ms 100ms
+    display: none
+  &:hover > .sell-by-date
+    display: inline-block
+
+#save-modal
+  [class^="DialogContent"] span
+    font-weight: 700
+
+.error-modal
+  background: $color-error-light !important
+  border-color: $color-error !important
+  [class^="Button-module_button"]
+    background: white
+    &:hover
+      background: $color-black-10

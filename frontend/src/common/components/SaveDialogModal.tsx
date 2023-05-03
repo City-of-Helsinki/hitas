@@ -1,13 +1,19 @@
 import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
-import {Button, Dialog} from "hds-react";
+import {Accordion, Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {IApartmentDetails, IBuilding, IHousingCompanyDetails, IRealEstate} from "../schemas";
+import {
+    IApartmentDetails,
+    IBuilding,
+    IExternalSalesDataResponse,
+    IHousingCompanyDetails,
+    IRealEstate,
+} from "../schemas";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface SaveStateProps {
-    data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | undefined;
+    data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | IExternalSalesDataResponse | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     baseURL?: string;
     linkURL?: string;
@@ -15,6 +21,7 @@ interface SaveStateProps {
     isLoading: boolean;
     isVisible: boolean;
     setIsVisible;
+    title?: string;
 }
 
 const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
@@ -46,23 +53,41 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
 };
 
 const ActionFailed = ({error, setIsVisible}) => {
+    const errorStatus = error?.data?.status + ":" ?? "";
+    const errorFields = error?.data?.fields ?? [];
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
     return (
-        <>
-            <Dialog.Content>
-                <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
-                <p>{nonFieldError}</p>
-            </Dialog.Content>
-            <Dialog.ActionButtons>
-                <Button
-                    onClick={() => setIsVisible(false)}
-                    variant="secondary"
-                    theme="black"
+        <Dialog.Content>
+            <h3>
+                {errorStatus} {nonFieldError}
+            </h3>
+            {errorFields.length > 1 ? (
+                <Accordion
+                    size="s"
+                    heading="Virheelliset kentät"
+                    closeButton={false}
+                    initiallyOpen={true}
                 >
-                    Sulje
-                </Button>
-            </Dialog.ActionButtons>
-        </>
+                    <ul>
+                        {errorFields.map((field, idx) => {
+                            return (
+                                <li key={idx}>
+                                    <span>{field.field}</span>: {field.message}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </Accordion>
+            ) : (
+                errorFields.length > 0 && (
+                    <ul>
+                        <li>
+                            <span>{errorFields[0].field}</span>: {errorFields[0].message}
+                        </li>
+                    </ul>
+                )
+            )}
+        </Dialog.Content>
     );
 };
 
@@ -75,19 +100,21 @@ export default function SaveDialogModal({
     isLoading,
     isVisible,
     setIsVisible,
+    title,
 }: SaveStateProps): JSX.Element {
     return (
         <Dialog
-            id="modification__end-modal"
+            id="save-modal"
             closeButtonLabelText="args.closeButtonLabelText"
             aria-labelledby="finish-modal"
             isOpen={isVisible}
             close={() => setIsVisible(false)}
+            className={error && "error-modal"}
             boxShadow
         >
             <Dialog.Header
-                id="modification__end-modal__header"
-                title="Tallennetaan tietokantaan"
+                id="save-modal__header"
+                title={error ? "Virhe tallentaessa" : title ?? "Tallennetaan tietokantaan"}
             />
             <QueryStateHandler
                 data={data}
@@ -107,6 +134,15 @@ export default function SaveDialogModal({
                     data={data}
                 />
             </QueryStateHandler>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Sulje
+                </Button>
+            </Dialog.ActionButtons>
         </Dialog>
     );
 }

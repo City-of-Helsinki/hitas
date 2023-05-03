@@ -68,7 +68,100 @@
     flex-grow: 1
     .regulation, .companies
       padding: $spacing-m
-      background-color: $color-engel-medium-light
+
     .regulation
       background: $color-black-10
-      margin-bottom: $spacing-m
+      .actions
+        display: grid
+        grid-template-columns: 1fr 1fr
+        grid-template-rows: auto auto
+        gap: $spacing-l
+        label
+          @include flexbox()
+          @include justify-content(space-between)
+          width: 100%
+        .input-field
+          margin: 0
+          height: auto
+        .time-period
+          @include flexbox()
+          @include flex-flow(row wrap)
+          @include justify-content(space-between)
+          @include align-content(flex-start)
+          column-gap: $spacing-m
+          row-gap: $spacing-xs
+          grid-column: 1
+          grid-row: 1
+          > *
+            flex-grow: 1
+        .price-ceiling
+          @include flexbox()
+          @include flex-flow(column nowrap)
+          grid-row: 1
+          grid-column: 2
+          .value
+            @include flexbox()
+            @include align-items(center)
+            height: 56px
+            margin-top: $spacing-xs
+            font-size: $fontsize-heading-l
+      .file
+        position: relative
+        grid-row: 2
+        grid-column: 1 / span 2
+        display: flex
+        flex-flow: column nowrap
+        .input-field--file
+          position: relative
+          display: grid
+          grid-template-columns: 1fr 1fr
+          grid-template-rows: auto auto
+          gap: $spacing-l
+        button[type="submit"]
+          //display: none
+        &--selected
+          [class*="FileInput-module_fileInputContainer"]
+            //display: none
+          button[type="submit"]
+            display: flex
+            margin: auto
+        label
+          width: 100%
+          margin-bottom: $spacing-s
+        #file-input-list
+          grid-column: 2
+          grid-row: 1
+        [class^="TextInput-module_root"]
+          @include flexbox()
+          @include flex-flow(column nowrap)
+          grid-column: 1
+          grid-row: 1 / span 2
+
+        [class^="FileInput-module_fileInputWrapper"]
+          width: 100%
+        button[type="submit"]
+          margin-left: auto
+          margin-right: 0
+        #file-input-info
+          position: absolute
+          top: 3.25rem
+          right: 0
+        #file-input-success
+          display: none
+        .buttons
+          @include flexbox()
+          @include justify-content(flex-end)
+          gap: $spacing-m
+          grid-column: 2
+          grid-row: 2
+      .external-sales-data-exists
+        grid-row: 2
+        color: $color-black-50
+        font-size: $fontsize-body-m
+    .spinner-wrap
+      flex-grow: 1
+      [class*="LoadingSpinner-module_loadingSpinner"]
+        --spinner-size: 7rem
+        --spinner-thickness: 1rem
+        --spinner-color: $color-engel
+        color: $color-engel

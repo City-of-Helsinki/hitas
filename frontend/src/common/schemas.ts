@@ -16,6 +16,25 @@ export const housingCompanyStates = [
     "ready_no_statistics",
 ] as const;
 
+export const hitasQuarters = [
+    {
+        value: "02-01",
+        label: "1.2. - 30.4.",
+    },
+    {
+        value: "05-01",
+        label: "1.5. - 31.7.",
+    },
+    {
+        value: "08-01",
+        label: "1.8. - 31.10.",
+    },
+    {
+        value: "11-01",
+        label: "1.11. - 31.1.",
+    },
+] as const;
+
 export const indexNames = ["market_price_index", "construction_price_index", "surface_area_price_ceiling"] as const;
 
 const CostAreas = ["1", "2", "3", "4"] as const;
@@ -851,6 +870,23 @@ const ApartmentMaximumPriceWritableSchema = object({
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
 
+const QuarterSchema = string().regex(/\d{4}Q\d/);
+const ExternalSalesQuarterSchema = object({
+    quarter: QuarterSchema,
+    areas: object({
+        postal_code: string().regex(/\d{3}/),
+        sale_count: number(),
+        price: number(),
+    }).array(),
+});
+const ExternalSalesDataResponseSchema = object({
+    calculation_quarter: QuarterSchema,
+    quarter_1: ExternalSalesQuarterSchema,
+    quarter_2: ExternalSalesQuarterSchema,
+    quarter_3: ExternalSalesQuarterSchema,
+    quarter_4: ExternalSalesQuarterSchema,
+});
+
 // ********************************
 // * Request / Response schemas
 // ********************************
@@ -1016,6 +1052,7 @@ export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartme
 export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 
+export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
 export type ICreateConditionOfSale = z.infer<typeof CreateConditionOfSaleSchema>;

@@ -1,5 +1,6 @@
 import Checkbox from "./Checkbox";
 import DateInput from "./DateInput";
+import FileInput from "./FileInput";
 import NumberInput from "./NumberInput";
 import RelatedModelInput from "./RelatedModelInput";
 import Select from "./SelectInput";
@@ -17,6 +18,7 @@ export type FormInputProps = {
     errorText?: string;
     key?: string;
     tooltipText?: string;
+    className?: string;
     placeholder?;
     value?;
     disabled?;
@@ -25,4 +27,4 @@ export type FormInputProps = {
     onBlur?;
 };
 
-export {TextInput, TextAreaInput, NumberInput, DateInput, Select, Checkbox, ToggleInput, RelatedModelInput};
+export {TextInput, TextAreaInput, NumberInput, DateInput, Select, Checkbox, ToggleInput, RelatedModelInput, FileInput};
