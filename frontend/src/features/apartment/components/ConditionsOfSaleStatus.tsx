@@ -22,6 +22,9 @@ const ConditionsOfSaleStatus = ({apartment, conditionOfSale}: IConditionsOfSaleS
         sellByDate = apartment.sell_by_date;
         // IApartment
         if ("has_grace_period" in apartment) {
+            if (!apartment.has_conditions_of_sale) {
+                return null;
+            }
             hasGracePeriod = apartment.has_grace_period;
             fulfilled = false; // Never fulfilled in apartment list api, any fulfilled COS are not shown.
         }
