@@ -431,31 +431,3 @@ footer
     background: white
     &:hover
       background: $color-black-10
-    overflow: hidden
-    width: 0px
-    opacity: 0
-    text-align: center
-    transition: width 200ms 100ms, opacity 200ms
-  &:hover
-    [class*="hds-status-label-icon"]
-      width: 0px
-      opacity: 0
-      transition: width 100ms, opacity 100ms
-    .sell-by-date
-      width: 74px
-      opacity: 1
-      transition: width 200ms, opacity 200ms 100ms
-  &:hover > .sell-by-date
-    display: inline-block
-
-#save-modal
-  [class^="DialogContent"] span
-    font-weight: 700
-
-.error-modal
-  background: $color-error-light !important
-  border-color: $color-error !important
-  [class^="Button-module_button"]
-    background: white
-    &:hover
-      background: $color-black-10
