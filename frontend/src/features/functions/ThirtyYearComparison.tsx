@@ -1,22 +1,107 @@
-import {Tooltip} from "hds-react";
+import {Button, Tooltip} from "hds-react";
 import {useForm} from "react-hook-form";
 import {hitasQuarters} from "../../common/schemas";
 
-import {useState} from "react";
-
-import {useGetExternalSalesDataQuery, useSaveExternalSalesDataMutation} from "../../app/services";
-import {Divider, Heading, SaveButton, SaveDialogModal} from "../../common/components";
-
+import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {
+    useCreateThirtyYearComparisonMutation,
+    useGetExternalSalesDataQuery,
+    useGetThirtyYearRegulationQuery,
+    useSaveExternalSalesDataMutation,
+} from "../../app/services";
+import {Divider, Heading, QueryStateHandler, SaveButton, SaveDialogModal} from "../../common/components";
+import ErrorNotificationModal from "../../common/components/ErrorNotificationModal";
 import {FileInput, Select} from "../../common/components/form";
-import {hdsToast} from "../../common/utils";
-import {priceCeilings} from "./simulatedResponses";
+import {formatDate, hdsToast} from "../../common/utils";
+import {comparisonResponses, priceCeilings} from "./simulatedResponses";
 
+const LoadedThirtyYearComparison = ({data}) => {
+    if (data?.error !== undefined) return <h3>Error: {data.error}</h3>; // For testing purposes - error's shouldn't get here
+    const automaticallyReleased = data?.automatically_released ?? [];
+    const releasedFromRegulation = data?.released_from_regulation ?? [];
+    const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];
+    const stayingCompanies = data?.stays_regulated ?? [];
+
+    const ListItem = ({company}) => (
+        <Link to={`/housing-companies/${company.id}`}>
+            <li className="results-list__item">
+                <div className="name">{company.display_name}</div>
+                <div className="address">
+                    {company.address.street_address}
+                    <br />
+                    {company.address.postal_code}, {company.address.city}
+                </div>
+                <div className="date">{formatDate(company.completion_date)}</div>
+            </li>
+        </Link>
+    );
+
+    const ListItems = ({list}) => {
+        if (list.length < 1) return <p>Ei yhtiöitä!</p>;
+        return list.map((item, idx) => (
+            <ListItem
+                company={item}
+                key={idx}
+            />
+        ));
+    };
+
+    const ResultsList = ({category}) => (
+        <div className={`companies companies--${category}`}>
+            <Heading type="body">
+                {category === "freed" ? "Vapautuneet " : "Valvonnan piiriin jäävät "}
+                yhtiöt
+            </Heading>
+            <div className="list">
+                <div className="list-headers">
+                    <div className="list-header name">Nimi</div>
+                    <div className="list-header address">Osoite</div>
+                    <div className="list-header date">Valmistunut</div>
+                </div>
+                {releasedCompanies.length > 0 ? (
+                    <ul className="results-list">
+                        {category === "freed" ? (
+                            <ListItems list={releasedCompanies} />
+                        ) : (
+                            <ListItems list={stayingCompanies} />
+                        )}
+                    </ul>
+                ) : (
+                    <p>Ei vapautuvia yhtiöitä</p>
+                )}
+            </div>
+        </div>
+    );
+
+    return (
+        <>
+            <ResultsList category="freed" />
+            <ResultsList category="remaining" />
+        </>
+    );
+};
 const ThirtyYearComparison = () => {
+    const [isTestMode, setIsTestMode] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [hasComparison, setHasComparison] = useState(false);
     const years = [
         {label: "2023", value: "2023"},
         {label: "2022", value: "2022"},
         {label: "2021", value: "2021"},
+        {label: "Testaus", value: "TEST"}, // TODO: remove this after testing/before release
+    ];
+    const testOptions = [
+        {label: "Onnistunut vertailu", value: "noProblems"},
+        {label: "Yhtiöta ei pystytty vertailemaan", value: "skippedCompany"},
+        {label: "Ei yhtiöitä", value: "noCompanies"},
+        {label: "Indeksi puuttuu", value: "missingIndex"},
+        {label: "Excel-tiedosto puuttuu", value: "missingExcel"},
+        {label: "Rajahinta puuttuu", value: "missingPriceCeiling"},
+        {label: "Yhtiöltä puuttuu pinta-alaa", value: "missingSurfaceArea"},
+        {label: "Jonkin yhtiön pinta-ala on 0", value: "zeroSurfaceArea"},
+        {label: "Saman vertailun toisto", value: "alreadyCompared"},
     ];
 
     // React hook form
@@ -69,18 +154,60 @@ const ThirtyYearComparison = () => {
         saveExternalSalesData,
         {data: savedExternalSalesData, isLoading: isExternalSalesDataSaving, error: saveExternalSalesDataError},
     ] = useSaveExternalSalesDataMutation();
+    const {
+        data: getComparisonData,
+        isLoading: isGetComparisonLoading,
+        error: getComparisonError,
+    } = useGetThirtyYearRegulationQuery({
+        calculation_date: formDate,
+    });
+    const [makeComparison, {data: makeComparisonData, isLoading: isMakeComparisonLoading, error: makeComparisonError}] =
+        useCreateThirtyYearComparisonMutation();
 
     const hasTimePeriodFile = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
+    const isValidTestMode = isTestMode && isNaN(Number(formTimePeriod.value.charAt(0)));
 
     // Simulated comparison API responses
     const priceCeiling = priceCeilings[formYear.value][formTimePeriod.value];
+    const comparisonData = isValidTestMode ? comparisonResponses.success : getComparisonData ?? makeComparisonData;
+    const isComparisonLoading = isValidTestMode ? false : isGetComparisonLoading ?? isMakeComparisonLoading;
+    const comparisonError = isValidTestMode
+        ? comparisonResponses.failure[formTimePeriod.value]
+        : getComparisonError ?? makeComparisonError;
 
     // ******************
     // * Event handlers *
     // ******************
 
+    const onCompareButtonClick = (result) => {
+        if (isTestMode) {
+            if (formTimePeriod.value === "noProblems") {
+                setHasComparison(true);
+                hdsToast.success("Vertailu suoritettu onnistuneesti.");
+            } else {
+                setHasComparison(false);
+                hdsToast.error("Vertailua ei voitu suorittaa!");
+                setIsErrorModalOpen(true);
+            }
+            return;
+        }
+        makeComparison({data: {calculation_date: formDate}})
+            .then(() => {
+                setHasComparison(true);
+                hdsToast.success("Vertailu suoritettu onnistuneesti.");
+            })
+            .catch((error) => {
+                console.warn("Error:", error);
+                setIsErrorModalOpen(true);
+            });
+    };
+
     // Submit = upload file
     const onSubmit = (data) => {
+        if (isTestMode) {
+            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
+            return;
+        }
         const fileWithDate = {
             data: data.file,
             calculation_date: formDate,
@@ -101,6 +228,20 @@ const ThirtyYearComparison = () => {
                 }
             });
     };
+
+    // *************
+    // * Test mode *
+    // *************
+    useEffect(() => {
+        if (formYear.value === "TEST") {
+            console.log("Test mode ON!");
+            setIsTestMode((prev) => true);
+            formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
+        } else if (isTestMode) {
+            console.log("Test mode OFF!");
+            setIsTestMode((prev) => false);
+        }
+    }, [formYear]);
 
     return (
         <div className="view--functions__thirty-year-regulation">
@@ -128,17 +269,18 @@ const ThirtyYearComparison = () => {
                         />
                         <Select
                             label=""
-                            options={hitasQuarterOptions}
+                            options={isTestMode ? testOptions : hitasQuarterOptions}
                             name="quarter"
                             formObject={formObject}
-                            defaultValue={hitasQuarterOptions[0]}
+                            defaultValue={isTestMode ? testOptions[0] : hitasQuarterOptions[0]}
                             value={formTimePeriod}
                         />
                     </div>
                     <div className="price-ceiling">
                         <label>
                             Rajaneliöhinta
-                            {` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
+                            {!isTestMode &&
+                                ` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
                         </label>
                         <div className="value">{priceCeiling ?? "---"} €/m²</div>
                     </div>
@@ -172,6 +314,26 @@ const ThirtyYearComparison = () => {
                     <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
                 )}
             </div>
+            {!hasComparison && (
+                <div className="row row--buttons">
+                    <Button
+                        theme="black"
+                        onClick={onCompareButtonClick}
+                        type="submit"
+                        disabled={(!priceCeiling || !hasTimePeriodFile) && !isTestMode}
+                    >
+                        Aloita vertailu
+                    </Button>
+                </div>
+            )}
+            <QueryStateHandler
+                data={comparisonData}
+                error={comparisonError}
+                isLoading={isComparisonLoading}
+                attemptedAction="hae vertailun tulokset, tai suorita vertailu"
+            >
+                <LoadedThirtyYearComparison data={comparisonData} />
+            </QueryStateHandler>
             <SaveDialogModal
                 title="Tallennetaan excel-tiedostoa"
                 data={savedExternalSalesData}
@@ -179,6 +341,11 @@ const ThirtyYearComparison = () => {
                 isLoading={isExternalSalesDataSaving}
                 isVisible={isSaveModalOpen}
                 setIsVisible={setIsSaveModalOpen}
+            />
+            <ErrorNotificationModal
+                isOpen={isErrorModalOpen}
+                setIsOpen={setIsErrorModalOpen}
+                error={comparisonError}
             />
         </div>
     );

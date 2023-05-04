@@ -894,6 +894,21 @@ const ApartmentMaximumPriceWritableSchema = object({
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
 
+const ThirtyYearRegulationCompanySchema = object({
+    id: string(),
+    display_name: string(),
+    price: number(),
+    old_ruleset: boolean(),
+});
+
+const ThirtyYearRegulationResponseSchema = object({
+    automatically_released: ThirtyYearRegulationCompanySchema.array(),
+    released_from_regulation: ThirtyYearRegulationCompanySchema.array(),
+    stays_regulated: ThirtyYearRegulationCompanySchema.array(),
+    skipped: ThirtyYearRegulationCompanySchema.array().optional(),
+    obfuscated_owners: OwnerSchema.array().optional(),
+});
+
 const QuarterSchema = string().regex(/\d{4}Q\d/);
 const ExternalSalesQuarterSchema = object({
     quarter: QuarterSchema,
@@ -1079,6 +1094,8 @@ export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
+export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
+
 export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
 export type ICreateConditionOfSale = z.infer<typeof CreateConditionOfSaleSchema>;
