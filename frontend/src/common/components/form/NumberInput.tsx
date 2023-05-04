@@ -1,5 +1,6 @@
 import {NumberInput as HDSNumberInput} from "hds-react";
 
+import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
 interface FormNumberInputProps extends FormInputProps {
@@ -23,7 +24,10 @@ const NumberInput = ({
         watch,
         formState: {errors},
     } = formObject;
-    const formNumber = register(name, {valueAsNumber: true});
+    const formNumber = register(name, {
+        setValueAs: (value) => (!value && value !== 0 ? null : Number(value)),
+    });
+    const fieldError = dotted(errors, formNumber.name);
     watch(name);
 
     const handleWheel = (e) => {
@@ -48,8 +52,8 @@ const NumberInput = ({
                 onChange={formNumber.onChange}
                 onBlur={formNumber.onBlur}
                 onWheel={handleWheel}
-                errorText={!!errors[formNumber.name] && errors[formNumber.name].message}
-                invalid={invalid ?? !!errors[formNumber.name]}
+                errorText={!!fieldError && fieldError.message}
+                invalid={invalid ?? !!fieldError}
                 required={required}
                 {...rest}
             />

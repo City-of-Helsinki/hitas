@@ -34,7 +34,7 @@ export const errorMessages = {
     numberType: "Arvon pitää olla numero",
     numberMin: "Liian pieni arvo",
     numberMax: "Liian suuri arvo",
-    numberPositive: "Arvo ei voi olla alle 0",
+    numberPositive: "Arvon täytyy olla positiivinen luku",
     dateFormat: "Virheellinen päivämäärä",
     dateMin: "Liian aikainen päivämäärä",
     dateMax: "Liian myöhäinen päivämäärä",
@@ -53,6 +53,10 @@ export const errorMessages = {
     catalogOverMaxPrice: "Kauppahinta ylittää myyntihintaluettelon hinnan",
     catalogUnderMaxPrice: "Kauppahinta alittaa myyntihintaluettelon hinnan",
     catalogPricesMissing: "Myyntihintaluettelon hinnat puuttuvat",
+    sharesEmpty: "Toinen osakekenttä on tyhjä",
+    sharesStartGreaterThanEnd: "Osakkeiden lopun on oltava suurempi kuin alun",
+    constructionInterestEmpty: "Toinen korkokenttä on tyhjä",
+    constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -92,6 +96,24 @@ z.setErrorMap(customErrorMap);
 const APIIdString = string().min(32, errorMessages.APIIdMin).max(32, errorMessages.APIIdMax);
 
 const addAPIId = (zodObject) => zodObject.merge(APIIdString);
+
+const nullishNumber = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+    .nonnegative(errorMessages.numberPositive)
+    .nullish();
+
+const nullishPositiveNumber = number({
+    invalid_type_error: errorMessages.numberType,
+    required_error: errorMessages.required,
+})
+    .positive(errorMessages.numberPositive)
+    .nullish();
+
+const writableRequiredNumber = number({
+    invalid_type_error: errorMessages.required,
+    required_error: errorMessages.required,
+})
+    .nonnegative(errorMessages.numberPositive)
+    .optional(); // allow undefined but no null
 
 const CodeSchema = object({
     id: APIIdString,
@@ -179,7 +201,7 @@ const RealEstateSchema = object({
 });
 
 const HousingCompanyDetailsSchema = object({
-    id: APIIdString.optional(),
+    id: APIIdString,
     name: object({official: string(), display: string()}),
     business_id: string().nullable(),
     state: HousingCompanyStateSchema,
@@ -218,7 +240,6 @@ const HousingCompanyDetailsSchema = object({
 });
 
 const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
-    id: true,
     name: true,
     business_id: true,
     state: true,
@@ -230,6 +251,7 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     improvements: true,
 }).merge(
     object({
+        id: APIIdString.optional(),
         financing_method: object({id: string()}),
         building_type: object({id: string()}),
         developer: object({id: string()}),
@@ -245,8 +267,8 @@ const ApartmentAddressSchema = object({
     street_address: string(),
     postal_code: string().optional(),
     city: string().optional(), // Read only
-    apartment_number: number().nullable(),
-    floor: number().nullable(),
+    apartment_number: writableRequiredNumber,
+    floor: nullishNumber,
     stair: string().min(1, "Pakollinen kenttä!"),
 });
 
@@ -354,13 +376,13 @@ const ApartmentPricesSchema = object({
     catalog_share_of_housing_company_loans: number().nullable(), // Read only
     catalog_acquisition_price: number().nullable(), // Read only. (purchase_price + share_of_hosing_company_loans)
     construction: object({
-        loans: number().nullable(),
-        additional_work: number().nullable(),
+        loans: nullishNumber,
+        additional_work: nullishNumber,
         interest: object({
-            rate_6: number().nullish(),
-            rate_14: number().nullish(),
+            rate_6: nullishNumber,
+            rate_14: nullishNumber,
         }).optional(),
-        debt_free_purchase_price: number().nullable(),
+        debt_free_purchase_price: nullishNumber,
     }),
     maximum_prices: object({
         // Read only
@@ -386,8 +408,8 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
 });
 
 const ApartmentSharesSchema = object({
-    start: number().nullable(),
-    end: number().nullable(),
+    start: nullishPositiveNumber,
+    end: nullishPositiveNumber,
     total: number(),
 });
 
@@ -431,15 +453,14 @@ const ApartmentDetailsSchema = object({
 const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
     state: z.enum(apartmentStates).nullable(),
-    type: object({id: string().nullable()}),
-    surface_area: number().nullable(),
-    rooms: number().nullable(),
+    type: object({id: string()}).nullable(),
+    surface_area: nullishNumber,
+    rooms: nullishNumber,
     shares: ApartmentSharesSchema.omit({total: true}),
     address: ApartmentAddressSchema,
     prices: ApartmentWritablePricesSchema,
     completion_date: string().nullish(),
     building: object({id: string()}),
-    ownerships: ownershipsSchema,
     notes: string(),
     improvements: object({
         market_price_index: MarketPriceIndexImprovementSchema.array(),

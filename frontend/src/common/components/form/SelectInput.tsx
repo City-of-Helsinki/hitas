@@ -1,5 +1,6 @@
 import {Combobox, Select as HDSSelect} from "hds-react";
 
+import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
 interface SelectProps extends FormInputProps {
@@ -9,6 +10,7 @@ interface SelectProps extends FormInputProps {
         value: string;
     }[];
     searchable?: boolean;
+    setDirectValue?: boolean;
 }
 
 const Select = ({
@@ -19,12 +21,14 @@ const Select = ({
     defaultValue,
     formObject,
     searchable = false,
+    setDirectValue = false, // If true, set the `value` of the option, otherwise sets the whole option object
     ...rest
 }: SelectProps) => {
     formObject.register(name);
     const {
         formState: {errors},
     } = formObject;
+    const fieldError = dotted(errors, name);
     const inputProps = {
         label: label,
         required: required,
@@ -35,9 +39,14 @@ const Select = ({
         selectedItemRemoveButtonAriaLabel: "Poista",
         ...rest,
     };
+
     const handleChange = (newValue: {label?: string; value?: string}) => {
         if (newValue) {
-            formObject.setValue(name, newValue, true);
+            if (setDirectValue) {
+                formObject.setValue(name, newValue.value);
+            } else {
+                formObject.setValue(name, newValue);
+            }
         } else if (!required) formObject.setValue(name, null);
     };
 
@@ -50,15 +59,14 @@ const Select = ({
                 />
             ) : (
                 <>
-                    <legend style={{fontWeight: required ? "bold" : "normal"}}>{label + (required ? " *" : "")}</legend>
                     <HDSSelect
                         {...inputProps}
-                        label=""
+                        label={label}
                         onChange={handleChange}
-                        invalid={invalid ?? !!errors[name]}
-                        required={required}
+                        invalid={invalid ?? !!fieldError}
+                        required={true}
                     />
-                    {errors[name] && <p className="text-input_hds-text-input__error-text">{errors[name].message}</p>}
+                    {!!fieldError && <p className="text-input_hds-text-input__error-text">{fieldError.message}</p>}
                 </>
             )}
         </div>

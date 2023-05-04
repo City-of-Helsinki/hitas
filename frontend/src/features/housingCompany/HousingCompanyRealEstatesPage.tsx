@@ -6,8 +6,8 @@ import {useImmer} from "use-immer";
 
 import {
     useCreateRealEstateMutation,
+    useDeleteRealEstateMutation,
     useGetHousingCompanyDetailQuery,
-    useRemoveRealEstateMutation,
 } from "../../app/services";
 import {
     ConfirmDialogModal,
@@ -35,14 +35,15 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
     };
     const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
     const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
-    const [removeRealEstate, {data: removeData, error: removeError, isLoading: isRemoving}] =
-        useRemoveRealEstateMutation();
+
+    const [deleteRealEstate, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteRealEstateMutation();
     const handleSaveButtonClicked = () => {
         saveRealEstate({data: formData, housingCompanyId: params.housingCompanyId as string});
         setIsEndModalVisible(true);
     };
     const handleConfirmedRemove = () => {
-        removeRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string}).then(
+        deleteRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string}).then(
             () => {
                 setRealEstateToRemove(null);
                 setIsConfirmModalVisible(false);
@@ -121,11 +122,11 @@ const HousingCompanyRealEstatesPage = (): JSX.Element => {
                 setIsVisible={setIsEndModalVisible}
             />
             <ConfirmDialogModal
-                data={removeData}
+                data={deleteData}
                 modalText="Haluatko varmasti poistaa kiinteistön?"
                 successText="Kiinteistö poistettu"
-                error={removeError}
-                isLoading={isRemoving}
+                error={deleteError}
+                isLoading={isDeleteLoading}
                 isVisible={isConfirmModalVisible}
                 setIsVisible={setIsConfirmModalVisible}
                 confirmAction={handleConfirmedRemove}

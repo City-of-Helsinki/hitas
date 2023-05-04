@@ -6,8 +6,8 @@ import {useImmer} from "use-immer";
 
 import {
     useCreateBuildingMutation,
+    useDeleteBuildingMutation,
     useGetHousingCompanyDetailQuery,
-    useRemoveBuildingMutation,
 } from "../../app/services";
 import {
     ConfirmDialogModal,
@@ -40,7 +40,8 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
         params.housingCompanyId
     );
     const [saveBuilding, {data, error, isLoading}] = useCreateBuildingMutation();
-    const [removeBuilding, {data: removeData, error: removeError, isLoading: isRemoving}] = useRemoveBuildingMutation();
+    const [deleteBuilding, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteBuildingMutation();
 
     const realEstateOptions =
         isHousingCompanyLoading || !housingCompanyData
@@ -62,7 +63,7 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
     };
 
     const handleConfirmedRemove = () => {
-        removeBuilding({
+        deleteBuilding({
             id: idsToRemove.building as string,
             housingCompanyId: params.housingCompanyId as string,
             realEstateId: idsToRemove.realEstate as string,
@@ -171,12 +172,12 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                 setIsVisible={setIsEndModalVisible}
             />
             <ConfirmDialogModal
-                data={removeData}
+                data={deleteData}
                 buttonText="Poista"
                 modalText="Haluatko varmasti poistaa rakennuksen?"
                 successText="Rakennus poistettu"
-                error={removeError}
-                isLoading={isRemoving}
+                error={deleteError}
+                isLoading={isDeleteLoading}
                 isVisible={isConfirmModalVisible}
                 setIsVisible={setIsConfirmModalVisible}
                 confirmAction={handleConfirmedRemove}

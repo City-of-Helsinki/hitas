@@ -13,26 +13,22 @@
     div
       display: flex
       flex-direction: row
+      gap: 1rem
 
-    a
+    a, span
       @include align-items(center)
       display: inherit
       &:hover > span:not([class*="status-label"])
         text-decoration: underline
 
-    a > span
-      display: inline-block
-      margin-right: $spacing-layout-s
-
     span:not([class*="status-label"])
-      margin-right: $spacing-layout-s
+      margin-left: 0.5rem
+      margin-right: 0.5rem
 
     .address
       font-weight: 400
 
     [class^="StatusLabel"]
-      display: flex
-      flex-direction: row
       background-color: var(--color-engel-light)
 
   .apartment-stats

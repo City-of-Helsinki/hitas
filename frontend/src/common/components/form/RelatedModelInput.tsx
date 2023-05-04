@@ -2,6 +2,7 @@ import {useState} from "react";
 
 import {Dialog, IconCrossCircle, IconSearch, Table, TextInput} from "hds-react";
 
+import {dotted} from "../../utils";
 import {QueryStateHandler} from "../index";
 
 const RelatedModelTextInput = ({
@@ -16,6 +17,7 @@ const RelatedModelTextInput = ({
     const fieldValue = formObject.getValues(formObjectFieldPath);
     const isFieldClearable = !required && fieldValue;
     const errors = formObject.formState.errors;
+    const fieldError = dotted(errors, formObjectFieldPath);
 
     const handleKeyDown = (e) => {
         // Make other key presses than Tab (and Shift+Tab) open the modal
@@ -26,7 +28,8 @@ const RelatedModelTextInput = ({
     };
 
     const clearFieldValue = () => {
-        formObject.setValue(formObjectFieldPath, "");
+        formObject.watch(formObjectFieldPath);
+        formObject.setValue(formObjectFieldPath, null);
     };
 
     return (
@@ -41,8 +44,8 @@ const RelatedModelTextInput = ({
             onKeyDown={(e) => handleKeyDown(e)}
             buttonIcon={isFieldClearable ? <IconCrossCircle /> : <IconSearch />}
             onButtonClick={isFieldClearable ? clearFieldValue : openModal}
-            errorText={errors[formObjectFieldPath]}
-            invalid={!!errors[formObjectFieldPath]}
+            errorText={!!fieldError && fieldError.message}
+            invalid={!!fieldError}
         />
     );
 };

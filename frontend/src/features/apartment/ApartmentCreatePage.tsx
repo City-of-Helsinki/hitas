@@ -3,19 +3,20 @@ import {useEffect, useRef, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {v4 as uuidv4} from "uuid";
+import {useNavigate, useParams} from "react-router-dom";
 
 import {
+    useDeleteApartmentMutation,
+    useGetApartmentDetailQuery,
     useGetApartmentTypesQuery,
     useGetHousingCompanyDetailQuery,
-    useRemoveApartmentMutation,
     useSaveApartmentMutation,
 } from "../../app/services";
 import {
     ConfirmDialogModal,
     Heading,
     NavigateBackButton,
+    QueryStateHandler,
     RemoveButton,
     SaveButton,
     SaveDialogModal,
@@ -32,199 +33,308 @@ import {getApartmentStateLabel} from "../../common/localisation";
 import {
     apartmentStates,
     ApartmentWritableFormSchema,
+    errorMessages,
     IApartmentDetails,
     IApartmentWritable,
     IApartmentWritableForm,
     ICode,
+    IHousingCompanyDetails,
 } from "../../common/schemas";
-import {hitasToast} from "../../common/utils";
+import {hdsToast, isEmpty} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
-
-interface IApartmentState {
-    pathname: string;
-    state: null | {apartment: IApartmentDetails};
-}
 
 const apartmentStateOptions = apartmentStates.map((state) => {
     return {label: getApartmentStateLabel(state), value: state};
 });
 
-const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritableForm => {
+const ApartmentDeleteButton = ({apartment}) => {
+    const navigate = useNavigate();
+
+    const [deleteApartment, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteApartmentMutation();
+
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+    if (!apartment) return null;
+
+    const handleConfirmedDeleteAction = () => {
+        deleteApartment({
+            id: apartment.id,
+            housingCompanyId: apartment.links.housing_company.id,
+        })
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Asunto poistettu onnistuneesti!");
+                navigate(`/housing-companies/${apartment.links.housing_company.id}`);
+            })
+            .catch(() => {
+                hdsToast.error("Virhe poistaessa asuntoa!");
+                setIsDeleteModalVisible(true);
+            });
+    };
+
+    return (
+        <>
+            <RemoveButton
+                onClick={() => setIsDeleteModalVisible(true)}
+                isLoading={isDeleteLoading}
+            />
+            <ConfirmDialogModal
+                linkText="Palaa asuntoyhtiön sivulle"
+                linkURL={`/housing-companies/${apartment.links.housing_company.id}`}
+                modalText="Haluatko varmasti poistaa asunnon?"
+                successText="Asunto poistettu"
+                buttonText="Poista"
+                isVisible={isDeleteModalVisible}
+                setIsVisible={setIsDeleteModalVisible}
+                data={deleteData}
+                error={deleteError}
+                isLoading={isDeleteLoading}
+                confirmAction={handleConfirmedDeleteAction}
+                cancelAction={() => setIsDeleteModalVisible(false)}
+            />
+        </>
+    );
+};
+
+const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm => {
+    if (apartment) {
+        return convertApartmentDetailToWritable(apartment);
+    } else {
+        return {
+            state: "free",
+            type: null,
+            surface_area: null,
+            rooms: null,
+            shares: {start: undefined, end: undefined},
+            address: {
+                apartment_number: undefined,
+                floor: null,
+                stair: "",
+            },
+            completion_date: null,
+            prices: {
+                construction: {
+                    loans: null,
+                    interest: {
+                        rate_6: undefined,
+                        rate_14: undefined,
+                    },
+                    debt_free_purchase_price: null,
+                    additional_work: null,
+                },
+            },
+            // The first building in the list is selected by default
+            building: buildingOptions.length
+                ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
+                : {label: "", value: ""},
+            improvements: {
+                market_price_index: [],
+                construction_price_index: [],
+            },
+            notes: "",
+        };
+    }
+};
+
+const convertApartmentDetailToWritable = (apartment: IApartmentDetails): IApartmentWritableForm => {
     return {
-        ...ap,
-        shares: ap.shares || {start: null, end: null},
-        ownerships: [], // Stored in a separate state, not needed here
-        building: {label: ap.links.building.street_address, value: ap.links.building.id},
+        ...apartment,
+        shares: apartment.shares
+            ? {start: apartment.shares.start, end: apartment.shares.end}
+            : {start: undefined, end: undefined},
+        building: {label: apartment.links.building.street_address, value: apartment.links.building.id},
     };
 };
 
-const ApartmentCreatePage = () => {
+const formatApartmentFormDataForSubmit = (apartment, data): IApartmentWritable => {
+    return {
+        ...data,
+        // Copy street_address from selected building
+        address: {...data.address, street_address: data.building.label},
+        building: {id: data.building.value},
+
+        // Clean share fields
+        shares: {
+            start: data.shares?.start ?? null,
+            end: data.shares?.end ?? null,
+        },
+    };
+};
+
+const LoadedApartmentCreatePage = ({
+    housingCompany,
+    apartment,
+}: {
+    housingCompany: IHousingCompanyDetails;
+    apartment: IApartmentDetails | undefined;
+}) => {
     const navigate = useNavigate();
-    const {pathname, state}: IApartmentState = useLocation();
-    const params = useParams() as {readonly housingCompanyId: string};
-    const formRef = useRef<HTMLFormElement | null>(null);
-    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
-        params.housingCompanyId
-    );
-    const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
-    const [removeApartment, {data: removeData, error: removeError, isLoading: isRemoving}] =
-        useRemoveApartmentMutation();
+
+    const [saveApartment, {data: saveData, error: saveError, isLoading: isSaveLoading}] = useSaveApartmentMutation();
+
+    // Flags
+    const isEditPage = !!apartment;
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+
     // Get all buildings that belong to HousingCompany from RealEstates
-    const buildingOptions =
-        isHousingCompanyLoading || !housingCompanyData
-            ? []
-            : housingCompanyData.real_estates.flatMap((realEstate) => {
-                  return realEstate.buildings.map((building) => {
-                      return {label: building.address.street_address, value: building.id};
-                  });
-              });
+    const buildingOptions = housingCompany.real_estates.flatMap((realEstate) => {
+        return realEstate.buildings.map((building) => {
+            return {label: building.address.street_address, value: building.id};
+        });
+    });
 
     // Form
-    const initialFormData: IApartmentWritableForm =
-        state === null || state?.apartment === undefined
-            ? {
-                  state: "free",
-                  type: {id: null},
-                  surface_area: null,
-                  rooms: null,
-                  shares: {start: null, end: null},
-                  address: {
-                      apartment_number: null,
-                      floor: null,
-                      stair: "",
-                  },
-                  completion_date: null,
-                  prices: {
-                      construction: {
-                          loans: null,
-                          interest: {
-                              rate_6: null,
-                              rate_14: null,
-                          },
-                          debt_free_purchase_price: null,
-                          additional_work: null,
-                      },
-                  },
-                  building:
-                      buildingOptions.length === 1
-                          ? {label: buildingOptions[0].label, value: buildingOptions[0].value}
-                          : {label: "", value: ""},
-                  ownerships: [],
-                  improvements: {
-                      market_price_index: [],
-                      construction_price_index: [],
-                  },
-                  notes: "",
-              }
-            : convertApartmentDetailToWritable(state.apartment);
+    const initialFormData: IApartmentWritableForm = getInitialFormData(apartment, buildingOptions);
+    const formRef = useRef<HTMLFormElement | null>(null);
     const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
-        mode: "all",
-        reValidateMode: "onBlur",
+        mode: "onBlur",
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
+
+    // Set errors returned from the API for form fields
+    const setAPIErrorsForFormFields = (error) => {
+        if (error?.data?.fields) {
+            for (const fieldError of error.data.fields) {
+                formObject.setError(fieldError.field, {type: "custom", message: fieldError.message});
+            }
+        }
+    };
+
     const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
-        const formattedFormData: IApartmentWritable = {
-            ...data,
-            // Copy street_address from selected building
-            address: {...data.address, street_address: data.building.label},
-            building: {id: data.building.value},
-
-            // Clean away ownership items that don't have an owner selected
-            ownerships: formOwnershipsList.filter((o) => o.owner.id),
-
-            // Clean share fields
-            shares: {
-                start: formObject.getValues("shares.start") ?? null,
-                end: formObject.getValues("shares.end") ?? null,
-            },
-        };
+        const formattedFormData = formatApartmentFormDataForSubmit(apartment, data);
 
         saveApartment({
             data: formattedFormData,
-            id: state?.apartment.id,
-            housingCompanyId: params.housingCompanyId,
-        });
+            id: apartment?.id,
+            housingCompanyId: housingCompany.id,
+        })
+            .unwrap()
+            .then((payload) => {
+                hdsToast.success("Asunto tallennettu onnistuneesti!");
+                if (!isEditPage) {
+                    setIsEndModalVisible(true);
+                } else {
+                    navigate(`/housing-companies/${housingCompany.id}/apartments/${payload.id}`);
+                }
+            })
+            .catch((error) => {
+                hdsToast.error("Asunnon tallentaminen epäonnistui!");
+                setIsEndModalVisible(true);
+                setAPIErrorsForFormFields(error);
+            });
+    };
 
-        if (!isEditPage) {
-            setIsEndModalVisible(true);
+    const handleValidateShares = (start, end) => {
+        // Form-level validation for shares
+        if (start === null && end === null) {
+            formObject.clearErrors("shares");
+        }
+        // If either start or end is null, we have an error
+        else if (!start) {
+            formObject.setError("shares.start", {type: "custom", message: errorMessages.sharesEmpty});
+        } else if (!end) {
+            formObject.setError("shares.end", {type: "custom", message: errorMessages.sharesEmpty});
+        }
+        // If start is greater than end, we have an error
+        else if (start && end && start >= end) {
+            formObject.setError("shares.start", {type: "custom", message: errorMessages.sharesStartGreaterThanEnd});
+            formObject.setError("shares.end", {type: "custom", message: errorMessages.sharesStartGreaterThanEnd});
+        } else {
+            // If we got so far, there were no errors, clear any remaining shares errors away.
+            formObject.clearErrors("shares");
         }
     };
 
-    const formOwnershipsList =
-        state?.apartment !== undefined ? state.apartment.ownerships.map((o) => ({...o, key: uuidv4()})) : [];
-
-    // Flags
-    const isEditPage = pathname.split("/").at(-1) === "edit";
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+    const handleValidateInterestDuringConstructionRates = (rate6, rate14) => {
+        // Form-level validation for interest rates during construction
+        if (rate6 === null && rate14 === null) {
+            formObject.clearErrors("prices.construction.interest");
+        }
+        // If either interest rate is null, we have an error
+        else if (!rate6 && rate6 !== 0) {
+            formObject.setError("prices.construction.interest.rate_6", {
+                type: "custom",
+                message: errorMessages.constructionInterestEmpty,
+            });
+        } else if (!rate14 && rate14 !== 0) {
+            formObject.setError("prices.construction.interest.rate_14", {
+                type: "custom",
+                message: errorMessages.constructionInterestEmpty,
+            });
+        }
+        // If 6% is greater than 14%, we have an error
+        else if (rate6 && rate14 && rate6 >= rate14) {
+            formObject.setError("prices.construction.interest.rate_6", {
+                type: "custom",
+                message: errorMessages.constructionInterest6GreaterThan14,
+            });
+            formObject.setError("prices.construction.interest.rate_14", {
+                type: "custom",
+                message: errorMessages.constructionInterest6GreaterThan14,
+            });
+        } else {
+            // If we got so far, there were no errors, clear any remaining interest rate errors away.
+            formObject.clearErrors("prices.construction.interest");
+        }
+    };
 
     // Event handlers
-    const handleSubmitButtonClick = () => {
+    const handleFormSubmit = () => {
+        // Recursively find the first error in the form (The error may be nested, e.g. shares.start)
+        const getFirstError = (errors, _fullPath = "") => {
+            if (isEmpty(errors)) return null;
+            const firstKey = Object.keys(errors)[0];
+            const firstError = errors[firstKey];
+            if (firstError.type) {
+                return `${_fullPath}${firstKey}`;
+            }
+            return getFirstError(firstError, `${_fullPath}${firstKey}.`);
+        };
+
+        handleValidateShares(...formObject.getValues(["shares.start", "shares.end"]));
+        handleValidateInterestDuringConstructionRates(
+            ...formObject.getValues(["prices.construction.interest.rate_6", "prices.construction.interest.rate_14"])
+        );
+
+        // If there are errors, set focus to the first error field
+        const firstError = getFirstError(formObject.formState.errors);
+        if (firstError && firstError !== "root") {
+            formObject.setFocus(firstError);
+            return; // Don't submit the form if there are errors
+        }
+
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
 
-    const handleConfirmedRemove = () => {
-        removeApartment({
-            id: state?.apartment.id,
-            housingCompanyId: params.housingCompanyId,
+    const watch = formObject.watch;
+    useEffect(() => {
+        const subscription = watch((value, {name}) => {
+            if (name === "shares.start" || name === "shares.end") {
+                handleValidateShares(value?.shares?.start, value.shares?.end);
+            }
+
+            if (name === "prices.construction.interest.rate_6" || name === "prices.construction.interest.rate_14") {
+                handleValidateInterestDuringConstructionRates(
+                    value?.prices?.construction?.interest?.rate_6,
+                    value?.prices?.construction?.interest?.rate_14
+                );
+            }
         });
-    };
-
-    // Handle remove flow
-    useEffect(() => {
-        if (isEditPage) {
-            if (!isRemoving && !removeError && removeData === null) {
-                hitasToast("Asunto poistettu onnistuneesti!");
-                navigate(`/housing-companies/${params.housingCompanyId}`);
-            } else if (removeError) {
-                setIsRemoveModalVisible(true);
-            }
-        }
-    }, [isRemoving, removeError, removeData, navigate, isEditPage, params.housingCompanyId]);
-
-    // Handle saving flow when editing
-    useEffect(() => {
-        if (isEditPage) {
-            if (!isLoading && !error && data && data.id) {
-                hitasToast("Asunto tallennettu onnistuneesti!");
-                navigate(`/housing-companies/${data.links.housing_company.id}/apartments/${data.id}`);
-            } else if (error) {
-                setIsEndModalVisible(true);
-            }
-        }
-    }, [isLoading, error, data, navigate, isEditPage]);
-
-    // Redirect user to detail page if state is missing Apartment data and user is trying to edit the apartment
-    useEffect(() => {
-        if (isEditPage && state === null) navigate("..");
-    }, [isEditPage, navigate, pathname, state]);
+        return () => subscription.unsubscribe();
+        // eslint-disable-next-line
+    }, [watch]);
 
     return (
-        <div className="view--create">
-            {state?.apartment ? <ApartmentHeader apartment={state.apartment} /> : <Heading>Uusi asunto</Heading>}
+        <>
+            {apartment ? <ApartmentHeader apartment={apartment} /> : <Heading>Uusi asunto</Heading>}
             <form
                 ref={formRef}
                 onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}
             >
                 <div className="field-sets">
                     <Fieldset heading="">
-                        <div className="input-field">
-                            <TextInput
-                                name="housing_company"
-                                id="input-housing_company.name"
-                                label="Asunto-osakeyhtiö"
-                                value={
-                                    housingCompanyData?.name.display !== undefined
-                                        ? housingCompanyData?.name.display
-                                        : state?.apartment !== undefined
-                                        ? state.apartment.links.housing_company.display_name
-                                        : ""
-                                }
-                                formObject={formObject}
-                                disabled
-                            />
-                        </div>
                         <div className="row">
                             <Select
                                 label="Rakennus"
@@ -274,12 +384,11 @@ const ApartmentCreatePage = () => {
                             />
                             <RelatedModelInput
                                 label="Asuntotyyppi"
-                                required
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
                                 formObject={formObject}
                                 formObjectFieldPath="type"
-                                formatFormObjectValue={(obj: ICode) => (obj.id ? obj.value : "")}
+                                formatFormObjectValue={(obj: ICode) => (obj?.id ? obj.value : "")}
                             />
                         </div>
                         <div className="row">
@@ -289,6 +398,8 @@ const ApartmentCreatePage = () => {
                                 options={apartmentStateOptions}
                                 defaultValue={{label: "Vapaa", value: "free"}}
                                 formObject={formObject}
+                                required
+                                setDirectValue
                             />
                             <DateInput
                                 label="Valmistumispäivä"
@@ -361,40 +472,63 @@ const ApartmentCreatePage = () => {
             </form>
             <div className="row row--buttons">
                 <NavigateBackButton />
-                {isEditPage && (
-                    <RemoveButton
-                        onClick={() => setIsRemoveModalVisible(true)}
-                        isLoading={isRemoving}
-                    />
-                )}
+                {isEditPage && <ApartmentDeleteButton apartment={apartment} />}
                 <SaveButton
-                    onClick={handleSubmitButtonClick}
-                    isLoading={isLoading}
+                    onClick={handleFormSubmit}
+                    isLoading={isSaveLoading}
                 />
             </div>
-            <ConfirmDialogModal
-                linkText="Palaa asuntoyhtiön sivulle"
-                linkURL={`/housing-companies/${params.housingCompanyId}`}
-                modalText="Haluatko varmasti poistaa asunnon?"
-                successText="Asunto poistettu"
-                buttonText="Poista"
-                isVisible={isRemoveModalVisible}
-                setIsVisible={setIsRemoveModalVisible}
-                data={removeData}
-                error={removeError}
-                isLoading={isRemoving}
-                confirmAction={handleConfirmedRemove}
-                cancelAction={() => setIsRemoveModalVisible(false)}
-            />
             <SaveDialogModal
                 linkText="Asunnon sivulle"
-                baseURL={`/housing-companies/${params.housingCompanyId}/apartments/`}
+                baseURL={`/housing-companies/${housingCompany.id}/apartments/`}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
+                data={saveData}
+                error={saveError}
+                isLoading={isSaveLoading}
+            />
+        </>
+    );
+};
+
+const ApartmentCreatePage = () => {
+    // Load required data and pass it to the child component
+    const params = useParams() as {housingCompanyId: string; apartmentId?: string};
+    const isEditPage = !!params.apartmentId;
+
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: isHousingCompanyLoading,
+    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+    const {
+        data: apartmentData,
+        error: apartmentError,
+        isLoading: isApartmentLoading,
+    } = useGetApartmentDetailQuery(
+        {
+            housingCompanyId: params.housingCompanyId,
+            apartmentId: params.apartmentId as string,
+        },
+        {skip: !isEditPage}
+    );
+
+    const data = isEditPage ? housingCompanyData && apartmentData : housingCompanyData;
+    const error = housingCompanyError || apartmentError;
+    const isLoading = isHousingCompanyLoading || (isEditPage && isApartmentLoading);
+
+    return (
+        <div className="view--create">
+            <QueryStateHandler
                 data={data}
                 error={error}
                 isLoading={isLoading}
-            />
+            >
+                <LoadedApartmentCreatePage
+                    housingCompany={housingCompanyData as IHousingCompanyDetails}
+                    apartment={apartmentData as IApartmentDetails}
+                />
+            </QueryStateHandler>
         </div>
     );
 };

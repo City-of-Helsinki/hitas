@@ -2,7 +2,7 @@ import {Button, IconPen} from "hds-react";
 import {Link} from "react-router-dom";
 
 interface EditButtonProps {
-    state: object;
+    state?: object;
     pathname?: string;
     className?: string;
     disabled?: boolean;

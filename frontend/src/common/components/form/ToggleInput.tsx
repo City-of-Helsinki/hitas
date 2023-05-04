@@ -1,5 +1,6 @@
 import {ToggleButton} from "hds-react";
 
+import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
 const ToggleInput = ({id, name, label, required, formObject}: FormInputProps) => {
@@ -9,6 +10,8 @@ const ToggleInput = ({id, name, label, required, formObject}: FormInputProps) =>
     } = formObject;
     const formToggle = register(name);
     const value = formObject.getValues(formToggle.name);
+    const fieldError = dotted(errors, formToggle);
+
     return (
         <div className={required ? "force-bold" : ""}>
             <ToggleButton
@@ -21,7 +24,7 @@ const ToggleInput = ({id, name, label, required, formObject}: FormInputProps) =>
                 }}
                 variant="inline"
             />
-            {errors[formToggle.name] && <div className="error-message">{errors[formToggle.name].message}</div>}
+            {!!fieldError && <div className="error-message">{fieldError.message}</div>}
         </div>
     );
 };

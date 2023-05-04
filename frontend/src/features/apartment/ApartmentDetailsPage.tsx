@@ -19,7 +19,7 @@ import {
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
@@ -63,9 +63,20 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
         return acc;
     }, {});
 
-    return (
-        <Card>
-            <div className="row row--buttons">
+    const ApartmentSalesPageLinkButton = () => {
+        // If apartment has been sold for the first time, and it's still not completed, it can not be re-sold
+        if (!apartment.completion_date && apartment.prices.first_purchase_date) {
+            return (
+                <Button
+                    theme="black"
+                    iconLeft={<IconGlyphEuro />}
+                    onClick={() => hdsToast.error("Valmistumatonta asuntoa ei voida jälleenmyydä.")}
+                >
+                    Kauppatapahtuma
+                </Button>
+            );
+        } else {
+            return (
                 <Link to="sales">
                     <Button
                         theme="black"
@@ -74,6 +85,14 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                         Kauppatapahtuma
                     </Button>
                 </Link>
+            );
+        }
+    };
+
+    return (
+        <Card>
+            <div className="row row--buttons">
+                <ApartmentSalesPageLinkButton />
                 <Link to="conditions-of-sale">
                     <Button
                         theme="black"
