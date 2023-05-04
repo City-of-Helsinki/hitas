@@ -143,6 +143,11 @@ const writableRequiredNumber = number({
     .nonnegative(errorMessages.numberPositive)
     .optional(); // allow undefined but no null
 
+const APIDateSchema = string({required_error: errorMessages.required}).regex(
+    /^\d{4}-\d{2}-\d{2}$/,
+    errorMessages.dateFormat
+);
+
 const CodeSchema = object({
     id: APIIdString,
     value: string(),
@@ -324,7 +329,7 @@ const ApartmentLinkedModelsSchema = object({
     apartment: ApartmentLinkedModelSchema,
 });
 
-const ownerSchema = object({
+const OwnerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
@@ -332,7 +337,7 @@ const ownerSchema = object({
 });
 
 const ownershipSchema = object({
-    owner: ownerSchema,
+    owner: OwnerSchema,
     percentage: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .positive(errorMessages.numberPositive)
@@ -348,7 +353,7 @@ const OwnershipFormSchema = ownershipSchema
     .and(object({owner: object({id: string()})}))
     .array();
 
-const ownerAPISchema = addAPIId(ownerSchema);
+const ownerAPISchema = addAPIId(OwnerSchema);
 
 // Condition of Sale
 const CreateConditionOfSaleSchema = object({
@@ -357,7 +362,7 @@ const CreateConditionOfSaleSchema = object({
 
 const ApartmentConditionOfSaleSchema = object({
     id: string(),
-    owner: ownerSchema.omit({id: true}).and(object({id: string()})),
+    owner: OwnerSchema.omit({id: true}).and(object({id: string()})),
     apartment: object({
         id: string(),
         address: ApartmentAddressSchema,
@@ -999,6 +1004,7 @@ const IndexQuerySchema = object({
 
 // Schemas
 export {
+    APIDateSchema,
     AddressSchema,
     PostalCodeSchema,
     UserInfoSchema,
@@ -1024,7 +1030,7 @@ export {
     ApartmentQuerySchema,
     IndexQuerySchema,
     ApartmentSaleFormSchema,
-    ownerSchema,
+    OwnerSchema,
     OwnershipFormSchema,
     ownerAPISchema,
     ownershipsSchema,
@@ -1033,6 +1039,7 @@ export {
 };
 
 // Types (i.e. models)
+export type IAPIDate = z.infer<typeof APIDateSchema>;
 export type IAddress = z.infer<typeof AddressSchema>;
 export type IImprovement = z.infer<typeof ImprovementSchema>;
 export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
@@ -1078,7 +1085,7 @@ export type IIndex = z.infer<typeof IndexSchema>;
 export type ICode = z.infer<typeof CodeSchema>;
 export type IPostalCode = z.infer<typeof PostalCodeSchema>;
 export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
-export type IOwner = z.infer<typeof ownerSchema>;
+export type IOwner = z.infer<typeof OwnerSchema>;
 export type IOwnership = z.infer<typeof ownershipSchema>;
 
 // Query/list responses & paging
