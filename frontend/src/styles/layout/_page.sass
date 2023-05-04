@@ -92,11 +92,33 @@ header
         grid-template-rows: auto auto
 
         .number
+          @include flexbox()
+          @include align-items(center)
           font-size: $fontsize-heading-l
           letter-spacing: -1px
-          text-transform: uppercase
-          width: 10%
-          line-height: 1.25
+          width: 12%
+          text-align: center
+          padding-right: 1rem
+          .stair-and-number
+            width: 100%
+            line-height: 1.25
+            text-transform: uppercase
+          .conditions-of-sale-status
+            position: relative
+            width: 32px
+            margin: 0
+            padding: 0
+            transition: width 200ms
+            [class*="hds-status-label-icon"]
+              position: absolute
+              width: 24px
+              transition: opacity 200ms 200ms
+            &:hover
+              width: 70px
+              [class*="hds-status-label-icon"]
+                transition: opacity 200ms
+              .sell-by-date
+                overflow: visible
 
         .details
           @include flex-grow(1)
@@ -356,15 +378,33 @@ footer
     margin: $spacing-m 0
 
 .conditions-of-sale-status
-  display: flex
+  @include flexbox()
   flex-direction: row
-  align-items: center
-  padding-left: 8px
-  padding-right: 8px
+  @include justify-content(center)
+  @include align-items(center)
+  //padding-left: 8px
+  //padding-right: 8px
   margin-right: 0.5em
   span
     margin: 0
+    svg
+      margin: 0 !important
+  [class*="hds-status-label-icon"]
+    width: 24px
+    opacity: 1
+    transition: width 200ms 100ms, opacity 100ms
   .sell-by-date
-    display: none
-  &:hover > .sell-by-date
-    display: inline-block
+    overflow: hidden
+    width: 0px
+    opacity: 0
+    text-align: center
+    transition: width 200ms 100ms, opacity 200ms
+  &:hover
+    [class*="hds-status-label-icon"]
+      width: 0px
+      opacity: 0
+      transition: width 100ms, opacity 100ms
+    .sell-by-date
+      width: 74px
+      opacity: 1
+      transition: width 200ms, opacity 200ms 100ms

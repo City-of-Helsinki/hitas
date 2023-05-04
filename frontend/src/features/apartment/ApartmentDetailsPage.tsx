@@ -39,7 +39,7 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
                             to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
                         >
                             <ConditionsOfSaleStatus conditionOfSale={cos} />
-                            {formatAddress(cos.apartment.address)}
+                            <span className="address">{formatAddress(cos.apartment.address)}</span>
                         </Link>
                     </li>
                 ))}
@@ -62,6 +62,15 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
         }
         return acc;
     }, {});
+    // Order owners with unfulfilled conditions of sale first.
+    // When owners have the same amount of unfulfilled conditions of sale, owners with more total COS are last.
+    const sortedKeys = Object.keys(groupedConditionsOfSale).sort((a, b) => {
+        const diff =
+            groupedConditionsOfSale[b].filter((cos) => !cos.fulfilled).length -
+            groupedConditionsOfSale[a].filter((cos) => !cos.fulfilled).length;
+        if (diff !== 0) return diff;
+        return groupedConditionsOfSale[a].length - groupedConditionsOfSale[b].length;
+    });
 
     const ApartmentSalesPageLinkButton = () => {
         // If apartment has been sold for the first time, and it's still not completed, it can not be re-sold
@@ -97,25 +106,29 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
+                        disabled={!apartment.ownerships.length}
                     >
                         Muokkaa myyntiehtoja
                     </Button>
                 </Link>
             </div>
-            <label className="card-heading">
-                <IconLock /> Myyntiehdot
-            </label>
+            <label className="card-heading card-heading--conditions-of-sale">Myyntiehdot</label>
             {Object.keys(groupedConditionsOfSale).length ? (
                 <ul>
-                    {Object.entries(groupedConditionsOfSale).map(([ownerId, cos]) => (
+                    {sortedKeys.map((ownerId) => (
                         <SingleApartmentConditionOfSale
                             key={ownerId}
-                            conditionsOfSale={cos}
+                            conditionsOfSale={
+                                // Sort owners conditions of sale by unfulfilled first
+                                groupedConditionsOfSale[ownerId].sort((a, b) =>
+                                    !!a.fulfilled === !!b.fulfilled ? 0 : a.fulfilled ? 1 : -1
+                                )
+                            }
                         />
                     ))}
                 </ul>
             ) : (
-                <span>Ei myyntiehtoja.</span>
+                <span className="no-conditions">Ei myyntiehtoja.</span>
             )}
         </Card>
     );
