@@ -15,6 +15,7 @@ from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
 from hitas.exceptions import HitasModelNotFound, ModelConflict, get_hitas_object_or_404
+from hitas.models import HitasPostalCode
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import (
@@ -101,6 +102,12 @@ class ReportColumns(NamedTuple):
     state: str
     completion_date: datetime.date | str
     age: str
+
+
+class RegulationPostalCode(TypedDict):
+    postal_code: str
+    price_by_area: Decimal
+    cost_area: Optional[int]
 
 
 def perform_thirty_year_regulation(calculation_date: datetime.date) -> RegulationResults:
@@ -190,13 +197,13 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         f"Fetching HITAS sales data between {this_quarter_previous_year.isoformat()} (inclusive) "
         f"and {this_quarter.isoformat()} (exclusive)..."
     )
-    sales_data = _get_sales_data(this_quarter_previous_year, this_quarter, postal_codes)
+    sales_data = get_sales_data(this_quarter_previous_year, this_quarter, postal_codes)
 
     logger.info("Fetching external sales data for the last four quarters...")
-    external_sales_data = _get_external_sales_data(to_quarter(previous_quarter), postal_codes)
+    external_sales_data = get_external_sales_data(to_quarter(previous_quarter), postal_codes)
 
     logger.info("Combining HITAS and external sales data for each postal code...")
-    price_by_area = _combine_sales_data(sales_data, external_sales_data)
+    price_by_area = combine_sales_data(sales_data, external_sales_data)
 
     logger.info("Determining regulation need for housing companies...")
     results = _determine_regulation_need(comparison_values, price_by_area)
@@ -343,13 +350,13 @@ def _get_comparison_values(
     return comparison_values
 
 
-def _get_sales_data(
+def get_sales_data(
     from_: datetime.date,
     to_: datetime.date,
-    postal_codes: list[PostalCodeT],
+    postal_codes: Optional[list[PostalCodeT]] = None,
 ) -> dict[PostalCodeT, dict[QuarterT, SaleData]]:
     """
-    Find all sales for apartments in the given postal codes between the given dates
+    Find all sales for apartments (in the given postal codes if not None) between the given dates
     ('from_' is inclusive, 'to_' is exclusive) for use in regulation check.
     """
 
@@ -379,15 +386,17 @@ def _get_sales_data(
             purchase_date__lt=to_,
             exclude_from_statistics=False,
             apartment__building__real_estate__housing_company__exclude_from_statistics=False,
+        )
+    )
+    if postal_codes is not None:
+        sales_in_previous_year = sales_in_previous_year.filter(
             apartment__building__real_estate__housing_company__postal_code__value__in=postal_codes,
         )
-        .all()
-    )
 
     for sale in sales_in_previous_year:
         quarter = to_quarter(sale.purchase_date)
         postal_code = sale.apartment.postal_code.value
-        if postal_code not in postal_codes:
+        if postal_codes is not None and postal_code not in postal_codes:
             continue
 
         sales_by_quarter.setdefault(postal_code, {})
@@ -398,13 +407,12 @@ def _get_sales_data(
     return sales_by_quarter
 
 
-def _get_external_sales_data(
+def get_external_sales_data(
     quarter: QuarterT,
-    postal_codes: list[PostalCodeT],
+    postal_codes: Optional[list[PostalCodeT]] = None,
 ) -> dict[PostalCodeT, dict[QuarterT, SaleData]]:
     """
-    Get all external sales data for the given quarter,
-    filtering the results to include only the given postal codes.
+    Get all external sales data (in the given postal codes if not None) for the given quarter.
     """
     sales_data = get_hitas_object_or_404(ExternalSalesData, calculation_quarter=quarter)
 
@@ -413,7 +421,7 @@ def _get_external_sales_data(
         for area in quarter_data["areas"]:
             quarter_ = quarter_data["quarter"]
             postal_code = area["postal_code"]
-            if postal_code not in postal_codes:
+            if postal_codes is not None and postal_code not in postal_codes:
                 continue
 
             sales_by_quarter.setdefault(postal_code, {})
@@ -422,7 +430,7 @@ def _get_external_sales_data(
     return sales_by_quarter
 
 
-def _combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> dict[PostalCodeT, Decimal]:
+def combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> dict[PostalCodeT, Decimal]:
     """
     Combine multiple sources of sales data (e.g. Hitas sales and External sales data),
     and calculate the average per postal code.
@@ -846,3 +854,19 @@ def convert_thirty_year_regulation_results_to_comparison_data(
         )
 
     return regulation_results
+
+
+def compile_postal_codes_with_cost_areas(price_by_area: dict[PostalCodeT, Decimal]) -> list[RegulationPostalCode]:
+    results: dict[PostalCodeT, RegulationPostalCode] = {
+        postal_code: RegulationPostalCode(
+            postal_code=postal_code,
+            price_by_area=price_by_area,
+            cost_area=None,
+        )
+        for postal_code, price_by_area in price_by_area.items()
+    }
+
+    for postal_code in HitasPostalCode.objects.filter(value__in=list(price_by_area)):
+        results[postal_code.value]["cost_area"] = postal_code.cost_area
+
+    return list(results.values())

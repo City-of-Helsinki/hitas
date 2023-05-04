@@ -2602,6 +2602,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],

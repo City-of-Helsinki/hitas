@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.decorators import action
@@ -11,12 +12,16 @@ from rest_framework.viewsets import ViewSet
 from hitas.models.thirty_year_regulation import RegulationResult
 from hitas.services.thirty_year_regulation import (
     build_thirty_year_regulation_report_excel,
+    combine_sales_data,
+    compile_postal_codes_with_cost_areas,
     convert_thirty_year_regulation_results_to_comparison_data,
+    get_external_sales_data,
+    get_sales_data,
     get_thirty_year_regulation_results,
     get_thirty_year_regulation_results_for_housing_company,
     perform_thirty_year_regulation,
 )
-from hitas.utils import from_iso_format_or_today_if_none
+from hitas.utils import business_quarter, from_iso_format_or_today_if_none, hitas_calculation_quarter, to_quarter
 from hitas.views.utils.excel import get_excel_response
 from hitas.views.utils.pdf import get_pdf_response
 
@@ -90,3 +95,23 @@ class ThirtyYearRegulationView(ViewSet):
         workbook = build_thirty_year_regulation_report_excel(results)
         filename = f"30v vertailun tulokset ({results.calculation_month.isoformat()}).xlsx"
         return get_excel_response(filename=filename, excel=workbook)
+
+
+class ThirtyYearRegulationPostalCodesView(ViewSet):
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            calculation_date = from_iso_format_or_today_if_none(request.query_params.get("calculation_date"))
+        except ValueError as error:
+            raise ValidationError({"calculation_date": str(error)}) from error
+
+        calculation_month = hitas_calculation_quarter(calculation_date)
+        this_quarter = business_quarter(calculation_month)
+        this_quarter_previous_year = this_quarter - relativedelta(years=1)
+        previous_quarter = this_quarter - relativedelta(months=3)
+
+        sales_data = get_sales_data(this_quarter_previous_year, this_quarter)
+        external_sales_data = get_external_sales_data(to_quarter(previous_quarter))
+        price_by_area = combine_sales_data(sales_data, external_sales_data)
+        results = compile_postal_codes_with_cost_areas(price_by_area)
+
+        return Response(data=results, status=status.HTTP_200_OK)
