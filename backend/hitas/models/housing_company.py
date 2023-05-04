@@ -3,6 +3,7 @@ from decimal import Decimal
 from types import DynamicClassAttribute
 from typing import Optional
 
+from auditlog.registry import auditlog
 from crum import get_current_user
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -13,7 +14,12 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete.models import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
+from hitas.models._base import (
+    ExternalSafeDeleteHitasModel,
+    HitasImprovement,
+    HitasMarketPriceImprovement,
+    HitasModelDecimalField,
+)
 from hitas.models.utils import validate_business_id
 
 
@@ -128,7 +134,7 @@ class RegulationStatus(Enum):
 
 
 # Taloyhtiö / "Osakeyhtiö"
-class HousingCompany(ExternalHitasModel):
+class HousingCompany(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     # Official spelling of the housing company name
@@ -279,3 +285,8 @@ class HousingCompanyConstructionPriceImprovement(HitasImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany", on_delete=models.CASCADE, related_name="construction_price_improvements"
     )
+
+
+auditlog.register(HousingCompany)
+auditlog.register(HousingCompanyMarketPriceImprovement)
+auditlog.register(HousingCompanyConstructionPriceImprovement)

@@ -2,11 +2,12 @@ import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, TypeAlias, TypedDict
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 
-from hitas.models._base import HitasModelDecimalField
+from hitas.models._base import HitasModel, HitasModelDecimalField
 
 if TYPE_CHECKING:
     from hitas.models.external_sales_data import SaleData
@@ -30,7 +31,7 @@ class FullSalesData(TypedDict):
     price_by_area: dict[PostalCodeT, float]
 
 
-class ThirtyYearRegulationResultsRow(models.Model):
+class ThirtyYearRegulationResultsRow(HitasModel):
     parent = models.ForeignKey("ThirtyYearRegulationResults", on_delete=models.CASCADE, related_name="rows")
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.CASCADE, related_name="+")
     completion_date = models.DateField()
@@ -65,7 +66,7 @@ class ThirtyYearRegulationResultsRowWithAnnotations(ThirtyYearRegulationResultsR
         abstract = True
 
 
-class ThirtyYearRegulationResults(models.Model):
+class ThirtyYearRegulationResults(HitasModel):
     calculation_month = models.DateField(unique=True)
     regulation_month = models.DateField()
     surface_area_price_ceiling = HitasModelDecimalField(null=True)
@@ -77,3 +78,7 @@ class ThirtyYearRegulationResults(models.Model):
 
     def __str__(self) -> str:
         return f"Thirty-year regulation results for {self.calculation_month.isoformat()!r}"
+
+
+auditlog.register(ThirtyYearRegulationResultsRow)
+auditlog.register(ThirtyYearRegulationResults)

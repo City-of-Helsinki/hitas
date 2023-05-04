@@ -12,7 +12,7 @@ from rest_framework.relations import SlugRelatedField
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import HitasPostalCode
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
 class ValueOrNullField(serializers.Field):
@@ -39,7 +39,7 @@ class UUIDField(serializers.Field):
             raise ValidationError("Not a valid UUID hex.", code="invalid") from error
 
 
-TModel = TypeVar("TModel", bound=ExternalHitasModel)
+TModel = TypeVar("TModel", bound=ExternalSafeDeleteHitasModel)
 
 
 class UUIDRelatedField(SlugRelatedField):

@@ -1,12 +1,13 @@
+from auditlog.registry import auditlog
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
 # Postinumero
-class HitasPostalCode(ExternalHitasModel):
+class HitasPostalCode(ExternalSafeDeleteHitasModel):
     value = models.CharField(max_length=5, unique=True)
     city = models.CharField(max_length=1024, default="Helsinki")
     cost_area = models.PositiveIntegerField(validators=[MaxValueValidator(4), MinValueValidator(1)])
@@ -20,3 +21,6 @@ class HitasPostalCode(ExternalHitasModel):
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}:{self.pk}:{self.value}>"
+
+
+auditlog.register(HitasPostalCode)

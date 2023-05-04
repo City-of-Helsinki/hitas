@@ -30,6 +30,7 @@ num2words = "^0.5.12"
 sentry-sdk = "^1.13.0"
 tomli = "^2.0.1"
 openpyxl = "^3.0.10"
+django-auditlog = "^2.2.2"
 
 [tool.poetry.dependencies.uWSGI]
 version = "^2.0.20"
@@ -50,6 +51,7 @@ testcontainers = {extras = ["postgresql"], version = "^3.6.0"}
 django-debug-toolbar = "^3.6.0"
 pre-commit = "^3"
 pypdf = "^3.6.0"
+sqlparse = "^0.4.4"
 
 [tool.poetry.group.migration]
 optional = true

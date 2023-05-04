@@ -3,7 +3,7 @@ from uuid import UUID
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
-from hitas.models._base import ExternalHitasModel
+from hitas.models._base import ExternalSafeDeleteHitasModel
 from hitas.views.utils import HitasPostalCodeField
 
 
@@ -26,7 +26,7 @@ class ReadOnlySerializer(serializers.Serializer):
 class HitasModelSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
 
-    def get_id(self, instance: ExternalHitasModel) -> str:
+    def get_id(self, instance: ExternalSafeDeleteHitasModel) -> str:
         return instance.uuid.hex
 
     def to_internal_value(self, data):

@@ -1,7 +1,10 @@
 from typing import TypedDict
 
+from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from hitas.models._base import HitasModel
 
 
 class SaleData(TypedDict):
@@ -25,7 +28,7 @@ class ExternalSalesDataType(TypedDict):
     quarter_4: QuarterData
 
 
-class ExternalSalesData(models.Model):
+class ExternalSalesData(HitasModel):
     """Data pulled from tilastokeskus excel for surface area price ceiling calculation"""
 
     calculation_quarter = models.CharField(primary_key=True, max_length=6)
@@ -40,3 +43,6 @@ class ExternalSalesData(models.Model):
     class Meta:
         verbose_name = _("External sales data")
         verbose_name_plural = _("External sales datas")
+
+
+auditlog.register(ExternalSalesData)

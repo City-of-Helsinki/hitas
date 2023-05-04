@@ -1,11 +1,15 @@
-from typing import Optional
+from typing import Any, Optional
 
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from hitas.models import Owner, Ownership
-from hitas.models.utils import check_business_id, check_social_security_number
+from hitas.models.utils import (
+    check_business_id,
+    check_social_security_number,
+)
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
 
 
@@ -50,7 +54,7 @@ class OwnerViewSet(HitasModelViewSet):
     serializer_class = OwnerSerializer
     model_class = Owner
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         instance: Owner = self.get_object()
 
         number_of_ownerships = Ownership.objects.filter(owner__id=instance.id).count()

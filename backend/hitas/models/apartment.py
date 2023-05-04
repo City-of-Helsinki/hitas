@@ -4,6 +4,7 @@ from decimal import Decimal
 from itertools import chain
 from typing import Optional
 
+from auditlog.registry import auditlog
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -11,7 +12,13 @@ from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
 from safedelete import SOFT_DELETE_CASCADE
 
-from hitas.models._base import ExternalHitasModel, HitasImprovement, HitasMarketPriceImprovement, HitasModelDecimalField
+from hitas.models._base import (
+    ExternalSafeDeleteHitasModel,
+    HitasImprovement,
+    HitasMarketPriceImprovement,
+    HitasModel,
+    HitasModelDecimalField,
+)
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.condition_of_sale import ConditionOfSaleAnnotated, GracePeriod
 from hitas.models.housing_company import HousingCompany
@@ -32,7 +39,7 @@ class ApartmentState(Enum):
 
 
 # Huoneisto / Asunto
-class Apartment(ExternalHitasModel):
+class Apartment(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     building = models.ForeignKey("Building", on_delete=models.PROTECT, related_name="apartments")
@@ -406,7 +413,7 @@ class ApartmentConstructionPriceImprovement(HitasImprovement):
     depreciation_percentage = EnumField(DepreciationPercentage, default=DepreciationPercentage.TEN)
 
 
-class ApartmentMaximumPriceCalculation(models.Model):
+class ApartmentMaximumPriceCalculation(HitasModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="max_price_calculations")
@@ -431,3 +438,9 @@ class ApartmentMaximumPriceCalculation(models.Model):
     class Meta:
         verbose_name = _("Apartment maximum price calculation")
         verbose_name_plural = _("Apartment maximum price calculations")
+
+
+auditlog.register(Apartment)
+auditlog.register(ApartmentMarketPriceImprovement)
+auditlog.register(ApartmentConstructionPriceImprovement)
+auditlog.register(ApartmentMaximumPriceCalculation)
