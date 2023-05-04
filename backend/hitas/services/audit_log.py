@@ -1,3 +1,4 @@
+import json
 from typing import TYPE_CHECKING, Iterable, Literal, TypeAlias
 
 from auditlog.models import LogEntry
@@ -33,7 +34,7 @@ def bulk_create_log_entries(
                 object_id=pk if isinstance(pk, int) else None,
                 object_repr=smart_str(obj),
                 action=action,
-                changes=changes[obj.pk],
+                changes=json.dumps(changes[obj.pk]),
                 serialized_data=serialized_data,
             )
         )
