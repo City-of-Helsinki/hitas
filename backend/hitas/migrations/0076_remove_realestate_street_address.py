@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("hitas", "0074_thirtyyearregulationresultsrow_letter_fetched"),
+        ("hitas", "0075_thirtyyearregulationresults_replacement_postal_codes"),
     ]
 
     operations = [

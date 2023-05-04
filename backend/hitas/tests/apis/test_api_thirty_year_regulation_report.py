@@ -54,6 +54,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
             "internal": {"00001": {"2022Q4": {"price": 49000.0, "sale_count": 1}}},
             "price_by_area": {"00001": 49000.0},
         },
+        replacement_postal_codes=[],
     )
 
     row = ThirtyYearRegulationResultsRow.objects.create(
@@ -256,6 +257,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
             "internal": {"00001": {"2022Q4": {"price": 4900.0, "sale_count": 1}}},
             "price_by_area": {"00001": 4900.0},
         },
+        replacement_postal_codes=[],
     )
 
     row = ThirtyYearRegulationResultsRow.objects.create(
@@ -454,6 +456,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
             "internal": {"00001": {"2022Q4": {"price": 49000.0, "sale_count": 1}}},
             "price_by_area": {"00001": 49000.0},
         },
+        replacement_postal_codes=[],
     )
     ThirtyYearRegulationResultsRow.objects.create(
         parent=result_1,
@@ -479,6 +482,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
             "internal": {"00001": {"2022Q4": {"price": 51000.0, "sale_count": 1}}},
             "price_by_area": {"00001": 51000.0},
         },
+        replacement_postal_codes=[],
     )
     row = ThirtyYearRegulationResultsRow.objects.create(
         parent=result,
@@ -750,6 +754,7 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
             "internal": {"00001": {"2022Q4": {"price": 49000.0, "sale_count": 1}}},
             "price_by_area": {"00001": 49000.0},
         },
+        replacement_postal_codes=[],
     )
 
     ThirtyYearRegulationResultsRow.objects.create(
