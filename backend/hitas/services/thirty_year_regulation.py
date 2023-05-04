@@ -109,12 +109,12 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     :param calculation_date: Date to check regulation from.
     """
 
-    this_quarter = business_quarter(calculation_date)
-    this_quarter_previous_year = this_quarter - relativedelta(years=1)
-    previous_quarter = this_quarter - relativedelta(months=3)
-
     calculation_month = hitas_calculation_quarter(calculation_date)
     regulation_month = calculation_month - relativedelta(years=30)
+
+    this_quarter = business_quarter(calculation_month)
+    this_quarter_previous_year = this_quarter - relativedelta(years=1)
+    previous_quarter = this_quarter - relativedelta(months=3)
 
     check_existing_regulation_data(calculation_month)
 

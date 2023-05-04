@@ -2306,6 +2306,14 @@ paths:
       operationId: create-external-sales-data
       tags:
         - External Sales Data
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date, use current date if not given.
+          schema:
+            type: string
+            example: 2023-01-01
       requestBody:
         required: true
         content:
