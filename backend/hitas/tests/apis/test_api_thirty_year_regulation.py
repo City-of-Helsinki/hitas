@@ -63,6 +63,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
         completion_month_index=Decimal("100"),
         calculation_month_index=Decimal("200"),
         regulation_result=RegulationResult.STAYS_REGULATED,
+        letter_fetched=True,
     )
 
     url = reverse("hitas:thirty-year-regulation-list")
@@ -95,6 +96,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=True,
             )
         ],
         skipped=[],
@@ -255,6 +257,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],
@@ -411,6 +414,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         stays_regulated=[],
@@ -551,6 +555,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         stays_regulated=[],
@@ -744,6 +749,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         released_from_regulation=[],
@@ -883,6 +889,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                         city=sale_1.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         released_from_regulation=[
@@ -907,6 +914,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                         city=sale_2.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         stays_regulated=[],
@@ -1032,6 +1040,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         stays_regulated=[],
@@ -1134,6 +1143,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -1227,6 +1237,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -1321,6 +1332,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -1425,6 +1437,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
                         city=sale_1.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -1523,6 +1536,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],
@@ -1631,6 +1645,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],
@@ -1731,6 +1746,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
                         city=apartment_1.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],
@@ -2073,6 +2089,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -2168,6 +2185,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         obfuscated_owners=[],
@@ -2276,6 +2294,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=False,
             )
         ],
         skipped=[],
@@ -2419,6 +2438,7 @@ def test__api__regulation__housing_company_regulation_status(
                             city=sale.apartment.housing_company.property_manager.city,
                         ),
                     ),
+                    letter_fetched=False,
                 )
             ],
             skipped=[],

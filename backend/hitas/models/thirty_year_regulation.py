@@ -43,6 +43,7 @@ class ThirtyYearRegulationResultsRow(HitasModel):
     completion_month_index = HitasModelDecimalField(null=True)
     calculation_month_index = HitasModelDecimalField(null=True)
     regulation_result = EnumField(RegulationResult, max_length=24)
+    letter_fetched = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Thirty Year Regulation Results Row")

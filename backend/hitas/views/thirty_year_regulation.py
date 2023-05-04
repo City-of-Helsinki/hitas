@@ -66,7 +66,13 @@ class ThirtyYearRegulationView(ViewSet):
         context = {"results": results}
         choice = "jatkumisesta" if results.regulation_result == RegulationResult.STAYS_REGULATED else "pättymisestä"
         filename = f"Tiedote sääntelyn {choice} - {results.housing_company.display_name}.pdf"
-        return get_pdf_response(filename=filename, template="regulation_letter.jinja", context=context)
+        response = get_pdf_response(filename=filename, template="regulation_letter.jinja", context=context)
+
+        if not results.letter_fetched:
+            results.letter_fetched = True
+            results.save(update_fields=["letter_fetched"])
+
+        return response
 
     @action(
         methods=["GET"],
