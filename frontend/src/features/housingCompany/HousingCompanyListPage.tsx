@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {Button, IconPlus, IconSearch} from "hds-react";
+import {Button, IconPlus, IconSearch, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
@@ -12,20 +12,34 @@ import {
     QueryStateHandler,
 } from "../../common/components";
 import FilterRelatedModelComboboxField from "../../common/components/FilterRelatedModelComboboxField";
+import {getHousingCompanyHitasTypeName} from "../../common/localisation";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
 import {formatDate} from "../../common/utils";
 
-const HousingCompanyListItem = ({id, name, address, date}): JSX.Element => {
+const HousingCompanyListItem = ({housingCompany}): JSX.Element => {
+    const getStatusLabelText = () => {
+        if (housingCompany.regulation_status.startsWith("released")) {
+            return "Vapautunut";
+        } else if (!housingCompany.completed) {
+            return "Ei valmis";
+        } else {
+            return getHousingCompanyHitasTypeName(housingCompany.hitas_type);
+        }
+    };
+
     return (
-        <Link to={`/housing-companies/${id}`}>
+        <Link to={`/housing-companies/${housingCompany.id}`}>
             <li className="results-list__item">
-                <div className="name">{name}</div>
+                <div className="name">{housingCompany.name}</div>
                 <div className="address">
-                    {address.street_address}
+                    {housingCompany.address.street_address}
                     <br />
-                    {address.postal_code}, {address.city}
+                    {housingCompany.address.postal_code}, {housingCompany.address.city}
                 </div>
-                <div className="date">{formatDate(date)}</div>
+                <div className="date">{formatDate(housingCompany.date)}</div>
+                <div className="housing-company-state">
+                    <StatusLabel>{getStatusLabelText()}</StatusLabel>
+                </div>
             </li>
         </Link>
     );
@@ -45,15 +59,13 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                     <div className="list-header name">Yhtiö</div>
                     <div className="list-header address">Osoite</div>
                     <div className="list-header date">Valmistunut</div>
+                    <div className="list-header housing-company-state">Tila</div>
                 </div>
                 <ul className="results-list">
-                    {data.contents.map((item: IHousingCompany) => (
+                    {data.contents.map((housingCompany: IHousingCompany) => (
                         <HousingCompanyListItem
-                            key={item.id}
-                            id={item.id}
-                            name={item.name}
-                            address={item.address}
-                            date={item.date}
+                            key={housingCompany.id}
+                            housingCompany={housingCompany}
                         />
                     ))}
                 </ul>

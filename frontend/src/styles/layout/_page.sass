@@ -62,22 +62,27 @@ header
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
-      .name, .address, .date, .number, .state, .details > div
+      .name, .address, .date, .housing-company-state, .number, .state, .details > div
         @include flexbox()
         @include flex-flow(column nowrap)
         @include justify-content(center)
+        align-items: flex-start
 
       .name
         width: 35%
 
       .address
-        width: 50%
+        width: 35%
 
       .name, .address
         padding-right: $spacing-layout-2-xs
 
       .date
-        width: 15%
+        width: 18%
+
+      .housing-company-state
+        width: 12%
+        align-items: flex-end
 
       .area
         width: 15%
@@ -218,14 +223,17 @@ header
       padding-right: $spacing-layout-2-xs
 
     &.address
-      width: 50%
+      width: 35%
       padding-right: $spacing-layout-2-xs
 
       .apartments &
         width: 40%
 
     &.date
-      width: 15%
+      width: 18%
+
+    &.housing-company-state
+      width: 12%
 
     &.area
       width: 14%
