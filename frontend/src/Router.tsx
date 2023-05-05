@@ -14,6 +14,7 @@ import {
 } from "./features/apartment";
 import {Codes} from "./features/codes";
 import Documents from "./features/documents/Documents";
+import {Functions} from "./features/functions";
 import {
     HousingCompanyBuildingsPage,
     HousingCompanyCreatePage,
@@ -124,6 +125,10 @@ export default function Router() {
                 <Route
                     path="codes"
                     element={<Codes />}
+                />
+                <Route
+                    path="functions"
+                    element={<Functions />}
                 />
                 <Route
                     index

@@ -1,13 +1,20 @@
 import {Button, IconSaveDisketteFill} from "hds-react";
 
 interface SaveButtonProps {
-    onClick?: () => void;
+    onClick?: (unknown) => unknown;
     isLoading?: boolean;
     disabled?: boolean;
     type?: "submit";
+    buttonText?: string;
 }
 
-export default function SaveButton({onClick, isLoading = false, disabled = false, type}: SaveButtonProps): JSX.Element {
+export default function SaveButton({
+    onClick,
+    isLoading = false,
+    disabled = false,
+    type,
+    buttonText,
+}: SaveButtonProps): JSX.Element {
     return (
         <Button
             iconLeft={<IconSaveDisketteFill />}
@@ -23,7 +30,7 @@ export default function SaveButton({onClick, isLoading = false, disabled = false
             disabled={disabled}
             type={type || "button"}
         >
-            Tallenna
+            {buttonText ?? "Tallenna"}
         </Button>
     );
 }

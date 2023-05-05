@@ -37,6 +37,42 @@ ul, ol
       --spinner-size: 12rem
       --spinner-color: var(--color-engel)
       --spinner-thickness: 1.4rem
+    button &
+      height: 1em
+      margin-left: $spacing-2-xs
+      [class*="LoadingSpinner-module_loadingSpinner"]
+        --spinner-size: 1.5em
+        --spinner-thickness: 3px
+    [class*="Button-module_secondary"] & [class*="LoadingSpinner-module_loadingSpinner"]
+      color: $color-engel-dark
+      --spinner-color: $color-engel-dark
+    [class*="Button-module_secondary"]:not(:disabled):hover & [class*="LoadingSpinner-module_loadingSpinner"]
+      color: $color-engel-medium-light
+      --spinner-color: $color-engel-medium-light
+
+
+[class^="view--"]
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  flex-grow: 1
+  > .spinner-wrap
+    flex-grow: 1
+    [class*="LoadingSpinner-module_loadingSpinner"]
+      --spinner-size: 12rem
+      --spinner-color: var(--color-engel)
+      --spinner-thickness: 1.4rem
+    button &
+      height: 1em
+      margin-left: $spacing-2-xs
+      [class*="LoadingSpinner-module_loadingSpinner"]
+        --spinner-size: 1.5em
+        --spinner-thickness: 3px
+    [class*="Button-module_secondary"] & [class*="LoadingSpinner-module_loadingSpinner"]
+      color: $color-engel-dark
+      --spinner-color: $color-engel-dark
+    [class*="Button-module_secondary"]:not(:disabled):hover & [class*="LoadingSpinner-module_loadingSpinner"]
+      color: $color-engel-medium-light
+      --spinner-color: $color-engel-medium-light
 
 .query-handler-error
   @include flexbox()
