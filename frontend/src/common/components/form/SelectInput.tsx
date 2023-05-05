@@ -64,8 +64,6 @@ const Select = ({
                         label={label}
                         onChange={handleChange}
                         invalid={invalid ?? !!errors[name]}
-                        required={required}
-                        clearable={!required}
                     />
                     {!!fieldError && <p className="text-input_hds-text-input__error-text">{fieldError.message}</p>}
                 </>
