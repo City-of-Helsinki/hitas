@@ -133,7 +133,7 @@ def business_quarter(date: datetime.date) -> datetime.date:
 
 
 def hitas_calculation_quarter(date: datetime.date) -> datetime.date:
-    """Get hitas calculation quarter (yyyy-[2,5,8,11]-01) from the given date.
+    """Get hitas calculation quarter (yyyy-[02,05,08,11]-01) from the given date.
 
     Hitas calculation quarters are different from business quarters, since hitas calculations
     have to be made at least one month after business quarters start due to delays in receiving index

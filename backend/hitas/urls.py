@@ -11,6 +11,11 @@ router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
 router.register(r"owners", views.OwnerViewSet, basename="owner")
 router.register(r"conditions-of-sale", views.ConditionOfSaleViewSet, basename="conditions-of-sale")
 router.register(r"thirty-year-regulation", views.ThirtyYearRegulationView, basename="thirty-year-regulation")
+router.register(
+    r"thirty-year-regulation/postal-codes",
+    views.ThirtyYearRegulationPostalCodesView,
+    basename="thirty-year-regulation-postal-codes",
+)
 router.register(r"indices/maximum-price-index", views.MaximumPriceIndexViewSet, basename="maximum-price-index")
 router.register(r"indices/market-price-index", views.MarketPriceIndexViewSet, basename="market-price-index")
 router.register(

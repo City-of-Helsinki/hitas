@@ -2306,6 +2306,14 @@ paths:
       operationId: create-external-sales-data
       tags:
         - External Sales Data
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date, use current date if not given.
+          schema:
+            type: string
+            example: 2023-01-01
       requestBody:
         required: true
         content:
@@ -2479,6 +2487,37 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/thirty-year-regulation/postal-codes:
+    get:
+      description: List all postal codes available from the sales data
+      operationId: read-regulation-postal-codes
+      tags:
+        - Thirty Year Regulation
+      parameters:
+        - name: calculation_date
+          required: false
+          in: query
+          description: Calculation date of the regulation, use current date if not given
+          schema:
+            type: string
+            example: 2023-01-01
+      responses:
+        '200':
+          description: Successfully read postal codes
+          content:
+            application/json:
+              schema:
+                description: List of postal codes with additional information
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThirtyYearRegulationPostalCodes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -7373,6 +7412,32 @@ components:
           description: Has the regulation letter been fetched for this housing company?
           type: boolean
           example: false
+
+    ThirtyYearRegulationPostalCodes:
+      description: Thirty year regulation postal codes
+      type: object
+      additionalProperties: false
+      required:
+        - postal_code
+        - price_by_area
+        - cost_area
+      properties:
+        postal_code:
+          description: Postal code
+          type: string
+          example: 00230
+        price_by_area:
+          description: Average price per square meter for the postal code
+          type: number
+          minimum: 0
+          example: 143535.00
+        cost_area:
+          description: Cost area of the postal code
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 4
+          example: 2
 
     ObfuscatedOwner:
       description: Owner that has been obfuscated due to no longer owning any regulated apartments
