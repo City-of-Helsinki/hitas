@@ -7331,8 +7331,12 @@ components:
       required:
         - id
         - display_name
+        - address
         - price
         - old_ruleset
+        - completion_date
+        - property_manager
+        - letter_fetched
       properties:
         id:
           description: ID of a housing company
@@ -7365,6 +7369,10 @@ components:
           example: 2023-02-01
         property_manager:
           $ref: '#/components/schemas/ReadOnlyPropertyManager'
+        letter_fetched:
+          description: Has the regulation letter been fetched for this housing company?
+          type: boolean
+          example: false
 
     ObfuscatedOwner:
       description: Owner that has been obfuscated due to no longer owning any regulated apartments

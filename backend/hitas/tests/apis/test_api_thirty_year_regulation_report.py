@@ -68,6 +68,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         completion_month_index=Decimal("100.00"),
         calculation_month_index=Decimal("200.00"),
         regulation_result=RegulationResult.STAYS_REGULATED,
+        letter_fetched=False,
     )
 
     url = (
@@ -77,6 +78,10 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
 
     response: HttpResponse = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
+
+    # Fetch has been saved
+    row.refresh_from_db()
+    assert row.letter_fetched is True
 
     letter = PdfReader(BytesIO(response.content))
     assert len(letter.pages) == 2
@@ -274,6 +279,10 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
 
     response: HttpResponse = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
+
+    # Fetch has been saved
+    row.refresh_from_db()
+    assert row.letter_fetched is True
 
     letter = PdfReader(BytesIO(response.content))
     assert len(letter.pages) == 2

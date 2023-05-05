@@ -77,6 +77,7 @@ class ComparisonData(TypedDict):
     old_ruleset: bool
     completion_date: datetime.date | str
     property_manager: PropertyManagerInfo
+    letter_fetched: bool
 
 
 class RegulationResults(TypedDict):
@@ -294,6 +295,7 @@ def _split_automatically_released(
                             city=housing_company.property_manager.city,
                         ),
                     ),
+                    letter_fetched=False,
                 )
             )
             housing_companies[i] = None
@@ -335,6 +337,7 @@ def _get_comparison_values(
                     city=housing_company.property_manager.city,
                 ),
             ),
+            letter_fetched=False,
         )
 
     return comparison_values
@@ -838,6 +841,7 @@ def convert_thirty_year_regulation_results_to_comparison_data(
                         city=row.housing_company.property_manager.city,
                     ),
                 ),
+                letter_fetched=row.letter_fetched,
             )
         )
 
