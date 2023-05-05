@@ -16,6 +16,25 @@ export const housingCompanyStates = [
     "ready_no_statistics",
 ] as const;
 
+export const housingCompanyHitasTypes = [
+    "non_hitas",
+    "hitas_1",
+    "hitas_2",
+    "hitas_1_no_interest",
+    "hitas_2_no_interest",
+    "new_hitas_1",
+    "new_hitas_2",
+    "half_hitas",
+    "rental_hitas_1",
+    "rental_hitas_2",
+] as const;
+
+export const housingCompanyRegulationStatus = [
+    "regulated",
+    "released_by_hitas",
+    "released_by_plot_department",
+] as const;
+
 export const hitasQuarters = [
     {
         value: "02-01",
@@ -185,12 +204,19 @@ const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
 
 const HousingCompanyAreaSchema = object({name: string(), cost_area: number()});
 
+const HousingCompanyHitasTypeSchema = z.enum(housingCompanyHitasTypes);
 const HousingCompanyStateSchema = z.enum(housingCompanyStates);
+const HousingCompanyRegulationStatusSchema = z.enum(housingCompanyRegulationStatus);
 
 const HousingCompanySchema = object({
     id: APIIdString,
     name: string(),
     state: HousingCompanyStateSchema,
+    hitas_type: HousingCompanyHitasTypeSchema,
+    exclude_from_statistics: boolean(),
+    regulation_status: HousingCompanyRegulationStatusSchema,
+    over_thirty_years_old: boolean(),
+    completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
     date: string().nullable(),
@@ -221,12 +247,18 @@ const RealEstateSchema = object({
 
 const HousingCompanyDetailsSchema = object({
     id: APIIdString,
-    name: object({official: string(), display: string()}),
     business_id: string().nullable(),
+    name: object({official: string(), display: string()}),
     state: HousingCompanyStateSchema,
+    hitas_type: HousingCompanyHitasTypeSchema,
+    exclude_from_statistics: boolean(),
+    regulation_status: HousingCompanyRegulationStatusSchema,
+    over_thirty_years_old: boolean(),
+    completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
     date: string().nullable(),
+    real_estates: RealEstateSchema.array(),
     financing_method: CodeSchema,
     building_type: CodeSchema,
     developer: CodeSchema,
@@ -234,9 +266,9 @@ const HousingCompanyDetailsSchema = object({
     acquisition_price: number(),
     primary_loan: number().optional(),
     sales_price_catalogue_confirmation_date: string().nullable(),
-    release_date: string().nullable(),
-    archive_id: number(),
     notes: string().nullable(),
+    archive_id: number(),
+    release_date: string().nullable(),
     last_modified: object({
         user: object({
             user: string().nullable(),
@@ -245,7 +277,6 @@ const HousingCompanyDetailsSchema = object({
         }),
         datetime: z.date(),
     }),
-    real_estates: RealEstateSchema.array(),
     summary: object({
         average_price_per_square_meter: number(),
         realized_acquisition_price: number(),

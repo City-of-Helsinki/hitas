@@ -3,7 +3,11 @@ import {Link, useParams} from "react-router-dom";
 
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
-import {getHousingCompanyStateName} from "../../common/localisation";
+import {
+    getHousingCompanyHitasTypeName,
+    getHousingCompanyRegulationStatusName,
+    getHousingCompanyStateName,
+} from "../../common/localisation";
 import {IHousingCompanyDetails} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
@@ -18,6 +22,20 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             </Heading>
             <div className="company-status">
                 <StatusLabel>Vapautunut 1.6.2022 ({getHousingCompanyStateName(data.state)})</StatusLabel>
+                <StatusLabel>{getHousingCompanyHitasTypeName(housingCompany.hitas_type)}</StatusLabel>
+                <StatusLabel>{housingCompany.completed ? "Valmis" : "Ei valmis"}</StatusLabel>
+                {housingCompany.completed ? (
+                    <>
+                        <StatusLabel>
+                            {housingCompany.over_thirty_years_old ? "Yli 30 vuotta" : "Alle 30 vuotta"}
+                        </StatusLabel>
+                        <StatusLabel>
+                            {getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}
+                        </StatusLabel>
+                    </>
+                ) : null}
+
+                {housingCompany.exclude_from_statistics ? <StatusLabel>Ei tilastoihin</StatusLabel> : null}
             </div>
             <div className="company-details">
                 <div className="tab-area">
