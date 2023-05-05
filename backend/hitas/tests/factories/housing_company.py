@@ -48,7 +48,6 @@ class RealEstateFactory(DjangoModelFactory):
 
     housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
     property_identifier = factory.Faker("bothify", text="####-####-####-####")
-    street_address = factory.Faker("street_address")
 
 
 class BuildingFactory(DjangoModelFactory):

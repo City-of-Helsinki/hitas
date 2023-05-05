@@ -15273,7 +15273,6 @@
       "deleted_by_cascade": false,
       "uuid": "a20254d4-b3ea-4f25-a509-f4f081d9e446",
       "housing_company": 1,
-      "street_address": "Fakestreet 123",
       "property_identifier": "091-020-0015-0003"
     }
   },
@@ -15285,7 +15284,6 @@
       "deleted_by_cascade": false,
       "uuid": "5a62b822-5ee2-40ce-aa6e-49644f77ec45",
       "housing_company": 2,
-      "street_address": "Betleheminkuja 300",
       "property_identifier": "6535-9995-1426-4929"
     }
   },
@@ -15297,7 +15295,6 @@
       "deleted_by_cascade": false,
       "uuid": "6a21e0f1-9ad5-49f8-8f0a-94a096a5eac4",
       "housing_company": 3,
-      "street_address": "Malminkartanonbulevardi 575",
       "property_identifier": "4510-9520-6441-3392"
     }
   },
@@ -15309,7 +15306,6 @@
       "deleted_by_cascade": false,
       "uuid": "4a8e7cf0-3a7e-45cb-a4fe-a3285799dafa",
       "housing_company": 4,
-      "street_address": "Uurtajanpolku 782",
       "property_identifier": "2059-2641-8704-8619"
     }
   },
@@ -15321,7 +15317,6 @@
       "deleted_by_cascade": false,
       "uuid": "91d5c926-f0fc-4ed0-91d8-160ae87b11bb",
       "housing_company": 5,
-      "street_address": "Willebrandinbulevardi 4",
       "property_identifier": "3032-1618-8490-9881"
     }
   },
@@ -15333,7 +15328,6 @@
       "deleted_by_cascade": false,
       "uuid": "367aeceb-6c52-49b9-8f87-d24b3e738927",
       "housing_company": 6,
-      "street_address": "Niitynperänkuja 74",
       "property_identifier": "4669-9138-2027-5229"
     }
   },
@@ -15345,7 +15339,6 @@
       "deleted_by_cascade": false,
       "uuid": "e487b17e-13e0-49dc-8c4c-034b7a875ebb",
       "housing_company": 7,
-      "street_address": "Orisaarenbulevardi 48",
       "property_identifier": "6911-0472-5072-1192"
     }
   },
@@ -15357,7 +15350,6 @@
       "deleted_by_cascade": false,
       "uuid": "5ff86872-53a3-48f9-8dfb-656171ce3315",
       "housing_company": 8,
-      "street_address": "Fabianinbulevardi 461",
       "property_identifier": "8440-9485-1889-1839"
     }
   },

@@ -14,8 +14,6 @@ class RealEstate(ExternalSafeDeleteHitasModel):
 
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")
 
-    street_address = models.CharField(max_length=1024)
-
     # 'kiinteistötunnus'
     property_identifier = models.CharField(
         null=True,
@@ -23,6 +21,10 @@ class RealEstate(ExternalSafeDeleteHitasModel):
         validators=[validate_property_id],
         help_text=_("Format: 1234-1234-1234-1234"),
     )
+
+    @property
+    def street_address(self) -> str:
+        return self.housing_company.street_address
 
     @property
     def postal_code(self) -> HitasPostalCode:

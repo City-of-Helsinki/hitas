@@ -490,8 +490,6 @@ def create_real_estates_and_buildings(
         new = RealEstate()
         new.housing_company = housing_company
         new.property_identifier = real_estate["property_identifier"]
-        new.street_address = housing_company.street_address
-
         new.save()
 
         b = Building()
