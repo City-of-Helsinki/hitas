@@ -57,7 +57,7 @@ companies = Table(
     Column("C_SAANNOSTELY", HitasBoolean, nullable=False),
     Column("C_HITVAPKOODI", String(16), key="state_codebook", nullable=False),  # Always 'HITVAPAUTUS'
     Column("C_HITVAPTYYP", String(12), key="state_code", nullable=False),
-    Column("D_HITVAPILMPVM", Date, key="notification_date"),
+    Column("D_HITVAPILMPVM", Date, key="legacy_release_date"),
     Column("N_MHINDKESKIHINTA", Integer, nullable=False),
     Column("N_RAKINDKESKIHINTA", Integer, nullable=False),
     Column("C_DIAARINRO", String(10)),
@@ -77,7 +77,7 @@ company_addresses = Table(
     metadata_obj,
     Column("KG_YOTUNNUS", Integer, key="id", primary_key=True),
     Column("KG_YTUNNUS", Integer, ForeignKey("HITYHTIO.id"), key="company_id", nullable=False),
-    Column("C_KATUOS", String(50), nullable=False),
+    Column("C_KATUOS", String(50), key="street_address", nullable=False),
     Column("C_MUUTTAJA", String(10), nullable=False),
     Column("D_MUUTETTU", Date, nullable=False),
 )
