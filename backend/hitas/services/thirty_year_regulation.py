@@ -79,6 +79,7 @@ class ComparisonData(TypedDict):
     completion_date: datetime.date | str
     property_manager: PropertyManagerInfo
     letter_fetched: bool
+    current_regulation_status: RegulationStatus | str
 
 
 class RegulationResults(TypedDict):
@@ -303,6 +304,7 @@ def _split_automatically_released(
                         ),
                     ),
                     letter_fetched=False,
+                    current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
                 )
             )
             housing_companies[i] = None
@@ -345,6 +347,7 @@ def _get_comparison_values(
                 ),
             ),
             letter_fetched=False,
+            current_regulation_status=RegulationStatus.REGULATED.value,  # Changed later if necessary
         )
 
     return comparison_values
@@ -489,6 +492,7 @@ def _determine_regulation_need(
                     f"Housing company {display_name!r} should be released from regulation since: "
                     f"{comparison_value} >= {postal_code_average_price_per_square_meter}."
                 )
+                comparison_data["current_regulation_status"] = RegulationStatus.RELEASED_BY_HITAS.value
                 results["released_from_regulation"].append(comparison_data)
             else:
                 logger.info(
@@ -850,6 +854,7 @@ def convert_thirty_year_regulation_results_to_comparison_data(
                     ),
                 ),
                 letter_fetched=row.letter_fetched,
+                current_regulation_status=row.housing_company.regulation_status.value,
             )
         )
 
