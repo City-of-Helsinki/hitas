@@ -51,6 +51,7 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                                         formObjectFieldPath={`ownerships.${index}.owner`}
                                         formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
                                         disabled={disabled}
+                                        relatedModelMutateComponent={<>TODO</>}
                                     />
                                 </div>
                                 <div className="percentage">
