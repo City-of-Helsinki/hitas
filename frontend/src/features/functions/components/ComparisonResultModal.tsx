@@ -1,7 +1,7 @@
 import {Dialog} from "hds-react";
-import {CloseButton} from "./index";
+import {CloseButton} from "../../../common/components";
 
-export default function ErrorNotificationModal({isOpen, setIsOpen, error}) {
+export default function ComparisonResultModal({isOpen, setIsOpen, error}) {
     if (!error) {
         return null;
     }
@@ -13,7 +13,7 @@ export default function ErrorNotificationModal({isOpen, setIsOpen, error}) {
         >
             <Dialog.Header
                 id="error-notification-modal-header"
-                title={`Virhe ${error?.status && error.status + ": "}${error?.reason}!`}
+                title={`Virhe ${error?.data?.status && error.status + ": "}${error?.reason}!`}
             />
             <Dialog.Content>
                 <ul>

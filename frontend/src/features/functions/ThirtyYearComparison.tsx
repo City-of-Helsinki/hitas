@@ -3,7 +3,6 @@ import {useForm} from "react-hook-form";
 import {hitasQuarters} from "../../common/schemas";
 
 import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
 import {
     useCreateThirtyYearComparisonMutation,
     useGetExternalSalesDataQuery,
@@ -11,76 +10,11 @@ import {
     useSaveExternalSalesDataMutation,
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler, SaveButton, SaveDialogModal} from "../../common/components";
-import ErrorNotificationModal from "../../common/components/ErrorNotificationModal";
 import {FileInput, Select} from "../../common/components/form";
-import {formatDate, hdsToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
+import {ComparisonResultModal, LoadedThirtyYearComparison} from "./components";
 import {comparisonResponses, priceCeilings} from "./simulatedResponses";
 
-const LoadedThirtyYearComparison = ({data}) => {
-    if (data?.error !== undefined) return <h3>Error: {data.error}</h3>; // For testing purposes - error's shouldn't get here
-    const automaticallyReleased = data?.automatically_released ?? [];
-    const releasedFromRegulation = data?.released_from_regulation ?? [];
-    const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];
-    const stayingCompanies = data?.stays_regulated ?? [];
-
-    const ListItem = ({company}) => (
-        <Link to={`/housing-companies/${company.id}`}>
-            <li className="results-list__item">
-                <div className="name">{company.display_name}</div>
-                <div className="address">
-                    {company.address.street_address}
-                    <br />
-                    {company.address.postal_code}, {company.address.city}
-                </div>
-                <div className="date">{formatDate(company.completion_date)}</div>
-            </li>
-        </Link>
-    );
-
-    const ListItems = ({list}) => {
-        if (list.length < 1) return <p>Ei yhtiöitä!</p>;
-        return list.map((item, idx) => (
-            <ListItem
-                company={item}
-                key={idx}
-            />
-        ));
-    };
-
-    const ResultsList = ({category}) => (
-        <div className={`companies companies--${category}`}>
-            <Heading type="body">
-                {category === "freed" ? "Vapautuneet " : "Valvonnan piiriin jäävät "}
-                yhtiöt
-            </Heading>
-            <div className="list">
-                <div className="list-headers">
-                    <div className="list-header name">Nimi</div>
-                    <div className="list-header address">Osoite</div>
-                    <div className="list-header date">Valmistunut</div>
-                </div>
-                {releasedCompanies.length > 0 ? (
-                    <ul className="results-list">
-                        {category === "freed" ? (
-                            <ListItems list={releasedCompanies} />
-                        ) : (
-                            <ListItems list={stayingCompanies} />
-                        )}
-                    </ul>
-                ) : (
-                    <p>Ei vapautuvia yhtiöitä</p>
-                )}
-            </div>
-        </div>
-    );
-
-    return (
-        <>
-            <ResultsList category="freed" />
-            <ResultsList category="remaining" />
-        </>
-    );
-};
 const ThirtyYearComparison = () => {
     const [isTestMode, setIsTestMode] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -180,18 +114,8 @@ const ThirtyYearComparison = () => {
     // ******************
 
     const onCompareButtonClick = (result) => {
-        if (isTestMode) {
-            if (formTimePeriod.value === "noProblems") {
-                setHasComparison(true);
-                hdsToast.success("Vertailu suoritettu onnistuneesti.");
-            } else {
-                setHasComparison(false);
-                hdsToast.error("Vertailua ei voitu suorittaa!");
-                setIsErrorModalOpen(true);
-            }
-            return;
-        }
         makeComparison({data: {calculation_date: formDate}})
+            .unwrap()
             .then(() => {
                 setHasComparison(true);
                 hdsToast.success("Vertailu suoritettu onnistuneesti.");
@@ -214,12 +138,14 @@ const ThirtyYearComparison = () => {
         };
         console.log("File + date:", fileWithDate);
         saveExternalSalesData(fileWithDate)
+            .unwrap()
             .catch((error) => {
                 console.warn("Caught error:", error);
                 setIsSaveModalOpen(true);
             })
             .then((data) => {
                 if ("error" in (data as object)) {
+                    console.warn("Uncaught error:", data.error);
                     setIsSaveModalOpen(true);
                 } else {
                     // Successful upload
@@ -330,7 +256,7 @@ const ThirtyYearComparison = () => {
                 data={comparisonData}
                 error={comparisonError}
                 isLoading={isComparisonLoading}
-                attemptedAction="hae vertailun tulokset, tai suorita vertailu"
+                attemptedAction="hae suoritetun vertailun tulokset"
             >
                 <LoadedThirtyYearComparison data={comparisonData} />
             </QueryStateHandler>
@@ -342,7 +268,7 @@ const ThirtyYearComparison = () => {
                 isVisible={isSaveModalOpen}
                 setIsVisible={setIsSaveModalOpen}
             />
-            <ErrorNotificationModal
+            <ComparisonResultModal
                 isOpen={isErrorModalOpen}
                 setIsOpen={setIsErrorModalOpen}
                 error={comparisonError}
