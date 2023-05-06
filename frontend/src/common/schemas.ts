@@ -322,7 +322,7 @@ const ownerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
-    email: string({required_error: errorMessages.required}).email(errorMessages.emailInvalid).nullable(),
+    email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
 });
 
 const ownershipSchema = object({

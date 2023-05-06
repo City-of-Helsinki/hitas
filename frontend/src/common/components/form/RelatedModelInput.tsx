@@ -1,9 +1,16 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
-import {Button, Dialog, IconArrowLeft, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
+import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 
 import {dotted} from "../../utils";
 import {QueryStateHandler} from "../index";
+
+type IRelatedModelMutateComponent = React.FC<{
+    formObject;
+    formObjectFieldPath: string;
+    cancelButtonAction: () => void;
+    closeModalAction: () => void;
+}>;
 
 const RelatedModelTextInput = ({
     label,
@@ -50,6 +57,19 @@ const RelatedModelTextInput = ({
     );
 };
 
+interface IRelatedModelInputProps {
+    label?: string;
+    queryFunction;
+    relatedModelSearchField: string;
+    formObject;
+    formObjectFieldPath: string;
+    formatFormObjectValue: (unknown) => string;
+    isModalOpen: boolean;
+    closeModal: () => void;
+    // If component is passed, creating new objects is enabled
+    RelatedModelMutateComponent?: IRelatedModelMutateComponent;
+}
+
 const RelatedModelModal = ({
     label,
     queryFunction,
@@ -59,8 +79,8 @@ const RelatedModelModal = ({
     formatFormObjectValue,
     isModalOpen,
     closeModal,
-    relatedModelMutateComponent,
-}) => {
+    RelatedModelMutateComponent,
+}: IRelatedModelInputProps) => {
     const MIN_LENGTH = 2; // Minimum length before applying filter
     const [internalFilterValue, setInternalFilterValue] = useState("");
     const [isRelatedModelMutateVisible, setIsRelatedModelMutateVisible] = useState(false);
@@ -113,18 +133,13 @@ const RelatedModelModal = ({
             />
             <Dialog.Content>
                 <div className="input-field--related-model--modal--content">
-                    {isRelatedModelMutateVisible ? (
-                        <>
-                            {relatedModelMutateComponent}
-                            <Button
-                                theme="black"
-                                size="small"
-                                iconLeft={<IconArrowLeft />}
-                                onClick={() => setIsRelatedModelMutateVisible(false)}
-                            >
-                                Peruuta
-                            </Button>
-                        </>
+                    {isRelatedModelMutateVisible && RelatedModelMutateComponent ? (
+                        <RelatedModelMutateComponent
+                            formObject={formObject}
+                            formObjectFieldPath={formObjectFieldPath}
+                            cancelButtonAction={() => setIsRelatedModelMutateVisible(false)}
+                            closeModalAction={() => closeModal()}
+                        />
                     ) : (
                         <>
                             <TextInput
@@ -158,7 +173,7 @@ const RelatedModelModal = ({
                                     Näytetään {data?.page.size}/{data?.page.total_items} tulosta.
                                 </span>
                             </QueryStateHandler>
-                            {relatedModelMutateComponent ? (
+                            {RelatedModelMutateComponent ? (
                                 <Button
                                     theme="black"
                                     size="small"
@@ -192,7 +207,7 @@ interface RelatedModelInputProps {
     errorText?: string;
     tooltipText?: string;
 
-    relatedModelMutateComponent?: JSX.Element;
+    RelatedModelMutateComponent?: IRelatedModelMutateComponent;
 }
 
 const RelatedModelInput = ({
@@ -207,7 +222,7 @@ const RelatedModelInput = ({
     formObjectFieldPath,
     formatFormObjectValue,
 
-    relatedModelMutateComponent,
+    RelatedModelMutateComponent,
 }: RelatedModelInputProps) => {
     formObject.register(formObjectFieldPath);
 
@@ -235,7 +250,7 @@ const RelatedModelInput = ({
                 formatFormObjectValue={formatFormObjectValue}
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
-                relatedModelMutateComponent={relatedModelMutateComponent}
+                RelatedModelMutateComponent={RelatedModelMutateComponent}
             />
         </div>
     );
