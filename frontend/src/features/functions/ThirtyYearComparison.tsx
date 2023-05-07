@@ -166,22 +166,26 @@ const ThirtyYearComparison = () => {
             data: data.file,
             calculation_date: formDate,
         };
-        saveExternalSalesData(fileWithDate)
-            .unwrap()
-            .catch((error) => {
-                console.warn("Caught error:", error);
-                setIsSaveModalOpen(true);
-            })
-            .then((data) => {
-                if ("error" in (data as object)) {
-                    console.warn("Uncaught error:", data.error);
+        if (isTestMode) {
+            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
+            return;
+        } else
+            saveExternalSalesData(fileWithDate)
+                .unwrap()
+                .catch((error) => {
+                    console.warn("Caught error:", error);
                     setIsSaveModalOpen(true);
-                } else {
-                    // Successful upload
-                    hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
-                    formObject.setValue("file", undefined, {shouldValidate: true});
-                }
-            });
+                })
+                .then((data) => {
+                    if ("error" in (data as object)) {
+                        console.warn("Uncaught error:", data.error);
+                        setIsSaveModalOpen(true);
+                    } else {
+                        // Successful upload
+                        hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
+                        formObject.setValue("file", undefined, {shouldValidate: true});
+                    }
+                });
     };
 
     // *************
