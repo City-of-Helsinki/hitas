@@ -27,15 +27,15 @@ const ThirtyYearComparison = () => {
         {label: "Testaus", value: "TEST"}, // TODO: remove this after testing/before release
     ];
     const testOptions = [
-        {label: "Onnistunut vertailu", value: "noProblems"},
-        {label: "Yhtiöta ei pystytty vertailemaan", value: "skippedCompany"},
-        {label: "Ei yhtiöitä", value: "noCompanies"},
-        {label: "Indeksi puuttuu", value: "missingIndex"},
-        {label: "Excel-tiedosto puuttuu", value: "missingExcel"},
-        {label: "Rajahinta puuttuu", value: "missingPriceCeiling"},
-        {label: "Yhtiöltä puuttuu pinta-alaa", value: "missingSurfaceArea"},
-        {label: "Jonkin yhtiön pinta-ala on 0", value: "zeroSurfaceArea"},
-        {label: "Saman vertailun toisto", value: "alreadyCompared"},
+        {label: "Onnistunut vertailu", value: "result_noProblems"},
+        {label: "Yhtiöta ei pystytty vertailemaan", value: "result_skippedCompany"},
+        {label: "Ei yhtiöitä", value: "result_noCompanies"},
+        {label: "Indeksi puuttuu", value: "error_missingIndex"},
+        {label: "Excel-tiedosto puuttuu", value: "error_missingExcel"},
+        {label: "Rajahinta puuttuu", value: "error_missingPriceCeiling"},
+        {label: "Yhtiöltä puuttuu pinta-ala", value: "error_missingSurfaceArea"},
+        {label: "Jonkin yhtiön pinta-ala on 0", value: "error_zeroSurfaceArea"},
+        {label: "Saman vertailun toisto", value: "error_alreadyCompared"},
     ];
 
     // React hook form
@@ -103,56 +103,77 @@ const ThirtyYearComparison = () => {
 
     // Simulated comparison API responses
     const priceCeiling = priceCeilings[formYear.value][formTimePeriod.value];
-    const comparisonData = isValidTestMode ? comparisonResponses.success : getComparisonData ?? makeComparisonData;
+    let comparisonData: object | undefined = getComparisonData ?? makeComparisonData;
     const isComparisonLoading = isValidTestMode ? false : isGetComparisonLoading ?? isMakeComparisonLoading;
-    const comparisonError = isValidTestMode
-        ? comparisonResponses.failure[formTimePeriod.value]
-        : getComparisonError ?? makeComparisonError;
+    let comparisonError = getComparisonError ?? makeComparisonError;
+    // If test mode is on, use the selected test option to simulate a response or error
+    if (isTestMode) {
+        if (formTimePeriod.value.split("_")[0] === "result") {
+            comparisonData = comparisonResponses[formTimePeriod.value];
+            comparisonError = undefined;
+        } else {
+            comparisonData = undefined;
+            comparisonError = comparisonResponses[formTimePeriod.value];
+        }
+        console.log(comparisonData, comparisonError);
+    }
 
     // ******************
     // * Event handlers *
     // ******************
 
     const onCompareButtonClick = (result) => {
-        makeComparison({data: {calculation_date: formDate}})
-            .unwrap()
-            .then(() => {
-                setHasComparison(true);
-                hdsToast.success("Vertailu suoritettu onnistuneesti.");
-            })
-            .catch((error) => {
-                console.warn("Error:", error);
-                setIsErrorModalOpen(true);
-            });
+        if (isTestMode) {
+            console.log("onCompareButtonClick event, with result:", result);
+            if (formTimePeriod.value.split("_")[0] === "result") {
+                comparisonData = comparisonResponses[formTimePeriod.value];
+                comparisonError = {};
+            } else {
+                comparisonData = {};
+                comparisonError = comparisonResponses[formTimePeriod.value];
+            }
+            if (formTimePeriod.value.split("_")[0] === "error") setIsErrorModalOpen(true);
+            else setHasComparison(true);
+        } else
+            makeComparison({data: {calculation_date: formDate}})
+                .unwrap()
+                .then((data) => {
+                    console.log("Comparison data:", data);
+                    setHasComparison(true);
+                    hdsToast.success("Vertailu suoritettu onnistuneesti!");
+                })
+                .catch((error) => {
+                    console.warn("Error:", error);
+                    setIsErrorModalOpen(true);
+                });
     };
 
     // Submit = upload file
     const onSubmit = (data) => {
-        if (isTestMode) {
-            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
-            return;
-        }
         const fileWithDate = {
             data: data.file,
             calculation_date: formDate,
         };
-        console.log("File + date:", fileWithDate);
-        saveExternalSalesData(fileWithDate)
-            .unwrap()
-            .catch((error) => {
-                console.warn("Caught error:", error);
-                setIsSaveModalOpen(true);
-            })
-            .then((data) => {
-                if ("error" in (data as object)) {
-                    console.warn("Uncaught error:", data.error);
+        if (isTestMode) {
+            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
+            return;
+        } else
+            saveExternalSalesData(fileWithDate)
+                .unwrap()
+                .catch((error) => {
+                    console.warn("Caught error:", error);
                     setIsSaveModalOpen(true);
-                } else {
-                    // Successful upload
-                    hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
-                    formObject.setValue("file", undefined, {shouldValidate: true});
-                }
-            });
+                })
+                .then((data) => {
+                    if ("error" in (data as object)) {
+                        console.warn("Uncaught error:", data.error);
+                        setIsSaveModalOpen(true);
+                    } else {
+                        // Successful upload
+                        hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
+                        formObject.setValue("file", undefined, {shouldValidate: true});
+                    }
+                });
     };
 
     // *************
@@ -160,14 +181,17 @@ const ThirtyYearComparison = () => {
     // *************
     useEffect(() => {
         if (formYear.value === "TEST") {
-            console.log("Test mode ON!");
             setIsTestMode((prev) => true);
-            formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
+            setHasComparison(false);
+            // set the value to the first test option if there is a date selected
+            if (!isNaN(Number(formTimePeriod.value.charAt(0))))
+                formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
         } else if (isTestMode) {
             console.log("Test mode OFF!");
+            formObject.setValue("quarter", hitasQuarters[0], {shouldValidate: true});
             setIsTestMode((prev) => false);
         }
-    }, [formYear]);
+    }, [formDate]);
 
     return (
         <div className="view--functions__thirty-year-regulation">
@@ -192,6 +216,7 @@ const ThirtyYearComparison = () => {
                             formObject={formObject}
                             defaultValue={years[0]}
                             value={formYear}
+                            required
                         />
                         <Select
                             label=""
@@ -200,6 +225,7 @@ const ThirtyYearComparison = () => {
                             formObject={formObject}
                             defaultValue={isTestMode ? testOptions[0] : hitasQuarterOptions[0]}
                             value={formTimePeriod}
+                            required
                         />
                     </div>
                     <div className="price-ceiling">
@@ -211,36 +237,49 @@ const ThirtyYearComparison = () => {
                         <div className="value">{priceCeiling ?? "---"} €/m²</div>
                     </div>
                 </form>
-                <Divider size="l" />
-                {!hasTimePeriodFile ? (
-                    <form
-                        className={`file${formFile === undefined ? "" : " file--selected"}`}
-                        onSubmit={handleSubmit(onSubmit)}
-                    >
-                        <FileInput
-                            name="file"
-                            id="file-input"
-                            buttonLabel="Valitse tiedosto"
-                            formObject={formObject}
-                            label="Syötä postinumeroalueiden keskineliöhinnat"
-                            tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
-                        />
-                        <SaveButton
-                            type="submit"
-                            isLoading={isExternalSalesDataSaving}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                return;
-                            }}
-                            disabled={formFile === undefined}
-                            buttonText="Tallenna keskineliöhinnat"
-                        />
-                    </form>
-                ) : (
-                    <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
+                {!isTestMode && (
+                    <>
+                        <Divider size="l" />
+                        {!hasComparison && !hasTimePeriodFile ? (
+                            <form
+                                className={`file${formFile === undefined ? "" : " file--selected"}`}
+                                onSubmit={handleSubmit(onSubmit)}
+                            >
+                                <FileInput
+                                    name="file"
+                                    id="file-input"
+                                    buttonLabel="Valitse tiedosto"
+                                    formObject={formObject}
+                                    label="Syötä postinumeroalueiden keskineliöhinnat"
+                                    tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
+                                />
+                                <SaveButton
+                                    type="submit"
+                                    isLoading={isExternalSalesDataSaving}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        return;
+                                    }}
+                                    disabled={formFile === undefined}
+                                    buttonText="Tallenna keskineliöhinnat"
+                                />
+                            </form>
+                        ) : (
+                            <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
+                        )}
+                    </>
                 )}
             </div>
-            {!hasComparison && (
+            {hasComparison ? (
+                <QueryStateHandler
+                    data={comparisonData}
+                    error={comparisonError}
+                    isLoading={isComparisonLoading}
+                    attemptedAction="hae suoritetun vertailun tulokset"
+                >
+                    <LoadedThirtyYearComparison data={comparisonData} />
+                </QueryStateHandler>
+            ) : (
                 <div className="row row--buttons">
                     <Button
                         theme="black"
@@ -252,14 +291,6 @@ const ThirtyYearComparison = () => {
                     </Button>
                 </div>
             )}
-            <QueryStateHandler
-                data={comparisonData}
-                error={comparisonError}
-                isLoading={isComparisonLoading}
-                attemptedAction="hae suoritetun vertailun tulokset"
-            >
-                <LoadedThirtyYearComparison data={comparisonData} />
-            </QueryStateHandler>
             <SaveDialogModal
                 title="Tallennetaan excel-tiedostoa"
                 data={savedExternalSalesData}
@@ -271,7 +302,7 @@ const ThirtyYearComparison = () => {
             <ComparisonResultModal
                 isOpen={isErrorModalOpen}
                 setIsOpen={setIsErrorModalOpen}
-                error={comparisonError}
+                response={comparisonError}
             />
         </div>
     );

@@ -904,6 +904,11 @@ const ThirtyYearRegulationCompanySchema = object({
     display_name: string(),
     price: number(),
     old_ruleset: boolean(),
+    property_manager: object({
+        email: string(),
+        id: APIIdString,
+        name: string(),
+    }),
 });
 
 const ThirtyYearRegulationResponseSchema = object({
@@ -946,6 +951,19 @@ const PageInfoSchema = object({
         next: string().nullable(),
         previous: string().nullable(),
     }),
+});
+
+const ErrorResponseSchema = object({
+    error: string().email(),
+    status: number(),
+    reason: string(),
+    message: string(),
+    fields: object({
+        field: string(),
+        message: string(),
+    })
+        .array()
+        .optional(),
 });
 
 // List responses
@@ -1091,6 +1109,7 @@ export type IOwnership = z.infer<typeof ownershipSchema>;
 // Query/list responses & paging
 export type PageInfo = z.infer<typeof PageInfoSchema>;
 export type IUserInfoResponse = z.infer<typeof UserInfoSchema>;
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
 export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
