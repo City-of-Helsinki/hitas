@@ -31,6 +31,15 @@ class FullSalesData(TypedDict):
     price_by_area: dict[PostalCodeT, float]
 
 
+class ReplacementPostalCodes(TypedDict):
+    postal_code: PostalCodeT
+    replacements: list[PostalCodeT]
+
+
+class ReplacementPostalCodesWithPrice(ReplacementPostalCodes):
+    price_by_area: float
+
+
 class ThirtyYearRegulationResultsRow(HitasModel):
     parent = models.ForeignKey("ThirtyYearRegulationResults", on_delete=models.CASCADE, related_name="rows")
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.CASCADE, related_name="+")
@@ -72,6 +81,7 @@ class ThirtyYearRegulationResults(HitasModel):
     regulation_month = models.DateField()
     surface_area_price_ceiling = HitasModelDecimalField(null=True)
     sales_data: FullSalesData = models.JSONField()
+    replacement_postal_codes: list[ReplacementPostalCodesWithPrice] = models.JSONField()
 
     class Meta:
         verbose_name = _("Thirty Year Regulation Results")

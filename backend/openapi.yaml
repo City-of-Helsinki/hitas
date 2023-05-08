@@ -2392,14 +2392,8 @@ paths:
         content:
           application/json:
             schema:
-              description: Thirty-year regulation information
-              type: object
               additionalProperties: false
-              properties:
-                calculation_date:
-                  description: Calculation date, use current date if not given.
-                  type: string
-                  example: 2023-01-01
+              $ref: '#/components/schemas/ThirtyYearRegulationParameters'
       responses:
         '200':
           description: Successfully performed thirty-year regulation for housing companies
@@ -7351,6 +7345,41 @@ components:
           minimum: 0
           nullable: true
           example: 28490
+
+    ThirtyYearRegulationParameters:
+      description: Thirty-year regulation information
+      type: object
+      additionalProperties: false
+      properties:
+        calculation_date:
+          description: Calculation date, use current date if not given.
+          type: string
+          example: 2023-01-01
+        replacement_postal_codes:
+          description: >
+            If some housing companies cannot be regulated due to lack of sales data,
+            this list can be used to replace the postal code with two other postal codes.
+            The average of these postal codes' price per square meter will be used as the replaced postal code's
+            price per square meter.
+          type: array
+          items:
+            description: Postal code and its replacements.
+            type: object
+            additionalProperties: false
+            properties:
+              postal_code:
+                description: Postal code to replace.
+                type: string
+                example: 00100
+              replacements:
+                description: Replacement postal codes.
+                type: array
+                minItems: 2
+                maxItems: 2
+                items:
+                  description: Replacement postal code.
+                  type: string
+                  example: 00120
 
     ThirtyYearRegulationResults:
       description: Thirty year regulation results

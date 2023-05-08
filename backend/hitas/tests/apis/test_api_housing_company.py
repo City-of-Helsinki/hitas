@@ -448,6 +448,7 @@ def test__api__housing_company__retrieve__release_date__regulation(api_client: H
         regulation_month=date(2000, 1, 1),
         surface_area_price_ceiling=Decimal("5000"),
         sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+        replacement_postal_codes=[],
     )
     ThirtyYearRegulationResultsRow.objects.create(
         parent=results,
@@ -476,6 +477,7 @@ def test__api__housing_company__retrieve__release_date__regulation__dont_count_i
         regulation_month=date(2000, 1, 1),
         surface_area_price_ceiling=Decimal("5000"),
         sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+        replacement_postal_codes=[],
     )
     ThirtyYearRegulationResultsRow.objects.create(
         parent=results,

@@ -13,6 +13,7 @@ from hitas.models.owner import Owner, OwnerT
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
+    ReplacementPostalCodesWithPrice,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
 )
@@ -52,6 +53,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
         regulation_month=regulation_month,
         surface_area_price_ceiling=Decimal("5000"),
         sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+        replacement_postal_codes=[],
     )
     row = ThirtyYearRegulationResultsRow.objects.create(
         parent=results,
@@ -288,6 +290,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
         external={},
         price_by_area={"00001": 49_000},
     )
+    assert regulation_results[0].replacement_postal_codes == []
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
@@ -453,6 +456,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         external={},
         price_by_area={"00001": 4_900},
     )
+    assert regulation_results[0].replacement_postal_codes == []
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
@@ -787,6 +791,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     assert regulation_results[0].calculation_month == this_month
     assert regulation_results[0].surface_area_price_ceiling is None
     assert regulation_results[0].sales_data == FullSalesData(internal={}, external={}, price_by_area={})
+    assert regulation_results[0].replacement_postal_codes == []
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
@@ -1159,6 +1164,255 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         ],
         obfuscated_owners=[],
     )
+
+
+@pytest.mark.django_db
+def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_client: HitasAPIClient, freezer):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    previous_year_last_month = this_month - relativedelta(months=2)
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Create necessary indices
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    # Sale for the apartment in a housing company that will be under regulation checking
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    # Apartment where sales happened in the previous year, but it is on another postal code
+    apartment_1: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00002",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year
+    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
+    ApartmentSaleFactory.create(
+        apartment=apartment_1,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+    # Apartment where sales happened in the previous year, but it is on another postal code
+    apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00003",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year
+    # Average sales price will be: (4_000 + 900) / 1 = 4_900
+    ApartmentSaleFactory.create(
+        apartment=apartment_2,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=4_000,
+        apartment_share_of_housing_company_loans=900,
+    )
+
+    # Create necessary external sales data (no external sales)
+    ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(previous_year_last_month),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list")
+
+    data = {
+        "replacement_postal_codes": [
+            {
+                "postal_code": "00001",
+                "replacements": ["00002", "00003"],
+            },
+        ],
+    }
+
+    response = api_client.post(url, data=data, format="json")
+
+    #
+    # Since there is no sales data for the postal code, we use the replacement postal codes.
+    # The average price per square meter for the replacement postal codes is (49_000 + 4_900) / 2 = 26_950.
+    #
+    # Since the average sales price per square meter in the last year (26_950) is higher than the
+    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
+    # the company stays regulated.
+    #
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[
+            ComparisonData(
+                id=sale.apartment.housing_company.uuid.hex,
+                display_name=sale.apartment.housing_company.display_name,
+                address=AddressInfo(
+                    street_address=sale.apartment.housing_company.street_address,
+                    postal_code=sale.apartment.housing_company.postal_code.value,
+                    city=sale.apartment.housing_company.postal_code.city,
+                ),
+                price=Decimal("12000.0"),
+                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
+                completion_date=regulation_month.isoformat(),
+                property_manager=PropertyManagerInfo(
+                    id=sale.apartment.housing_company.property_manager.uuid.hex,
+                    name=sale.apartment.housing_company.property_manager.name,
+                    email=sale.apartment.housing_company.property_manager.email,
+                    address=AddressInfo(
+                        street_address=sale.apartment.housing_company.property_manager.street_address,
+                        postal_code=sale.apartment.housing_company.property_manager.postal_code,
+                        city=sale.apartment.housing_company.property_manager.city,
+                    ),
+                ),
+                letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
+            )
+        ],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+
+    #
+    # Check that the housing company stays regulated
+    #
+    sale.apartment.housing_company.refresh_from_db()
+    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
+    assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+
+    #
+    # Check that the regulation results were saved
+    #
+    regulation_results = list(ThirtyYearRegulationResults.objects.all())
+    assert len(regulation_results) == 1
+    assert regulation_results[0].regulation_month == regulation_month
+    assert regulation_results[0].calculation_month == this_month
+    assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
+    assert regulation_results[0].sales_data == FullSalesData(
+        internal={
+            "00002": {"2022Q4": SaleData(sale_count=1, price=49_000)},
+            "00003": {"2022Q4": SaleData(sale_count=1, price=4_900)},
+        },
+        external={},
+        price_by_area={"00002": 49000.0, "00003": 4900.0},
+    )
+    assert regulation_results[0].replacement_postal_codes == [
+        ReplacementPostalCodesWithPrice(
+            postal_code="00001",
+            replacements=["00002", "00003"],
+            price_by_area=26950.0,
+        ),
+    ]
+
+    result_rows = list(regulation_results[0].rows.all())
+    assert len(result_rows) == 1
+    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].completion_date == regulation_month
+    assert result_rows[0].surface_area == Decimal("10")
+    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
+    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
+    assert result_rows[0].completion_month_index == Decimal("100")
+    assert result_rows[0].calculation_month_index == Decimal("200")
+    assert result_rows[0].regulation_result == RegulationResult.STAYS_REGULATED
+
+
+@pytest.mark.django_db
+def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_missing_price(
+    api_client: HitasAPIClient,
+    freezer,
+):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    previous_year_last_month = this_month - relativedelta(months=2)
+    regulation_month = this_month - relativedelta(years=30)
+
+    # Create necessary indices
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    # Sale for the apartment in a housing company that will be under regulation checking
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    ApartmentSaleFactory.create(
+        purchase_date=regulation_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=regulation_month,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    # Apartment where sales happened in the previous year, but it is on another postal code
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=previous_year_last_month,
+        building__real_estate__housing_company__postal_code__value="00002",
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales__purchase_date=previous_year_last_month,  # first sale, not counted
+    )
+
+    # Sale in the previous year
+    ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+    # Create necessary external sales data (no external sales)
+    ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(previous_year_last_month),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+    url = reverse("hitas:thirty-year-regulation-list")
+
+    data = {
+        "replacement_postal_codes": [
+            {
+                "postal_code": "00001",
+                "replacements": ["00002", "00003"],
+            },
+        ],
+    }
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing",
+        "message": "Missing price data for replacement postal codes: ['00003'].",
+        "reason": "Conflict",
+        "status": 409,
+    }
 
 
 @pytest.mark.django_db
@@ -2500,6 +2754,7 @@ def test__api__regulation__regulation_already_made(api_client: HitasAPIClient, f
         regulation_month=regulation_month,
         surface_area_price_ceiling=Decimal("5000"),
         sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+        replacement_postal_codes=[],
     )
     ThirtyYearRegulationResultsRow.objects.create(
         parent=results,

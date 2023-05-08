@@ -33,6 +33,7 @@ from hitas.models.thirty_year_regulation import (
     PostalCodeT,
     QuarterT,
     RegulationResult,
+    ReplacementPostalCodesWithPrice,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
     ThirtyYearRegulationResultsRowWithAnnotations,
@@ -111,11 +112,18 @@ class RegulationPostalCode(TypedDict):
     cost_area: Optional[int]
 
 
-def perform_thirty_year_regulation(calculation_date: datetime.date) -> RegulationResults:
+def perform_thirty_year_regulation(
+    calculation_date: datetime.date,
+    replacement_postal_codes: Optional[dict[PostalCodeT, list[PostalCodeT]]] = None,
+) -> RegulationResults:
     """Check housing companies over 30 years old whether they should be released from hitas regulation or not.
 
     :param calculation_date: Date to check regulation from.
+    :param replacement_postal_codes: Postal codes to replace with other postal codes in case some housing companies
+                                     cannot be regulated due to missing sales data.
     """
+
+    replacement_postal_codes = replacement_postal_codes or {}
 
     calculation_month = hitas_calculation_quarter(calculation_date)
     regulation_month = calculation_month - relativedelta(years=30)
@@ -169,6 +177,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
             sales_data=None,
             external_sales_data=None,
             price_by_area=None,
+            replacement_postal_codes=replacement_postal_codes,
         )
 
         logger.info("Regulation check complete!")
@@ -192,7 +201,9 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     logger.info("Determining comparison values for housing companies...")
     comparison_values = _get_comparison_values(housing_companies, surface_area_price_ceiling.value)
 
-    postal_codes: list[PostalCodeT] = list(comparison_values)
+    postal_codes: set[PostalCodeT] = set(comparison_values) | {
+        postal_code for postal_codes in replacement_postal_codes.values() for postal_code in postal_codes
+    }
 
     logger.info(
         f"Fetching HITAS sales data between {this_quarter_previous_year.isoformat()} (inclusive) "
@@ -207,7 +218,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
     price_by_area = combine_sales_data(sales_data, external_sales_data)
 
     logger.info("Determining regulation need for housing companies...")
-    results = _determine_regulation_need(comparison_values, price_by_area)
+    results = _determine_regulation_need(comparison_values, price_by_area, replacement_postal_codes)
 
     if results["skipped"]:
         logger.info(
@@ -248,6 +259,7 @@ def perform_thirty_year_regulation(calculation_date: datetime.date) -> Regulatio
         sales_data=sales_data,
         external_sales_data=external_sales_data,
         price_by_area=price_by_area,
+        replacement_postal_codes=replacement_postal_codes,
     )
 
     logger.info("Regulation check complete!")
@@ -356,7 +368,7 @@ def _get_comparison_values(
 def get_sales_data(
     from_: datetime.date,
     to_: datetime.date,
-    postal_codes: Optional[list[PostalCodeT]] = None,
+    postal_codes: Optional[set[PostalCodeT]] = None,
 ) -> dict[PostalCodeT, dict[QuarterT, SaleData]]:
     """
     Find all sales for apartments (in the given postal codes if not None) between the given dates
@@ -412,7 +424,7 @@ def get_sales_data(
 
 def get_external_sales_data(
     quarter: QuarterT,
-    postal_codes: Optional[list[PostalCodeT]] = None,
+    postal_codes: Optional[set[PostalCodeT]] = None,
 ) -> dict[PostalCodeT, dict[QuarterT, SaleData]]:
     """
     Get all external sales data (in the given postal codes if not None) for the given quarter.
@@ -456,6 +468,7 @@ def combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> di
 def _determine_regulation_need(
     comparison_values: dict[PostalCodeT, dict[HousingCompanyUUIDHex, ComparisonData]],
     price_by_area: dict[PostalCodeT, Decimal],
+    replacement_postal_codes: dict[PostalCodeT, list[PostalCodeT]],
 ) -> RegulationResults:
     """
     Determine id a given housing company should stay regulated or be released from regulation
@@ -469,11 +482,33 @@ def _determine_regulation_need(
         obfuscated_owners=[],
     )
 
+    if replacement_postal_codes:
+        missing: list[PostalCodeT] = [
+            postal_code
+            for postal_codes in replacement_postal_codes.values()
+            for postal_code in postal_codes
+            if postal_code not in price_by_area
+        ]
+        if missing:
+            raise ModelConflict(
+                f"Missing price data for replacement postal codes: {missing}.",
+                error_code="missing",
+            )
+
     for postal_code, comparison_data_by_housing_company in comparison_values.items():
         postal_code_average_price_per_square_meter = price_by_area.get(postal_code)
 
         if postal_code_average_price_per_square_meter is None:
-            postal_code_average_price_per_square_meter = _find_average_of_nearest(postal_code, price_by_area)
+            postal_code_average_price_per_square_meter = _find_average_of_nearest(
+                postal_code,
+                price_by_area,
+                replacement_postal_codes,
+            )
+            if postal_code_average_price_per_square_meter is not None:
+                logger.info(
+                    f"Using average price per square meter from replacement postal codes: "
+                    f"{postal_code} -> {replacement_postal_codes[postal_code]}."
+                )
 
         for comparison_data in comparison_data_by_housing_company.values():
             display_name = comparison_data["display_name"]
@@ -504,12 +539,19 @@ def _determine_regulation_need(
     return results
 
 
-def _find_average_of_nearest(postal_code: PostalCodeT, price_by_area: dict[PostalCodeT, Decimal]) -> Optional[Decimal]:
+def _find_average_of_nearest(
+    postal_code: PostalCodeT,
+    price_by_area: dict[PostalCodeT, Decimal],
+    replacement_postal_codes: dict[PostalCodeT, list[PostalCodeT]],
+) -> Optional[Decimal]:
     """
     Find the average of the nearest two postal areas in the given prices by area.
     """
-    # TODO: Determine nearest value somehow...
-    return None
+    replacements = replacement_postal_codes.get(postal_code)
+    if replacements is None:
+        return None
+
+    return sum(price_by_area[postal_code] for postal_code in replacements) / len(replacements)
 
 
 def _free_housing_companies_from_regulation(
@@ -548,6 +590,7 @@ def _save_regulation_results(
     sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],
     external_sales_data: Optional[dict[PostalCodeT, dict[QuarterT, SaleData]]],
     price_by_area: Optional[dict[PostalCodeT, Decimal]],
+    replacement_postal_codes: dict[PostalCodeT, list[PostalCodeT]],
 ) -> ThirtyYearRegulationResults:
     """
     Save regulation results for reporting.
@@ -563,6 +606,14 @@ def _save_regulation_results(
                 external=json.loads(json.dumps(external_sales_data, default=float)) or {},
                 price_by_area=json.loads(json.dumps(price_by_area, default=float)) or {},
             ),
+            "replacement_postal_codes": [
+                ReplacementPostalCodesWithPrice(
+                    postal_code=postal_code,
+                    replacements=replacements,
+                    price_by_area=float(_find_average_of_nearest(postal_code, price_by_area, replacement_postal_codes)),
+                )
+                for postal_code, replacements in replacement_postal_codes.items()
+            ],
         },
     )
 

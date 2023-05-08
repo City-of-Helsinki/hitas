@@ -2,15 +2,16 @@ from uuid import UUID
 
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponse
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from hitas.models.thirty_year_regulation import RegulationResult
+from hitas.models.thirty_year_regulation import RegulationResult, ReplacementPostalCodes
 from hitas.services.thirty_year_regulation import (
+    PostalCodeT,
     build_thirty_year_regulation_report_excel,
     combine_sales_data,
     compile_postal_codes_with_cost_areas,
@@ -21,9 +22,37 @@ from hitas.services.thirty_year_regulation import (
     get_thirty_year_regulation_results_for_housing_company,
     perform_thirty_year_regulation,
 )
+from hitas.services.validation import validate_postal_code
 from hitas.utils import business_quarter, from_iso_format_or_today_if_none, hitas_calculation_quarter, to_quarter
 from hitas.views.utils.excel import get_excel_response
 from hitas.views.utils.pdf import get_pdf_response
+
+
+class ReplacementPostalCodeSerializer(serializers.Serializer):
+    postal_code = serializers.CharField(max_length=5, min_length=5)
+    replacements = serializers.ListField(
+        child=serializers.CharField(max_length=5, min_length=5),
+        min_length=2,
+        max_length=2,
+    )
+
+    @staticmethod
+    def validate_postal_code(value: str) -> str:
+        return validate_postal_code(value)
+
+    @staticmethod
+    def validate_replacement_postal_codes(value: list[str]) -> list[str]:
+        errors: list[ValidationError] = []
+        for postal_code in value:
+            try:
+                validate_postal_code(postal_code)
+            except ValidationError as error:
+                errors += error
+
+        if errors:
+            raise ValidationError(errors)
+
+        return value
 
 
 class ThirtyYearRegulationView(ViewSet):
@@ -44,7 +73,15 @@ class ThirtyYearRegulationView(ViewSet):
         except ValueError as error:
             raise ValidationError({"calculation_date": str(error)}) from error
 
-        results = perform_thirty_year_regulation(calculation_date)
+        replacement_postal_codes: list[ReplacementPostalCodes] = request.data.get("replacement_postal_codes", [])
+        if replacement_postal_codes:
+            ReplacementPostalCodeSerializer(data=replacement_postal_codes, many=True).is_valid(raise_exception=True)
+
+        replacements: dict[PostalCodeT, list[PostalCodeT]] = {
+            replacement["postal_code"]: replacement["replacements"] for replacement in replacement_postal_codes
+        }
+
+        results = perform_thirty_year_regulation(calculation_date, replacements)
         return Response(data=results, status=status.HTTP_200_OK)
 
     @action(
