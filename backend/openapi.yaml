@@ -4333,7 +4333,8 @@ components:
           type: string
           pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
         address:
-          $ref: '#/components/schemas/HitasAddress'
+          readOnly: true
+          $ref: '#/components/schemas/RealEstateAddress'
         buildings:
           description: List of buildings this real estate has
           type: array
@@ -4355,7 +4356,7 @@ components:
           readOnly: true
           example: 9d0ac35b01eb44829bc84c25f7c1813a
         address:
-          $ref: '#/components/schemas/HitasAddress'
+          $ref: '#/components/schemas/BuildingAddress'
         building_identifier:
           description: This building's official identifier
           type: string
@@ -6400,7 +6401,32 @@ components:
           maxLength: 16
           example: A
 
-    HitasAddress:
+    RealEstateAddress:
+      description: Hitas address information
+      type: object
+      additionalProperties: false
+      required:
+        - street_address
+        - postal_code
+        - city
+      properties:
+        street_address:
+          description: Street address
+          type: string
+          readOnly: true
+          example: Hannunkatu 24
+        postal_code:
+          description: Hitas postal code
+          type: string
+          readOnly: true
+          example: "00100"
+        city:
+          description: City based on the postal code
+          type: string
+          readOnly: true
+          example: Helsinki
+
+    BuildingAddress:
       description: Hitas address information
       type: object
       additionalProperties: false

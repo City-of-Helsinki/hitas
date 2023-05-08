@@ -144,7 +144,6 @@ class SalesCatalogCreateView(ViewSet):
         real_estate: Optional[RealEstate] = housing_company.real_estates.first()
         if real_estate is None:
             real_estate = RealEstate.objects.create(
-                street_address=housing_company.street_address,
                 housing_company=housing_company,
             )
 

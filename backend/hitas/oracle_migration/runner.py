@@ -69,6 +69,7 @@ from hitas.oracle_migration.oracle_schema import (
     codebooks,
     codes,
     companies,
+    company_addresses,
     company_construction_price_indices,
     company_market_price_indices,
     construction_price_indices,
@@ -108,7 +109,8 @@ class CreatedRealEstate:
 class CreatedHousingCompany:
     value: HousingCompany = None
     interest_rate: Decimal = None
-    real_estates: List[CreatedRealEstate] = field(default_factory=list)
+    addresses: set[str] = field(default_factory=list)
+    real_estates: list[CreatedRealEstate] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -228,7 +230,7 @@ def run(
             # Real estates (and buildings) and apartments
             converted_data.apartments_by_oracle_id = {}
             for chc in converted_data.created_housing_companies_by_oracle_id.values():
-                chc.real_estates = create_real_estates_and_buildings(chc.value, connection)
+                chc.real_estates = create_real_estates_and_buildings(chc.value, chc.addresses, connection)
                 created_building = chc.real_estates[0].buildings[0]
 
                 # Create apartments
@@ -369,8 +371,15 @@ def create_housing_companies(
             new.postal_code.save()
 
         new.save()
+
+        addresses = connection.execute(
+            select(company_addresses).where(company_addresses.c.company_id == hc["id"])
+        ).fetchall()
+
         housing_companies_by_id[new.id] = CreatedHousingCompany(
-            value=new, interest_rate=hc["construction_time_interest_rate"]
+            value=new,
+            interest_rate=hc["construction_time_interest_rate"],
+            addresses={address["street_address"] for address in addresses} | {new.street_address},
         )
 
     # Update ID sequence as we forced same IDs as Oracle DB had
@@ -480,6 +489,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
 
 def create_real_estates_and_buildings(
     housing_company: HousingCompany,
+    addresses: set[str],
     connection: Connection,
 ) -> List[CreatedRealEstate]:
     created_real_estates = []
@@ -490,18 +500,19 @@ def create_real_estates_and_buildings(
         new = RealEstate()
         new.housing_company = housing_company
         new.property_identifier = real_estate["property_identifier"]
-        new.street_address = housing_company.street_address
-
         new.save()
+        created_real_estates.append(CreatedRealEstate(value=new, buildings=[]))
 
+    buildings: list[CreatedBuilding] = []
+    for address in addresses:
         b = Building()
-        b.real_estate = new
-        b.street_address = new.street_address
+        b.real_estate = created_real_estates[0].value
+        b.street_address = address
         b.building_identifier = ""
-
         b.save()
+        buildings.append(CreatedBuilding(value=b))
 
-        created_real_estates.append(CreatedRealEstate(value=new, buildings=[CreatedBuilding(value=b)]))
+    created_real_estates[0].buildings = buildings
 
     return created_real_estates
 

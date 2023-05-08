@@ -180,9 +180,6 @@ def test__api__real_estate__retrieve__invalid_real_estate(api_client: HitasAPICl
 def test__api__real_estate__create(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     data = {
-        "address": {
-            "street_address": "test-street-address-1",
-        },
         "property_identifier": "1-1234-321-56",
     }
 
@@ -219,9 +216,6 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     re: RealEstate = RealEstateFactory.create(housing_company=hc)
     data = {
-        "address": {
-            "street_address": "test-street-address-1",
-        },
         "property_identifier": "1111-1111-1111-1111",
     }
 
@@ -233,7 +227,7 @@ def test__api__real_estate__update(api_client: HitasAPIClient):
         "address": {
             "city": hc.postal_code.city,
             "postal_code": hc.postal_code.value,
-            "street_address": data["address"]["street_address"],
+            "street_address": hc.street_address,
         },
         "property_identifier": data["property_identifier"],
         "buildings": [],

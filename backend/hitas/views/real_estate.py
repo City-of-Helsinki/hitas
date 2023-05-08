@@ -10,13 +10,13 @@ from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
 class RealEstateHitasAddressSerializer(serializers.Serializer):
-    street_address = serializers.CharField()
+    street_address = serializers.CharField(source="housing_company.street_address", read_only=True)
     postal_code = serializers.CharField(source="housing_company.postal_code.value", read_only=True)
     city = serializers.CharField(source="housing_company.city", read_only=True)
 
 
 class RealEstateSerializer(HitasModelSerializer):
-    address = RealEstateHitasAddressSerializer(source="*")
+    address = RealEstateHitasAddressSerializer(source="*", read_only=True)
     buildings = BuildingSerializer(many=True, read_only=True)
 
     @property
