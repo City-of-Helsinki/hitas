@@ -7376,6 +7376,7 @@ components:
         - completion_date
         - property_manager
         - letter_fetched
+        - current_regulation_status
       properties:
         id:
           description: ID of a housing company
@@ -7412,6 +7413,8 @@ components:
           description: Has the regulation letter been fetched for this housing company?
           type: boolean
           example: false
+        current_regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
 
     ThirtyYearRegulationPostalCodes:
       description: Thirty year regulation postal codes

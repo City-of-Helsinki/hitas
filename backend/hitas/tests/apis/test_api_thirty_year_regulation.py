@@ -42,7 +42,9 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
         apartment__completion_date=regulation_month,
         apartment__building__real_estate__housing_company__postal_code__value="00001",
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        apartment__building__real_estate__housing_company__regulation_status=(
+            RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT
+        ),
     )
 
     results = ThirtyYearRegulationResults.objects.create(
@@ -97,6 +99,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
                     ),
                 ),
                 letter_fetched=True,
+                current_regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT.value,
             )
         ],
         skipped=[],
@@ -258,6 +261,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
@@ -415,6 +419,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         stays_regulated=[],
@@ -556,6 +561,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         stays_regulated=[],
@@ -750,6 +756,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         released_from_regulation=[],
@@ -890,6 +897,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         released_from_regulation=[
@@ -915,6 +923,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         stays_regulated=[],
@@ -1041,6 +1050,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
             )
         ],
         stays_regulated=[],
@@ -1144,6 +1154,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -1238,6 +1249,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -1333,6 +1345,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -1438,6 +1451,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -1537,6 +1551,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
@@ -1646,6 +1661,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
@@ -1747,6 +1763,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
@@ -2090,6 +2107,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -2186,6 +2204,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         obfuscated_owners=[],
@@ -2295,6 +2314,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
@@ -2439,6 +2459,7 @@ def test__api__regulation__housing_company_regulation_status(
                         ),
                     ),
                     letter_fetched=False,
+                    current_regulation_status=RegulationStatus.REGULATED.value,
                 )
             ],
             skipped=[],
@@ -2603,6 +2624,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
                     ),
                 ),
                 letter_fetched=False,
+                current_regulation_status=RegulationStatus.REGULATED.value,
             )
         ],
         skipped=[],
