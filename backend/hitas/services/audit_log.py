@@ -1,14 +1,14 @@
+import datetime
 import json
-from typing import TYPE_CHECKING, Iterable, Literal, TypeAlias
+from typing import TYPE_CHECKING, Iterable, Literal, Optional, TypeAlias, overload
 
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
+from django.db.models import DateTimeField, OuterRef, Q, Subquery
 from django.utils.encoding import smart_str
 
 if TYPE_CHECKING:
-    from hitas.models._base import HitasSafeDeleteModel
-
+    from hitas.models._base import HitasModel, HitasSafeDeleteModel
 
 PK: TypeAlias = int
 FieldName: TypeAlias = str
@@ -50,3 +50,45 @@ def bulk_create_log_entries(
         LogEntry.objects.filter(condition).delete()
 
     return LogEntry.objects.bulk_create(log_entries, ignore_conflicts=True)
+
+
+@overload
+def get_last_modified(
+    model: type["HitasModel"] | type["HitasSafeDeleteModel"],
+    *,
+    model_id: str,
+    hint: str,
+) -> Subquery:
+    ...
+
+
+@overload
+def get_last_modified(
+    model: type["HitasModel"] | type["HitasSafeDeleteModel"],
+    *,
+    model_id: int,
+    hint: str,
+) -> Optional[datetime.date]:
+    ...
+
+
+def last_modified(
+    model: type["HitasModel"] | type["HitasSafeDeleteModel"],
+    *,
+    model_id: str | int,
+    hint: str,
+):
+    """Return the last date when the given model object's changes contain the hinted string."""
+    subquery = isinstance(model_id, str)
+    queryset = (
+        LogEntry.objects.filter(
+            content_type=ContentType.objects.get_for_model(model),
+            object_id=OuterRef(model_id) if subquery else model_id,
+            changes__contains=hint,
+        )
+        .order_by("-timestamp")
+        .values_list("timestamp", flat=True)
+    )
+    if subquery:
+        return Subquery(queryset=queryset[:1], output_field=DateTimeField(null=True))
+    return queryset.first()

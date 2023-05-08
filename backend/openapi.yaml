@@ -7463,13 +7463,45 @@ components:
           format: date
           example: 2023-02-01
         property_manager:
-          $ref: '#/components/schemas/ReadOnlyPropertyManager'
+          $ref: '#/components/schemas/PropertyManagerWithEditInfo'
         letter_fetched:
           description: Has the regulation letter been fetched for this housing company?
           type: boolean
           example: false
         current_regulation_status:
           $ref: '#/components/schemas/RegulationStatus'
+
+    PropertyManagerWithEditInfo:
+      description: Property manager information with the date it was last modified on a given housing company
+      nullable: true
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - email
+        - address
+        - last_modified
+      properties:
+        id:
+          description: ID of this property manager
+          type: string
+          example: dc1072975bab4ba69f64814f021c6785
+        name:
+          description: Name of this property manager
+          type: string
+          example: Ismo Isännöitsijät Oy
+        email:
+          description: Email for this property manager
+          type: string
+          example: ismo@example.com
+        address:
+          $ref: '#/components/schemas/ReadOnlyAddress'
+        last_modified:
+          description: When this property manager was last modified on a given housing company?
+          type: string
+          format: date
+          example: 2022-01-01
 
     ThirtyYearRegulationPostalCodes:
       description: Thirty year regulation postal codes

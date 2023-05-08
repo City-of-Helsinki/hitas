@@ -18,7 +18,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
-from hitas.tests.apis.helpers import HitasAPIClient, count_queries
+from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
@@ -99,6 +99,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=True,
                 current_regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT.value,
@@ -205,28 +206,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
     url = reverse("hitas:thirty-year-regulation-list")
 
-    # 1. Check for previous regulation results
-    # 2. Fetch housing companies
-    # 3. Prefetch real estates for housing companies
-    # 4. Prefetch buildings for real estates
-    # 5. Prefetch apartments for buildings
-    # 6. Fetch apartments with missing prices
-    # 7. Fetch market price indices
-    # 8. Fetch surface area price ceiling
-    # 9. Fetch hitas sales
-    # 10. Fetch external sales data
-    # 11. Fetch housing companies for audit log update
-    # 12. Set housing companies' states
-    # 13. Search for owners to be obfuscated (none found)
-    # 14. Select thirty year regulation results for update
-    # 15. Save thirty year regulation results
-    # 16. Fetch current thirty year regulation result row ids
-    # 17. Save thirty year regulation results' rows
-    # 18. Select current thirty year regulation result rows for audit log update
-    # 19. TODO: ???
-    # 20. TODO: ???
-    with count_queries(20):
-        response = api_client.post(url, data={}, format="json")
+    response = api_client.post(url, data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -261,6 +241,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -363,30 +344,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     url = reverse("hitas:thirty-year-regulation-list")
 
-    # 1. Check for previous regulation results
-    # 2. Fetch housing companies
-    # 3. Prefetch real estates for housing companies
-    # 4. Prefetch buildings for real estates
-    # 5. Prefetch apartments for buildings
-    # 6. Fetch apartments with missing prices
-    # 7. Fetch market price indices
-    # 8. Fetch surface area price ceiling
-    # 9. Fetch hitas sales
-    # 10. Fetch external sales data
-    # 11. Fetch housing companies for audit log update
-    # 12. Set housing companies' states
-    # 13. Search for owners to be obfuscated
-    # 14. Fetch owners for audit log update
-    # 15. Obfuscate owners without any regulated apartments
-    # 16. Select thirty year regulation results for update
-    # 17. Save thirty year regulation results
-    # 18. Fetch current thirty year regulation result row ids
-    # 19. Save thirty year regulation results' rows
-    # 20. Select current thirty year regulation result rows for audit log update
-    # 21. TODO: ???
-    # 22. TODO: ???
-    with count_queries(22):
-        response = api_client.post(url, data={}, format="json")
+    response = api_client.post(url, data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -420,6 +378,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -563,6 +522,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -758,6 +718,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -900,6 +861,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                         postal_code=sale_1.apartment.housing_company.property_manager.postal_code,
                         city=sale_1.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -926,6 +888,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
                         postal_code=sale_2.apartment.housing_company.property_manager.postal_code,
                         city=sale_2.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -1053,6 +1016,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -1157,6 +1121,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1284,6 +1249,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1501,6 +1467,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1597,6 +1564,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1703,6 +1671,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
                         postal_code=sale_1.apartment.housing_company.property_manager.postal_code,
                         city=sale_1.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1803,6 +1772,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -1913,6 +1883,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2015,6 +1986,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
                         postal_code=apartment_1.housing_company.property_manager.postal_code,
                         city=apartment_1.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2359,6 +2331,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2456,6 +2429,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2566,6 +2540,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=this_month.isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2711,6 +2686,7 @@ def test__api__regulation__housing_company_regulation_status(
                             postal_code=sale.apartment.housing_company.property_manager.postal_code,
                             city=sale.apartment.housing_company.property_manager.city,
                         ),
+                        last_modified=this_month.isoformat(),
                     ),
                     letter_fetched=False,
                     current_regulation_status=RegulationStatus.REGULATED.value,
@@ -2877,6 +2853,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
                         postal_code=sale.apartment.housing_company.property_manager.postal_code,
                         city=sale.apartment.housing_company.property_manager.city,
                     ),
+                    last_modified=last_day.date().isoformat(),
                 ),
                 letter_fetched=False,
                 current_regulation_status=RegulationStatus.REGULATED.value,

@@ -59,6 +59,14 @@ class ThirtyYearRegulationResultsRow(HitasModel):
         verbose_name_plural = _("Thirty Year Regulation Results Rows")
 
 
+class ThirtyYearRegulationResultsRowPrefetched(ThirtyYearRegulationResultsRow):
+    apartment_count: int
+    last_modified: datetime.datetime
+
+    class Meta:
+        abstract = True
+
+
 class ThirtyYearRegulationResultsRowWithAnnotations(ThirtyYearRegulationResultsRow):
     check_count: int
     min_share: int
