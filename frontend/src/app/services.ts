@@ -25,6 +25,7 @@ import {
     IOwner,
     IPostalCodeResponse,
     IRealEstate,
+    IUserInfoResponse,
 } from "../common/schemas";
 import {hitasToast} from "../common/utils";
 
@@ -35,14 +36,9 @@ declare global {
 }
 
 export class Config {
-    static api_url =
-        window.__env !== undefined
-            ? window.__env.API_URL
-            : process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1";
-    static token =
-        window.__env !== undefined
-            ? window.__env.AUTH_TOKEN
-            : process.env.REACT_APP_AUTH_TOKEN || "52bf0606e0a0075c990fecc0afa555e5dae56404";
+    static api_url = process.env.REACT_APP_API_BASEURL;
+    static token = process.env.REACT_APP_AUTH_TOKEN;
+    static auth_api_url = process.env.REACT_APP_AUTH_API_BASEURL;
 }
 
 // Helper to return either the passed value prefixed with `/` or an empty string
@@ -65,8 +61,12 @@ const handleDownloadPDF = (response) => {
 
 const getFetchInit = () => {
     return {
-        headers: new Headers({Authorization: "Bearer " + Config.token, "Content-Type": "application/json"}),
+        headers: new Headers({
+            "Content-Type": "application/json",
+            ...(Config.token && {Authorization: "Bearer " + Config.token}),
+        }),
         method: "POST",
+        ...(!Config.token && {credentials: "include" as RequestCredentials}),
     };
 };
 export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails, additionalInfo?: string) => {
@@ -92,12 +92,32 @@ export const hitasApi = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: Config.api_url,
         prepareHeaders: (headers) => {
-            headers.set("Authorization", "Bearer " + Config.token);
+            Config.token && headers.set("Authorization", "Bearer " + Config.token);
             return headers;
         },
+        ...(!Config.token && {credentials: "include"}),
     }),
     tagTypes: ["HousingCompany", "Apartment", "Index", "Owner"],
     endpoints: (builder) => ({}),
+});
+
+export const authApi = createApi({
+    reducerPath: "authApi",
+    baseQuery: fetchBaseQuery({
+        baseUrl: Config.auth_api_url,
+        credentials: "include",
+    }),
+    endpoints: (builder) => ({}),
+});
+
+const userApi = authApi.injectEndpoints({
+    endpoints: (builder) => ({
+        getUserInfo: builder.query<IUserInfoResponse, void>({
+            query: () => ({
+                url: "userinfo",
+            }),
+        }),
+    }),
 });
 
 const listApi = hitasApi.injectEndpoints({
@@ -385,6 +405,8 @@ const mutationApi = hitasApi.injectEndpoints({
         }),
     }),
 });
+
+export const {useGetUserInfoQuery} = userApi;
 
 export const {
     useGetHousingCompaniesQuery,

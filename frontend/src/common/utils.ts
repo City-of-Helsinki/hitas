@@ -162,3 +162,18 @@ export function isEmpty(obj: object | undefined | null): boolean {
     if (obj === undefined || obj === null) return true;
     return Object.keys(obj).length === 0;
 }
+
+// Returns href url for sign in dialog when given redirect url as parameter
+export const getSignInUrl = (callBackUrl: string): string => {
+    if (callBackUrl === `${process.env.REACT_APP_DOMAIN}/logout`) {
+        return process.env.REACT_APP_AUTH_LOGIN_BASEURL + `${process.env.REACT_APP_DOMAIN}/`;
+    }
+    return process.env.REACT_APP_AUTH_LOGIN_BASEURL + callBackUrl;
+};
+
+// Returns href url for logging out with redirect url to /logout
+export const getLogOutUrl = (): string => {
+    const baseUrl = process.env.REACT_APP_AUTH_LOGOUT_BASEURL;
+    const callBackUrl = `${process.env.REACT_APP_DOMAIN}/logout`;
+    return baseUrl + callBackUrl;
+};
