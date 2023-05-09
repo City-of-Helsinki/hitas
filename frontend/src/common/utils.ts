@@ -1,5 +1,6 @@
 import toast, {ToastOptions} from "react-hot-toast";
 
+import {Config} from "../app/services";
 import {IAddress, IApartmentAddress, IOwner} from "./schemas";
 
 export function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
@@ -165,15 +166,17 @@ export function isEmpty(obj: object | undefined | null): boolean {
 
 // Returns href url for sign in dialog when given redirect url as parameter
 export const getSignInUrl = (callBackUrl: string): string => {
-    if (callBackUrl === `${process.env.REACT_APP_DOMAIN}/logout`) {
-        return process.env.REACT_APP_AUTH_LOGIN_BASEURL + `${process.env.REACT_APP_DOMAIN}/`;
+    const baseUrl = new URL(callBackUrl).origin;
+
+    if (callBackUrl === baseUrl + `/logout`) {
+        return Config.api_auth_url + "/login?next=" + baseUrl;
     }
-    return process.env.REACT_APP_AUTH_LOGIN_BASEURL + callBackUrl;
+    return Config.api_auth_url + "/login?next=" + callBackUrl;
 };
 
 // Returns href url for logging out with redirect url to /logout
 export const getLogOutUrl = (): string => {
-    const baseUrl = process.env.REACT_APP_AUTH_LOGOUT_BASEURL;
-    const callBackUrl = `${process.env.REACT_APP_DOMAIN}/logout`;
-    return baseUrl + callBackUrl;
+    const baseUrl = new URL(window.location.href).origin;
+    const callBackUrl = baseUrl + `/logout`;
+    return Config.api_auth_url + "/logout?next=" + callBackUrl;
 };
