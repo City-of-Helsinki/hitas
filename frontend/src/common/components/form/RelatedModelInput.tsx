@@ -1,9 +1,16 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
-import {Dialog, IconCrossCircle, IconSearch, Table, TextInput} from "hds-react";
+import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 
 import {dotted} from "../../utils";
 import {QueryStateHandler} from "../index";
+
+type IRelatedModelMutateComponent = React.FC<{
+    formObject;
+    formObjectFieldPath: string;
+    cancelButtonAction: () => void;
+    closeModalAction: () => void;
+}>;
 
 const RelatedModelTextInput = ({
     label,
@@ -50,6 +57,19 @@ const RelatedModelTextInput = ({
     );
 };
 
+interface IRelatedModelInputProps {
+    label?: string;
+    queryFunction;
+    relatedModelSearchField: string;
+    formObject;
+    formObjectFieldPath: string;
+    formatFormObjectValue: (unknown) => string;
+    isModalOpen: boolean;
+    closeModal: () => void;
+    // If component is passed, creating new objects is enabled
+    RelatedModelMutateComponent?: IRelatedModelMutateComponent;
+}
+
 const RelatedModelModal = ({
     label,
     queryFunction,
@@ -59,9 +79,11 @@ const RelatedModelModal = ({
     formatFormObjectValue,
     isModalOpen,
     closeModal,
-}) => {
+    RelatedModelMutateComponent,
+}: IRelatedModelInputProps) => {
     const MIN_LENGTH = 2; // Minimum length before applying filter
     const [internalFilterValue, setInternalFilterValue] = useState("");
+    const [isRelatedModelMutateVisible, setIsRelatedModelMutateVisible] = useState(false);
 
     const {data, error, isLoading} = queryFunction(
         (internalFilterValue.length >= MIN_LENGTH && {[relatedModelSearchField]: internalFilterValue}) || {},
@@ -97,47 +119,73 @@ const RelatedModelModal = ({
             aria-labelledby={label || formObjectFieldPath}
             closeButtonLabelText="args.closeButtonLabelText"
             isOpen={isModalOpen}
-            close={closeModal}
+            close={() => {
+                closeModal();
+                setIsRelatedModelMutateVisible(false);
+            }}
             theme={{
                 "--accent-line-color": "var(--color-black-80)",
             }}
         >
             <Dialog.Header
                 id={`input-modal-${formObjectFieldPath}__title`}
-                title={`Valitse ${label}`}
+                title={isRelatedModelMutateVisible ? `Luo uusi ${label}` : `Valitse ${label}`}
             />
             <Dialog.Content>
-                <TextInput
-                    id={`modal-search-${formObjectFieldPath}`}
-                    label="Hae"
-                    value={internalFilterValue}
-                    onChange={(e) => setInternalFilterValue(e.target.value)}
-                    onButtonClick={() => setInternalFilterValue("")}
-                    buttonIcon={internalFilterValue ? <IconCrossCircle /> : null}
-                />
-                <br />
-                <QueryStateHandler
-                    data={data}
-                    error={error}
-                    isLoading={isLoading}
-                >
-                    <Table
-                        cols={cols}
-                        rows={data?.contents}
-                        indexKey="id"
-                        renderIndexCol={false}
-                        checkboxSelection
-                        selectedRows={[]}
-                        setSelectedRows={handleSetSelectedRows}
-                        zebra
-                        theme={{
-                            "--header-background-color": "var(--color-black-80)",
-                        }}
-                    />
-                    <span>
-                        Näytetään {data?.page.size}/{data?.page.total_items} tulosta.
-                    </span>
-                </QueryStateHandler>
+                <div className="input-field--related-model--modal--content">
+                    {isRelatedModelMutateVisible && RelatedModelMutateComponent ? (
+                        <RelatedModelMutateComponent
+                            formObject={formObject}
+                            formObjectFieldPath={formObjectFieldPath}
+                            cancelButtonAction={() => setIsRelatedModelMutateVisible(false)}
+                            closeModalAction={() => closeModal()}
+                        />
+                    ) : (
+                        <>
+                            <TextInput
+                                id={`modal-search-${formObjectFieldPath}`}
+                                className="text-input-search"
+                                label="Hae"
+                                value={internalFilterValue}
+                                onChange={(e) => setInternalFilterValue(e.target.value)}
+                                onButtonClick={() => setInternalFilterValue("")}
+                                buttonIcon={internalFilterValue ? <IconCrossCircle /> : null}
+                            />
+                            <QueryStateHandler
+                                data={data}
+                                error={error}
+                                isLoading={isLoading}
+                            >
+                                <Table
+                                    cols={cols}
+                                    rows={data?.contents}
+                                    indexKey="id"
+                                    renderIndexCol={false}
+                                    checkboxSelection
+                                    selectedRows={[]}
+                                    setSelectedRows={handleSetSelectedRows}
+                                    zebra
+                                    theme={{
+                                        "--header-background-color": "var(--color-black-80)",
+                                    }}
+                                />
+                                <span className="results-count">
+                                    Näytetään {data?.page.size}/{data?.page.total_items} tulosta.
+                                </span>
+                            </QueryStateHandler>
+                            {RelatedModelMutateComponent ? (
+                                <Button
+                                    theme="black"
+                                    size="small"
+                                    iconLeft={<IconPlus />}
+                                    onClick={() => setIsRelatedModelMutateVisible(true)}
+                                >
+                                    Luo uusi
+                                </Button>
+                            ) : null}
+                        </>
+                    )}
+                </div>
             </Dialog.Content>
         </Dialog>
     );
@@ -158,6 +206,8 @@ interface RelatedModelInputProps {
     invalid?: boolean;
     errorText?: string;
     tooltipText?: string;
+
+    RelatedModelMutateComponent?: IRelatedModelMutateComponent;
 }
 
 const RelatedModelInput = ({
@@ -171,6 +221,8 @@ const RelatedModelInput = ({
     formObject,
     formObjectFieldPath,
     formatFormObjectValue,
+
+    RelatedModelMutateComponent,
 }: RelatedModelInputProps) => {
     formObject.register(formObjectFieldPath);
 
@@ -198,6 +250,7 @@ const RelatedModelInput = ({
                 formatFormObjectValue={formatFormObjectValue}
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
+                RelatedModelMutateComponent={RelatedModelMutateComponent}
             />
         </div>
     );

@@ -6,6 +6,7 @@ interface SaveButtonProps {
     disabled?: boolean;
     type?: "submit";
     buttonText?: string;
+    size?: "small" | "default";
 }
 
 export default function SaveButton({
@@ -14,6 +15,7 @@ export default function SaveButton({
     disabled = false,
     type,
     buttonText,
+    size = "default",
 }: SaveButtonProps): JSX.Element {
     return (
         <Button
@@ -29,6 +31,7 @@ export default function SaveButton({
             isLoading={isLoading}
             disabled={disabled}
             type={type || "button"}
+            size={size}
         >
             {buttonText ?? "Tallenna"}
         </Button>

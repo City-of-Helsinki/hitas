@@ -1,11 +1,120 @@
-import {Button, Fieldset, IconAlertCircleFill, IconCrossCircle, IconPlus} from "hds-react";
-import {useFieldArray} from "react-hook-form";
+import {Button, Dialog, Fieldset, IconAlertCircleFill, IconArrowLeft, IconCrossCircle, IconPlus} from "hds-react";
+import {useFieldArray, useForm} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
-import {useGetOwnersQuery} from "../../../app/services";
+import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
+import {useRef, useState} from "react";
+import {z} from "zod";
+import {useCreateOwnerMutation, useGetOwnersQuery} from "../../../app/services";
 import {NumberInput, RelatedModelInput} from "../../../common/components/form";
-import {IOwner, OwnershipsListSchema} from "../../../common/schemas";
-import {formatOwner} from "../../../common/utils";
+import TextInput from "../../../common/components/form/TextInput";
+import SaveButton from "../../../common/components/SaveButton";
+import {IOwner, ownerSchema, OwnershipsListSchema} from "../../../common/schemas";
+import {formatOwner, hdsToast, validateSocialSecurityNumber} from "../../../common/utils";
+
+const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, closeModalAction}) => {
+    const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);
+
+    const [saveOwner, {isLoading: isSaveOwnerLoading}] = useCreateOwnerMutation();
+    const runSaveOwner = (data) => {
+        saveOwner({data: data})
+            .unwrap()
+            .then((payload) => {
+                hdsToast.success("Omistaja luotu onnistuneesti!");
+                formObject.setValue(formObjectFieldPath, payload);
+                cancelButtonAction();
+                closeModalAction();
+            })
+            .catch((error) => {
+                hdsToast.error("Virhe omistajan luonnissa!");
+                error.data.fields.forEach((field) =>
+                    ownerFormObject.setError(field.field, {type: "custom", message: field.message})
+                );
+            });
+    };
+
+    const initialFormData = {name: "", identifier: "", email: ""};
+
+    const resolver = (data, context, options) => {
+        return zodResolver(
+            ownerSchema.superRefine((data, ctx) => {
+                if (!isInvalidSSNAllowed && !validateSocialSecurityNumber(data.identifier)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["identifier"],
+                        message: "Virheellinen sosiaaliturvatunnus",
+                    });
+                }
+            })
+        )(data, context, {...options, mode: "sync"});
+    };
+
+    const ownerFormObject = useForm({
+        defaultValues: {...initialFormData},
+        mode: "all",
+        resolver: resolver,
+    });
+
+    const formRef = useRef<HTMLFormElement | null>(null);
+
+    const onFormSubmitValid = () => {
+        runSaveOwner(ownerFormObject.getValues());
+    };
+
+    const onFormSubmitInvalid = (errors) => {
+        if (errors.identifier && errors.identifier.type === z.ZodIssueCode.custom) {
+            setIsInvalidSSNAllowed(true);
+        }
+    };
+
+    const handleSaveButtonClick = () => {
+        // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
+    };
+
+    return (
+        <>
+            <form
+                ref={formRef}
+                onSubmit={ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)}
+            >
+                <TextInput
+                    name="name"
+                    label="Nimi"
+                    formObject={ownerFormObject}
+                    required
+                />
+                <TextInput
+                    name="identifier"
+                    label="Henkilö- tai Y-tunnus"
+                    formObject={ownerFormObject}
+                    required
+                />
+                <TextInput
+                    name="email"
+                    label="Sähköpostiosoite"
+                    formObject={ownerFormObject}
+                />
+            </form>
+
+            <Dialog.ActionButtons>
+                <Button
+                    theme="black"
+                    size="small"
+                    iconLeft={<IconArrowLeft />}
+                    onClick={cancelButtonAction}
+                >
+                    Peruuta
+                </Button>
+                <SaveButton
+                    onClick={handleSaveButtonClick}
+                    isLoading={isSaveOwnerLoading}
+                    size="small"
+                />
+            </Dialog.ActionButtons>
+        </>
+    );
+};
 
 const OwnershipsListFieldSet = ({formObject, disabled}) => {
     const {fields, append, remove} = useFieldArray({
@@ -51,6 +160,7 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                                         formObjectFieldPath={`ownerships.${index}.owner`}
                                         formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
                                         disabled={disabled}
+                                        RelatedModelMutateComponent={OwnerMutateForm}
                                     />
                                 </div>
                                 <div className="percentage">
@@ -98,7 +208,7 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                     onClick={() => append(emptyOwnership)}
                     disabled={disabled}
                 >
-                    Lisää omistajuus
+                    Lisää uusi omistajuus rivi
                 </Button>
             </div>
         </Fieldset>
