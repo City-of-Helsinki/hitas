@@ -115,7 +115,6 @@ const ThirtyYearComparison = () => {
             comparisonData = undefined;
             comparisonError = comparisonResponses[formTimePeriod.value];
         }
-        console.log(comparisonData, comparisonError);
     }
 
     // ******************
@@ -138,7 +137,6 @@ const ThirtyYearComparison = () => {
             makeComparison({data: {calculation_date: formDate}})
                 .unwrap()
                 .then((data) => {
-                    console.log("Comparison data:", data);
                     setHasComparison(true);
                     hdsToast.success("Vertailu suoritettu onnistuneesti!");
                 })
@@ -154,26 +152,22 @@ const ThirtyYearComparison = () => {
             data: data.file,
             calculation_date: formDate,
         };
-        if (isTestMode) {
-            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
-            return;
-        } else
-            saveExternalSalesData(fileWithDate)
-                .unwrap()
-                .catch((error) => {
-                    console.warn("Caught error:", error);
+        saveExternalSalesData(fileWithDate)
+            .unwrap()
+            .catch((error) => {
+                console.warn("Caught error:", error);
+                setIsSaveModalOpen(true);
+            })
+            .then((data) => {
+                if ("error" in (data as object)) {
+                    console.warn("Uncaught error:", data.error);
                     setIsSaveModalOpen(true);
-                })
-                .then((data) => {
-                    if ("error" in (data as object)) {
-                        console.warn("Uncaught error:", data.error);
-                        setIsSaveModalOpen(true);
-                    } else {
-                        // Successful upload
-                        hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
-                        formObject.setValue("file", undefined, {shouldValidate: true});
-                    }
-                });
+                } else {
+                    // Successful upload
+                    hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
+                    formObject.setValue("file", undefined, {shouldValidate: true});
+                }
+            });
     };
 
     // *************
@@ -187,7 +181,6 @@ const ThirtyYearComparison = () => {
             if (!isNaN(Number(formTimePeriod.value.charAt(0))))
                 formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
         } else if (isTestMode) {
-            console.log("Test mode OFF!");
             formObject.setValue("quarter", hitasQuarters[0], {shouldValidate: true});
             setIsTestMode((prev) => false);
         }
