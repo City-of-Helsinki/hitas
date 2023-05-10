@@ -31,5 +31,5 @@ def init_test() -> None:
 @pytest.fixture()
 def api_client():
     api_client = HitasAPIClient()
-    api_client.force_authenticate(UserFactory.create())
+    api_client.force_authenticate(UserFactory.create(is_staff=True))
     return api_client

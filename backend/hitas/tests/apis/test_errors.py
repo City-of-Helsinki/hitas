@@ -11,7 +11,7 @@ class ExceptionApiCases(APITestCase):
 
     @pytest.fixture(autouse=True)
     def setup_user(self, db):
-        self.user = UserFactory.create()
+        self.user = UserFactory.create(is_staff=True)
 
     def __init__(self, methodName="runTest"):
         super().__init__(methodName=methodName)
