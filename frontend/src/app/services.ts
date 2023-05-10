@@ -36,9 +36,12 @@ declare global {
 }
 
 export class Config {
-    static api_url = process.env.REACT_APP_API_BASEURL;
     static token = process.env.REACT_APP_AUTH_TOKEN;
-    static auth_api_url = process.env.REACT_APP_AUTH_API_BASEURL;
+    static api_base_url =
+        window.__env !== undefined ? window.__env.API_URL : process.env.REACT_APP_API_URL || "http://localhost:8000";
+    // Derived settings
+    static api_v1_url = Config.api_base_url + "/api/v1";
+    static api_auth_url = Config.api_base_url + "/helauth";
 }
 
 // Helper to return either the passed value prefixed with `/` or an empty string
@@ -70,7 +73,7 @@ const getFetchInit = () => {
     };
 };
 export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails, additionalInfo?: string) => {
-    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
+    const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {
         ...getFetchInit(),
         body: JSON.stringify({additional_info: additionalInfo}),
@@ -83,14 +86,14 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) =
         hitasToast("Enimmäishintalaskelmaa ei ole olemassa", "error");
         return;
     }
-    const url = `${Config.api_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
+    const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
     fetch(url, getFetchInit()).then(handleDownloadPDF);
 };
 
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: Config.api_url,
+        baseUrl: Config.api_v1_url,
         prepareHeaders: (headers) => {
             Config.token && headers.set("Authorization", "Bearer " + Config.token);
             return headers;
@@ -104,7 +107,7 @@ export const hitasApi = createApi({
 export const authApi = createApi({
     reducerPath: "authApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: Config.auth_api_url,
+        baseUrl: Config.api_auth_url,
         credentials: "include",
     }),
     endpoints: (builder) => ({}),
@@ -114,7 +117,7 @@ const userApi = authApi.injectEndpoints({
     endpoints: (builder) => ({
         getUserInfo: builder.query<IUserInfoResponse, void>({
             query: () => ({
-                url: "userinfo",
+                url: "userinfo/",
             }),
         }),
     }),
