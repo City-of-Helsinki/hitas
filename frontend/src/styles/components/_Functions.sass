@@ -184,8 +184,11 @@
           @include justify-content(space-between)
           @include align-items(center)
           width: 100%
+          padding: $spacing-m
           .input-field
             height: auto
+          [class^="Select-module_wrapper"]
+            height: 56px
     .spinner-wrap
       flex-grow: 1
       [class*="LoadingSpinner-module_loadingSpinner"]

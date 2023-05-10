@@ -19,10 +19,13 @@ const options = [
 
 export default function ComparisonSkippedListItem({company}): JSX.Element {
     const formObject = useForm({
-        mode: "onChange",
+        mode: "all",
     });
     const {handleSubmit, watch} = formObject;
-    const newPostalCode = watch(company.id);
+    const selectName1 = `${company.id}-1`;
+    const selectName2 = `${company.id}-2`;
+    const newPostalCode1 = watch(selectName1);
+    const newPostalCode2 = watch(selectName2);
     const onSubmit = (data) => {
         console.log(data);
     };
@@ -35,15 +38,22 @@ export default function ComparisonSkippedListItem({company}): JSX.Element {
                 <span>{company.display_name}</span>
                 <div>{company.address.postal_code}</div>
                 <SelectInput
-                    label="Korvaava postinumero"
+                    label="Korvaava postinumero 1"
                     options={options}
-                    name={company.id}
+                    name={selectName1}
+                    formObject={formObject}
+                    required
+                />
+                <SelectInput
+                    label="Korvaava postinumero 2"
+                    options={options}
+                    name={selectName2}
                     formObject={formObject}
                     required
                 />
                 <SaveButton
                     type="submit"
-                    disabled={newPostalCode === undefined}
+                    disabled={newPostalCode1 === undefined || newPostalCode2 === undefined}
                 />
             </form>
         </li>
