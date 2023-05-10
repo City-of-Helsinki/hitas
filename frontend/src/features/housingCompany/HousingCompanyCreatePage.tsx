@@ -1,21 +1,21 @@
 import {useEffect, useState} from "react";
 
-import {Fieldset} from "hds-react";
+import {Checkbox, Fieldset} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
     useGetBuildingTypesQuery,
     useGetDevelopersQuery,
-    useGetFinancingMethodsQuery,
     useGetPostalCodesQuery,
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
 import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
-import {getHousingCompanyStateName} from "../../common/localisation";
+import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {
-    housingCompanyStates,
+    housingCompanyHitasTypes,
+    housingCompanyRegulationStatus,
     ICode,
     IHousingCompanyDetails,
     IHousingCompanyWritable,
@@ -44,10 +44,12 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                       postal_code: "",
                       street_address: "",
                   },
+                  hitas_type: "new_hitas_1",
+                  exclude_from_statistics: false,
+                  regulation_status: "regulated",
                   building_type: {id: ""},
                   business_id: "",
                   developer: {id: ""},
-                  financing_method: {id: ""},
                   name: {
                       display: "",
                       official: "",
@@ -55,7 +57,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                   notes: "",
                   primary_loan: undefined,
                   property_manager: null,
-                  state: "not_ready",
                   sales_price_catalogue_confirmation_date: null,
                   improvements: {
                       market_price_index: [],
@@ -69,10 +70,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     const handleSaveButtonClicked = () => {
         saveHousingCompany({data: formData, id: state?.housingCompany.id});
     };
-
-    const stateOptions = housingCompanyStates.map((state) => {
-        return {label: getHousingCompanyStateName(state), value: state};
-    });
 
     // Navigate user directly to detail page of the just created Housing Company
     useEffect(() => {
@@ -88,6 +85,13 @@ const HousingCompanyCreatePage = (): JSX.Element => {
     useEffect(() => {
         if (isEditPage && state === null) navigate("..");
     }, [isEditPage, navigate, pathname, state]);
+
+    const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
+        return {label: getHousingCompanyRegulationStatusName(state), value: state};
+    });
+    const hitasTypeOptions = housingCompanyHitasTypes.map((state) => {
+        return {label: getHousingCompanyHitasTypeName(state), value: state};
+    });
 
     return (
         <div className="view--create view--create-company">
@@ -138,17 +142,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             setFormData={setFormData}
                             error={error}
                         />
-                        <FormInputField
-                            inputType="select"
-                            label="Tila"
-                            fieldPath="state"
-                            options={stateOptions}
-                            defaultValue={{label: "Ei valmis", value: "not_ready"}}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
                     </div>
                     <div className="row">
                         <FormInputField
@@ -173,6 +166,51 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                             error={error}
                         />
                     </div>
+                    <div className="row">
+                        <FormInputField
+                            inputType="select"
+                            label="Sääntelyn tila"
+                            fieldPath="regulation_status"
+                            options={regulationStatusOptions}
+                            defaultValue={{
+                                label: getHousingCompanyRegulationStatusName(initialFormData.regulation_status),
+                                value: initialFormData.regulation_status,
+                            }}
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                            required
+                        />
+                        <FormInputField
+                            inputType="select"
+                            label="Hitas-tyyppi"
+                            fieldPath="hitas_type"
+                            options={hitasTypeOptions}
+                            defaultValue={{
+                                label: getHousingCompanyHitasTypeName(initialFormData.hitas_type),
+                                value: initialFormData.hitas_type,
+                            }}
+                            formData={formData}
+                            setFormData={setFormData}
+                            error={error}
+                            required
+                        />
+                    </div>
+                    <div className="row">
+                        <Checkbox
+                            id="exclude_from_statistics-checkbox"
+                            label="Ei-tilastoihin"
+                            checked={formData.exclude_from_statistics}
+                            onChange={(e) =>
+                                setFormData((draft) => {
+                                    draft.exclude_from_statistics = e.target.checked;
+                                })
+                            }
+                            // tooltipText="Mikäli yhtiötä ei haluta mukaan '30v vertailuun',
+                            // 'rajaneliöhinnan laskentaan' tai 'Toteutuneet kauppahinnat' tilastoihin."
+                        />
+                        <div />
+                    </div>
                 </Fieldset>
                 <Fieldset heading="">
                     <div className="row">
@@ -195,19 +233,6 @@ const HousingCompanyCreatePage = (): JSX.Element => {
                         />
                     </div>
                     <div className="row">
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Rahoitusmuoto"
-                            fieldPath="financing_method.id"
-                            placeholder={state?.housingCompany.financing_method.value}
-                            queryFunction={useGetFinancingMethodsQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
                         <FormInputField
                             inputType="relatedModel"
                             label="Talotyyppi"

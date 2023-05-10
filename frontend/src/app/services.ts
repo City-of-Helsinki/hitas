@@ -190,12 +190,6 @@ const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getFinancingMethods: builder.query<ICodeResponse, object>({
-            query: (params: object) => ({
-                url: "financing-methods",
-                params: params,
-            }),
-        }),
     }),
 });
 
@@ -422,7 +416,6 @@ export const {
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
-    useGetFinancingMethodsQuery,
 } = listApi;
 
 export const {

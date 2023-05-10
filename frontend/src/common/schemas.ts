@@ -6,14 +6,23 @@ import {boolean, literal, number, object, string, z} from "zod";
 
 export const apartmentStates = ["free", "reserved", "sold"] as const;
 
-export const housingCompanyStates = [
-    "not_ready",
-    "lt_30_years",
-    "gt_30_years_not_free",
-    "gt_30_years_free",
-    "gt_30_years_plot_department_notification",
+export const housingCompanyHitasTypes = [
+    "non_hitas",
+    "hitas_1",
+    "hitas_2",
+    "hitas_1_no_interest",
+    "hitas_2_no_interest",
+    "new_hitas_1",
+    "new_hitas_2",
     "half_hitas",
-    "ready_no_statistics",
+    "rental_hitas_1",
+    "rental_hitas_2",
+] as const;
+
+export const housingCompanyRegulationStatus = [
+    "regulated",
+    "released_by_hitas",
+    "released_by_plot_department",
 ] as const;
 
 export const hitasQuarters = [
@@ -191,12 +200,17 @@ const UserInfoSchema = object({
 
 const HousingCompanyAreaSchema = object({name: string(), cost_area: number()});
 
-const HousingCompanyStateSchema = z.enum(housingCompanyStates);
+const HousingCompanyHitasTypeSchema = z.enum(housingCompanyHitasTypes);
+const HousingCompanyRegulationStatusSchema = z.enum(housingCompanyRegulationStatus);
 
 const HousingCompanySchema = object({
     id: APIIdString,
     name: string(),
-    state: HousingCompanyStateSchema,
+    hitas_type: HousingCompanyHitasTypeSchema,
+    exclude_from_statistics: boolean(),
+    regulation_status: HousingCompanyRegulationStatusSchema,
+    over_thirty_years_old: boolean(),
+    completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
     date: string().nullable(),
@@ -227,22 +241,26 @@ const RealEstateSchema = object({
 
 const HousingCompanyDetailsSchema = object({
     id: APIIdString,
-    name: object({official: string(), display: string()}),
     business_id: string().nullable(),
-    state: HousingCompanyStateSchema,
+    name: object({official: string(), display: string()}),
+    hitas_type: HousingCompanyHitasTypeSchema,
+    exclude_from_statistics: boolean(),
+    regulation_status: HousingCompanyRegulationStatusSchema,
+    over_thirty_years_old: boolean(),
+    completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
     date: string().nullable(),
-    financing_method: CodeSchema,
+    real_estates: RealEstateSchema.array(),
     building_type: CodeSchema,
     developer: CodeSchema,
     property_manager: PropertyManagerSchema.nullable(),
     acquisition_price: number(),
     primary_loan: number().optional(),
     sales_price_catalogue_confirmation_date: string().nullable(),
-    release_date: string().nullable(),
-    archive_id: number(),
     notes: string().nullable(),
+    archive_id: number(),
+    release_date: string().nullable(),
     last_modified: object({
         user: object({
             user: string().nullable(),
@@ -251,7 +269,6 @@ const HousingCompanyDetailsSchema = object({
         }),
         datetime: z.date(),
     }),
-    real_estates: RealEstateSchema.array(),
     summary: object({
         average_price_per_square_meter: number(),
         realized_acquisition_price: number(),
@@ -267,7 +284,9 @@ const HousingCompanyDetailsSchema = object({
 const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     name: true,
     business_id: true,
-    state: true,
+    hitas_type: true,
+    exclude_from_statistics: true,
+    regulation_status: true,
     address: true,
     acquisition_price: true,
     primary_loan: true,
@@ -277,7 +296,6 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
 }).merge(
     object({
         id: APIIdString.optional(),
-        financing_method: object({id: string()}),
         building_type: object({id: string()}),
         developer: object({id: string()}),
         property_manager: object({id: string()}).nullable(),
@@ -310,7 +328,7 @@ const ownerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
-    email: string({required_error: errorMessages.required}).email(errorMessages.emailInvalid).nullable(),
+    email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
 });
 
 const ownershipSchema = object({
