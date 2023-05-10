@@ -1,13 +1,14 @@
 import {Button} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
+import {downloadCompanyRegulationLetter} from "../../../app/services";
 import {formatDate} from "../../../common/utils";
 
 const ComparisonResultListItem = ({company}) => {
     const [isClicked, setIsClicked] = useState(false);
     const handleClick = () => {
+        downloadCompanyRegulationLetter(company);
         setIsClicked(true);
-        console.log("Download button clicked");
     };
     return (
         <li className="results-list__item">

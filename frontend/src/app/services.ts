@@ -94,6 +94,7 @@ const fetchAndDownloadPDF = (url: string, data: object) => {
         .then(handleDownloadPDF)
         .catch((error) => console.error(error));
 };
+
 // ////////////////
 // Download PDFs //
 // ////////////////
@@ -118,6 +119,18 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, r
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
     const data = {request_date: requestDate};
     fetchAndDownloadPDF(url, data);
+};
+
+export const downloadCompanyRegulationLetter = (company: IHousingCompanyDetails, calculationDate?: string) => {
+    const params = `housing_company_id=${company.id}${
+        calculationDate !== undefined ? `&calculation_date=${calculationDate}` : ""
+    }`;
+    const url = `${Config.api_v1_url}/thirty-year-regulation/reports/download-regulation-letter?${params}`;
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init).then(handleDownloadPDF);
 };
 
 // ///////////
