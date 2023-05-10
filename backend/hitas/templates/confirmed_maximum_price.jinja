@@ -147,7 +147,9 @@
         </p>
     {% endif %}
 
-    <p class="plain-text">Lisätiedot: Maija Meikäläinen, suunnittelija, puhelin 310 00000</p>
+    <p class="plain-text">
+      Lisätiedot: {{ user.first_name }} {{ user.last_name }}, {{ user.title }}, puhelin {{ user.phone }}
+    </p>
 
     <br>
     <br>

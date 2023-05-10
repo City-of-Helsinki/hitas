@@ -915,13 +915,15 @@ class ApartmentViewSet(HitasModelViewSet):
             raise IndexMissingException(error_code="sapc", date=this_month())
 
         sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month())
+
+        filename = f"Hinta-arvio {apartment.address}.pdf"
         context = {
             "apartment": apartment_data,
             "additional_info": request.data.get("additional_info", ""),
             "surface_area_price_ceiling": sapc.value,
             "old_hitas_ruleset": apartment.old_hitas_ruleset,
+            "user": request.user,
         }
-        filename = f"Hinta-arvio {apartment.address}.pdf"
         return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-confirmed-prices")
@@ -940,5 +942,8 @@ class ApartmentViewSet(HitasModelViewSet):
             raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
 
         filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
-        context = {"maximum_price_calculation": mpc}
+        context = {
+            "maximum_price_calculation": mpc,
+            "user": request.user,
+        }
         return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
