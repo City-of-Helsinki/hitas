@@ -1,6 +1,9 @@
 import {Navigate, Route, Routes} from "react-router-dom";
 import App from "./app/App";
-import LogoutCallback from "./common/components/LogoutCallback";
+import {selectIsAuthenticated} from "./app/authSlice";
+import {useAppSelector} from "./app/hooks";
+import Logout from "./common/components/Logout";
+import Unauthorized from "./common/components/Unauthorized";
 import {
     ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
@@ -24,6 +27,13 @@ import {
 import Reports from "./features/reports/Reports";
 
 export default function Router() {
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+    // Use this function to protect routes that require authentication
+    const protect = (element: JSX.Element) => {
+        return isAuthenticated ? element : <Unauthorized />;
+    };
+
     return (
         <Routes>
             <Route
@@ -33,66 +43,66 @@ export default function Router() {
                 <Route path="housing-companies">
                     <Route
                         index
-                        element={<HousingCompanyListPage />}
+                        element={protect(<HousingCompanyListPage />)}
                     />
                     <Route
                         path="create"
-                        element={<HousingCompanyCreatePage />}
+                        element={protect(<HousingCompanyCreatePage />)}
                     />
                     <Route path=":housingCompanyId">
                         <Route
                             index
-                            element={<HousingCompanyDetailsPage />}
+                            element={protect(<HousingCompanyDetailsPage />)}
                         />
                         <Route
                             path="edit"
-                            element={<HousingCompanyCreatePage />}
+                            element={protect(<HousingCompanyCreatePage />)}
                         />
                         <Route
                             path="improvements"
-                            element={<HousingCompanyImprovementsPage />}
+                            element={protect(<HousingCompanyImprovementsPage />)}
                         />
                         <Route
                             path="real-estates"
-                            element={<HousingCompanyRealEstatesPage />}
+                            element={protect(<HousingCompanyRealEstatesPage />)}
                         />
                         <Route
                             path="buildings"
-                            element={<HousingCompanyBuildingsPage />}
+                            element={protect(<HousingCompanyBuildingsPage />)}
                         />
                         <Route path="apartments">
                             <Route
                                 index
-                                element={<Navigate to=".." />}
+                                element={protect(<Navigate to=".." />)}
                             />
                             <Route
                                 path="create"
-                                element={<ApartmentCreatePage />}
+                                element={protect(<ApartmentCreatePage />)}
                             />
                             <Route path=":apartmentId">
                                 <Route
                                     index
-                                    element={<ApartmentDetailsPage />}
+                                    element={protect(<ApartmentDetailsPage />)}
                                 />
                                 <Route
                                     path="edit"
-                                    element={<ApartmentCreatePage />}
+                                    element={protect(<ApartmentCreatePage />)}
                                 />
                                 <Route
                                     path="improvements"
-                                    element={<ApartmentImprovementsPage />}
+                                    element={protect(<ApartmentImprovementsPage />)}
                                 />
                                 <Route
                                     path="max-price"
-                                    element={<ApartmentMaxPricePage />}
+                                    element={protect(<ApartmentMaxPricePage />)}
                                 />
                                 <Route
                                     path="sales"
-                                    element={<ApartmentNewSalePage />}
+                                    element={protect(<ApartmentNewSalePage />)}
                                 />
                                 <Route
                                     path="conditions-of-sale"
-                                    element={<ApartmentConditionsOfSalePage />}
+                                    element={protect(<ApartmentConditionsOfSalePage />)}
                                 />
                             </Route>
                         </Route>
@@ -101,52 +111,46 @@ export default function Router() {
                 <Route path="apartments">
                     <Route
                         index
-                        element={<ApartmentListPage />}
+                        element={protect(<ApartmentListPage />)}
                     />
                     <Route
                         path=":apartmentId"
-                        element={<ApartmentDetailsPage />}
+                        element={protect(<ApartmentDetailsPage />)}
                     />
                 </Route>
                 <Route
                     path="reports"
-                    element={<Reports />}
+                    element={protect(<Reports />)}
                 />
                 <Route
                     path="documents"
-                    element={<Documents />}
+                    element={protect(<Documents />)}
                 />
                 <Route
                     path="codes"
-                    element={<Codes />}
+                    element={protect(<Codes />)}
                 />
                 <Route
                     path="functions"
-                    element={<Functions />}
+                    element={protect(<Functions />)}
                 />
-            </Route>
-            <Route
-                path="/logout"
-                element={
-                    <App isContentProtected={false}>
-                        <LogoutCallback />
-                    </App>
-                }
-            />
-            <Route
-                index
-                element={<Navigate to="/housing-companies" />}
-            />
-            <Route
-                path="*"
-                element={
-                    <App isContentProtected={false}>
+                <Route
+                    path="logout"
+                    element={isAuthenticated ? <></> : <Logout />}
+                />
+                <Route
+                    index
+                    element={<Navigate to="/housing-companies" />}
+                />
+                <Route
+                    path="*"
+                    element={
                         <main style={{padding: "1rem"}}>
                             <h1>Päädyit tyhjälle sivulle. Ole hyvä ja tarkista osoite!</h1>
                         </main>
-                    </App>
-                }
-            />
+                    }
+                />
+            </Route>
         </Routes>
     );
 }

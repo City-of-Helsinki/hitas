@@ -1,28 +1,22 @@
 import {Container, Footer, IconSignout, Navigation} from "hds-react";
-import {ReactNode, useEffect, useState} from "react";
-import {Outlet} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Link, Outlet} from "react-router-dom";
 import Notifications from "../common/components/Notifications";
 import Spinner from "../common/components/Spinner";
-import Unauthorized from "../common/components/Unauthorized";
 import "../styles/index.sass";
 import {selectIsAuthenticated, selectIsAuthenticating, setIsAuthenticated} from "./authSlice";
 import {useAppDispatch, useAppSelector} from "./hooks";
 import {useGetUserInfoQuery} from "./services";
 import useAuthentication from "./useAuthentication";
 
-interface AppProps {
-    isContentProtected?: boolean;
-    children?: ReactNode;
-}
-
-const App = ({isContentProtected = true, children}: AppProps): JSX.Element => {
+const App = (): JSX.Element => {
     // Authentication
     const {data: userInfoData, isLoading: isUserInfoLoading} = useGetUserInfoQuery();
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isAuthenticating = useAppSelector(selectIsAuthenticating);
     const {signIn, logOut} = useAuthentication();
-    const dispatch = useAppDispatch();
     const [userTitle, setUserTitle] = useState<string | number>(0);
+    const dispatch = useAppDispatch();
     const token = process.env.REACT_APP_AUTH_TOKEN;
 
     // Check the authentication and get the user name
@@ -48,16 +42,6 @@ const App = ({isContentProtected = true, children}: AppProps): JSX.Element => {
     }, [userInfoData, isUserInfoLoading, dispatch, token]);
 
     // Layout
-    const NavItem = (item) => {
-        return (
-            <Navigation.Item
-                href={"/" + item.path}
-                label={item.label}
-                className={item.className}
-            />
-        );
-    };
-
     return (
         <div className="App">
             <Navigation
@@ -86,47 +70,17 @@ const App = ({isContentProtected = true, children}: AppProps): JSX.Element => {
                     </Navigation.Actions>
                 )}
                 <Navigation.Row ariaLabel="Main navigation">
-                    <NavItem
-                        label="Yhtiöt"
-                        path="housing-companies"
-                    />
-                    <NavItem
-                        label="Asunnot"
-                        path="apartments"
-                    />
-                    <NavItem
-                        label="Raportit"
-                        path="reports"
-                    />
-                    <NavItem
-                        label="Dokumentit"
-                        path="documents"
-                    />
-                    <NavItem
-                        label="Koodisto"
-                        path="codes"
-                    />
-                    <NavItem
-                        label="Toiminnot"
-                        path="functions"
-                    />
+                    <Link to="housing-companies">Yhtiöt</Link>
+                    <Link to="apartments">Asunnot</Link>
+                    <Link to="reports">Raportit</Link>
+                    <Link to="documents">Dokumentit</Link>
+                    <Link to="codes">Koodisto</Link>
+                    <Link to="functions">Toiminnot</Link>
                 </Navigation.Row>
             </Navigation>
 
             <Container className="main-content">
-                {isContentProtected ? (
-                    isAuthenticating ? (
-                        <Spinner />
-                    ) : isUserInfoLoading ? (
-                        <></>
-                    ) : isAuthenticated ? (
-                        <Outlet />
-                    ) : (
-                        <Unauthorized />
-                    )
-                ) : (
-                    children
-                )}
+                {isAuthenticating ? <Spinner /> : isUserInfoLoading ? <></> : <Outlet />}
             </Container>
 
             <Notifications />
