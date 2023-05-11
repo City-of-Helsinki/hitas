@@ -17,7 +17,7 @@ def test__api__apartment_max_price_pdf__retrieve(api_client: HitasAPIClient):
             args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
         + "/reports/download-latest-confirmed-prices",
-        data={},
+        data={"request_date": "2022-01-01"},
         format="json",
     )
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -34,7 +34,7 @@ def test__api__apartment_max_price_pdf__retrieve__unconfirmed(api_client: HitasA
             args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
         + "/reports/download-latest-confirmed-prices",
-        data={},
+        data={"request_date": "2022-01-01"},
         format="json",
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
@@ -50,7 +50,7 @@ def test__api__apartment_max_price_pdf__retrieve__migrated(api_client: HitasAPIC
             args=[mpc.apartment.housing_company.uuid.hex, mpc.apartment.uuid.hex],
         )
         + "/reports/download-latest-confirmed-prices",
-        data={},
+        data={"request_date": "2022-01-01"},
         format="json",
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
