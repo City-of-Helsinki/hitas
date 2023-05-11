@@ -1,4 +1,5 @@
 import os
+import re
 
 import environ
 from dateutil.relativedelta import relativedelta
@@ -60,17 +61,29 @@ STATIC_ROOT = var_root("static")
 MEDIA_ROOT = var_root("media")
 STATIC_URL = env("STATIC_URL")
 MEDIA_URL = env("MEDIA_URL")
-CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 UWSGI_WARMUP = env("UWSGI_WARMUP")
 
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
-CORS_EXPOSE_HEADERS = ["Content-Disposition"]
-CORS_ALLOW_CREDENTIALS = True
 
 # How long to show fulfilled (=deleted) conditions of sale from the endpoints
 SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS: relativedelta = env("SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS")
+
+# ----- CORS and CSRF settings -------------------------------------------------------------------------
+
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
+CORS_ALLOW_CREDENTIALS = True
+
+# In Django 3.2, this should not include schema.
+# This was changed in django 4.0+ so that schema is mandatory,
+# so this should be changed when updating to django 4.0+.
+# https://docs.djangoproject.com/en/dev/releases/4.0/#format-change
+CSRF_TRUSTED_ORIGINS = [re.sub(r"^https?://", "", host) for host in CORS_ALLOWED_ORIGINS]
+if CSRF_TRUSTED_ORIGINS:
+    # Allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
+    CSRF_COOKIE_DOMAIN = "." + ".".join(CSRF_TRUSTED_ORIGINS[0].split(".")[1:])
 
 # ----- Installed apps ---------------------------------------------------------------------------------
 
