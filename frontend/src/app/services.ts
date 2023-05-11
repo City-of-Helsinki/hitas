@@ -1,5 +1,6 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
+import {getCookie} from "typescript-cookie";
 import {
     IApartmentDetails,
     IApartmentListResponse,
@@ -66,12 +67,14 @@ const getFetchInit = () => {
     return {
         headers: new Headers({
             "Content-Type": "application/json",
+            ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
             ...(Config.token && {Authorization: "Bearer " + Config.token}),
         }),
         method: "POST",
         ...(!Config.token && {credentials: "include" as RequestCredentials}),
     };
 };
+
 export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails, additionalInfo?: string) => {
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {
@@ -227,6 +230,11 @@ const detailApi = hitasApi.injectEndpoints({
     }),
 });
 
+const JSONMutationHeaders = {
+    "Content-type": "application/json; charset=UTF-8",
+    "X-CSRFToken": getCookie("csrftoken"),
+};
+
 const mutationApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
@@ -234,7 +242,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "HousingCompany", id: "LIST"},
@@ -246,7 +254,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/real-estates`,
                 method: "POST",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [
                 {
@@ -259,7 +267,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${id}`,
                 method: "DELETE",
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -271,7 +279,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
                 method: "POST",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -279,7 +287,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId, realEstateId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings/${id}`,
                 method: "DELETE",
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -291,7 +299,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -312,7 +320,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => {
                 // Invalidate Apartment Details only when confirming a maximum price
@@ -332,7 +340,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${id}`,
                 method: "DELETE",
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -345,7 +353,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `owners`,
                 method: "POST",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: () => [{type: "Owner"}],
         }),
@@ -354,7 +362,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `indices/${index}/${month}`,
                 method: "PUT",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
@@ -370,7 +378,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales`,
                 method: "POST",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -386,7 +394,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `conditions-of-sale`,
                 method: "POST",
                 body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
+                headers: JSONMutationHeaders,
             }),
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
@@ -397,7 +405,10 @@ const mutationApi = hitasApi.injectEndpoints({
                 method: "POST",
                 body: arg.data,
                 params: {calculation_date: arg.calculation_date},
-                headers: {"Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
+                headers: {
+                    "Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
             }),
         }),
     }),
