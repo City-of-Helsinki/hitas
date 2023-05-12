@@ -4,6 +4,7 @@ from typing import Any, Iterable, Optional, TypeAlias, TypeVar
 
 from auditlog.diff import model_instance_diff
 from auditlog.models import LogEntry
+from auditlog.receivers import log_delete, log_update
 from auditlog.registry import auditlog
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
@@ -13,6 +14,7 @@ from django.db.models.manager import BaseManager
 from safedelete.managers import SafeDeleteAllManager, SafeDeleteDeletedManager, SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from safedelete.queryset import SafeDeleteQueryset
+from safedelete.signals import post_softdelete, post_undelete
 
 from hitas.services.audit_log import bulk_create_log_entries
 
@@ -21,6 +23,10 @@ FieldName: TypeAlias = str
 OldValue: TypeAlias = str
 NewValue: TypeAlias = str
 TModel = TypeVar("TModel", bound=Model)
+
+# Create audit logs when soft-delete models are soft-deleted or undeleted
+auditlog._signals[post_softdelete] = log_delete
+auditlog._signals[post_undelete] = log_update
 
 
 class AuditableUpdateMixin:
@@ -110,38 +116,6 @@ class AuditableBulkCreateMixin:
         return objs
 
 
-class AuditableDeleteMixin:
-    def delete(self) -> tuple[int, dict[str, int]]:
-        if self.model not in auditlog.get_models():
-            return super().delete()
-
-        objs: list[Model] = list(self.all())
-        changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]]
-        changes = {obj.pk: model_instance_diff(obj, None) for obj in objs}
-
-        with transaction.atomic():
-            ret = super().delete()
-            bulk_create_log_entries(objs, LogEntry.Action.DELETE, changes)
-
-        return ret
-
-
-class AuditableDeleteForceMixin:
-    def delete(self, force_policy: Optional[int] = None) -> tuple[int, dict[str, int]]:
-        if self.model not in auditlog.get_models():
-            return super().delete(force_policy)
-
-        objs: list[Model] = list(self.all())
-        changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]]
-        changes = {obj.pk: model_instance_diff(obj, None) for obj in objs}
-
-        with transaction.atomic():
-            ret = super().delete(force_policy)
-            bulk_create_log_entries(objs, LogEntry.Action.DELETE, changes)
-
-        return ret
-
-
 class PostFetchQuerySetMixin:
     """Patch QuerySet so that results can be modified right after they are fetched."""
 
@@ -156,7 +130,10 @@ class PostFetchQuerySetMixin:
 class HitasQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
-    AuditableDeleteMixin,
+    # Model send signals to auditlog, so queryset "fast deletes" are not possible.
+    # See `django.db.models.deletion.Collector.can_fast_delete`.
+    # Therefore, log entries are created with the model's delete,
+    # and we don't need to override queryset's delete() method.
     PostFetchQuerySetMixin,
     QuerySet,
 ):
@@ -194,8 +171,11 @@ class HitasModel(PostFetchModelMixin, Model):
 class HitasSafeDeleteQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
-    AuditableDeleteForceMixin,
     PostFetchQuerySetMixin,
+    # SafeDelete models override queryset's delete() method
+    # so that the model's delete() is called for each object.
+    # Therefore, log entries are created with the model's delete,
+    # and we don't need to override queryset's delete() method.
     SafeDeleteQueryset,
 ):
     pass
