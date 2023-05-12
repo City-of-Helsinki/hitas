@@ -230,9 +230,18 @@ const detailApi = hitasApi.injectEndpoints({
     }),
 });
 
-const JSONMutationHeaders = {
-    "Content-type": "application/json; charset=UTF-8",
-    "X-CSRFToken": getCookie("csrftoken"),
+const mutationApiJsonHeaders = () => {
+    return new Headers({
+        "Content-type": "application/json; charset=UTF-8",
+        ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
+    });
+};
+
+const mutationApiExcelHeaders = () => {
+    return new Headers({
+        "Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
+    });
 };
 
 const mutationApi = hitasApi.injectEndpoints({
@@ -242,7 +251,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "HousingCompany", id: "LIST"},
@@ -254,7 +263,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/real-estates`,
                 method: "POST",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
                 {
@@ -267,7 +276,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${id}`,
                 method: "DELETE",
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -279,7 +288,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
                 method: "POST",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -287,7 +296,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId, realEstateId}) => ({
                 url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings/${id}`,
                 method: "DELETE",
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
@@ -299,7 +308,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -320,7 +329,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => {
                 // Invalidate Apartment Details only when confirming a maximum price
@@ -340,7 +349,7 @@ const mutationApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${id}`,
                 method: "DELETE",
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -353,7 +362,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `owners`,
                 method: "POST",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: () => [{type: "Owner"}],
         }),
@@ -362,7 +371,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `indices/${index}/${month}`,
                 method: "PUT",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
@@ -378,7 +387,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales`,
                 method: "POST",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
                 {type: "Apartment", id: "LIST"},
@@ -394,7 +403,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `conditions-of-sale`,
                 method: "POST",
                 body: data,
-                headers: JSONMutationHeaders,
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
@@ -405,10 +414,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 method: "POST",
                 body: arg.data,
                 params: {calculation_date: arg.calculation_date},
-                headers: {
-                    "Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    "X-CSRFToken": getCookie("csrftoken"),
-                },
+                headers: mutationApiExcelHeaders(),
             }),
         }),
     }),
