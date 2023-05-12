@@ -281,3 +281,11 @@ class SQSum(Subquery):
     def __init__(self, queryset, output_field=None, *, sum_field="", **extra):
         extra["sum_field"] = sum_field
         super().__init__(queryset, output_field, **extra)
+
+
+def index_of(tup: tuple[Any, ...], value: Any) -> Optional[int]:
+    """Get the index of a value in a tuple or None if item is not in the tuple."""
+    try:
+        return tup.index(value)
+    except ValueError:
+        return None

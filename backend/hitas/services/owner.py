@@ -34,9 +34,14 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
         )
     ).filter(owned_regulated_housing_companies=0)
 
-    obfuscated_owners: list[OwnerT] = list(owners.values("name", "identifier", "email"))
+    # 'non_disclosure' needs to be included temporarily so that we can determine
+    # if obfuscation is needed in 'owner.post_fetch_hook'
+    obfuscated_owners: list[OwnerT] = list(owners.values("name", "identifier", "email", "non_disclosure"))
 
     if obfuscated_owners:
+        for owner in obfuscated_owners:
+            del owner["non_disclosure"]
+
         owners.update(
             name=None,
             identifier=None,
