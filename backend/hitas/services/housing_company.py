@@ -16,6 +16,7 @@ from hitas.models.housing_company import HousingCompany, HousingCompanyWithAnnot
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRow
 from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, get_first_sale_acquisition_price
+from hitas.services.audit_log import last_modified
 from hitas.utils import max_if_all_not_null, roundup
 
 logger = logging.getLogger()
@@ -63,6 +64,11 @@ def get_completed_housing_companies(
                 F("realized_acquisition_price")
                 # Prevent zero-division errors
                 / (NullIf(F("surface_area"), 0, output_field=HitasModelDecimalField()))
+            ),
+            property_manager_last_edited=last_modified(
+                model=HousingCompany,
+                model_id="id",
+                hint='"property_manager": ',
             ),
         )
         .filter(

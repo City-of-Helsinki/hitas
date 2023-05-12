@@ -36,8 +36,10 @@ from hitas.models.thirty_year_regulation import (
     ReplacementPostalCodesWithPrice,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
+    ThirtyYearRegulationResultsRowPrefetched,
     ThirtyYearRegulationResultsRowWithAnnotations,
 )
+from hitas.services.audit_log import last_modified
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.services.indices import subquery_appropriate_cpi
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
@@ -69,6 +71,7 @@ class PropertyManagerInfo(TypedDict):
     name: str
     email: str
     address: AddressInfo
+    last_modified: datetime.date | str
 
 
 class ComparisonData(TypedDict):
@@ -314,6 +317,7 @@ def _split_automatically_released(
                             postal_code=housing_company.property_manager.postal_code,
                             city=housing_company.property_manager.city,
                         ),
+                        last_modified=housing_company.property_manager_last_edited.date(),
                     ),
                     letter_fetched=False,
                     current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -357,6 +361,7 @@ def _get_comparison_values(
                     postal_code=housing_company.property_manager.postal_code,
                     city=housing_company.property_manager.city,
                 ),
+                last_modified=housing_company.property_manager_last_edited.date(),
             ),
             letter_fetched=False,
             current_regulation_status=RegulationStatus.REGULATED.value,  # Changed later if necessary
@@ -679,6 +684,11 @@ def get_thirty_year_regulation_results(calculation_date: datetime.date) -> Thirt
                 )
                 .annotate(
                     apartment_count=Count("housing_company__real_estates__buildings__apartments"),
+                    last_modified=last_modified(
+                        model=HousingCompany,
+                        model_id="housing_company__id",
+                        hint='"property_manager": ',
+                    ),
                 )
                 .order_by("regulation_result", "completion_date"),
             ),
@@ -869,6 +879,7 @@ def convert_thirty_year_regulation_results_to_comparison_data(
         skipped=[],
         obfuscated_owners=[],
     )
+    row: ThirtyYearRegulationResultsRowPrefetched
     for row in results.rows.all():
         column: dict[
             RegulationResult,
@@ -903,6 +914,7 @@ def convert_thirty_year_regulation_results_to_comparison_data(
                         postal_code=row.housing_company.property_manager.postal_code,
                         city=row.housing_company.property_manager.city,
                     ),
+                    last_modified=row.last_modified.date(),
                 ),
                 letter_fetched=row.letter_fetched,
                 current_regulation_status=row.housing_company.regulation_status.value,

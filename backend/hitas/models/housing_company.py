@@ -270,6 +270,7 @@ class HousingCompanyWithAnnotations(HousingCompany):
     realized_acquisition_price: Optional[Decimal]
     surface_area: Optional[Decimal]
     avg_price_per_square_meter: Optional[Decimal]
+    property_manager_last_edited: Optional[datetime.datetime]
 
     class Meta:
         abstract = True
