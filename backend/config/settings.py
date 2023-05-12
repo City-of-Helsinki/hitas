@@ -45,6 +45,7 @@ env = environ.Env(
     SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_SECRET=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, ["localhost:3000"]),
+    REQUIRED_AD_GROUPS=(list, []),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -199,7 +200,9 @@ REST_FRAMEWORK = {
         "config.settings.BearerAuthentication",  # DEV-tokens
         "rest_framework.authentication.SessionAuthentication",  # Helsinki profile sessions
     ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "users.permissions.IsAdminOrHasRequiredADGroups",
+    ],
     "DEFAULT_RENDERER_CLASSES": ["hitas.types.HitasJSONRenderer"],
 }
 
@@ -227,6 +230,9 @@ SOCIAL_AUTH_TUNNISTAMO_PIPELINE = defaults.SOCIAL_AUTH_PIPELINE
 
 HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
+
+# One of these AD groups is required for API access
+REQUIRED_AD_GROUPS: list[str] = env("REQUIRED_AD_GROUPS")
 
 AUTHENTICATION_BACKENDS = [
     "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
