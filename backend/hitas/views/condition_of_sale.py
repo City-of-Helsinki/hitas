@@ -45,6 +45,7 @@ class MinimalOwnerSerializer(HitasModelSerializer):
             "name",
             "identifier",
             "email",
+            "non_disclosure",
         ]
 
 

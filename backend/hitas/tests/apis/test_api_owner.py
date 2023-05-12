@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+from auditlog.models import LogEntry
 from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
@@ -44,12 +45,14 @@ def test__api__owner__list(api_client: HitasAPIClient):
             "name": owner1.name,
             "identifier": owner1.identifier,
             "email": owner1.email,
+            "non_disclosure": owner1.non_disclosure,
         },
         {
             "id": owner2.uuid.hex,
             "name": owner2.name,
             "identifier": owner2.identifier,
             "email": owner2.email,
+            "non_disclosure": owner2.non_disclosure,
         },
     ]
     assert response.json()["page"] == {
@@ -79,6 +82,7 @@ def test__api__owner__retrieve(api_client: HitasAPIClient):
         "name": owner.name,
         "identifier": owner.identifier,
         "email": owner.email,
+        "non_disclosure": owner.non_disclosure,
     }
 
 
@@ -105,6 +109,7 @@ def get_owner_create_data() -> dict[str, Any]:
         "name": "fake-first-name fake-last-name",
         "identifier": "010199-123Y",
         "email": "hitas@example.com",
+        "non_disclosure": False,
     }
 
 
@@ -214,6 +219,7 @@ def test__api__owner__update(api_client: HitasAPIClient):
         "name": "Matti Meikäläinen",
         "identifier": "010199-123Y",
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -224,6 +230,7 @@ def test__api__owner__update(api_client: HitasAPIClient):
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     }
 
     get_response = api_client.get(url)
@@ -237,6 +244,7 @@ def test__api__owner__update__valid_identifier_to_invalid(api_client: HitasAPICl
         "name": "Matti Meikäläinen",
         "identifier": "foo",
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -263,6 +271,7 @@ def test__api__owner__update__valid_identifier_to_null(api_client: HitasAPIClien
         "name": "Matti Meikäläinen",
         "identifier": None,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -289,6 +298,7 @@ def test__api__owner__update__valid_identifier_to_self(api_client: HitasAPIClien
         "name": "Matti Meikäläinen",
         "identifier": owner.identifier,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -299,6 +309,7 @@ def test__api__owner__update__valid_identifier_to_self(api_client: HitasAPIClien
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     } == response.json()
 
 
@@ -310,6 +321,7 @@ def test__api__owner__update__valid_identifier_to_existing_valid(api_client: Hit
         "name": "Matti Meikäläinen",
         "identifier": owner_2.identifier,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner_1.uuid.hex})
@@ -336,6 +348,7 @@ def test__api__owner__update__invalid_identifier_to_invalid(api_client: HitasAPI
         "name": "Matti Meikäläinen",
         "identifier": "foobar",
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -346,6 +359,7 @@ def test__api__owner__update__invalid_identifier_to_invalid(api_client: HitasAPI
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     }
 
 
@@ -356,6 +370,7 @@ def test__api__owner__update__invalid_identifier_to_null(api_client: HitasAPICli
         "name": "Matti Meikäläinen",
         "identifier": None,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -366,6 +381,7 @@ def test__api__owner__update__invalid_identifier_to_null(api_client: HitasAPICli
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     }
 
 
@@ -376,6 +392,7 @@ def test__api__owner__update__invalid_identifier_to_self(api_client: HitasAPICli
         "name": "Matti Meikäläinen",
         "identifier": owner.identifier,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
@@ -386,6 +403,7 @@ def test__api__owner__update__invalid_identifier_to_self(api_client: HitasAPICli
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     } == response.json()
 
 
@@ -397,6 +415,7 @@ def test__api__owner__update__invalid_identifier_to_existing_invalid(api_client:
         "name": "Matti Meikäläinen",
         "identifier": owner_2.identifier,
         "email": "test@example.com",
+        "non_disclosure": False,
     }
 
     url = reverse("hitas:owner-detail", kwargs={"uuid": owner_1.uuid.hex})
@@ -407,6 +426,7 @@ def test__api__owner__update__invalid_identifier_to_existing_invalid(api_client:
         "name": data["name"],
         "identifier": data["identifier"],
         "email": data["email"],
+        "non_disclosure": data["non_disclosure"],
     } == response.json()
 
 
@@ -467,3 +487,31 @@ def test__api__owner__filter(api_client: HitasAPIClient, selected_filter):
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == 1, response.json()
+
+
+# Obfuscated owner endpoint tests
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("non_disclosure", [True, False])
+def test__api__deobfuscated_owner__retrieve(api_client: HitasAPIClient, non_disclosure):
+    owner: Owner = OwnerFactory.create(
+        name="Testi Testinen",
+        identifier="123456-789A",
+        email="testi.testinen.fi",
+        non_disclosure=non_disclosure,
+    )
+
+    url = reverse("hitas:owner-deobfuscated-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "Testi Testinen",
+        "identifier": "123456-789A",
+        "email": "testi.testinen.fi",
+        "non_disclosure": non_disclosure,
+    }
+
+    audit_logs: list[LogEntry] = list(LogEntry.objects.filter(action=LogEntry.Action.ACCESS))
+    assert len(audit_logs) == (1 if non_disclosure else 0)

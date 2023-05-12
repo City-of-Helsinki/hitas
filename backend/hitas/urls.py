@@ -9,6 +9,7 @@ router.register(r"housing-companies", views.HousingCompanyViewSet, basename="hou
 router.register(r"property-managers", views.PropertyManagerViewSet, basename="property-manager")
 router.register(r"apartments", views.ApartmentListViewSet, basename="apartment")
 router.register(r"owners", views.OwnerViewSet, basename="owner")
+router.register(r"owners/deobfuscated", views.DeObfuscatedOwnerView, basename="owner-deobfuscated")
 router.register(r"conditions-of-sale", views.ConditionOfSaleViewSet, basename="conditions-of-sale")
 router.register(r"thirty-year-regulation", views.ThirtyYearRegulationView, basename="thirty-year-regulation")
 router.register(

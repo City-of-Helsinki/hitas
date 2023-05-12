@@ -10,6 +10,7 @@ class OwnerSerializer(ReadOnlySerializer):
     name = serializers.CharField(read_only=True)
     identifier = serializers.CharField(read_only=True)
     email = serializers.CharField(read_only=True)
+    non_disclosure = serializers.BooleanField(read_only=True)
 
     def get_model_class(self):
         return Owner
@@ -20,6 +21,7 @@ class OwnerSerializer(ReadOnlySerializer):
             "name",
             "identifier",
             "email",
+            "non_disclosure",
         ]
 
 

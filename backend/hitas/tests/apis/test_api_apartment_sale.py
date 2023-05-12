@@ -68,6 +68,7 @@ def test__api__apartment_sale__list(api_client: HitasAPIClient):
                         "name": ownership.owner.name,
                         "email": ownership.owner.email,
                         "identifier": ownership.owner.identifier,
+                        "non_disclosure": ownership.owner.non_disclosure,
                     },
                     "percentage": float(ownership.percentage),
                 }
@@ -147,6 +148,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
                     "name": ownership.owner.name,
                     "email": ownership.owner.email,
                     "identifier": ownership.owner.identifier,
+                    "non_disclosure": ownership.owner.non_disclosure,
                 },
                 "percentage": float(ownership.percentage),
             },
@@ -1073,6 +1075,7 @@ def test__api__apartment_sale__update(api_client: HitasAPIClient):
                     "name": ownership.owner.name,
                     "email": ownership.owner.email,
                     "identifier": ownership.owner.identifier,
+                    "non_disclosure": ownership.owner.non_disclosure,
                 },
                 "percentage": float(ownership.percentage),
             }

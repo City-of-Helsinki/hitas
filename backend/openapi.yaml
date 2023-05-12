@@ -2115,6 +2115,36 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # De-obfuscated owner access
+
+  /api/v1/owners/deobfuscated/{owner_id}:
+    get:
+      description: Fetch a single de-obfuscated owner by id
+      operationId: read-deobfuscated-owner
+      tags:
+        - Owners
+      parameters:
+        - name: owner_id
+          required: true
+          in: path
+          description: Owner ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      responses:
+        '200':
+          description: Successfully read an owner's details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Condition of Sale
 
   /api/v1/conditions-of-sale:
@@ -6218,6 +6248,7 @@ components:
         - name
         - identifier
         - email
+        - non_disclosure
       properties:
         id:
           description: ID of this owner
@@ -6238,6 +6269,10 @@ components:
           type: string
           nullable: true
           example: martti.virtanen@example.com
+        non_disclosure:
+          description: Is this owner's information under a non-disclosure agreement?
+          type: boolean
+          example: false
 
     ReadOnlyOwner:
       description: Owner information
@@ -6248,6 +6283,7 @@ components:
         - name
         - identifier
         - email
+        - non_disclosure
       properties:
         id:
           description: ID of this owner
@@ -6270,6 +6306,11 @@ components:
           readOnly: true
           nullable: true
           example: martti.virtanen@example.com
+        non_disclosure:
+          description: Is this owner's information under a non-disclosure agreement?
+          readOnly: true
+          type: boolean
+          example: false
 
     ReadOnlyAddress:
       description: Address information
