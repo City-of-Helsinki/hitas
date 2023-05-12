@@ -7,6 +7,8 @@ from helusers.models import AbstractUser
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    phone = models.CharField(max_length=50, null=True, blank=True, default=None)
+    title = models.CharField(max_length=50, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"

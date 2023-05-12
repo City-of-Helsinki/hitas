@@ -22,12 +22,14 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentSaleFactory
+from users.models import User
 
 # Regulation letters
 
 
 @pytest.mark.django_db
 def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient, freezer):
+    api_user: User = api_client.handler._force_user
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -149,7 +151,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
         neljännesvuosivertailun jälkeen.
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
-        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
+        Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE
         Laskelma yhtiön keskineliöhinnoista
         TIEDOKSI
@@ -231,6 +233,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
 
 @pytest.mark.django_db
 def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, freezer):
+    api_user: User = api_client.handler._force_user
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
@@ -346,7 +349,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Tämän ilmoituksen jälkeen yhtiön asuntojen enimmäishintoja ei enää vahvisteta, eikä tietoja
         tapahtuneista kaupoista ilmoiteta.
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
-        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
+        Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE
         Laskelma yhtiön keskineliöhinnoista
         TIEDOKSI
@@ -428,6 +431,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
 
 @pytest.mark.django_db
 def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, freezer):
+    api_user: User = api_client.handler._force_user
     day = datetime.datetime(2023, 3, 1)
     freezer.move_to(day)
 
@@ -572,7 +576,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
         neljännesvuosivertailun jälkeen.
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
-        Lisätiedot: Maija Meikäläinen, asuntosihteeri, puhelin 001 002003
+        Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE
         Laskelma yhtiön keskineliöhinnoista
         TIEDOKSI

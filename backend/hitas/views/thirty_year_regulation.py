@@ -105,7 +105,7 @@ class ThirtyYearRegulationView(ViewSet):
 
         results = get_thirty_year_regulation_results_for_housing_company(housing_company_uuid, calculation_date)
 
-        context = {"results": results}
+        context = {"results": results, "user": request.user}
         choice = "jatkumisesta" if results.regulation_result == RegulationResult.STAYS_REGULATED else "pättymisestä"
         filename = f"Tiedote sääntelyn {choice} - {results.housing_company.display_name}.pdf"
         response = get_pdf_response(filename=filename, template="regulation_letter.jinja", context=context)
