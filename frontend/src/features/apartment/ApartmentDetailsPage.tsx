@@ -20,7 +20,7 @@ import {
     IHousingCompanyDetails,
     IOwnership,
 } from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
+import {formatAddress, formatDate, formatMoney, hdsToast, today} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
@@ -178,7 +178,7 @@ interface DownloadModalProps {
 
 const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const downloadForm = useForm({defaultValues: {notification_date: formatDate(Date()), additional_info: ""}});
+    const downloadForm = useForm({defaultValues: {request_date: today(), additional_info: ""}});
     const {handleSubmit} = downloadForm;
     const handleDownloadButtonClick = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
@@ -187,7 +187,7 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
         downloadApartmentUnconfirmedMaximumPricePDF(
             apartment,
             downloadForm.getValues("additional_info"),
-            downloadForm.getValues("notification_date")
+            downloadForm.getValues("request_date")
         );
     };
 
@@ -220,6 +220,8 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
                         label="Pyynnön vastaanottamispäivä"
                         formObject={downloadForm}
                         maxDate={new Date()}
+                        tooltipText="Päivämäärä, jolloin hinta-arvio pyyntö on vastaanotettu."
+                        required
                     />
                 </form>
             </Dialog.Content>
@@ -245,12 +247,74 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
     );
 };
 
+const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+    const formRef = useRef<HTMLFormElement>(null);
+    const downloadForm = useForm({defaultValues: {request_date: formatDate(Date()), additional_info: ""}});
+    const {handleSubmit} = downloadForm;
+    const handleDownloadButtonClick = () => {
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
+    };
+    const onSubmit = () => {
+        downloadApartmentMaximumPricePDF(apartment, downloadForm.getValues("request_date"));
+    };
+
+    return (
+        <Dialog
+            id="maximum-prices-download-modal"
+            closeButtonLabelText=""
+            aria-labelledby=""
+            isOpen={isVisible}
+            close={() => setIsVisible(false)}
+            boxShadow
+        >
+            <Dialog.Header
+                id="unconfirmed-prices-download-modal__header"
+                title="Lataa enimmäishintalaskelma"
+            />
+            <Dialog.Content>
+                <form
+                    ref={formRef}
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <DateInput
+                        name="request_date"
+                        label="Pyynnön vastaanottamispäivä"
+                        formObject={downloadForm}
+                        maxDate={new Date()}
+                        tooltipText="Päivämäärä, jolloin enimmäishintalaskelma pyyntö on vastaanotettu."
+                        required
+                    />
+                </form>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => setIsVisible(false)}
+                    variant="secondary"
+                    theme="black"
+                    size="small"
+                >
+                    Sulje
+                </Button>
+                <Button
+                    theme="black"
+                    size="small"
+                    iconLeft={<IconDownload />}
+                    onClick={() => handleDownloadButtonClick()}
+                >
+                    Lataa enimmäishintalaskelma
+                </Button>
+            </Dialog.ActionButtons>
+        </Dialog>
+    );
+};
+
 const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails}) => {
     const isPre2011 = apartment.prices.maximum_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
         ? apartment.prices.maximum_prices.unconfirmed.pre_2011
         : apartment.prices.maximum_prices.unconfirmed.onwards_2011;
     const [isUnconfirmedMaximumPriceModalVisible, setIsUnconfirmedMaximumPriceModalVisible] = useState(false);
+    const [isMaximumPriceModalVisible, setIsMaximumPriceModalVisible] = useState(false);
 
     return (
         <Card>
@@ -295,8 +359,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     theme="black"
                     size="small"
                     variant="secondary"
-                    iconLeft={<IconDownload />}
-                    onClick={() => downloadApartmentMaximumPricePDF(apartment)}
+                    onClick={() => setIsMaximumPriceModalVisible(true)}
                     disabled={
                         !apartment.prices.maximum_prices.confirmed || !apartment.prices.maximum_prices.confirmed.id
                     }
@@ -318,6 +381,11 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                 apartment={apartment}
                 isVisible={isUnconfirmedMaximumPriceModalVisible}
                 setIsVisible={setIsUnconfirmedMaximumPriceModalVisible}
+            />
+            <MaximumPriceDownloadModal
+                apartment={apartment}
+                isVisible={isMaximumPriceModalVisible}
+                setIsVisible={setIsMaximumPriceModalVisible}
             />
         </Card>
     );
