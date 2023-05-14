@@ -1,8 +1,9 @@
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
+import {useForm} from "react-hook-form";
 import {
     downloadApartmentMaximumPricePDF,
     downloadApartmentUnconfirmedMaximumPricePDF,
@@ -10,7 +11,7 @@ import {
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
 import {DetailField, Divider, ImprovementsTable, QueryStateHandler} from "../../common/components";
-import FormTextInputField from "../../common/components/formInputField/FormTextInputField";
+import {DateInput, TextAreaInput} from "../../common/components/form";
 import {
     IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,
@@ -169,13 +170,26 @@ const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaxim
     );
 };
 
-interface UnconfirmedPricesDownloadModalProps {
+interface DownloadModalProps {
     apartment: IApartmentDetails;
     isVisible: boolean;
     setIsVisible;
 }
-const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: UnconfirmedPricesDownloadModalProps) => {
-    const [additionalInfo, setAdditionalInfo] = useState("");
+
+const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+    const formRef = useRef<HTMLFormElement>(null);
+    const downloadForm = useForm({defaultValues: {notification_date: formatDate(Date()), additional_info: ""}});
+    const {handleSubmit} = downloadForm;
+    const handleDownloadButtonClick = () => {
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
+    };
+    const onSubmit = () => {
+        downloadApartmentUnconfirmedMaximumPricePDF(
+            apartment,
+            downloadForm.getValues("additional_info"),
+            downloadForm.getValues("notification_date")
+        );
+    };
 
     return (
         <Dialog
@@ -188,18 +202,26 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Un
         >
             <Dialog.Header
                 id="unconfirmed-prices-download-modal__header"
-                title="Lataa Enimmäishinta-arvio"
+                title="Lataa enimmäishinta-arvio"
             />
             <Dialog.Content>
-                <FormTextInputField
-                    id="input-additional_details"
-                    key="input-additional_details"
-                    label="Lisätietoja"
-                    size="large"
-                    value={additionalInfo}
-                    setFieldValue={setAdditionalInfo}
-                    tooltipText="Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää. Kentän teksti lisätään tulostettavaan hinta-arvio PDF:ään."
-                />
+                <form
+                    ref={formRef}
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <TextAreaInput
+                        name="additional_info"
+                        label="Lisätietoja"
+                        formObject={downloadForm}
+                        tooltipText="Lisätietokenttään kirjoitetaan, jos laskelmassa on jotain erityistä, mitä osakkaan on syytä tietää. Kentän teksti lisätään tulostettavaan hinta-arvio PDF:ään."
+                    />
+                    <DateInput
+                        name="request_date"
+                        label="Pyynnön vastaanottamispäivä"
+                        formObject={downloadForm}
+                        maxDate={new Date()}
+                    />
+                </form>
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
@@ -214,7 +236,7 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Un
                     theme="black"
                     size="small"
                     iconLeft={<IconDownload />}
-                    onClick={() => downloadApartmentUnconfirmedMaximumPricePDF(apartment, additionalInfo)}
+                    onClick={() => handleDownloadButtonClick()}
                 >
                     Lataa Hinta-arvio
                 </Button>
