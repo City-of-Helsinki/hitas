@@ -2680,30 +2680,6 @@
     }
   },
   {
-    "model": "hitas.conditionofsale",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "55fd033c-4870-4260-877f-76de9b50fe8d",
-      "new_ownership": 10,
-      "old_ownership": 9,
-      "grace_period": "not_given"
-    }
-  },
-  {
-    "model": "hitas.conditionofsale",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "19fada83-689c-4e32-a3b0-b7598c7a6830",
-      "new_ownership": 11,
-      "old_ownership": 8,
-      "grace_period": "not_given"
-    }
-  },
-  {
     "model": "hitas.constructionpriceindex",
     "pk": "1978-01-01",
     "fields": {
@@ -15415,6 +15391,30 @@
       "owner": 8,
       "sale": 7,
       "percentage": "100.00"
+    }
+  },
+  {
+    "model": "hitas.conditionofsale",
+    "pk": 1,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "55fd033c-4870-4260-877f-76de9b50fe8d",
+      "new_ownership": 10,
+      "old_ownership": 9,
+      "grace_period": "not_given"
+    }
+  },
+  {
+    "model": "hitas.conditionofsale",
+    "pk": 2,
+    "fields": {
+      "deleted": null,
+      "deleted_by_cascade": false,
+      "uuid": "19fada83-689c-4e32-a3b0-b7598c7a6830",
+      "new_ownership": 11,
+      "old_ownership": 8,
+      "grace_period": "not_given"
     }
   },
   {
