@@ -51,7 +51,7 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
                         variant="secondary"
                         theme="black"
                     >
-                        Syötä uusi
+                        Uusi
                     </Button>
                     <NavigateBackButton />
                 </>

@@ -295,13 +295,15 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
         }),
-        createBuilding: builder.mutation<
+        saveBuilding: builder.mutation<
             IBuilding,
             {data: IBuildingWritable; housingCompanyId: string; realEstateId: string}
         >({
             query: ({data, housingCompanyId, realEstateId}) => ({
-                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings`,
-                method: "POST",
+                url: `housing-companies/${housingCompanyId}/real-estates/${realEstateId}/buildings${idOrBlank(
+                    data.id
+                )}`,
+                method: data.id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
@@ -472,7 +474,7 @@ export const {
     useSaveHousingCompanyMutation,
     useCreateRealEstateMutation,
     useDeleteRealEstateMutation,
-    useCreateBuildingMutation,
+    useSaveBuildingMutation,
     useDeleteBuildingMutation,
     useSaveApartmentMutation,
     useDeleteApartmentMutation,

@@ -1,14 +1,10 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
-import {Fieldset, IconCrossCircle} from "hds-react";
+import {Fieldset, IconCrossCircle, IconPen} from "hds-react";
 import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {
-    useCreateBuildingMutation,
-    useDeleteBuildingMutation,
-    useGetHousingCompanyDetailQuery,
-} from "../../app/services";
+import {useDeleteBuildingMutation, useGetHousingCompanyDetailQuery, useSaveBuildingMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
     FormInputField,
@@ -16,7 +12,8 @@ import {
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
-import {IBuildingWritable} from "../../common/schemas";
+import CancelButton from "../../common/components/CancelButton";
+import {IBuilding, IBuildingWritable, IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
 const blankForm: IBuildingWritable = {
@@ -35,11 +32,12 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
         realEstate: null,
     });
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+    const [editing, setEditing] = useState<{building: IBuilding; realEstate: IRealEstate} | null>(null);
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
     const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
         params.housingCompanyId
     );
-    const [saveBuilding, {data, error, isLoading}] = useCreateBuildingMutation();
+    const [saveBuilding, {data, error, isLoading}] = useSaveBuildingMutation();
     const [deleteBuilding, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
         useDeleteBuildingMutation();
 
@@ -53,7 +51,7 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                   };
               });
 
-    const handleSaveButtonClicked = () => {
+    const handleSaveBuilding = () => {
         saveBuilding({
             data: formData,
             housingCompanyId: params.housingCompanyId as string,
@@ -73,6 +71,18 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
             setIsConfirmModalVisible(false);
         });
     };
+
+    const cancelEditing = () => {
+        setFormData(blankForm);
+        setEditing(null);
+    };
+
+    useEffect(() => {
+        if (!isEndModalVisible && !error) {
+            setFormData(blankForm);
+            setEditing(null);
+        }
+    }, [isEndModalVisible, error, setFormData]);
 
     return (
         <div className="view--create view--buildings">
@@ -97,8 +107,21 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                                     >
                                         {building.address.street_address}
                                         {building.building_identifier ? ` (${building.building_identifier})` : ""}
-                                        <span className="remove-icon">
+                                        <span>
+                                            <IconPen
+                                                className="edit-icon"
+                                                onClick={() => {
+                                                    setEditing({building, realEstate});
+                                                    setFormData({
+                                                        address: {street_address: building.address.street_address},
+                                                        building_identifier: building.building_identifier,
+                                                        real_estate_id: realEstate.id,
+                                                        id: building.id,
+                                                    });
+                                                }}
+                                            />
                                             <IconCrossCircle
+                                                className="remove-icon"
                                                 onClick={() => {
                                                     if (building.apartment_count === 0) {
                                                         setIdsToRemove({
@@ -118,21 +141,36 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                         ""
                     )
                 )}
-            <h2>Uusi rakennus</h2>
+            <h2>{editing ? "Muokkaa rakennuksen tietoja" : "Uusi rakennus"}</h2>
             <div className="field-sets">
                 <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            inputType="select"
-                            label="Kiinteistö"
-                            fieldPath="real_estate_id"
-                            options={realEstateOptions}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
+                    {editing ? (
+                        <>
+                            <h4>
+                                Kiinteistö: {editing.realEstate.address.street_address} (
+                                {editing.realEstate.property_identifier})
+                            </h4>
+                            <h3>
+                                Rakennus: {editing.building.address.street_address}
+                                {editing.building.building_identifier
+                                    ? ` (${editing.building.building_identifier})`
+                                    : ""}
+                            </h3>
+                        </>
+                    ) : (
+                        <div className="row">
+                            <FormInputField
+                                inputType="select"
+                                label="Kiinteistö"
+                                fieldPath="real_estate_id"
+                                options={realEstateOptions}
+                                required
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
+                            />
+                        </div>
+                    )}
                     <div className="row">
                         <FormInputField
                             label="Katuosoite"
@@ -155,12 +193,21 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
                     </div>
                 </Fieldset>
             </div>
+
             <div className="row row--buttons">
                 <NavigateBackButton />
-                <SaveButton
-                    onClick={handleSaveButtonClicked}
-                    isLoading={isHousingCompanyLoading}
-                />
+                <div>
+                    {editing && (
+                        <CancelButton
+                            onClick={cancelEditing}
+                            isLoading={isLoading}
+                        />
+                    )}
+                    <SaveButton
+                        onClick={handleSaveBuilding}
+                        isLoading={isHousingCompanyLoading}
+                    />
+                </div>
             </div>
             <SaveDialogModal
                 data={data}
