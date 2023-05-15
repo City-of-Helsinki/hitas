@@ -46,7 +46,7 @@ env = environ.Env(
     SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_SECRET=(str, ""),
     SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, ["localhost:3000"]),
-    REQUIRED_AD_GROUPS=(list, []),
+    ALLOWED_AD_GROUPS=(list, []),
 )
 env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -245,7 +245,7 @@ HELUSERS_PASSWORD_LOGIN_DISABLED = False
 HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
 
 # One of these AD groups is required for API access
-REQUIRED_AD_GROUPS: list[str] = env("REQUIRED_AD_GROUPS")
+ALLOWED_AD_GROUPS: list[str] = env("ALLOWED_AD_GROUPS")
 
 AUTHENTICATION_BACKENDS = [
     "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
