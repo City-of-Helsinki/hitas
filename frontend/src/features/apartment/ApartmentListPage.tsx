@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {SearchInput, StatusLabel} from "hds-react";
+import {IconSearch, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
@@ -55,25 +55,6 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     );
 };
 
-function result(data, error, isLoading, currentPage, setCurrentPage) {
-    return (
-        <div className="results">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedApartmentResultsList data={data as IApartmentListResponse} />
-                <ListPageNumbers
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    pageInfo={data?.page}
-                />
-            </QueryStateHandler>
-        </div>
-    );
-}
-
 const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
     return (
         <>
@@ -97,6 +78,25 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
         </>
     );
 };
+
+function result(data, error, isLoading, currentPage, setCurrentPage) {
+    return (
+        <div className="results">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedApartmentResultsList data={data as IApartmentListResponse} />
+                <ListPageNumbers
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    pageInfo={data?.page}
+                />
+            </QueryStateHandler>
+        </div>
+    );
+}
 
 export const ApartmentResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -167,16 +167,15 @@ const ApartmentListPage = (): JSX.Element => {
         <div className="view--apartments-listing">
             <Heading>Kaikki kohteet</Heading>
             <div className="listing">
-                <SearchInput
-                    className="search"
-                    label=""
-                    placeholder="Rajaa hakusanalla"
-                    searchButtonAriaLabel="Search"
-                    clearButtonAriaLabel="Clear search field"
-                    onSubmit={(
-                        submittedValue // eslint-disable-next-line no-console
-                    ) => console.log("Submitted search-value:", submittedValue)}
-                />
+                <div className="search">
+                    <FilterTextInputField
+                        label=""
+                        filterFieldName="housing_company_name"
+                        filterParams={filterParams}
+                        setFilterParams={setFilterParams}
+                    />
+                    <IconSearch />
+                </div>
 
                 <ApartmentResultsList filterParams={filterParams} />
 
