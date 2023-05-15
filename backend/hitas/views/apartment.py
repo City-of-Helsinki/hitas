@@ -34,6 +34,7 @@ from hitas.models import (
     MarketPriceIndex2005Equal100,
     Ownership,
     SurfaceAreaPriceCeiling,
+    JobPerformance,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
@@ -44,6 +45,7 @@ from hitas.models.apartment import (
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
+from hitas.models.job_performance import JobPerformanceSource
 from hitas.services.apartment import (
     get_first_sale_purchase_date,
     get_first_sale_loan_amount,
@@ -901,6 +903,9 @@ class ApartmentViewSet(HitasModelViewSet):
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
     def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
+        input_data = UnconfirmedPriceSerializer(data=request.data)
+        input_data.is_valid(raise_exception=True)
+
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
         ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
@@ -924,11 +929,22 @@ class ApartmentViewSet(HitasModelViewSet):
             "old_hitas_ruleset": apartment.old_hitas_ruleset,
             "user": request.user,
         }
-        return get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
+        pdf = get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
+
+        JobPerformance.objects.create(
+            user=request.user,
+            request_date=input_data.data["request_date"],
+            delivery_date=timezone.now().date(),
+            source=JobPerformanceSource.UNCONFIRMED_MAX_PRICE,
+        )
+        return pdf
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-confirmed-prices")
     def download_latest_confirmed_prices(self, request, **kwargs) -> HttpResponse:
-        mpc = (
+        input_data = UnconfirmedPriceSerializer(data=request.data)
+        input_data.is_valid(raise_exception=True)
+
+        mpc: Optional[ApartmentMaximumPriceCalculation] = (
             ApartmentMaximumPriceCalculation.objects.filter(
                 apartment=self.get_object(),
                 json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
@@ -946,4 +962,26 @@ class ApartmentViewSet(HitasModelViewSet):
             "maximum_price_calculation": mpc,
             "user": request.user,
         }
-        return get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
+        pdf = get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
+
+        JobPerformance.objects.create(
+            user=request.user,
+            request_date=input_data.data["request_date"],
+            delivery_date=timezone.now().date(),
+            source=JobPerformanceSource.CONFIRMED_MAX_PRICE,
+        )
+        return pdf
+
+
+class ConfirmedPriceSerializer(serializers.Serializer):
+    request_date = serializers.DateField()
+
+    @staticmethod
+    def validate_request_date(value):
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Request date cannot be in the future.")
+        return value
+
+
+class UnconfirmedPriceSerializer(ConfirmedPriceSerializer):
+    additional_info = serializers.CharField(required=False, allow_blank=True, default="")

@@ -25,6 +25,7 @@ from hitas.models.indices import (
     MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
 )
+from hitas.models.job_performance import JobPerformance
 from hitas.models.migration_done import MigrationDone
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership

@@ -904,7 +904,7 @@ def _test_max_prices(
     response = api_client.post(
         reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex])
         + "/reports/download-latest-unconfirmed-prices",
-        data={"additional_info": "This is additional information"},
+        data={"request_date": "2022-01-01", "additional_info": "This is additional information"},
         format="json",
     )
 

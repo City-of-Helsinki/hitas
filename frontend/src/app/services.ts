@@ -75,22 +75,30 @@ const getFetchInit = () => {
     };
 };
 
-export const downloadApartmentUnconfirmedMaximumPricePDF = (apartment: IApartmentDetails, additionalInfo?: string) => {
+export const downloadApartmentUnconfirmedMaximumPricePDF = (
+    apartment: IApartmentDetails,
+    requestDate: string,
+    additionalInfo?: string
+) => {
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {
         ...getFetchInit(),
-        body: JSON.stringify({additional_info: additionalInfo}),
+        body: JSON.stringify({additional_info: additionalInfo, request_date: requestDate}),
     };
     fetch(url, init).then(handleDownloadPDF);
 };
 
-export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails) => {
+export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, requestDate?: string) => {
     if (!apartment.prices.maximum_prices.confirmed) {
         hitasToast("Enimmäishintalaskelmaa ei ole olemassa", "error");
         return;
     }
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
-    fetch(url, getFetchInit()).then(handleDownloadPDF);
+    const init = {
+        ...getFetchInit(),
+        body: JSON.stringify({request_date: requestDate}),
+    };
+    fetch(url, init).then(handleDownloadPDF);
 };
 
 export const hitasApi = createApi({
