@@ -189,6 +189,7 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
             downloadForm.getValues("additional_info"),
             downloadForm.getValues("request_date")
         );
+        setIsVisible(false);
     };
 
     return (
@@ -256,6 +257,7 @@ const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: Downloa
     };
     const onSubmit = () => {
         downloadApartmentMaximumPricePDF(apartment, downloadForm.getValues("request_date"));
+        setIsVisible(false);
     };
 
     return (

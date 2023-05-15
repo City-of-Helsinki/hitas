@@ -77,8 +77,8 @@ const getFetchInit = () => {
 
 export const downloadApartmentUnconfirmedMaximumPricePDF = (
     apartment: IApartmentDetails,
-    additionalInfo?: string,
-    requestDate?: string
+    requestDate: string,
+    additionalInfo?: string
 ) => {
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {
