@@ -80,12 +80,17 @@ const getFetchInit = () => {
 export const downloadApartmentUnconfirmedMaximumPricePDF = (
     apartment: IApartmentDetails,
     requestDate: string,
-    additionalInfo?: string
+    additionalInfo?: string,
+    calculationDate?: string
 ) => {
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
     const init = {
         ...getFetchInit(),
-        body: JSON.stringify({additional_info: additionalInfo, request_date: requestDate}),
+        body: JSON.stringify({
+            additional_info: additionalInfo,
+            request_date: requestDate,
+            calculation_date: calculationDate,
+        }),
     };
     fetch(url, init)
         .then(handleDownloadPDF)
