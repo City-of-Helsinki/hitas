@@ -42,7 +42,7 @@ export const hitasQuarters = [
         value: "11-01",
         label: "1.11. - 31.1.",
     },
-] as const;
+];
 
 export const indexNames = ["market_price_index", "construction_price_index", "surface_area_price_ceiling"] as const;
 

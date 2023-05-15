@@ -60,6 +60,7 @@ const PriceCeilingPerSquare = () => {
                     <ListItem
                         quarter={0}
                         year={2023}
+                        value={undefined}
                     />
                     <ListItem
                         quarter={3}
@@ -81,7 +82,6 @@ const PriceCeilingPerSquare = () => {
                         name="year"
                         formObject={formObject}
                         defaultValue={years[0]}
-                        clearable={false}
                     />
                     <Select
                         label="Ajanjakso"
@@ -89,7 +89,6 @@ const PriceCeilingPerSquare = () => {
                         name="period"
                         formObject={formObject}
                         defaultValue={hitasQuarters[0]}
-                        clearable={false}
                     />
                     <CalculateButton />
                 </div>
