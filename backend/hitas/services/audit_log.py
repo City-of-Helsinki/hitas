@@ -26,6 +26,10 @@ def bulk_create_log_entries(
     log_entries: list[LogEntry] = []
     for obj in objs:
         pk = LogEntry.objects._get_pk_value(obj)
+
+        if pk not in changes:
+            continue
+
         serialized_data = LogEntry.objects._get_serialized_data_or_none(obj)
         log_entries.append(
             LogEntry(
