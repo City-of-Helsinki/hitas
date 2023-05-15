@@ -393,34 +393,34 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
     );
 };
 
-const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element => {
-    const {
-        data: housingCompanyData,
-        error: housingCompanyError,
-        isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(data.links.housing_company.id);
-
+const LoadedApartmentDetails = ({
+    apartment,
+    housingCompany,
+}: {
+    apartment: IApartmentDetails;
+    housingCompany: IHousingCompanyDetails;
+}): JSX.Element => {
     return (
         <>
             <ApartmentHeader
-                apartment={data as IApartmentDetails}
+                apartment={apartment as IApartmentDetails}
                 showEditButton={true}
             />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
-                    {data.address.stair}
-                    {data.address.apartment_number}
+                    {apartment.address.stair}
+                    {apartment.address.apartment_number}
                 </span>
                 <span>
-                    {data.rooms || ""}
-                    {data.type?.value || ""}
+                    {apartment.rooms || ""}
+                    {apartment.type?.value || ""}
                 </span>
-                <span>{data.surface_area ? data.surface_area + "m²" : ""}</span>
-                <span>{data.address.floor ? data.address.floor + ".krs" : ""}</span>
+                <span>{apartment.surface_area ? apartment.surface_area + "m²" : ""}</span>
+                <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
             </h2>
             <div className="apartment-action-cards">
-                <ApartmentMaximumPricesCard apartment={data} />
-                <ApartmentConditionsOfSaleCard apartment={data} />
+                <ApartmentMaximumPricesCard apartment={apartment} />
+                <ApartmentConditionsOfSaleCard apartment={apartment} />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
@@ -434,17 +434,17 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                 <div className="row">
                                     <DetailField
                                         label="Viimeisin kauppahinta"
-                                        value={formatMoney(data.prices.latest_sale_purchase_price)}
+                                        value={formatMoney(apartment.prices.latest_sale_purchase_price)}
                                         horizontal
                                     />
                                     <DetailField
                                         label="Hankinta-arvo"
-                                        value={formatMoney(data.prices.first_sale_acquisition_price)}
+                                        value={formatMoney(apartment.prices.first_sale_acquisition_price)}
                                         horizontal
                                     />
                                     <DetailField
                                         label="Valmistumispäivä"
-                                        value={formatDate(data.completion_date)}
+                                        value={formatDate(apartment.completion_date)}
                                         horizontal
                                     />
                                 </div>
@@ -453,7 +453,7 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                     <div className="column">
                                         <div>
                                             <label className="detail-field-label">Omistajat</label>
-                                            {data.ownerships.map((ownership: IOwnership) => (
+                                            {apartment.ownerships.map((ownership: IOwnership) => (
                                                 <div
                                                     key={ownership.owner.id}
                                                     className="detail-field-value"
@@ -465,20 +465,20 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                         </div>
                                         <DetailField
                                             label="Isännöitsijä"
-                                            value={housingCompanyData?.property_manager?.name}
+                                            value={housingCompany?.property_manager?.name}
                                         />
                                         <DetailField
                                             label="Osakkeet"
                                             value={
-                                                data.shares
-                                                    ? `${data.shares.start} - ${data.shares.end} (${data.shares.total} kpl)`
+                                                apartment.shares
+                                                    ? `${apartment.shares.start} - ${apartment.shares.end} (${apartment.shares.total} kpl)`
                                                     : undefined
                                             }
                                         />
                                         <div>
                                             <label className="detail-field-label">Huomioitavaa</label>
                                             <textarea
-                                                value={(data.notes as string) || ""}
+                                                value={(apartment.notes as string) || ""}
                                                 readOnly
                                             />
                                         </div>
@@ -486,76 +486,80 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                                     <div className="column">
                                         <DetailField
                                             label="Viimeisin kauppapäivä"
-                                            value={formatDate(data.prices.latest_purchase_date)}
+                                            value={formatDate(apartment.prices.latest_purchase_date)}
                                         />
 
                                         <Divider size="s" />
 
                                         <DetailField
                                             label="Ensimmäinen kauppapäivä"
-                                            value={formatDate(data.prices.first_purchase_date)}
+                                            value={formatDate(apartment.prices.first_purchase_date)}
                                         />
                                         <DetailField
                                             label="Ensimmäinen Kauppahinta"
-                                            value={formatMoney(data.prices.first_sale_purchase_price)}
+                                            value={formatMoney(apartment.prices.first_sale_purchase_price)}
                                         />
                                         <DetailField
                                             label="Ensisijaislaina"
-                                            value={formatMoney(data.prices.first_sale_share_of_housing_company_loans)}
+                                            value={formatMoney(
+                                                apartment.prices.first_sale_share_of_housing_company_loans
+                                            )}
                                         />
 
                                         <Divider size="s" />
 
                                         <DetailField
                                             label="Rakennusaikaiset lisätyöt"
-                                            value={formatMoney(data.prices.construction.additional_work)}
+                                            value={formatMoney(apartment.prices.construction.additional_work)}
                                         />
                                         <DetailField
                                             label="Rakennusaikaiset korot (6 %)"
                                             value={
-                                                data.prices.construction.interest
-                                                    ? formatMoney(data.prices.construction.interest.rate_6)
+                                                apartment.prices.construction.interest
+                                                    ? formatMoney(apartment.prices.construction.interest.rate_6)
                                                     : 0
                                             }
                                         />
                                         <DetailField
                                             label="Rakennusaikaiset korot (14 %)"
                                             value={
-                                                data.prices.construction.interest
-                                                    ? formatMoney(data.prices.construction.interest.rate_14)
+                                                apartment.prices.construction.interest
+                                                    ? formatMoney(apartment.prices.construction.interest.rate_14)
                                                     : 0
                                             }
                                         />
-                                        {data.prices.construction.loans ? (
+                                        {apartment.prices.construction.loans ? (
                                             <DetailField
                                                 label="Rakennusaikaiset lainat"
-                                                value={formatMoney(data.prices.construction.loans)}
+                                                value={formatMoney(apartment.prices.construction.loans)}
                                             />
                                         ) : null}
-                                        {data.prices.construction.debt_free_purchase_price ? (
+                                        {apartment.prices.construction.debt_free_purchase_price ? (
                                             <DetailField
                                                 label="Luovutushinta (RA)"
-                                                value={formatMoney(data.prices.construction.debt_free_purchase_price)}
+                                                value={formatMoney(
+                                                    apartment.prices.construction.debt_free_purchase_price
+                                                )}
                                             />
                                         ) : null}
 
-                                        {data.prices.catalog_purchase_price ||
-                                        data.prices.catalog_share_of_housing_company_loans ? (
+                                        {apartment.prices.catalog_purchase_price ||
+                                        apartment.prices.catalog_share_of_housing_company_loans ? (
                                             <>
                                                 <Divider size="s" />
                                                 <DetailField
                                                     label="Myyntihintaluettelon luovutushinta"
-                                                    value={formatMoney(data.prices.catalog_purchase_price)}
+                                                    value={formatMoney(apartment.prices.catalog_purchase_price)}
                                                 />
                                                 <DetailField
                                                     label="Myyntihintaluettelon ensisijaislaina"
                                                     value={formatMoney(
-                                                        data.prices.catalog_share_of_housing_company_loans
+                                                        apartment.prices.catalog_share_of_housing_company_loans
                                                     )}
                                                 />
                                                 <DetailField
                                                     label="Myyntihintaluettelon Hankinta-arvo"
-                                                    value={formatMoney(data.prices.catalog_acquisition_price)}
+                                                    value={formatMoney(apartment.prices.catalog_acquisition_price)}
                                                 />
                                             </>
                                         ) : null}
@@ -569,33 +573,42 @@ const LoadedApartmentDetails = ({data}: {data: IApartmentDetails}): JSX.Element 
                     </Tabs>
                 </div>
                 <ImprovementsTable
-                    data={data}
+                    data={apartment}
                     title="Asuntokohtaiset parannukset"
                     editableType="apartment"
                 />
-                <QueryStateHandler
-                    data={housingCompanyData}
-                    error={housingCompanyError}
-                    isLoading={isHousingCompanyLoading}
-                >
-                    <ImprovementsTable
-                        data={housingCompanyData as IHousingCompanyDetails}
-                        title="Yhtiökohtaiset parannukset"
-                        editableType="housingCompany"
-                        editPath={`/housing-companies/${housingCompanyData?.id}/improvements`}
-                    />
-                </QueryStateHandler>
+                <ImprovementsTable
+                    data={housingCompany}
+                    title="Yhtiökohtaiset parannukset"
+                    editableType="housingCompany"
+                    editPath={`/housing-companies/${housingCompany.id}/improvements`}
+                />
             </div>
         </>
     );
 };
 
 const ApartmentDetailsPage = (): JSX.Element => {
-    const params = useParams();
-    const {data, error, isLoading} = useGetApartmentDetailQuery({
-        housingCompanyId: params.housingCompanyId as string,
-        apartmentId: params.apartmentId as string,
+    // Load required data and pass it to the child component
+    const params = useParams() as {housingCompanyId: string; apartmentId: string};
+
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: isHousingCompanyLoading,
+    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+    const {
+        data: apartmentData,
+        error: apartmentError,
+        isLoading: isApartmentLoading,
+    } = useGetApartmentDetailQuery({
+        housingCompanyId: params.housingCompanyId,
+        apartmentId: params.apartmentId,
     });
+
+    const data = housingCompanyData && apartmentData;
+    const error = housingCompanyError || apartmentError;
+    const isLoading = isHousingCompanyLoading || isApartmentLoading;
 
     return (
         <div className="view--apartment-details">
@@ -604,7 +617,10 @@ const ApartmentDetailsPage = (): JSX.Element => {
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedApartmentDetails data={data as IApartmentDetails} />
+                <LoadedApartmentDetails
+                    housingCompany={housingCompanyData as IHousingCompanyDetails}
+                    apartment={apartmentData as IApartmentDetails}
+                />
             </QueryStateHandler>
         </div>
     );
