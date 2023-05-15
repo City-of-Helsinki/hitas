@@ -31,6 +31,6 @@ class IsAdminOrHasRequiredADGroups(BasePermission):
 
         # Helsinki profile users require certain AD groups
         user: User = request.user
-        if user.ad_groups.filter(name__in=settings.REQUIRED_AD_GROUPS).exists():
+        if user.ad_groups.filter(name__in=settings.ALLOWED_AD_GROUPS).exists():
             return True
         return False
