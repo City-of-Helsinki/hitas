@@ -55,7 +55,7 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     );
 };
 
-const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
+const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListResponse; isFetching: boolean}) => {
     return (
         <>
             <div className="list-amount">
@@ -68,18 +68,24 @@ const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
                 <div className="list-header state">Tila</div>
             </div>
             <ul className="results-list">
-                {data.contents.map((item: IApartment) => (
-                    <ApartmentListItem
-                        key={item.id}
-                        apartment={item}
-                    />
-                ))}
+                <QueryStateHandler
+                    data={data}
+                    error={undefined}
+                    isLoading={isFetching}
+                >
+                    {data.contents.map((item: IApartment) => (
+                        <ApartmentListItem
+                            key={item.id}
+                            apartment={item}
+                        />
+                    ))}
+                </QueryStateHandler>
             </ul>
         </>
     );
 };
 
-function result(data, error, isLoading, currentPage, setCurrentPage) {
+function result(data, error, isLoading, isFetching, currentPage, setCurrentPage) {
     return (
         <div className="results">
             <QueryStateHandler
@@ -87,7 +93,10 @@ function result(data, error, isLoading, currentPage, setCurrentPage) {
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedApartmentResultsList data={data as IApartmentListResponse} />
+                <LoadedApartmentResultsList
+                    data={data as IApartmentListResponse}
+                    isFetching={isFetching}
+                />
                 <ListPageNumbers
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
@@ -100,18 +109,18 @@ function result(data, error, isLoading, currentPage, setCurrentPage) {
 
 export const ApartmentResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
+    const {data, error, isLoading, isFetching} = useGetApartmentsQuery({...filterParams, page: currentPage});
 
-    return result(data, error, isLoading, currentPage, setCurrentPage);
+    return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
 export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetHousingCompanyApartmentsQuery({
+    const {data, error, isLoading, isFetching} = useGetHousingCompanyApartmentsQuery({
         housingCompanyId: housingCompanyId,
         params: {page: currentPage},
     });
-    return result(data, error, isLoading, currentPage, setCurrentPage);
+    return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
 const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
