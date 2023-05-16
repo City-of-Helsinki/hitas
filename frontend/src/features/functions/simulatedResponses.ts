@@ -22,6 +22,7 @@ const comparisonResponses = {
                         city: "Oulu",
                     },
                 },
+                letter_fetched: true,
             },
         ],
         released_from_regulation: [
@@ -46,6 +47,7 @@ const comparisonResponses = {
                         city: "Oulu",
                     },
                 },
+                letter_fetched: false,
             },
         ],
         stays_regulated: [
@@ -70,6 +72,7 @@ const comparisonResponses = {
                         city: "Oulu",
                     },
                 },
+                letter_fetched: false,
             },
         ],
         skipped: [],
