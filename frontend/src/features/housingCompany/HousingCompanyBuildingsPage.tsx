@@ -55,7 +55,7 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
         saveBuilding({
             data: formData,
             housingCompanyId: params.housingCompanyId as string,
-            realEstateId: formData.real_estate_id as string,
+            realEstateId: editing ? (editing.realEstate.id as string) : (formData.real_estate_id as string),
         });
         setIsEndModalVisible(true);
     };
@@ -144,26 +144,37 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
             <h2>{editing ? "Muokkaa rakennuksen tietoja" : "Uusi rakennus"}</h2>
             <div className="field-sets">
                 <Fieldset heading="">
-                    {editing ? (
-                        <>
-                            <h4>
-                                Kiinteistö: {editing.realEstate.address.street_address} (
-                                {editing.realEstate.property_identifier})
-                            </h4>
-                            <h3>
-                                Rakennus: {editing.building.address.street_address}
-                                {editing.building.building_identifier
-                                    ? ` (${editing.building.building_identifier})`
-                                    : ""}
-                            </h3>
-                        </>
-                    ) : (
+                    {editing && (
+                        <h3>
+                            Rakennus: {editing.building.address.street_address}
+                            {editing.building.building_identifier ? ` (${editing.building.building_identifier})` : ""}
+                        </h3>
+                    )}
+                    {!editing && (
                         <div className="row">
                             <FormInputField
                                 inputType="select"
                                 label="Kiinteistö"
                                 fieldPath="real_estate_id"
                                 options={realEstateOptions}
+                                required
+                                formData={formData}
+                                setFormData={setFormData}
+                                error={error}
+                            />
+                        </div>
+                    )}
+                    {editing && (
+                        <div className="row">
+                            <FormInputField
+                                inputType="select"
+                                label="Kiinteistö"
+                                fieldPath="real_estate_id"
+                                options={realEstateOptions}
+                                defaultValue={{
+                                    label: `${editing.realEstate.address.street_address} (${editing.realEstate.property_identifier})`,
+                                    value: editing.realEstate.id,
+                                }}
                                 required
                                 formData={formData}
                                 setFormData={setFormData}
