@@ -14,7 +14,10 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
         <>
             <Heading>
                 {housingCompany.name.display}
-                <EditButton state={{housingCompany: housingCompany}} />
+                <EditButton
+                    state={{housingCompany: housingCompany}}
+                    disabled={housingCompany.regulation_status !== "regulated"}
+                />
             </Heading>
             <div className="company-status">
                 <StatusLabel>{getHousingCompanyHitasTypeName(housingCompany.hitas_type)}</StatusLabel>
@@ -166,7 +169,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                 <ImprovementsTable
                     data={housingCompany}
                     title="Yhtiökohtaiset parannukset"
-                    editableType="housingCompany"
+                    editableType={housingCompany.regulation_status === "regulated" ? "housingCompany" : undefined}
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">
@@ -175,6 +178,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                             <EditButton
                                 pathname="real-estates"
                                 state={{housingCompany: housingCompany}}
+                                disabled={housingCompany.regulation_status !== "regulated"}
                             />
                         </Heading>
 
@@ -196,6 +200,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                             <EditButton
                                 pathname="buildings"
                                 state={{housingCompany: housingCompany}}
+                                disabled={housingCompany.regulation_status !== "regulated"}
                             />
                         </Heading>
                         <ul className="detail-list__list">
@@ -221,6 +226,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                 theme="black"
                                 size="small"
                                 iconLeft={<IconPlus />}
+                                disabled={housingCompany.regulation_status !== "regulated"}
                             >
                                 Lisää asunto
                             </Button>

@@ -49,7 +49,13 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
     );
 };
 
-const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetails}) => {
+const ApartmentConditionsOfSaleCard = ({
+    apartment,
+    housingCompany,
+}: {
+    apartment: IApartmentDetails;
+    housingCompany: IHousingCompanyDetails;
+}) => {
     const conditionsOfSale = apartment.conditions_of_sale;
     // Create a dict with owner id as key, and all of their conditions of sale in a list as value
     interface IGroupedConditionsOfSale {
@@ -81,6 +87,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     theme="black"
                     iconLeft={<IconGlyphEuro />}
                     onClick={() => hdsToast.error("Valmistumatonta asuntoa ei voida jälleenmyydä.")}
+                    disabled={housingCompany.regulation_status !== "regulated"}
                 >
                     Kauppatapahtuma
                 </Button>
@@ -91,6 +98,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     <Button
                         theme="black"
                         iconLeft={<IconGlyphEuro />}
+                        disabled={housingCompany.regulation_status !== "regulated"}
                     >
                         Kauppatapahtuma
                     </Button>
@@ -107,7 +115,7 @@ const ApartmentConditionsOfSaleCard = ({apartment}: {apartment: IApartmentDetail
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
-                        disabled={!apartment.ownerships.length}
+                        disabled={!apartment.ownerships.length || housingCompany.regulation_status !== "regulated"}
                     >
                         Muokkaa myyntiehtoja
                     </Button>
@@ -310,7 +318,13 @@ const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: Downloa
     );
 };
 
-const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails}) => {
+const ApartmentMaximumPricesCard = ({
+    apartment,
+    housingCompany,
+}: {
+    apartment: IApartmentDetails;
+    housingCompany: IHousingCompanyDetails;
+}) => {
     const isPre2011 = apartment.prices.maximum_prices.unconfirmed.pre_2011 !== null;
     const unconfirmedPrices = isPre2011
         ? apartment.prices.maximum_prices.unconfirmed.pre_2011
@@ -346,7 +360,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                                 unconfirmedPrices.market_price_index.value &&
                                 unconfirmedPrices.construction_price_index.value &&
                                 unconfirmedPrices.surface_area_price_ceiling.value
-                            )
+                            ) || housingCompany.regulation_status !== "regulated"
                         }
                     >
                         Lataa Hinta-arvio
@@ -363,7 +377,9 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     variant="secondary"
                     onClick={() => setIsMaximumPriceModalVisible(true)}
                     disabled={
-                        !apartment.prices.maximum_prices.confirmed || !apartment.prices.maximum_prices.confirmed.id
+                        !apartment.prices.maximum_prices.confirmed ||
+                        !apartment.prices.maximum_prices.confirmed.id ||
+                        housingCompany.regulation_status !== "regulated"
                     }
                 >
                     Lataa enimmäishintalaskelma
@@ -372,7 +388,7 @@ const ApartmentMaximumPricesCard = ({apartment}: {apartment: IApartmentDetails})
                     <Button
                         theme="black"
                         size="small"
-                        disabled={!apartment.completion_date}
+                        disabled={!apartment.completion_date || housingCompany.regulation_status !== "regulated"}
                     >
                         Vahvista
                     </Button>
@@ -402,7 +418,7 @@ const LoadedApartmentDetails = ({
 }): JSX.Element => {
     return (
         <>
-            <ApartmentHeader showEditButton={true} />
+            <ApartmentHeader showEditButton={housingCompany.regulation_status === "regulated"} />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {apartment.address.stair}
@@ -416,8 +432,14 @@ const LoadedApartmentDetails = ({
                 <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
             </h2>
             <div className="apartment-action-cards">
-                <ApartmentMaximumPricesCard apartment={apartment} />
-                <ApartmentConditionsOfSaleCard apartment={apartment} />
+                <ApartmentMaximumPricesCard
+                    apartment={apartment}
+                    housingCompany={housingCompany}
+                />
+                <ApartmentConditionsOfSaleCard
+                    apartment={apartment}
+                    housingCompany={housingCompany}
+                />
             </div>
             <div className="apartment-details">
                 <div className="tab-area">
@@ -572,12 +594,12 @@ const LoadedApartmentDetails = ({
                 <ImprovementsTable
                     data={apartment}
                     title="Asuntokohtaiset parannukset"
-                    editableType="apartment"
+                    editableType={housingCompany.regulation_status === "regulated" ? "apartment" : undefined}
                 />
                 <ImprovementsTable
                     data={housingCompany}
                     title="Yhtiökohtaiset parannukset"
-                    editableType="housingCompany"
+                    editableType={housingCompany.regulation_status === "regulated" ? "housingCompany" : undefined}
                     editPath={`/housing-companies/${housingCompany.id}/improvements`}
                 />
             </div>
