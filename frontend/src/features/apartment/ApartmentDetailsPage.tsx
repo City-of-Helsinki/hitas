@@ -402,10 +402,7 @@ const LoadedApartmentDetails = ({
 }): JSX.Element => {
     return (
         <>
-            <ApartmentHeader
-                apartment={apartment as IApartmentDetails}
-                showEditButton={true}
-            />
+            <ApartmentHeader showEditButton={true} />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {apartment.address.stair}

@@ -228,13 +228,7 @@ const ApartmentConditionsOfSalePage = () => {
 
     return (
         <div className="view--create view--apartment-conditions-of-sale">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <ApartmentHeader apartment={data as IApartmentDetails} />
-            </QueryStateHandler>
+            <ApartmentHeader />
             <Heading type="main">Myyntiehdot</Heading>
             <QueryStateHandler
                 data={data}

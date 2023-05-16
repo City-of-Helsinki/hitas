@@ -1,43 +1,6 @@
 @use '../imports' as *
 
 .view--apartment-details
-
-  .heading--main
-    @include flex-flow(row)
-    height: 75px
-    padding: $spacing-layout-s
-    background: var(--color-engel)
-    font-size: $fontsize-heading-s
-    border: 0
-
-    div
-      display: flex
-      flex-direction: row
-      gap: 1rem
-
-    a, span
-      @include align-items(center)
-      display: inherit
-      &:hover > span:not([class*="status-label"])
-        text-decoration: underline
-
-    span:not([class*="status-label"])
-      margin-left: 0.5rem
-      margin-right: 0.5rem
-
-    .address
-      font-weight: 400
-
-    [class^="StatusLabel"]
-      background-color: var(--color-engel-light)
-      // cancel the hover effect, as we don't have a date to display
-      &:hover
-        width: auto
-        opacity: 1
-        [class*="hds-status-label-icon"]
-          width: auto
-          opacity: 1
-
   .apartment-stats
     @include flexbox()
     @include align-items(center)
@@ -229,3 +192,39 @@
 #unconfirmed-prices-download-modal
   .input-field
     height: auto
+
+.heading--main.heading--apartment
+  @include flex-flow(row)
+  height: 75px
+  padding: $spacing-layout-s
+  background: var(--color-engel)
+  font-size: $fontsize-heading-s
+  border: 0
+
+  div
+    display: flex
+    flex-direction: row
+    gap: 1rem
+
+  a, span
+    @include align-items(center)
+    display: inherit
+    &:hover > span:not([class*="status-label"])
+      text-decoration: underline
+
+  span:not([class*="status-label"])
+    margin-left: 0.5rem
+    margin-right: 0.5rem
+
+  .address
+    font-weight: 400
+
+  [class^="StatusLabel"]
+    background-color: var(--color-engel-light)
+    // cancel the hover effect, as we don't have a date to display
+    &:hover
+      width: auto
+      opacity: 1
+      [class*="hds-status-label-icon"]
+        width: auto
+        opacity: 1

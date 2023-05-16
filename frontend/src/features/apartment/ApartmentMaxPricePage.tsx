@@ -83,7 +83,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
 
     return (
         <div className="view--apartment-max-price">
-            <ApartmentHeader apartment={apartment} />
+            <ApartmentHeader />
             <div className="field-sets">
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>

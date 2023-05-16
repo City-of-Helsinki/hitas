@@ -1,51 +1,90 @@
 import {IconLock, StatusLabel} from "hds-react";
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useParams} from "react-router-dom";
 
-import {EditButton, Heading} from "../../../common/components";
-import {getApartmentStateLabel} from "../../../common/localisation";
-import {IApartmentDetails} from "../../../common/schemas";
+import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../../app/services";
+import {EditButton, Heading, QueryStateHandler} from "../../../common/components";
+import {getApartmentStateLabel, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
+import {IApartmentDetails, IHousingCompanyDetails} from "../../../common/schemas";
 import {formatAddress} from "../../../common/utils";
 
-const ApartmentHeader = ({
+const ApartmentHeaderContent = ({
     apartment,
-    showEditButton = false,
+    housingCompany,
 }: {
     apartment: IApartmentDetails;
-    showEditButton?: boolean;
+    housingCompany: IHousingCompanyDetails;
 }) => {
     const {pathname} = useLocation();
     const isApartmentSubPage = pathname.split("/").pop() !== apartment.id;
 
     return (
-        <div className="view--apartment-details">
-            <Heading type="main">
-                <div>
-                    <Link to={`/housing-companies/${apartment.links.housing_company.id}`}>
-                        <span className="name">
-                            {apartment.links.housing_company.display_name} {isApartmentSubPage}
-                        </span>
-                    </Link>
-                    <span className="unselectable">|</span>
-                    {isApartmentSubPage ? (
-                        <Link
-                            to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}
-                        >
-                            <span className="address">{apartment && formatAddress(apartment.address)}</span>
-                        </Link>
-                    ) : (
-                        <span className="address">{apartment && formatAddress(apartment.address)}</span>
-                    )}
-                    <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
-                    {apartment.sell_by_date ? (
-                        <StatusLabel
-                            className="conditions-of-sale-status"
-                            iconLeft={<IconLock />}
-                        />
-                    ) : null}
-                </div>
-                {showEditButton ? <EditButton /> : null}
-            </Heading>
+        <div>
+            <Link to={`/housing-companies/${apartment.links.housing_company.id}`}>
+                <span className="name">
+                    {apartment.links.housing_company.display_name} {isApartmentSubPage}
+                </span>
+            </Link>
+
+            <span className="unselectable">|</span>
+
+            {isApartmentSubPage ? (
+                <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
+                    <span className="address">{apartment && formatAddress(apartment.address)}</span>
+                </Link>
+            ) : (
+                <span className="address">{apartment && formatAddress(apartment.address)}</span>
+            )}
+
+            <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
+
+            {apartment.sell_by_date && (
+                <StatusLabel
+                    className="conditions-of-sale-status"
+                    iconLeft={<IconLock />}
+                />
+            )}
+
+            {housingCompany.regulation_status !== "regulated" && (
+                <StatusLabel>{getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}</StatusLabel>
+            )}
         </div>
+    );
+};
+
+const ApartmentHeader = ({showEditButton = false}: {showEditButton?: boolean}) => {
+    const params = useParams() as {housingCompanyId: string; apartmentId: string};
+
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: isHousingCompanyLoading,
+    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+    const {
+        data: apartmentData,
+        error: apartmentError,
+        isLoading: isApartmentLoading,
+    } = useGetApartmentDetailQuery({
+        housingCompanyId: params.housingCompanyId,
+        apartmentId: params.apartmentId,
+    });
+
+    return (
+        <Heading
+            type="main"
+            className="heading--apartment"
+        >
+            <QueryStateHandler
+                data={housingCompanyData && apartmentData}
+                error={housingCompanyError || apartmentError}
+                isLoading={isHousingCompanyLoading || isApartmentLoading}
+            >
+                <ApartmentHeaderContent
+                    apartment={apartmentData as IApartmentDetails}
+                    housingCompany={housingCompanyData as IHousingCompanyDetails}
+                />
+            </QueryStateHandler>
+            {showEditButton ? <EditButton /> : null}
+        </Heading>
     );
 };
 

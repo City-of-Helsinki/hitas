@@ -182,7 +182,7 @@ const ApartmentImprovementsPage = () => {
 
     return (
         <div className="view--create view--create-improvements">
-            <ApartmentHeader apartment={state.apartment} />
+            <ApartmentHeader />
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
                     <ul className="improvements-list">
