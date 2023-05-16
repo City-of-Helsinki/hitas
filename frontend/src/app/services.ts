@@ -26,6 +26,7 @@ import {
     IOwner,
     IPostalCodeResponse,
     IRealEstate,
+    IThirtyYearRegulationResponse,
     IUserInfoResponse,
 } from "../common/schemas";
 import {hitasToast} from "../common/utils";
@@ -235,6 +236,12 @@ const detailApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
+        getThirtyYearRegulation: builder.query<IThirtyYearRegulationResponse, object>({
+            query: (params: object) => ({
+                url: "thirty-year-regulation",
+                params: params,
+            }),
+        }),
     }),
 });
 
@@ -416,6 +423,16 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
         }),
+        createThirtyYearComparison: builder.mutation<IThirtyYearRegulationResponse, {data: {calculation_date: string}}>(
+            {
+                query: ({data}) => ({
+                    url: `thirty-year-regulation`,
+                    method: "POST",
+                    body: data,
+                    headers: {"Content-type": "application/json; charset=UTF-8"},
+                }),
+            }
+        ),
         saveExternalSalesData: builder.mutation({
             query: (arg) => ({
                 url: "external-sales-data",
@@ -448,6 +465,7 @@ export const {
     useGetApartmentDetailQuery,
     useGetApartmentMaximumPriceQuery,
     useGetExternalSalesDataQuery,
+    useGetThirtyYearRegulationQuery,
 } = detailApi;
 
 export const {
@@ -463,5 +481,6 @@ export const {
     useSaveIndexMutation,
     useCreateSaleMutation,
     useCreateConditionOfSaleMutation,
+    useCreateThirtyYearComparisonMutation,
     useSaveExternalSalesDataMutation,
 } = mutationApi;

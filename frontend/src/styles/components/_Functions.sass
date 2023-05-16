@@ -158,6 +158,37 @@
         grid-row: 2
         color: $color-black-50
         font-size: $fontsize-body-m
+
+    .companies
+      margin-top: $spacing-m
+      background-color: $color-engel-medium-light
+      &--skipped
+        background-color: $color-error-light
+      p
+        background-color: white
+        padding: $spacing-m
+      .list-headers
+        width: 75%
+      .results-list__item
+        cursor: inherit
+        padding: 0
+        a
+          width: 80%
+          padding: $spacing-m
+          @include flexbox()
+          @include justify-content(space-between)
+        button
+          margin: $spacing-m
+        form
+          @include flexbox()
+          @include justify-content(space-between)
+          @include align-items(center)
+          width: 100%
+          padding: $spacing-m
+          .input-field
+            height: auto
+          [class^="Select-module_wrapper"]
+            height: 56px
     .spinner-wrap
       flex-grow: 1
       [class*="LoadingSpinner-module_loadingSpinner"]

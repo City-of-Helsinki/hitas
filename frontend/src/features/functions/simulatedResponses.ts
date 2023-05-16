@@ -1,5 +1,5 @@
 const comparisonResponses = {
-    success: {
+    result_noProblems: {
         automatically_released: [
             {
                 id: "dccd2cbc98264f28b097da8209441bbf",
@@ -86,175 +86,98 @@ const comparisonResponses = {
             },
         ],
     },
-    get: {
+    result_skippedCompany: {
         automatically_released: [],
-        released_from_regulation: [
-            {
-                id: "7938b3fd2b774139b0b7f410758e09c6",
-                display_name: "Karjalainen",
-                address: {
-                    street_address: "Yrttimaanpolku 020",
-                    postal_code: "00530",
-                    city: "Helsinki",
-                },
-                price: 12000.0,
-                old_ruleset: true,
-                completion_date: "2014-06-02",
-                property_manager: {
-                    id: "dc1072975bab4ba69f64814f021c6785",
-                    name: "Ismo Isännöitsijät Oy",
-                    email: "ismo@example.com",
-                    address: {
-                        street_address: "Torikatu 16 B 4",
-                        postal_code: "90100",
-                        city: "Oulu",
-                    },
-                },
-            },
-            {
-                id: "dccd2cbc98264f28b097da8209441bbf",
-                display_name: "Helsingin Rumpupolun palvelutalo",
-                address: {
-                    street_address: "Fakestreet 123",
-                    postal_code: "00100",
-                    city: "Helsinki",
-                },
-                price: 0.0,
-                old_ruleset: false,
-                completion_date: "2014-06-02",
-                property_manager: {
-                    id: "dc1072975bab4ba69f64814f021c6785",
-                    name: "Ismo Isännöitsijät Oy",
-                    email: "ismo@example.com",
-                    address: {
-                        street_address: "Torikatu 16 B 4",
-                        postal_code: "90100",
-                        city: "Oulu",
-                    },
-                },
-            },
-        ],
-        stays_regulated: [
-            {
-                id: "01c9168e637b4ce0947802e9b417d15a",
-                display_name: "Jokela",
-                address: {
-                    street_address: "Biologinkuja 3",
-                    postal_code: "00200",
-                    city: "Helsinki",
-                },
-                price: 1337.0,
-                old_ruleset: true,
-                completion_date: "2014-06-02",
-                property_manager: {
-                    id: "dc1072975bab4ba69f64814f021c6785",
-                    name: "Ismo Isännöitsijät Oy",
-                    email: "ismo@example.com",
-                    address: {
-                        street_address: "Torikatu 16 B 4",
-                        postal_code: "90100",
-                        city: "Oulu",
-                    },
-                },
-            },
-        ],
-        skipped: [],
         obfuscated_owners: [],
-    },
-    failure: {
-        skippedCompany: {
-            automatically_released: [],
-            obfuscated_owners: [],
-            released_from_regulation: [],
-            skipped: [
-                {
+        released_from_regulation: [],
+        skipped: [
+            {
+                address: {
+                    city: "Helsinki",
+                    postal_code: "00100",
+                    street_address: "Disankuja 14",
+                },
+                completion_date: "1993-02-01",
+                display_name: "Test Housing company 000",
+                id: "e3c34b7f47c74ef796bd51e8fbbe0929",
+                old_ruleset: true,
+                price: 12000.0,
+                property_manager: {
                     address: {
-                        city: "Helsinki",
-                        postal_code: "00001",
-                        street_address: "Disankuja 14",
+                        city: "Liperi",
+                        postal_code: "95024",
+                        street_address: "Edelfeltinkatu 7",
                     },
-                    completion_date: "1993-02-01",
-                    display_name: "Test Housing company 000",
-                    id: "e3c34b7f47c74ef796bd51e8fbbe0929",
-                    old_ruleset: true,
-                    price: 12000.0,
-                    property_manager: {
-                        address: {
-                            city: "Liperi",
-                            postal_code: "95024",
-                            street_address: "Edelfeltinkatu 7",
-                        },
-                        email: "kari06@example.net",
-                        id: "216f86ca32ff49cea26fe8e2d9447e8f",
-                        name: "Maria Kyll\u00f6nen-Jokinen",
-                    },
+                    email: "kari06@example.net",
+                    id: "216f86ca32ff49cea26fe8e2d9447e8f",
+                    name: "Maria Kyll\u00f6nen-Jokinen",
                 },
-            ],
-            stays_regulated: [],
-        },
-        noCompanies: {
-            automatically_released: [],
-            obfuscated_owners: [],
-            released_from_regulation: [],
-            skipped: [],
-            stays_regulated: [],
-        },
-        missingIndex: {
-            error: "missing_values",
-            fields: [
-                {
-                    field: "non_field_errors",
-                    message: "Pre 2011 market price indices missing for months: '1993-02', '2023-02'.",
-                },
-            ],
-            message: "Missing required indices",
-            reason: "Conflict",
-            status: 409,
-        },
-        missingExcel: {
-            error: "external_sales_data_not_found",
-            message: "External sales data not found",
-            reason: "Not Found",
-            status: 404,
-        },
-        missingPriceCeiling: {
-            error: "surface_area_price_ceiling_not_found",
-            message: "Surface area price ceiling not found",
-            reason: "Not Found",
-            status: 404,
-        },
-        missingSurfaceArea: {
-            error: "missing_values",
-            fields: [
-                {
-                    field: "non_field_errors",
-                    message:
-                        "Average price per square meter could not be calculated for 'Test Housing company 000': Apartment 'Uurtajanpolku 5 t 75' does not have surface area set.",
-                },
-            ],
-            message: "Missing apartment details",
-            reason: "Conflict",
-            status: 409,
-        },
-        zeroSurfaceArea: {
-            error: "bad_request",
-            fields: [
-                {
-                    field: "non_field_errors",
-                    message:
-                        "Average price per square meter zero or missing for these housing companies: 'Test Housing company 000'. Index adjustments cannot be made.",
-                },
-            ],
-            message: "Bad request",
-            reason: "Bad Request",
-            status: 400,
-        },
-        alreadyCompared: {
-            error: "unique",
-            message: "Previous regulation exists. Cannot re-check regulation for this quarter.",
-            reason: "Conflict",
-            status: 409,
-        },
+            },
+        ],
+        stays_regulated: [],
+    },
+    result_noCompanies: {
+        automatically_released: [],
+        obfuscated_owners: [],
+        released_from_regulation: [],
+        skipped: [],
+        stays_regulated: [],
+    },
+    error_missingIndex: {
+        error: "missing_values",
+        fields: [
+            {
+                field: "non_field_errors",
+                message: "Pre 2011 market price indices missing for months: '1993-02', '2023-02'.",
+            },
+        ],
+        message: "Missing required indices",
+        reason: "Conflict",
+        status: 409,
+    },
+    error_missingExcel: {
+        error: "external_sales_data_not_found",
+        message: "External sales data not found",
+        reason: "Not Found",
+        status: 404,
+    },
+    error_missingPriceCeiling: {
+        error: "surface_area_price_ceiling_not_found",
+        message: "Surface area price ceiling not found",
+        reason: "Not Found",
+        status: 404,
+    },
+    error_missingSurfaceArea: {
+        error: "missing_values",
+        fields: [
+            {
+                field: "non_field_errors",
+                message:
+                    "Average price per square meter could not be calculated for 'Test Housing company 000': Apartment 'Uurtajanpolku 5 t 75' does not have surface area set.",
+            },
+        ],
+        message: "Missing apartment details",
+        reason: "Conflict",
+        status: 409,
+    },
+    error_zeroSurfaceArea: {
+        error: "bad_request",
+        fields: [
+            {
+                field: "non_field_errors",
+                message:
+                    "Average price per square meter zero or missing for these housing companies: 'Test Housing company 000'. Index adjustments cannot be made.",
+            },
+        ],
+        message: "Bad request",
+        reason: "Bad Request",
+        status: 400,
+    },
+    error_alreadyCompared: {
+        error: "unique",
+        message: "Previous regulation exists. Cannot re-check regulation for this quarter.",
+        reason: "Conflict",
+        status: 409,
     },
 };
 

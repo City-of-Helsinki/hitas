@@ -9,7 +9,7 @@ import {useCreateOwnerMutation, useGetOwnersQuery} from "../../../app/services";
 import {NumberInput, RelatedModelInput} from "../../../common/components/form";
 import TextInput from "../../../common/components/form/TextInput";
 import SaveButton from "../../../common/components/SaveButton";
-import {IOwner, ownerSchema, OwnershipsListSchema} from "../../../common/schemas";
+import {IOwner, OwnerSchema, OwnershipsListSchema} from "../../../common/schemas";
 import {formatOwner, hdsToast, validateSocialSecurityNumber} from "../../../common/utils";
 
 const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, closeModalAction}) => {
@@ -37,7 +37,7 @@ const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, c
 
     const resolver = (data, context, options) => {
         return zodResolver(
-            ownerSchema.superRefine((data, ctx) => {
+            OwnerSchema.superRefine((data, ctx) => {
                 if (!isInvalidSSNAllowed && !validateSocialSecurityNumber(data.identifier)) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,

@@ -143,6 +143,11 @@ const writableRequiredNumber = number({
     .nonnegative(errorMessages.numberPositive)
     .optional(); // allow undefined but no null
 
+const APIDateSchema = string({required_error: errorMessages.required}).regex(
+    /^\d{4}-\d{2}-\d{2}$/,
+    errorMessages.dateFormat
+);
+
 const CodeSchema = object({
     id: APIIdString,
     value: string(),
@@ -324,7 +329,7 @@ const ApartmentLinkedModelsSchema = object({
     apartment: ApartmentLinkedModelSchema,
 });
 
-const ownerSchema = object({
+const OwnerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
@@ -332,7 +337,7 @@ const ownerSchema = object({
 });
 
 const ownershipSchema = object({
-    owner: ownerSchema,
+    owner: OwnerSchema,
     percentage: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .positive(errorMessages.numberPositive)
@@ -348,7 +353,7 @@ const OwnershipFormSchema = ownershipSchema
     .and(object({owner: object({id: string()})}))
     .array();
 
-const ownerAPISchema = addAPIId(ownerSchema);
+const ownerAPISchema = addAPIId(OwnerSchema);
 
 // Condition of Sale
 const CreateConditionOfSaleSchema = object({
@@ -357,7 +362,7 @@ const CreateConditionOfSaleSchema = object({
 
 const ApartmentConditionOfSaleSchema = object({
     id: string(),
-    owner: ownerSchema.omit({id: true}).and(object({id: string()})),
+    owner: OwnerSchema.omit({id: true}).and(object({id: string()})),
     apartment: object({
         id: string(),
         address: ApartmentAddressSchema,
@@ -894,6 +899,26 @@ const ApartmentMaximumPriceWritableSchema = object({
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
 
+const ThirtyYearRegulationCompanySchema = object({
+    id: string(),
+    display_name: string(),
+    price: number(),
+    old_ruleset: boolean(),
+    property_manager: object({
+        email: string(),
+        id: APIIdString,
+        name: string(),
+    }),
+});
+
+const ThirtyYearRegulationResponseSchema = object({
+    automatically_released: ThirtyYearRegulationCompanySchema.array(),
+    released_from_regulation: ThirtyYearRegulationCompanySchema.array(),
+    stays_regulated: ThirtyYearRegulationCompanySchema.array(),
+    skipped: ThirtyYearRegulationCompanySchema.array().optional(),
+    obfuscated_owners: OwnerSchema.array().optional(),
+});
+
 const QuarterSchema = string().regex(/\d{4}Q\d/);
 const ExternalSalesQuarterSchema = object({
     quarter: QuarterSchema,
@@ -926,6 +951,19 @@ const PageInfoSchema = object({
         next: string().nullable(),
         previous: string().nullable(),
     }),
+});
+
+const ErrorResponseSchema = object({
+    error: string().email(),
+    status: number(),
+    reason: string(),
+    message: string(),
+    fields: object({
+        field: string(),
+        message: string(),
+    })
+        .array()
+        .optional(),
 });
 
 // List responses
@@ -984,6 +1022,7 @@ const IndexQuerySchema = object({
 
 // Schemas
 export {
+    APIDateSchema,
     AddressSchema,
     PostalCodeSchema,
     UserInfoSchema,
@@ -1009,7 +1048,7 @@ export {
     ApartmentQuerySchema,
     IndexQuerySchema,
     ApartmentSaleFormSchema,
-    ownerSchema,
+    OwnerSchema,
     OwnershipFormSchema,
     ownerAPISchema,
     ownershipsSchema,
@@ -1018,6 +1057,7 @@ export {
 };
 
 // Types (i.e. models)
+export type IAPIDate = z.infer<typeof APIDateSchema>;
 export type IAddress = z.infer<typeof AddressSchema>;
 export type IImprovement = z.infer<typeof ImprovementSchema>;
 export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
@@ -1063,12 +1103,13 @@ export type IIndex = z.infer<typeof IndexSchema>;
 export type ICode = z.infer<typeof CodeSchema>;
 export type IPostalCode = z.infer<typeof PostalCodeSchema>;
 export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
-export type IOwner = z.infer<typeof ownerSchema>;
+export type IOwner = z.infer<typeof OwnerSchema>;
 export type IOwnership = z.infer<typeof ownershipSchema>;
 
 // Query/list responses & paging
 export type PageInfo = z.infer<typeof PageInfoSchema>;
 export type IUserInfoResponse = z.infer<typeof UserInfoSchema>;
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
 export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
@@ -1079,6 +1120,8 @@ export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
+export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
+
 export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
 export type ICreateConditionOfSale = z.infer<typeof CreateConditionOfSaleSchema>;

@@ -4,7 +4,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Button} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
 
-import {IOwner, ownerSchema} from "../schemas";
+import {IOwner, OwnerSchema} from "../schemas";
 import {validateSocialSecurityNumber} from "../utils";
 import {TextInput} from "./form";
 import {SaveButton} from "./index";
@@ -27,7 +27,7 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
     const formObject = useForm<IOwner>({
         defaultValues: initialFormData,
         mode: "all",
-        resolver: zodResolver(ownerSchema),
+        resolver: zodResolver(OwnerSchema),
     });
     const {
         formState: {isDirty, isValid},

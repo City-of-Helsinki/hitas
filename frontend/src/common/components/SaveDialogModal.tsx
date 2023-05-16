@@ -9,11 +9,19 @@ import {
     IExternalSalesDataResponse,
     IHousingCompanyDetails,
     IRealEstate,
+    IThirtyYearRegulationResponse,
 } from "../schemas";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface SaveStateProps {
-    data: IHousingCompanyDetails | IApartmentDetails | IRealEstate | IBuilding | IExternalSalesDataResponse | undefined;
+    data:
+        | IHousingCompanyDetails
+        | IApartmentDetails
+        | IRealEstate
+        | IBuilding
+        | IThirtyYearRegulationResponse
+        | IExternalSalesDataResponse
+        | undefined;
     error: FetchBaseQueryError | SerializedError | undefined;
     baseURL?: string;
     linkURL?: string;
