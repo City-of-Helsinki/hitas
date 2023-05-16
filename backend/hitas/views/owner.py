@@ -4,13 +4,15 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from hitas.models import Owner, Ownership
 from hitas.models.utils import (
     check_business_id,
     check_social_security_number,
+    deobfuscate,
 )
-from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet
+from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelMixin, HitasModelSerializer, HitasModelViewSet
 
 
 class OwnerSerializer(HitasModelSerializer):
@@ -37,6 +39,7 @@ class OwnerSerializer(HitasModelSerializer):
             "name",
             "identifier",
             "email",
+            "non_disclosure",
         ]
 
 
@@ -78,3 +81,14 @@ class OwnerViewSet(HitasModelViewSet):
     @staticmethod
     def get_filterset_class():
         return OwnerFilterSet
+
+
+class DeObfuscatedOwnerView(HitasModelMixin, GenericViewSet):
+    serializer_class = OwnerSerializer
+    model_class = Owner
+
+    def retrieve(self, request: Request, *args, **kwargs) -> Response:
+        instance: Owner = self.get_object()
+        deobfuscate(instance)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

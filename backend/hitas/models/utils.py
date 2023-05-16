@@ -1,9 +1,17 @@
 import datetime
 import re
-from typing import Optional
+from functools import wraps
+from typing import Optional, TypeVar, ParamSpec, Callable, Any, Iterable
 
+from auditlog.signals import accessed
 from django.core.exceptions import ValidationError
+from django.db.models import Model
 from django.utils.translation import gettext_lazy as _
+
+from hitas.models._base import PostFetchModelMixin
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 
 def validate_property_id(value: Optional[str]) -> None:
@@ -139,3 +147,66 @@ def check_social_security_number(value: str) -> bool:
 
     # Validate check digit
     return _SSN_CHECK_DIGITS[int(date_str + individual_number_str) % 31] == check_digit
+
+
+def obfuscate(instance: PostFetchModelMixin) -> None:
+    """Obfuscate the given model instance."""
+    if not instance.should_obfuscate:
+        return
+
+    # Cache the un-obfuscated values so that they can be restored later
+    if not hasattr(instance, "_unobfuscated_data"):
+        instance._unobfuscated_data = {}
+
+    fields: dict[str, Any] = instance.obfuscation_rules.copy()
+
+    for field, value in fields.items():
+        instance._unobfuscated_data[field] = getattr(instance, field)
+        setattr(instance, field, value)
+
+
+def deobfuscate(
+    instance: PostFetchModelMixin,
+    fields: Iterable[str] = (),
+    *,
+    log_access: bool = True,
+) -> Optional[dict[str, Any]]:
+    """De-obfuscate the given model instance (without removing the obfuscation cache)."""
+    if not hasattr(instance, "_unobfuscated_data"):
+        # Skip de-obfuscation if the instance has not been obfuscated
+        return None
+
+    # De-obfuscate all fields if not specified
+    if not fields:
+        fields = list(instance.obfuscation_rules)
+
+    obfuscated_data: dict[str, Any] = {}
+    for field in fields:
+        obfuscated_data[field] = getattr(instance, field)
+        setattr(instance, field, instance._unobfuscated_data[field])
+
+    # Log the access to de-obfuscated fields
+    if log_access:
+        accessed.send(instance.__class__, instance=instance)
+
+    return obfuscated_data
+
+
+def lift_obfuscation(func: Callable[P, T]) -> Callable[P, T]:
+    """
+    Temporarily de-obfuscates the model.
+
+    Meant to be used in `Model.save()`.
+    DOES NOT LOG ACCESS TO THE FIELDS!!!
+    """
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        self: PostFetchModelMixin = args[0]
+        deobfuscate(self, log_access=False)
+        try:
+            return func(*args, **kwargs)
+        finally:
+            obfuscate(self)
+
+    return wrapper

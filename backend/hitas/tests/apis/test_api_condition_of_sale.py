@@ -75,6 +75,7 @@ def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
                     "name": cos.new_ownership.owner.name,
                     "identifier": cos.new_ownership.owner.identifier,
                     "email": cos.new_ownership.owner.email,
+                    "non_disclosure": cos.new_ownership.owner.non_disclosure,
                 },
             },
             "old_ownership": {
@@ -99,6 +100,7 @@ def test__api__condition_of_sale__list__single(api_client: HitasAPIClient):
                     "name": cos.old_ownership.owner.name,
                     "identifier": cos.old_ownership.owner.identifier,
                     "email": cos.old_ownership.owner.email,
+                    "non_disclosure": cos.old_ownership.owner.non_disclosure,
                 },
             },
         }
@@ -150,6 +152,7 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                     "name": cos_1.new_ownership.owner.name,
                     "identifier": cos_1.new_ownership.owner.identifier,
                     "email": cos_1.new_ownership.owner.email,
+                    "non_disclosure": cos_1.new_ownership.owner.non_disclosure,
                 },
             },
             "old_ownership": {
@@ -174,6 +177,7 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                     "name": cos_1.old_ownership.owner.name,
                     "identifier": cos_1.old_ownership.owner.identifier,
                     "email": cos_1.old_ownership.owner.email,
+                    "non_disclosure": cos_1.old_ownership.owner.non_disclosure,
                 },
             },
         },
@@ -203,6 +207,7 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                     "name": cos_2.new_ownership.owner.name,
                     "identifier": cos_2.new_ownership.owner.identifier,
                     "email": cos_2.new_ownership.owner.email,
+                    "non_disclosure": cos_2.new_ownership.owner.non_disclosure,
                 },
             },
             "old_ownership": {
@@ -227,6 +232,7 @@ def test__api__condition_of_sale__list__multiple(api_client: HitasAPIClient):
                     "name": cos_2.old_ownership.owner.name,
                     "identifier": cos_2.old_ownership.owner.identifier,
                     "email": cos_2.old_ownership.owner.email,
+                    "non_disclosure": cos_2.old_ownership.owner.non_disclosure,
                 },
             },
         },
@@ -330,6 +336,7 @@ def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
                 "name": cos.new_ownership.owner.name,
                 "identifier": cos.new_ownership.owner.identifier,
                 "email": cos.new_ownership.owner.email,
+                "non_disclosure": cos.new_ownership.owner.non_disclosure,
             },
         },
         "old_ownership": {
@@ -354,6 +361,7 @@ def test__api__condition_of_sale__retrieve(api_client: HitasAPIClient):
                 "name": cos.old_ownership.owner.name,
                 "identifier": cos.old_ownership.owner.identifier,
                 "email": cos.old_ownership.owner.email,
+                "non_disclosure": cos.old_ownership.owner.non_disclosure,
             },
         },
     }

@@ -43,6 +43,7 @@ class OwnerFactory(DjangoModelFactory):
     identifier = faker.identifier()
     email = factory.Faker("email")
     bypass_conditions_of_sale = False
+    non_disclosure = False
 
 
 class OwnershipFactory(DjangoModelFactory):

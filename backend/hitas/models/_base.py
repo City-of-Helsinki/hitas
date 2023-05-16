@@ -1,18 +1,21 @@
 import uuid
 from decimal import Decimal
-from typing import Any, Iterable, Optional, TypeAlias, TypeVar
+from typing import Any, Iterable, Optional, TypeAlias, TypeVar, overload
 
 from auditlog.diff import model_instance_diff
 from auditlog.models import LogEntry
+from auditlog.receivers import log_delete, log_update
 from auditlog.registry import auditlog
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Model, QuerySet
 from django.db.models.functions import Cast
 from django.db.models.manager import BaseManager
+from django.utils.functional import classproperty
 from safedelete.managers import SafeDeleteAllManager, SafeDeleteDeletedManager, SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from safedelete.queryset import SafeDeleteQueryset
+from safedelete.signals import post_softdelete, post_undelete
 
 from hitas.services.audit_log import bulk_create_log_entries
 
@@ -21,6 +24,10 @@ FieldName: TypeAlias = str
 OldValue: TypeAlias = str
 NewValue: TypeAlias = str
 TModel = TypeVar("TModel", bound=Model)
+
+# Create audit logs when soft-delete models are soft-deleted or undeleted
+auditlog._signals[post_softdelete] = log_delete
+auditlog._signals[post_undelete] = log_update
 
 
 class AuditableUpdateMixin:
@@ -110,45 +117,13 @@ class AuditableBulkCreateMixin:
         return objs
 
 
-class AuditableDeleteMixin:
-    def delete(self) -> tuple[int, dict[str, int]]:
-        if self.model not in auditlog.get_models():
-            return super().delete()
-
-        objs: list[Model] = list(self.all())
-        changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]]
-        changes = {obj.pk: model_instance_diff(obj, None) for obj in objs}
-
-        with transaction.atomic():
-            ret = super().delete()
-            bulk_create_log_entries(objs, LogEntry.Action.DELETE, changes)
-
-        return ret
-
-
-class AuditableDeleteForceMixin:
-    def delete(self, force_policy: Optional[int] = None) -> tuple[int, dict[str, int]]:
-        if self.model not in auditlog.get_models():
-            return super().delete(force_policy)
-
-        objs: list[Model] = list(self.all())
-        changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]]
-        changes = {obj.pk: model_instance_diff(obj, None) for obj in objs}
-
-        with transaction.atomic():
-            ret = super().delete(force_policy)
-            bulk_create_log_entries(objs, LogEntry.Action.DELETE, changes)
-
-        return ret
-
-
 class PostFetchQuerySetMixin:
     """Patch QuerySet so that results can be modified right after they are fetched."""
 
     def _fetch_all(self):
         if self._result_cache is None:
             results: list[Model] = list(self._iterable_class(self))
-            self._result_cache = self.model.post_fetch_hook(results)
+            self._result_cache = self.model.post_fetch_hook(results, getattr(self, "_fields", ()))
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 
@@ -156,7 +131,10 @@ class PostFetchQuerySetMixin:
 class HitasQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
-    AuditableDeleteMixin,
+    # Model send signals to auditlog, so queryset "fast deletes" are not possible.
+    # See `django.db.models.deletion.Collector.can_fast_delete`.
+    # Therefore, log entries are created with the model's delete,
+    # and we don't need to override queryset's delete() method.
     PostFetchQuerySetMixin,
     QuerySet,
 ):
@@ -168,8 +146,45 @@ class HitasManager(BaseManager.from_queryset(HitasQuerySet)):
 
 
 class PostFetchModelMixin:
+    @classproperty
+    def obfuscation_rules(cls) -> dict[str, Any]:
+        """Which fields to obfuscate and with what values."""
+        return NotImplemented
+
+    @property
+    def should_obfuscate(self) -> bool:
+        """Whether the model should be obfuscated or not."""
+        return NotImplemented
+
     @classmethod
-    def post_fetch_hook(cls: type[TModel], results: list[TModel]) -> list[TModel]:
+    @overload
+    def post_fetch_hook(
+        cls: type[TModel],
+        results: list[TModel],
+        fields: tuple[str, ...],
+    ) -> list[TModel]:
+        """If model instance is accessed (e.g. model.objects.get())."""
+
+    @classmethod
+    @overload
+    def post_fetch_hook(
+        cls: type[TModel],
+        results: list[dict[str, Any]],
+        fields: tuple[str, ...],
+    ) -> list[dict[str, Any]]:
+        """If model values are accessed with qs.values()."""
+
+    @classmethod
+    @overload
+    def post_fetch_hook(
+        cls: type[TModel],
+        results: list[tuple[str, ...]],
+        fields: tuple[str, ...],
+    ) -> list[tuple[str, ...]]:
+        """If model values are accessed with qs.values_list()."""
+
+    @classmethod
+    def post_fetch_hook(cls: type[TModel], results: list[TModel | dict[str, Any]], fields: tuple[str, ...]):
         """Implement this method to modify queryset results after they are fetched."""
         return results
 
@@ -194,8 +209,11 @@ class HitasModel(PostFetchModelMixin, Model):
 class HitasSafeDeleteQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
-    AuditableDeleteForceMixin,
     PostFetchQuerySetMixin,
+    # SafeDelete models override queryset's delete() method
+    # so that the model's delete() is called for each object.
+    # Therefore, log entries are created with the model's delete,
+    # and we don't need to override queryset's delete() method.
     SafeDeleteQueryset,
 ):
     pass

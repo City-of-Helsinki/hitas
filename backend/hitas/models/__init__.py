@@ -24,6 +24,7 @@ from hitas.models.indices import (
     MarketPriceIndex2005Equal100,
     MaximumPriceIndex,
     SurfaceAreaPriceCeiling,
+    SurfaceAreaPriceCeilingCalculationData,
 )
 from hitas.models.job_performance import JobPerformance
 from hitas.models.migration_done import MigrationDone
