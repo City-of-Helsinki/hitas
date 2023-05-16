@@ -5,7 +5,7 @@ import {downloadCompanyRegulationLetter} from "../../../app/services";
 import {formatDate} from "../../../common/utils";
 
 const ComparisonResultListItem = ({company}) => {
-    const [isClicked, setIsClicked] = useState(false);
+    const [isClicked, setIsClicked] = useState(company.letter_fetched);
     const handleClick = () => {
         downloadCompanyRegulationLetter(company);
         setIsClicked(true);
@@ -28,7 +28,7 @@ const ComparisonResultListItem = ({company}) => {
                 variant={isClicked ? "secondary" : "primary"}
                 className="download-button"
             >
-                Lataa tiedote
+                Hae {isClicked ? "uudelleen" : "tiedote"}
             </Button>
         </li>
     );
