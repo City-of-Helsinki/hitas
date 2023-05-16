@@ -37,7 +37,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                         </li>
                         {data.improvements.market_price_index.map((item, index) => (
                             <li
-                                className="detail-list__list-item detail-list__list-item--mh"
+                                className="detail-list__list-item"
                                 key={`market-item-${index}`}
                             >
                                 <div>MH</div>
@@ -49,7 +49,7 @@ export default function ImprovementsTable({data, title, editableType, editPath}:
                         ))}
                         {data.improvements.construction_price_index.map((item, index) => (
                             <li
-                                className="detail-list__list-item detail-list__list-item--rk"
+                                className="detail-list__list-item"
                                 key={`market-item-${index}`}
                             >
                                 <div>RK</div>

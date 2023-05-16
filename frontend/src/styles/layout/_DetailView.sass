@@ -1,0 +1,42 @@
+@use '../imports' as *
+
+// List element inside a Detail view
+.detail-list
+  &__heading
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    @include justify-content(space-between)
+    @include align-items(center)
+    width: 100%
+  &__list
+    background-color: $color-engel-medium-light
+    padding: $spacing-layout-s
+
+    li
+      @include flexbox()
+      @include justify-content(space-between)
+
+    &-headers
+      padding: 0 $spacing-layout-s $spacing-s
+      font-weight: bold
+
+    &-item
+      background-color: white
+      padding: $spacing-layout-s
+      > *
+        @include flexbox()
+        @include align-items(center)
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
+.column
+  @include flexbox()
+  @include flex-flow(column)
+  gap: $spacing-layout-xs
+  width: 50%
+
+  textarea
+    font-size: $fontsize-body-m
+    width: 100%
+    height: 200px
+    resize: none

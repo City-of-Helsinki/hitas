@@ -235,7 +235,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     <div className="listing">
                         <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
                     </div>
-                    <div className="results" />
                 </div>
             </div>
         </>

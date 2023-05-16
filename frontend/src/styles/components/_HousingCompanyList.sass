@@ -1,11 +1,6 @@
 @use '../imports' as *
 
 .view--housing-company-list
-  .results-list
-    height: 859px
-    overflow: hidden
-    background: #eee
-
   .list-header
     &.name
       width: 35%
@@ -34,9 +29,32 @@
       width: 12%
       text-align: right
 
-  .results-list__item
-    height: 85px
-    background: white
+  .results-list
+    height: 859px
+    overflow: hidden
+    background: #eee
 
-  .results-list > a:last-child
-    border-bottom: 1px solid #ccc
+    &__item
+      height: 85px
+      background: white
+
+      .name, .address, .date, .housing-company-state, > div
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include justify-content(center)
+        align-items: flex-start
+
+      .name
+        width: 35%
+        padding-right: $spacing-layout-2-xs
+
+      .address
+        width: 32%
+        padding-right: $spacing-layout-2-xs
+
+      .date
+        width: 18%
+
+      .housing-company-state
+        width: 15%
+        align-items: flex-end

@@ -441,7 +441,7 @@ const LoadedApartmentDetails = ({
                     housingCompany={housingCompany}
                 />
             </div>
-            <div className="apartment-details">
+            <div>
                 <div className="tab-area">
                     <Tabs>
                         <Tabs.TabList className="tab-list">
@@ -449,7 +449,7 @@ const LoadedApartmentDetails = ({
                             <Tabs.Tab>Dokumentit</Tabs.Tab>
                         </Tabs.TabList>
                         <Tabs.TabPanel>
-                            <div className="company-details__tab basic-details">
+                            <div className="apartment-details__tab basic-details">
                                 <div className="row">
                                     <DetailField
                                         label="Viimeisin kauppahinta"
@@ -587,7 +587,7 @@ const LoadedApartmentDetails = ({
                             </div>
                         </Tabs.TabPanel>
                         <Tabs.TabPanel>
-                            <div className="company-details__tab documents">Dokumentit</div>
+                            <div className="apartment-details__tab documents">Dokumentit</div>
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
