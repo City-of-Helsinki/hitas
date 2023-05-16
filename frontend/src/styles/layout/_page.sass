@@ -109,6 +109,7 @@ header
             line-height: 1.25
             text-transform: uppercase
           .conditions-of-sale-status
+            @include flexbox()
             position: relative
             width: 32px
             margin: 0
@@ -119,7 +120,7 @@ header
               width: 24px
               transition: opacity 200ms 200ms
             &:hover
-              width: 70px
+              width: 68px
               [class*="hds-status-label-icon"]
                 transition: opacity 200ms
               .sell-by-date
@@ -390,8 +391,6 @@ footer
   flex-direction: row
   @include justify-content(center)
   @include align-items(center)
-  //padding-left: 8px
-  //padding-right: 8px
   margin-right: 0.5em
   span
     margin: 0
@@ -403,13 +402,13 @@ footer
     transition: width 200ms 100ms, opacity 100ms
   .sell-by-date
     overflow: hidden
-    width: 0px
+    width: 0
     opacity: 0
     text-align: center
     transition: width 200ms 100ms, opacity 200ms
   &:hover
     [class*="hds-status-label-icon"]
-      width: 0px
+      width: 0
       opacity: 0
       transition: width 100ms, opacity 100ms
     .sell-by-date
