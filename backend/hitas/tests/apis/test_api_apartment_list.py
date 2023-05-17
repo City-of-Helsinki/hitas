@@ -8,6 +8,7 @@ from rest_framework import status
 
 from hitas.models.apartment import Apartment, ApartmentSale, ApartmentState, HousingCompany
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
+from hitas.models.housing_company import RegulationStatus
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
@@ -276,6 +277,29 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert len(response.json()["contents"]) == number_of_apartments, response.json()
+
+
+@pytest.mark.django_db
+def test__api__apartment__filter__regulation_status(api_client: HitasAPIClient):
+    ApartmentFactory.create(building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED)
+    ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS
+    )
+
+    url = reverse("hitas:apartment-list") + "?is_regulated=true"
+    response_json = api_client.get(url).json()["contents"]
+    assert len(response_json) == 1, response_json
+
+    url = reverse("hitas:apartment-list") + "?is_regulated=false"
+    response_json = api_client.get(url).json()["contents"]
+    print(response_json)
+    assert len(response_json) == 3, response_json
 
 
 @pytest.mark.parametrize(
