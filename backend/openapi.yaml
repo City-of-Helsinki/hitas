@@ -4412,6 +4412,11 @@ components:
           type: integer
           minimum: 0
           example: 4
+        real_estate_id:
+          description: New ID of this building's real estate
+          type: string
+          writeOnly: true
+          example: c86eaa399ce141d89d962d46bb81ab2b
 
     MinimalHousingCompany:
       description: Housing company identifier

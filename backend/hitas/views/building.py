@@ -8,7 +8,7 @@ from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import Building, HousingCompany, RealEstate
 from hitas.models.utils import validate_building_id
 from hitas.services.validation import lookup_model_id_by_uuid
-from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, ValueOrNullField
+from hitas.views.utils import HitasModelSerializer, HitasModelViewSet, UUIDRelatedField, ValueOrNullField
 
 
 class BuildingHitasAddressSerializer(serializers.Serializer):
@@ -21,6 +21,12 @@ class BuildingSerializer(HitasModelSerializer):
     address = BuildingHitasAddressSerializer(source="*")
     building_identifier = ValueOrNullField(required=False, allow_null=True)
     apartment_count = serializers.SerializerMethodField()
+    real_estate_id = UUIDRelatedField(
+        queryset=RealEstate.objects,
+        source=None,  # reset source to use the default
+        required=False,
+        write_only=True,
+    )
 
     def get_apartment_count(self, instance: Building) -> int:
         apartment_count: Optional[int] = getattr(instance, "apartment_count", None)
@@ -37,8 +43,15 @@ class BuildingSerializer(HitasModelSerializer):
 
     @property
     def validated_data(self):
-        """Inject related Real Estate ID to the validated data"""
         validated_data = super().validated_data
+
+        # If real estate is updated, the real estate is already in the validated data
+        # Just take the id out of it.
+        if "real_estate_id" in validated_data:
+            validated_data["real_estate_id"] = validated_data["real_estate_id"].id
+            return validated_data
+
+        # If real estate is not updated, we need to inject it to the validated data
         try:
             real_estate_uuid = UUID(hex=self.context["view"].kwargs.get("real_estate_uuid"))
             real_estate_id = RealEstate.objects.only("id").get(uuid=real_estate_uuid).id
@@ -55,6 +68,7 @@ class BuildingSerializer(HitasModelSerializer):
             "address",
             "apartment_count",
             "building_identifier",
+            "real_estate_id",
         ]
 
 

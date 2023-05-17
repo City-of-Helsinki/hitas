@@ -324,6 +324,35 @@ def test__api__building__update(api_client: HitasAPIClient):
     assert response.json() == get_response.json()
 
 
+@pytest.mark.django_db
+def test__api__building__update__change_real_estate(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create()
+    real_estate_1: RealEstate = RealEstateFactory.create(housing_company=housing_company)
+    real_estate_2: RealEstate = RealEstateFactory.create(housing_company=housing_company)
+    building: Building = BuildingFactory.create(real_estate=real_estate_1)
+
+    data = {
+        "address": {
+            "street_address": "test-street-address-1",
+        },
+        "real_estate_id": real_estate_2.uuid.hex,
+    }
+
+    url = reverse(
+        "hitas:building-detail",
+        kwargs={
+            "housing_company_uuid": housing_company.uuid.hex,
+            "real_estate_uuid": real_estate_1.uuid.hex,
+            "uuid": building.uuid.hex,
+        },
+    )
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    building.refresh_from_db()
+    assert building.real_estate == real_estate_2
+
+
 # Delete tests
 
 

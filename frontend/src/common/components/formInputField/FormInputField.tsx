@@ -124,6 +124,9 @@ export default function FormInputField({
             if (errorMessage) {
                 setIsInvalid(true);
             }
+        } else {
+            setErrorMessage("");
+            setIsInvalid(false);
         }
     }, [error, errorMessage, setErrorMessage, fieldPath]);
 

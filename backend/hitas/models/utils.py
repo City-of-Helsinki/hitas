@@ -87,7 +87,7 @@ def validate_building_id(value: Optional[str]) -> None:
     building_id_match = re.search(r"^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4} [A-Za-z0-9] \d{3}$", value)
     if building_id_match is None:
         raise ValidationError(
-            _("%(value)s is not an valid building id"),
+            _("%(value)s is not a valid building id"),
             params={"value": value},
         )
     # TODO: verify building id with the check digit

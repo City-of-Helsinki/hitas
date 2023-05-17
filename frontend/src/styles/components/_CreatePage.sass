@@ -107,7 +107,6 @@
 
   > button
     margin: $spacing-layout-s auto
-
 .view--create-improvements
   .field-sets
     @include flex-direction(column)
@@ -177,8 +176,13 @@
     .remove-icon
       cursor: pointer
       height: 24px
+      margin-left: $spacing-xs
       &:hover
         color: $color-error
+    .edit-icon
+      @extend .remove-icon
+      &:hover
+        color: $color-info
 
 .view--real-estates
   .real-estates-list

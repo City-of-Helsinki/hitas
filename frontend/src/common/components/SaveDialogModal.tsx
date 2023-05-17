@@ -37,7 +37,7 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
         <>
             <Dialog.Content>Tiedot tallennettu onnistuneesti!</Dialog.Content>
             <Dialog.ActionButtons>
-                <>
+                {(linkURL || baseURL) && (
                     <Link to={linkURL || baseURL + data.id}>
                         <Button
                             variant="secondary"
@@ -46,15 +46,15 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
                             {linkText}
                         </Button>
                     </Link>
-                    <Button
-                        onClick={() => window.location.reload()}
-                        variant="secondary"
-                        theme="black"
-                    >
-                        Syötä uusi
-                    </Button>
-                    <NavigateBackButton />
-                </>
+                )}
+                <Button
+                    onClick={() => window.location.reload()}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Uusi
+                </Button>
+                <NavigateBackButton />
             </Dialog.ActionButtons>
         </>
     );
