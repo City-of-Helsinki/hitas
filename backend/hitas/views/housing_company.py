@@ -92,11 +92,10 @@ class HousingCompanyFilterSet(HitasFilterSet):
         if value is None:
             return queryset
 
-        cutoff_date = datetime.date(2011, 1, 1)
         if value:
-            return queryset.filter(date__gte=cutoff_date)
+            return queryset.filter(hitas_type__in=HitasType.with_new_hitas_ruleset())
         else:
-            return queryset.filter(date__lt=cutoff_date)
+            return queryset.exclude(hitas_type__in=HitasType.with_new_hitas_ruleset())
 
     class Meta:
         model = HousingCompany
