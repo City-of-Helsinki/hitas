@@ -87,6 +87,7 @@ class HousingCompanyFilterSet(HitasFilterSet):
     developer = HitasCharFilter(field_name="developer__value", lookup_expr="icontains")
     archive_id = HitasNumberFilter(field_name="id", min_value=1)
     new_hitas = BooleanFilter(method="new_hitas_filter")
+    is_regulated = BooleanFilter(method="is_regulated_filter")
 
     def new_hitas_filter(self, queryset, name, value):
         if value is None:
@@ -96,6 +97,15 @@ class HousingCompanyFilterSet(HitasFilterSet):
             return queryset.filter(hitas_type__in=HitasType.with_new_hitas_ruleset())
         else:
             return queryset.exclude(hitas_type__in=HitasType.with_new_hitas_ruleset())
+
+    def is_regulated_filter(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        if value:
+            return queryset.filter(regulation_status=RegulationStatus.REGULATED.value)
+        else:
+            return queryset.exclude(regulation_status=RegulationStatus.REGULATED.value)
 
     class Meta:
         model = HousingCompany

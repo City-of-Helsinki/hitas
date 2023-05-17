@@ -23,7 +23,7 @@ from hitas.models import (
     PropertyManager,
     RealEstate,
 )
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
@@ -1130,6 +1130,23 @@ def test__api__housing_company__filter__new_hitas(api_client: HitasAPIClient):
     assert len(response_json) == 1, response_json
 
     url = reverse("hitas:housing-company-list") + "?new_hitas=false"
+    response_json = api_client.get(url).json()["contents"]
+    print(response_json)
+    assert len(response_json) == 3, response_json
+
+
+@pytest.mark.django_db
+def test__api__housing_company__filter__regulation_status(api_client: HitasAPIClient):
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.REGULATED)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_HITAS)
+
+    url = reverse("hitas:housing-company-list") + "?is_regulated=true"
+    response_json = api_client.get(url).json()["contents"]
+    assert len(response_json) == 1, response_json
+
+    url = reverse("hitas:housing-company-list") + "?is_regulated=false"
     response_json = api_client.get(url).json()["contents"]
     print(response_json)
     assert len(response_json) == 3, response_json
