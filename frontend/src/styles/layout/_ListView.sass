@@ -1,0 +1,107 @@
+@use '../imports' as *
+
+
+.listing
+  background: $color-engel-medium-light
+  padding: $spacing-layout-s
+  display: grid
+  grid-template-columns: 70% 30%
+
+  > .search
+    position: relative
+    margin-bottom: $spacing-s
+
+    [class^="Icon-module"]
+      position: absolute
+      top: 1rem
+      right: 1rem
+
+.results
+  grid-row: 2
+
+  &__page-counter
+    @include flexbox()
+    @include justify-content(center)
+    font-weight: bold
+
+  &-list
+    background: white
+    list-style: none
+    padding: 0
+    margin: 0
+
+    > a
+      display: block
+
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
+    &__item
+      @include flexbox()
+      @include justify-content(space-between)
+      cursor: pointer
+      padding: $spacing-layout-2-xs $spacing-layout-xs
+
+      &:hover
+        background: $color-black-5
+
+      &:not(:last-child)
+        border-bottom: 1px solid #ccc
+
+.list
+  &-amount
+    padding: 0 0 0 $spacing-layout-xs
+    margin: 0 0 $spacing-layout-l
+
+  &-headers
+    @include flexbox()
+    @include justify-content(space-between)
+    margin-bottom: $spacing-xs
+    padding: 0 $spacing-layout-xs
+
+  &-header
+    @include flexbox()
+
+.filters
+  grid-row: 2
+  padding: 5.5rem 0 0 $spacing-layout-s
+
+  > *
+    margin-bottom: $spacing-layout-s
+
+
+[class*="pagination_hds-pagination-container"]
+  @include flexbox()
+  nav
+    width: 100%
+    margin-top: $spacing-s
+    @include flexbox()
+    @include justify-content(space-between)
+    @include align-items(center)
+    height: 40px
+    position: relative
+    > div
+      display: none
+    > ul
+      @include flex-grow(1)
+      min-width: 416px
+      margin-left: 142px
+      margin-right: 142px
+      li
+        min-width: 40px
+    [type="button"]
+      border-radius: 40px
+      width: 142px
+      position: absolute
+      top: -8px
+      div
+        transition: all 350ms ease-out
+      &:hover
+        background: $color-engel
+        text-decoration: underline
+        &[class*="button-prev"] div
+          transform: translateX(-8px)
+        &[class*="button-next"] div
+          transform: translateX(8px)
+    &:before
+      display: none

@@ -1,27 +1,118 @@
 @use '../imports' as *
 
-.view--apartments-listing
+$apartment-list-column-width-apartment-number: 12%
+$apartment-list-column-width-address: 34%
+$apartment-list-column-width-owners-and-area: 44%
+$apartment-list-column-width-state: 10%
+
+
+.view--apartments-listing .results.results--apartment .results-list
+  height: 1009px
+
+.results.results--apartment
+  .list-header
+    &.apartment-number
+      width: $apartment-list-column-width-apartment-number
+    &.address-and-housing-company
+      width: $apartment-list-column-width-address
+    &.owners-and-area
+      width: $apartment-list-column-width-owners-and-area
+    &.state
+      width: $apartment-list-column-width-state
 
   .results-list
+    min-height: 100px
+    overflow: hidden
     background: #eee
 
-  .results-list__item
-    height: 108px
-    background: white
+    .results-list__item
+      height: 100px
+      background: white
 
-  .results-list > a:last-child
-    border-bottom: 0
+      .apartment-number, .address-and-housing-company, .owners-and-area
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include flex-grow(1)
 
-  .list-header
+      .apartment-number
+        justify-content: center
+        align-items: center
+        font-size: 1.8rem
+        letter-spacing: -1px
+        width: $apartment-list-column-width-apartment-number
+        text-align: center
+        padding-right: 1rem
+        .stair-and-number
+          width: 100%
+          line-height: 1.25
+          text-transform: uppercase
+        .conditions-of-sale-status
+          @include flexbox()
+          position: relative
+          width: 32px
+          margin: 0
+          padding: 0
+          transition: width 200ms
+          [class*="hds-status-label-icon"]
+            position: absolute
+            width: 24px
+            transition: opacity 200ms 200ms
+          &:hover
+            width: 68px
+            [class*="hds-status-label-icon"]
+              transition: opacity 200ms
+            .sell-by-date
+              overflow: visible
 
-    &.apartment
-      width: 10%
+      .address-and-housing-company
+        justify-content: space-between
+        width: $apartment-list-column-width-address
+        font-size: $fontsize-body-l
+        .housing-company, .address
+          padding-right: 0.5em
+        .housing-company
+          font-size: $fontsize-body-m
+          font-weight: 600
+        .address
+          margin-top: auto
+          .street-address
+            font-size: $fontsize-body-m
+          .postal-code
+            font-size: $fontsize-body-s
 
-    &.address
-      width: 34%
+      .owners-and-area
+        width: $apartment-list-column-width-owners-and-area
+        justify-content: space-between
+        font-size: $fontsize-body-m
+        .ownership
+          color: $color-black-60
+          display: inline-block
+          z-index: 10
+          line-height: 1
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+          scrollbar-width: none
+          scrollbar-color: transparent transparent
+          margin-bottom: auto
+        .surface-area
+          font-size: $fontsize-body-m
+          margin-top: auto
 
-    &.area
-      width: 47%
+      &:hover .owners-and-area .ownership
+          overflow-x: auto
+          text-overflow: clip
 
-    &.state
-      width: 10%
+          &::-webkit-scrollbar
+            height: 2px
+            &-track
+              background: $color-black-10
+            &-thumb
+              background: $color-black-30
+
+      .state
+        @include flexbox()
+        flex-direction: row-reverse
+        align-items: center
+        column-gap: 0.4em
+        width: $apartment-list-column-width-state

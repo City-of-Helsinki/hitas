@@ -328,7 +328,7 @@ const LoadedApartmentCreatePage = ({
 
     return (
         <>
-            {apartment ? <ApartmentHeader apartment={apartment} /> : <Heading>Uusi asunto</Heading>}
+            {apartment ? <ApartmentHeader /> : <Heading>Uusi asunto</Heading>}
             <form
                 ref={formRef}
                 onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}

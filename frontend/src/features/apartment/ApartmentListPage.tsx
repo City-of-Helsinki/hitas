@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {SearchInput, StatusLabel} from "hds-react";
+import {IconSearch, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
@@ -23,16 +23,15 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     return (
         <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
             <li className="results-list__item results-list__item--apartment">
-                <div className="number">
+                <div className="apartment-number">
                     <span className="stair-and-number">
                         {apartment.address.stair}
                         {apartment.address.apartment_number}
                     </span>
                     <ConditionsOfSaleStatus apartment={apartment} />
                 </div>
-                <div className="details">
+                <div className="address-and-housing-company">
                     <div className="housing-company">{apartment.links.housing_company.display_name}</div>
-                    <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="address">
                         <div className="street-address">
                             {apartment.address.street_address} {apartment.address.stair}{" "}
@@ -42,7 +41,10 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                             {apartment.address.postal_code}, {apartment.address.city}
                         </div>
                     </div>
-                    <div className="area">
+                </div>
+                <div className="owners-and-area">
+                    <div className="ownership">{`${ownershipsString}`}</div>
+                    <div className="surface-area">
                         {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
                         ${apartment.rooms || ""} ${apartment.type}`}
                     </div>
@@ -55,15 +57,48 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     );
 };
 
-function result(data, error, isLoading, currentPage, setCurrentPage) {
+const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListResponse; isFetching: boolean}) => {
     return (
-        <div className="results">
+        <>
+            <div className="list-amount">
+                Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
+            </div>
+            <div className="list-headers">
+                <div className="list-header apartment-number">Asunto</div>
+                <div className="list-header address-and-housing-company">Osoite</div>
+                <div className="list-header owners-and-area">Omistajuudet / Asunnon tiedot</div>
+                <div className="list-header state">Tila</div>
+            </div>
+            <ul className="results-list">
+                <QueryStateHandler
+                    data={data}
+                    error={undefined}
+                    isLoading={isFetching}
+                >
+                    {data.contents.map((item: IApartment) => (
+                        <ApartmentListItem
+                            key={item.id}
+                            apartment={item}
+                        />
+                    ))}
+                </QueryStateHandler>
+            </ul>
+        </>
+    );
+};
+
+function result(data, error, isLoading, isFetching, currentPage, setCurrentPage) {
+    return (
+        <div className="results results--apartment">
             <QueryStateHandler
                 data={data}
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedApartmentResultsList data={data as IApartmentListResponse} />
+                <LoadedApartmentResultsList
+                    data={data as IApartmentListResponse}
+                    isFetching={isFetching}
+                />
                 <ListPageNumbers
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
@@ -74,44 +109,20 @@ function result(data, error, isLoading, currentPage, setCurrentPage) {
     );
 }
 
-const LoadedApartmentResultsList = ({data}: {data: IApartmentListResponse}) => {
-    return (
-        <>
-            <div className="list-amount">
-                Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
-            </div>
-            <div className="list-headers">
-                <div className="list-header apartment">Asunto</div>
-                <div className="list-header address">Osoite</div>
-                <div className="list-header area">Omistajuudet / Asunnon tiedot</div>
-                <div className="list-header state">Tila</div>
-            </div>
-            <ul className="results-list">
-                {data.contents.map((item: IApartment) => (
-                    <ApartmentListItem
-                        key={item.id}
-                        apartment={item}
-                    />
-                ))}
-            </ul>
-        </>
-    );
-};
-
 export const ApartmentResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetApartmentsQuery({...filterParams, page: currentPage});
+    const {data, error, isLoading, isFetching} = useGetApartmentsQuery({...filterParams, page: currentPage});
 
-    return result(data, error, isLoading, currentPage, setCurrentPage);
+    return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
 export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetHousingCompanyApartmentsQuery({
+    const {data, error, isLoading, isFetching} = useGetHousingCompanyApartmentsQuery({
         housingCompanyId: housingCompanyId,
         params: {page: currentPage},
     });
-    return result(data, error, isLoading, currentPage, setCurrentPage);
+    return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
 const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
@@ -167,16 +178,15 @@ const ApartmentListPage = (): JSX.Element => {
         <div className="view--apartments-listing">
             <Heading>Kaikki kohteet</Heading>
             <div className="listing">
-                <SearchInput
-                    className="search"
-                    label=""
-                    placeholder="Rajaa hakusanalla"
-                    searchButtonAriaLabel="Search"
-                    clearButtonAriaLabel="Clear search field"
-                    onSubmit={(
-                        submittedValue // eslint-disable-next-line no-console
-                    ) => console.log("Submitted search-value:", submittedValue)}
-                />
+                <div className="search">
+                    <FilterTextInputField
+                        label=""
+                        filterFieldName="housing_company_name"
+                        filterParams={filterParams}
+                        setFilterParams={setFilterParams}
+                    />
+                    <IconSearch />
+                </div>
 
                 <ApartmentResultsList filterParams={filterParams} />
 

@@ -47,9 +47,15 @@ const HousingCompanyListItem = ({housingCompany}): JSX.Element => {
 
 const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
-    const {data, error, isLoading} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
+    const {data, error, isLoading, isFetching} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
 
-    const LoadedHousingCompanyResultsList = ({data}: {data: IHousingCompanyListResponse}) => {
+    const LoadedHousingCompanyResultsList = ({
+        data,
+        isFetching,
+    }: {
+        data: IHousingCompanyListResponse;
+        isFetching: boolean;
+    }) => {
         return (
             <>
                 <div className="list-amount">
@@ -62,12 +68,18 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                     <div className="list-header housing-company-state">Tila</div>
                 </div>
                 <ul className="results-list">
-                    {data.contents.map((housingCompany: IHousingCompany) => (
-                        <HousingCompanyListItem
-                            key={housingCompany.id}
-                            housingCompany={housingCompany}
-                        />
-                    ))}
+                    <QueryStateHandler
+                        data={data}
+                        error={undefined}
+                        isLoading={isFetching}
+                    >
+                        {data.contents.map((housingCompany: IHousingCompany) => (
+                            <HousingCompanyListItem
+                                key={housingCompany.id}
+                                housingCompany={housingCompany}
+                            />
+                        ))}
+                    </QueryStateHandler>
                 </ul>
             </>
         );
@@ -80,7 +92,10 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedHousingCompanyResultsList data={data as IHousingCompanyListResponse} />
+                <LoadedHousingCompanyResultsList
+                    data={data as IHousingCompanyListResponse}
+                    isFetching={isFetching}
+                />
                 <ListPageNumbers
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}

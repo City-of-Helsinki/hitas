@@ -22,7 +22,7 @@ const ApartmentNewSalePage = () => {
                 error={error}
                 isLoading={isLoading}
             >
-                <ApartmentHeader apartment={data as IApartmentDetails} />
+                <ApartmentHeader />
                 <Heading type="main">
                     {data && data.prices.first_purchase_date ? "Kauppatapahtuma" : "Uudiskohteen kauppa"}
                 </Heading>

@@ -1,7 +1,6 @@
 @use '../imports' as *
 
 .view--housing-company-details
-
   .company-status
     display: flex
     flex-direction: row
@@ -27,10 +26,6 @@
       padding: $spacing-layout-s
 
       .column
-        @include flexbox()
-        @include flex-flow(column)
-        gap: $spacing-layout-xs
-        width: 50%
         border-left: 1px solid #ccc
         padding-left: $spacing-layout-xs
 
@@ -40,11 +35,13 @@
       .detail-field-label
         display: block
         font-size: $fontsize-body-m
+        margin: $spacing-4-xs 0
         margin-bottom: $spacing-3-xs
         letter-spacing: 1px
         color: $color-black-50
 
       .detail-field-value
+        margin: $spacing-4-xs 0
         font-size: $fontsize-body-xl
         font-weight: 600
 
@@ -55,10 +52,8 @@
         &:not(:last-child)
           margin-bottom: $spacing-layout-s
 
-      textarea
-        font-size: $fontsize-body-m
-        width: 100%
-        height: 200px
+  .list-wrapper--real-estates, .list-wrapper--buildings
+    width: 50%
 
   .list-amount
     display: none

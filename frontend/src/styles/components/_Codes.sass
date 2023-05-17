@@ -22,8 +22,6 @@
     @include flex-flow(column nowrap)
     @include flex-grow(1)
 
-  .results
-    height: 510px
 
   .filters
     @include flexbox()
@@ -40,36 +38,40 @@
     background-color: $codes-background-color
     padding-right: $spacing-layout-2-xl
 
-  .results-list
-    border: 1px solid #888
 
-  .results-list__item
-    position: relative
-    padding: $spacing-xs $spacing-m
-    cursor: pointer
-    &:after
-      @include opacity(0)
-      display: block
-      content: "Muokkaa"
-      font-weight: 700
-      position: absolute
-      top: 0.75em
-      right: calc(70px - 5rem)
-      overflow: hidden
-      max-width: 10px
-      transition: all 200ms
-    &:not(:last-child)
-      border: none
-    &:hover
-      background-color: $color-engel-medium-light
-      &:after
-        right: -5rem
-        max-width: 70px
-        @include opacity(0.2)
-    &:nth-child(odd)
-      background-color: $color-engel-light
-      &:hover
-        background-color: $color-engel-medium-light
+  .results
+    height: 510px
+
+    &-list
+      border: 1px solid #888
+
+      &__item
+        position: relative
+        padding: $spacing-xs $spacing-m
+        cursor: pointer
+        &:after
+          @include opacity(0)
+          display: block
+          content: "Muokkaa"
+          font-weight: 700
+          position: absolute
+          top: 0.75em
+          right: calc(70px - 5rem)
+          overflow: hidden
+          max-width: 10px
+          transition: all 200ms
+        &:not(:last-child)
+          border: none
+        &:hover
+          background-color: $color-engel-medium-light
+          &:after
+            right: -5rem
+            max-width: 70px
+            @include opacity(0.2)
+        &:nth-child(odd)
+          background-color: $color-engel-light
+          &:hover
+            background-color: $color-engel-medium-light
 
   &__tab--indices
     @include flexbox()

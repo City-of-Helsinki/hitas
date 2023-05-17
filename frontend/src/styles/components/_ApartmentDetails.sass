@@ -1,43 +1,6 @@
 @use '../imports' as *
 
 .view--apartment-details
-
-  .heading--main
-    @include flex-flow(row)
-    height: 75px
-    padding: $spacing-layout-s
-    background: var(--color-engel)
-    font-size: $fontsize-heading-s
-    border: 0
-
-    div
-      display: flex
-      flex-direction: row
-      gap: 1rem
-
-    a, span
-      @include align-items(center)
-      display: inherit
-      &:hover > span:not([class*="status-label"])
-        text-decoration: underline
-
-    span:not([class*="status-label"])
-      margin-left: 0.5rem
-      margin-right: 0.5rem
-
-    .address
-      font-weight: 400
-
-    [class^="StatusLabel"]
-      background-color: var(--color-engel-light)
-      // cancel the hover effect, as we don't have a date to display
-      &:hover
-        width: auto
-        opacity: 1
-        [class*="hds-status-label-icon"]
-          width: auto
-          opacity: 1
-
   .apartment-stats
     @include flexbox()
     @include align-items(center)
@@ -192,11 +155,47 @@
     background: $color-black-5
     margin: $spacing-l 0
 
-  .company-details__tab
+  .apartment-details__tab
+    @include flexbox()
     @include flex-flow(column nowrap)
     background: $color-black-5
+    margin: $spacing-layout-s
+    padding: $spacing-layout-s
     padding-top: 0
     padding-bottom: 4rem
+
+    .columns
+      @include flexbox()
+      @include flex-flow(row)
+
+      .column
+        border: 0
+        padding-left: $spacing-layout-xs
+
+        &:first-child
+          padding-left: 0
+        &:not(:first-child)
+          margin-left: $spacing-layout-s
+
+    .detail-field-label
+      display: block
+      font-size: $fontsize-body-m
+      margin: $spacing-4-xs 0
+      margin-bottom: $spacing-3-xs
+      letter-spacing: 1px
+      color: $color-black-50
+
+    .detail-field-value
+      margin: $spacing-4-xs 0
+      font-size: $fontsize-body-xl
+      font-weight: 600
+
+      span
+        color: $color-black-50
+        font-weight: 400
+
+      &:not(:last-child)
+        margin-bottom: $spacing-layout-s
 
     .row
       @include justify-content(space-between)
@@ -210,22 +209,78 @@
       .detail-field-value
         font-size: $fontsize-heading-m
 
-    .columns
-      @include flexbox()
-      @include flex-flow(row)
-
-      .column
-        @include flexbox()
-        @include flex-flow(column)
-        gap: $spacing-layout-xs
-        border: 0
-
-        &:first-child
-          padding-left: 0
-
   [class^="Tabs-module_tablistBar"]
     background: white
 
 #unconfirmed-prices-download-modal
   .input-field
     height: auto
+
+.heading--main.heading--apartment
+  @include flex-flow(row)
+  height: 75px
+  padding: $spacing-layout-s
+  background: var(--color-engel)
+  font-size: $fontsize-heading-s
+  border: 0
+
+  div
+    display: flex
+    flex-direction: row
+    gap: 1rem
+
+  a, span
+    @include align-items(center)
+    display: inherit
+    &:hover > span:not([class*="status-label"])
+      text-decoration: underline
+
+  span:not([class*="status-label"])
+    margin-left: 0.5rem
+    margin-right: 0.5rem
+
+  .address
+    font-weight: 400
+
+  [class^="StatusLabel"]
+    background-color: var(--color-engel-light)
+    // cancel the hover effect, as we don't have a date to display
+    &:hover
+      width: auto
+      opacity: 1
+      [class*="hds-status-label-icon"]
+        width: auto
+        opacity: 1
+
+.conditions-of-sale-status
+  @include flexbox()
+  flex-direction: row
+  @include justify-content(center)
+  @include align-items(center)
+  margin-right: 0.5em
+  span
+    margin: 0
+    svg
+      margin: 0 !important
+  [class*="hds-status-label-icon"]
+    width: 24px
+    opacity: 1
+    transition: width 200ms 100ms, opacity 100ms
+  .sell-by-date
+    overflow: hidden
+    width: 0
+    opacity: 0
+    text-align: center
+    transition: width 200ms 100ms, opacity 200ms
+  &:hover
+    [class*="hds-status-label-icon"]
+      width: 0
+      opacity: 0
+      transition: width 100ms, opacity 100ms
+    .sell-by-date
+      width: 74px
+      opacity: 1
+      transition: width 200ms, opacity 200ms 100ms
+    display: none
+  &:hover > .sell-by-date
+    display: inline-block

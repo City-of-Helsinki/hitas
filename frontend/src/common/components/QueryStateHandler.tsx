@@ -45,9 +45,7 @@ export default function QueryStateHandler({
     } else if (isLoading) {
         return (
             <div className="spinner-wrap">
-                <div className="spinner-container">
-                    <LoadingSpinner />
-                </div>
+                <LoadingSpinner />
             </div>
         );
     } else if (data && (!("contents" in data) || data.contents.length)) {
