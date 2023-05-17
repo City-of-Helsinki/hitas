@@ -91,6 +91,9 @@ from hitas.oracle_migration.utils import (
 )
 from hitas.utils import monthify
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 @dataclass
 class CreatedBuilding:
@@ -133,11 +136,52 @@ class ConvertedData:
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
     apartment_types_by_code_number: Dict[str, ApartmentType] = None
 
-    owners: Dict[OwnerKey, Owner] = None
+    owners: Dict[str, Owner] = None
     current_ownerships_by_oracle_apartment_id: dict[int, list[Ownership]] = None
 
 
-BULK_INSERT_THRESHOLD = 1000
+BULK_INSERT_THRESHOLD: int = 1000
+APARTMENTS_WITH_OWNER_CHANGES_WITHOUT_SALES: list[int] = [
+    # These changes are due to periodic checks of
+    # the sales catalog or from estate inventory deeds
+    14335,
+    14906,
+    15332,
+    12059,
+    12959,
+    20136,
+    17938,
+    18433,
+    18688,
+    21919,
+    22503,
+    21235,
+]
+APARTMENTS_WITH_ALLOWED_OWNER_CHANGES: list[int] = [
+    # These changes are valid,
+    # but could not be determined programmatically
+    14547,
+    14561,
+    14829,
+    15196,
+    15214,
+    11848,
+    12136,
+    12142,
+    12539,
+    12588,
+    12749,
+    13110,
+    13809,
+    17123,
+    17937,
+    18200,
+    18627,
+    20992,
+    # These changes are can be corrected
+    # before or after the migration to the new system
+    11866,
+]
 
 
 def run(
@@ -155,15 +199,16 @@ def run(
     if debug:
         logging.basicConfig()
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+        logger.setLevel(logging.DEBUG)
 
     if anonymize:
-        print("Creating anonymized data...\n")
+        logger.info("Creating anonymized data...\n")
         anonymize_data()
     else:
-        print("Creating *REAL* non-anonymized data...\n")
+        logger.info("Creating *REAL* non-anonymized data...\n")
 
     if truncate or truncate_only:
-        print("Removing existing data...\n")
+        logger.info("Removing existing data...\n")
         do_truncate()
 
     if truncate_only:
@@ -179,7 +224,7 @@ def run(
 
     with engine.connect() as connection:
         with connection.begin():
-            print(f"Connected to oracle database at {oracle_host}:{oracle_port}.\n")
+            logger.info(f"Connected to oracle database at {oracle_host}:{oracle_port}.\n")
 
             # Codebooks by id
             codebooks_by_id = read_codebooks(connection)
@@ -238,9 +283,9 @@ def run(
                 len(hc.real_estates) for hc in converted_data.created_housing_companies_by_oracle_id.values()
             )
 
-            print(f"Loaded {total_real_estates} real estates.\n")
-            print(f"Loaded {total_real_estates} buildings.\n")
-            print(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.\n")
+            logger.info(f"Loaded {total_real_estates} real estates.\n")
+            logger.info(f"Loaded {total_real_estates} buildings.\n")
+            logger.info(f"Loaded {len(converted_data.apartments_by_oracle_id)} apartments.\n")
 
             # Apartment improvements
             create_apartment_improvements(connection, converted_data)
@@ -318,11 +363,11 @@ def create_housing_companies(
         command = select(companies, additional_infos).join(additional_infos, isouter=True)
         if minimal_dataset:
             # Only migrate a pre-specified set of housing companies e.g. for a testing environment
-            print("Running migration with a minimal housing company dataset.")
+            logger.info("Running migration with a minimal housing company dataset.")
             ids = (441, 461, 468, 504, 514, 657, 658, 659, 696, 709, 763, 779, 805)
             command = command.where(companies.c.id.in_(ids))
         if regulated_only:
-            print("Running migration with only regulated housing companies.")
+            logger.info("Running migration with only regulated housing companies.")
             command = command.where(companies.c.state_code.in_(("001", "002")))
         return connection.execute(command).fetchall()
 
@@ -381,7 +426,7 @@ def create_housing_companies(
     with django_connection.cursor() as cursor:
         cursor.execute("ALTER SEQUENCE hitas_housingcompany_id_seq RESTART WITH %s", [max_id + 1])
 
-    print(f"Loaded {len(housing_companies_by_id)} housing companies.\n")
+    logger.info(f"Loaded {len(housing_companies_by_id)} housing companies.\n")
 
     return housing_companies_by_id
 
@@ -478,7 +523,7 @@ def create_housing_company_improvements(connection: Connection, converted_data: 
     if bulk_mpi:
         HousingCompanyMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {count} housing company improvements.\n")
+    logger.info(f"Loaded {count} housing company improvements.\n")
 
 
 def create_real_estates_and_buildings(
@@ -729,14 +774,12 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
             # Print out and add them as normal improvements to be handled manually later.
             bulk_cpi.extend(cpi_awdc["improvements"])
             bulk_mpi.extend(mpi_awdc["improvements"])
-            print(
-                f"""
-Unhandled 'Additional work during construction' improvement, adding it as a regular improvement:
-{v.housing_company.id}, {v.housing_company.display_name}
-{apartment_oracle_id}, {v.address}, Calculation: {cpi_awdc['date']}
-RKI, {sum_cpi} €, {[str(i) for i in cpi_awdc['improvements']]}
-MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
-                """
+            logger.info(
+                f"Unhandled 'Additional work during construction' improvement, adding it as a regular improvement:\n"
+                f"{v.housing_company.id}, {v.housing_company.display_name}\n"
+                f"{apartment_oracle_id}, {v.address}, Calculation: {cpi_awdc['date']}\n"
+                f"RKI, {sum_cpi} €, {[str(i) for i in cpi_awdc['improvements']]}\n"
+                f"MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}\n"
             )
 
         v.additional_work_during_construction = v.additional_work_during_construction + awdc
@@ -747,7 +790,7 @@ MHI, {sum_mpi} €, {[str(i) for i in mpi_awdc['improvements']]}
     if bulk_mpi:
         ApartmentMarketPriceImprovement.objects.bulk_create(bulk_mpi)
 
-    print(f"Loaded {count} apartment improvements.\n")
+    logger.info(f"Loaded {count} apartment improvements.\n")
 
 
 def create_owners_and_ownerships(connection: Connection, converted_data: ConvertedData) -> None:
@@ -771,33 +814,33 @@ def create_owners_and_ownerships(connection: Connection, converted_data: Convert
             .where(apartment_ownerships.c.apartment_id != 0)
         ).fetchall()
 
-    def create_owner(_ownership: apartment_ownerships) -> Owner:
+    def create_owner(_ownership: apartment_ownerships) -> tuple[Owner, bool]:
         nonlocal count
+        identifier: Optional[str] = _ownership["social_security_number"]
+        if identifier:
+            identifier = identifier.upper()
+
         _new_owner = Owner(
             name=_ownership["name"],
-            identifier=_ownership["social_security_number"],
-            valid_identifier=(
-                check_social_security_number(_ownership["social_security_number"])
-                or check_business_id(_ownership["social_security_number"])
-            ),
+            identifier=identifier,
+            valid_identifier=check_social_security_number(identifier) or check_business_id(identifier),
         )
 
-        # Check if this owner has been already added.
+        # Check if this owner has been already added (has the same valid identifier).
         # If it is, do not create a new one but combine them into one.
-        # Only do this when the owner has a valid social security number or a valid business id
         if _new_owner.valid_identifier:
-            key = OwnerKey(_new_owner.identifier, _new_owner.name)
+            key = _new_owner.identifier
             if key in already_created:
-                return already_created[key]
+                return already_created[key], True
             already_created[key] = _new_owner
 
         bulk_owners.append(_new_owner)
         count += 1
-        return _new_owner
+        return _new_owner, False
 
     count = 0
     bulk_owners: list[Owner] = []
-    already_created: dict[OwnerKey, Owner] = {}
+    already_created: dict[str, Owner] = {}
     converted_data.current_ownerships_by_oracle_apartment_id = {}
 
     for ownership in get_all_current_ownerships():
@@ -805,7 +848,22 @@ def create_owners_and_ownerships(connection: Connection, converted_data: Convert
         if not converted_data.apartments_by_oracle_id.get(ownership["apartment_id"]):
             continue
 
-        new_owner = create_owner(ownership)
+        new_owner, duplicate = create_owner(ownership)
+        if duplicate:
+            # Take care of cases where same apartment has owners with the same identifier but different name.
+            # These are errors, but should be combined into one ownership for now.
+            this_apartment_owners: list[Ownership] = converted_data.current_ownerships_by_oracle_apartment_id.get(
+                ownership["apartment_id"], []
+            )
+            combined: bool = False
+            for _ownership in this_apartment_owners:
+                if _ownership.owner.identifier == new_owner.identifier:
+                    logger.info("Error: Duplicate owner with same identifier but different name. Combining them...")
+                    _ownership.percentage += ownership["percentage"]
+                    combined = True
+                    break
+            if combined:
+                continue
 
         new = Ownership(
             owner=new_owner,
@@ -824,7 +882,7 @@ def create_owners_and_ownerships(connection: Connection, converted_data: Convert
         Owner.objects.bulk_create(bulk_owners)
 
     converted_data.owners = already_created
-    print(f"Loaded {count} owners.\n")
+    logger.info(f"Loaded {count} owners.\n")
 
 
 def create_apartment_max_price_calculations(connection: Connection, converted_data: ConvertedData) -> None:
@@ -864,7 +922,7 @@ def create_property_managers(connection: Connection) -> Dict[str, PropertyManage
 
         property_managers_by_id[pm[property_managers.c.id]] = new
 
-    print(f"Loaded {len(property_managers_by_id)} property managers.\n")
+    logger.info(f"Loaded {len(property_managers_by_id)} property managers.\n")
 
     return property_managers_by_id
 
@@ -891,7 +949,7 @@ def create_users(connection: Connection) -> Dict[str, Dict[str, get_user_model()
 
         users_by_id[user["username"]] = created_user
 
-    print(f"Loaded {len(users_by_id)} users.\n")
+    logger.info(f"Loaded {len(users_by_id)} users.\n")
 
     return users_by_id
 
@@ -929,7 +987,7 @@ def read_codebooks(connection: Connection) -> Dict[str, List[LegacyRow]]:
             new_codes.append(code)
             total_codes += 1
 
-    print(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.\n")
+    logger.info(f"Loaded {len(codebooks_by_id)} codebooks with total of {total_codes} codes.\n")
 
     return codebooks_by_id
 
@@ -976,6 +1034,7 @@ def create_hitas_types(financing_methods: List[LegacyRow]) -> dict[str, HitasTyp
     return hitas_types_by_code_number
 
 
+# @prints_to_file("log.txt")
 def create_apartment_sales(connection: Connection, converted_data: ConvertedData) -> None:  # noqa: C901
     def get_oracle_apartment(_apartment_oracle_id: int) -> apartments:
         return connection.execute(select(apartments).where(apartments.c.id == _apartment_oracle_id)).first()
@@ -999,13 +1058,13 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             )
         )
 
-    def get_or_create_buyers(_sale: hitas_monitoring) -> list[Owner]:
+    def create_ownerships_for_buyers(_oracle_sale: hitas_monitoring, _sale: ApartmentSale) -> list[Ownership]:
         """Get buyers (Owner) from already converted data, or create new ones."""
-        _buyers: list[Owner] = []
+        _buyers: dict[OwnerKey, Owner] = {}
 
         # Handle both Buyer 1 and Buyer 2
         for i in ["1", "2"]:
-            name = _sale["buyer_name_" + i]
+            name = _oracle_sale["buyer_name_" + i]
 
             # Owner is unknown, can be skipped
             if not name or name == "Ei tiedossa":
@@ -1014,43 +1073,45 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             name = name.replace("\x00", "")
             name = strip_percentage(name)
 
-            identifier = _sale["buyer_identifier_" + i] or ""
+            identifier: Optional[str] = _oracle_sale["buyer_identifier_" + i]
+            if identifier is not None:
+                identifier = identifier.upper()
+
             new_owner = Owner(
                 name=name,
                 identifier=identifier,
                 valid_identifier=check_social_security_number(identifier) or check_business_id(identifier),
             )
 
-            # Check if this owner has been already added.
+            # Check if this owner has been already added (has the same valid identifier).
             # If it is, do not create a new one but combine them into one.
-            # Only do this when the owner has a valid social security number or a valid business id
-
-            if not new_owner.valid_identifier:
+            if new_owner.valid_identifier:
+                key = new_owner.identifier
+                if key in converted_data.owners:
+                    new_owner = converted_data.owners[key]
+                else:
+                    converted_data.owners[key] = new_owner
+                    bulk_owners.append(new_owner)
+            else:
                 bulk_owners.append(new_owner)
-                _buyers.append(new_owner)
+
+            owner_key = OwnerKey(new_owner.identifier, new_owner.name)
+            if owner_key in _buyers:
+                logger.info("Duplicate buyer found in sale, skipping.")
                 continue
 
-            key = OwnerKey(new_owner.identifier, new_owner.name)
-            if key in converted_data.owners:
-                _buyers.append(converted_data.owners[key])
-                continue
+            _buyers[owner_key] = new_owner
 
-            converted_data.owners[key] = new_owner
-            _buyers.append(new_owner)
-            bulk_owners.append(new_owner)
-
-        return _buyers
-
-    def create_ownerships_for_buyers(_buyers: list[Owner]) -> list[Ownership]:
         return [
             Ownership(
-                owner=buyer,
-                sale=sale,
+                owner=_buyer,
+                sale=_sale,
                 # Assume equal split, as there is no way to know the real percentages
-                percentage=100 / len(buyers),
+                percentage=100 / len(_buyers),
+                # Old sale, so ownership is deleted
                 deleted=timezone.now(),
             )
-            for buyer in buyers
+            for _buyer in _buyers.values()
         ]
 
     count = 0
@@ -1058,14 +1119,18 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
     error_2 = 0
     error_3 = 0
     error_4 = 0
-    skipped_1 = 0
-    skipped_2 = 0
-    skipped_3 = 0
-    skipped_4 = 0
-    skipped_5 = 0
-    skipped_6 = 0
-    skipped_7 = 0
-    skipped_8 = 0
+    error_5 = 0
+    error_6 = 0
+    note_1 = 0
+    note_2 = 0
+    note_3 = 0
+    note_4 = 0
+    note_5 = 0
+    note_6 = 0
+    note_7 = 0
+    note_8 = 0
+    today = date.today()
+    year_ago = today - relativedelta(years=1)
     bulk_apartment_sales: list[ApartmentSale] = []
     bulk_owners: list[Owner] = []
     bulk_ownerships: list[Ownership] = []
@@ -1078,7 +1143,40 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
         sales: dict[tuple[int, date], ApartmentSale] = {}
         ownerships: dict[int, list[Ownership]] = {}
 
+        logger.debug("----------------------------------------------------------------------------------------\n")
+        logger.debug(
+            f"Housing company: ({apartment.housing_company.id})\n"
+            f"  | display_name={apartment.housing_company.display_name}\n"
+            f"  | regulation_status={apartment.housing_company.regulation_status.value}\n"
+            f"  | hitas_type={apartment.housing_company.hitas_type.value}"
+        )
+        logger.debug(
+            f"Apartment: ({apartment_oracle_id})\n"
+            f"  | address={apartment.address}\n"
+            f"  | completion_date={oracle_apartment['completion_date']}\n"
+            f"  | first_purchase_date={oracle_apartment['first_purchase_date']}\n"
+            f"  | latest_purchase_date={oracle_apartment['latest_purchase_date']}\n"
+            f"  | first_sale_purchase_price={oracle_apartment['debt_free_purchase_price']}\n"
+            f"  | first_sale_loan_amount={oracle_apartment['primary_loan_amount']}"
+        )
+        logger.debug(f"Current ownerships: {latest_owners}")
+        logger.debug(f"Number of Sales: {len(oracle_sales)}\n")
+
         for num, oracle_sale in enumerate(oracle_sales):
+            logger.debug(
+                f"  {num + 1}) Sale: ({oracle_sale['id']})\n"
+                f"    | purchase_date={oracle_sale['purchase_date']}\n"
+                f"    | buyer1={oracle_sale['buyer_name_1']}\n"
+                f"    | buyer2={oracle_sale['buyer_name_2']}\n"
+                f"    | purchase_price={oracle_sale['purchase_price']}\n"
+                f"    | loan_amount={oracle_sale['apartment_share_of_housing_company_loans']}\n"
+                f"    | monitoring_state={ApartmentSaleMonitoringState(oracle_sale['monitoring_state'])}\n"
+                f"    | seller={oracle_sale['seller_name']}\n"
+                f"    | maximum_price={oracle_sale['maximum_price']}\n"
+                f"    | calculation_date={oracle_sale['calculation_date']}\n"
+                f"    | notification_date={oracle_sale['notification_date']}"
+            )
+
             # Skip any calculations with missing buyer or purchase date, as it is most likely
             # only a calculation, and couldn't be imported anyway due to missing data.
             # The only exception to this rule is the latest calculation (the active one).
@@ -1087,25 +1185,19 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 or not oracle_sale["buyer_name_1"]
                 or oracle_sale["buyer_name_1"] == "Ei tiedossa"
             ):
-                skipped_1 += 1
-                continue
-
-            # When the seller is the same as the buyer, the sale can be skipped because these sales should
-            # only change the ownerships of the apartment in case of divorce, sale to a relative, etc.
-            if oracle_sale["seller_name"] == oracle_sale["buyer_name_1"] and oracle_sale["buyer_name_2"] is None:
-                if len(oracle_sales) == 1:
-                    skipped_7 += 1
-
-                elif oracle_sale["purchase_date"] and num != 0 and oracle_sale["purchase_date"] < date(2022, 1, 1):
-                    pass
-
-                elif not oracle_sale["purchase_date"]:
-                    skipped_7 += 1
-
+                alt_date: Optional[date] = (
+                    oracle_sale["purchase_date"] or oracle_sale["calculation_date"] or oracle_sale["notification_date"]
+                )
+                if alt_date and alt_date >= year_ago:
+                    note_1 += 1
+                    note_6 += 1
+                    logger.debug(
+                        "\nNote 1! Non-active sale does not have purchase date or buyer information."
+                        "\nNote 6! Skipping recent sale!\n"
+                    )
                 else:
-                    skipped_7 += 1
-
-                skipped_2 += 1
+                    logger.debug("\nNote 1! Non-active sale does not have purchase date or buyer information.\n")
+                    note_1 += 1
                 continue
 
             # Last active calculation can use latest sale date if it's missing purchase date,
@@ -1115,29 +1207,63 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 and not oracle_sale["purchase_date"]
             ):
                 purchase_date: Optional[date] = oracle_apartment["latest_purchase_date"]
+                alt_date: Optional[date] = oracle_sale["calculation_date"] or oracle_sale["notification_date"]
+
                 if not purchase_date:
-                    skipped_5 += 1
+                    if alt_date is not None and alt_date >= year_ago:
+                        note_4 += 1
+                        note_6 += 1
+                        logger.debug(
+                            "\nNote 4! No latest purchase date. Can't determine if active calculation is valid."
+                            "\nNote 6! Skipping recent sale!\n"
+                        )
+                    else:
+                        note_4 += 1
+                        logger.debug(
+                            "\nNote 4! No latest purchase date. Can't determine if active calculation is valid.\n"
+                        )
                     continue
 
-                alt_date: Optional[date] = oracle_sale["calculation_date"] or oracle_sale["notification_date"]
                 if not alt_date:
-                    skipped_4 += 1
+                    logger.debug(
+                        "\nNote 3! No calculation date or notification date. "
+                        "Can't determine if active calculation is valid.\n"
+                    )
+                    note_3 += 1
                     continue
 
                 # Check if the calculation was at valid the last time apartment was sold.
                 # 4 Months is the longest a calculation can be active (when using Surface Area Price Ceiling)
                 if not (alt_date <= purchase_date <= (alt_date + relativedelta(months=4))):
-                    skipped_3 += 1
+                    if alt_date >= year_ago:
+                        note_2 += 1
+                        note_6 += 1
+                        logger.debug("\nNote 2! Active calculation not valid anymore.\nNote 6! Skipping recent sale!\n")
+                    else:
+                        logger.debug("\nNote 2! Active calculation not valid anymore.\n")
+                        note_2 += 1
                     continue
 
                 # If purchase price is missing, the price is almost certainly missing as well.
                 purchase_price = oracle_sale["purchase_price"]
                 apartment_share_of_housing_company_loans = oracle_sale["apartment_share_of_housing_company_loans"]
+                exclude_from_statistics = False
                 if not purchase_price:
-                    skipped_6 += 1
-                    purchase_price = oracle_sale["maximum_price"]
-                    if apartment_share_of_housing_company_loans:
-                        skipped_8 += 1
+                    note_5 += 1
+                    logger.debug("\nNote 5! Purchase price missing, creating sale with purchase price of 1.")
+                    if purchase_date >= year_ago:
+                        error_2 += 1
+                        logger.debug(
+                            "\nError 2! Creating a sale from active sale without purchase price that is recent."
+                        )
+
+                    purchase_price = 1
+                    apartment_share_of_housing_company_loans = 0
+                    exclude_from_statistics = True
+
+                if purchase_date >= year_ago:
+                    logger.debug("\nNote 7: Creating a sale from active calculation that is quite recent.\n")
+                    note_7 += 1
 
                 sale = ApartmentSale(
                     apartment=apartment,
@@ -1145,13 +1271,17 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                     purchase_date=purchase_date,
                     purchase_price=purchase_price,
                     apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
-                    exclude_from_statistics=False,
+                    exclude_from_statistics=exclude_from_statistics,
                 )
                 sales[(oracle_sale["id"], sale.purchase_date)] = sale
                 count += 1
 
-                buyers = get_or_create_buyers(oracle_sale)
-                ownerships[oracle_sale["id"]] = create_ownerships_for_buyers(buyers)
+                logger.debug(
+                    f"    -> Created a sale for an active calculation without purchase date "
+                    f"using apartment latest purchase date {purchase_date}\n"
+                )
+
+                ownerships[oracle_sale["id"]] = create_ownerships_for_buyers(oracle_sale, sale)
                 continue
 
             # Normal logic for sales that have all the necessary data.
@@ -1169,8 +1299,9 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             sales[(oracle_sale["id"], sale.purchase_date)] = sale
             count += 1
 
-            buyers = get_or_create_buyers(oracle_sale)
-            ownerships[oracle_sale["id"]] = create_ownerships_for_buyers(buyers)
+            logger.debug("    -> Created a sale using normal logic\n")
+
+            ownerships[oracle_sale["id"]] = create_ownerships_for_buyers(oracle_sale, sale)
 
         # All sales related for an apartment have now been created.
         # Check against apartment data to see if first and latest sale need to be created.
@@ -1188,14 +1319,42 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
                 apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
                 exclude_from_statistics=False,
             )
-            sales[(-sys.maxsize, sale.purchase_date)] = sale
+            sales[(-sys.maxsize + 1, sale.purchase_date)] = sale
             count += 1
+            logger.debug("  -> Created first sale based on apartment data.\n")
+        elif oracle_apartment["first_purchase_date"]:
+            logger.debug("  First sale already exists.\n")
 
         # If there aren't any sales on the latest purchase date, then one must be created.
         # Assume that this sale will have the latest purchase date.
         if oracle_apartment["latest_purchase_date"] and not any(
             sale.purchase_date == oracle_apartment["latest_purchase_date"] for sale in sales.values()
         ):
+            if oracle_apartment["latest_purchase_date"] >= year_ago:
+                logger.debug("Note 8: Creating latest sale from apartment data that is quite recent.")
+                note_8 += 1
+
+            sale = ApartmentSale(
+                apartment=apartment,
+                notification_date=oracle_apartment["latest_purchase_date"],
+                purchase_date=oracle_apartment["latest_purchase_date"],
+                purchase_price=1,  # There is no way to get the actual value
+                apartment_share_of_housing_company_loans=0,  # There is no way to get the actual value
+                exclude_from_statistics=True,  # Since the price is hardcoded to 1, exclude sale automatically
+            )
+            sales[(sys.maxsize - 1, sale.purchase_date)] = sale
+            count += 1
+            logger.debug("  -> Created latest sale based on apartment data.\n")
+        elif oracle_apartment["latest_purchase_date"]:
+            logger.debug("  Latest sale already exists.\n")
+
+        # These apartments have had owner changes without sales, e.g., with sales catalog checks, etc.
+        # Should create a 1 priced sale that is excluded from statistics.
+        if apartment_oracle_id in APARTMENTS_WITH_OWNER_CHANGES_WITHOUT_SALES:
+            if oracle_apartment["latest_purchase_date"] >= year_ago:
+                logger.debug("Note 8: Creating latest sale from apartment data that is quite recent.")
+                note_8 += 1
+
             sale = ApartmentSale(
                 apartment=apartment,
                 notification_date=oracle_apartment["latest_purchase_date"],
@@ -1206,18 +1365,51 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
             )
             sales[(sys.maxsize, sale.purchase_date)] = sale
             count += 1
+            logger.debug(
+                "  -> Created latest sale based on apartment data for apartment with owner changes without a sale.\n"
+            )
 
         # If there are no sales, the apartment might have sales catalog prices
         if not sales:
-            if latest_owners:
-                if len(latest_owners) == 1 and latest_owners[0].owner.name in (
+            if (
+                latest_owners
+                and len(latest_owners) == 1
+                and latest_owners[0].owner.name
+                in (
                     "Helsingin kaupunki",
                     "Helsingin Kaupunki",
                     "Helsingin Asuntohankinta",
-                ):
-                    error_2 += 1
+                )
+            ):
+                if not oracle_apartment["completion_date"]:
+                    error_6 += 1
+                    logger.debug(
+                        "Error 6! Completion date missing, cannot create sale for apartment "
+                        "owned by Helsinki City on its completion date.\n"
+                    )
                 else:
-                    error_1 += 1
+                    sale = ApartmentSale(
+                        apartment=apartment,
+                        notification_date=oracle_apartment["completion_date"],
+                        purchase_date=oracle_apartment["completion_date"],
+                        purchase_price=oracle_apartment["debt_free_purchase_price"],
+                        apartment_share_of_housing_company_loans=oracle_apartment["primary_loan_amount"],
+                        exclude_from_statistics=True,
+                    )
+                    sales[(sys.maxsize, sale.purchase_date)] = sale
+                    count += 1
+                    logger.debug("  -> Created sale for apartment owner by Helsinki City on its completion date.\n")
+
+            elif latest_owners:
+                error_1 += 1
+                logger.debug(
+                    f"Error 1! Apartment does not have any sales, "
+                    f"but it has owners for some reason... "
+                    f"Updating sales catalog prices and ignoring owners!\n"
+                    f"Owners: {latest_owners}\n"
+                )
+            else:
+                logger.debug("Apartment does not have any sales. Updating sales catalog prices.\n")
 
             apartment.catalog_purchase_price = oracle_apartment["debt_free_purchase_price"]
             apartment.catalog_primary_loan_amount = oracle_apartment["primary_loan_amount"]
@@ -1229,24 +1421,124 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
         (first_sale_oracle_id, _), first_sale = next(iter(sorted_sales))
         (latest_sale_oracle_id, _), latest_sale = next(reversed(sorted_sales))
 
+        logger.debug(
+            f"First Sale ({first_sale_oracle_id}):\n"
+            f"  | purchase_date={first_sale.purchase_date}\n"
+            f"  | purchase_price={first_sale.purchase_price}\n"
+            f"  | loan_amount={first_sale.apartment_share_of_housing_company_loans}\n"
+            f"  | owners: {ownerships.get(first_sale_oracle_id)}"
+        )
+        logger.debug(
+            f"Latest Sale ({latest_sale_oracle_id}):\n"
+            f"  | purchase_date={latest_sale.purchase_date}\n"
+            f"  | purchase_price={latest_sale.purchase_price}\n"
+            f"  | loan_amount={latest_sale.apartment_share_of_housing_company_loans}\n"
+            f"  | owners: {ownerships.get(latest_sale_oracle_id)}\n"
+        )
+
         # Check that latest sale purchase price and loans amount match apartment details
         if first_sale.purchase_price != oracle_apartment["debt_free_purchase_price"]:
+            logger.debug(
+                f"Updated first sale purchase price from "
+                f"{first_sale.purchase_price} to {oracle_apartment['debt_free_purchase_price']}\n"
+            )
             first_sale.purchase_price = oracle_apartment["debt_free_purchase_price"]
 
         if first_sale.apartment_share_of_housing_company_loans != oracle_apartment["primary_loan_amount"]:
+            logger.debug(
+                f"Updated first sale apartment share of housing company loans from "
+                f"{first_sale.apartment_share_of_housing_company_loans} to {oracle_apartment['primary_loan_amount']}\n"
+            )
             first_sale.apartment_share_of_housing_company_loans = oracle_apartment["primary_loan_amount"]
 
         if not latest_owners:
             # Owners from sale might not be empty, but should be...
             if ownerships:
+                logger.debug(f"Error 4! Apartment does not have latest owners, but sale does: {ownerships}\n")
                 error_4 += 1
                 continue
+            logger.debug("Error 3! Apartment does not have any latest owners.\n")
             error_3 += 1
             continue
 
         # Current ownerships should be added to the latest sale
         for ownership in latest_owners:
             ownership.sale = latest_sale
+
+        owners_at_sale: set[OwnerKey] = {
+            OwnerKey(identifier=ownership.owner.identifier or "", name=strip_percentage(ownership.owner.name or ""))
+            for ownership in ownerships.get(latest_sale_oracle_id, [])
+        }
+        current_owners: set[OwnerKey] = {
+            OwnerKey(identifier=ownership.owner.identifier or "", name=strip_percentage(ownership.owner.name or ""))
+            for ownership in latest_owners
+        }
+        if owners_at_sale and owners_at_sale != current_owners:
+            # Try to categorize changes to determine if there are "bad" owner changes
+            current_identifiers = {owner.identifier for owner in current_owners}
+            identifiers_at_sale = {owner.identifier for owner in owners_at_sale}
+            current_names = {owner.name for owner in current_owners}
+            names_at_sale = {owner.name for owner in owners_at_sale}
+
+            # This can happen in if:
+            # - Owner name is not the same as at the time of sale, e.g. changed name, used some other name, typo
+            # - Sale data can only include two buyers, but there are more
+            # - Original buyers have given parts of their ownership to their relatives, e.g. their children
+            if current_identifiers.issuperset(identifiers_at_sale):
+                logger.debug(
+                    "Latest sale owners changed, but all identifiers of the owners at sale "
+                    "are included in the current owners, which is allowed.\n"
+                    f"     {owners_at_sale}\n"
+                    f"  -> {current_owners}\n"
+                )
+
+            # This can happen in if:
+            # - Some people have given up their share of the house from the time of purchase, e.g. divorce
+            elif identifiers_at_sale.issuperset(current_identifiers):
+                logger.debug(
+                    "Latest sale owners changed, but all identifiers of the current owners "
+                    "are included in the owners at the time of sale, which is allowed.\n"
+                    f"     {owners_at_sale}\n"
+                    f"  -> {current_owners}\n"
+                )
+
+            # This can happen if:
+            # - Owner identifier is not the same as at the time of sale, e.g. identifier corrected or removed
+            elif current_names.issuperset(names_at_sale):
+                logger.debug(
+                    "Latest sale owners changed, but all names of the current owners "
+                    "are included in the owners at the time of sale, which is allowed.\n"
+                    f"     {owners_at_sale}\n"
+                    f"  -> {current_owners}\n"
+                )
+
+            # This can happen if:
+            # - There are some cases where identifiers differ by one letter.
+            #   This can be considered a typo, and should be allowed.
+            elif least_similar_identifier(current_owners, owners_at_sale) > 0.9:
+                logger.debug(
+                    "Latest sale owners changed, but it seems like there is a typo of one letter in "
+                    "one or more of the identifiers, so trust that the typo was fixed in the current owners.\n"
+                    f"     {owners_at_sale}\n"
+                    f"  -> {current_owners}\n"
+                )
+
+            # Keep a list of apartment whose latest sales have been looked through and changes allowed.
+            elif apartment_oracle_id in APARTMENTS_WITH_ALLOWED_OWNER_CHANGES:
+                logger.debug(
+                    "Latest sale owners changed, but these changes have been approved already.\n"
+                    f"     {owners_at_sale}\n"
+                    f"  -> {current_owners}\n"
+                )
+
+            # These changes and should be looked at
+            else:
+                logger.debug(
+                    f"Error 5: Latest sale owners changed unexpectedly!"
+                    f"\n     {owners_at_sale}"
+                    f"\n  -> {current_owners}\n"
+                )
+                error_5 += 1
 
         ownerships[latest_sale_oracle_id] = latest_owners
 
@@ -1266,39 +1558,49 @@ def create_apartment_sales(connection: Connection, converted_data: ConvertedData
         Owner.objects.bulk_create(bulk_owners)
         Ownership.objects.bulk_create(bulk_ownerships)
 
-    print(f"Loaded {count} apartment sales.")
-    print(f"- {error_1} apartments do not have any sales, but they do have current owners.")
-    print(f"- {error_2} apartments do not have any sales, but is owned by Helsinki city.")
-    print(f"- {error_3} apartments do not have any current owners.")
-    print(f"- {error_4} apartments do not have any current owners, but their sales do.")
-    print(f"- {skipped_1} sales skipped due to missing purchase date or buyer information (not active).")
-    print(f"- {skipped_2} sales skipped due to seller being the same as the buyer.")
-    print(f"  - {skipped_7} of these should be checked since they could affect regulation.")
-    print(f"- {skipped_3} sales skipped due to an active calculation not being valid anymore.")
-    print(
-        f"- {skipped_4} sales skipped since we cannot check if active calculation is active "
+    logger.info("\n----------------------------------------------------------------------------------------\n\n")
+    logger.info(f"Loaded {count} apartment sales.")
+    logger.info(f"- Error 1: {error_1} apartments do not have any sales, but they do have current owners.")
+    logger.info(f"- Error 2: {error_2} recent sales created from active calculation without purchase price.")
+    logger.info(f"- Error 3: {error_3} apartments do not have any current owners.")
+    logger.info(f"- Error 4: {error_4} apartments do not have any current owners, but their sales do.")
+    logger.info(f"- Error 5: {error_5} apartments had their current owners changed unexpectedly.")
+    logger.info(
+        f"- Error 6: {error_6} apartments do not have any sales, but they do have current owners (Helsinki City)."
+    )
+    logger.info(f"- Note 1: {note_1} sales skipped due to missing purchase date or buyer information (not active).")
+    logger.info(f"- Note 2: {note_2} sales skipped due to an active calculation not being valid anymore.")
+    logger.info(
+        f"- Note 3: {note_3} sales skipped since we cannot check if active calculation is active "
         f"due to missing sale calculation and notification date."
     )
-    print(
-        f"- {skipped_5} sales skipped since we cannot check if active calculation is active "
+    logger.info(
+        f"- Note 4: {note_4} sales skipped since we cannot check if active calculation is active "
         f"due to missing apartment latest sale date."
     )
-    print(f"- {skipped_6} cases where active calculation used maximum price instead of purchase price")
-    print(f"   - In {skipped_8} loan amount already exists and is left alone.")
+    logger.info(f"- Note 5: {note_5} cases where active calculation is zero-priced.")
+    logger.info(f"- Note 6: {note_6} sales skipped that are recent enough to affect regulations.")
+    logger.info(
+        f"- Note 7: {note_7} sales created from active calculation that are recent enough to affect regulations."
+    )
+    logger.info(
+        f"- Note 8: {note_7} zero priced sales created from latest purchase date "
+        f"that are recent enough to affect regulations."
+    )
 
     if converted_data.current_ownerships_by_oracle_apartment_id:
-        print("- Ownerships not used:")
+        logger.info("- Ownerships not used:")
         for apartment_oracle_id, ownerships in converted_data.current_ownerships_by_oracle_apartment_id.items():
             apartment = converted_data.apartments_by_oracle_id[apartment_oracle_id]
             ownerships_print = ", ".join((f"({ownership})" for ownership in ownerships))
-            print(
+            logger.info(
                 f"  - apartment: ({apartment_oracle_id}) '{apartment.address}', "
                 f"housing company: '{apartment.housing_company}', "
                 f"ownerships: {ownerships_print}"
             )
     else:
-        print("- All current ownerships used!")
-    print("\n")
+        logger.info("- All current ownerships used!")
+    logger.info("\n")
 
 
 def least_similar_identifier(current_owners: set[OwnerKey], owners_at_sale: set[OwnerKey]) -> float:
@@ -1376,4 +1678,4 @@ def remove_apartments_owned_by_housing_companies() -> None:
     for apartment in to_remove:
         apartment.delete(force_policy=HARD_DELETE)
 
-    print(f"Deleted {len(to_remove)} apartments owned by housing companies.\n")
+    logger.info(f"Deleted {len(to_remove)} apartments owned by housing companies.\n")
