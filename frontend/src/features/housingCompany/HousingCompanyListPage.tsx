@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
 import {
     FilterIntegerField,
+    FilterSelectField,
     FilterTextInputField,
     Heading,
     ListPageNumbers,
@@ -144,6 +145,16 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
                 minLength={1}
                 maxLength={10}
                 filterFieldName="archive_id"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <FilterSelectField
+                label="Yhtiön sääntelytila"
+                filterFieldName="is_regulated"
+                options={[
+                    {value: "true", label: "Säännelty"},
+                    {value: "false", label: "Ei säännelty"},
+                ]}
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
