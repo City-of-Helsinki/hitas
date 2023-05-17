@@ -52,6 +52,9 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 </div>
                 <div className="state">
                     <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
+                    {apartment.links.housing_company.regulation_status.startsWith("released") && (
+                        <StatusLabel>Vapautunut</StatusLabel>
+                    )}
                 </div>
             </li>
         </Link>
