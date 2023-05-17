@@ -223,8 +223,6 @@ const HousingCompanyBuildingsPage = (): JSX.Element => {
             <SaveDialogModal
                 data={data}
                 error={error}
-                linkURL={"/housing-companies/" + params.housingCompanyId}
-                linkText="Takaisin yhtiön sivulle"
                 isLoading={isLoading}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
