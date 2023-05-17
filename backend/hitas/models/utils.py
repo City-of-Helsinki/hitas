@@ -5,7 +5,6 @@ from typing import Optional, TypeVar, ParamSpec, Callable, Any, Iterable
 
 from auditlog.signals import accessed
 from django.core.exceptions import ValidationError
-from django.db.models import Model
 from django.utils.translation import gettext_lazy as _
 
 from hitas.models._base import PostFetchModelMixin

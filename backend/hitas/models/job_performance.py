@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -19,9 +21,9 @@ class JobPerformance(HitasModel):
         related_name="job_performances",
         editable=False,
     )
-    source = EnumField(JobPerformanceSource, max_length=21)
-    request_date = models.DateField(editable=False)
-    delivery_date = models.DateField(editable=False)
+    source: JobPerformanceSource = EnumField(JobPerformanceSource, max_length=21)
+    request_date: datetime.date = models.DateField(editable=False)
+    delivery_date: datetime.date = models.DateField(editable=False)
 
     class Meta:
         verbose_name = _("Job performance")

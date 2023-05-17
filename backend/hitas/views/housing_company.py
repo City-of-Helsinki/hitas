@@ -26,8 +26,9 @@ from hitas.models import (
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.utils import validate_business_id
+from hitas.services.audit_log import last_log
 from hitas.services.housing_company import get_regulation_release_date
-from hitas.utils import RoundWithPrecision, max_if_all_not_null, safe_attrgetter
+from hitas.utils import RoundWithPrecision, max_if_all_not_null
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
@@ -260,13 +261,14 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
 
     @staticmethod
     def get_last_modified(obj: HousingCompany) -> Dict[str, Any]:
+        log = last_log(HousingCompany, model_id=obj.id)
         return {
             "user": {
-                "username": safe_attrgetter(obj, "last_modified_by.username", default=None),
-                "first_name": safe_attrgetter(obj, "last_modified_by.first_name", default=None),
-                "last_name": safe_attrgetter(obj, "last_modified_by.last_name", default=None),
+                "username": getattr(log.actor, "username", None),
+                "first_name": getattr(log.actor, "first_name", None),
+                "last_name": getattr(log.actor, "last_name", None),
             },
-            "datetime": obj.last_modified_datetime,
+            "datetime": log.timestamp,
         }
 
     @staticmethod
@@ -391,7 +393,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "developer",
                 "building_type",
                 "property_manager",
-                "last_modified_by",
             )
             .alias(
                 _acquisition_price=Subquery(

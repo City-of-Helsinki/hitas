@@ -1,3 +1,5 @@
+from typing import Optional
+
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -12,12 +14,13 @@ from hitas.models.utils import validate_property_id
 class RealEstate(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
+    # 'Taloyhtiö'
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.PROTECT, related_name="real_estates")
 
-    # 'kiinteistötunnus'
-    property_identifier = models.CharField(
-        null=True,
+    # 'Kiinteistötunnus'
+    property_identifier: Optional[str] = models.CharField(
         max_length=19,
+        null=True,
         validators=[validate_property_id],
         help_text=_("Format: 1234-1234-1234-1234"),
     )

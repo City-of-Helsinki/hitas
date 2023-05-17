@@ -4278,6 +4278,7 @@ components:
                 username:
                   description: Username of this user
                   type: string
+                  nullable: true
                   example: mameik01
                 first_name:
                   description: First name of this user

@@ -40,10 +40,6 @@ def date_to_datetime(d: datetime.date) -> Optional[datetime.datetime]:
     return TZ.localize(datetime.datetime.combine(d, datetime.datetime.min.time()))
 
 
-def turn_off_auto_now(model: Type[models.Model], field_name: str) -> None:
-    model._meta.get_field(field_name).auto_now = False
-
-
 def value_to_depreciation_percentage(value: str) -> DepreciationPercentage:
     match value:  # noqa: E999
         case "000":

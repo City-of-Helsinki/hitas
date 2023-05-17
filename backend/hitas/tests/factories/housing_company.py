@@ -38,8 +38,6 @@ class HousingCompanyFactory(DjangoModelFactory):
     sales_price_catalogue_confirmation_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     legacy_release_date = None
     notes = factory.Faker("text")
-    last_modified_datetime = fuzzy.FuzzyDate(date(2010, 1, 1))
-    last_modified_by = factory.SubFactory("hitas.tests.factories.UserFactory")
 
 
 class RealEstateFactory(DjangoModelFactory):

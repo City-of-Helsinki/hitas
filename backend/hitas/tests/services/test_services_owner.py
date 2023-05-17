@@ -28,7 +28,7 @@ def test_obfuscate_owners_without_regulated_apartments__no_ownerships__single():
     assert owners[0]["email"] == owner_1.email
 
     owner_1.refresh_from_db()
-    assert owner_1.name is None
+    assert owner_1.name == ""
     assert owner_1.identifier is None
     assert owner_1.valid_identifier is False
     assert owner_1.email is None
@@ -53,14 +53,14 @@ def test_obfuscate_owners_without_regulated_apartments__no_ownerships__multiple(
     assert owners[1]["email"] == owner_2.email
 
     owner_1.refresh_from_db()
-    assert owner_1.name is None
+    assert owner_1.name == ""
     assert owner_1.identifier is None
     assert owner_1.valid_identifier is False
     assert owner_1.email is None
     assert owner_1.bypass_conditions_of_sale is True
 
     owner_2.refresh_from_db()
-    assert owner_2.name is None
+    assert owner_2.name == ""
     assert owner_2.identifier is None
     assert owner_2.valid_identifier is False
     assert owner_2.email is None

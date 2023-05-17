@@ -17,16 +17,16 @@ class OwnerT(TypedDict):
 
 
 class Owner(ExternalSafeDeleteHitasModel):
-    name = models.CharField(max_length=256, blank=True, null=True)
-    identifier = models.CharField(max_length=11, blank=True, null=True)
-    valid_identifier = models.BooleanField(default=False)
-    email = models.EmailField(blank=True, null=True)
-    bypass_conditions_of_sale = models.BooleanField(default=False)
-    non_disclosure = models.BooleanField(default=False)
+    name: str = models.CharField(max_length=256, blank=True)
+    identifier: Optional[str] = models.CharField(max_length=11, blank=True, null=True)
+    valid_identifier: bool = models.BooleanField(default=False)
+    email: Optional[str] = models.EmailField(blank=True, null=True)
+    bypass_conditions_of_sale: bool = models.BooleanField(default=False)
+    non_disclosure: bool = models.BooleanField(default=False)
 
     @classproperty
     def obfuscation_rules(cls) -> dict[str, Any]:
-        return {"name": None, "identifier": None, "email": None}
+        return {"name": "", "identifier": None, "email": None}
 
     @property
     def should_obfuscate(self) -> bool:

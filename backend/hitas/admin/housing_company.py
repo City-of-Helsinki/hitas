@@ -38,4 +38,4 @@ class HousingCompanyAdmin(AuditLogHistoryAdminMixin, NestedModelAdmin):
         HousingCompanyMarketPriceImprovementAdmin,
         HousingCompanyConstructionPriceImprovementAdmin,
     )
-    readonly_fields = ("last_modified_datetime", "last_modified_by", "id", "uuid", "city", "area_display")
+    readonly_fields = ("id", "uuid", "city", "area_display")

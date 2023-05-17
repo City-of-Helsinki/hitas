@@ -80,9 +80,12 @@ def last_modified(
     model: type["HitasModel"] | type["HitasSafeDeleteModel"],
     *,
     model_id: str | int,
-    hint: str,
+    hint: str = "",
 ):
-    """Return the last date when the given model object's changes contain the hinted string."""
+    """
+    Return the timestamp for the last audit log for the given model object
+    (where its changes contain the hinted string).
+    """
     subquery = isinstance(model_id, str)
     queryset = (
         LogEntry.objects.filter(
@@ -96,3 +99,22 @@ def last_modified(
     if subquery:
         return Subquery(queryset=queryset[:1], output_field=DateTimeField(null=True))
     return queryset.first()
+
+
+def last_log(
+    model: type["HitasModel"] | type["HitasSafeDeleteModel"],
+    *,
+    model_id: int,
+    hint: str = "",
+) -> Optional[LogEntry]:
+    """Return the last audit log for the given model object (where its changes contain the hinted string)."""
+    return (
+        LogEntry.objects.select_related("actor")
+        .filter(
+            content_type=ContentType.objects.get_for_model(model),
+            object_id=model_id,
+            changes__contains=hint,
+        )
+        .order_by("-timestamp")
+        .first()
+    )

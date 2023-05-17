@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, TypeAlias, TypedDict
+from typing import TYPE_CHECKING, Optional, TypeAlias, TypedDict
 
 from auditlog.registry import auditlog
 from django.db import models
@@ -43,16 +43,16 @@ class ReplacementPostalCodesWithPrice(ReplacementPostalCodes):
 class ThirtyYearRegulationResultsRow(HitasModel):
     parent = models.ForeignKey("ThirtyYearRegulationResults", on_delete=models.CASCADE, related_name="rows")
     housing_company = models.ForeignKey("HousingCompany", on_delete=models.CASCADE, related_name="+")
-    completion_date = models.DateField()
-    surface_area = HitasModelDecimalField()
-    postal_code = models.CharField(max_length=5)
-    realized_acquisition_price = HitasModelDecimalField()
-    unadjusted_average_price_per_square_meter = HitasModelDecimalField(null=True)
-    adjusted_average_price_per_square_meter = HitasModelDecimalField(null=True)
-    completion_month_index = HitasModelDecimalField(null=True)
-    calculation_month_index = HitasModelDecimalField(null=True)
-    regulation_result = EnumField(RegulationResult, max_length=24)
-    letter_fetched = models.BooleanField(default=False)
+    completion_date: datetime.date = models.DateField()
+    surface_area: Decimal = HitasModelDecimalField()
+    postal_code: str = models.CharField(max_length=5)
+    realized_acquisition_price: Decimal = HitasModelDecimalField()
+    unadjusted_average_price_per_square_meter: Optional[Decimal] = HitasModelDecimalField(null=True)
+    adjusted_average_price_per_square_meter: Optional[Decimal] = HitasModelDecimalField(null=True)
+    completion_month_index: Optional[Decimal] = HitasModelDecimalField(null=True)
+    calculation_month_index: Optional[Decimal] = HitasModelDecimalField(null=True)
+    regulation_result: RegulationResult = EnumField(RegulationResult, max_length=24)
+    letter_fetched: bool = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("Thirty Year Regulation Results Row")
@@ -85,9 +85,9 @@ class ThirtyYearRegulationResultsRowWithAnnotations(ThirtyYearRegulationResultsR
 
 
 class ThirtyYearRegulationResults(HitasModel):
-    calculation_month = models.DateField(unique=True)
-    regulation_month = models.DateField()
-    surface_area_price_ceiling = HitasModelDecimalField(null=True)
+    calculation_month: datetime.date = models.DateField(unique=True)
+    regulation_month: datetime.date = models.DateField()
+    surface_area_price_ceiling: Optional[Decimal] = HitasModelDecimalField(null=True)
     sales_data: FullSalesData = models.JSONField()
     replacement_postal_codes: list[ReplacementPostalCodesWithPrice] = models.JSONField()
 
