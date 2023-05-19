@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from datetime import date
 from decimal import Decimal
@@ -42,27 +43,30 @@ class ApartmentState(Enum):
 class Apartment(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
+    # 'Rakennus'
     building = models.ForeignKey("Building", on_delete=models.PROTECT, related_name="apartments")
-
-    state = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
+    # 'Huoneistotyyppi'
     apartment_type = models.ForeignKey("ApartmentType", on_delete=models.PROTECT, related_name="apartments", null=True)
-    surface_area = HitasModelDecimalField(null=True, help_text=_("Measured in m^2"))
-    # 'Huoneiden määrä'
-    rooms = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
     # 'Pienin ja suurin osakenumero'
-    share_number_start = models.IntegerField(null=True, validators=[MinValueValidator(1)])
-    share_number_end = models.IntegerField(null=True, validators=[MinValueValidator(1)])
+    share_number_start: Optional[int] = models.IntegerField(null=True, validators=[MinValueValidator(1)])
+    share_number_end: Optional[int] = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
-    completion_date = models.DateField(null=True)
+    # 'Valmistumispäivä'
+    completion_date: Optional[datetime.date] = models.DateField(null=True)
 
-    street_address = models.CharField(max_length=128)
-    # 'Huoneistonumero'
-    apartment_number = models.PositiveSmallIntegerField()
+    # 'Osoite'
+    street_address: str = models.CharField(max_length=128)
+    # 'Rappu'
+    stair: str = models.CharField(max_length=16)
+    # 'Asunnon numero'
+    apartment_number: int = models.PositiveSmallIntegerField()
     # 'Kerros'
-    floor = models.CharField(max_length=50, blank=True, null=True)
-    # 'Porras'
-    stair = models.CharField(max_length=16)
+    floor: Optional[str] = models.CharField(max_length=50, blank=True, null=True)
+    # 'Pinta-ala'
+    surface_area: Optional[Decimal] = HitasModelDecimalField(null=True)
+    # 'Huoneiden määrä'
+    rooms: Optional[int] = models.IntegerField(null=True, validators=[MinValueValidator(1)])
 
     # 'Myyntihintaluettelon luovutushinta'
     catalog_purchase_price: Optional[Decimal] = HitasModelDecimalField(null=True)
@@ -80,7 +84,12 @@ class Apartment(ExternalSafeDeleteHitasModel):
     # 'Luovutushinta (RA)'
     debt_free_purchase_price_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
 
-    notes = models.TextField(blank=True, null=True)
+    # 'Muistiinpanot'
+    notes: Optional[str] = models.TextField(blank=True, null=True)
+
+    # TODO: To be removed
+    # 'Tila'
+    state: ApartmentState = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
 
     # 'Myyntihintaluettelon Hankinta-arvo' = Myyntihintaluettelon kauppakirjahinta + yhtiölainaosuus
     @property

@@ -38,7 +38,7 @@ class Ownership(HitasSafeDeleteModel):
         symmetrical=False,
     )
 
-    percentage = HitasModelDecimalField(
+    percentage: Decimal = HitasModelDecimalField(
         validators=[
             MinValueValidator(Decimal("0")),
             MaxValueValidator(Decimal("100")),

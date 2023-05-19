@@ -4,9 +4,7 @@ from types import DynamicClassAttribute
 from typing import Optional
 
 from auditlog.registry import auditlog
-from crum import get_current_user
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.db import models
 from django.db.models import F, Sum
 from django.utils import timezone
@@ -138,47 +136,64 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
     # Official spelling of the housing company name
-    official_name = models.CharField(max_length=1024, unique=True)
+    official_name: str = models.CharField(max_length=1024, unique=True)
     # More human-friendly housing company name
-    display_name = models.CharField(max_length=1024, unique=True)
+    display_name: str = models.CharField(max_length=1024, unique=True)
 
-    # [DEPREKOITU] 'Yhtiön tila'
-    state = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
-    # "Näkyvätkö yhtiön asuntojen kaupat tilastoissa?"
-    exclude_from_statistics = models.BooleanField(default=False)
-    # "Ei vapautunut / Vapautunut kenen toimesta?"
-    regulation_status = EnumField(RegulationStatus, default=RegulationStatus.REGULATED, max_length=27)
-
-    # Business ID / 'y-tunnus'
-    business_id = models.CharField(
-        max_length=9, validators=[validate_business_id], help_text=_("Format: 1234567-1"), null=True
+    # 'Yhtiö tunnus'
+    business_id: Optional[str] = models.CharField(
+        max_length=9,
+        null=True,
+        validators=[validate_business_id],
+        help_text=_("Format: 1234567-1"),
     )
 
-    street_address = models.CharField(max_length=1024)
+    # 'Osoite'
+    street_address: str = models.CharField(max_length=1024)
+    # 'Postikoodi'
     postal_code = models.ForeignKey("HitasPostalCode", on_delete=models.PROTECT, related_name="housing_companies")
-
+    # 'Talotyyppi'
     building_type = models.ForeignKey("BuildingType", on_delete=models.PROTECT, related_name="housing_companies")
-    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
+
+    # 'Hitas-tyyppi'
     hitas_type: HitasType = EnumField(HitasType, max_length=20)
+    # 'Sääntelyn tila'
+    regulation_status: RegulationStatus = EnumField(RegulationStatus, default=RegulationStatus.REGULATED, max_length=27)
+
+    # 'Rakennuttaja'
+    developer = models.ForeignKey(
+        "Developer",
+        on_delete=models.PROTECT,
+        related_name="housing_companies",
+    )
+    # 'Isännöitsijä'
     property_manager = models.ForeignKey(
-        "PropertyManager", on_delete=models.PROTECT, related_name="housing_companies", null=True
+        "PropertyManager",
+        on_delete=models.PROTECT,
+        related_name="housing_companies",
+        null=True,
     )
-    developer = models.ForeignKey("Developer", on_delete=models.PROTECT, related_name="housing_companies")
+    # 'Tilastoidaanko' / "Näkyvätkö yhtiön asuntojen kaupat tilastoissa?"
+    exclude_from_statistics: bool = models.BooleanField(default=False)
 
-    # 'hankinta-arvo'
-    acquisition_price = HitasModelDecimalField()
-    # 'ensisijaislaina'
-    primary_loan = HitasModelDecimalField(null=True, blank=True)
-    # 'Myyntihintaluettelon vahvistamispäivä'
-    sales_price_catalogue_confirmation_date = models.DateField(null=True, blank=True)
-    # 'Sääntelystä vapautumispäivä (LEGACY)'
-    legacy_release_date = models.DateField(null=True, blank=True)
+    # 'Hankinta-arvo'
+    acquisition_price: Decimal = HitasModelDecimalField()
+    # 'Ensisijaislaina'
+    primary_loan: Optional[Decimal] = HitasModelDecimalField(null=True, blank=True)
 
-    notes = models.TextField(blank=True)
-    last_modified_datetime = models.DateTimeField(auto_now=True)
-    last_modified_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, related_name="housing_companies"
-    )
+    # 'Muistiinpanot'
+    notes: str = models.TextField(blank=True)
+
+    # 'Myyntihintaluettelon vahvistamispäivä (migraatiosta saatu tieto)'
+    sales_price_catalogue_confirmation_date: Optional[datetime.date] = models.DateField(null=True, blank=True)
+    # 'Sääntelystä vapautumispäivä (migraatiosta saatu tieto)'
+    legacy_release_date: Optional[datetime.date] = models.DateField(null=True, blank=True)
+
+    # TODO: To be removed
+    # [DEPREKOITU] 'Yhtiön tila'
+    state: HousingCompanyState = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
+    # [DEPREKOITU] 'Rahoistustyypppi'
+    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
 
     @property
     def city(self) -> str:
@@ -245,12 +260,6 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
         self._release_date = get_regulation_release_date(self.id)
         return self._release_date
 
-    def save(self, *args, **kwargs):
-        current_user = get_current_user()
-        if current_user is not None and current_user.is_authenticated:
-            self.last_modified_by = current_user
-        super().save(*args, **kwargs)
-
     class Meta:
         verbose_name = _("Housing company")
         verbose_name_plural = _("Housing companies")
@@ -278,13 +287,17 @@ class HousingCompanyWithAnnotations(HousingCompany):
 
 class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     housing_company = models.ForeignKey(
-        "HousingCompany", on_delete=models.CASCADE, related_name="market_price_improvements"
+        "HousingCompany",
+        on_delete=models.CASCADE,
+        related_name="market_price_improvements",
     )
 
 
 class HousingCompanyConstructionPriceImprovement(HitasImprovement):
     housing_company = models.ForeignKey(
-        "HousingCompany", on_delete=models.CASCADE, related_name="construction_price_improvements"
+        "HousingCompany",
+        on_delete=models.CASCADE,
+        related_name="construction_price_improvements",
     )
 
 

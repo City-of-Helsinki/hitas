@@ -30,6 +30,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
 )
+from hitas.services.audit_log import last_log
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_invalid_foreign_key
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -269,6 +270,8 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
     # Second HousingCompany with a building
     BuildingFactory.create()
 
+    log = last_log(HousingCompany, model_id=hc1.id)
+
     response = api_client.get(reverse("hitas:housing-company-detail", args=[hc1.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
@@ -383,11 +386,12 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "archive_id": hc1.id,
         "release_date": hc1.legacy_release_date,
         "last_modified": {
-            "datetime": hc1.last_modified_datetime.isoformat().replace("+00:00", "Z"),
+            "datetime": log.timestamp.isoformat().replace("+00:00", "Z"),
             "user": {
-                "username": hc1.last_modified_by.username,
-                "first_name": hc1.last_modified_by.first_name,
-                "last_name": hc1.last_modified_by.last_name,
+                # User not set since housing company created outside an api request
+                "username": None,
+                "first_name": None,
+                "last_name": None,
             },
         },
         "improvements": {

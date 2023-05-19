@@ -234,7 +234,7 @@ def test_activity_log__obfuscated_owner():
     )
 
     # Owner is obfuscated immediately after it has been saved
-    assert owner_0.name is None
+    assert owner_0.name == ""
     assert owner_0.identifier is None
     assert owner_0.email is None
 
@@ -245,7 +245,7 @@ def test_activity_log__obfuscated_owner():
     owner_1: Owner = Owner.objects.first()
 
     # Access obfuscated owner fields, which should be obfuscated
-    assert owner_1.name is None
+    assert owner_1.name == ""
     assert owner_1.identifier is None
     assert owner_1.email is None
 
@@ -256,14 +256,14 @@ def test_activity_log__obfuscated_owner():
     owner_1.save()
 
     # The current instance should still be obfuscated
-    assert owner_1.name is None
+    assert owner_1.name == ""
     assert owner_1.identifier is None
     assert owner_1.email is None
     assert owner_1._unobfuscated_data == {"name": "Testi Testinen", "identifier": "123456-789A", "email": None}
 
     # Obfuscated values should not have been saved to the database, but the owner is still obfuscated when accessed
     owner_2: Owner = Owner.objects.first()
-    assert owner_2.name is None
+    assert owner_2.name == ""
     assert owner_2.identifier is None
     assert owner_2.email is None
     assert owner_2._unobfuscated_data == {"name": "Testi Testinen", "identifier": "123456-789A", "email": None}
@@ -280,4 +280,4 @@ def test_activity_log__obfuscated_owner():
     assert access_logs[0].object_pk == str(owner_2.pk)
 
     # This is the data that was used to obfuscate the owner
-    assert obfuscated_data == {"name": None, "identifier": None, "email": None}
+    assert obfuscated_data == {"name": "", "identifier": None, "email": None}

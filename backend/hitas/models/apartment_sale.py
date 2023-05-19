@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 
 from auditlog.registry import auditlog
@@ -9,18 +10,19 @@ from hitas.models._base import ExternalSafeDeleteHitasModel, HitasModelDecimalFi
 
 # 'Asunnon myyntitapahtuma' / 'Kauppakirja' / 'Uusi myynti'
 class ApartmentSale(ExternalSafeDeleteHitasModel):
-    apartment = models.ForeignKey("Apartment", related_name="sales", on_delete=models.CASCADE)
+    # 'Asunto'
+    apartment = models.ForeignKey("Apartment", related_name="sales", on_delete=models.CASCADE, editable=False)
 
     # "Ilmoituspäivä"
-    notification_date = models.DateField()
+    notification_date: datetime.date = models.DateField()
     # "Kauppakirjan päivämäärä"
-    purchase_date = models.DateField()
+    purchase_date: datetime.date = models.DateField()
     # "Kauppahinta"
-    purchase_price = HitasModelDecimalField()
+    purchase_price: Decimal = HitasModelDecimalField()
     # "Yhtiölainaosuus"
-    apartment_share_of_housing_company_loans = HitasModelDecimalField()
+    apartment_share_of_housing_company_loans: Decimal = HitasModelDecimalField()
     # "Kirjataanko kauppa tilastoihin?"
-    exclude_from_statistics = models.BooleanField(default=False)
+    exclude_from_statistics: bool = models.BooleanField(default=False)
 
     @property
     def total_price(self) -> Decimal:

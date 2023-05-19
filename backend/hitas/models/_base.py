@@ -1,6 +1,7 @@
-import uuid
+import datetime
 from decimal import Decimal
 from typing import Any, Iterable, Optional, TypeAlias, TypeVar, overload
+from uuid import UUID, uuid4
 
 from auditlog.diff import model_instance_diff
 from auditlog.models import LogEntry
@@ -257,7 +258,7 @@ class ExternalSafeDeleteHitasModel(HitasSafeDeleteModel):
     Abstract model for Hitas entities with an externally visible ID in UUID format
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid: UUID = models.UUIDField(default=uuid4, editable=False, unique=True)
 
     class Meta:
         abstract = True
@@ -271,9 +272,9 @@ class HitasModelDecimalField(models.DecimalField):
 
 
 class HitasImprovement(HitasSafeDeleteModel):
-    name = models.CharField(max_length=128)
-    completion_date = models.DateField()
-    value = HitasModelDecimalField(validators=[MinValueValidator(0)])
+    name: str = models.CharField(max_length=128)
+    completion_date: datetime.date = models.DateField()
+    value: Decimal = HitasModelDecimalField(validators=[MinValueValidator(0)])
 
     class Meta:
         abstract = True
@@ -288,7 +289,7 @@ class HitasMarketPriceImprovement(HitasImprovement):
     # This means that the full value of the improvement is always added to the price of the apartment
     # This is used e.g. for an attic room, elevators or repair costs of construction defects
     # These improvements values are also index adjusted.
-    no_deductions = models.BooleanField(default=False)
+    no_deductions: bool = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

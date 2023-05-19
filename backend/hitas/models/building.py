@@ -1,3 +1,5 @@
+from typing import Optional
+
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -14,13 +16,13 @@ class Building(ExternalSafeDeleteHitasModel):
 
     real_estate = models.ForeignKey("RealEstate", on_delete=models.PROTECT, related_name="buildings")
 
-    street_address = models.CharField(max_length=1024)
-
-    # 'rakennustunnus'
-    building_identifier = models.CharField(
-        blank=True,
-        null=True,
+    # 'Osoite'
+    street_address: str = models.CharField(max_length=1024)
+    # 'Rakennustunnus'
+    building_identifier: Optional[str] = models.CharField(
         max_length=25,
+        null=True,
+        blank=True,
         validators=[validate_building_id],
         help_text=_("Format: 100012345A or 91-17-16-1 S 001"),
     )

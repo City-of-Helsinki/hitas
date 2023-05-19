@@ -31,7 +31,7 @@ class ExternalSalesDataType(TypedDict):
 class ExternalSalesData(HitasModel):
     """Data pulled from tilastokeskus excel for surface area price ceiling calculation"""
 
-    calculation_quarter = models.CharField(primary_key=True, max_length=6)
+    calculation_quarter: str = models.CharField(primary_key=True, max_length=6)
     quarter_1: QuarterData = models.JSONField()  # previous-previous-previous quarter
     quarter_2: QuarterData = models.JSONField()  # previous-previous quarter
     quarter_3: QuarterData = models.JSONField()  # previous quarter

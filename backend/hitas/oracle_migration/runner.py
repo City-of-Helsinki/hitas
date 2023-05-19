@@ -87,7 +87,6 @@ from hitas.oracle_migration.utils import (
     housing_company_regulation_status_from,
     housing_company_state_from,
     str_to_year_month,
-    turn_off_auto_now,
     value_to_depreciation_percentage,
 )
 from hitas.utils import monthify
@@ -171,9 +170,6 @@ def run(
         return
 
     init_cost_areas()
-
-    # Disable auto_now as we want not to update the last_modified_datetime but instead migrate the old value
-    turn_off_auto_now(HousingCompany, "last_modified_datetime")
 
     converted_data = ConvertedData()
 
@@ -347,14 +343,12 @@ def create_housing_companies(
         new.sales_price_catalogue_confirmation_date = date_to_datetime(hc["sales_price_catalogue_confirmation_date"])
         new.legacy_release_date = date_to_datetime(hc["legacy_release_date"])
         new.notes = combine_notes(hc)
-        new.last_modified_datetime = date_to_datetime(hc["last_modified"])
         new.building_type = converted_data.building_types_by_code_number[hc["building_type_code"]]
         new.developer = converted_data.developers_by_code_number[hc["developer_code"]]
         new.postal_code = converted_data.postal_codes_by_postal_code[hc["postal_code_code"]]
         new.financing_method = converted_data.financing_methods_by_code_number[hc["financing_method_code"]]
         new.hitas_type = converted_data.hitas_types_by_code_number[hc["financing_method_code"]]
         new.property_manager = converted_data.property_managers_by_oracle_id[hc["property_manager_id"]]
-        new.last_modified_by = converted_data.users_by_username.get(hc["last_modified_by"])
 
         # FIXME: this name is in the test dataset file but will be fixed in test/prod environments
         # This is a temporary solution to ignore the only instance of housing companies with non-unique name

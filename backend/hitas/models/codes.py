@@ -1,3 +1,6 @@
+import datetime
+from typing import Optional
+
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils import timezone
@@ -7,14 +10,14 @@ from hitas.models._base import ExternalSafeDeleteHitasModel
 
 
 class AbstractCode(ExternalSafeDeleteHitasModel):
-    value = models.CharField(max_length=1024)
-    description = models.TextField(blank=True)
+    value: str = models.CharField(max_length=1024)
+    description: str = models.TextField(blank=True)
 
-    in_use = models.BooleanField(default=True)
-    order = models.PositiveSmallIntegerField(null=True, blank=True)
-    legacy_code_number = models.CharField(null=True, max_length=12)
-    legacy_start_date = models.DateTimeField(default=timezone.now)
-    legacy_end_date = models.DateTimeField(null=True, blank=True)
+    in_use: bool = models.BooleanField(default=True)
+    order: Optional[int] = models.PositiveSmallIntegerField(null=True, blank=True)
+    legacy_code_number: Optional[str] = models.CharField(null=True, max_length=12)
+    legacy_start_date: datetime.datetime = models.DateTimeField(default=timezone.now)
+    legacy_end_date: Optional[datetime.datetime] = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -36,9 +39,9 @@ class BuildingType(AbstractCode):
 
 # Rahoitusmuoto
 class FinancingMethod(AbstractCode):
-    include_in_statistics = models.BooleanField(default=True)
-    old_hitas_ruleset = models.BooleanField(default=False)
-    half_hitas = models.BooleanField(default=False)
+    include_in_statistics: bool = models.BooleanField(default=True)
+    old_hitas_ruleset: bool = models.BooleanField(default=False)
+    half_hitas: bool = models.BooleanField(default=False)
 
     class Meta(AbstractCode.Meta):
         verbose_name = _("Financing method")

@@ -43,7 +43,7 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
             del owner["non_disclosure"]
 
         owners.update(
-            name=None,
+            name="",
             identifier=None,
             valid_identifier=False,
             email=None,

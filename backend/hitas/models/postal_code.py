@@ -8,9 +8,9 @@ from hitas.models._base import ExternalSafeDeleteHitasModel
 
 # Postinumero
 class HitasPostalCode(ExternalSafeDeleteHitasModel):
-    value = models.CharField(max_length=5, unique=True)
-    city = models.CharField(max_length=1024, default="Helsinki")
-    cost_area = models.PositiveIntegerField(validators=[MaxValueValidator(4), MinValueValidator(1)])
+    value: str = models.CharField(max_length=5, unique=True)
+    city: str = models.CharField(max_length=1024, default="Helsinki")
+    cost_area: int = models.PositiveIntegerField(validators=[MaxValueValidator(4), MinValueValidator(1)])
 
     class Meta:
         verbose_name = _("Postal code")

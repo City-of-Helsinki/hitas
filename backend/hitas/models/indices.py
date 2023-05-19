@@ -1,3 +1,5 @@
+import datetime
+from decimal import Decimal
 from typing import TypedDict
 
 from auditlog.registry import auditlog
@@ -9,10 +11,8 @@ from hitas.models._base import HitasModel, HitasModelDecimalField
 
 
 class AbstractIndex(models.Model):
-    month = models.DateField(primary_key=True)
-    value = HitasModelDecimalField(
-        validators=[MinValueValidator(1)],
-    )
+    month: datetime.date = models.DateField(primary_key=True)
+    value: Decimal = HitasModelDecimalField(validators=[MinValueValidator(1)])
 
     class Meta:
         abstract = True

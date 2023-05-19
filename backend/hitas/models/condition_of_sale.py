@@ -35,7 +35,7 @@ class ConditionOfSale(ExternalSafeDeleteHitasModel):
         on_delete=models.CASCADE,
         editable=False,
     )
-    grace_period = EnumField(GracePeriod, default=GracePeriod.NOT_GIVEN, max_length=12)
+    grace_period: GracePeriod = EnumField(GracePeriod, default=GracePeriod.NOT_GIVEN, max_length=12)
 
     class Meta:
         verbose_name = _("Condition of Sale")

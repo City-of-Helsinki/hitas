@@ -7,11 +7,11 @@ from hitas.models._base import ExternalSafeDeleteHitasModel
 
 # Isännöitsijä
 class PropertyManager(ExternalSafeDeleteHitasModel):
-    name = models.CharField(max_length=1024)
-    email = models.EmailField()
-    street_address = models.CharField(max_length=1024)
-    postal_code = models.CharField(max_length=5)
-    city = models.CharField(max_length=1024)
+    name: str = models.CharField(max_length=1024)
+    email: str = models.EmailField()
+    street_address: str = models.CharField(max_length=1024)
+    postal_code: str = models.CharField(max_length=5)
+    city: str = models.CharField(max_length=1024)
 
     class Meta:
         verbose_name = _("Property manager")
