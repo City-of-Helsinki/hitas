@@ -7,7 +7,6 @@ services:
       - "8081:8080"
     volumes:
       - ./frontend/docker-env-config.js:/usr/share/nginx/html/env-config.js:ro
-      - ./frontend/example-htpasswd:/usr/share/nginx/.htpasswd:ro
     depends_on:
       - hitas-backend
     container_name: hitas-frontend
