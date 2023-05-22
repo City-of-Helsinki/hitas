@@ -1,6 +1,6 @@
 import {Button} from "hds-react";
 import {useFieldArray, useForm} from "react-hook-form";
-import {useGetSkippedPostalCodesQuery} from "../../../app/services";
+import {useGetAvailablePostalCodesQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
 import {today} from "../../../common/utils";
 import ComparisonSkippedListItem from "./ComparisonSkippedListItem";
@@ -19,7 +19,7 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
         data: codes,
         error,
         isLoading,
-    } = useGetSkippedPostalCodesQuery({
+    } = useGetAvailablePostalCodesQuery({
         calculation_date: validCalculationDate,
     });
 

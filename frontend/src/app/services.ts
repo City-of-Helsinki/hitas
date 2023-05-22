@@ -207,9 +207,9 @@ const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getSkippedPostalCodes: builder.query<IThirtyYearAvailablePostalCodesResponse, object>({
+        getAvailablePostalCodes: builder.query<IThirtyYearAvailablePostalCodesResponse, object>({
             query: (params: object) => ({
-                url: "thirty-year-available-postal-codes",
+                url: "thirty-year-regulation/postal-codes",
                 params: params,
             }),
         }),
@@ -471,7 +471,7 @@ export const {
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
-    useGetSkippedPostalCodesQuery,
+    useGetAvailablePostalCodesQuery,
 } = listApi;
 
 export const {
