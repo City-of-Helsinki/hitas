@@ -170,10 +170,6 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
     # 'Sääntelystä vapautumispäivä (migraatiosta saatu tieto)'
     legacy_release_date: Optional[datetime.date] = models.DateField(null=True, blank=True)
 
-    # TODO: To be removed
-    # [DEPREKOITU] 'Rahoistustyypppi'
-    financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
-
     @property
     def city(self) -> str:
         return self.postal_code.city

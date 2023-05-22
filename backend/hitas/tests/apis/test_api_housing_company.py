@@ -14,7 +14,6 @@ from hitas.models import (
     Building,
     BuildingType,
     Developer,
-    FinancingMethod,
     HitasPostalCode,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
@@ -40,7 +39,6 @@ from hitas.tests.factories import (
     HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyFactory,
     HousingCompanyMarketPriceImprovementFactory,
-    OldHitasFinancingMethodFactory,
     PropertyManagerFactory,
     RealEstateFactory,
 )
@@ -347,12 +345,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
                 ],
             },
         ],
-        "financing_method": {
-            "id": hc1.financing_method.uuid.hex,
-            "value": hc1.financing_method.value,
-            "description": hc1.financing_method.description,
-            "code": hc1.financing_method.legacy_code_number,
-        },
         "building_type": {
             "id": hc1.building_type.uuid.hex,
             "value": hc1.building_type.value,
@@ -518,7 +510,6 @@ def test__api__housing_company__read__not_found(api_client: HitasAPIClient, inva
 
 def get_housing_company_create_data() -> dict[str, Any]:
     developer: Developer = DeveloperFactory.create()
-    financing_method: FinancingMethod = OldHitasFinancingMethodFactory.create()
     building_type: BuildingType = BuildingTypeFactory.create()
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()
@@ -532,7 +523,6 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "building_type": {"id": building_type.uuid.hex},
         "business_id": "1234567-1",
         "developer": {"id": developer.uuid.hex},
-        "financing_method": {"id": financing_method.uuid.hex},
         "name": {
             "display": "test-housing-company-1",
             "official": "test-housing-company-1-as-oy",
@@ -654,7 +644,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
             {"field": "name", "message": "This field is mandatory and cannot be null."},
             {"field": "hitas_type", "message": "This field is mandatory and cannot be null."},
             {"field": "address", "message": "This field is mandatory and cannot be null."},
-            {"field": "financing_method", "message": "This field is mandatory and cannot be null."},
             {"field": "building_type", "message": "This field is mandatory and cannot be null."},
             {"field": "developer", "message": "This field is mandatory and cannot be null."},
             {"field": "acquisition_price", "message": "This field is mandatory and cannot be null."},
@@ -669,7 +658,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
 @pytest.mark.parametrize(
     "invalid_data,fields",
     [
-        *parametrize_invalid_foreign_key("financing_method"),
         *parametrize_invalid_foreign_key("building_type"),
         *parametrize_invalid_foreign_key("developer"),
         *parametrize_invalid_foreign_key("property_manager", nullable=True),
@@ -810,7 +798,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     hc: HousingCompany = HousingCompanyFactory.create()
     ApartmentFactory.create(building__real_estate__housing_company=hc)
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
-    financing_method: FinancingMethod = OldHitasFinancingMethodFactory.create()
     property_manager: PropertyManager = PropertyManagerFactory.create()
 
     data = {
@@ -822,7 +809,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "building_type": {"id": hc.building_type.uuid.hex},
         "business_id": "",
         "developer": {"id": hc.developer.uuid.hex},
-        "financing_method": {"id": financing_method.uuid.hex},
         "name": {
             "display": "changed-name",
             "official": "changed-name-as-oy",
@@ -849,7 +835,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
 
     hc.refresh_from_db()
     assert hc.postal_code == postal_code
-    assert hc.financing_method == financing_method
     assert hc.property_manager == property_manager
     assert hc.business_id is None
     assert hc.street_address == "changed-street-address"
@@ -897,7 +882,6 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
         "building_type": {"id": hc.building_type.uuid.hex},
         "business_id": hc.business_id,
         "developer": {"id": hc.developer.uuid.hex},
-        "financing_method": {"id": hc.financing_method.uuid.hex},
         "name": {
             "display": hc.display_name,
             "official": hc.official_name,
@@ -951,7 +935,6 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
         "building_type": {"id": hc.building_type.uuid.hex},
         "business_id": hc.business_id,
         "developer": {"id": hc.developer.uuid.hex},
-        "financing_method": {"id": hc.financing_method.uuid.hex},
         "name": {
             "display": hc.display_name,
             "official": hc.official_name,
@@ -987,7 +970,6 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
         "building_type": {"id": hc.building_type.uuid.hex},
         "business_id": hc.business_id,
         "developer": {"id": hc.developer.uuid.hex},
-        "financing_method": {"id": hc.financing_method.uuid.hex},
         "name": {
             "display": hc.display_name,
             "official": hc.official_name,

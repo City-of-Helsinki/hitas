@@ -36,7 +36,6 @@ def get_completed_housing_companies(
     housing_company_queryset: QuerySet[HousingCompanyWithAnnotations] = (
         HousingCompany.objects.select_related(
             "postal_code",
-            "financing_method",
             "property_manager",
         )
         .prefetch_related(

@@ -31,7 +31,6 @@ from hitas.utils import RoundWithPrecision, max_if_all_not_null
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
-    ReadOnlyFinancingMethodSerializer,
 )
 from hitas.views.property_manager import ReadOnlyPropertyManagerSerializer
 from hitas.views.real_estate import RealEstateSerializer
@@ -181,7 +180,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     area = serializers.SerializerMethodField()
     date = serializers.SerializerMethodField()
     real_estates = RealEstateSerializer(many=True, read_only=True)
-    financing_method = ReadOnlyFinancingMethodSerializer()
     building_type = ReadOnlyBuildingTypeSerializer()
     developer = ReadOnlyDeveloperSerializer()
     property_manager = ReadOnlyPropertyManagerSerializer(allow_null=True, required=False)
@@ -298,7 +296,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "area",
             "date",
             "real_estates",
-            "financing_method",
             "building_type",
             "developer",
             "property_manager",
@@ -386,7 +383,6 @@ class HousingCompanyViewSet(HitasModelViewSet):
             )
             .select_related(
                 "postal_code",
-                "financing_method",
                 "developer",
                 "building_type",
                 "property_manager",

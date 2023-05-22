@@ -8328,424 +8328,6 @@
     }
   },
   {
-    "model": "hitas.financingmethod",
-    "pk": 1,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "cd674d17-d36f-4c90-bcd9-a7e00e3fa0df",
-      "value": "Tuntematon",
-      "description": "",
-      "in_use": true,
-      "order": 1,
-      "legacy_code_number": "000",
-      "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": false,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 2,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "0a76cff0-5ecf-4eba-b050-204c3477d1c9",
-      "value": "Vapaarahoitteinen, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 2,
-      "legacy_code_number": "101",
-      "legacy_start_date": "2022-06-10T12:53:10.136Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 3,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "fcb1a033-6161-44a2-9114-97b57c6fd53f",
-      "value": "Vapaarahoitteinen, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 3,
-      "legacy_code_number": "102",
-      "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 4,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4a9446cf-54cd-4e94-9e26-a44a6fe29ec2",
-      "value": "HK valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 4,
-      "legacy_code_number": "211",
-      "legacy_start_date": "2022-06-10T12:53:10.137Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 5,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "6cbfaa4b-b81f-4ee2-9800-fcd3c109a0ac",
-      "value": "HK valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 5,
-      "legacy_code_number": "212",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 6,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "b1d6c359-fbf9-4b7a-a5d6-caf189835ead",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 6,
-      "legacy_code_number": "221",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 7,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "36ecc9af-f5ff-455a-b89f-60f2557a53aa",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 7,
-      "legacy_code_number": "222",
-      "legacy_start_date": "2022-06-10T12:53:10.138Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 8,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4739ad1c-01d1-4a32-889b-b19f1f8c6a33",
-      "value": "HK valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 8,
-      "legacy_code_number": "311",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 9,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "1781fdb8-cff3-4c3b-9af0-1cc4ae3c3d36",
-      "value": "HK valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 9,
-      "legacy_code_number": "312",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 10,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "c05bab17-3153-4bc1-91b6-2354e582fcc8",
-      "value": "RA valtion laina, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 10,
-      "legacy_code_number": "321",
-      "legacy_start_date": "2022-06-10T12:53:10.139Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 11,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "b60c3d06-f3a9-4cec-9c1e-0bd41de324ba",
-      "value": "RA valtion laina, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 11,
-      "legacy_code_number": "322",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 12,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "64467849-4239-4a62-983e-5ac66a8153a4",
-      "value": "Korkotuki, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 12,
-      "legacy_code_number": "411",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 13,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "485d8561-ad32-4d2b-a384-29f8a28c04a7",
-      "value": "Korkotuki, Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 13,
-      "legacy_code_number": "412",
-      "legacy_start_date": "2022-06-10T12:53:10.140Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 14,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "0b957ecb-1ead-4ad1-ae29-e6515fed3077",
-      "value": "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 14,
-      "legacy_code_number": "511",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 15,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "4e3943a6-d097-439e-bd68-3ae8d9a072f6",
-      "value": "Pitkä korkotukilaina osaomistus Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 15,
-      "legacy_code_number": "611",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 16,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "6f6ab506-79a0-45f7-a752-65d1a1848dbb",
-      "value": "Omaksi lunastettava vuokra-asunto, Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 16,
-      "legacy_code_number": "711",
-      "legacy_start_date": "2022-06-10T12:53:10.141Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 17,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "e062e181-24b9-48fb-a51a-bceec2a37d34",
-      "value": "Uusi Hitas I (vapaarahoitteinen)",
-      "description": "",
-      "in_use": true,
-      "order": 0,
-      "legacy_code_number": "811",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": false,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 18,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "793f4bad-0b63-41a7-a6df-1e3dc0337f07",
-      "value": "Uusi Hitas II (vapaarahoitteinen)",
-      "description": "",
-      "in_use": true,
-      "order": 0,
-      "legacy_code_number": "812",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": false,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 19,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "2913209c-9724-4f8e-82e5-f5a44e9bdfb4",
-      "value": "Uusi Hitas I (vanhat säännöt)",
-      "description": "",
-      "in_use": true,
-      "order": 19,
-      "legacy_code_number": "821",
-      "legacy_start_date": "2022-06-10T12:53:10.142Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 20,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "de4dfac0-ca52-46bf-bb8c-394d78a52db7",
-      "value": "Uusi Hitas II (vanhat säännöt)",
-      "description": "",
-      "in_use": true,
-      "order": 20,
-      "legacy_code_number": "822",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null,
-      "include_in_statistics": true,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 21,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "a42bd1a4-ddee-4fca-aa36-461b61742f4c",
-      "value": "Vuokratalo Hitas II",
-      "description": "",
-      "in_use": true,
-      "order": 21,
-      "legacy_code_number": "911",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null,
-      "include_in_statistics": false,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
-    "model": "hitas.financingmethod",
-    "pk": 22,
-    "fields": {
-      "deleted": null,
-      "deleted_by_cascade": false,
-      "uuid": "3b36f759-4fa8-40f5-a477-574a936374bf",
-      "value": "Vuokratalo Hitas I",
-      "description": "",
-      "in_use": true,
-      "order": 22,
-      "legacy_code_number": "912",
-      "legacy_start_date": "2022-06-10T12:53:10.143Z",
-      "legacy_end_date": null,
-      "include_in_statistics": false,
-      "old_hitas_ruleset": true,
-      "half_hitas": false
-    }
-  },
-  {
     "model": "hitas.hitaspostalcode",
     "pk": 1,
     "fields": {
@@ -9240,7 +8822,6 @@
       "street_address": "Fakestreet 123",
       "postal_code": 1,
       "building_type": 2,
-      "financing_method": 2,
       "hitas_type": "hitas_1_no_interest",
       "property_manager": 2,
       "developer": 5,
@@ -9266,7 +8847,6 @@
       "street_address": "Yrttimaanpolku 020",
       "postal_code": 6,
       "building_type": 9,
-      "financing_method": 15,
       "hitas_type": "hitas_1_no_interest",
       "property_manager": 3,
       "developer": 6,
@@ -9292,7 +8872,6 @@
       "street_address": "Biologinkuja 3",
       "postal_code": 12,
       "building_type": 5,
-      "financing_method": 2,
       "hitas_type": "new_hitas_1",
       "property_manager": 4,
       "developer": 7,
@@ -9318,7 +8897,6 @@
       "street_address": "Iltaruskonkatu 3",
       "postal_code": 4,
       "building_type": 12,
-      "financing_method": 1,
       "hitas_type": "hitas_1",
       "property_manager": 5,
       "developer": 8,
@@ -9344,7 +8922,6 @@
       "street_address": "Tuomarinkylänkatu 071",
       "postal_code": 23,
       "building_type": 5,
-      "financing_method": 3,
       "hitas_type": "new_hitas_2",
       "property_manager": 6,
       "developer": 9,
@@ -9370,7 +8947,6 @@
       "street_address": "Fastbölenpolku 8",
       "postal_code": 28,
       "building_type": 10,
-      "financing_method": 20,
       "hitas_type": "hitas_2",
       "property_manager": 7,
       "developer": 10,
@@ -9396,7 +8972,6 @@
       "street_address": "Salavakatu 0",
       "postal_code": 4,
       "building_type": 3,
-      "financing_method": 12,
       "hitas_type": "hitas_1",
       "property_manager": 8,
       "developer": 11,
@@ -9422,7 +8997,6 @@
       "street_address": "Vaakalinnunpolku 446",
       "postal_code": 6,
       "building_type": 9,
-      "financing_method": 15,
       "hitas_type": "hitas_1_no_interest",
       "property_manager": 9,
       "developer": 12,

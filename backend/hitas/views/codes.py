@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
+from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSerializer, HitasModelViewSet, UUIDRelatedField
 from hitas.views.utils.serializers import ReadOnlySerializer
 
@@ -20,11 +20,6 @@ class AbstractCodeSerializer(HitasModelSerializer):
 class BuildingTypeSerializer(AbstractCodeSerializer):
     class Meta(AbstractCodeSerializer.Meta):
         model = BuildingType
-
-
-class FinancingMethodSerializer(AbstractCodeSerializer):
-    class Meta(AbstractCodeSerializer.Meta):
-        model = FinancingMethod
 
 
 class DeveloperSerializer(AbstractCodeSerializer):
@@ -55,7 +50,6 @@ def define_read_only_serializer(model_class):
 
 ReadOnlyApartmentTypeSerializer = define_read_only_serializer(ApartmentType)
 ReadOnlyDeveloperSerializer = define_read_only_serializer(Developer)
-ReadOnlyFinancingMethodSerializer = define_read_only_serializer(FinancingMethod)
 ReadOnlyBuildingTypeSerializer = define_read_only_serializer(BuildingType)
 
 
@@ -79,11 +73,6 @@ class AbstractCodeViewSet(HitasModelViewSet):
 class BuildingTypeViewSet(AbstractCodeViewSet):
     serializer_class = BuildingTypeSerializer
     model_class = BuildingType
-
-
-class FinancingMethodViewSet(AbstractCodeViewSet):
-    serializer_class = FinancingMethodSerializer
-    model_class = FinancingMethod
 
 
 class DeveloperViewSet(AbstractCodeViewSet):
