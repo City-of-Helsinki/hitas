@@ -162,8 +162,6 @@
     .companies
       margin-top: $spacing-m
       background-color: $color-engel-medium-light
-      &--skipped
-        background-color: $color-error-light
       p
         background-color: white
         padding: $spacing-m
@@ -177,7 +175,7 @@
           padding: $spacing-m
           @include flexbox()
           @include justify-content(space-between)
-        button
+        .download-button
           margin: $spacing-m
         form
           @include flexbox()
@@ -189,6 +187,46 @@
             height: auto
           [class^="Select-module_wrapper"]
             height: 56px
+      &--skipped
+        background-color: $color-error-light
+        .results-list
+          background: transparent
+          &__item
+            @include flex-flow(row wrap)
+            background: white
+            margin-bottom: $spacing-s
+            padding: $spacing-m
+            h2
+              margin: 0 $spacing-s 0 0
+            .input-field
+              margin: 0
+            > div
+              width: 100%
+              @include flexbox()
+              @include align-items(center)
+              &.inputs
+                margin-top: $spacing-s
+                gap: $spacing-m
+                > *
+                  width: 50%
+              > ul
+                @include flexbox()
+                @include flex-flow(row wrap)
+                > li
+                  display: inline-block
+                  &:not(:last-child):not(:first-child):after
+                    display: inline-block
+                    content: ","
+                    margin-right: 2px
+                  &:first-child
+                    margin-right: $spacing-2-xs
+                  a
+                    display: inline
+                    font-weight: 700
+                    padding: 0
+                    margin: 0
+                    &:hover
+                      text-decoration: underline
     .spinner-wrap
       flex-grow: 1
       [class*="LoadingSpinner-module_loadingSpinner"]

@@ -270,7 +270,11 @@ const ThirtyYearComparison = () => {
                     isLoading={isComparisonLoading}
                     attemptedAction="hae suoritetun vertailun tulokset"
                 >
-                    <LoadedThirtyYearComparison data={comparisonData} />
+                    <LoadedThirtyYearComparison
+                        data={comparisonData}
+                        calculationDate={formDate}
+                        reCalculateFn={onCompareButtonClick}
+                    />
                 </QueryStateHandler>
             ) : (
                 <div className="row row--buttons">
