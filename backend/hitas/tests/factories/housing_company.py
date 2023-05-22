@@ -9,7 +9,6 @@ from hitas.models import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
     RealEstate,
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
@@ -22,7 +21,6 @@ class HousingCompanyFactory(DjangoModelFactory):
 
     display_name = factory.Sequence(lambda n: f"Test Housing company {n:03}")
     official_name = factory.LazyAttribute(lambda self: f"As Oy {self.display_name}")
-    state = fuzzy.FuzzyChoice(state[0] for state in HousingCompanyState.choices())
     hitas_type = fuzzy.FuzzyChoice(state[0] for state in HitasType.choices())
     exclude_from_statistics = False
     regulation_status = RegulationStatus.REGULATED

@@ -21,7 +21,6 @@ from hitas.models import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
     RealEstate,
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
@@ -173,8 +172,8 @@ class HousingCompanyImprovementSerializer(serializers.Serializer):
 
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
-    state = HitasEnumField(enum=HousingCompanyState)
     hitas_type = HitasEnumField(enum=HitasType)
+    regulation_status = HitasEnumField(enum=RegulationStatus, default=RegulationStatus.REGULATED)
     over_thirty_years_old = serializers.SerializerMethodField()
     completed = serializers.SerializerMethodField()
     business_id = ValueOrNullField(allow_null=True, required=False)
@@ -290,7 +289,6 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "id",
             "business_id",
             "name",
-            "state",
             "hitas_type",
             "exclude_from_statistics",
             "regulation_status",
@@ -324,7 +322,6 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
         fields = [
             "id",
             "name",
-            "state",
             "hitas_type",
             "exclude_from_statistics",
             "regulation_status",

@@ -11,6 +11,8 @@ import django.utils.timezone
 import enumfields.fields
 from django.conf import settings
 from django.db import migrations, models
+from django.utils.translation import gettext_lazy as _
+from enumfields import Enum
 
 import hitas.models._base
 import hitas.models.apartment
@@ -20,6 +22,25 @@ import hitas.models.job_performance
 import hitas.models.thirty_year_regulation
 import hitas.models.utils
 import hitas.types
+
+
+class HousingCompanyState(Enum):
+    NOT_READY = "not_ready"
+    LESS_THAN_30_YEARS = "lt_30_years"
+    GREATER_THAN_30_YEARS_NOT_FREE = "gt_30_years_not_free"
+    GREATER_THAN_30_YEARS_FREE = "gt_30_years_free"
+    GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = "gt_30_years_plot_department_notification"
+    HALF_HITAS = "half_hitas"
+    READY_NO_STATISTICS = "ready_no_statistics"
+
+    class Labels:
+        NOT_READY = _("Not Ready")
+        LESS_THAN_30_YEARS = _("Less than 30 years")
+        GREATER_THAN_30_YEARS_NOT_FREE = _("Greater than 30 years, not free")
+        GREATER_THAN_30_YEARS_FREE = _("Greater than 30 years, free")
+        GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = _("Greater than 30 years, plot department notification")
+        HALF_HITAS = _("Half hitas")  # Puolihitas
+        READY_NO_STATISTICS = _("Ready, no statistics")
 
 
 class Migration(migrations.Migration):
@@ -536,9 +557,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "state",
-                    enumfields.fields.EnumField(
-                        default="not_ready", enum=hitas.models.housing_company.HousingCompanyState, max_length=40
-                    ),
+                    enumfields.fields.EnumField(default="not_ready", enum=HousingCompanyState, max_length=40),
                 ),
                 ("exclude_from_statistics", models.BooleanField(default=False)),
                 (

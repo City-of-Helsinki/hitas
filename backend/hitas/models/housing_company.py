@@ -21,25 +21,6 @@ from hitas.models._base import (
 from hitas.models.utils import validate_business_id
 
 
-class HousingCompanyState(Enum):
-    NOT_READY = "not_ready"
-    LESS_THAN_30_YEARS = "lt_30_years"
-    GREATER_THAN_30_YEARS_NOT_FREE = "gt_30_years_not_free"
-    GREATER_THAN_30_YEARS_FREE = "gt_30_years_free"
-    GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = "gt_30_years_plot_department_notification"
-    HALF_HITAS = "half_hitas"
-    READY_NO_STATISTICS = "ready_no_statistics"
-
-    class Labels:
-        NOT_READY = _("Not Ready")
-        LESS_THAN_30_YEARS = _("Less than 30 years")
-        GREATER_THAN_30_YEARS_NOT_FREE = _("Greater than 30 years, not free")
-        GREATER_THAN_30_YEARS_FREE = _("Greater than 30 years, free")
-        GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION = _("Greater than 30 years, plot department notification")
-        HALF_HITAS = _("Half hitas")  # Puolihtas
-        READY_NO_STATISTICS = _("Ready, no statistics")
-
-
 class HitasType(Enum):
     # Vanhat säännöt, Ei sisällytetä tilastoihin
     NON_HITAS = "non_hitas"
@@ -190,8 +171,6 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
     legacy_release_date: Optional[datetime.date] = models.DateField(null=True, blank=True)
 
     # TODO: To be removed
-    # [DEPREKOITU] 'Yhtiön tila'
-    state: HousingCompanyState = EnumField(HousingCompanyState, default=HousingCompanyState.NOT_READY, max_length=40)
     # [DEPREKOITU] 'Rahoistustyypppi'
     financing_method = models.ForeignKey("FinancingMethod", on_delete=models.PROTECT, related_name="housing_companies")
 

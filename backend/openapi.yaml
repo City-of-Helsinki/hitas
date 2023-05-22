@@ -4032,7 +4032,6 @@ components:
         - date
         - id
         - name
-        - state
         - hitas_type
         - exclude_from_statistics
         - regulation_status
@@ -4049,8 +4048,6 @@ components:
           type: string
           example: Taloyhtiö Helmi
           maxLength: 1024
-        state:
-          $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
         exclude_from_statistics:
@@ -4106,7 +4103,6 @@ components:
         - date
         - id
         - name
-        - state
         - hitas_type
         - real_estates
         - summary
@@ -4141,8 +4137,6 @@ components:
           nullable: true
           pattern: '^$|^\d{7}-\d$'
           example: 1234567-1
-        state:
-          $ref: '#/components/schemas/HousingCompanyState'
         hitas_type:
           $ref: '#/components/schemas/HitasType'
         exclude_from_statistics:
@@ -6774,29 +6768,6 @@ components:
         - regulated
         - released_by_hitas
         - released_by_plot_department
-
-    HousingCompanyState:
-      description: |-
-        Housing company state
-
-        Can have the following values:
-        - not_ready
-        - lt_30_years
-        - gt_30_years_not_free
-        - gt_30_years_free
-        - gt_30_years_plot_department_notification
-        - half_hitas
-        - ready_no_statistics
-      type: string
-      example: gt_30_years_not_free
-      x-extensible-enum:
-        - not_ready
-        - lt_30_years
-        - gt_30_years_not_free
-        - gt_30_years_free
-        - gt_30_years_plot_department_notification
-        - half_hitas
-        - ready_no_statistics
 
     ApartmentState:
       description: |-
