@@ -70,10 +70,20 @@ export function validateSocialSecurityNumber(value: string): boolean {
     if (centuryChar === undefined) return false;
     let century;
     switch (centuryChar) {
-        case "A" || "B" || "C" || "D" || "E" || "F":
+        case "A":
+        case "B":
+        case "C":
+        case "D":
+        case "E":
+        case "F":
             century = "20";
             break;
-        case "-" || "Y" || "X" || "W" || "V" || "U":
+        case "-":
+        case "Y":
+        case "X":
+        case "W":
+        case "V":
+        case "U":
             century = "19";
             break;
         case "+":

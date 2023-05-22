@@ -86,7 +86,9 @@ export const downloadApartmentUnconfirmedMaximumPricePDF = (
         ...getFetchInit(),
         body: JSON.stringify({additional_info: additionalInfo, request_date: requestDate}),
     };
-    fetch(url, init).then(handleDownloadPDF);
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        .catch((error) => console.error(error));
 };
 
 export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, requestDate?: string) => {
@@ -99,7 +101,9 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, r
         ...getFetchInit(),
         body: JSON.stringify({request_date: requestDate}),
     };
-    fetch(url, init).then(handleDownloadPDF);
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        .catch((error) => console.error(error));
 };
 
 export const hitasApi = createApi({
