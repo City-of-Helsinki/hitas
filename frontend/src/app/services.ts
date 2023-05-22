@@ -26,6 +26,7 @@ import {
     IOwner,
     IPostalCodeResponse,
     IRealEstate,
+    IThirtyYearAvailablePostalCodesResponse,
     IThirtyYearRegulationResponse,
     IUserInfoResponse,
 } from "../common/schemas";
@@ -203,6 +204,12 @@ const listApi = hitasApi.injectEndpoints({
         getApartmentTypes: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
                 url: "apartment-types",
+                params: params,
+            }),
+        }),
+        getSkippedPostalCodes: builder.query<IThirtyYearAvailablePostalCodesResponse, object>({
+            query: (params: object) => ({
+                url: "thirty-year-available-postal-codes",
                 params: params,
             }),
         }),
@@ -464,6 +471,7 @@ export const {
     useGetDevelopersQuery,
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
+    useGetSkippedPostalCodesQuery,
 } = listApi;
 
 export const {
