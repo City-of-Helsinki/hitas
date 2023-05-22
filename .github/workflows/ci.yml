@@ -98,6 +98,9 @@ jobs:
     steps:
     - name: "Checkout code"
       uses: actions/checkout@v3
+      with:
+        # Disable shallow cloning to improving relevancy of reporting for SonarCloud
+        fetch-depth: 0
 
     - name: "Set up Python 3.10"
       id: setup-python
@@ -146,15 +149,28 @@ jobs:
         cd backend
         && pre-commit run --all-files
 
-    - name: "Run tests"
-      run: >
-        cd backend
-        && pytest -vvv --cov=. .
-
     - name: "Test for migration issues"
       run: >
         cd backend
         && ./manage.py makemigrations --check --no-color --no-input --dry-run
+
+    - name: "Run tests and create coverage report"
+      run: >
+        cd backend
+        && pytest -s -vvv --cov=. --cov-report=xml --cov-branch .
+
+    # Without this workaround Sonar reports a warning about an incorrect source path
+    - name: "Override coverage report source path for Sonar"
+      run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' backend/coverage.xml
+
+    - name: "SonarCloud Scan"
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        # Full debug logging
+        args: -X
 
   build-backend:
     name: "Test building backend docker image"

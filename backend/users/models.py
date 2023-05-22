@@ -11,7 +11,7 @@ class User(AbstractUser):
     title = models.CharField(max_length=50, null=True, blank=True, default=None)
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}" or self.email
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else self.email
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} ({self.pk}): {self.get_username()}>"
