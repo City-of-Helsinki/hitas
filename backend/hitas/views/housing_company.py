@@ -271,13 +271,14 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     @staticmethod
     def get_last_modified(obj: HousingCompany) -> Dict[str, Any]:
         log = last_log(HousingCompany, model_id=obj.id)
+        actor = getattr(log, "actor", None)
         return {
             "user": {
-                "username": getattr(log.actor, "username", None),
-                "first_name": getattr(log.actor, "first_name", None),
-                "last_name": getattr(log.actor, "last_name", None),
+                "username": getattr(actor, "username", None),
+                "first_name": getattr(actor, "first_name", None),
+                "last_name": getattr(actor, "last_name", None),
             },
-            "datetime": log.timestamp,
+            "datetime": getattr(log, "timestamp", None),
         }
 
     @staticmethod
