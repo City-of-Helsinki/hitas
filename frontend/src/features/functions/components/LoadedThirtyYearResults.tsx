@@ -11,15 +11,7 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
-
-    const ListItems = ({list}) => {
-        return list.map((item, idx) => (
-            <ComparisonResultListItem
-                company={item}
-                key={idx}
-            />
-        ));
-    };
+    console.log(data, stayingCompanies);
 
     const ResultsList = ({category}) => (
         <div className={`companies companies--${category}`}>
@@ -28,25 +20,33 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
                 yhtiöt
             </Heading>
             <div className="list">
-                {releasedCompanies.length > 0 ? (
-                    <>
-                        <div className="list-headers">
-                            <div className="list-header name">Nimi</div>
-                            <div className="list-header address">Osoite</div>
-                            <div className="list-header date">Valmistunut</div>
-                            <div className="list-header property-manager">Isännöitsijä</div>
-                        </div>
-                        <ul className="results-list">
-                            {category === "freed" ? (
-                                <ListItems list={releasedCompanies} />
-                            ) : (
-                                <ListItems list={stayingCompanies} />
-                            )}
-                        </ul>
-                    </>
-                ) : (
-                    <p>Ei listattavia yhtiöitä</p>
-                )}
+                <div className="list-headers">
+                    <div className="list-header name">Nimi</div>
+                    <div className="list-header address">Osoite</div>
+                    <div className="list-header date">Valmistunut</div>
+                    <div className="list-header property-manager">Isännöitsijä</div>
+                </div>
+                <ul className="results-list">
+                    {category === "freed" ? (
+                        <>
+                            {releasedCompanies.map((item, idx) => (
+                                <ComparisonResultListItem
+                                    company={item}
+                                    key={idx}
+                                />
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            {stayingCompanies.map((item, idx) => (
+                                <ComparisonResultListItem
+                                    company={item}
+                                    key={idx}
+                                />
+                            ))}
+                        </>
+                    )}
+                </ul>
             </div>
         </div>
     );
