@@ -353,6 +353,7 @@ const ApartmentMaximumPricesCard = ({
                         theme="black"
                         size="small"
                         variant="secondary"
+                        iconLeft={<IconDownload />}
                         onClick={() => setIsUnconfirmedMaximumPriceModalVisible(true)}
                         disabled={
                             // Button should be disabled if any of the price calculations are missing
@@ -375,6 +376,7 @@ const ApartmentMaximumPricesCard = ({
                     theme="black"
                     size="small"
                     variant="secondary"
+                    iconLeft={<IconDownload />}
                     onClick={() => setIsMaximumPriceModalVisible(true)}
                     disabled={
                         !apartment.prices.maximum_prices.confirmed ||

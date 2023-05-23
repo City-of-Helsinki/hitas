@@ -323,7 +323,9 @@ const ApartmentAddressSchema = object({
 const ApartmentLinkedModelSchema = object({id: string(), link: string()});
 
 const ApartmentLinkedModelsSchema = object({
-    housing_company: ApartmentLinkedModelSchema.merge(object({display_name: string()})),
+    housing_company: ApartmentLinkedModelSchema.merge(
+        object({display_name: string(), regulation_status: HousingCompanyRegulationStatusSchema})
+    ),
     real_estate: ApartmentLinkedModelSchema,
     building: ApartmentLinkedModelSchema.merge(object({street_address: string()})),
     apartment: ApartmentLinkedModelSchema,

@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
     FilterIntegerField,
+    FilterSelectField,
     FilterTextInputField,
     Heading,
     ListPageNumbers,
@@ -51,6 +52,9 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                 </div>
                 <div className="state">
                     <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
+                    {apartment.links.housing_company.regulation_status.startsWith("released") && (
+                        <StatusLabel>Vapautunut</StatusLabel>
+                    )}
                 </div>
             </li>
         </Link>
@@ -146,17 +150,21 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
-            <FilterTextInputField
-                label="Yhtiön nimi"
-                filterFieldName="housing_company_name"
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-            />
             <FilterIntegerField
                 label="Postinumero"
                 minLength={5}
                 maxLength={5}
                 filterFieldName="postal_code"
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+            />
+            <FilterSelectField
+                label="Yhtiön sääntelytila"
+                filterFieldName="is_regulated"
+                options={[
+                    {value: "true", label: "Säännelty"},
+                    {value: "false", label: "Ei säännelty"},
+                ]}
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />

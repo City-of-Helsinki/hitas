@@ -5943,6 +5943,8 @@ components:
               description: Housing company's display name
               type: string
               example: Taloyhtiö Helmi
+            regulation_status:
+              $ref: '#/components/schemas/RegulationStatus'
             link:
               description: API link to housing company
               type: string

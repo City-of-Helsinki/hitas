@@ -4,8 +4,8 @@ import DetailField from "./DetailField";
 import Divider from "./Divider";
 import EditButton from "./EditButton";
 import FilterCheckboxField from "./FilterCheckboxField";
-import FilterComboboxField from "./FilterComboboxField";
 import FilterIntegerField from "./FilterIntegerField";
+import FilterSelectField from "./FilterSelectField";
 import FilterTextInputField from "./FilterTextInputField";
 import FormInputField from "./formInputField/FormInputField";
 import Heading from "./Heading";
@@ -26,7 +26,7 @@ export {
     Divider,
     EditButton,
     FilterCheckboxField,
-    FilterComboboxField,
+    FilterSelectField,
     FilterIntegerField,
     FilterTextInputField,
     FormInputField,

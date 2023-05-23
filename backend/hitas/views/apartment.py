@@ -44,7 +44,7 @@ from hitas.models.apartment import (
     DepreciationPercentage,
 )
 from hitas.models.condition_of_sale import GracePeriod
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.job_performance import JobPerformanceSource
 from hitas.services.apartment import (
     get_first_sale_purchase_date,
@@ -98,6 +98,20 @@ class ApartmentFilterSet(HitasFilterSet):
         max_length=11,
     )
     has_conditions_of_sale = BooleanFilter()
+    is_regulated = BooleanFilter(method="is_regulated_filter")
+
+    def is_regulated_filter(self, queryset, name, value):
+        if value is None:
+            return queryset
+
+        if value:
+            return queryset.filter(
+                building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED.value
+            )
+        else:
+            return queryset.exclude(
+                building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED.value
+            )
 
     class Meta:
         model = Apartment
@@ -504,6 +518,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
         "housing_company": {
             "id": instance.housing_company.uuid.hex,
             "display_name": instance.housing_company.display_name,
+            "regulation_status": instance.housing_company.regulation_status.value,
             "link": reverse(
                 "hitas:housing-company-detail",
                 kwargs={

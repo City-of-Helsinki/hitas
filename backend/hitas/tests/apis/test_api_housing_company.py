@@ -23,7 +23,7 @@ from hitas.models import (
     PropertyManager,
     RealEstate,
 )
-from hitas.models.housing_company import HitasType
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
     RegulationResult,
@@ -1107,54 +1107,49 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
 
 
 @pytest.mark.django_db
-def test__api__housing_company__filter__new_hitas__false(api_client: HitasAPIClient):
-    ApartmentFactory.create(completion_date=datetime.date(2012, 1, 1))
-    ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
-    apartment_pre_2011 = ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
-    apartment_2009 = ApartmentFactory.create(completion_date=datetime.date(2009, 1, 1))
-
-    hc_both_old_and_new = HousingCompanyFactory.create()
+def test__api__housing_company__filter__new_hitas(api_client: HitasAPIClient):
     ApartmentFactory.create(
-        building__real_estate__housing_company=hc_both_old_and_new,
+        completion_date=datetime.date(2012, 1, 1),
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+    )
+    ApartmentFactory.create(
         completion_date=datetime.date(2010, 12, 31),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
     )
     ApartmentFactory.create(
-        building__real_estate__housing_company=hc_both_old_and_new,
-        completion_date=datetime.date(2011, 1, 1),
-    )
-
-    url = reverse("hitas:housing-company-list") + "?new_hitas=false"
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 2, response.json()
-    assert response.json()["contents"][0]["id"] == apartment_pre_2011.housing_company.uuid.hex
-    assert response.json()["contents"][1]["id"] == apartment_2009.housing_company.uuid.hex
-
-
-@pytest.mark.django_db
-def test__api__housing_company__filter__new_hitas__true(api_client: HitasAPIClient):
-    apartment_2012 = ApartmentFactory.create(completion_date=datetime.date(2012, 1, 1))
-    apartment_2011 = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
-    ApartmentFactory.create(completion_date=datetime.date(2010, 12, 31))
-    ApartmentFactory.create(completion_date=datetime.date(2009, 1, 1))
-
-    hc_both_old_and_new = HousingCompanyFactory.create()
-    ApartmentFactory.create(
-        building__real_estate__housing_company=hc_both_old_and_new,
-        completion_date=datetime.date(2010, 12, 31),
-    )
-    ApartmentFactory.create(
-        building__real_estate__housing_company=hc_both_old_and_new,
-        completion_date=datetime.date(2011, 1, 1),
+        completion_date=datetime.date(1990, 1, 1),
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
     )
 
     url = reverse("hitas:housing-company-list") + "?new_hitas=true"
-    response = api_client.get(url)
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 3, response.json()
-    assert response.json()["contents"][0]["id"] == apartment_2012.housing_company.uuid.hex
-    assert response.json()["contents"][1]["id"] == apartment_2011.housing_company.uuid.hex
-    assert response.json()["contents"][2]["id"] == hc_both_old_and_new.uuid.hex
+    response_json = api_client.get(url).json()["contents"]
+    assert len(response_json) == 1, response_json
+
+    url = reverse("hitas:housing-company-list") + "?new_hitas=false"
+    response_json = api_client.get(url).json()["contents"]
+    print(response_json)
+    assert len(response_json) == 3, response_json
+
+
+@pytest.mark.django_db
+def test__api__housing_company__filter__regulation_status(api_client: HitasAPIClient):
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.REGULATED)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_HITAS)
+
+    url = reverse("hitas:housing-company-list") + "?is_regulated=true"
+    response_json = api_client.get(url).json()["contents"]
+    assert len(response_json) == 1, response_json
+
+    url = reverse("hitas:housing-company-list") + "?is_regulated=false"
+    response_json = api_client.get(url).json()["contents"]
+    print(response_json)
+    assert len(response_json) == 3, response_json
 
 
 @pytest.mark.parametrize(
