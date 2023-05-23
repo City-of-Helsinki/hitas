@@ -127,7 +127,7 @@ const ThirtyYearComparison = () => {
         if (data.skipped) {
             data.skipped.forEach((skipped) => {
                 skippedArray.push({
-                    postal_code: "20820", //  skipped.missingCode,
+                    postal_code: skipped.missingCode,
                     replacements: [skipped.postalCode1, skipped.postalCode2],
                 });
             });

@@ -40,6 +40,7 @@ export default function ComparisonSkippedListItem({
             <div className="inputs">
                 <Select
                     label="Korvaava postinumero 1"
+                    tooltipText="Puolet postinumeroalueen korvaavan hinnan muodostavasta keskiarvosta"
                     options={options}
                     name={`skipped.${index}.replacementCode1`}
                     formObject={formObject}
@@ -48,6 +49,7 @@ export default function ComparisonSkippedListItem({
                 />
                 <Select
                     label="Korvaava postinumero 2"
+                    tooltipText="Valitse sama postinumero kuin vaihtoehdossa 1, jos haluat käyttää vain yhtä korvaavaa postinumeroa"
                     options={options}
                     name={`skipped.${index}.replacementCode2`}
                     formObject={formObject}
