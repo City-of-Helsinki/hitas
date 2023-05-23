@@ -8,12 +8,11 @@ export default function ComparisonSkippedListItem({
     formObject,
     index,
 }): JSX.Element {
-    //  const [resultArray, setResultArray] = useState<(string | null)[]>([null, null]);
     const options: {label: string; value: string}[] = [];
     postalCodeOptionSet.forEach((option) => {
         options.push({
             label: `${option.postal_code} (${option.price_by_area} €/m², alue: ${option.cost_area})`,
-            value: option.postal_code.substring(2, 5),
+            value: option.postal_code,
         });
     });
     return (
@@ -42,7 +41,7 @@ export default function ComparisonSkippedListItem({
                 <Select
                     label="Korvaava postinumero 1"
                     options={options}
-                    name={`skipped.${index}.postalCode1`}
+                    name={`skipped.${index}.replacementCode1`}
                     formObject={formObject}
                     setDirectValue={true}
                     required
@@ -50,7 +49,7 @@ export default function ComparisonSkippedListItem({
                 <Select
                     label="Korvaava postinumero 2"
                     options={options}
-                    name={`skipped.${index}.postalCode2`}
+                    name={`skipped.${index}.replacementCode2`}
                     formObject={formObject}
                     setDirectValue={true}
                     required

@@ -7,8 +7,9 @@ import ComparisonSkippedListItem from "./ComparisonSkippedListItem";
 
 type NewPostalCodes = {
     skipped: {
-        postalCode1: string | null;
-        postalCode2: string | null;
+        missingCode: string;
+        replacementCode1: string | null;
+        replacementCode2: string | null;
     }[];
 };
 
@@ -36,21 +37,25 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
         // console.log("skipped:", skippedPostalCodes);
     }
     const initialValues: object[] = [];
-    Object.entries(skippedPostalCodes).map((code) => initialValues.push({postalCode1: null, postalCode2: null}));
+    Object.entries(skippedPostalCodes).map((code, index) =>
+        initialValues.push({missingCode: code[0], replacementCode1: null, replacementCode2: null})
+    );
     const skippedForm = useForm<NewPostalCodes>({
         defaultValues: {skipped: initialValues},
         mode: "onBlur",
     });
-    const {control} = skippedForm;
-    const {fields} = useFieldArray({name: "skipped", control});
+    const {control, watch} = skippedForm;
+    useFieldArray({name: "skipped", control});
 
-    const onSubmit = (data) => {
-        console.log(data);
-    };
+    let skippedCheck = 0;
+    watch("skipped").forEach((item) => {
+        if (item.replacementCode1 === null || item.replacementCode2 === null) skippedCheck++;
+    });
+
     return (
         <form
             className="companies companies--skipped"
-            onSubmit={skippedForm.handleSubmit(onSubmit)}
+            onSubmit={skippedForm.handleSubmit(reCalculateFn)}
         >
             <Heading type="body">Vertailua ei voitu suorittaa</Heading>
             <h3 className="error-text">
@@ -77,11 +82,10 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                 </div>
             </QueryStateHandler>
             <div className="row row--buttons">
-                {/* TODO: Add disabling of button if form is invalid */}
                 <Button
                     theme="black"
                     type="submit"
-                    onClick={() => reCalculateFn(fields)}
+                    disabled={skippedCheck !== 0}
                 >
                     Suorita vertailu korvaavin postinumeroin
                 </Button>

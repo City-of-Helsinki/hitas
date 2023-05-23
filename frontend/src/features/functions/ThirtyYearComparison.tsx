@@ -12,7 +12,7 @@ import {
 import {Divider, Heading, QueryStateHandler, SaveButton, SaveDialogModal} from "../../common/components";
 import {FileInput, Select} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
-import {ComparisonResultModal, LoadedThirtyYearComparison} from "./components";
+import {ComparisonErrorModal, LoadedThirtyYearComparison} from "./components";
 import {comparisonResponses, priceCeilings} from "./simulatedResponses";
 
 const ThirtyYearComparison = () => {
@@ -121,9 +121,18 @@ const ThirtyYearComparison = () => {
     // * Event handlers *
     // ******************
 
-    const onCompareButtonClick = (result) => {
-        if (isTestMode) {
-            console.log("onCompareButtonClick event, with result:", result);
+    const onCompareButtonClick = (data) => {
+        // format eventual skipped data to match the API format
+        const skippedArray: object[] = [];
+        if (data.skipped) {
+            data.skipped.forEach((skipped) => {
+                skippedArray.push({
+                    postal_code: "20820", //  skipped.missingCode,
+                    replacements: [skipped.postalCode1, skipped.postalCode2],
+                });
+            });
+        }
+        if (isTestMode && !data.skipped) {
             if (formTimePeriod.value.split("_")[0] === "result") {
                 comparisonData = comparisonResponses[formTimePeriod.value];
                 comparisonError = {};
@@ -134,7 +143,12 @@ const ThirtyYearComparison = () => {
             if (formTimePeriod.value.split("_")[0] === "error") setIsErrorModalOpen(true);
             else setHasComparison(true);
         } else
-            makeComparison({data: {calculation_date: formDate}})
+            makeComparison({
+                data: {
+                    calculation_date: isNaN(Number(formDate.substring(0, 1))) ? "2023-05-01" : formDate,
+                    replacement_postal_codes: skippedArray,
+                },
+            })
                 .unwrap()
                 .then((data) => {
                     setHasComparison(true);
@@ -296,7 +310,7 @@ const ThirtyYearComparison = () => {
                 isVisible={isSaveModalOpen}
                 setIsVisible={setIsSaveModalOpen}
             />
-            <ComparisonResultModal
+            <ComparisonErrorModal
                 isOpen={isErrorModalOpen}
                 setIsOpen={setIsErrorModalOpen}
                 response={comparisonError}

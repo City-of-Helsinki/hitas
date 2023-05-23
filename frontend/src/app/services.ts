@@ -436,16 +436,17 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
         }),
-        createThirtyYearComparison: builder.mutation<IThirtyYearRegulationResponse, {data: {calculation_date: string}}>(
-            {
-                query: ({data}) => ({
-                    url: `thirty-year-regulation`,
-                    method: "POST",
-                    body: data,
-                    headers: {"Content-type": "application/json; charset=UTF-8"},
-                }),
-            }
-        ),
+        createThirtyYearComparison: builder.mutation<
+            IThirtyYearRegulationResponse,
+            {data: {calculation_date: string; replacement_postal_codes: Array<object>}}
+        >({
+            query: ({data}) => ({
+                url: `thirty-year-regulation`,
+                method: "POST",
+                body: data,
+                headers: {"Content-type": "application/json; charset=UTF-8"},
+            }),
+        }),
         saveExternalSalesData: builder.mutation({
             query: (arg) => ({
                 url: "external-sales-data",
