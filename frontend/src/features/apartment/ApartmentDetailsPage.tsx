@@ -258,7 +258,9 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
 
 const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const downloadForm = useForm({defaultValues: {request_date: formatDate(Date()), additional_info: ""}});
+    const downloadForm = useForm({
+        defaultValues: {request_date: today(), additional_info: ""},
+    });
     const {handleSubmit} = downloadForm;
     const handleDownloadButtonClick = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
