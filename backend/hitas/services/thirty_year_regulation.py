@@ -133,7 +133,6 @@ def perform_thirty_year_regulation(
 
     this_quarter = business_quarter(calculation_month)
     this_quarter_previous_year = this_quarter - relativedelta(years=1)
-    previous_quarter = this_quarter - relativedelta(months=3)
 
     check_existing_regulation_data(calculation_month)
 
@@ -219,7 +218,7 @@ def perform_thirty_year_regulation(
     sales_data = get_sales_data(this_quarter_previous_year, this_quarter, postal_codes)
 
     logger.info("Fetching external sales data for the last four quarters...")
-    external_sales_data = get_external_sales_data(to_quarter(previous_quarter), postal_codes)
+    external_sales_data = get_external_sales_data(to_quarter(this_quarter), postal_codes)
 
     logger.info("Combining HITAS and external sales data for each postal code...")
     price_by_area = combine_sales_data(sales_data, external_sales_data)
