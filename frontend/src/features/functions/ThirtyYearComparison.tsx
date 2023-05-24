@@ -4,6 +4,7 @@ import {hitasQuarters} from "../../common/schemas";
 
 import {useEffect, useState} from "react";
 import {
+    downloadRegulationResults,
     useCreateThirtyYearComparisonMutation,
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
@@ -245,6 +246,14 @@ const ThirtyYearComparison = () => {
                                 ` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
                         </label>
                         <div className="value">{priceCeiling ?? "---"} €/m²</div>
+                        {hasComparison && (
+                            <Button
+                                theme="black"
+                                onClick={() => downloadRegulationResults(formDate)}
+                            >
+                                Lataa kokonaisraportti
+                            </Button>
+                        )}
                     </div>
                 </form>
                 {!isTestMode && (
