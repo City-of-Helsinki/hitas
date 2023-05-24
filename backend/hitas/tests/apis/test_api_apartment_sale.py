@@ -618,8 +618,8 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
 def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: HitasAPIClient):
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
+    new_ownership: Ownership = OwnershipFactory.create(owner=owner_1, sale__purchase_date=datetime.date(2023, 1, 1))
+    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, sale__purchase_date=datetime.date(2022, 1, 1))
     condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create(
         new_ownership=new_ownership,
         old_ownership=old_ownership,

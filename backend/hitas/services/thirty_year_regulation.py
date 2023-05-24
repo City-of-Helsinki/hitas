@@ -70,7 +70,7 @@ class PropertyManagerInfo(TypedDict):
     name: str
     email: str
     address: AddressInfo
-    last_modified: datetime.date | str
+    last_modified: datetime.date | str | None
 
 
 class ComparisonData(TypedDict):
@@ -316,7 +316,11 @@ def _split_automatically_released(
                             postal_code=housing_company.property_manager.postal_code,
                             city=housing_company.property_manager.city,
                         ),
-                        last_modified=housing_company.property_manager_last_edited.date(),
+                        last_modified=(
+                            housing_company.property_manager_last_edited.date()
+                            if housing_company.property_manager_last_edited
+                            else None
+                        ),
                     ),
                     letter_fetched=False,
                     current_regulation_status=RegulationStatus.RELEASED_BY_HITAS.value,
@@ -360,7 +364,11 @@ def _get_comparison_values(
                     postal_code=housing_company.property_manager.postal_code,
                     city=housing_company.property_manager.city,
                 ),
-                last_modified=housing_company.property_manager_last_edited.date(),
+                last_modified=(
+                    housing_company.property_manager_last_edited.date()
+                    if housing_company.property_manager_last_edited
+                    else None
+                ),
             ),
             letter_fetched=False,
             current_regulation_status=RegulationStatus.REGULATED.value,  # Changed later if necessary

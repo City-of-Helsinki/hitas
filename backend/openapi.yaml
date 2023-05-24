@@ -7540,6 +7540,7 @@ components:
         last_modified:
           description: When this property manager was last modified on a given housing company?
           type: string
+          nullable: true
           format: date
           example: 2022-01-01
 
