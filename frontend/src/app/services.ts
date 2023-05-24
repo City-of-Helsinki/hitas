@@ -122,6 +122,16 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, r
     fetchAndDownloadPDF(url, data);
 };
 
+export const downloadRegulationResults = (calculationDate?: string) => {
+    const params = `calculation_date=${calculationDate}`;
+    const url = `${Config.api_v1_url}/thirty-year-regulation/reports/download-regulation-results?${params}`;
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init).then(handleDownloadPDF);
+};
+
 export const downloadCompanyRegulationLetter = (company: IHousingCompanyDetails, calculationDate?: string) => {
     const params = `housing_company_id=${company.id}${
         calculationDate !== undefined ? `&calculation_date=${calculationDate}` : ""
