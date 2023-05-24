@@ -25,6 +25,7 @@ const ComparisonResultListItem = ({company}) => {
                 theme="black"
                 onClick={handleClick}
                 variant={isClicked ? "secondary" : "primary"}
+                className="download-button"
             >
                 Lataa tiedote
             </Button>

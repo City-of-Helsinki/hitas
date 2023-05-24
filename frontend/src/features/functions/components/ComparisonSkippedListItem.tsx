@@ -1,61 +1,62 @@
-import {useForm} from "react-hook-form";
-import {SaveButton} from "../../../common/components";
-import SelectInput from "../../../common/components/form/SelectInput";
+import {Link} from "react-router-dom";
+import {Select} from "../../../common/components/form";
 
-const options = [
-    {
-        label: "00100",
-        value: "00100",
-    },
-    {
-        label: "00200",
-        value: "00200",
-    },
-    {
-        label: "00300",
-        value: "00300",
-    },
-];
-
-export default function ComparisonSkippedListItem({company}): JSX.Element {
-    const formObject = useForm({
-        mode: "all",
+export default function ComparisonSkippedListItem({
+    postalCode,
+    companies,
+    postalCodeOptionSet,
+    formObject,
+    index,
+}): JSX.Element {
+    const options: {label: string; value: string}[] = [];
+    postalCodeOptionSet.forEach((option) => {
+        options.push({
+            label: `${option.postal_code} (${option.price_by_area} €/m², alue: ${option.cost_area})`,
+            value: option.postal_code,
+        });
     });
-    const {handleSubmit, watch} = formObject;
-    const selectName1 = `${company.id}-1`;
-    const selectName2 = `${company.id}-2`;
-    const newPostalCode1 = watch(selectName1);
-    const newPostalCode2 = watch(selectName2);
-    const onSubmit = (data) => {
-        console.log(data);
-    };
     return (
         <li
             className="results-list__item"
-            key={company.id}
+            key={postalCode}
         >
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <span>{company.display_name}</span>
-                <div>{company.address.postal_code}</div>
-                <SelectInput
+            <div>
+                <h2>{postalCode}</h2>
+                <ul>
+                    <li>{companies.length > 1 ? "Yhtiöt:" : "Yhtiö:"} </li>
+                    {companies.map((company) => (
+                        <li key={company.display_name}>
+                            <Link
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                to={`/housing-companies/${company.id}`}
+                            >
+                                {company.display_name}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div className="inputs">
+                <Select
                     label="Korvaava postinumero 1"
+                    tooltipText="Puolet postinumeroalueen korvaavan hinnan muodostavasta keskiarvosta"
                     options={options}
-                    name={selectName1}
+                    name={`skipped.${index}.replacementCode1`}
                     formObject={formObject}
+                    setDirectValue={true}
                     required
                 />
-                <SelectInput
+                <Select
                     label="Korvaava postinumero 2"
+                    tooltipText="Valitse sama postinumero kuin vaihtoehdossa 1, jos haluat käyttää vain yhtä korvaavaa postinumeroa"
                     options={options}
-                    name={selectName2}
+                    name={`skipped.${index}.replacementCode2`}
                     formObject={formObject}
+                    setDirectValue={true}
                     required
                 />
-                <SaveButton
-                    type="submit"
-                    disabled={newPostalCode1 === undefined || newPostalCode2 === undefined}
-                />
-            </form>
+            </div>
         </li>
     );
 }

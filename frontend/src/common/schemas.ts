@@ -921,6 +921,14 @@ const ThirtyYearRegulationResponseSchema = object({
     obfuscated_owners: OwnerSchema.array().optional(),
 });
 
+const ThirtyYearAvailablePostalCodeSchema = object({
+    postal_code: string(),
+    price_by_area: number(),
+    cost_area: number(),
+});
+
+const ThirtyYearAvailablePostalCodesResponseSchema = ThirtyYearAvailablePostalCodeSchema.array();
+
 const QuarterSchema = string().regex(/\d{4}Q\d/);
 const ExternalSalesQuarterSchema = object({
     quarter: QuarterSchema,
@@ -1123,6 +1131,8 @@ export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
+export type IThirtyYearAvailablePostalCode = z.infer<typeof ThirtyYearAvailablePostalCodeSchema>;
+export type IThirtyYearAvailablePostalCodesResponse = z.infer<typeof ThirtyYearAvailablePostalCodesResponseSchema>;
 
 export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
