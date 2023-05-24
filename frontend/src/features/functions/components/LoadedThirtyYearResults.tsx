@@ -11,6 +11,7 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
+    const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
 
     const ResultsList = ({category}) => (
         <div className={`companies companies--${category}`}>
@@ -57,6 +58,29 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
                 calculationDate={calculationDate}
                 reCalculateFn={reCalculateFn}
             />
+        );
+    else if (releasedCompanies.length === 0 && stayingCompanies.length === 0)
+        return (
+            <Dialog
+                className="error-modal"
+                id="no-companies-modal"
+                aria-labelledby="no-companies-modal"
+                isOpen={isNoCompaniesModalOpen}
+                close={() => setIsNoCompaniesModalOpen(false)}
+                closeButtonLabelText="Sulje"
+            >
+                <Dialog.Header
+                    title="Ei vapautuvia tai valvottavia yhtiöitä"
+                    id="no-companies-modal-header"
+                />
+                <Dialog.Content>
+                    Järjestelmä ei palauttanut yhtiötä jotka vapautuisivat tai jäisivät sääntelyn piiriin. Kannassa ei
+                    ole yhtiöitä mitä verrata.
+                </Dialog.Content>
+                <Dialog.ActionButtons>
+                    <CloseButton onClick={() => setIsNoCompaniesModalOpen(false)} />
+                </Dialog.ActionButtons>
+            </Dialog>
         );
     else
         return (
