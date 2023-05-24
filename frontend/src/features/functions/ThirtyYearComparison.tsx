@@ -292,7 +292,7 @@ const ThirtyYearComparison = () => {
                     reCalculateFn={onCompareButtonClick}
                 />
             </QueryStateHandler>
-            {!hasComparison && (
+            {!hasComparison && !(comparisonData as {skipped: object[]})?.skipped && (
                 <div className="row row--buttons">
                     <Button
                         theme="black"
