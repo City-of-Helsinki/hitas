@@ -49,29 +49,17 @@ const ThirtyYearComparison = () => {
     const formDate = `${formYear.value}-${formTimePeriod.value}`;
     const formFile: File | undefined = watch("file");
 
-    // Function for adding a time period select option
-    const addQuarterOption = (option) => {
-        // If it's the last quarter, add the years to the date string in the label since the later date is in the next year
-        const labelToAdd =
-            option.value === "11-01"
-                ? `${option.label.split(" ")[0]}${formYear.value} - ${option.label.split(" ")[2]}${
-                      Number(formYear.value) + 1
-                  }`
-                : option.label;
-        hitasQuarterOptions.push({value: option.value, label: labelToAdd});
-    };
-
     // Populate the time quarter select with options, if current year is selected in the year selector
     const hitasQuarterOptions: {label: string; value: string}[] = [];
     const currentTime = new Date();
     // If the current year is not selected, add all quarters to the time period select options...
     if (currentTime.getFullYear().toString() !== formYear.value && !isNaN(Number(formYear.label))) {
-        hitasQuarters.forEach((quarter) => addQuarterOption(quarter));
+        hitasQuarters.forEach((quarter) => hitasQuarterOptions.push({value: quarter.value, label: quarter.label}));
     } else {
         // ...otherwise add only the quarters that have passed
         for (let i = 0; i < 4; i++) {
             if (currentTime.getMonth() + 1 >= (i + 1) * 3 - 1) {
-                addQuarterOption(hitasQuarters[i]);
+                hitasQuarterOptions.push(hitasQuarters[i]);
             }
         }
     }
@@ -234,7 +222,9 @@ const ThirtyYearComparison = () => {
                             options={isTestMode ? testOptions : hitasQuarterOptions}
                             name="quarter"
                             formObject={formObject}
-                            defaultValue={isTestMode ? testOptions[0] : hitasQuarterOptions[0]}
+                            defaultValue={
+                                isTestMode ? testOptions[0] : hitasQuarterOptions[hitasQuarterOptions.length - 1]
+                            }
                             value={formTimePeriod}
                             required
                         />
