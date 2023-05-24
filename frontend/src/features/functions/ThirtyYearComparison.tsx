@@ -118,11 +118,6 @@ const ThirtyYearComparison = () => {
             comparisonError = comparisonResponses[formTimePeriod.value];
         }
     }
-    // console.log("hasTimePeriodFile", hasTimePeriodFile, isExternalSalesDataLoading, externalSalesDataLoadError, externalSalesData);
-    console.log("comparisonData", comparisonData);
-    console.log("isLoading", isGetComparisonLoading);
-    console.log("error", getComparisonError);
-    console.log("data", getComparisonData);
 
     // ******************
     // * Event handlers *

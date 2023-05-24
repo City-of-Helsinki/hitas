@@ -39,8 +39,8 @@ export default function ComparisonSkippedListItem({
             </div>
             <div className="inputs">
                 <Select
-                    label="Korvaava postinumero 1"
-                    tooltipText="Puolet postinumeroalueen korvaavan hinnan muodostavasta keskiarvosta"
+                    label="Korvaava postinumero"
+                    tooltipText="Puolet keskiarvosta, joka korvaa puuttuvan postinumeroalueen hinnan."
                     options={options}
                     name={`skipped.${index}.replacementCode1`}
                     formObject={formObject}
@@ -48,12 +48,15 @@ export default function ComparisonSkippedListItem({
                     required
                 />
                 <Select
-                    label="Korvaava postinumero 2"
-                    tooltipText="Valitse sama postinumero kuin vaihtoehdossa 1, jos haluat käyttää vain yhtä korvaavaa postinumeroa"
-                    options={options}
+                    label="Korvaava postinumero"
+                    tooltipText="Toinen korvaava postinumero on valittavissa vasta kun olet valinnut ensimmäisen puolikkaan."
+                    options={options.filter(
+                        (option) => option.value !== formObject.getValues(`skipped.${index}.replacementCode1`)
+                    )}
                     name={`skipped.${index}.replacementCode2`}
                     formObject={formObject}
                     setDirectValue={true}
+                    disabled={formObject.getValues(`skipped.${index}.replacementCode1`) === null}
                     required
                 />
             </div>

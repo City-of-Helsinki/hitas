@@ -57,10 +57,13 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
             className="companies companies--skipped"
             onSubmit={skippedForm.handleSubmit(reCalculateFn)}
         >
-            <Heading type="body">Vertailua ei voitu suorittaa</Heading>
-            <h3 className="error-text">
-                Seuraavilta postinumeroalueilta puuttuu keskineliöhinta, ole hyvä ja valitse korvaavat postinumeroalueet
-            </h3>
+            <Heading type="body">Vertailu ei onnistunut</Heading>
+            <p>
+                Vertailua ei voitu suorittaa, koska seuraavilta postinumeroalueilta puuttuu keskineliöhinnat.
+                <br />
+                Ole hyvä ja valitse kutakin kohti kaksi korvaavaa postinumeroaluetta, joiden keskiarvoa käytetään
+                vertailussa puuttuvan keskineliöhinnan sijaan.
+            </p>
             <QueryStateHandler
                 data={codes}
                 error={error}
