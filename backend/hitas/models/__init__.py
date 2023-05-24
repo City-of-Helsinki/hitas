@@ -8,7 +8,7 @@ from hitas.models.apartment import (
 )
 from hitas.models.apartment_sale import ApartmentSale
 from hitas.models.building import Building
-from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer, FinancingMethod
+from hitas.models.codes import AbstractCode, ApartmentType, BuildingType, Developer
 from hitas.models.condition_of_sale import ConditionOfSale
 from hitas.models.external_sales_data import ExternalSalesData
 from hitas.models.housing_company import (

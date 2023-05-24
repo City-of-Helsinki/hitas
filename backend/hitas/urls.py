@@ -52,7 +52,6 @@ router.register(
 
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
-router.register(r"financing-methods", views.FinancingMethodViewSet, basename="financing-method")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
 router.register(r"developers", views.DeveloperViewSet, basename="developer")
 router.register(r"apartment-types", views.ApartmentTypeViewSet, basename="apartment-type")

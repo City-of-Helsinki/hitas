@@ -28,7 +28,6 @@ class HousingCompanyFactory(DjangoModelFactory):
     street_address = factory.Faker("street_address")
     postal_code = factory.SubFactory("hitas.tests.factories.HitasPostalCodeFactory")
     building_type = factory.SubFactory("hitas.tests.factories.BuildingTypeFactory")
-    financing_method = factory.SubFactory("hitas.tests.factories.NewHitasFinancingMethodFactory")
     property_manager = factory.SubFactory("hitas.tests.factories.PropertyManagerFactory")
     developer = factory.SubFactory("hitas.tests.factories.DeveloperFactory")
     acquisition_price = fuzzy.FuzzyDecimal(10000000, 99999999, precision=2)

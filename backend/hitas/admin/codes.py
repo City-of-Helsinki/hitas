@@ -1,10 +1,10 @@
 from django.contrib import admin
 
 from hitas.admin.audit_log import AuditLogHistoryAdminMixin
-from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod
+from hitas.models import ApartmentType, BuildingType, Developer
 
 
-@admin.register(BuildingType, FinancingMethod, Developer, ApartmentType)
+@admin.register(BuildingType, Developer, ApartmentType)
 class CodeAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
     list_display = [
         "value",

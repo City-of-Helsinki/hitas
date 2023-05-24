@@ -34,7 +34,6 @@ from hitas.models import (
     ConstructionPriceIndex2005Equal100,
     DepreciationPercentage,
     Developer,
-    FinancingMethod,
     HitasPostalCode,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
@@ -55,7 +54,6 @@ from hitas.models.utils import check_business_id, check_social_security_number
 from hitas.oracle_migration.cost_areas import hitas_cost_area, init_cost_areas
 from hitas.oracle_migration.financing_types import (
     FINANCING_METHOD_TO_HITAS_TYPE_MAP,
-    format_financing_method,
     strip_financing_method_id,
 )
 from hitas.oracle_migration.globals import anonymize_data, faker, should_anonymize
@@ -130,7 +128,6 @@ class ConvertedData:
 
     building_types_by_code_number: Dict[str, BuildingType] = None
     developers_by_code_number: Dict[str, Developer] = None
-    financing_methods_by_code_number: Dict[str, FinancingMethod] = None
     hitas_types_by_code_number: Dict[str, HitasType] = None
     postal_codes_by_postal_code: Dict[str, HitasPostalCode] = None
     apartment_types_by_code_number: Dict[str, ApartmentType] = None
@@ -238,9 +235,6 @@ def run(
             converted_data.developers_by_code_number = create_codes(
                 codebooks_by_id["RAKENTAJA"], Developer, sensitive=True
             )
-            converted_data.financing_methods_by_code_number = create_codes(
-                codebooks_by_id["RAHMUOTO"], FinancingMethod, modify_fn=format_financing_method
-            )
             converted_data.hitas_types_by_code_number = create_hitas_types(codebooks_by_id["RAHMUOTO"])
 
             converted_data.apartment_types_by_code_number = create_codes(codebooks_by_id["HUONETYYPPI"], ApartmentType)
@@ -314,7 +308,6 @@ def do_truncate():
         PropertyManager,
         BuildingType,
         Developer,
-        FinancingMethod,
         Owner,
         HitasPostalCode,
     ]:
@@ -389,7 +382,6 @@ def create_housing_companies(
         new.building_type = converted_data.building_types_by_code_number[hc["building_type_code"]]
         new.developer = converted_data.developers_by_code_number[hc["developer_code"]]
         new.postal_code = converted_data.postal_codes_by_postal_code[hc["postal_code_code"]]
-        new.financing_method = converted_data.financing_methods_by_code_number[hc["financing_method_code"]]
         new.hitas_type = converted_data.hitas_types_by_code_number[hc["financing_method_code"]]
         new.property_manager = converted_data.property_managers_by_oracle_id[hc["property_manager_id"]]
 

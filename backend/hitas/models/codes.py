@@ -37,17 +37,6 @@ class BuildingType(AbstractCode):
         verbose_name_plural = _("Building types")
 
 
-# Rahoitusmuoto
-class FinancingMethod(AbstractCode):
-    include_in_statistics: bool = models.BooleanField(default=True)
-    old_hitas_ruleset: bool = models.BooleanField(default=False)
-    half_hitas: bool = models.BooleanField(default=False)
-
-    class Meta(AbstractCode.Meta):
-        verbose_name = _("Financing method")
-        verbose_name_plural = _("Financing methods")
-
-
 # Rakennuttaja
 class Developer(AbstractCode):
     class Meta(AbstractCode.Meta):
@@ -63,6 +52,5 @@ class ApartmentType(AbstractCode):
 
 
 auditlog.register(BuildingType)
-auditlog.register(FinancingMethod)
 auditlog.register(Developer)
 auditlog.register(ApartmentType)

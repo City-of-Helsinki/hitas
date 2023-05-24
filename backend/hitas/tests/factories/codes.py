@@ -6,7 +6,7 @@ from factory import fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from hitas.models import ApartmentType, BuildingType, Developer, FinancingMethod
+from hitas.models import ApartmentType, BuildingType, Developer
 
 faker = Faker(locale="fi_FI")
 
@@ -45,53 +45,6 @@ class BuildingTypeFactory(AbstractCodeFactory):
             "rivitalo/erillistalo",
         ]
     )
-
-
-class OldHitasFinancingMethodFactory(AbstractCodeFactory):
-    class Meta:
-        model = FinancingMethod
-
-    value = fuzzy.FuzzyChoice(
-        [
-            "vapaarahoitteinen, Hitas I",
-            "vapaarahoitteinen, Hitas II",
-            "HK valtion laina, Hitas I",
-            "HK valtion laina, Hitas II",
-            "RA valtion laina, Hitas I",
-            "RA valtion laina, Hitas I",
-            "HK valtion laina, Hitas I",
-            "HK valtion laina, Hitas II",
-            "RA valtion laina, Hitas I",
-            "RA valtion laina, Hitas II",
-            "Korkotuki, Hitas I",
-            "Korkotuki, Hitas II",
-            "Lyhyt korkotukilaina, ns. osaomistus Hitas I",
-            "Pitkä korkotukilaina osaomistus Hitas I",
-            "Omaksi lunastettava vuokra-asunto, Hitas I",
-            "Uusi Hitas I (vanhat säännöt)",
-            "Uusi Hitas II (vanhat säännöt)",
-            "Vuokratalo Hitas II",
-            "Vuokratalo Hitas I",
-        ]
-    )
-    include_in_statistics = factory.Faker("boolean")
-    old_hitas_ruleset = True
-    half_hitas = False
-
-
-class NewHitasFinancingMethodFactory(AbstractCodeFactory):
-    class Meta:
-        model = FinancingMethod
-
-    value = fuzzy.FuzzyChoice(
-        [
-            "Uusi Hitas I (vapaarahoitteinen)",
-            "Uusi Hitas II (vapaarahoitteinen)",
-        ]
-    )
-    include_in_statistics = True
-    old_hitas_ruleset = False
-    half_hitas = False
 
 
 class DeveloperFactory(AbstractCodeFactory):
