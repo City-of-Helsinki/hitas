@@ -37,7 +37,7 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
         // console.log("skipped:", skippedPostalCodes);
     }
     const initialValues: object[] = [];
-    Object.entries(skippedPostalCodes).map((code, index) =>
+    Object.entries(skippedPostalCodes).forEach((code, index) =>
         initialValues.push({missingCode: code[0], replacementCode1: null, replacementCode2: null})
     );
     const skippedForm = useForm<NewPostalCodes>({

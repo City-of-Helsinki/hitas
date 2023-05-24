@@ -11,7 +11,6 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
-    console.log(data, stayingCompanies);
 
     const ResultsList = ({category}) => (
         <div className={`companies companies--${category}`}>

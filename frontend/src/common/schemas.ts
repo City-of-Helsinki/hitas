@@ -917,8 +917,8 @@ const ThirtyYearRegulationResponseSchema = object({
     automatically_released: ThirtyYearRegulationCompanySchema.array(),
     released_from_regulation: ThirtyYearRegulationCompanySchema.array(),
     stays_regulated: ThirtyYearRegulationCompanySchema.array(),
-    skipped: ThirtyYearRegulationCompanySchema.array().optional(),
-    obfuscated_owners: OwnerSchema.array().optional(),
+    skipped: ThirtyYearRegulationCompanySchema.array(),
+    obfuscated_owners: OwnerSchema.array(),
 });
 
 const ThirtyYearAvailablePostalCodeSchema = object({
@@ -1024,6 +1024,16 @@ const IndexQuerySchema = object({
         limit: number(),
         year: string(),
     }),
+});
+
+const ThirtyYearRegulationQuerySchema = object({
+    calculationDate: string(),
+    replacementPostalCodes: object({
+        postalCode: string(),
+        replacements: string().array(),
+    })
+        .array()
+        .optional(),
 });
 
 // ********************************
@@ -1133,6 +1143,7 @@ export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataRespons
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
 export type IThirtyYearAvailablePostalCode = z.infer<typeof ThirtyYearAvailablePostalCodeSchema>;
 export type IThirtyYearAvailablePostalCodesResponse = z.infer<typeof ThirtyYearAvailablePostalCodesResponseSchema>;
+export type IThirtyYearRegulationQuery = z.infer<typeof ThirtyYearRegulationQuerySchema>;
 
 export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
