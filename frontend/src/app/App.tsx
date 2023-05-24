@@ -11,13 +11,13 @@ import useAuthentication from "./useAuthentication";
 
 const App = (): JSX.Element => {
     // Authentication
-    const {data: userInfoData, isLoading: isUserInfoLoading} = useGetUserInfoQuery();
+    const token = process.env.REACT_APP_AUTH_TOKEN;
+    const {data: userInfoData, isLoading: isUserInfoLoading} = useGetUserInfoQuery(null, {skip: !!token});
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isAuthenticating = useAppSelector(selectIsAuthenticating);
     const {signIn, logOut} = useAuthentication();
     const [userTitle, setUserTitle] = useState<string | number>(0);
     const dispatch = useAppDispatch();
-    const token = process.env.REACT_APP_AUTH_TOKEN;
 
     // Check the authentication and get the user name
     useEffect(() => {
