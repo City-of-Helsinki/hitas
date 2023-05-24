@@ -19,7 +19,6 @@ const ThirtyYearComparison = () => {
     const [isTestMode, setIsTestMode] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-    const [hasComparison, setHasComparison] = useState(false);
     const years = [
         {label: "2023", value: "2023"},
         {label: "2022", value: "2022"},
@@ -78,8 +77,8 @@ const ThirtyYearComparison = () => {
 
     // Queries and mutations
     const {
-        data: externalSalesData,
-        isLoading: isExternalSalesDataLoading,
+        currentData: externalSalesData,
+        isFetching: isExternalSalesDataLoading,
         error: externalSalesDataLoadError,
     } = useGetExternalSalesDataQuery({
         calculation_date: formDate,
@@ -89,15 +88,18 @@ const ThirtyYearComparison = () => {
         {data: savedExternalSalesData, isLoading: isExternalSalesDataSaving, error: saveExternalSalesDataError},
     ] = useSaveExternalSalesDataMutation();
     const {
-        data: getComparisonData,
-        isLoading: isGetComparisonLoading,
+        currentData: getComparisonData,
+        isFetching: isGetComparisonLoading,
         error: getComparisonError,
-    } = useGetThirtyYearRegulationQuery({
-        calculation_date: formDate,
-    });
+    } = useGetThirtyYearRegulationQuery(
+        {
+            calculationDate: formDate,
+        },
+        {skip: !externalSalesData || !!isExternalSalesDataLoading || !!externalSalesDataLoadError}
+    );
     const [makeComparison, {data: makeComparisonData, isLoading: isMakeComparisonLoading, error: makeComparisonError}] =
         useCreateThirtyYearComparisonMutation();
-
+    const hasComparison = !isGetComparisonLoading && !getComparisonError && !!getComparisonData;
     const hasTimePeriodFile = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
     const isValidTestMode = isTestMode && isNaN(Number(formTimePeriod.value.charAt(0)));
 
@@ -116,6 +118,11 @@ const ThirtyYearComparison = () => {
             comparisonError = comparisonResponses[formTimePeriod.value];
         }
     }
+    // console.log("hasTimePeriodFile", hasTimePeriodFile, isExternalSalesDataLoading, externalSalesDataLoadError, externalSalesData);
+    console.log("comparisonData", comparisonData);
+    console.log("isLoading", isGetComparisonLoading);
+    console.log("error", getComparisonError);
+    console.log("data", getComparisonData);
 
     // ******************
     // * Event handlers *
@@ -123,11 +130,11 @@ const ThirtyYearComparison = () => {
 
     const onCompareButtonClick = (data) => {
         // format eventual skipped data to match the API format
-        const skippedArray: object[] = [];
+        const skippedArray: {postalCode: string; replacements: string[]}[] = [];
         if (data.skipped) {
             data.skipped.forEach((skipped) => {
                 skippedArray.push({
-                    postal_code: skipped.missingCode,
+                    postalCode: skipped.missingCode,
                     replacements: [skipped.postalCode1, skipped.postalCode2],
                 });
             });
@@ -141,17 +148,15 @@ const ThirtyYearComparison = () => {
                 comparisonError = comparisonResponses[formTimePeriod.value];
             }
             if (formTimePeriod.value.split("_")[0] === "error") setIsErrorModalOpen(true);
-            else setHasComparison(true);
         } else
             makeComparison({
                 data: {
-                    calculation_date: isNaN(Number(formDate.substring(0, 1))) ? "2023-05-01" : formDate,
-                    replacement_postal_codes: skippedArray,
+                    calculationDate: isNaN(Number(formDate.substring(0, 1))) ? "2023-05-01" : formDate,
+                    replacementPostalCodes: skippedArray,
                 },
             })
                 .unwrap()
                 .then((data) => {
-                    setHasComparison(true);
                     hdsToast.success("Vertailu suoritettu onnistuneesti!");
                 })
                 .catch((error) => {
@@ -194,7 +199,6 @@ const ThirtyYearComparison = () => {
     useEffect(() => {
         if (formYear.value === "TEST") {
             setIsTestMode((prev) => true);
-            setHasComparison(false);
             // set the value to the first test option if there is a date selected
             if (!isNaN(Number(formTimePeriod.value.charAt(0))))
                 formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
@@ -251,7 +255,7 @@ const ThirtyYearComparison = () => {
                 {!isTestMode && (
                     <>
                         <Divider size="l" />
-                        {!hasComparison && !hasTimePeriodFile ? (
+                        {!hasTimePeriodFile ? (
                             <form
                                 className={`file${formFile === undefined ? "" : " file--selected"}`}
                                 onSubmit={handleSubmit(onSubmit)}
@@ -281,20 +285,19 @@ const ThirtyYearComparison = () => {
                     </>
                 )}
             </div>
-            {hasComparison ? (
-                <QueryStateHandler
+            <QueryStateHandler
+                data={comparisonData}
+                error={comparisonData ? undefined : comparisonError}
+                isLoading={isComparisonLoading}
+                attemptedAction="hae suoritetun vertailun tulokset"
+            >
+                <LoadedThirtyYearComparison
                     data={comparisonData}
-                    error={comparisonError}
-                    isLoading={isComparisonLoading}
-                    attemptedAction="hae suoritetun vertailun tulokset"
-                >
-                    <LoadedThirtyYearComparison
-                        data={comparisonData}
-                        calculationDate={formDate}
-                        reCalculateFn={onCompareButtonClick}
-                    />
-                </QueryStateHandler>
-            ) : (
+                    calculationDate={formDate}
+                    reCalculateFn={onCompareButtonClick}
+                />
+            </QueryStateHandler>
+            {!hasComparison && (
                 <div className="row row--buttons">
                     <Button
                         theme="black"

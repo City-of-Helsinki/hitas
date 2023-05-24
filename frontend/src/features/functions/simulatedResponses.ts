@@ -361,6 +361,7 @@ const fileImportResponses = {
 const priceCeilings = {
     2023: {
         "02-01": 4621,
+        "05-01": 4622,
     },
     2022: {
         "02-01": 2201,

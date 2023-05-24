@@ -27,6 +27,7 @@ import {
     IPostalCodeResponse,
     IRealEstate,
     IThirtyYearAvailablePostalCodesResponse,
+    IThirtyYearRegulationQuery,
     IThirtyYearRegulationResponse,
     IUserInfoResponse,
 } from "../common/schemas";
@@ -168,7 +169,7 @@ export const hitasApi = createApi({
         },
         ...(!Config.token && {credentials: "include"}),
     }),
-    tagTypes: ["HousingCompany", "Apartment", "Index", "Owner"],
+    tagTypes: ["HousingCompany", "Apartment", "Index", "Owner", "ExternalSaleData", "ThirtyYearRegulation"],
     endpoints: (builder) => ({}),
 });
 
@@ -278,12 +279,16 @@ const detailApi = hitasApi.injectEndpoints({
                 url: "external-sales-data",
                 params: params,
             }),
+            providesTags: (result, error, arg) => [{type: "ExternalSaleData", id: arg.calculation_date}],
         }),
-        getThirtyYearRegulation: builder.query<IThirtyYearRegulationResponse, object>({
-            query: (params: object) => ({
+        getThirtyYearRegulation: builder.query<IThirtyYearRegulationResponse, IThirtyYearRegulationQuery>({
+            query: (params: IThirtyYearRegulationQuery) => ({
                 url: "thirty-year-regulation",
-                params: params,
+                params: {
+                    calculation_date: params.calculationDate,
+                },
             }),
+            providesTags: (result, error, arg) => [{type: "ThirtyYearRegulation", id: arg.calculationDate}],
         }),
     }),
 });
@@ -468,17 +473,23 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
         }),
-        createThirtyYearComparison: builder.mutation<
-            IThirtyYearRegulationResponse,
-            {data: {calculation_date: string; replacement_postal_codes: Array<object>}}
-        >({
-            query: ({data}) => ({
-                url: `thirty-year-regulation`,
-                method: "POST",
-                body: data,
-                headers: {"Content-type": "application/json; charset=UTF-8"},
-            }),
-        }),
+        createThirtyYearComparison: builder.mutation<IThirtyYearRegulationResponse, {data: IThirtyYearRegulationQuery}>(
+            {
+                query: ({data}) => ({
+                    url: `thirty-year-regulation`,
+                    method: "POST",
+                    body: {
+                        calculation_date: data.calculationDate,
+                        replacement_postal_codes: data.replacementPostalCodes?.map((p) => {
+                            return {postal_code: p.postalCode, replacements: p.replacements};
+                        }),
+                    },
+                    headers: {"Content-type": "application/json; charset=UTF-8"},
+                }),
+                invalidatesTags: (result, error, arg) =>
+                    !error && result ? [{type: "ThirtyYearRegulation", id: arg.data.calculationDate}] : [],
+            }
+        ),
         saveExternalSalesData: builder.mutation({
             query: (arg) => ({
                 url: "external-sales-data",
@@ -487,6 +498,8 @@ const mutationApi = hitasApi.injectEndpoints({
                 params: {calculation_date: arg.calculation_date},
                 headers: mutationApiExcelHeaders(),
             }),
+            invalidatesTags: (result, error, arg) =>
+                !error && result ? [{type: "ExternalSaleData", id: arg.calculation_date}] : [],
         }),
     }),
 });

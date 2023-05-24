@@ -8,14 +8,14 @@ const Functions = () => {
             <Heading>Järjestelmän toiminnot</Heading>
             <Tabs>
                 <Tabs.TabList>
-                    <Tabs.Tab>Rajaneliöhinnan laskenta</Tabs.Tab>
                     <Tabs.Tab>Vapautumisen tarkistus</Tabs.Tab>
+                    <Tabs.Tab>Rajaneliöhinnan laskenta</Tabs.Tab>
                 </Tabs.TabList>
                 <Tabs.TabPanel>
-                    <PriceCeilingPerSquare />
+                    <ThirtyYearComparison />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel>
-                    <ThirtyYearComparison />
+                    <PriceCeilingPerSquare />
                 </Tabs.TabPanel>
             </Tabs>
         </div>
