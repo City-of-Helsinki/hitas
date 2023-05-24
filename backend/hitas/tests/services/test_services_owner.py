@@ -2,7 +2,7 @@ from typing import NamedTuple
 
 import pytest
 
-from hitas.models import HousingCompanyState, Owner, Ownership
+from hitas.models import Owner, Ownership
 from hitas.models.housing_company import RegulationStatus
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
 from hitas.tests.apis.helpers import parametrize_helper
@@ -68,7 +68,7 @@ def test_obfuscate_owners_without_regulated_apartments__no_ownerships__multiple(
 
 
 class ObfuscationTestInfo(NamedTuple):
-    regulation_status: HousingCompanyState
+    regulation_status: RegulationStatus
     obfuscated: bool
 
 

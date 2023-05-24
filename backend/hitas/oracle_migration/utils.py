@@ -1,15 +1,14 @@
 import sys
 import datetime
 from functools import wraps
-from typing import Optional, Type, ParamSpec, TypeVar, Callable
+from typing import Optional, ParamSpec, TypeVar, Callable
 
 import pytz
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum
 from sqlalchemy.engine import LegacyRow
 
-from hitas.models import BuildingType, HousingCompanyState
+from hitas.models import BuildingType
 from hitas.models.apartment import DepreciationPercentage
 from hitas.models.housing_company import RegulationStatus
 
@@ -60,25 +59,6 @@ def combine_notes(a: LegacyRow) -> str:
     return "\n".join(
         [note for note in [a["TEKSTI1"], a["TEKSTI2"], a["TEKSTI3"], a["TEKSTI4"], a["TEKSTI5"]] if note is not None]
     ).replace("-\n", "")
-
-
-def housing_company_state_from(code: str) -> HousingCompanyState:
-    # These are hardcoded as the code number (C_KOODISTOID) and
-    # the name (C_NAME) are the only ones that can be used to
-    # identify these types
-    match code:
-        case "000":
-            return HousingCompanyState.NOT_READY
-        case "001":
-            return HousingCompanyState.LESS_THAN_30_YEARS
-        case "002":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
-        case "003":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_FREE
-        case "004":
-            return HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION
-        case "005":
-            return HousingCompanyState.HALF_HITAS
 
 
 def housing_company_regulation_status_from(code: str) -> RegulationStatus:

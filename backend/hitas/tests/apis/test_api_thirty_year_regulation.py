@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ApartmentSale, ExternalSalesData, HousingCompanyState
+from hitas.models import Apartment, ApartmentSale, ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
@@ -255,7 +255,6 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
     # Check that the housing company stays regulated
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
     assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
 
     #
@@ -399,7 +398,6 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     # Check that the housing company was freed from regulation
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
     assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
@@ -740,7 +738,6 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     # Check that the housing company was freed from regulation
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
     assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
@@ -914,11 +911,9 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     # Check that the first housing companies were freed from regulation
     #
     sale_1.apartment.housing_company.refresh_from_db()
-    assert sale_1.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
     assert sale_1.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     sale_2.apartment.housing_company.refresh_from_db()
-    assert sale_2.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_FREE
     assert sale_2.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
@@ -1263,7 +1258,6 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
     # Check that the housing company stays regulated
     #
     sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.state == HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
     assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
 
     #

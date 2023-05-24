@@ -19,7 +19,6 @@ from hitas.models import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
     PropertyManager,
     RealEstate,
 )
@@ -88,7 +87,6 @@ def test__api__housing_company__list(api_client: HitasAPIClient, freezer):
         {
             "id": hc2.uuid.hex,
             "name": hc2.display_name,
-            "state": hc2.state.value,
             "hitas_type": hc2.hitas_type.value,
             "completed": False,
             "over_thirty_years_old": False,
@@ -105,7 +103,6 @@ def test__api__housing_company__list(api_client: HitasAPIClient, freezer):
         {
             "id": hc1.uuid.hex,
             "name": hc1.display_name,
-            "state": hc1.state.value,
             "hitas_type": hc1.hitas_type.value,
             "completed": True,
             "over_thirty_years_old": False,
@@ -278,7 +275,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "id": hc1.uuid.hex,
         "business_id": hc1.business_id,
         "name": {"display": hc1.display_name, "official": hc1.official_name},
-        "state": hc1.state.value,
         "hitas_type": hc1.hitas_type.value,
         "completed": True,
         "exclude_from_statistics": False,
@@ -544,7 +540,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "notes": "This is a note.",
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
-        "state": "not_ready",
+        "regulation_status": RegulationStatus.REGULATED.value,
         "hitas_type": "hitas_1",
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
@@ -656,7 +652,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         "error": "bad_request",
         "fields": [
             {"field": "name", "message": "This field is mandatory and cannot be null."},
-            {"field": "state", "message": "This field is mandatory and cannot be null."},
             {"field": "hitas_type", "message": "This field is mandatory and cannot be null."},
             {"field": "address", "message": "This field is mandatory and cannot be null."},
             {"field": "financing_method", "message": "This field is mandatory and cannot be null."},
@@ -682,20 +677,6 @@ def test__api__housing_company__create__empty(api_client: HitasAPIClient):
         ({"business_id": "123"}, [{"field": "business_id", "message": "'123' is not a valid business id."}]),
         ({"name": None}, [{"field": "name", "message": "This field is mandatory and cannot be null."}]),
         ({"name": 0}, [{"field": "name", "message": "Invalid data. Expected a dictionary, but got int."}]),
-        ({"state": None}, [{"field": "state", "message": "This field is mandatory and cannot be null."}]),
-        (
-            {"state": "invalid_state"},
-            [
-                {
-                    "field": "state",
-                    "message": (
-                        "Unsupported value 'invalid_state'. Supported values are:"
-                        " ['not_ready', 'lt_30_years', 'gt_30_years_not_free', 'gt_30_years_free', "
-                        "'gt_30_years_plot_department_notification', 'half_hitas', 'ready_no_statistics']."
-                    ),
-                }
-            ],
-        ),
         ({"address": None}, [{"field": "address", "message": "This field is mandatory and cannot be null."}]),
         ({"address": 123}, [{"field": "address", "message": "Invalid data. Expected a dictionary, but got int."}]),
         (
@@ -849,7 +830,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "notes": "",
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
-        "state": HousingCompanyState.LESS_THAN_30_YEARS.value,
         "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
@@ -873,7 +853,6 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     assert hc.property_manager == property_manager
     assert hc.business_id is None
     assert hc.street_address == "changed-street-address"
-    assert hc.state == HousingCompanyState.LESS_THAN_30_YEARS
     assert hc.acquisition_price == Decimal("10.01")
     assert hc.notes == ""
     assert response.json()["date"]
@@ -926,7 +905,6 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
         "notes": hc.notes,
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
-        "state": hc.state.value,
         "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
@@ -981,7 +959,6 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
         "notes": hc.notes,
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
-        "state": hc.state.value,
         "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
@@ -1018,7 +995,6 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
         "notes": hc.notes,
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
-        "state": hc.state.value,
         "hitas_type": HitasType.HITAS_I.value,
         "improvements": {
             "construction_price_index": [],
@@ -1088,7 +1064,7 @@ def test__api__housing_company__filter(api_client: HitasAPIClient, selected_filt
     hc: HousingCompany = HousingCompanyFactory.create(display_name="TestDisplayName")
     HousingCompanyFactory.create(official_name="TestOfficialName OY")
     HousingCompanyFactory.create(display_name="test-XX-display")
-    HousingCompanyFactory.create(state=HousingCompanyState.GREATER_THAN_30_YEARS_PLOT_DEPARTMENT_NOTIFICATION)
+    HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT)
     HousingCompanyFactory.create(street_address="test-street")
     HousingCompanyFactory.create(street_address="test-XX-street")
     HousingCompanyFactory.create(property_manager__name="TestPropertyManager")

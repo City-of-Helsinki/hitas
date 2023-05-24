@@ -21,7 +21,6 @@ from hitas.models.external_sales_data import ExternalSalesData, SaleData
 from hitas.models.housing_company import (
     HitasType,
     HousingCompany,
-    HousingCompanyState,
     HousingCompanyWithAnnotations,
     RegulationStatus,
 )
@@ -575,13 +574,11 @@ def _free_housing_companies_from_regulation(
     for housing_company in housing_companies:
         if housing_company.uuid.hex not in housing_company_uuids:
             housing_company.regulation_status = RegulationStatus.REGULATED
-            housing_company.state = HousingCompanyState.GREATER_THAN_30_YEARS_NOT_FREE
             continue
 
         housing_company.regulation_status = RegulationStatus.RELEASED_BY_HITAS
-        housing_company.state = HousingCompanyState.GREATER_THAN_30_YEARS_FREE
 
-    HousingCompany.objects.bulk_update(housing_companies, fields=["state", "regulation_status"])
+    HousingCompany.objects.bulk_update(housing_companies, fields=["regulation_status"])
 
 
 def _save_regulation_results(

@@ -15,7 +15,6 @@ from hitas.models.housing_company import (
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
     HousingCompanyMarketPriceImprovement,
-    HousingCompanyState,
 )
 from hitas.models.indices import (
     ConstructionPriceIndex,
