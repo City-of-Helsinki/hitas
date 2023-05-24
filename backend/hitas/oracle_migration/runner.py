@@ -717,19 +717,20 @@ def create_apartment_improvements(connection: Connection, converted_data: Conver
                 value=mpi_improvement["value"],
             )
 
-            # Check if improvement value should be moved to apartment.additional_work_during_construction instead
+            # Check if improvement requires special handling:
+            # - If improvement value should be moved to apartment.additional_work_during_construction instead
+            # - If improvement should be marked as having 'no_deductions'
             if (
-                # awdc Improvements have no excess
+                # Improvements have no excess
                 mpi_improvement["excess"] == "000"
-                # and is completed at almost the same time as the apartment
-                and is_date_within_one_month(new.completion_date, monthify(v.completion_date))
                 # and the improvements accepted value should not be less than the original value
                 and mpi_improvement["accepted_value"] >= mpi_improvement["value"]
             ):
                 if new.name == "Ullakkohuoneen rakentaminen":
                     # 'Attic room' improvements are not considered awdc improvements, as they require special handling
                     new.no_deductions = True
-                else:
+                # AWDC improvement must be completed at almost the same time as the apartment
+                elif is_date_within_one_month(new.completion_date, monthify(v.completion_date)):
                     mpi_awdc["improvements"].append(new)
                     mpi_awdc["date"] = mpi_improvement.calculation_date
                     continue
