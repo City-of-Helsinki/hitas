@@ -82,8 +82,10 @@ CORS_ALLOW_CREDENTIALS = True
 # https://docs.djangoproject.com/en/dev/releases/4.0/#format-change
 CSRF_TRUSTED_ORIGINS = [re.sub(r"^https?://", "", host) for host in CORS_ALLOWED_ORIGINS]
 if CSRF_TRUSTED_ORIGINS:
-    # Allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
-    CSRF_COOKIE_DOMAIN = "." + ".".join(CSRF_TRUSTED_ORIGINS[0].split(".")[1:])
+    # Don't set CSRF_COOKIE_DOMAIN if running locally
+    if CSRF_TRUSTED_ORIGINS[0].split(":")[0] not in ["localhost", "127.0.0.1"]:
+        # Allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
+        CSRF_COOKIE_DOMAIN = "." + ".".join(CSRF_TRUSTED_ORIGINS[0].split(".")[1:])
 
 # ----- Installed apps ---------------------------------------------------------------------------------
 
