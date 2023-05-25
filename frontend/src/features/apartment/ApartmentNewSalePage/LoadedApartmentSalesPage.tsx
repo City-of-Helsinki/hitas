@@ -9,11 +9,26 @@ import {useCreateSaleMutation} from "../../../app/services";
 import {NavigateBackButton, SaveButton} from "../../../common/components";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
-import {ApartmentSaleSchema, errorMessages, IApartmentDetails, IApartmentSaleForm} from "../../../common/schemas";
+import {
+    ApartmentSaleSchema,
+    errorMessages,
+    IApartmentDetails,
+    IApartmentSaleForm,
+    indexNames,
+} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
 import ApartmentCatalogPrices from "./ApartmentCatalogPrices";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
+
+export type ISalesPageMaximumPrices =
+    | {
+          maximumPrice: number;
+          debtFreePurchasePrice: number;
+          apartmentShareOfHousingCompanyLoans: number;
+          index: (typeof indexNames)[number] | "";
+      }
+    | undefined;
 
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
     const navigate = useNavigate();
@@ -24,15 +39,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         apartment.prices.catalog_share_of_housing_company_loans !== null &&
         apartment.prices.catalog_acquisition_price !== null;
 
-    const [maximumPrices, setMaximumPrices] = useState<
-        | undefined
-        | {
-              maximumPrice: number;
-              debtFreePurchasePrice: number;
-              apartmentShareOfHousingCompanyLoans: number;
-              index: string;
-          }
-    >(
+    const [maximumPrices, setMaximumPrices] = useState<ISalesPageMaximumPrices>(
         isApartmentFirstSale && hasValidCatalogPrices
             ? {
                   maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
@@ -231,9 +238,10 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             maximumPrices.apartmentShareOfHousingCompanyLoans;
 
     // Disable the saving button when the form has errors or when there is no valid calculation
-    const isSavingDisabled = isApartmentFirstSale
-        ? !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success
-        : maximumPrices === undefined || !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
+    let isSavingDisabled = !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
+    if (!isApartmentFirstSale) {
+        isSavingDisabled = isSavingDisabled || maximumPrices === undefined;
+    }
 
     // Disable all fields not related to creating a calculation when it's missing (Does not apply for first sales)
     const isMaximumPriceCalculationMissing = !isApartmentFirstSale && maximumPrices === undefined;

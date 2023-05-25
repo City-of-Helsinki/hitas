@@ -2,17 +2,31 @@ import {Dialog, Fieldset} from "hds-react";
 import {useEffect, useState} from "react";
 import {useGetApartmentMaximumPriceQuery, useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
-import {ApartmentSaleFormSchema, IApartmentMaximumPrice} from "../../../common/schemas";
+import {
+    ApartmentSaleFormSchema,
+    IApartmentConfirmedMaximumPrice,
+    IApartmentDetails,
+    IApartmentMaximumPrice,
+} from "../../../common/schemas";
 import {formatDate, hdsToast} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
+import {ISalesPageMaximumPrices} from "./LoadedApartmentSalesPage";
 import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
 import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 import MaximumPriceModalError from "./MaximumPriceModalError";
 
-const MaximumPriceCalculationFieldSet = ({apartment, setMaximumPrices, saleForm}) => {
+const MaximumPriceCalculationFieldSet = ({
+    apartment,
+    setMaximumPrices,
+    saleForm,
+}: {
+    apartment: IApartmentDetails;
+    setMaximumPrices: (maximumPrices: ISalesPageMaximumPrices) => void;
+    saleForm;
+}) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
-    const apartmentHasValidCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
+    const hasApartmentConfirmedCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
 
     const {
         data: maximumPriceCalculationData,
@@ -102,12 +116,14 @@ const MaximumPriceCalculationFieldSet = ({apartment, setMaximumPrices, saleForm}
     return (
         <Fieldset
             heading={`Enimmäishintalaskelma${
-                apartmentHasValidCalculation
-                    ? ` (vahvistettu ${formatDate(apartment.prices.maximum_prices.confirmed.confirmed_at)})`
+                hasApartmentConfirmedCalculation
+                    ? ` (vahvistettu ${formatDate(
+                          (apartment.prices.maximum_prices.confirmed as IApartmentConfirmedMaximumPrice).confirmed_at
+                      )})`
                     : ""
             } *`}
         >
-            {apartmentHasValidCalculation ? (
+            {hasApartmentConfirmedCalculation ? (
                 <QueryStateHandler
                     data={maximumPriceCalculationData}
                     error={maximumPriceError}
