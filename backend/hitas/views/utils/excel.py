@@ -68,7 +68,7 @@ class RowPostValidator(Protocol):
         """Validator function"""
 
 
-def parse_sheet(
+def parse_sheet(  # NOSONAR
     worksheet: Worksheet,
     *,
     row_data_key: str,

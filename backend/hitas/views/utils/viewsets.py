@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.db import models
 from django.http import Http404
 from rest_framework import serializers, viewsets
@@ -8,14 +10,14 @@ from hitas.views.utils import HitasPagination
 
 
 class HitasModelMixin:
-    serializer_class: type[serializers.Serializer] = None
-    list_serializer_class: type[serializers.Serializer] = None
-    detail_serializer_class: type[serializers.Serializer] = None
-    create_serializer_class: type[serializers.Serializer] = None
-    update_serializer_class: type[serializers.Serializer] = None
-    partial_update_serializer_class: type[serializers.Serializer] = None
+    serializer_class: Optional[type[serializers.Serializer]] = None
+    list_serializer_class: Optional[type[serializers.Serializer]] = None
+    detail_serializer_class: Optional[type[serializers.Serializer]] = None
+    create_serializer_class: Optional[type[serializers.Serializer]] = None
+    update_serializer_class: Optional[type[serializers.Serializer]] = None
+    partial_update_serializer_class: Optional[type[serializers.Serializer]] = None
 
-    model_class: type[models.Model] = None
+    model_class: Optional[type[models.Model]] = None
     lookup_field = "uuid"
     pagination_class = HitasPagination
 
@@ -77,9 +79,8 @@ class HitasModelMixin:
         if self.action == "create" and self.create_serializer_class is not None:
             return self.create_serializer_class
 
-        if self.action == "update":
-            if self.update_serializer_class is not None:
-                return self.update_serializer_class
+        if self.action == "update" and self.update_serializer_class is not None:
+            return self.update_serializer_class
 
         if self.action == "partial_update":
             if self.partial_update_serializer_class is not None:
