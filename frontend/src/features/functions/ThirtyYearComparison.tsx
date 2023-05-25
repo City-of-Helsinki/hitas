@@ -2,7 +2,7 @@ import {Button, Tooltip} from "hds-react";
 import {useForm} from "react-hook-form";
 import {hitasQuarters} from "../../common/schemas";
 
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
     downloadRegulationResults,
     useCreateThirtyYearComparisonMutation,
@@ -11,20 +11,18 @@ import {
     useSaveExternalSalesDataMutation,
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler, SaveButton, SaveDialogModal} from "../../common/components";
-import {FileInput, Select} from "../../common/components/form";
+import {FileInput, Select, ToggleInput} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
 import {ComparisonErrorModal, LoadedThirtyYearComparison} from "./components";
 import {comparisonResponses, priceCeilings} from "./simulatedResponses";
 
 const ThirtyYearComparison = () => {
-    const [isTestMode, setIsTestMode] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const years = [
         {label: "2023", value: "2023"},
         {label: "2022", value: "2022"},
         {label: "2021", value: "2021"},
-        {label: "Testaus", value: "TEST"}, // TODO: remove this after testing/before release
     ];
     const testOptions = [
         {label: "Onnistunut vertailu", value: "result_noProblems"},
@@ -40,7 +38,13 @@ const ThirtyYearComparison = () => {
 
     // React hook form
     const formObject = useForm({
-        defaultValues: {year: years[0], quarter: {label: "1.2. - 30.4.", value: "02-01"}, file: undefined},
+        defaultValues: {
+            year: years[0],
+            quarter: {label: "1.2. - 30.4.", value: "02-01"},
+            file: undefined,
+            test: false,
+            testSelect: testOptions[0],
+        },
         mode: "all",
     });
     const {watch, handleSubmit} = formObject;
@@ -48,12 +52,14 @@ const ThirtyYearComparison = () => {
     const formYear: {label: string; value: string} = watch("year");
     const formDate = `${formYear.value}-${formTimePeriod.value}`;
     const formFile: File | undefined = watch("file");
+    const isTestMode: boolean = watch("test");
+    const testSelection: {label: string; value: string} | null = watch("testSelect");
 
     // Populate the time quarter select with options, if current year is selected in the year selector
     const hitasQuarterOptions: {label: string; value: string}[] = [];
     const currentTime = new Date();
     // If the current year is not selected, add all quarters to the time period select options...
-    if (currentTime.getFullYear().toString() !== formYear.value && !isNaN(Number(formYear.label))) {
+    if (currentTime.getFullYear().toString() !== formYear.value) {
         hitasQuarters.forEach((quarter) => hitasQuarterOptions.push({value: quarter.value, label: quarter.label}));
     } else {
         // ...otherwise add only the quarters that have passed
@@ -90,21 +96,22 @@ const ThirtyYearComparison = () => {
         useCreateThirtyYearComparisonMutation();
     const hasComparison = !isGetComparisonLoading && !getComparisonError && !!getComparisonData;
     const hasTimePeriodFile = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
-    const isValidTestMode = isTestMode && isNaN(Number(formTimePeriod.value.charAt(0)));
 
     // Simulated comparison API responses
     const priceCeiling = priceCeilings[formYear.value][formTimePeriod.value];
     let comparisonData: object | undefined = getComparisonData ?? makeComparisonData;
-    const isComparisonLoading = isValidTestMode ? false : isGetComparisonLoading ?? isMakeComparisonLoading;
+    const isComparisonLoading = isTestMode ? false : isGetComparisonLoading ?? isMakeComparisonLoading;
     let comparisonError = getComparisonError ?? makeComparisonError;
     // If test mode is on, use the selected test option to simulate a response or error
     if (isTestMode) {
-        if (formTimePeriod.value.split("_")[0] === "result") {
+        if (testSelection?.value.split("_")[0] === "result") {
+            console.log("show non-error result");
             comparisonData = comparisonResponses[formTimePeriod.value];
             comparisonError = undefined;
         } else {
             comparisonData = undefined;
             comparisonError = comparisonResponses[formTimePeriod.value];
+            setIsErrorModalOpen(() => true);
         }
     }
 
@@ -124,24 +131,24 @@ const ThirtyYearComparison = () => {
             });
         }
         if (isTestMode && !data.skipped) {
-            if (formTimePeriod.value.split("_")[0] === "result") {
-                comparisonData = comparisonResponses[formTimePeriod.value];
+            if (testSelection?.value.split("_")[0] === "result") {
+                comparisonData = comparisonResponses[testSelection?.value];
                 comparisonError = {};
             } else {
                 comparisonData = {};
-                comparisonError = comparisonResponses[formTimePeriod.value];
+                comparisonError = comparisonResponses[testSelection?.value];
             }
-            if (formTimePeriod.value.split("_")[0] === "error") setIsErrorModalOpen(true);
+            if (testSelection?.value.split("_")[0] === "error") setIsErrorModalOpen(true);
         } else
             makeComparison({
                 data: {
-                    calculationDate: isNaN(Number(formDate.substring(0, 1))) ? "2023-05-01" : formDate,
+                    calculationDate: formDate,
                     replacementPostalCodes: skippedArray,
                 },
             })
                 .unwrap()
                 .then((data) => {
-                    hdsToast.success("Vertailu suoritettu onnistuneesti!");
+                    hdsToast.success("Vertailu suoritettu  onnistuneesti!");
                 })
                 .catch((error) => {
                     console.warn("Error:", error);
@@ -155,42 +162,23 @@ const ThirtyYearComparison = () => {
             data: data.file,
             calculation_date: formDate,
         };
-        if (isTestMode) {
-            console.log("onSubmit event, with data.file:", data.file, "formFile:", formFile);
-            return;
-        } else
-            saveExternalSalesData(fileWithDate)
-                .unwrap()
-                .catch((error) => {
-                    console.warn("Caught error:", error);
+        saveExternalSalesData(fileWithDate)
+            .unwrap()
+            .catch((error) => {
+                console.warn("Caught error:", error);
+                setIsSaveModalOpen(true);
+            })
+            .then((data) => {
+                if ("error" in (data as object)) {
+                    console.warn("Uncaught error:", data.error);
                     setIsSaveModalOpen(true);
-                })
-                .then((data) => {
-                    if ("error" in (data as object)) {
-                        console.warn("Uncaught error:", data.error);
-                        setIsSaveModalOpen(true);
-                    } else {
-                        // Successful upload
-                        hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
-                        formObject.setValue("file", undefined, {shouldValidate: true});
-                    }
-                });
+                } else {
+                    // Successful upload
+                    hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
+                    formObject.setValue("file", undefined, {shouldValidate: true});
+                }
+            });
     };
-
-    // *************
-    // * Test mode *
-    // *************
-    useEffect(() => {
-        if (formYear.value === "TEST") {
-            setIsTestMode((prev) => true);
-            // set the value to the first test option if there is a date selected
-            if (!isNaN(Number(formTimePeriod.value.charAt(0))))
-                formObject.setValue("quarter", testOptions[0], {shouldValidate: true});
-        } else if (isTestMode) {
-            formObject.setValue("quarter", hitasQuarters[0], {shouldValidate: true});
-            setIsTestMode((prev) => false);
-        }
-    }, [formDate]);
 
     return (
         <div className="view--functions__thirty-year-regulation">
@@ -232,8 +220,7 @@ const ThirtyYearComparison = () => {
                     <div className="price-ceiling">
                         <label>
                             Rajaneliöhinta
-                            {!isTestMode &&
-                                ` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
+                            {` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
                         </label>
                         <div className="value">{priceCeiling ?? "---"} €/m²</div>
                         {hasComparison && (
@@ -246,53 +233,67 @@ const ThirtyYearComparison = () => {
                         )}
                     </div>
                 </form>
-                {!isTestMode && (
-                    <>
-                        <Divider size="l" />
-                        {!hasTimePeriodFile ? (
-                            <form
-                                className={`file${formFile === undefined ? "" : " file--selected"}`}
-                                onSubmit={handleSubmit(onSubmit)}
-                            >
-                                <FileInput
-                                    name="file"
-                                    id="file-input"
-                                    buttonLabel="Valitse tiedosto"
-                                    formObject={formObject}
-                                    label="Syötä postinumeroalueiden keskineliöhinnat"
-                                    tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
-                                />
-                                <SaveButton
-                                    type="submit"
-                                    isLoading={isExternalSalesDataSaving}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        return;
-                                    }}
-                                    disabled={formFile === undefined}
-                                    buttonText="Tallenna keskineliöhinnat"
-                                />
-                            </form>
-                        ) : (
-                            <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
-                        )}
-                    </>
+                <Divider size="l" />
+                {!hasTimePeriodFile ? (
+                    <form
+                        className={`file${formFile === undefined ? "" : " file--selected"}`}
+                        onSubmit={handleSubmit(onSubmit)}
+                    >
+                        <FileInput
+                            name="file"
+                            id="file-input"
+                            buttonLabel="Valitse tiedosto"
+                            formObject={formObject}
+                            label="Syötä postinumeroalueiden keskineliöhinnat"
+                            tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
+                        />
+                        <SaveButton
+                            type="submit"
+                            isLoading={isExternalSalesDataSaving}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                return;
+                            }}
+                            disabled={formFile === undefined}
+                            buttonText="Tallenna keskineliöhinnat"
+                        />
+                    </form>
+                ) : (
+                    <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
                 )}
             </div>
-            <QueryStateHandler
-                data={comparisonData}
-                error={comparisonData ? undefined : comparisonError}
-                isLoading={isComparisonLoading}
-                attemptedAction="hae suoritetun vertailun tulokset"
-            >
-                <LoadedThirtyYearComparison
+            {hasTimePeriodFile && hasComparison && (
+                <QueryStateHandler
                     data={comparisonData}
-                    calculationDate={formDate}
-                    reCalculateFn={onCompareButtonClick}
-                />
-            </QueryStateHandler>
+                    error={comparisonData ? undefined : comparisonError}
+                    isLoading={isComparisonLoading}
+                    attemptedAction="hae suoritetun vertailun tulokset"
+                >
+                    <LoadedThirtyYearComparison
+                        data={comparisonData}
+                        calculationDate={formDate}
+                        reCalculateFn={onCompareButtonClick}
+                    />
+                </QueryStateHandler>
+            )}
             {!hasComparison && !(comparisonData as {skipped: object[]})?.skipped && (
-                <div className="row row--buttons">
+                <div className="row row--buttons test-toggle">
+                    <ToggleInput
+                        name="test"
+                        label="Testitila"
+                        formObject={formObject}
+                    />
+                    {isTestMode && (
+                        <Select
+                            label="Vertailun lopputulos (simuloitu)"
+                            tooltipText="Valitse lopputulos jota haluat testata. Huom! Testitilan ollessa päällä, todellista vertailua ei suoriteta."
+                            options={testOptions}
+                            name="testSelect"
+                            formObject={formObject}
+                            className="test-select"
+                            defaultValue={testOptions[0]}
+                        />
+                    )}
                     <Button
                         theme="black"
                         onClick={onCompareButtonClick}

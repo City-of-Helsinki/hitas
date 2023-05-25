@@ -72,6 +72,7 @@
     .regulation
       background: $color-black-10
       .actions
+        position: relative
         display: grid
         grid-template-columns: 1fr 1fr
         gap: $spacing-l
@@ -109,6 +110,17 @@
             font-size: $fontsize-heading-l
           button
             margin: $spacing-xs
+        .test-toggle
+          @include flexbox()
+          position: absolute
+          top: -80px
+          right: 0
+          [class^="Select-module_root"]
+            width: 450px
+            margin-right: 20px
+            margin-top: -15px
+          label
+            margin-right: 20px
       .file
         position: relative
         grid-row: 2
@@ -245,3 +257,11 @@
         --spinner-thickness: 1rem
         --spinner-color: $color-engel
         color: $color-engel
+    .test-toggle
+      height: 70px
+      label
+        margin-right: 20px
+      .input-field
+        height: auto
+    .test-select
+      width: 500px
