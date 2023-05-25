@@ -1,8 +1,10 @@
+import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Container, Footer, IconSignout, Navigation} from "hds-react";
 import {useEffect, useState} from "react";
 import {Link, Outlet} from "react-router-dom";
 import Notifications from "../common/components/Notifications";
 import Spinner from "../common/components/Spinner";
+import {hitasToast} from "../common/utils";
 import "../styles/index.sass";
 import {selectIsAuthenticated, selectIsAuthenticating, setIsAuthenticated} from "./authSlice";
 import {useAppDispatch, useAppSelector} from "./hooks";
@@ -12,7 +14,11 @@ import useAuthentication from "./useAuthentication";
 const App = (): JSX.Element => {
     // Authentication
     const token = process.env.REACT_APP_AUTH_TOKEN;
-    const {data: userInfoData, isLoading: isUserInfoLoading} = useGetUserInfoQuery(null, {skip: !!token});
+    const {
+        currentData: userInfoData,
+        isFetching: isUserInfoLoading,
+        error: userInfoError,
+    } = useGetUserInfoQuery(null, {skip: !!token});
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isAuthenticating = useAppSelector(selectIsAuthenticating);
     const {signIn, logOut} = useAuthentication();
@@ -37,9 +43,15 @@ const App = (): JSX.Element => {
             } else {
                 // Set the user as unauthenticated if user info data fetch was not successful
                 dispatch(setIsAuthenticated(false));
+
+                // Error 401 is returned when the user is not authenticated
+                // Error 403 is returned when the user is authenticated but does not have access
+                if ((userInfoError as FetchBaseQueryError | undefined)?.status === 403) {
+                    hitasToast("Kirjautuminen onnistui, mutta sinulla on puutteelliset oikeudet!", "error");
+                }
             }
         }
-    }, [userInfoData, isUserInfoLoading, dispatch, token]);
+    }, [userInfoData, userInfoError, dispatch, token]);
 
     // Layout
     return (
