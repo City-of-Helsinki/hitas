@@ -743,6 +743,21 @@ files = [
 ]
 
 [[package]]
+name = "django-post-fetch-hook"
+version = "0.0.1"
+description = "Modify data fetched from a database after it has been fetched but before it has been cached in django's result cache."
+category = "main"
+optional = false
+python-versions = ">=3.9,<4"
+files = [
+    {file = "django_post_fetch_hook-0.0.1-py3-none-any.whl", hash = "sha256:7959358cbcf5432f962dcabc5a99d5c8e5234567eaffe5e4e5d7db8f34156e36"},
+    {file = "django_post_fetch_hook-0.0.1.tar.gz", hash = "sha256:73e9db90abeb5211887b910db177ff84b2452d6e1b5f36c94c71d93873fcc43d"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "django-safedelete"
 version = "1.3.2"
 description = "Mask your objects instead of deleting them from your database."
@@ -3166,4 +3181,4 @@ svglib = ">=1.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "beb9f3a1243f758abd97ad71d713c25013b4b76aafaaaa3837f11a38872ab53c"
+content-hash = "20b46e15269f34f393a0897be63caa97abf3fb3e5019db81251212f52bd129e4"

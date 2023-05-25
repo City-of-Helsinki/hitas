@@ -31,6 +31,7 @@ sentry-sdk = "^1.13.0"
 tomli = "^2.0.1"
 openpyxl = "^3.0.10"
 django-auditlog = "^2.2.2"
+django-post-fetch-hook = "0.0.1"
 
 [tool.poetry.dependencies.uWSGI]
 version = "^2.0.20"

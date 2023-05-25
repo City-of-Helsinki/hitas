@@ -38,40 +38,46 @@ class Owner(ExternalSafeDeleteHitasModel):
         super().save(*args, **kwargs)
 
     @classmethod
-    def post_fetch_hook(cls, results, fields):
-        for i, owner in enumerate(results):
-            # qs.values(...)
-            if isinstance(owner, dict):
-                # If non_disclosure is not given, we assume the owner needs to be obfuscated
-                if "non_disclosure" not in owner or owner["non_disclosure"] is True:
-                    for field in cls.obfuscation_rules:
-                        if field in owner:
-                            owner[field] = None
+    def post_fetch_hook(cls, model: "Owner") -> "Owner":
+        obfuscate(model)
+        return model
 
-            # qs.values_list(...)
-            elif isinstance(owner, tuple):
-                # Fields that were accessed
-                index_nd = index_of(fields, "non_disclosure")
+    @classmethod
+    def post_fetch_values_hook(cls, values: dict[str, Any], fields: tuple[str, ...]) -> dict[str, Any]:
+        if "non_disclosure" not in values:
+            raise RuntimeError(
+                f"Due to owner obfuscation, 'non_disclosure' field should always be included "
+                f"when fetching owners. Field not found in fields: {fields}"
+            )
+        # If non_disclosure is not given, we assume the owner needs to be obfuscated
+        if values["non_disclosure"] is True:
+            for field, value in cls.obfuscation_rules.items():
+                if field in values:
+                    values[field] = value
+        return values
 
-                # If non_disclosure is not given, we assume the owner needs to be obfuscated
-                if index_nd is None or owner[index_nd] is True:
-                    for field in cls.obfuscation_rules:
-                        field_index = index_of(fields, field)
-                        if field_index is not None:
-                            results[i] = (*owner[:field_index], None, *owner[field_index + 1 :])
+    @classmethod
+    def post_fetch_values_list_hook(cls, values: tuple[Any, ...], fields: tuple[str, ...]) -> tuple[Any, ...]:
+        index_nd = index_of(fields, "non_disclosure")
+        if index_nd is None:
+            raise RuntimeError(
+                f"Due to owner obfuscation, 'non_disclosure' field should always be included "
+                f"when fetching owners. Field not found in fields: {fields}"
+            )
+        if values[index_nd] is True:
+            for field, value in cls.obfuscation_rules.items():
+                field_index = index_of(fields, field)
+                if field_index is not None:
+                    values = (*values[:field_index], value, *values[field_index + 1 :])
+        return values
 
-            # qs.get(...), qs.all(), etc.
-            elif isinstance(owner, Owner):
-                obfuscate(owner)
-
-            # qs.values_list(..., flat=True)
-            else:
-                # We cannot know if the owner should be obfuscated or not, so we assume it should be.
-                # This should probably not be used, but it's here just in case.
-                if fields[0] in cls.obfuscation_rules:
-                    results[i] = None
-
-        return results
+    @classmethod
+    def post_fetch_values_list_flat_hook(cls, value: Any, field: str) -> Any:
+        raise RuntimeError(
+            "Due to owner obfuscation, 'non_disclosure' field should always be included "
+            "when fetching owners. When using .values_list(..., flat=True), this cannot be done."
+            "Please use some other way to fetch this value."
+        )
 
     class Meta:
         verbose_name = _("Owner")
