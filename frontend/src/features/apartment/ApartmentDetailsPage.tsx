@@ -25,7 +25,14 @@ import {
     IOwner,
     IOwnership,
 } from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney, hdsToast, today} from "../../common/utils";
+import {
+    formatAddress,
+    formatDate,
+    formatMoney,
+    getApartmentUnconfirmedPrices,
+    hdsToast,
+    today,
+} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
@@ -343,10 +350,7 @@ const ApartmentMaximumPricesCard = ({
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
 }) => {
-    const isPre2011 = apartment.prices.maximum_prices.unconfirmed.pre_2011 !== null;
-    const unconfirmedPrices = isPre2011
-        ? apartment.prices.maximum_prices.unconfirmed.pre_2011
-        : apartment.prices.maximum_prices.unconfirmed.onwards_2011;
+    const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
     const [isUnconfirmedMaximumPriceModalVisible, setIsUnconfirmedMaximumPriceModalVisible] = useState(false);
     const [isMaximumPriceModalVisible, setIsMaximumPriceModalVisible] = useState(false);
 

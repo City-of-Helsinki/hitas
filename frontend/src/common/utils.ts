@@ -1,7 +1,13 @@
 import toast, {ToastOptions} from "react-hot-toast";
 
 import {Config} from "../app/services";
-import {IAddress, IApartmentAddress, IOwner} from "./schemas";
+import {
+    IAddress,
+    IApartmentAddress,
+    IApartmentDetails,
+    IApartmentUnconfirmedMaximumPriceIndices,
+    IOwner,
+} from "./schemas";
 
 export function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
     /*
@@ -189,4 +195,12 @@ export const getLogOutUrl = (): string => {
     const baseUrl = new URL(window.location.href).origin;
     const callBackUrl = baseUrl + `/logout`;
     return Config.api_auth_url + "/logout?next=" + callBackUrl;
+};
+
+export const getApartmentUnconfirmedPrices = (
+    apartment: IApartmentDetails
+): IApartmentUnconfirmedMaximumPriceIndices => {
+    const isPre2011 = apartment.prices.maximum_prices.unconfirmed.pre_2011 !== null;
+    if (isPre2011) return apartment.prices.maximum_prices.unconfirmed.pre_2011;
+    else return apartment.prices.maximum_prices.unconfirmed.onwards_2011;
 };
