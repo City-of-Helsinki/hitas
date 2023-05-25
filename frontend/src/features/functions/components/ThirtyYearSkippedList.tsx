@@ -3,7 +3,7 @@ import {useFieldArray, useForm} from "react-hook-form";
 import {useGetAvailablePostalCodesQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
 import {today} from "../../../common/utils";
-import ComparisonSkippedListItem from "./ComparisonSkippedListItem";
+import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
 
 type NewPostalCodes = {
     skipped: {
@@ -13,7 +13,7 @@ type NewPostalCodes = {
     }[];
 };
 
-const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
+const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     // If in Test mode, use today's date as the calculation date
     const validCalculationDate = isNaN(Number(calculationDate.substring(0, 4))) ? today() : calculationDate;
     const {
@@ -72,7 +72,7 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                 <div className="list">
                     <ul className="results-list">
                         {Object.entries(skippedPostalCodes).map(([key, value], index) => (
-                            <ComparisonSkippedListItem
+                            <ThirtyYearSkippedListItem
                                 key={key}
                                 postalCode={key}
                                 companies={value}
@@ -97,4 +97,4 @@ const ComparisonSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     );
 };
 
-export default ComparisonSkippedList;
+export default ThirtyYearSkippedList;

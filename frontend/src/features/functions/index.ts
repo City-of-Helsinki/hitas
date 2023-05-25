@@ -1,5 +1,5 @@
 import Functions from "./Functions";
 import PriceCeilingPerSquare from "./PriceCeilingPerSquare";
-import ThirtyYearComparison from "./ThirtyYearComparison";
+import ThirtyYearRegulation from "./ThirtyYearRegulation";
 
-export {Functions, PriceCeilingPerSquare, ThirtyYearComparison};
+export {Functions, PriceCeilingPerSquare, ThirtyYearRegulation};

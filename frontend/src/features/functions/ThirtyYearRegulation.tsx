@@ -5,7 +5,7 @@ import {hitasQuarters} from "../../common/schemas";
 import {useState} from "react";
 import {
     downloadRegulationResults,
-    useCreateThirtyYearComparisonMutation,
+    useCreateThirtyYearRegulationMutation,
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
     useSaveExternalSalesDataMutation,
@@ -13,10 +13,10 @@ import {
 import {Divider, Heading, QueryStateHandler, SaveDialogModal} from "../../common/components";
 import {FileInput, Select, ToggleInput} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
-import {ComparisonErrorModal, LoadedThirtyYearComparison} from "./components";
-import {comparisonResponses, priceCeilings} from "./simulatedResponses";
+import {ThirtyYearErrorModal, ThirtyYearLoadedResults} from "./components";
+import {priceCeilings, regulationAPIResponses} from "./simulatedResponses";
 
-const ThirtyYearComparison = () => {
+const ThirtyYearRegulation = () => {
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const years = [
@@ -83,34 +83,34 @@ const ThirtyYearComparison = () => {
         {data: savedExternalSalesData, isLoading: isExternalSalesDataSaving, error: saveExternalSalesDataError},
     ] = useSaveExternalSalesDataMutation();
     const {
-        currentData: getComparisonData,
-        isFetching: isGetComparisonLoading,
-        error: getComparisonError,
+        currentData: getRegulationData,
+        isFetching: isGetRegulationLoading,
+        error: getRegulationError,
     } = useGetThirtyYearRegulationQuery(
         {
             calculationDate: formDate,
         },
         {skip: !externalSalesData || !!isExternalSalesDataLoading || !!externalSalesDataLoadError}
     );
-    const [makeComparison, {data: makeComparisonData, isLoading: isMakeComparisonLoading, error: makeComparisonError}] =
-        useCreateThirtyYearComparisonMutation();
-    const hasComparison = !isGetComparisonLoading && !getComparisonError && !!getComparisonData;
-    const hasTimePeriodFile = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
+    const [makeRegulation, {data: makeRegulationData, isLoading: isMakeRegulationLoading, error: makeRegulationError}] =
+        useCreateThirtyYearRegulationMutation();
+    const hasRegulationResults = !isGetRegulationLoading && !getRegulationError && !!getRegulationData;
+    const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
 
-    // Simulated comparison API responses
+    // Simulated API responses for the get/post thirty year regulation queries
     const priceCeiling = priceCeilings[formYear.value][formTimePeriod.value];
-    let comparisonData: object | undefined = getComparisonData ?? makeComparisonData;
-    const isComparisonLoading = isTestMode ? false : isGetComparisonLoading ?? isMakeComparisonLoading;
-    let comparisonError = getComparisonError ?? makeComparisonError;
+    let regulationData: object | undefined = getRegulationData ?? makeRegulationData;
+    const isRegulationLoading = isTestMode ? false : isGetRegulationLoading ?? isMakeRegulationLoading;
+    let regulationError = getRegulationError ?? makeRegulationError;
     // If test mode is on, use the selected test option to simulate a response or error
     if (isTestMode) {
         if (testSelection?.value.split("_")[0] === "result") {
             console.log("show non-error result");
-            comparisonData = comparisonResponses[formTimePeriod.value];
-            comparisonError = undefined;
+            regulationData = regulationAPIResponses[formTimePeriod.value];
+            regulationError = undefined;
         } else {
-            comparisonData = undefined;
-            comparisonError = comparisonResponses[formTimePeriod.value];
+            regulationData = undefined;
+            regulationError = regulationAPIResponses[formTimePeriod.value];
             setIsErrorModalOpen(() => true);
         }
     }
@@ -132,15 +132,15 @@ const ThirtyYearComparison = () => {
         }
         if (isTestMode && !data.skipped) {
             if (testSelection?.value.split("_")[0] === "result") {
-                comparisonData = comparisonResponses[testSelection?.value];
-                comparisonError = {};
+                regulationData = regulationAPIResponses[testSelection?.value];
+                regulationError = {};
             } else {
-                comparisonData = {};
-                comparisonError = comparisonResponses[testSelection?.value];
+                regulationData = {};
+                regulationError = regulationAPIResponses[testSelection?.value];
             }
             if (testSelection?.value.split("_")[0] === "error") setIsErrorModalOpen(true);
         } else
-            makeComparison({
+            makeRegulation({
                 data: {
                     calculationDate: formDate,
                     replacementPostalCodes: skippedArray,
@@ -223,7 +223,7 @@ const ThirtyYearComparison = () => {
                             {` (${formObject.getValues("quarter").label}${formObject.getValues("year").label})`}
                         </label>
                         <div className="value">{priceCeiling ?? "---"} €/m²</div>
-                        {hasComparison && (
+                        {hasRegulationResults && (
                             <Button
                                 theme="black"
                                 onClick={() => downloadRegulationResults(formDate)}
@@ -234,7 +234,7 @@ const ThirtyYearComparison = () => {
                     </div>
                 </form>
                 <Divider size="l" />
-                {!hasTimePeriodFile ? (
+                {!hasExternalSalesData ? (
                     <form
                         className={`file${formFile === undefined ? "" : " file--selected"}`}
                         onSubmit={handleSubmit(onSubmit)}
@@ -253,21 +253,21 @@ const ThirtyYearComparison = () => {
                     <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
                 )}
             </div>
-            {hasTimePeriodFile && hasComparison && (
+            {hasExternalSalesData && hasRegulationResults && (
                 <QueryStateHandler
-                    data={comparisonData}
-                    error={comparisonData ? undefined : comparisonError}
-                    isLoading={isComparisonLoading}
+                    data={regulationData}
+                    error={regulationData ? undefined : regulationError}
+                    isLoading={isRegulationLoading}
                     attemptedAction="hae suoritetun vertailun tulokset"
                 >
-                    <LoadedThirtyYearComparison
-                        data={comparisonData}
+                    <ThirtyYearLoadedResults
+                        data={regulationData}
                         calculationDate={formDate}
                         reCalculateFn={onCompareButtonClick}
                     />
                 </QueryStateHandler>
             )}
-            {!hasComparison && !(comparisonData as {skipped: object[]})?.skipped && (
+            {!hasRegulationResults && !(regulationData as {skipped: object[]})?.skipped && (
                 <div className="row row--buttons test-toggle">
                     <ToggleInput
                         name="test"
@@ -289,7 +289,7 @@ const ThirtyYearComparison = () => {
                         theme="black"
                         onClick={onCompareButtonClick}
                         type="submit"
-                        disabled={(!priceCeiling || !hasTimePeriodFile) && !isTestMode}
+                        disabled={(!priceCeiling || !hasExternalSalesData) && !isTestMode}
                     >
                         Aloita vertailu
                     </Button>
@@ -303,13 +303,13 @@ const ThirtyYearComparison = () => {
                 isVisible={isSaveModalOpen}
                 setIsVisible={setIsSaveModalOpen}
             />
-            <ComparisonErrorModal
+            <ThirtyYearErrorModal
                 isOpen={isErrorModalOpen}
                 setIsOpen={setIsErrorModalOpen}
-                response={comparisonError}
+                response={regulationError}
             />
         </div>
     );
 };
 
-export default ThirtyYearComparison;
+export default ThirtyYearRegulation;

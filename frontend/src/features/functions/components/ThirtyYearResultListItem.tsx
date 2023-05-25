@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import {downloadCompanyRegulationLetter} from "../../../app/services";
 import {formatDate} from "../../../common/utils";
 
-const ComparisonResultListItem = ({company}) => {
+const ThirtyYearResultListItem = ({company}) => {
     const [isClicked, setIsClicked] = useState(company.letter_fetched);
     const handleClick = () => {
         downloadCompanyRegulationLetter(company);
@@ -34,4 +34,4 @@ const ComparisonResultListItem = ({company}) => {
     );
 };
 
-export default ComparisonResultListItem;
+export default ThirtyYearResultListItem;

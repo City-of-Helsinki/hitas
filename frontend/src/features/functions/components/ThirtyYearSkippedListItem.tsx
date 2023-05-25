@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom";
 import {Select} from "../../../common/components/form";
 
-export default function ComparisonSkippedListItem({
+export default function ThirtyYearSkippedListItem({
     postalCode,
     companies,
     postalCodeOptionSet,

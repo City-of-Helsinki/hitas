@@ -1,9 +1,9 @@
 import {Dialog} from "hds-react";
 import {useState} from "react";
 import {CloseButton, Heading} from "../../../common/components";
-import {ComparisonResultListItem, ComparisonSkippedList} from "./";
+import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./";
 
-const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX.Element => {
+const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.Element => {
     const automaticallyReleased = data?.automatically_released ?? [];
     const releasedFromRegulation = data?.released_from_regulation ?? [];
     const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];
@@ -30,7 +30,7 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
                     {category === "freed" ? (
                         <>
                             {releasedCompanies.map((item, idx) => (
-                                <ComparisonResultListItem
+                                <ThirtyYearResultListItem
                                     company={item}
                                     key={idx}
                                 />
@@ -39,7 +39,7 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
                     ) : (
                         <>
                             {stayingCompanies.map((item, idx) => (
-                                <ComparisonResultListItem
+                                <ThirtyYearResultListItem
                                     company={item}
                                     key={idx}
                                 />
@@ -53,7 +53,7 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
 
     if (skippedCompanies.length > 0)
         return (
-            <ComparisonSkippedList
+            <ThirtyYearSkippedList
                 companies={skippedCompanies}
                 calculationDate={calculationDate}
                 reCalculateFn={reCalculateFn}
@@ -114,4 +114,4 @@ const LoadedThirtyYearComparison = ({data, calculationDate, reCalculateFn}): JSX
         );
 };
 
-export default LoadedThirtyYearComparison;
+export default ThirtyYearLoadedResults;
