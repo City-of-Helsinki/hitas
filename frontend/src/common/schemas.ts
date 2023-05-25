@@ -414,7 +414,7 @@ const ApartmentConfirmedMaximumPriceSchema = object({
     created_at: string(),
     maximum_price: number(),
     valid: object({is_valid: boolean(), valid_until: string()}),
-}).nullable();
+});
 
 const ApartmentPricesSchema = object({
     first_sale_purchase_price: number().nullable(), // Read only
@@ -437,7 +437,7 @@ const ApartmentPricesSchema = object({
     }),
     maximum_prices: object({
         // Read only
-        confirmed: ApartmentConfirmedMaximumPriceSchema,
+        confirmed: ApartmentConfirmedMaximumPriceSchema.nullable(),
         unconfirmed: object({
             onwards_2011: ApartmentUnconfirmedMaximumPriceIndicesSchema,
             pre_2011: ApartmentUnconfirmedMaximumPriceIndicesSchema,

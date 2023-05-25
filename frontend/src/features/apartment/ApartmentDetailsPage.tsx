@@ -170,7 +170,7 @@ const UnconfirmedPriceRow = ({label, unconfirmedPrice}: UnconfirmedPriceRowProps
     );
 };
 
-const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaximumPrice}) => {
+const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaximumPrice | null}) => {
     if (confirmed === null) return <p className="confirmed-price">-</p>;
     return (
         <>
