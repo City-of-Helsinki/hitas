@@ -169,17 +169,23 @@
         background-color: white
         padding: $spacing-m
       .list-headers
-        width: 75%
+        width: 50%
       .results-list__item
         cursor: inherit
         padding: 0
+        @include align-items(center)
         a
-          width: 80%
           padding: $spacing-m
           @include flexbox()
+          @include flex-flow(column nowrap)
           @include justify-content(space-between)
+          &:hover
+            text-decoration: underline
+        .buttons
+          width: 45%
+          padding: $spacing-m
         .download-button
-          margin: $spacing-m
+          margin-left: $spacing-m
         form
           @include flexbox()
           @include justify-content(space-between)
@@ -190,6 +196,9 @@
             height: auto
           [class^="Select-module_wrapper"]
             height: 56px
+        &:hover
+          background-color: inherit
+          cursor: inherit
       &--skipped
         background-color: $color-error-light
         .heading--body
