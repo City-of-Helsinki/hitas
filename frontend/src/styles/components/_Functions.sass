@@ -129,44 +129,34 @@
         flex-flow: column nowrap
         .input-field--file
           position: relative
-        button[type="submit"]
-          display: none
-        &--selected
-          [class*="FileInput-module_fileInputContainer"]
-            display: none
-          button[type="submit"]
-            display: flex
-            margin: auto
+          @include flexbox()
+          @include flex-flow(column nowrap)
+          gap: $spacing-l
+          button
+            width: 200px
+            height: 56px
+          section
+            transform: translate(40px) !important
         label
-          width: 100%
+          width: calc(50% - 25px)
           margin-bottom: $spacing-s
-        #file-input-list
-          width: 50%
-          position: absolute
-          top: 0
-          right: 0
-          margin: 0
+        [class^="Tooltip-module_root"]
+          width: 80%
+          position: relative
+          top: -35px
         [class^="TextInput-module_root"]
-          display: grid
-          grid-template-columns: auto 1fr auto
-          grid-template-rows: auto auto
+          @include flexbox()
+          @include align-items(center)
+          @include justify-content(space-between)
         [class^="FileInput-module_fileInputWrapper"]
           width: 100%
           margin-top: 0
         [class*="FieldLabel-module_tooltipButton"]
-          left: 360px
           right: auto
-        button[type="submit"]
-          margin: $spacing-xl 0 0 auto
         #file-input-info,
-        #file-input-success
+        #file-input-success,
+          #file-input-list
           display: none
-        .buttons
-          @include flexbox()
-          @include justify-content(flex-end)
-          gap: $spacing-m
-          grid-column: 2
-          grid-row: 2
       .external-sales-data-exists
         grid-row: 2
         color: $color-black-50

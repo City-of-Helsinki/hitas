@@ -10,7 +10,7 @@ import {
     useGetThirtyYearRegulationQuery,
     useSaveExternalSalesDataMutation,
 } from "../../app/services";
-import {Divider, Heading, QueryStateHandler, SaveButton, SaveDialogModal} from "../../common/components";
+import {Divider, Heading, QueryStateHandler, SaveDialogModal} from "../../common/components";
 import {FileInput, Select, ToggleInput} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
 import {ComparisonErrorModal, LoadedThirtyYearComparison} from "./components";
@@ -164,10 +164,6 @@ const ThirtyYearComparison = () => {
         };
         saveExternalSalesData(fileWithDate)
             .unwrap()
-            .catch((error) => {
-                console.warn("Caught error:", error);
-                setIsSaveModalOpen(true);
-            })
             .then((data) => {
                 if ("error" in (data as object)) {
                     console.warn("Uncaught error:", data.error);
@@ -177,6 +173,10 @@ const ThirtyYearComparison = () => {
                     hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
                     formObject.setValue("file", undefined, {shouldValidate: true});
                 }
+            })
+            .catch((error) => {
+                console.warn("Caught error:", error);
+                setIsSaveModalOpen(true);
             });
     };
 
@@ -246,16 +246,7 @@ const ThirtyYearComparison = () => {
                             formObject={formObject}
                             label="Syötä postinumeroalueiden keskineliöhinnat"
                             tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
-                        />
-                        <SaveButton
-                            type="submit"
-                            isLoading={isExternalSalesDataSaving}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                return;
-                            }}
-                            disabled={formFile === undefined}
-                            buttonText="Tallenna keskineliöhinnat"
+                            onChange={() => onSubmit(formObject.getValues())}
                         />
                     </form>
                 ) : (
