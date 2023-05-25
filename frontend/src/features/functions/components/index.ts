@@ -1,13 +1,13 @@
-import ComparisonErrorModal from "./ComparisonErrorModal";
-import ComparisonResultListItem from "./ComparisonResultListItem";
-import ComparisonSkippedList from "./ComparisonSkippedList";
-import ComparisonSkippedListItem from "./ComparisonSkippedListItem";
-import LoadedThirtyYearComparison from "./LoadedThirtyYearResults";
+import ThirtyYearErrorModal from "./ThirtyYearErrorModal";
+import ThirtyYearLoadedResults from "./ThirtyYearLoadedResults";
+import ThirtyYearResultListItem from "./ThirtyYearResultListItem";
+import ThirtyYearSkippedList from "./ThirtyYearSkippedList";
+import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
 
 export {
-    ComparisonResultListItem,
-    ComparisonErrorModal,
-    ComparisonSkippedList,
-    ComparisonSkippedListItem,
-    LoadedThirtyYearComparison,
+    ThirtyYearResultListItem,
+    ThirtyYearErrorModal,
+    ThirtyYearSkippedList,
+    ThirtyYearSkippedListItem,
+    ThirtyYearLoadedResults,
 };

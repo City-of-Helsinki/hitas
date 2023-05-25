@@ -1,4 +1,4 @@
-const comparisonResponses = {
+const regulationAPIResponses = {
     result_noProblems: {
         automatically_released: [
             {
@@ -383,4 +383,4 @@ const priceCeilings = {
     },
 };
 
-export {comparisonResponses, fileImportResponses, priceCeilings};
+export {regulationAPIResponses, fileImportResponses, priceCeilings};

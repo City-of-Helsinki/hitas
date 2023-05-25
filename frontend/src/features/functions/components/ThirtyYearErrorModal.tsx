@@ -9,7 +9,7 @@ interface ComparisonResultModalProps {
     response: ErrorResponse | object | undefined;
 }
 
-export default function ComparisonErrorModal({isOpen, setIsOpen, response}: ComparisonResultModalProps) {
+export default function ThirtyYearErrorModal({isOpen, setIsOpen, response}: ComparisonResultModalProps) {
     if (!response) return <></>;
     const error = response as ErrorResponse;
     return (
