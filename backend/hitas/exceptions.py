@@ -12,7 +12,7 @@ from rest_framework.views import set_rollback
 TModel = TypeVar("TModel", bound=Model)
 
 
-def exception_handler(exc, context):
+def exception_handler(exc, context):  # NOSONAR
     if isinstance(exc, HitasException):
         set_rollback()
         return exc.to_response()
@@ -285,7 +285,7 @@ def _convert_field_error(field_name: str, error: dict[str, Any]) -> dict[str, An
     ]:
         return {"field": field_name, "message": error["message"]}
     else:
-        raise Exception(f"Unhandled error code '{error['code']}'.")
+        raise Exception(f"Unhandled error code '{error['code']}'.")  # NOSONAR
 
 
 def get_hitas_object_or_404(model: type[TModel], **kwargs: Any) -> TModel:

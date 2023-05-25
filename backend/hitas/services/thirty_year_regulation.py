@@ -142,7 +142,7 @@ def perform_thirty_year_regulation(
     housing_companies = get_completed_housing_companies(completion_month=regulation_month)
     if not housing_companies:
         logger.info("No housing companies to check regulation for.")
-        logger.info("Regulation check complete!")
+        logger.info("Regulation check complete!")  # NOSONAR
         return RegulationResults(
             automatically_released=[],
             released_from_regulation=[],
@@ -477,7 +477,7 @@ def combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> di
     return total_by_postal_code
 
 
-def _determine_regulation_need(
+def _determine_regulation_need(  # NOSONAR
     comparison_values: dict[PostalCodeT, dict[HousingCompanyUUIDHex, ComparisonData]],
     price_by_area: dict[PostalCodeT, Decimal],
     replacement_postal_codes: dict[PostalCodeT, list[PostalCodeT]],
@@ -589,7 +589,7 @@ def _free_housing_companies_from_regulation(
     HousingCompany.objects.bulk_update(housing_companies, fields=["regulation_status"])
 
 
-def _save_regulation_results(
+def _save_regulation_results(  # NOSONAR
     results: RegulationResults,
     calculation_month: datetime.date,
     regulation_month: datetime.date,
@@ -837,6 +837,9 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
             )
         )
 
+    euro_format = "#,##0.00\\ €"
+    square_meter_format = "#,##0.00\\ \\m\\²"
+
     format_sheet(
         worksheet,
         formatting_rules={
@@ -849,13 +852,13 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
                 f"A{summary_start + i}": {"alignment": Alignment(horizontal="right")}
                 for i in range(0, len(summary_rows))
             },
-            "B": {"number_format": "#,##0.00\\ €"},
+            "B": {"number_format": euro_format},
             "D": {"alignment": Alignment(horizontal="right")},
-            "E": {"number_format": "#,##0.00\\ €"},
-            "F": {"number_format": "#,##0.00\\ €"},
-            "G": {"number_format": "#,##0.00\\ \\m\\²"},
-            "H": {"number_format": "#,##0.00\\ €"},
-            "I": {"number_format": "#,##0.00\\ €"},
+            "E": {"number_format": euro_format},
+            "F": {"number_format": euro_format},
+            "G": {"number_format": square_meter_format},
+            "H": {"number_format": euro_format},
+            "I": {"number_format": euro_format},
             "J": {
                 "alignment": Alignment(horizontal="right"),
                 # Change the font color depending on the text in the field

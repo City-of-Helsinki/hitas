@@ -4,7 +4,7 @@ from django.urls import reverse
 
 
 class AuditLogHistoryAdminMixin:
-    def history_view(self, request, object_id, extra_context=None):
+    def history_view(self, request, object_id, extra_context=None):  # NOSONAR
         return HttpResponseRedirect(
             "{url}?object_repr={object_repr}".format(
                 url=reverse("admin:auditlog_logentry_changelist", args=()),

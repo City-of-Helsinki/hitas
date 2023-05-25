@@ -171,9 +171,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        # Full debug logging
-        args: -X
 
   build-backend:
     name: "Test building backend docker image"

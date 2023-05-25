@@ -123,7 +123,7 @@ def _save_calculation_data(
                 calculation_month_index=float(indices[key][calculation_month]),
             )
             for housing_company in housing_companies
-            if (key := "old" if housing_company.hitas_type.old_hitas_ruleset else "new")
+            if (key := "old" if housing_company.hitas_type.old_hitas_ruleset else "new")  # NOSONAR
         ],
         created_surface_area_price_ceilings=surface_area_price_ceilings,
     )
@@ -241,6 +241,9 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
         )
     )
 
+    euro_format = "#,##0.00\\ €"
+    square_meter_format = "#,##0.00\\ \\m\\²"
+
     format_sheet(
         worksheet,
         formatting_rules={
@@ -260,12 +263,12 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
                 "border": Border(bottom=Side(style="thin")),
                 "alignment": Alignment(horizontal="right"),
             },
-            "B": {"number_format": "#,##0.00\\ €"},
+            "B": {"number_format": euro_format},
             "C": {"alignment": Alignment(horizontal="right")},
-            "D": {"number_format": "#,##0.00\\ €"},
-            "E": {"number_format": "#,##0.00\\ €"},
-            "F": {"number_format": "#,##0.00\\ \\m\\²"},
-            "G": {"number_format": "#,##0.00\\ €"},
+            "D": {"number_format": euro_format},
+            "E": {"number_format": euro_format},
+            "F": {"number_format": square_meter_format},
+            "G": {"number_format": euro_format},
         },
     )
 

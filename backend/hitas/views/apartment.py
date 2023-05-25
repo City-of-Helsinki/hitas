@@ -439,26 +439,25 @@ class PricesSerializer(serializers.Serializer):
             .first()
         )
 
-        return (
-            {
-                "id": (
-                    latest_confirmed_max_price_calculation.uuid.hex
-                    if latest_confirmed_max_price_calculation.json_version
-                    == ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION
-                    else None
-                ),
-                "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
-                "created_at": latest_confirmed_max_price_calculation.created_at,
-                "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,
-                "calculation_date": latest_confirmed_max_price_calculation.calculation_date,
-                "valid": {
-                    "is_valid": latest_confirmed_max_price_calculation.valid_until >= timezone.now().date(),
-                    "valid_until": latest_confirmed_max_price_calculation.valid_until,
-                },
-            }
-            if latest_confirmed_max_price_calculation
-            else None
-        )
+        if not latest_confirmed_max_price_calculation:
+            return None
+
+        return {
+            "id": (
+                latest_confirmed_max_price_calculation.uuid.hex
+                if latest_confirmed_max_price_calculation.json_version
+                == ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION
+                else None
+            ),
+            "maximum_price": latest_confirmed_max_price_calculation.maximum_price,
+            "created_at": latest_confirmed_max_price_calculation.created_at,
+            "confirmed_at": latest_confirmed_max_price_calculation.confirmed_at,
+            "calculation_date": latest_confirmed_max_price_calculation.calculation_date,
+            "valid": {
+                "is_valid": latest_confirmed_max_price_calculation.valid_until >= timezone.now().date(),
+                "valid_until": latest_confirmed_max_price_calculation.valid_until,
+            },
+        }
 
     @staticmethod
     def get_unconfirmed_max_prices(instance: Apartment) -> Dict[str, Any]:
@@ -666,10 +665,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
             raise serializers.ValidationError(code="blank")
 
         housing_company_uuid = self.context["view"].kwargs["housing_company_uuid"]
-        try:
-            hc = HousingCompany.objects.only("id").get(uuid=uuid.UUID(hex=housing_company_uuid))
-        except (HousingCompany.DoesNotExist, ValueError, TypeError):
-            raise
+        hc = HousingCompany.objects.only("id").get(uuid=uuid.UUID(hex=housing_company_uuid))
 
         if building.real_estate.housing_company.id != hc.id:
             raise ValidationError(f"Object does not exist with given id '{building.uuid.hex}'.", code="invalid")

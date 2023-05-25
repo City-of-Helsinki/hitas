@@ -207,7 +207,7 @@ def calculate_multiple_apartment_improvements(
 @dataclass
 class HousingCompanyImprovementCalculationResult(ApartmentImprovementCalculationResult):
     # Final accepted value for the whole housing company
-    accepted_value_for_housing_company: Decimal = 0
+    accepted_value_for_housing_company: Decimal = Decimal("0")
 
 
 @dataclass

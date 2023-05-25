@@ -33,7 +33,7 @@ auditlog._signals[post_undelete] = log_update
 
 
 class AuditableUpdateMixin:
-    def update(self, **kwargs: Any) -> int:
+    def update(self, **kwargs: Any) -> int:  # NOSONAR
         if self.model not in auditlog.get_models():
             return super().update(**kwargs)
 

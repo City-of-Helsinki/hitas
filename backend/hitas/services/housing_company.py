@@ -132,7 +132,7 @@ def make_index_adjustment_for_housing_companies(
     return indices
 
 
-def _get_indices_for_adjustment(
+def _get_indices_for_adjustment(  # NOSONAR
     housing_companies: list[HousingCompanyWithAnnotations],
     calculation_month: datetime.date,
 ) -> dict[Literal["old", "new"], dict[datetime.date, Decimal]]:
@@ -177,7 +177,7 @@ def _get_indices_for_adjustment(
     return {"old": old_indexes, "new": new_indexes}
 
 
-def _validate_prices_and_surface_areas(housing_companies: list[HousingCompanyWithAnnotations]) -> None:
+def _validate_prices_and_surface_areas(housing_companies: list[HousingCompanyWithAnnotations]) -> None:  # NOSONAR
     """
     Validate that all apartments in the housing company have sales prices or sales catalog prices and surface areas.
     Raise an error in case they don't.

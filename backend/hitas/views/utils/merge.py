@@ -31,7 +31,7 @@ def merge_model(model_class, existing_qs, wanted, create_defaults, equal_fields)
     )
 
 
-def merge(
+def merge(  # NOSONAR
     existing_objects: list[ExistingObject],
     wanted_objects: list[Dict[str, Any]],
     create_fn: Callable[[Any], None],

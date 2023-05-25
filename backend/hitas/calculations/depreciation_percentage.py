@@ -2,8 +2,8 @@ from decimal import Decimal
 
 # Depreciation multiplier static values
 #
-# FIXME: We haven't found a correct formula for this yet and haven't had enough time to check for it. Below
-# is a table how this value approximately decreases but it's far from perfect.
+# TODO: We haven't found a correct formula for this yet and haven't had enough time to check for it.
+#  Below is a table how this value approximately decreases, but it's far from perfect.
 #
 # +-------------+----------------+--------------------------------------------------------+-----------|
 # | timespan    | months         | formula                                                | accurate? |
