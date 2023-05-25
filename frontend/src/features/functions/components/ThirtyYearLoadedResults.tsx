@@ -13,43 +13,41 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
     const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
 
-    const ResultsList = ({category}) => (
-        <div className={`companies companies--${category}`}>
-            <Heading type="body">
-                {category === "freed" ? "Valvonnasta vapautuvat " : "Valvonnan piiriin jäävät "}
-                yhtiöt
-            </Heading>
-            <div className="list">
-                <div className="list-headers">
-                    <div className="list-header name">Nimi</div>
-                    <div className="list-header address">Osoite</div>
-                    <div className="list-header date">Valmistunut</div>
-                    <div className="list-header property-manager">Isännöitsijä</div>
-                </div>
-                <ul className="results-list">
-                    {category === "freed" ? (
-                        <>
-                            {releasedCompanies.map((item, idx) => (
-                                <ThirtyYearResultListItem
-                                    company={item}
-                                    key={idx}
-                                />
-                            ))}
-                        </>
+    const ResultsList = ({category}) => {
+        const companies = category === "freed" ? releasedCompanies : stayingCompanies;
+        return (
+            <div className={`companies companies--${category}`}>
+                <Heading type="body">
+                    {category === "freed" ? "Valvonnasta vapautuvat " : "Valvonnan piiriin jäävät "}
+                    yhtiöt
+                </Heading>
+                <div className="list">
+                    {companies.length > 0 ? (
+                        <div className="list-headers">
+                            <div className="list-header name">Nimi ja osoite</div>
+                            <div className="list-header date">Valmistumispäivä</div>
+                            <div className="list-header property-manager">
+                                Isännöitsijätiedot
+                                <br />
+                                päivitetty viimeksi
+                            </div>
+                        </div>
                     ) : (
-                        <>
-                            {stayingCompanies.map((item, idx) => (
-                                <ThirtyYearResultListItem
-                                    company={item}
-                                    key={idx}
-                                />
-                            ))}
-                        </>
+                        <p>Ei listattavia yhtiöitä.</p>
                     )}
-                </ul>
+                    <ul className="results-list">
+                        {companies.map((item, idx) => (
+                            <ThirtyYearResultListItem
+                                company={item}
+                                category={category}
+                                key={idx}
+                            />
+                        ))}
+                    </ul>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     if (skippedCompanies.length > 0)
         return (
@@ -74,8 +72,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                     id="no-companies-modal-header"
                 />
                 <Dialog.Content>
-                    Järjestelmä ei palauttanut yhtiötä jotka vapautuisivat tai jäisivät sääntelyn piiriin. Kannassa ei
-                    ole yhtiöitä mitä verrata.
+                    Järjestelmä ei palauttanut vertailutulosta, koska kannassa ei ole yhtiöitä mitä verrata.
                 </Dialog.Content>
                 <Dialog.ActionButtons>
                     <CloseButton onClick={() => setIsNoCompaniesModalOpen(false)} />
