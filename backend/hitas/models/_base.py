@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Any, Iterable, Optional, TypeAlias, TypeVar, overload
+from typing import Any, Iterable, Optional, TypeAlias, TypeVar
 from uuid import UUID, uuid4
 
 from auditlog.diff import model_instance_diff
@@ -13,6 +13,7 @@ from django.db.models import Model, QuerySet
 from django.db.models.functions import Cast
 from django.db.models.manager import BaseManager
 from django.utils.functional import classproperty
+from post_fetch_hook import mixins
 from safedelete.managers import SafeDeleteAllManager, SafeDeleteDeletedManager, SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from safedelete.queryset import SafeDeleteQueryset
@@ -118,17 +119,6 @@ class AuditableBulkCreateMixin:
         return objs
 
 
-class PostFetchQuerySetMixin:
-    """Patch QuerySet so that results can be modified right after they are fetched."""
-
-    def _fetch_all(self):
-        if self._result_cache is None:
-            results: list[Model] = list(self._iterable_class(self))
-            self._result_cache = self.model.post_fetch_hook(results, getattr(self, "_fields", ()))
-        if self._prefetch_related_lookups and not self._prefetch_done:
-            self._prefetch_related_objects()
-
-
 class HitasQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
@@ -136,7 +126,7 @@ class HitasQuerySet(
     # See `django.db.models.deletion.Collector.can_fast_delete`.
     # Therefore, log entries are created with the model's delete,
     # and we don't need to override queryset's delete() method.
-    PostFetchQuerySetMixin,
+    mixins.PostFetchQuerySetMixin,
     QuerySet,
 ):
     pass
@@ -146,7 +136,7 @@ class HitasManager(BaseManager.from_queryset(HitasQuerySet)):
     pass
 
 
-class PostFetchModelMixin:
+class PostFetchModelMixin(mixins.PostFetchModelMixin):
     @classproperty
     def obfuscation_rules(cls) -> dict[str, Any]:
         """Which fields to obfuscate and with what values."""
@@ -156,38 +146,6 @@ class PostFetchModelMixin:
     def should_obfuscate(self) -> bool:
         """Whether the model should be obfuscated or not."""
         return NotImplemented
-
-    @classmethod
-    @overload
-    def post_fetch_hook(
-        cls: type[TModel],
-        results: list[TModel],
-        fields: tuple[str, ...],
-    ) -> list[TModel]:
-        """If model instance is accessed (e.g. model.objects.get())."""
-
-    @classmethod
-    @overload
-    def post_fetch_hook(
-        cls: type[TModel],
-        results: list[dict[str, Any]],
-        fields: tuple[str, ...],
-    ) -> list[dict[str, Any]]:
-        """If model values are accessed with qs.values()."""
-
-    @classmethod
-    @overload
-    def post_fetch_hook(
-        cls: type[TModel],
-        results: list[tuple[str, ...]],
-        fields: tuple[str, ...],
-    ) -> list[tuple[str, ...]]:
-        """If model values are accessed with qs.values_list()."""
-
-    @classmethod
-    def post_fetch_hook(cls: type[TModel], results: list[TModel | dict[str, Any]], fields: tuple[str, ...]):
-        """Implement this method to modify queryset results after they are fetched."""
-        return results
 
 
 class HitasModel(PostFetchModelMixin, Model):
@@ -210,7 +168,7 @@ class HitasModel(PostFetchModelMixin, Model):
 class HitasSafeDeleteQuerySet(
     AuditableUpdateMixin,
     AuditableBulkCreateMixin,
-    PostFetchQuerySetMixin,
+    mixins.PostFetchQuerySetMixin,
     # SafeDelete models override queryset's delete() method
     # so that the model's delete() is called for each object.
     # Therefore, log entries are created with the model's delete,
