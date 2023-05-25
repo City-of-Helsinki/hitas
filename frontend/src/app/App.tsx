@@ -25,30 +25,26 @@ const App = (): JSX.Element => {
     const [userTitle, setUserTitle] = useState<string | number>(0);
     const dispatch = useAppDispatch();
 
-    // Check the authentication and get the user name
+    // Check the authentication and get the username
     useEffect(() => {
-        // userinfo endpoint is not called when using token authentication in development mode
+        // UserInfo endpoint should not be called when using token authentication in development
         if (token) {
             dispatch(setIsAuthenticated(true));
-        } else {
-            if (userInfoData) {
-                // Set the user title if name or email is available
-                const userFirstName = userInfoData.first_name ? `${userInfoData.first_name} ` : "";
-                const userName =
-                    userInfoData.first_name || userInfoData.last_name ? userFirstName + userInfoData.last_name : "";
-                const userEmail = userInfoData.email || "";
-                setUserTitle(userName || userEmail);
-                // Set the user as authenticated if user info data fetch was successful
-                dispatch(setIsAuthenticated(true));
-            } else {
-                // Set the user as unauthenticated if user info data fetch was not successful
-                dispatch(setIsAuthenticated(false));
+            return;
+        }
 
-                // Error 401 is returned when the user is not authenticated
-                // Error 403 is returned when the user is authenticated but does not have access
-                if ((userInfoError as FetchBaseQueryError | undefined)?.status === 403) {
-                    hitasToast("Kirjautuminen onnistui, mutta sinulla on puutteelliset oikeudet!", "error");
-                }
+        if (userInfoData) {
+            // Set the user title if name or email is available
+            const userName = [userInfoData.first_name, userInfoData.last_name].join(" ").trim();
+            setUserTitle(userName || userInfoData.email || "tuntematon");
+            dispatch(setIsAuthenticated(true));
+        } else {
+            dispatch(setIsAuthenticated(false));
+
+            // Error 401 is returned when the user is not authenticated
+            // Error 403 is returned when the user is authenticated but does not have access
+            if ((userInfoError as FetchBaseQueryError | undefined)?.status === 403) {
+                hitasToast("Kirjautuminen onnistui, mutta sinulla on puutteelliset oikeudet!", "error");
             }
         }
     }, [userInfoData, userInfoError, dispatch, token]);
@@ -92,7 +88,7 @@ const App = (): JSX.Element => {
             </Navigation>
 
             <Container className="main-content">
-                {isAuthenticating ? <Spinner /> : isUserInfoLoading ? <></> : <Outlet />}
+                {isAuthenticating || isUserInfoLoading ? <Spinner /> : <Outlet />}
             </Container>
 
             <Notifications />
