@@ -996,16 +996,16 @@ class ConfirmedPriceSerializer(serializers.Serializer):
     @staticmethod
     def validate_request_date(value):
         if value > timezone.now().date():
-            raise serializers.ValidationError("Request date cannot be in the future.")
+            raise serializers.ValidationError("Date cannot be in the future.")
         return value
 
 
 class UnconfirmedPriceSerializer(ConfirmedPriceSerializer):
-    calculation_date = serializers.DateField(default=timezone.now().date())
+    calculation_date = serializers.DateField(default=lambda: timezone.now().date())
     additional_info = serializers.CharField(required=False, allow_blank=True, default="")
 
     @staticmethod
     def validate_calculation_date(value):
         if value > timezone.now().date():
-            raise serializers.ValidationError("Request date cannot be in the future.")
+            raise serializers.ValidationError("Date cannot be in the future.")
         return value
