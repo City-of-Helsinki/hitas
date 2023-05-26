@@ -1100,7 +1100,10 @@ paths:
                   description: When was this document requested?
                   type: string
                   format: date
-                  example: Example text
+                calculation_date:
+                  description: Date to use in calculation. Default is today.
+                  type: string
+                  format: date
                 additional_info:
                   description: Additional textual information to be displayed on the generated PDF
                   type: string

@@ -56,7 +56,7 @@ from hitas.services.apartment import (
 )
 
 from hitas.services.condition_of_sale import condition_of_sale_queryset
-from hitas.utils import RoundWithPrecision, check_for_overlap, this_month, valid_uuid
+from hitas.utils import RoundWithPrecision, check_for_overlap, valid_uuid, monthify
 from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
@@ -782,14 +782,16 @@ class ApartmentViewSet(HitasModelViewSet):
             type[ConstructionPriceIndex],
             type[ConstructionPriceIndex2005Equal100],
         ],
+        calculation_month: Optional[datetime.date] = None,
     ) -> RoundWithPrecision:
         original_value = Subquery(
             table.objects.filter(month=OuterRef("completion_month")).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
+        current_month = TruncMonth(Now()) if calculation_month is None else calculation_month
         current_value = Subquery(
-            table.objects.filter(month=TruncMonth(Now())).values("value"),
+            table.objects.filter(month=current_month).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
@@ -835,9 +837,10 @@ class ApartmentViewSet(HitasModelViewSet):
         )
 
     @staticmethod
-    def select_sapc() -> RoundWithPrecision:
+    def select_sapc(calculation_month: datetime.date) -> RoundWithPrecision:
+        current_month = TruncMonth(Now()) if calculation_month is None else calculation_month
         current_value = Subquery(
-            SurfaceAreaPriceCeiling.objects.filter(month=TruncMonth(Now())).values("value"),
+            SurfaceAreaPriceCeiling.objects.filter(month=current_month).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
@@ -898,6 +901,7 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
+        calculation_month: Optional[datetime.date] = self.kwargs.get("calculation_month")
         return self.get_list_queryset().annotate(
             _first_sale_purchase_price=get_first_sale_purchase_price("id"),
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
@@ -905,17 +909,19 @@ class ApartmentViewSet(HitasModelViewSet):
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
-            cpi=self.select_index(ConstructionPriceIndex),
-            cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100),
-            mpi=self.select_index(MarketPriceIndex),
-            mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100),
-            sapc=self.select_sapc(),
+            cpi=self.select_index(ConstructionPriceIndex, calculation_month=calculation_month),
+            cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100, calculation_month=calculation_month),
+            mpi=self.select_index(MarketPriceIndex, calculation_month=calculation_month),
+            mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100, calculation_month=calculation_month),
+            sapc=self.select_sapc(calculation_month=calculation_month),
         )
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
     def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
         input_data = UnconfirmedPriceSerializer(data=request.data)
         input_data.is_valid(raise_exception=True)
+
+        self.kwargs["calculation_month"] = this_month = monthify(input_data.validated_data["calculation_date"])
 
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
@@ -924,13 +930,13 @@ class ApartmentViewSet(HitasModelViewSet):
         ump = ump["pre_2011"] if is_pre_2011 else ump["onwards_2011"]
 
         if ump["construction_price_index"]["value"] is None:
-            raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=this_month())
+            raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=this_month)
         if ump["market_price_index"]["value"] is None:
-            raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=this_month())
+            raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=this_month)
         if ump["surface_area_price_ceiling"]["value"] is None:
-            raise IndexMissingException(error_code="sapc", date=this_month())
+            raise IndexMissingException(error_code="sapc", date=this_month)
 
-        sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month())
+        sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month)
 
         filename = f"Hinta-arvio {apartment.address}.pdf"
         context = {
@@ -995,4 +1001,11 @@ class ConfirmedPriceSerializer(serializers.Serializer):
 
 
 class UnconfirmedPriceSerializer(ConfirmedPriceSerializer):
+    calculation_date = serializers.DateField(default=timezone.now().date())
     additional_info = serializers.CharField(required=False, allow_blank=True, default="")
+
+    @staticmethod
+    def validate_calculation_date(value):
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Request date cannot be in the future.")
+        return value
