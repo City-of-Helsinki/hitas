@@ -6488,6 +6488,27 @@
     }
   },
   {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-05-01",
+    "fields": {
+      "value": "368.50"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-06-01",
+    "fields": {
+      "value": "368.50"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex",
+    "pk": "2023-07-01",
+    "fields": {
+      "value": "368.50"
+    }
+  },
+  {
     "model": "hitas.constructionpriceindex2005equal100",
     "pk": "2005-01-01",
     "fields": {
@@ -8025,6 +8046,27 @@
     "pk": "2023-04-01",
     "fields": {
       "value": "149.30"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-05-01",
+    "fields": {
+      "value": "150.80"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-06-01",
+    "fields": {
+      "value": "150.80"
+    }
+  },
+  {
+    "model": "hitas.constructionpriceindex2005equal100",
+    "pk": "2023-07-01",
+    "fields": {
+      "value": "150.80"
     }
   },
   {
@@ -13185,6 +13227,27 @@
     }
   },
   {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-05-01",
+    "fields": {
+      "value": "545.50"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-06-01",
+    "fields": {
+      "value": "545.50"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex",
+    "pk": "2023-07-01",
+    "fields": {
+      "value": "545.50"
+    }
+  },
+  {
     "model": "hitas.marketpriceindex2005equal100",
     "pk": "2005-05-01",
     "fields": {
@@ -14694,6 +14757,27 @@
     "pk": "2023-04-01",
     "fields": {
       "value": "179.60"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-05-01",
+    "fields": {
+      "value": "176.80"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-06-01",
+    "fields": {
+      "value": "176.80"
+    }
+  },
+  {
+    "model": "hitas.marketpriceindex2005equal100",
+    "pk": "2023-07-01",
+    "fields": {
+      "value": "176.80"
     }
   },
   {
@@ -17754,21 +17838,42 @@
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-02-01",
     "fields": {
-      "value": "1127.00"
+      "value": "4621.00"
     }
   },
   {
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-03-01",
     "fields": {
-      "value": "1127.00"
+      "value": "4621.00"
     }
   },
   {
     "model": "hitas.surfaceareapriceceiling",
     "pk": "2023-04-01",
     "fields": {
-      "value": "1127.00"
+      "value": "4621.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-05-01",
+    "fields": {
+      "value": "4545.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-06-01",
+    "fields": {
+      "value": "4545.00"
+    }
+  },
+  {
+    "model": "hitas.surfaceareapriceceiling",
+    "pk": "2023-07-01",
+    "fields": {
+      "value": "4545.00"
     }
   },
   {
