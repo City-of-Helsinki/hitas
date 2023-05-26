@@ -39,6 +39,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRowWithAnnotations,
 )
 from hitas.services.audit_log import last_modified
+from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
 from hitas.services.indices import subquery_appropriate_cpi
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
@@ -163,8 +164,12 @@ def perform_thirty_year_regulation(
         )
 
         logger.info("Updating housing company states...")
-        _free_housing_companies_from_regulation(split_housing_companies, results)
+        freed_housing_companies = _free_housing_companies_from_regulation(split_housing_companies, results)
 
+        logger.info("Fulfilling conditions of sale for apartments in released housing companies...")
+        fulfill_conditions_of_sales_for_housing_companies(freed_housing_companies)
+
+        logger.info("Obfuscating owners without regulated apartments...")
         results["obfuscated_owners"] = obfuscate_owners_without_regulated_apartments()
 
         logger.info("Saving regulation results for reporting...")
@@ -245,8 +250,12 @@ def perform_thirty_year_regulation(
     housing_companies += split_housing_companies
 
     logger.info("Updating housing company states...")
-    _free_housing_companies_from_regulation(housing_companies, results)
+    freed_housing_companies = _free_housing_companies_from_regulation(housing_companies, results)
 
+    logger.info("Fulfilling conditions of sale for apartments in released housing companies...")
+    fulfill_conditions_of_sales_for_housing_companies(freed_housing_companies)
+
+    logger.info("Obfuscating owners without regulated apartments...")
     results["obfuscated_owners"] = obfuscate_owners_without_regulated_apartments()
 
     logger.info("Saving regulation results for reporting...")
@@ -569,7 +578,7 @@ def _find_average_of_nearest(
 def _free_housing_companies_from_regulation(
     housing_companies: list[HousingCompanyWithAnnotations],
     regulation_results: RegulationResults,
-) -> None:
+) -> list[int]:
     """
     Change housing company states according to regulation results.
     """
@@ -579,14 +588,17 @@ def _free_housing_companies_from_regulation(
             regulation_results["automatically_released"], regulation_results["released_from_regulation"]
         )
     }
+    freed_housing_companies: list[int] = []
     for housing_company in housing_companies:
         if housing_company.uuid.hex not in housing_company_uuids:
             housing_company.regulation_status = RegulationStatus.REGULATED
             continue
 
         housing_company.regulation_status = RegulationStatus.RELEASED_BY_HITAS
+        freed_housing_companies.append(housing_company.id)
 
     HousingCompany.objects.bulk_update(housing_companies, fields=["regulation_status"])
+    return freed_housing_companies
 
 
 def _save_regulation_results(  # NOSONAR
