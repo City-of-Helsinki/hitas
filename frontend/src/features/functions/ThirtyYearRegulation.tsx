@@ -17,6 +17,8 @@ import {ThirtyYearErrorModal, ThirtyYearLoadedResults} from "./components";
 import {priceCeilings, regulationAPIResponses} from "./simulatedResponses";
 
 const ThirtyYearRegulation = () => {
+    const currentTime = new Date();
+    const [, forceRender] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const years = [
@@ -24,6 +26,26 @@ const ThirtyYearRegulation = () => {
         {label: "2022", value: "2022"},
         {label: "2021", value: "2021"},
     ];
+    let defaultQuarter = {label: "1.2. - 30.4.", value: "02-01"};
+    // set the correct selected quarter based on date
+    switch (currentTime.getMonth()) {
+        case 0:
+        case 10:
+        case 11:
+            defaultQuarter = {label: "1.11. - 31.1.", value: "11-01"};
+            break;
+        case 4:
+        case 5:
+        case 6:
+            defaultQuarter = {label: "1.5. - 31.7.", value: "05-01"};
+            break;
+        case 7:
+        case 8:
+        case 9:
+            defaultQuarter = {label: "1.8. - 31.10.", value: "08-01"};
+            break;
+    }
+
     const testOptions = [
         {label: "Onnistunut vertailu", value: "result_noProblems"},
         {label: "Yhtiöta ei pystytty vertailemaan", value: "result_skippedCompany"},
@@ -40,7 +62,7 @@ const ThirtyYearRegulation = () => {
     const formObject = useForm({
         defaultValues: {
             year: years[0],
-            quarter: {label: "1.2. - 30.4.", value: "02-01"},
+            quarter: defaultQuarter,
             file: undefined,
             test: false,
             testSelect: testOptions[0],
@@ -57,7 +79,6 @@ const ThirtyYearRegulation = () => {
 
     // Populate the time quarter select with options, if current year is selected in the year selector
     const hitasQuarterOptions: {label: string; value: string}[] = [];
-    const currentTime = new Date();
     // If the current year is not selected, add all quarters to the time period select options...
     if (currentTime.getFullYear().toString() !== formYear.value) {
         hitasQuarters.forEach((quarter) => hitasQuarterOptions.push({value: quarter.value, label: quarter.label}));
@@ -94,8 +115,6 @@ const ThirtyYearRegulation = () => {
     );
     const [makeRegulation, {data: makeRegulationData, isLoading: isMakeRegulationLoading, error: makeRegulationError}] =
         useCreateThirtyYearRegulationMutation();
-    const hasRegulationResults = !isGetRegulationLoading && !getRegulationError && !!getRegulationData;
-    const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
 
     // Simulated API responses for the get/post thirty year regulation queries
     const priceCeiling = priceCeilings[formYear.value][formTimePeriod.value];
@@ -134,6 +153,8 @@ const ThirtyYearRegulation = () => {
             if (testSelection?.value.split("_")[0] === "result") {
                 regulationData = regulationAPIResponses[testSelection?.value];
                 regulationError = {};
+                console.log(regulationData);
+                forceRender((v) => !v);
             } else {
                 regulationData = {};
                 regulationError = regulationAPIResponses[testSelection?.value];
@@ -179,7 +200,10 @@ const ThirtyYearRegulation = () => {
                 setIsSaveModalOpen(true);
             });
     };
-
+    const hasRegulationResults =
+        (!isGetRegulationLoading && !getRegulationError && !!getRegulationData) || !!regulationData;
+    console.log("show queryStateHandler:", hasRegulationResults, regulationData);
+    const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
     return (
         <div className="view--functions__thirty-year-regulation">
             <div className="regulation">

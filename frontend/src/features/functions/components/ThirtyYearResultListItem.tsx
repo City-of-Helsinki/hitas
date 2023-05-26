@@ -7,15 +7,12 @@ import {formatDate, hdsToast} from "../../../common/utils";
 
 const ThirtyYearResultListItem = ({company, category}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isClicked, setIsClicked] = useState(company.letter_fetched);
     const handleClick = () => {
         downloadCompanyRegulationLetter(company);
-        setIsClicked(true);
     };
     const handleFree = () => {
         console.log(`Action to free ${company.display_name} from regulation`);
         hdsToast.success(`Yhtiön ${company.display_name} manuaalinen vapautus onnistui.`);
-        setIsModalOpen(false);
     };
     return (
         <li className="results-list__item">
@@ -39,17 +36,17 @@ const ThirtyYearResultListItem = ({company, category}) => {
                         onClick={() => setIsModalOpen(true)}
                         iconLeft={<IconLockOpen />}
                     >
-                        Vapauta manuaalisesti
+                        Vapauta
                     </Button>
                 )}
                 <Button
                     theme="black"
                     onClick={handleClick}
-                    variant={isClicked ? "secondary" : "primary"}
+                    variant={company.letter_fetched ? "secondary" : "primary"}
                     className="download-button"
                     iconLeft={<IconDocument />}
                 >
-                    Hae {isClicked ? "uudelleen" : "tiedote"}
+                    Lataa tiedote
                 </Button>
             </div>
             <ConfirmDialogModal
