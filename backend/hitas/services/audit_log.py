@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from typing import TYPE_CHECKING, Iterable, Literal, Optional, TypeAlias, overload
 
 from auditlog.models import LogEntry
@@ -8,7 +9,10 @@ from django.db.models import DateTimeField, OuterRef, Q, Subquery
 from django.utils.encoding import smart_str
 
 if TYPE_CHECKING:
-    from hitas.models._base import HitasModel, HitasSafeDeleteModel
+    from hitas.models._base import AuditLogAdditionalDataT, HitasModel, HitasSafeDeleteModel
+
+
+logger = logging.getLogger(__name__)
 
 PK: TypeAlias = int
 FieldName: TypeAlias = str
@@ -30,7 +34,11 @@ def bulk_create_log_entries(
         if pk not in changes:
             continue
 
+        get_additional_data = getattr(obj, "get_additional_data", None)
+        additional_data: Optional[AuditLogAdditionalDataT]
+        additional_data = get_additional_data() if callable(get_additional_data) else None
         serialized_data = LogEntry.objects._get_serialized_data_or_none(obj)
+
         log_entries.append(
             LogEntry(
                 content_type=ContentType.objects.get_for_model(obj),
@@ -40,6 +48,7 @@ def bulk_create_log_entries(
                 action=action,
                 changes=json.dumps(changes[obj.pk]),
                 serialized_data=serialized_data,
+                additional_data=additional_data,
             )
         )
 
