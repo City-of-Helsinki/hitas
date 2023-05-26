@@ -84,3 +84,12 @@ def determine_conditions_of_sale(ownerships: list[Ownership]) -> list[ConditionO
             to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
 
     return list(to_save.values())
+
+
+def fulfill_conditions_of_sales_for_housing_companies(housing_companies: list[int]) -> None:
+    ConditionOfSale.objects.filter(
+        (
+            Q(new_ownership__sale__apartment__building__real_estate__housing_company__id__in=housing_companies)
+            | Q(old_ownership__sale__apartment__building__real_estate__housing_company__id__in=housing_companies)
+        ),
+    ).delete()
