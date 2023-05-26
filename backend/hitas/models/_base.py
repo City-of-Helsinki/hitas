@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Any, Iterable, Optional, TypeAlias, TypeVar
+from typing import Any, Iterable, Optional, TypeAlias, TypedDict, TypeVar
 from uuid import UUID, uuid4
 
 from auditlog.diff import model_instance_diff
@@ -148,7 +148,20 @@ class PostFetchModelMixin(mixins.PostFetchModelMixin):
         return NotImplemented
 
 
-class HitasModel(PostFetchModelMixin, Model):
+class AuditLogAdditionalDataT(TypedDict):
+    is_sent: bool
+
+
+class AuditLogAdditionalDataMixin:
+    @staticmethod
+    def get_additional_data() -> AuditLogAdditionalDataT:
+        """Get additional data to be saved with the log entry."""
+        return AuditLogAdditionalDataT(
+            is_sent=False,
+        )
+
+
+class HitasModel(PostFetchModelMixin, AuditLogAdditionalDataMixin, Model):
     """
     Model with bulk auditing capabilities.
     """
@@ -190,7 +203,7 @@ class HitasSafeDeleteDeletedManager(SafeDeleteDeletedManager):
     _queryset_class = HitasSafeDeleteQuerySet
 
 
-class HitasSafeDeleteModel(PostFetchModelMixin, SafeDeleteModel):
+class HitasSafeDeleteModel(PostFetchModelMixin, AuditLogAdditionalDataMixin, SafeDeleteModel):
     """
     Abstract model for Hitas entities without an externally visible ID
     """
