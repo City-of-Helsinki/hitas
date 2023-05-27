@@ -196,7 +196,12 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
             {!formErrors.success && formErrors.error ? (
                 <>
                     {formErrors.error.issues.map((e) => (
-                        <span key={`${e.code}-${e.message}`}>{e.message}</span>
+                        <span
+                            key={`${e.code}-${e.message}`}
+                            className="error-text"
+                        >
+                            {e.message}
+                        </span>
                     ))}
                 </>
             ) : null}
