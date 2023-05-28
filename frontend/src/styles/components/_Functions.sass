@@ -70,8 +70,14 @@
       padding: $spacing-m
 
     .regulation
-      background: $color-black-10
+      padding: 0
+      .heading--body
+        background: $color-black-10
+        padding: $spacing-m
+        margin: 0
       .actions
+        background: $color-black-10
+        padding: $spacing-m
         position: relative
         display: grid
         grid-template-columns: 1fr 1fr
@@ -121,6 +127,16 @@
             margin-top: -15px
           label
             margin-right: 20px
+      .divider-horizontal-l
+        background: $color-black-10
+        margin: 0
+        padding: $spacing-m 0
+      .external-sales-data-import
+        background: $color-black-10
+        h3
+          margin: 0
+          padding: $spacing-m
+          padding-top: 0
       .file
         position: relative
         grid-row: 2
@@ -159,6 +175,7 @@
           display: none
       .external-sales-data-exists
         grid-row: 2
+        background: $color-black-10
         color: $color-black-50
         font-size: $fontsize-body-m
 
@@ -257,10 +274,13 @@
         --spinner-color: $color-engel
         color: $color-engel
     .test-toggle
-      height: 70px
+      height: auto
       label
         margin-right: 20px
       .input-field
         height: auto
     .test-select
       width: 500px
+    .error-test-form
+      padding: $spacing-m
+      background: $color-black-10
