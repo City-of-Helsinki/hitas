@@ -358,29 +358,4 @@ const fileImportResponses = {
     },
 };
 
-const priceCeilings = {
-    2023: {
-        "02-01": 4621,
-        "05-01": 4622,
-    },
-    2022: {
-        "02-01": 2201,
-        "05-01": 2202,
-        "08-01": 2203,
-        "11-01": 2204,
-    },
-    2021: {
-        "02-01": 2101,
-        "05-01": 2102,
-        "08-01": 2103,
-        "11-01": 2104,
-    },
-    TEST: {
-        "02-01": "TEST",
-        "05-01": "TEST",
-        "08-01": "TEST",
-        "11-01": "TEST",
-    },
-};
-
-export {regulationAPIResponses, fileImportResponses, priceCeilings};
+export {regulationAPIResponses, fileImportResponses};
