@@ -1256,6 +1256,53 @@ def test__api__apartment_sale__create__half_hitas__last_apartment_sold(api_clien
     assert apartment_1.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
+@pytest.mark.django_db
+def test__api__apartment_sale__create__half_hitas__dont_create_condition_of_sale(api_client: HitasAPIClient):
+    old_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+    new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        completion_date=None,
+        sales=[],
+    )
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": old_ownership.owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": new_apartment.housing_company.uuid.hex,
+            "apartment_uuid": new_apartment.uuid.hex,
+        },
+    )
+    response = api_client.post(url_1, data=data, format="json")
+    response_data = response.json()
+
+    assert response.status_code == status.HTTP_201_CREATED, response_data
+
+    # No conditions of sale are created for half hitas apartments
+    assert response_data.pop("conditions_of_sale_created", None) is False
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0
+
+
 # Update tests
 
 

@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from hitas.models import ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import ConditionOfSaleAnnotated
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.services.apartment import get_first_sale_purchase_date
 
 
@@ -62,10 +62,17 @@ def determine_conditions_of_sale(ownerships: list[Ownership]) -> list[ConditionO
     to_save: dict[tuple[int, int], ConditionOfSale] = {}
     # Create conditions of sale for all ownerships to new apartments this owner has,
     # and all the additional ownerships given (if they are for new apartments).
-    # Don't create conditions of sale to unregulated housing companies.
     for ownership in ownerships:
         apartment = ownership.apartment
-        if apartment.housing_company.regulation_status != RegulationStatus.REGULATED or not apartment.is_new:
+
+        if (
+            # Don't create conditions of sale to unregulated housing companies.
+            apartment.housing_company.regulation_status != RegulationStatus.REGULATED
+            # No conditions of sale to half hitas apartments
+            or apartment.housing_company.hitas_type == HitasType.HALF_HITAS
+            # Conditions of sale are only created for first sales
+            or not apartment.is_new
+        ):
             continue
 
         for other_ownership in ownerships:
@@ -77,6 +84,8 @@ def determine_conditions_of_sale(ownerships: list[Ownership]) -> list[ConditionO
                 # Don't create conditions of sale between two ownerships to the same apartment.
                 # They are in the same sale but for different owners.
                 or other_ownership.apartment == apartment
+                # No conditions of sale to half hitas apartments
+                or apartment.housing_company.hitas_type == HitasType.HALF_HITAS
             ):
                 continue
 

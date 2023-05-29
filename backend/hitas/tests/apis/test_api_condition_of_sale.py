@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework import status
 
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
@@ -426,12 +426,14 @@ def test__api__condition_of_sale__create__single(api_client: HitasAPIClient, fre
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -487,12 +489,14 @@ def test__api__condition_of_sale__create__no_new_apartments(api_client: HitasAPI
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -521,18 +525,21 @@ def test__api__condition_of_sale__create__some_already_exist(api_client: HitasAP
     new_ownership: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=None,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership_1: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_1)
 
@@ -568,18 +575,21 @@ def test__api__condition_of_sale__create__all_already_exist(api_client: HitasAPI
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership_1: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_1)
     ConditionOfSaleFactory.create(new_ownership=new_ownership, old_ownership=old_ownership_2)
@@ -617,12 +627,14 @@ def test__api__condition_of_sale__create__has_sales__in_the_future(api_client: H
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=timezone.now() + relativedelta(days=1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -656,12 +668,14 @@ def test__api__condition_of_sale__create__has_sales__in_the_past(api_client: Hit
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=timezone.now() - relativedelta(days=1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -691,6 +705,7 @@ def test__api__condition_of_sale__create__only_one_old_apartment(api_client: Hit
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -719,6 +734,7 @@ def test__api__condition_of_sale__create__only_one_new_apartment(api_client: Hit
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -751,11 +767,13 @@ def test__api__condition_of_sale__create__household_of_two__one_has_new(api_clie
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -792,16 +810,19 @@ def test__api__condition_of_sale__create__household_of_two__both_have_new(api_cl
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_1: Ownership = OwnershipFactory.create(
         owner=owner_1,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -844,16 +865,19 @@ def test__api__condition_of_sale__create__household_of_two__one_has_multiple_new
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_1: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -897,12 +921,14 @@ def test__api__condition_of_sale__create__household_of_two__neither_have_new(api
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -933,14 +959,20 @@ def test__api__condition_of_sale__create__household_of_two__same_new_apartment(a
     owner_1_old_ownership: Ownership = OwnershipFactory.create(
         owner=owner_1,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sale__purchase_date=datetime.date(2022, 1, 1),
     )
     owner_1_new_ownership: Ownership = OwnershipFactory.create(
         owner=owner_1,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sale__apartment__completion_date=None,
     )
     owner_2_new_ownership: Ownership = OwnershipFactory.create(
         owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sale__apartment=owner_1_new_ownership.sale.apartment,
     )
 
@@ -984,16 +1016,19 @@ def test__api__condition_of_sale__create__two_households(api_client: HitasAPICli
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_1: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner_3,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -1111,12 +1146,14 @@ def test__api__condition_of_sale__create__not_if_flag_set(api_client: HitasAPICl
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
@@ -1147,17 +1184,20 @@ def test__api__condition_of_sale__create__apartment_new_due_to_condition_of_sale
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_ownership_2: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     old_ownership: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ConditionOfSaleFactory.create(new_ownership=new_ownership_1, old_ownership=old_ownership)
 
@@ -1195,12 +1235,50 @@ def test__api__condition_of_sale__create__not_if_not_regulated(api_client: Hitas
         owner=owner,
         sale__apartment__completion_date=None,
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=owner,
         sale__apartment__completion_date=datetime.date(2022, 1, 1),
         sale__purchase_date=datetime.date(2022, 1, 1),
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+
+    # when:
+    # - New conditions of sale are created for this owner as a household
+    data = {"household": [owner.uuid.hex]}
+    url = reverse("hitas:conditions-of-sale-list")
+    response = api_client.post(url, data=data, format="json")
+
+    # then:
+    # - The response contains no conditions of sale
+    # - The database contains no conditions of sale
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 0, response.json()
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0
+
+
+@pytest.mark.django_db
+def test__api__condition_of_sale__create__not_to_half_hitas(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
+    # given:
+    # - An owner with ownerships to one new half-hitas apartment and one old non-half-hitas apartment
+    owner: Owner = OwnerFactory.create()
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=None,
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+    )
+    OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     # when:
