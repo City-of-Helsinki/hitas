@@ -6,8 +6,12 @@
   &--invalid
     [class*="text-input_hds-text-input"]
       border-color: $color-error !important
+  label
+    font-size: var(--fontsize-body-m)
+    span
+      line-height: var(--fontsize-body-m)
   &--required label
-    font-weight: 700
+      font-weight: 700
 
 input, input + label::before
   --focus-outline-color: var(--color-black-50)
