@@ -26,6 +26,7 @@ from hitas.models import (
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.utils import validate_business_id
 from hitas.services.audit_log import last_log
+from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
 from hitas.services.housing_company import get_regulation_release_date
 from hitas.utils import RoundWithPrecision, max_if_all_not_null
 from hitas.views.codes import (
@@ -217,7 +218,15 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
+        should_fulfill_conditions_of_sale = (
+            instance.regulation_status == RegulationStatus.REGULATED
+            and validated_data.get("regulation_status") not in [None, RegulationStatus.REGULATED]
+        )
+
         instance: HousingCompany = super().update(instance, validated_data)
+
+        if should_fulfill_conditions_of_sale:
+            fulfill_conditions_of_sales_for_housing_companies([instance.id])
 
         merge_model(
             model_class=HousingCompanyMarketPriceImprovement,
