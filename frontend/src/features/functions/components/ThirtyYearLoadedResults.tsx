@@ -12,7 +12,6 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
     const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
-    console.log(data);
 
     const ResultsList = ({category}) => {
         const companies = category === "freed" ? releasedCompanies : stayingCompanies;

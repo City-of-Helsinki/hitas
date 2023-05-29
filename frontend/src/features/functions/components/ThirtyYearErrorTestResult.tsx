@@ -1,30 +1,32 @@
 import {Button} from "hds-react";
-import {useState} from "react";
-import {QueryStateHandler} from "../../../common/components";
-import {ThirtyYearLoadedResults} from "./index";
+import {useEffect, useState} from "react";
+import {regulationAPIResponses} from "../simulatedResponses";
+import {ThirtyYearErrorModal, ThirtyYearLoadedResults} from "./index";
 
-export default function ThirtyYearErrorTestResult({data, error, calculationDate, showTest}) {
+export default function ThirtyYearErrorTestResult({testType, selection, calculationDate}) {
     const [isShowingResult, setIsShowingResult] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const handleSubmitClick = () => {
-        console.log("handleSubmitClick");
-        setIsShowingResult(true);
-        console.log(data, error);
-        showTest();
+        if (testType === "result") {
+            setIsShowingResult(true);
+        } else {
+            setIsModalOpen(true);
+        }
     };
+    useEffect(() => {
+        setIsShowingResult(false);
+        setIsModalOpen(false);
+    }, [selection]);
     return (
         <>
             {isShowingResult && (
-                <QueryStateHandler
-                    data={data}
-                    error={error}
-                    isLoading={false}
-                >
-                    <ThirtyYearLoadedResults
-                        data={data}
-                        calculationDate={calculationDate}
-                        reCalculateFn={showTest}
-                    />
-                </QueryStateHandler>
+                <ThirtyYearLoadedResults
+                    data={testType === "result" ? regulationAPIResponses[selection] : {}}
+                    calculationDate={calculationDate}
+                    reCalculateFn={() => {
+                        return;
+                    }}
+                />
             )}
             <div className="row row--buttons">
                 <Button
@@ -35,6 +37,11 @@ export default function ThirtyYearErrorTestResult({data, error, calculationDate,
                     Aja testivertailu
                 </Button>
             </div>
+            <ThirtyYearErrorModal
+                isOpen={isModalOpen}
+                setIsOpen={setIsModalOpen}
+                response={testType !== "result" ? regulationAPIResponses[selection] : {}}
+            />
         </>
     );
 }

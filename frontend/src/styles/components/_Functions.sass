@@ -71,7 +71,7 @@
 
     .regulation
       padding: 0
-      .heading--body
+      .page-heading
         background: $color-black-10
         padding: $spacing-m
         margin: 0
@@ -133,10 +133,11 @@
         padding: $spacing-m 0
       .external-sales-data-import
         background: $color-black-10
+        padding: $spacing-m
+        padding-top: 0
         h3
           margin: 0
-          padding: $spacing-m
-          padding-top: 0
+          padding: 0
       .file
         position: relative
         grid-row: 2
@@ -148,14 +149,13 @@
           @include flexbox()
           @include flex-flow(column nowrap)
           gap: $spacing-l
-          button
+          button:not([class*="tooltip"])
             width: 200px
             height: 56px
           section
             transform: translate(40px) !important
         label
           width: calc(50% - 25px)
-          margin-bottom: $spacing-s
         [class^="Tooltip-module_root"]
           width: 80%
           position: relative
@@ -178,7 +178,6 @@
         background: $color-black-10
         color: $color-black-50
         font-size: $fontsize-body-m
-
     .companies
       margin-top: $spacing-m
       background-color: $color-engel-medium-light
@@ -186,7 +185,7 @@
         background-color: white
         padding: $spacing-m
       .list-headers
-        width: 50%
+        width: 63%
       .results-list__item
         cursor: inherit
         padding: 0
@@ -198,9 +197,22 @@
           @include justify-content(space-between)
           &:hover
             text-decoration: underline
+        .company-info
+          @include flexbox()
+          @include flex-flow(row nowrap)
+          @include justify-content(space-between)
+          @include align-items(center)
+          width: 63%
         .buttons
-          width: 45%
+          @include flexbox()
+          width: 37%
           padding: $spacing-m
+          *:only-child
+            margin-left: auto
+        .manual-free-button:disabled
+          color: black
+          border-color: black
+          cursor: default
         .download-button
           margin-left: $spacing-m
         form
@@ -214,7 +226,7 @@
           [class^="Select-module_wrapper"]
             height: 56px
         &:hover
-          background-color: inherit
+          background-color: white
           cursor: inherit
       &--skipped
         background-color: $color-error-light
@@ -284,3 +296,10 @@
     .error-test-form
       padding: $spacing-m
       background: $color-black-10
+
+#obfuscated-owners-modal
+  ul
+    list-style-type: disc
+    padding-left: $spacing-s
+  li
+    margin-bottom: $spacing-2-xs
