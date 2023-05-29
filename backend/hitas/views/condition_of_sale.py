@@ -8,6 +8,7 @@ from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+from hitas.exceptions import ModelConflict
 from hitas.models.apartment import Apartment
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
 from hitas.models.owner import Owner
@@ -129,6 +130,12 @@ class ConditionOfSaleViewSet(HitasModelViewSet):
     serializer_class = ConditionOfSaleSerializer
     create_serializer_class = ConditionOfSaleCreateSerializer
     model_class = ConditionOfSale
+
+    def perform_destroy(self, instance: ConditionOfSale) -> None:
+        if instance.new_ownership.owner == instance.old_ownership.owner:
+            raise ModelConflict("Cannot delete condition of sale between the same owner.", error_code="invalid")
+
+        super().perform_destroy(instance)
 
     def get_queryset(self):
         return condition_of_sale_queryset()
