@@ -11,6 +11,7 @@ from rest_framework.serializers import ModelSerializer
 from hitas.exceptions import ModelConflict
 from hitas.models.apartment import Apartment
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
+from hitas.models.housing_company import HitasType
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
 from hitas.services.apartment import prefetch_first_sale
@@ -98,7 +99,12 @@ class ConditionOfSaleCreateSerializer(serializers.Serializer):
         # conditions of sale between their ownerships
         owners = list(
             Owner.objects.prefetch_related(
-                Prefetch("ownerships", Ownership.objects.select_related("sale__apartment")),
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.select_related("sale__apartment__building__real_estate__housing_company").exclude(
+                        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+                    ),
+                ),
                 prefetch_first_sale(lookup_prefix="ownerships__sale__apartment__"),
                 "ownerships__sale__apartment__sales__ownerships",
                 "ownerships__sale__apartment__sales__ownerships__conditions_of_sale_new",

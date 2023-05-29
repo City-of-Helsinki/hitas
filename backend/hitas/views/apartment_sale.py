@@ -130,11 +130,16 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
 
         self.context["conditions_of_sale_created"] = False
 
-        if apartment.is_new:
+        if apartment.housing_company.hitas_type != HitasType.HALF_HITAS and apartment.is_new:
             owners = [ownership.owner for ownership in ownerships]
             prefetch_related_objects(
                 owners,
-                Prefetch("ownerships", Ownership.objects.select_related("sale__apartment")),
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.select_related("sale__apartment__building__real_estate__housing_company").exclude(
+                        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+                    ),
+                ),
                 # Ignore the sale we just created so that apartments sold for the first time
                 # after they have been completed are treated as new at this moment.
                 prefetch_first_sale(lookup_prefix="ownerships__sale__apartment__", ignore=[instance.id]),
