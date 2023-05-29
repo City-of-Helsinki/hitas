@@ -921,6 +921,53 @@ def test__api__condition_of_sale__create__household_of_two__neither_have_new(api
 
 
 @pytest.mark.django_db
+def test__api__condition_of_sale__create__household_of_two__same_new_apartment(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
+    # given:
+    # - Two owners:
+    #   - Owner 1 has an ownership to an old apartment and a new apartment
+    #   - Owner 2 has an ownership to the same new apartment
+    owner_1: Owner = OwnerFactory.create()
+    owner_2: Owner = OwnerFactory.create()
+    owner_1_old_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=datetime.date(2022, 1, 1),
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
+    owner_1_new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__completion_date=None,
+    )
+    owner_2_new_ownership: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment=owner_1_new_ownership.sale.apartment,
+    )
+
+    # when:
+    # - New conditions of sale are created for these two owners as a household
+    data = {"household": [owner_1.uuid.hex, owner_2.uuid.hex]}
+    url = reverse("hitas:conditions-of-sale-list")
+    response = api_client.post(url, data=data, format="json")
+
+    # then:
+    # - The response contains two conditions of sale
+    # - The database contains two condition of sale
+    # - The conditions of sale are between:
+    #   - The new ownership of Owner 1 and the old ownership of Owner 1
+    #   - The new ownership of Owner 2 and the old ownership of Owner 1
+    # - There is not an ownership between the two new ownerships to the same apartment
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert len(response.json().get("conditions_of_sale", [])) == 2, response.json()
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 2
+    assert conditions_of_sale[0].new_ownership == owner_1_new_ownership
+    assert conditions_of_sale[0].old_ownership == owner_1_old_ownership
+    assert conditions_of_sale[1].new_ownership == owner_2_new_ownership
+    assert conditions_of_sale[1].old_ownership == owner_1_old_ownership
+
+
+@pytest.mark.django_db
 def test__api__condition_of_sale__create__two_households(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01 00:00:00+00:00")
 
