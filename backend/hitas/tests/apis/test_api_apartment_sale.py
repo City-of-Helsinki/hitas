@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
+from hitas.models.housing_company import RegulationStatus
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -667,8 +668,14 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(api_client: HitasAPIClient):
-    old_ownership: Ownership = OwnershipFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(completion_date=None, sales=[])
+    old_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+    new_apartment: Apartment = ApartmentFactory.create(
+        completion_date=None,
+        sales=[],
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
 
     data = {
         "ownerships": [
@@ -723,6 +730,52 @@ def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(a
     response_2 = api_client.get(url_2)
     assert response_2.status_code == status.HTTP_200_OK, response_2.json()
     assert response_2.json() == response_data
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__new_apartment__condition_of_sale_not_created(api_client: HitasAPIClient):
+    # Condition of sale is not created, since the apartment
+    # the owner has had previously has been released from regulation
+    old_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+    )
+    new_apartment: Apartment = ApartmentFactory.create(
+        completion_date=None,
+        sales=[],
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": old_ownership.owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": new_apartment.housing_company.uuid.hex,
+            "apartment_uuid": new_apartment.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+    response_data = response_1.json()
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_data
+
+    assert response_data.pop("conditions_of_sale_created", None) is False
+    conditions_of_sale: list[ConditionOfSale] = list(ConditionOfSale.objects.all())
+    assert len(conditions_of_sale) == 0
 
 
 @pytest.mark.django_db
