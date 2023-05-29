@@ -12,10 +12,7 @@ import {
 import {Divider, Heading} from "../../common/components";
 import {Select, ToggleInput} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
-import {ThirtyYearErrorModal, ThirtyYearErrorTestResult, ThirtyYearResults} from "./components";
-import ExternalSalesDataImport from "./components/ExternalSalesDataImport";
-import ThirtyYearErrorSelect from "./components/ThirtyYearErrorSelect";
-import {regulationAPIResponses} from "./simulatedResponses";
+import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
 
 const priceCeilings = {
     2023: {
@@ -71,7 +68,6 @@ const ThirtyYearRegulation = () => {
             quarter: defaultQuarter,
             file: undefined,
             test: false,
-            testSelect: "result_noProblems",
         },
         mode: "all",
     });
@@ -160,22 +156,6 @@ const ThirtyYearRegulation = () => {
                     setIsErrorModalOpen(true);
                 });
     };
-    const selection = watch("testSelect");
-    const test = {
-        data: {},
-        error: {},
-    };
-
-    const showTest = () => {
-        if (selection.split("_")[0] === "result") {
-            test.data = regulationAPIResponses[selection];
-            test.error = {};
-        } else {
-            test.data = {};
-            test.error = regulationAPIResponses[selection];
-        }
-        console.log(test);
-    };
 
     const hasRegulationResults =
         (!isGetRegulationLoading && !getRegulationError && !!getRegulationData) || !!regulationData;
@@ -184,7 +164,10 @@ const ThirtyYearRegulation = () => {
     return (
         <div className="view--functions__thirty-year-regulation">
             <div className="regulation">
-                <Heading type="body">
+                <Heading
+                    type="body"
+                    className="page-heading"
+                >
                     <span>Vapautumisen tarkistus</span>
                     <div className="test-toggle">
                         <ToggleInput
@@ -195,10 +178,9 @@ const ThirtyYearRegulation = () => {
                     </div>
                 </Heading>
                 {isTestMode ? (
-                    <ThirtyYearErrorSelect
-                        formObject={testForm}
-                        testObject={test}
-                    />
+                    <>
+                        <ThirtyYearErrorTest />
+                    </>
                 ) : (
                     <>
                         <div className="actions">
@@ -253,33 +235,24 @@ const ThirtyYearRegulation = () => {
                                 <ExternalSalesDataImport formDate={formDate} />
                             )}
                         </div>
+                        <ThirtyYearResults
+                            hasResults={hasRegulationResults}
+                            hasData={hasExternalSalesData}
+                            data={regulationData}
+                            error={regulationError}
+                            isLoading={isRegulationLoading}
+                            date={formDate}
+                            priceCeiling={priceCeiling}
+                            compareFn={onCompareButtonClick}
+                        />
+                        <ThirtyYearErrorModal
+                            isOpen={isErrorModalOpen}
+                            setIsOpen={setIsErrorModalOpen}
+                            response={regulationError}
+                        />
                     </>
                 )}
             </div>
-            {isTestMode ? (
-                <ThirtyYearErrorTestResult
-                    showTest={showTest}
-                    calculationDate={formDate}
-                    data={test.data}
-                    error={test.error}
-                />
-            ) : (
-                <ThirtyYearResults
-                    hasResults={hasRegulationResults}
-                    hasData={hasExternalSalesData}
-                    data={regulationData}
-                    error={regulationError}
-                    isLoading={isRegulationLoading}
-                    date={formDate}
-                    priceCeiling={priceCeiling}
-                    compareFn={onCompareButtonClick}
-                />
-            )}
-            <ThirtyYearErrorModal
-                isOpen={isErrorModalOpen}
-                setIsOpen={setIsErrorModalOpen}
-                response={regulationError}
-            />
         </div>
     );
 };
