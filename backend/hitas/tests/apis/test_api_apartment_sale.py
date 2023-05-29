@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -169,6 +169,7 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
 def test__api__apartment_sale__create(api_client: HitasAPIClient):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
     owner: Owner = OwnerFactory.create()
@@ -227,6 +228,7 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
 def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClient):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
     owner_1: Owner = OwnerFactory.create()
@@ -519,6 +521,7 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
 def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, invalid_data: dict, fields: list):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     owner: Owner = OwnerFactory.create()
 
@@ -572,6 +575,7 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
 
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=datetime.date(2022, 1, 1),
         sales=[],
     )
@@ -633,11 +637,13 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
     owner_2: Owner = OwnerFactory.create()
     new_ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         owner=owner_1,
         sale__purchase_date=datetime.date(2023, 1, 1),
     )
     old_ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         owner=owner_1,
         sale__purchase_date=datetime.date(2022, 1, 1),
     )
@@ -690,9 +696,11 @@ def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: H
 def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(api_client: HitasAPIClient):
     old_ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     new_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=None,
         sales=[],
     )
@@ -803,6 +811,7 @@ def test__api__apartment_sale__create__new_apartment__no_other_apartments(api_cl
     owner: Owner = OwnerFactory.create()
     new_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=None,
         sales=[],
     )
@@ -868,10 +877,12 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
     # One owner has an old apartment
     old_ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         owner=owner_1,
     )
     new_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=None,
         sales=[],
     )
@@ -944,12 +955,14 @@ def test__api__apartment_sale__create__new_apartment__is_new_before_cos_fulfille
     owner: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=datetime.date(2022, 1, 1),
         sales__purchase_date=datetime.date(2022, 1, 1),
         sales__ownerships__owner=owner,
     )
     new_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         completion_date=datetime.date(2022, 1, 1),
         sales=[],
     )
@@ -1022,6 +1035,7 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
     owner: Owner = OwnerFactory.create()
     new_apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
 
@@ -1089,6 +1103,7 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
 def test__api__apartment_sale__create__second_sale_older_than_first(api_client: HitasAPIClient):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
     owner: Owner = OwnerFactory.create()
@@ -1140,6 +1155,7 @@ def test__api__apartment_sale__create__second_sale_older_than_first(api_client: 
 def test__api__apartment_sale__create__cannot_sell_unregulated_apartment(api_client: HitasAPIClient):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
     owner: Owner = OwnerFactory.create()
@@ -1175,6 +1191,69 @@ def test__api__apartment_sale__create__cannot_sell_unregulated_apartment(api_cli
         "reason": "Conflict",
         "status": 409,
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__half_hitas__last_apartment_sold(api_client: HitasAPIClient):
+    apartment_1: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        sales=[],
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company=apartment_1.housing_company,
+        sales=[],
+    )
+
+    owner: Owner = OwnerFactory.create()
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    # First apartment is sold
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_1.housing_company.uuid.hex,
+            "apartment_uuid": apartment_1.uuid.hex,
+        },
+    )
+    response_1 = api_client.post(url_1, data=data, format="json")
+
+    assert response_1.status_code == status.HTTP_201_CREATED, response_1.json()
+
+    # Apartment housing company is still regulated
+    apartment_1.housing_company.refresh_from_db()
+    assert apartment_1.housing_company.regulation_status == RegulationStatus.REGULATED
+
+    # First apartment is sold
+    url_2 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment_2.housing_company.uuid.hex,
+            "apartment_uuid": apartment_2.uuid.hex,
+        },
+    )
+    response_2 = api_client.post(url_2, data=data, format="json")
+
+    assert response_2.status_code == status.HTTP_201_CREATED, response_2.json()
+
+    # Apartment housing company is now released from regulation
+    apartment_1.housing_company.refresh_from_db()
+    assert apartment_1.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
 # Update tests
