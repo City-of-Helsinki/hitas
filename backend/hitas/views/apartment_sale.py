@@ -9,10 +9,11 @@ from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models.apartment import Apartment, ApartmentSale
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import get_latest_sale_purchase_date, prefetch_first_sale
 from hitas.services.condition_of_sale import create_conditions_of_sale
+from hitas.services.housing_company import get_number_of_unsold_apartments
 from hitas.services.validation import lookup_id_to_uuid, lookup_model_id_by_uuid
 from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
@@ -119,6 +120,13 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
                     for data in ownership_data
                 ],
             )
+
+            # Half hitas housing companies are released from regulation when their last apartment is sold.
+            if apartment.housing_company.hitas_type == HitasType.HALF_HITAS:
+                unsold_apartments = get_number_of_unsold_apartments(apartment.housing_company)
+                if unsold_apartments == 0:
+                    apartment.housing_company.regulation_status = RegulationStatus.RELEASED_BY_HITAS
+                    apartment.housing_company.save()
 
         self.context["conditions_of_sale_created"] = False
 

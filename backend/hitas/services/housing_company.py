@@ -15,7 +15,11 @@ from hitas.models.apartment import Apartment
 from hitas.models.housing_company import HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRow
-from hitas.services.apartment import aggregate_catalog_prices_where_no_sales, get_first_sale_acquisition_price
+from hitas.services.apartment import (
+    aggregate_catalog_prices_where_no_sales,
+    get_first_sale_acquisition_price,
+    get_first_sale_purchase_date,
+)
 from hitas.services.audit_log import last_modified
 from hitas.utils import max_if_all_not_null, roundup
 
@@ -258,3 +262,22 @@ def get_regulation_release_date(housing_company_id: str | int):
     if subquery:
         return Subquery(queryset=queryset[:1], output_field=models.DateField(null=True))
     return queryset.first()
+
+
+def get_number_of_unsold_apartments(housing_company: HousingCompany) -> int:
+    return (
+        Apartment.objects.alias(
+            _first_purchase_date=get_first_sale_purchase_date("id"),
+        )
+        .annotate(
+            _unsold=ExpressionWrapper(
+                expression=Q(_first_purchase_date__isnull=True),
+                output_field=models.BooleanField(),
+            ),
+        )
+        .filter(
+            building__real_estate__housing_company=housing_company,
+            _unsold=True,
+        )
+        .count()
+    )
