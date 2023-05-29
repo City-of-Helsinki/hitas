@@ -32,6 +32,10 @@ import {
 } from "../common/schemas";
 import {hitasToast} from "../common/utils";
 
+// /////////
+// Config //
+// /////////
+
 declare global {
     interface Window {
         __env: Record<string, string> | undefined;
@@ -47,8 +51,24 @@ export class Config {
     static api_auth_url = Config.api_base_url + "/helauth";
 }
 
+// ////////
+// Utils //
+// ////////
+
 // Helper to return either the passed value prefixed with `/` or an empty string
 const idOrBlank = (id: string | undefined) => (id ? `/${id}` : "");
+
+const getFetchInit = () => {
+    return {
+        headers: new Headers({
+            "Content-Type": "application/json",
+            ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
+            ...(Config.token && {Authorization: "Bearer " + Config.token}),
+        }),
+        method: "POST",
+        ...(!Config.token && {credentials: "include" as RequestCredentials}),
+    };
+};
 
 const handleDownloadPDF = (response) => {
     response.blob().then((blob) => {
@@ -65,17 +85,18 @@ const handleDownloadPDF = (response) => {
     });
 };
 
-const getFetchInit = () => {
-    return {
-        headers: new Headers({
-            "Content-Type": "application/json",
-            ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
-            ...(Config.token && {Authorization: "Bearer " + Config.token}),
-        }),
-        method: "POST",
-        ...(!Config.token && {credentials: "include" as RequestCredentials}),
+const fetchAndDownloadPDF = (url: string, data: object) => {
+    const init = {
+        ...getFetchInit(),
+        body: JSON.stringify(data),
     };
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        .catch((error) => console.error(error));
 };
+// ////////////////
+// Download PDFs //
+// ////////////////
 
 export const downloadApartmentUnconfirmedMaximumPricePDF = (
     apartment: IApartmentDetails,
@@ -84,17 +105,9 @@ export const downloadApartmentUnconfirmedMaximumPricePDF = (
     calculationDate?: string
 ) => {
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-unconfirmed-prices`;
-    const init = {
-        ...getFetchInit(),
-        body: JSON.stringify({
-            additional_info: additionalInfo,
-            request_date: requestDate,
-            calculation_date: calculationDate,
-        }),
-    };
-    fetch(url, init)
-        .then(handleDownloadPDF)
-        .catch((error) => console.error(error));
+
+    const data = {additional_info: additionalInfo, request_date: requestDate, calculation_date: calculationDate};
+    fetchAndDownloadPDF(url, data);
 };
 
 export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, requestDate?: string) => {
@@ -103,14 +116,34 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, r
         return;
     }
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
-    const init = {
-        ...getFetchInit(),
-        body: JSON.stringify({request_date: requestDate}),
-    };
-    fetch(url, init)
-        .then(handleDownloadPDF)
-        .catch((error) => console.error(error));
+    const data = {request_date: requestDate};
+    fetchAndDownloadPDF(url, data);
 };
+
+// ///////////
+// Auth API //
+// ///////////
+
+export const authApi = createApi({
+    reducerPath: "authApi",
+    baseQuery: fetchBaseQuery({
+        baseUrl: Config.api_auth_url,
+        credentials: "include",
+    }),
+    endpoints: (builder) => ({
+        getUserInfo: builder.query<IUserInfoResponse, null>({
+            query: () => ({
+                url: "userinfo/",
+            }),
+        }),
+    }),
+});
+
+export const {useGetUserInfoQuery} = authApi;
+
+// ////////////
+// Hitas API //
+// ////////////
 
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
@@ -124,25 +157,6 @@ export const hitasApi = createApi({
     }),
     tagTypes: ["HousingCompany", "Apartment", "Index", "Owner"],
     endpoints: (builder) => ({}),
-});
-
-export const authApi = createApi({
-    reducerPath: "authApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: Config.api_auth_url,
-        credentials: "include",
-    }),
-    endpoints: (builder) => ({}),
-});
-
-const userApi = authApi.injectEndpoints({
-    endpoints: (builder) => ({
-        getUserInfo: builder.query<IUserInfoResponse, void>({
-            query: () => ({
-                url: "userinfo/",
-            }),
-        }),
-    }),
 });
 
 const listApi = hitasApi.injectEndpoints({
@@ -463,8 +477,6 @@ const mutationApi = hitasApi.injectEndpoints({
         }),
     }),
 });
-
-export const {useGetUserInfoQuery} = userApi;
 
 export const {
     useGetHousingCompaniesQuery,
