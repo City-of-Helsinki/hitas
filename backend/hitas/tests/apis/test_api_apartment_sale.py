@@ -169,7 +169,10 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create(sales=[])
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales=[],
+    )
     owner: Owner = OwnerFactory.create()
 
     data = {
@@ -224,7 +227,10 @@ def test__api__apartment_sale__create(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create(sales=[])
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales=[],
+    )
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
 
@@ -513,7 +519,9 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
 )
 @pytest.mark.django_db
 def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, invalid_data: dict, fields: list):
-    apartment: Apartment = ApartmentFactory.create()
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
     owner: Owner = OwnerFactory.create()
 
     data = {
@@ -564,7 +572,11 @@ def test__api__apartment_sale__create__invalid_data(api_client: HitasAPIClient, 
 def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01 00:00:00+00:00")
 
-    apartment: Apartment = ApartmentFactory.create(completion_date=datetime.date(2022, 1, 1), sales=[])
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        completion_date=datetime.date(2022, 1, 1),
+        sales=[],
+    )
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
     owner_3: Owner = OwnerFactory.create()
@@ -621,8 +633,16 @@ def test__api__apartment_sale__create__replace_old_ownerships(api_client: HitasA
 def test__api__apartment_sale__create__condition_of_sale_fulfilled(api_client: HitasAPIClient):
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
-    new_ownership: Ownership = OwnershipFactory.create(owner=owner_1, sale__purchase_date=datetime.date(2023, 1, 1))
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1, sale__purchase_date=datetime.date(2022, 1, 1))
+    new_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        owner=owner_1,
+        sale__purchase_date=datetime.date(2023, 1, 1),
+    )
+    old_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        owner=owner_1,
+        sale__purchase_date=datetime.date(2022, 1, 1),
+    )
     condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create(
         new_ownership=new_ownership,
         old_ownership=old_ownership,
@@ -674,9 +694,9 @@ def test__api__apartment_sale__create__new_apartment__create_condition_of_sale(a
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
     new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         completion_date=None,
         sales=[],
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
     data = {
@@ -783,7 +803,11 @@ def test__api__apartment_sale__create__new_apartment__condition_of_sale_not_crea
 @pytest.mark.django_db
 def test__api__apartment_sale__create__new_apartment__no_other_apartments(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(completion_date=None, sales=[])
+    new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        completion_date=None,
+        sales=[],
+    )
 
     data = {
         "ownerships": [
@@ -844,8 +868,15 @@ def test__api__apartment_sale__create__multiple_owners__new_apartment(api_client
     owner_2: Owner = OwnerFactory.create()
 
     # One owner has an old apartment
-    old_ownership: Ownership = OwnershipFactory.create(owner=owner_1)
-    new_apartment: Apartment = ApartmentFactory.create(completion_date=None, sales=[])
+    old_ownership: Ownership = OwnershipFactory.create(
+        sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        owner=owner_1,
+    )
+    new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        completion_date=None,
+        sales=[],
+    )
 
     data = {
         "ownerships": [
@@ -914,11 +945,13 @@ def test__api__apartment_sale__create__new_apartment__is_new_before_cos_fulfille
 
     owner: Owner = OwnerFactory.create()
     old_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         completion_date=datetime.date(2022, 1, 1),
         sales__purchase_date=datetime.date(2022, 1, 1),
         sales__ownerships__owner=owner,
     )
     new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         completion_date=datetime.date(2022, 1, 1),
         sales=[],
     )
@@ -989,7 +1022,10 @@ def test__api__apartment_sale__create__new_apartment__is_new_before_cos_fulfille
 @pytest.mark.django_db
 def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_date(api_client: HitasAPIClient):
     owner: Owner = OwnerFactory.create()
-    new_apartment: Apartment = ApartmentFactory.create(sales=[])
+    new_apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales=[],
+    )
 
     data = {
         "ownerships": [
@@ -1053,7 +1089,10 @@ def test__api__apartment_sale__create__second_sale_sets_last_latest_purchase_dat
 
 @pytest.mark.django_db
 def test__api__apartment_sale__create__second_sale_older_than_first(api_client: HitasAPIClient):
-    apartment: Apartment = ApartmentFactory.create(sales=[])
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sales=[],
+    )
     owner: Owner = OwnerFactory.create()
 
     # Latest sale, which is later than the sale we are about to create
@@ -1097,6 +1136,47 @@ def test__api__apartment_sale__create__second_sale_older_than_first(api_client: 
     ownerships: list[Ownership] = list(Ownership.objects.all())
     assert len(ownerships) == 1
     assert ownerships[0].sale == sale
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__create__cannot_sell_unregulated_apartment(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sales=[],
+    )
+    owner: Owner = OwnerFactory.create()
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.post(url_1, data=data, format="json")
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "invalid",
+        "message": "Cannot sell an unregulated apartment.",
+        "reason": "Conflict",
+        "status": 409,
+    }
 
 
 # Update tests

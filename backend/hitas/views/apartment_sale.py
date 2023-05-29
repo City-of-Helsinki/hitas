@@ -9,6 +9,7 @@ from rest_framework import serializers
 
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models.apartment import Apartment, ApartmentSale
+from hitas.models.housing_company import RegulationStatus
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import get_latest_sale_purchase_date, prefetch_first_sale
 from hitas.services.condition_of_sale import create_conditions_of_sale
@@ -69,7 +70,10 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
 
         try:
             apartment: Apartment = (
-                Apartment.objects.prefetch_related(
+                Apartment.objects.select_related(
+                    "building__real_estate__housing_company",
+                )
+                .prefetch_related(
                     prefetch_first_sale(),
                     "sales__ownerships",
                     "sales__ownerships__conditions_of_sale_new",
@@ -81,6 +85,9 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
             )
         except Apartment.DoesNotExist as error:
             raise HitasModelNotFound(model=Apartment) from error
+
+        if apartment.housing_company.regulation_status != RegulationStatus.REGULATED:
+            raise ModelConflict("Cannot sell an unregulated apartment.", error_code="invalid")
 
         validated_data["apartment"] = apartment
 
