@@ -199,11 +199,11 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
     release_date = serializers.SerializerMethodField()
-    improvements = HousingCompanyImprovementSerializer(source="*")
+    improvements = HousingCompanyImprovementSerializer(source="*", required=False)
 
     def create(self, validated_data):
-        mpi = validated_data.pop("market_price_improvements")
-        cpi = validated_data.pop("construction_price_improvements")
+        mpi = validated_data.pop("market_price_improvements", None) or []
+        cpi = validated_data.pop("construction_price_improvements", None) or []
 
         instance: HousingCompany = super().create(validated_data)
 
@@ -215,8 +215,8 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return instance
 
     def update(self, instance: HousingCompany, validated_data: dict[str, Any]):
-        mpi = validated_data.pop("market_price_improvements")
-        cpi = validated_data.pop("construction_price_improvements")
+        mpi: Optional[list] = validated_data.pop("market_price_improvements", None)
+        cpi: Optional[list] = validated_data.pop("construction_price_improvements", None)
 
         should_fulfill_conditions_of_sale = (
             instance.regulation_status == RegulationStatus.REGULATED
@@ -228,21 +228,23 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         if should_fulfill_conditions_of_sale:
             fulfill_conditions_of_sales_for_housing_companies([instance.id])
 
-        merge_model(
-            model_class=HousingCompanyMarketPriceImprovement,
-            existing_qs=instance.market_price_improvements.all(),
-            wanted=mpi,
-            create_defaults={"housing_company": instance},
-            equal_fields=["value", "completion_date", "name", "no_deductions"],
-        )
+        if mpi is not None:
+            merge_model(
+                model_class=HousingCompanyMarketPriceImprovement,
+                existing_qs=instance.market_price_improvements.all(),
+                wanted=mpi,
+                create_defaults={"housing_company": instance},
+                equal_fields=["value", "completion_date", "name", "no_deductions"],
+            )
 
-        merge_model(
-            model_class=HousingCompanyConstructionPriceImprovement,
-            existing_qs=instance.construction_price_improvements.all(),
-            wanted=cpi,
-            create_defaults={"housing_company": instance},
-            equal_fields=["value", "completion_date", "name"],
-        )
+        if cpi is not None:
+            merge_model(
+                model_class=HousingCompanyConstructionPriceImprovement,
+                existing_qs=instance.construction_price_improvements.all(),
+                wanted=cpi,
+                create_defaults={"housing_company": instance},
+                equal_fields=["value", "completion_date", "name"],
+            )
 
         return instance
 
