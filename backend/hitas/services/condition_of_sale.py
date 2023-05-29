@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from hitas.models import ConditionOfSale, Owner, Ownership
 from hitas.models.condition_of_sale import ConditionOfSaleAnnotated
+from hitas.models.housing_company import RegulationStatus
 from hitas.services.apartment import get_first_sale_purchase_date
 
 
@@ -41,31 +42,12 @@ def create_conditions_of_sale(owners: list["Owner"]) -> list[ConditionOfSale]:
         ownership for owner in owners for ownership in owner.ownerships.all() if not owner.bypass_conditions_of_sale
     ]
 
-    to_save: dict[tuple[int, int], ConditionOfSale] = {}
-
-    # Create conditions of sale for all ownerships to new apartments this owner has,
-    # and all the additional ownerships given (if they are for new apartments)
-    for ownership in ownerships:
-        apartment = ownership.apartment
-
-        if apartment.is_new:
-            for other_ownership in ownerships:
-                # Don't create circular conditions of sale
-                if ownership.id == other_ownership.id:
-                    continue
-
-                # Only one condition of sale between two new apartments
-                key: tuple[int, int] = tuple(sorted([ownership.id, other_ownership.id]))  # type: ignore
-                if key in to_save:
-                    continue
-
-                to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
-
-    if not to_save:
+    conditions_of_sale = determine_conditions_of_sale(ownerships)
+    if not conditions_of_sale:
         return []
 
     # 'ignore_conflicts' so that we can create all missing conditions of sale if some already exist
-    ConditionOfSale.objects.bulk_create(to_save.values(), ignore_conflicts=True)
+    ConditionOfSale.objects.bulk_create(conditions_of_sale, ignore_conflicts=True)
 
     # We have to fetch ownerships separately, since if only some conditions of sale in 'to_save' were created,
     # the ids or conditions of sale in the returned list from 'bulk_create' are not correct.
@@ -74,3 +56,31 @@ def create_conditions_of_sale(owners: list["Owner"]) -> list[ConditionOfSale]:
         .filter(Q(new_ownership__owner__in=owners) | Q(old_ownership__owner__in=owners))
         .all()
     )
+
+
+def determine_conditions_of_sale(ownerships: list[Ownership]) -> list[ConditionOfSale]:
+    to_save: dict[tuple[int, int], ConditionOfSale] = {}
+    # Create conditions of sale for all ownerships to new apartments this owner has,
+    # and all the additional ownerships given (if they are for new apartments).
+    # Don't create conditions of sale to unregulated housing companies.
+    for ownership in ownerships:
+        apartment = ownership.apartment
+        if apartment.housing_company.regulation_status != RegulationStatus.REGULATED or not apartment.is_new:
+            continue
+
+        for other_ownership in ownerships:
+            if (
+                other_ownership.apartment.housing_company.regulation_status != RegulationStatus.REGULATED
+                # Don't create circular conditions of sale
+                or ownership.id == other_ownership.id
+            ):
+                continue
+
+            # Only one condition of sale between two new apartments
+            key: tuple[int, int] = tuple(sorted([ownership.id, other_ownership.id]))  # type: ignore
+            if key in to_save:
+                continue
+
+            to_save[key] = ConditionOfSale(new_ownership=ownership, old_ownership=other_ownership)
+
+    return list(to_save.values())
