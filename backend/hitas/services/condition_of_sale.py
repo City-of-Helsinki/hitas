@@ -70,9 +70,13 @@ def determine_conditions_of_sale(ownerships: list[Ownership]) -> list[ConditionO
 
         for other_ownership in ownerships:
             if (
+                # Don't create conditions of sale to unregulated housing companies.
                 other_ownership.apartment.housing_company.regulation_status != RegulationStatus.REGULATED
                 # Don't create circular conditions of sale
                 or ownership.id == other_ownership.id
+                # Don't create conditions of sale between two ownerships to the same apartment.
+                # They are in the same sale but for different owners.
+                or other_ownership.apartment == apartment
             ):
                 continue
 
