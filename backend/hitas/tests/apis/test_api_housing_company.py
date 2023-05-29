@@ -13,6 +13,7 @@ from hitas.models import (
     Apartment,
     Building,
     BuildingType,
+    ConditionOfSale,
     Developer,
     HitasPostalCode,
     HousingCompany,
@@ -34,6 +35,7 @@ from hitas.tests.factories import (
     ApartmentFactory,
     BuildingFactory,
     BuildingTypeFactory,
+    ConditionOfSaleFactory,
     DeveloperFactory,
     HitasPostalCodeFactory,
     HousingCompanyConstructionPriceImprovementFactory,
@@ -986,6 +988,65 @@ def test__api__housing_company__update__no_changes(api_client: HitasAPIClient):
 
     response = api_client.put(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]), data=data, format="json")
     assert response.status_code == status.HTTP_200_OK, response.json()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__update__fulfill_condition_of_sale(api_client: HitasAPIClient):
+    apartment_1: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create(
+        new_ownership=apartment_1.first_sale().ownerships.first(),
+        old_ownership=apartment_2.first_sale().ownerships.first(),
+    )
+
+    assert condition_of_sale.fulfilled is None
+
+    data = {
+        "acquisition_price": apartment_1.housing_company.acquisition_price,
+        "address": {
+            "street_address": apartment_1.housing_company.street_address,
+            "postal_code": apartment_1.housing_company.postal_code.value,
+        },
+        "building_type": {"id": apartment_1.housing_company.building_type.uuid.hex},
+        "business_id": apartment_1.housing_company.business_id,
+        "developer": {"id": apartment_1.housing_company.developer.uuid.hex},
+        "name": {
+            "display": apartment_1.housing_company.display_name,
+            "official": apartment_1.housing_company.official_name,
+        },
+        "notes": apartment_1.housing_company.notes,
+        "primary_loan": apartment_1.housing_company.primary_loan,
+        "property_manager": {"id": apartment_1.housing_company.property_manager.uuid.hex},
+        "hitas_type": apartment_1.housing_company.hitas_type.value,
+        "improvements": {
+            "construction_price_index": [],
+            "market_price_index": [],
+        },
+        "regulation_status": RegulationStatus.RELEASED_BY_HITAS.value,
+    }
+
+    url = reverse(
+        "hitas:housing-company-detail",
+        kwargs={
+            "uuid": apartment_1.housing_company.uuid.hex,
+        },
+    )
+
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    # Check that the regulation status has been updated
+    apartment_1.housing_company.refresh_from_db()
+    assert apartment_1.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+
+    # Check that the condition of sale has been fulfilled
+    condition_of_sale.refresh_from_db()
+    assert condition_of_sale.fulfilled is not None
 
 
 # Delete tests
