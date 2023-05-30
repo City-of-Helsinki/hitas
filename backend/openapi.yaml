@@ -205,6 +205,47 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+    patch:
+      description: Update a housing company partially
+      operationId: partial-update-housing-company
+      tags:
+        - Housing companies
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/HousingCompanyPartialUpdateDetails'
+      responses:
+        '200':
+          description: Successfully updated a housing company
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/HousingCompanyDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
     delete:
       description: Remove a housing company
       operationId: delete-housing-company
@@ -3927,6 +3968,263 @@ components:
           readOnly: true
 
     HousingCompanyDetails:
+      description: Single housing company's details
+      type: object
+      additionalProperties: false
+      required:
+        - address
+        - area
+        - date
+        - id
+        - name
+        - hitas_type
+        - real_estates
+        - summary
+        - improvements
+      properties:
+        id:
+          description: Housing company ID
+          type: string
+          readOnly: true
+          example: a3181b8fa60b47df8ccba0d554a913bb
+        name:
+          description: Name information about the housing company
+          type: object
+          additionalProperties: false
+          required:
+            - official
+            - display
+          properties:
+            official:
+              description: Official name of the housing company. Better suited for official documents, etc.
+              type: string
+              maxLength: 1024
+              example: As Oy Taloyhtiö Helmi
+            display:
+              description: Simpler form of official name. Better suited for displaying housing company's name
+              type: string
+              maxLength: 1024
+              example: Taloyhtiö Helmi
+        business_id:
+          description: Official business ID
+          type: string
+          nullable: true
+          pattern: '^$|^\d{7}-\d$'
+          example: 1234567-1
+        hitas_type:
+          $ref: '#/components/schemas/HitasType'
+        exclude_from_statistics:
+          description: Should this housing company's apartments' sales be excluded from statistics?
+          type: boolean
+          example: false
+        regulation_status:
+          $ref: '#/components/schemas/RegulationStatus'
+        over_thirty_years_old:
+          description: Is this housing company over 30 year old?
+          type: boolean
+          example: false
+        completed:
+          description: Is this housing company completed?
+          type: boolean
+          example: false
+        address:
+          $ref: '#/components/schemas/HitasHousingCompanyAddress'
+        area:
+          description: Hitas cost area information related to the housing company
+          type: object
+          additionalProperties: false
+          readOnly: true
+          required:
+            - name
+            - cost_area
+          properties:
+            name:
+              description: Area name based on the postal code
+              type: string
+              example: Helsinki Keskusta - Etu-Töölö
+            cost_area:
+              description: Hitas cost area based on the postal code
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4
+              example: 1
+        date:
+          description: Year of first construction based on the housing company's earliest constructed building
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        building_type:
+          $ref: '#/components/schemas/ReadOnlyCode'
+        developer:
+          $ref: '#/components/schemas/ReadOnlyCode'
+        property_manager:
+          nullable: true
+          $ref: '#/components/schemas/ReadOnlyPropertyManager'
+        summary:
+          description: Summary data for this housing company across all apartments
+          type: object
+          additionalProperties: false
+          readOnly: true
+          required:
+            - average_price_per_square_meter
+            - total_surface_area
+            - total_shares
+          properties:
+            average_price_per_square_meter:
+              description: Average square meter price
+              type: number
+              minimum: 0
+              example: 123000
+            realized_acquisition_price:
+              description: Realized acquisition price
+              type: number
+              minimum: 0
+              example: 112000.00
+            total_surface_area:
+              description: Total surface area across all apartments
+              type: number
+              minimum: 0
+              example: 20452.2
+            total_shares:
+              description: Total number of shares across all apartments
+              type: number
+              minimum: 0
+              example: 98500
+        acquisition_price:
+          description: Initial acquisition price of the housing company
+          type: number
+          format: float
+          minimum: 0
+          example: 112000.00
+        primary_loan:
+          description: Primary loan
+          type: number
+          format: float
+          nullable: true
+          example: 112000.00
+        sales_price_catalogue_confirmation_date:
+          description: Sales price catalogue confirmation date
+          type: string
+          format: date
+          nullable: true
+        release_date:
+          description: Regulation release date
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        archive_id:
+          description: Archive ID for this housing company
+          type: integer
+          readOnly: true
+          minimum: 1
+        notes:
+          description: Optional notes for this housing company
+          type: string
+        last_modified:
+          description: Last modified information
+          type: object
+          additionalProperties: false
+          readOnly: true
+          required:
+            - user
+            - datetime
+          properties:
+            user:
+              description: User who last modified this housing company
+              type: object
+              additionalProperties: false
+              required:
+                - username
+                - first_name
+                - last_name
+              properties:
+                username:
+                  description: Username of this user
+                  type: string
+                  nullable: true
+                  example: mameik01
+                first_name:
+                  description: First name of this user
+                  type: string
+                  nullable: true
+                  example: Matti
+                last_name:
+                  description: Last name of this user
+                  type: string
+                  nullable: true
+                  example: Meikäläinen
+            datetime:
+              description: When this housing company was last modified
+              type: string
+              format: date-time
+        real_estates:
+          description: List of real estates this housing company has
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/RealEstate'
+        improvements:
+          description: Contains housing company improvements
+          type: object
+          additionalProperties: false
+          required:
+            - market_price_index
+            - construction_price_index
+          properties:
+            market_price_index:
+              description: List of improvements for market price index
+              type: array
+              items:
+                description: Improvement
+                type: object
+                additionalProperties: false
+                required:
+                  - name
+                  - value
+                  - completion_date
+                properties:
+                  name:
+                    description: Name of this improvement
+                    type: string
+                    example: Hissisaneeraus
+                  value:
+                    description: Original value of this improvement
+                    type: number
+                    minimum: 0
+                    example: 78284.25
+                  completion_date:
+                    $ref: '#/components/schemas/YearMonth'
+                  no_deductions:
+                    description: Should this improvement be exempt from all deductions (excess, deprecation)
+                    type: boolean
+            construction_price_index:
+              description: List of improvements for construction price index
+              type: array
+              items:
+                description: Improvement
+                type: object
+                additionalProperties: false
+                required:
+                  - name
+                  - value
+                  - completion_date
+                properties:
+                  name:
+                    description: Name of this improvement
+                    type: string
+                    example: Liittyminen HTV-verkkoon
+                  value:
+                    description: Original value of this improvement
+                    type: number
+                    minimum: 0
+                    example: 13359.75
+                  completion_date:
+                    $ref: '#/components/schemas/YearMonth'
+
+    HousingCompanyPartialUpdateDetails:
       description: Single housing company's details
       type: object
       additionalProperties: false
