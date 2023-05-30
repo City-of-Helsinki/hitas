@@ -1,5 +1,5 @@
 import {useForm} from "react-hook-form";
-import {ThirtyYearErrorSelect, ThirtyYearErrorTestResult} from "./index";
+import {ThirtyYearErrorSelect, ThirtyYearErrorTestResult} from "../index";
 
 export default function ThirtyYearErrorTest() {
     const testForm = useForm({

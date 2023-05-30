@@ -19,7 +19,7 @@ export default function ThirtyYearResults({
                     data={data}
                     error={data ? undefined : error}
                     isLoading={isLoading}
-                    attemptedAction="hae suoritetun vertailun t ulokset"
+                    attemptedAction="hae suoritetun vertailun tulokset"
                 >
                     <ThirtyYearLoadedResults
                         data={data}

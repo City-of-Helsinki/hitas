@@ -3,7 +3,7 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {ReactNode} from "react";
+import React, {ReactNode} from "react";
 import {NavigateBackButton, QueryStateHandler} from "./index";
 
 interface ConfirmDialogModalProps {
