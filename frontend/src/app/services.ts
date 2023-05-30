@@ -72,18 +72,22 @@ const getFetchInit = () => {
 };
 
 const handleDownloadPDF = (response) => {
-    response.blob().then((blob) => {
-        const filename = response.headers.get("Content-Disposition")?.split("=")[1];
-        if (filename === undefined) {
-            hitasToast("Virhe tiedostoa ladattaessa.", "error");
-            return;
-        }
+    response
+        .blob()
+        .then((blob) => {
+            const filename = response.headers.get("Content-Disposition")?.split("=")[1];
+            if (filename === undefined) {
+                hitasToast("Virhe tiedostoa ladattaessa.", "error");
+                return;
+            }
 
-        const alink = document.createElement("a");
-        alink.href = window.URL.createObjectURL(blob);
-        alink.download = `${filename}`;
-        alink.click();
-    });
+            const alink = document.createElement("a");
+            alink.href = window.URL.createObjectURL(blob);
+            alink.download = `${filename}`;
+            alink.click();
+        })
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error(error));
 };
 
 const fetchAndDownloadPDF = (url: string, data: object) => {
@@ -93,6 +97,7 @@ const fetchAndDownloadPDF = (url: string, data: object) => {
     };
     fetch(url, init)
         .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
         .catch((error) => console.error(error));
 };
 
@@ -125,20 +130,6 @@ export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, r
 export const downloadRegulationResults = (calculationDate?: string) => {
     const params = `calculation_date=${calculationDate}`;
     const url = `${Config.api_v1_url}/thirty-year-regulation/reports/download-regulation-results?${params}`;
-    const init = {
-        ...getFetchInit(),
-        method: "GET",
-    };
-    fetch(url, init)
-        .then(handleDownloadPDF)
-        .catch((error) => console.error(error));
-};
-
-export const downloadCompanyRegulationLetter = (company: IHousingCompanyDetails, calculationDate?: string) => {
-    const params = `housing_company_id=${company.id}${
-        calculationDate !== undefined ? `&calculation_date=${calculationDate}` : ""
-    }`;
-    const url = `${Config.api_v1_url}/thirty-year-regulation/reports/download-regulation-letter?${params}`;
     const init = {
         ...getFetchInit(),
         method: "GET",
@@ -185,6 +176,25 @@ export const hitasApi = createApi({
     }),
     tagTypes: ["HousingCompany", "Apartment", "Index", "Owner", "ExternalSaleData", "ThirtyYearRegulation"],
     endpoints: (builder) => ({}),
+});
+
+// Mutations are used to allow invalidating cache when PDF is downloaded
+const pdfApi = hitasApi.injectEndpoints({
+    endpoints: (builder) => ({
+        downloadThirtyYearRegulationLetter: builder.mutation<object, {id: string; calculationDate: string}>({
+            query: ({id, calculationDate}) => {
+                return {
+                    url: `thirty-year-regulation/reports/download-regulation-letter?housing_company_id=${id}&calculation_date=${calculationDate}`,
+                    method: "GET",
+                    responseHandler: async (response) => {
+                        await handleDownloadPDF(response);
+                    },
+                    cache: "no-cache",
+                };
+            },
+            invalidatesTags: (result, error, arg) => [{type: "ThirtyYearRegulation", id: arg.calculationDate}],
+        }),
+    }),
 });
 
 const listApi = hitasApi.injectEndpoints({
@@ -333,6 +343,22 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) => [
                 {type: "HousingCompany", id: "LIST"},
                 {type: "HousingCompany", id: arg.id},
+            ],
+        }),
+        releaseHousingCompanyFromRegulation: builder.mutation<
+            IHousingCompanyDetails,
+            {housingCompanyId: string; calculationDate: string}
+        >({
+            query: ({housingCompanyId, calculationDate}) => ({
+                url: `housing-companies/${housingCompanyId}`,
+                method: "PATCH",
+                body: {regulation_status: "released_by_plot_department"},
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {type: "HousingCompany", id: "LIST"},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+                {type: "ThirtyYearRegulation", id: arg.calculationDate},
             ],
         }),
         createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
@@ -518,6 +544,8 @@ const mutationApi = hitasApi.injectEndpoints({
     }),
 });
 
+export const {useDownloadThirtyYearRegulationLetterMutation} = pdfApi;
+
 export const {
     useGetHousingCompaniesQuery,
     useGetApartmentsQuery,
@@ -542,6 +570,7 @@ export const {
 
 export const {
     useSaveHousingCompanyMutation,
+    useReleaseHousingCompanyFromRegulationMutation,
     useCreateRealEstateMutation,
     useDeleteRealEstateMutation,
     useSaveBuildingMutation,

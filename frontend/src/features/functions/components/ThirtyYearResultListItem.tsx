@@ -2,42 +2,38 @@ import {Button, IconDocument, IconLockOpen} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {
-    downloadCompanyRegulationLetter,
-    useGetHousingCompanyDetailQuery,
-    useSaveHousingCompanyMutation,
+    useDownloadThirtyYearRegulationLetterMutation,
+    useReleaseHousingCompanyFromRegulationMutation,
 } from "../../../app/services";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {formatDate, hdsToast} from "../../../common/utils";
 
-const ThirtyYearResultListItem = ({company, category}) => {
-    const [hasBeenFreed, setHasBeenFreed] = useState(false);
+const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [saveHousingCompany] = useSaveHousingCompanyMutation();
-    const {data: housingCompany, isLoading, error} = useGetHousingCompanyDetailQuery(company.id);
-    const handleClickDownload = () => {
-        downloadCompanyRegulationLetter(company);
+    const [releaseHousingCompany] = useReleaseHousingCompanyFromRegulationMutation();
+    const [downloadPDFFile] = useDownloadThirtyYearRegulationLetterMutation();
+    const isHousingCompanyReleased = company.current_regulation_status !== "regulated";
+
+    const handleClickDownloadPDFButton = () => {
+        downloadPDFFile({id: company.id, calculationDate: calculationDate});
     };
-    const handleFree = () => {
-        housingCompany &&
-            !isLoading &&
-            !error &&
-            saveHousingCompany({
-                data: {
-                    ...housingCompany,
-                    regulation_status: "released_by_plot_department",
-                },
-                id: company.id,
+
+    const handleFreeHousingCompanyFromRegulation = () => {
+        releaseHousingCompany({
+            housingCompanyId: company.id,
+            calculationDate: calculationDate,
+        })
+            .then(() => {
+                hdsToast.success(`${company.display_name} vapautettu onnistuneesti.`);
             })
-                .then(() => {
-                    setHasBeenFreed(true);
-                    hdsToast.success(`${company.display_name} vapautettu onnistuneesti.`);
-                })
-                .catch((error) => {
-                    hdsToast.error(`${company.display_name} vapautus epäonnistui.`);
-                    console.warn("Caught error:", error);
-                });
+            .catch((error) => {
+                hdsToast.error(`${company.display_name} vapautus epäonnistui.`);
+                // eslint-disable-next-line no-console
+                console.warn("Caught error:", error);
+            });
         setIsModalOpen(false);
     };
+
     return (
         <li className="results-list__item">
             <div className="company-info">
@@ -60,18 +56,18 @@ const ThirtyYearResultListItem = ({company, category}) => {
                     <Button
                         className="manual-free-button"
                         theme="black"
-                        variant={hasBeenFreed ? "secondary" : "primary"}
+                        variant={isHousingCompanyReleased ? "secondary" : "primary"}
                         onClick={() => setIsModalOpen(true)}
                         iconLeft={<IconLockOpen />}
-                        disabled={hasBeenFreed}
+                        disabled={isHousingCompanyReleased}
                     >
-                        {hasBeenFreed ? "Vapautettu" : "Vapauta"}
+                        {isHousingCompanyReleased ? "Vapautettu" : "Vapauta"}
                     </Button>
                 )}
-                {!hasBeenFreed && (
+                {!isHousingCompanyReleased && (
                     <Button
                         theme="black"
-                        onClick={handleClickDownload}
+                        onClick={handleClickDownloadPDFButton}
                         variant={company.letter_fetched ? "secondary" : "primary"}
                         className="download-button"
                         iconLeft={<IconDocument />}
@@ -86,7 +82,7 @@ const ThirtyYearResultListItem = ({company, category}) => {
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
                 buttonText="Vapauta"
-                confirmAction={handleFree}
+                confirmAction={handleFreeHousingCompanyFromRegulation}
                 cancelAction={() => setIsModalOpen(false)}
             />
         </li>
