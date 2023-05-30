@@ -30,12 +30,10 @@ from hitas.utils import subquery_first_id
 
 class ApartmentState(Enum):
     FREE = "free"
-    RESERVED = "reserved"
     SOLD = "sold"
 
     class Labels:
         FREE = _("Free")
-        RESERVED = _("Reserved")
         SOLD = _("Sold")
 
 
@@ -86,10 +84,6 @@ class Apartment(ExternalSafeDeleteHitasModel):
 
     # 'Muistiinpanot'
     notes: Optional[str] = models.TextField(blank=True, null=True)
-
-    # TODO: To be removed
-    # 'Tila'
-    state: ApartmentState = EnumField(ApartmentState, default=ApartmentState.FREE, null=True)
 
     # 'Myyntihintaluettelon Hankinta-arvo' = Myyntihintaluettelon kauppakirjahinta + yhtiölainaosuus
     @property
@@ -361,7 +355,15 @@ class Apartment(ExternalSafeDeleteHitasModel):
 
 
 # This is for typing only
-class ApartmentWithAnnotations(Apartment):
+class ApartmentWithListAnnotations(Apartment):
+    has_conditions_of_sale: Optional[bool]
+
+    class Meta:
+        abstract = True
+
+
+# This is for typing only
+class ApartmentWithAnnotations(ApartmentWithListAnnotations):
     completion_month: Optional[date]
     cpi: Optional[Decimal]
     cpi_2005_100: Optional[Decimal]
@@ -373,7 +375,6 @@ class ApartmentWithAnnotations(Apartment):
     _latest_sale_purchase_price: Optional[Decimal]
     _first_purchase_date: Optional[date]
     _latest_purchase_date: Optional[date]
-    has_conditions_of_sale: Optional[bool]
 
     class Meta:
         abstract = True

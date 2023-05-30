@@ -39,9 +39,10 @@ from hitas.models import (
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
     ApartmentMarketPriceImprovement,
-    ApartmentState,
     ApartmentWithAnnotations,
     DepreciationPercentage,
+    ApartmentWithListAnnotations,
+    ApartmentState,
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType, RegulationStatus
@@ -617,7 +618,7 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
 
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
-    state = HitasEnumField(enum=ApartmentState, required=False, allow_null=True)
+    state = serializers.SerializerMethodField()
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type", required=False, allow_null=True)
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
@@ -633,7 +634,11 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     sell_by_date = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_ownerships(instance: Apartment) -> list[dict[str, Any]]:
+    def get_state(instance: ApartmentWithAnnotations) -> str:
+        return ApartmentState.SOLD.value if instance.sales.exists() else ApartmentState.FREE.value
+
+    @staticmethod
+    def get_ownerships(instance: ApartmentWithAnnotations) -> list[dict[str, Any]]:
         ownerships: list[dict[str, Any]] = []
         for sale in instance.sales.all():  # only first sale prefetched
             for ownership in sale.ownerships.all():
@@ -641,7 +646,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return ownerships
 
     @staticmethod
-    def get_conditions_of_sale(instance: Apartment) -> list[dict[str, Any]]:
+    def get_conditions_of_sale(instance: ApartmentWithAnnotations) -> list[dict[str, Any]]:
         conditions_of_sale: list[ConditionOfSale] = [
             cos
             for sale in instance.sales.all()  # only first sale prefetched
@@ -653,11 +658,11 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return [ApartmentConditionsOfSaleSerializer(cos, context=context).data for cos in conditions_of_sale]
 
     @staticmethod
-    def get_sell_by_date(instance: Apartment) -> Optional[datetime.date]:
+    def get_sell_by_date(instance: ApartmentWithAnnotations) -> Optional[datetime.date]:
         return instance.sell_by_date
 
     @staticmethod
-    def get_links(instance: Apartment):
+    def get_links(instance: ApartmentWithAnnotations):
         return create_links(instance)
 
     def validate_building(self, building: Building) -> Building:
@@ -685,7 +690,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
 
         return instance
 
-    def update(self, instance: Apartment, validated_data: dict[str, Any]) -> Apartment:
+    def update(self, instance: ApartmentWithAnnotations, validated_data: dict[str, Any]) -> Apartment:
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
@@ -737,15 +742,15 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
     has_grace_period = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_type(instance: Apartment) -> Optional[str]:
+    def get_type(instance: ApartmentWithListAnnotations) -> Optional[str]:
         return getattr(getattr(instance, "apartment_type", None), "value", None)
 
     @staticmethod
-    def get_has_conditions_of_sale(instance: ApartmentWithAnnotations) -> bool:
+    def get_has_conditions_of_sale(instance: ApartmentWithListAnnotations) -> bool:
         return instance.has_conditions_of_sale
 
     @staticmethod
-    def get_has_grace_period(instance: Apartment) -> bool:
+    def get_has_grace_period(instance: ApartmentWithListAnnotations) -> bool:
         return instance.has_grace_period
 
     class Meta:

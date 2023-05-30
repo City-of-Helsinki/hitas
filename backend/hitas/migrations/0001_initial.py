@@ -43,6 +43,17 @@ class HousingCompanyState(Enum):
         READY_NO_STATISTICS = _("Ready, no statistics")
 
 
+class ApartmentState(Enum):
+    FREE = "free"
+    RESERVED = "reserved"
+    SOLD = "sold"
+
+    class Labels:
+        FREE = _("Free")
+        RESERVED = _("Reserved")
+        SOLD = _("Sold")
+
+
 class Migration(migrations.Migration):
     initial = True
 
@@ -147,9 +158,7 @@ class Migration(migrations.Migration):
                 ("notes", models.TextField(blank=True, null=True)),
                 (
                     "state",
-                    enumfields.fields.EnumField(
-                        default="free", enum=hitas.models.apartment.ApartmentState, max_length=10, null=True
-                    ),
+                    enumfields.fields.EnumField(default="free", enum=ApartmentState, max_length=10, null=True),
                 ),
             ],
             options={
