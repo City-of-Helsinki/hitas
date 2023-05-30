@@ -39,6 +39,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                         {companies.map((item, idx) => (
                             <ThirtyYearResultListItem
                                 company={item}
+                                calculationDate={calculationDate}
                                 category={category}
                                 key={idx}
                             />
