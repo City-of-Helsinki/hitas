@@ -1,9 +1,13 @@
 import {Button, IconAlertCircleFill} from "hds-react";
+import {useEffect} from "react";
+import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
+import {QueryStateHandler} from "../../../common/components";
 import {getIndexType} from "../../../common/localisation";
-import {formatMoney} from "../../../common/utils";
+import {IApartmentMaximumPrice} from "../../../common/schemas";
+import {formatMoney, hdsToast} from "../../../common/utils";
 
 // Element to display when there is a valid maximum price calculation for the apartment
-const MaximumPriceCalculationExists = ({
+const LoadedMaximumPriceCalculationExists = ({
     saleForm,
     maximumPriceCalculation,
     handleCalculateButton,
@@ -73,6 +77,68 @@ const MaximumPriceCalculationExists = ({
                 Luo uusi enimmäishintalaskelma
             </Button>
         </div>
+    );
+};
+
+const MaximumPriceCalculationExists = ({
+    apartment,
+    saleForm,
+    setMaximumPrices,
+    handleCalculateButton,
+    isCalculationFormValid,
+}) => {
+    const {
+        data: maximumPriceCalculationData,
+        error: maximumPriceError,
+        isLoading: isMaximumPriceLoading,
+    } = useGetApartmentMaximumPriceQuery(
+        {
+            housingCompanyId: apartment.links.housing_company.id,
+            apartmentId: apartment.id,
+            priceId: apartment.prices.maximum_prices.confirmed?.id as string,
+        },
+        {skip: !apartment.prices.maximum_prices.confirmed?.id}
+    );
+
+    const handleSetMaxPrices = (calculation: IApartmentMaximumPrice) => {
+        const indexVariables = calculation.calculations[calculation.index].calculation_variables;
+        setMaximumPrices({
+            maximumPrice: calculation.maximum_price,
+            debtFreePurchasePrice: indexVariables.debt_free_price,
+            apartmentShareOfHousingCompanyLoans: indexVariables.apartment_share_of_housing_company_loans,
+            index: calculation.index,
+        });
+
+        saleForm.setValue("purchase_date", calculation.calculation_date);
+        saleForm.setValue(
+            "apartment_share_of_housing_company_loans",
+            indexVariables.apartment_share_of_housing_company_loans
+        );
+    };
+
+    useEffect(() => {
+        if (isMaximumPriceLoading || !maximumPriceCalculationData) return;
+        if (maximumPriceCalculationData && !maximumPriceError) {
+            handleSetMaxPrices(maximumPriceCalculationData);
+        } else {
+            hdsToast.error("Enimmäishintalaskentan hakeminen epäonnistui.");
+        }
+        // eslint-disable-next-line
+    }, [maximumPriceCalculationData, maximumPriceError, isMaximumPriceLoading]);
+
+    return (
+        <QueryStateHandler
+            data={maximumPriceCalculationData}
+            error={maximumPriceError}
+            isLoading={isMaximumPriceLoading}
+        >
+            <LoadedMaximumPriceCalculationExists
+                saleForm={saleForm}
+                maximumPriceCalculation={maximumPriceCalculationData}
+                handleCalculateButton={handleCalculateButton}
+                isCalculationFormValid={isCalculationFormValid}
+            />
+        </QueryStateHandler>
     );
 };
 

@@ -1,6 +1,6 @@
 import {Dialog, Fieldset} from "hds-react";
-import {useEffect, useState} from "react";
-import {useGetApartmentMaximumPriceQuery, useSaveApartmentMaximumPriceMutation} from "../../../app/services";
+import {useState} from "react";
+import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {
     ApartmentSaleFormSchema,
@@ -26,20 +26,8 @@ const MaximumPriceCalculationFieldSet = ({
 }) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
-    const hasApartmentConfirmedCalculation = apartment.prices.maximum_prices.confirmed?.valid.is_valid;
-
-    const {
-        data: maximumPriceCalculationData,
-        error: maximumPriceError,
-        isLoading: isMaximumPriceLoading,
-    } = useGetApartmentMaximumPriceQuery(
-        {
-            housingCompanyId: apartment.links.housing_company.id,
-            apartmentId: apartment.id,
-            priceId: apartment.prices.maximum_prices.confirmed?.id as string,
-        },
-        {skip: !apartment.prices.maximum_prices.confirmed?.id}
-    );
+    const hasApartmentConfirmedCalculation =
+        apartment.prices.maximum_prices.confirmed && apartment.prices.maximum_prices.confirmed.valid.is_valid;
 
     const [
         saveMaximumPriceCalculation,
@@ -49,28 +37,6 @@ const MaximumPriceCalculationFieldSet = ({
             isLoading: isMaximumPriceCreateLoading,
         },
     ] = useSaveApartmentMaximumPriceMutation();
-
-    const handleSetMaxPrices = (calculation: IApartmentMaximumPrice) => {
-        // If created maximum price calculation is already expired, clear the state
-        if (new Date(calculation.valid_until) < new Date()) {
-            setMaximumPrices(undefined);
-            return;
-        }
-
-        const indexVariables = calculation.calculations[calculation.index].calculation_variables;
-        setMaximumPrices({
-            maximumPrice: calculation.maximum_price,
-            debtFreePurchasePrice: indexVariables.debt_free_price,
-            apartmentShareOfHousingCompanyLoans: indexVariables.apartment_share_of_housing_company_loans,
-            index: calculation.index,
-        });
-
-        saleForm.setValue("purchase_date", calculation.calculation_date);
-        saleForm.setValue(
-            "apartment_share_of_housing_company_loans",
-            indexVariables.apartment_share_of_housing_company_loans
-        );
-    };
 
     const handleCreateNewCalculationButton = () => {
         if (isCalculationFormValid) {
@@ -98,16 +64,6 @@ const MaximumPriceCalculationFieldSet = ({
         }
     };
 
-    useEffect(() => {
-        if (isMaximumPriceLoading || !maximumPriceCalculationData) return;
-        if (maximumPriceCalculationData && !maximumPriceError) {
-            handleSetMaxPrices(maximumPriceCalculationData);
-        } else {
-            hdsToast.error("Enimmäishintalaskentan hakeminen epäonnistui.");
-        }
-        // eslint-disable-next-line
-    }, [maximumPriceCalculationData, maximumPriceError, isMaximumPriceLoading]);
-
     const isCalculationFormValid = ApartmentSaleFormSchema.partial().safeParse({
         purchase_date: saleForm.getValues("purchase_date"),
         apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
@@ -124,18 +80,13 @@ const MaximumPriceCalculationFieldSet = ({
             } *`}
         >
             {hasApartmentConfirmedCalculation ? (
-                <QueryStateHandler
-                    data={maximumPriceCalculationData}
-                    error={maximumPriceError}
-                    isLoading={isMaximumPriceLoading}
-                >
-                    <MaximumPriceCalculationExists
-                        saleForm={saleForm}
-                        maximumPriceCalculation={maximumPriceCalculationData}
-                        handleCalculateButton={handleCreateNewCalculationButton}
-                        isCalculationFormValid={isCalculationFormValid}
-                    />
-                </QueryStateHandler>
+                <MaximumPriceCalculationExists
+                    apartment={apartment}
+                    saleForm={saleForm}
+                    setMaximumPrices={setMaximumPrices}
+                    handleCalculateButton={handleCreateNewCalculationButton}
+                    isCalculationFormValid={isCalculationFormValid}
+                />
             ) : (
                 <MaximumPriceCalculationMissing
                     handleCalculateButton={handleCreateNewCalculationButton}
