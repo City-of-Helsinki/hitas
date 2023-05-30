@@ -197,7 +197,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -334,7 +334,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -477,7 +477,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -682,7 +682,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -824,7 +824,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -968,7 +968,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1075,7 +1075,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1191,7 +1191,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1346,7 +1346,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1420,7 +1420,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1517,7 +1517,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1624,7 +1624,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -1714,7 +1714,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
     # Create necessary external sales data
     # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(
@@ -1822,7 +1822,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
     )
     # Create necessary external sales data
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(
@@ -1936,7 +1936,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2284,7 +2284,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2382,7 +2382,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2490,7 +2490,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2642,7 +2642,7 @@ def test__api__regulation__housing_company_regulation_status(
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2803,7 +2803,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -2928,7 +2928,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
