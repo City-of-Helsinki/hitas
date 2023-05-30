@@ -1,7 +1,7 @@
 import {Button} from "hds-react";
 import {useEffect, useState} from "react";
-import {regulationAPIResponses} from "../simulatedResponses";
-import {ThirtyYearErrorModal, ThirtyYearLoadedResults} from "./index";
+import {regulationAPIResponses} from "../../simulatedResponses";
+import {ThirtyYearErrorModal, ThirtyYearLoadedResults} from "../index";
 
 export default function ThirtyYearErrorTestResult({testType, selection, calculationDate}) {
     const [isShowingResult, setIsShowingResult] = useState(false);

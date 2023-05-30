@@ -129,7 +129,9 @@ export const downloadRegulationResults = (calculationDate?: string) => {
         ...getFetchInit(),
         method: "GET",
     };
-    fetch(url, init).then(handleDownloadPDF);
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        .catch((error) => console.error(error));
 };
 
 export const downloadCompanyRegulationLetter = (company: IHousingCompanyDetails, calculationDate?: string) => {
@@ -141,7 +143,9 @@ export const downloadCompanyRegulationLetter = (company: IHousingCompanyDetails,
         ...getFetchInit(),
         method: "GET",
     };
-    fetch(url, init).then(handleDownloadPDF);
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        .catch((error) => console.error(error));
 };
 
 // ///////////

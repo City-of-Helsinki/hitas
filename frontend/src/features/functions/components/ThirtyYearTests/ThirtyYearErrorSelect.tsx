@@ -1,4 +1,4 @@
-import {Select} from "../../../common/components/form";
+import {Select} from "../../../../common/components/form";
 
 const testOptions = [
     {label: "Onnistunut vertailu", value: "result_noProblems"},
