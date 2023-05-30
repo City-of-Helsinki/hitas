@@ -1259,13 +1259,13 @@ def test__api__apartment_sale__update__cannot_update_ownerships(api_client: Hita
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete(api_client: HitasAPIClient):
-    ownership: Ownership = OwnershipFactory.create()
-    sale: ApartmentSale = ApartmentSaleFactory.create(ownerships=[ownership])
+def test__api__apartment_sale__delete__first_sale(api_client: HitasAPIClient):
+    sale: ApartmentSale = ApartmentSaleFactory.create()
 
     sale_uuid = sale.uuid.hex
+    apartment = sale.apartment
 
-    assert ownership.sale.uuid.hex == sale_uuid
+    assert apartment.sales.count() == 1
 
     url = reverse(
         "hitas:apartment-sale-detail",
@@ -1281,9 +1281,65 @@ def test__api__apartment_sale__delete(api_client: HitasAPIClient):
     response_2 = api_client.get(url)
     assert response_2.status_code == status.HTTP_404_NOT_FOUND, response_2.json()
 
-    # Sale is only soft-deleted, not removed, so relationship remains intact
-    ownerships: list[Ownership] = list(Ownership.objects.all())
+    # Sale is only soft-deleted, not removed, so relationship remains intact (though also soft-deleted)
+    ownerships: list[Ownership] = list(Ownership.all_objects.all())
     assert len(ownerships) == 1
-    assert ownerships[0].id == ownership.id
     assert ownerships[0].sale is not None
     assert ownerships[0].sale.uuid.hex == sale_uuid
+    assert ownerships[0].deleted is not None
+
+    # Apartment not sold since first sale was deleted
+    apartment.refresh_from_db()
+    assert apartment.sales.count() == 0
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__delete__later_sale(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(sales=[])
+    latest_sale: ApartmentSale = ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=datetime.date(2023, 1, 1),
+    )
+    old_sale = ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=datetime.date(2022, 1, 1),
+    )
+    old_sale_uuid = old_sale.uuid.hex
+
+    assert apartment.sales.count() == 2
+
+    # Old sale's ownerships are soft-deleted / inactive
+    old_ownerships = old_sale.ownerships.all()
+    old_ownership: Ownership = old_ownerships[0]
+    old_ownership_id = old_ownership.id
+    old_ownerships.delete()
+
+    old_ownership.refresh_from_db()
+    assert old_ownership.deleted is not None
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": latest_sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": latest_sale.apartment.uuid.hex,
+            "uuid": latest_sale.uuid.hex,
+        },
+    )
+    response_1 = api_client.delete(url)
+    assert response_1.status_code == status.HTTP_204_NO_CONTENT, response_1.json()
+
+    response_2 = api_client.get(url)
+    assert response_2.status_code == status.HTTP_404_NOT_FOUND, response_2.json()
+
+    # Old ownerships are undeleted / reactivated
+    ownerships: list[Ownership] = list(Ownership.objects.all())
+    assert len(ownerships) == 1
+    assert ownerships[0].id == old_ownership_id
+    assert ownerships[0].sale is not None
+    assert ownerships[0].sale.uuid.hex == old_sale_uuid
+    assert ownerships[0].deleted is None
+
+    # Apartment not sold since first sale was deleted
+    apartment.refresh_from_db()
+    assert apartment.sales.count() == 1
+    assert apartment.sales.first() == old_sale

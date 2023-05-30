@@ -4,12 +4,15 @@ from decimal import Decimal
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from safedelete import SOFT_DELETE_CASCADE
 
 from hitas.models._base import ExternalSafeDeleteHitasModel, HitasModelDecimalField
 
 
 # 'Asunnon myyntitapahtuma' / 'Kauppakirja' / 'Uusi myynti'
 class ApartmentSale(ExternalSafeDeleteHitasModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     # 'Asunto'
     apartment = models.ForeignKey("Apartment", related_name="sales", on_delete=models.CASCADE, editable=False)
 
