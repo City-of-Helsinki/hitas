@@ -199,11 +199,11 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     last_modified = serializers.SerializerMethodField(read_only=True)
     summary = serializers.SerializerMethodField()
     release_date = serializers.SerializerMethodField()
-    improvements = HousingCompanyImprovementSerializer(source="*", required=False)
+    improvements = HousingCompanyImprovementSerializer(source="*")
 
     def create(self, validated_data):
-        mpi = validated_data.pop("market_price_improvements", None) or []
-        cpi = validated_data.pop("construction_price_improvements", None) or []
+        mpi: list = validated_data.pop("market_price_improvements")
+        cpi: list = validated_data.pop("construction_price_improvements")
 
         instance: HousingCompany = super().create(validated_data)
 
@@ -215,8 +215,9 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return instance
 
     def update(self, instance: HousingCompany, validated_data: dict[str, Any]):
-        mpi: Optional[list] = validated_data.pop("market_price_improvements", None)
-        cpi: Optional[list] = validated_data.pop("construction_price_improvements", None)
+        # Optional, since patch re-uses code from here
+        mpi: Optional[list[dict[str, Any]]] = validated_data.pop("market_price_improvements")
+        cpi: Optional[list[dict[str, Any]]] = validated_data.pop("construction_price_improvements")
 
         should_fulfill_conditions_of_sale = (
             instance.regulation_status == RegulationStatus.REGULATED
@@ -332,6 +333,19 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         ]
 
 
+class HousingCompanyPartialUpdateSerializer(HousingCompanyDetailSerializer):
+    improvements = HousingCompanyImprovementSerializer(source="*", required=False)
+
+    def update(self, instance: HousingCompany, validated_data: dict[str, Any]):
+        # Set None to optional fields
+        validated_data.setdefault("market_price_improvements", None)
+        validated_data.setdefault("construction_price_improvements", None)
+        return super().update(instance, validated_data)
+
+    class Meta(HousingCompanyDetailSerializer.Meta):
+        pass
+
+
 class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
     name = serializers.CharField(source="display_name", max_length=1024)
 
@@ -354,6 +368,7 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
 class HousingCompanyViewSet(HitasModelViewSet):
     serializer_class = HousingCompanyDetailSerializer
     list_serializer_class = HousingCompanyListSerializer
+    partial_update_serializer_class = HousingCompanyPartialUpdateSerializer
     model_class = HousingCompany
 
     def perform_destroy(self, instance: HousingCompany) -> None:
