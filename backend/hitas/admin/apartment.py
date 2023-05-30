@@ -19,7 +19,6 @@ class ApartmentAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
         "street_address",
         "apartment_number",
         "postal_code",
-        "state",
         "surface_area",
         "housing_company",
     ]

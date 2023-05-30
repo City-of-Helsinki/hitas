@@ -14,7 +14,7 @@ from hitas.models import (
     ApartmentMaximumPriceCalculation,
     ApartmentSale,
 )
-from hitas.models.apartment import ApartmentState, DepreciationPercentage
+from hitas.models.apartment import DepreciationPercentage
 from hitas.models.housing_company import HitasType
 from hitas.tests.factories._base import AbstractImprovementFactory
 from hitas.tests.factories.apartment_sale import ApartmentSaleFactory
@@ -31,7 +31,6 @@ class ApartmentFactory(DjangoModelFactory):
         model = Apartment
 
     building = factory.SubFactory("hitas.tests.factories.BuildingFactory")
-    state = fuzzy.FuzzyChoice(state[0] for state in ApartmentState.choices())
     apartment_type = factory.SubFactory("hitas.tests.factories.ApartmentTypeFactory")
     surface_area = fuzzy.FuzzyDecimal(10, 99, precision=2)
     rooms = fuzzy.FuzzyInteger(1, 9)

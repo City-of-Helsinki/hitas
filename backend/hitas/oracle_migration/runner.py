@@ -26,7 +26,6 @@ from hitas.models import (
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
     ApartmentSale,
-    ApartmentState,
     ApartmentType,
     Building,
     BuildingType,
@@ -567,7 +566,6 @@ def create_apartments(
     ).fetchall():
         new = Apartment()
         new.building = building
-        new.state = ApartmentState.SOLD
         new.apartment_type = converted_data.apartment_types_by_code_number[apartment["apartment_type_code"]]
         new.surface_area = apartment["surface_area"]
         new.street_address = apartment["street_address"]

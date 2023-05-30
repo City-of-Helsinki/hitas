@@ -3,7 +3,6 @@ from hitas.models.apartment import (
     ApartmentConstructionPriceImprovement,
     ApartmentMarketPriceImprovement,
     ApartmentMaximumPriceCalculation,
-    ApartmentState,
     DepreciationPercentage,
 )
 from hitas.models.apartment_sale import ApartmentSale

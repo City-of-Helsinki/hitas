@@ -65,7 +65,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     assert response.json()["contents"] == [
         {
             "id": ap1.uuid.hex,
-            "state": ap1.state.value,
+            "state": ApartmentState.SOLD.value,
             "type": ap1.apartment_type.value,
             "surface_area": float(ap1.surface_area),
             "address": {
@@ -133,7 +133,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         },
         {
             "id": ap2.uuid.hex,
-            "state": ap2.state.value,
+            "state": ApartmentState.FREE.value,
             "type": ap2.apartment_type.value,
             "surface_area": float(ap2.surface_area),
             "address": {
@@ -245,28 +245,27 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
 @pytest.mark.django_db
 def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, number_of_apartments):
     ApartmentFactory.create(
-        state=ApartmentState.FREE,
         building__real_estate__housing_company__uuid=UUID("38432c23-3a91-4dfb-9c2f-54d9f5ad9063"),
     )
 
     ApartmentFactory.create(
-        state=ApartmentState.FREE, building__real_estate__housing_company__display_name="TestDisplayName"
+        building__real_estate__housing_company__display_name="TestDisplayName",
     )
-    ApartmentFactory.create(state=ApartmentState.FREE, street_address="test-street")
-    OwnershipFactory.create(sale__apartment__state=ApartmentState.FREE, owner__name="Megatron Opetimus Prime")
-    OwnershipFactory.create(sale__apartment__state=ApartmentState.FREE, owner__identifier="010199-123A")
+    ApartmentFactory.create(street_address="test-street")
+    OwnershipFactory.create(owner__name="Megatron Opetimus Prime")
+    OwnershipFactory.create(owner__identifier="010199-123A")
     hc = HousingCompanyFactory.create(postal_code__value="99999")
     ApartmentFactory.create(building__real_estate__housing_company=hc)
 
-    old_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_1: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, completion_date=None)
+    old_apartment_1: Apartment = ApartmentFactory.create()
+    new_apartment_1: Apartment = ApartmentFactory.create(completion_date=None)
     ConditionOfSaleFactory(
         new_ownership=new_apartment_1.first_sale().ownerships.first(),
         old_ownership=old_apartment_1.first_sale().ownerships.first(),
     )
 
-    old_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE)
-    new_apartment_2: Apartment = ApartmentFactory.create(state=ApartmentState.FREE, completion_date=None)
+    old_apartment_2: Apartment = ApartmentFactory.create()
+    new_apartment_2: Apartment = ApartmentFactory.create(completion_date=None)
     cos: ConditionOfSale = ConditionOfSaleFactory(
         new_ownership=new_apartment_2.first_sale().ownerships.first(),
         old_ownership=old_apartment_2.first_sale().ownerships.first(),

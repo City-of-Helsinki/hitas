@@ -109,7 +109,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         "contents": [
             {
                 "id": ap1.uuid.hex,
-                "state": ap1.state.value,
+                "state": ApartmentState.SOLD.value,
                 "type": ap1.apartment_type.value,
                 "surface_area": float(ap1.surface_area),
                 "rooms": ap1.rooms,
@@ -178,7 +178,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             },
             {
                 "id": ap2.uuid.hex,
-                "state": ap2.state.value,
+                "state": ApartmentState.FREE.value,
                 "type": ap2.apartment_type.value,
                 "surface_area": float(ap2.surface_area),
                 "rooms": ap2.rooms,
@@ -275,7 +275,6 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
     b: Building = BuildingFactory.create(real_estate=re)
     ap1: Apartment = ApartmentFactory.create(
         building=b,
-        state=ApartmentState.FREE,
         apartment_type=None,
         surface_area=None,
         rooms=None,
@@ -301,7 +300,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
     assert response.json()["contents"] == [
         {
             "id": ap1.uuid.hex,
-            "state": ap1.state.value,
+            "state": ApartmentState.FREE.value,
             "type": ap1.apartment_type,
             "surface_area": ap1.surface_area,
             "rooms": ap1.rooms,
@@ -564,7 +563,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": ap1.uuid.hex,
-        "state": ap1.state.value,
+        "state": ApartmentState.SOLD.value,
         "type": {
             "id": ap1.apartment_type.uuid.hex,
             "value": ap1.apartment_type.value,
@@ -1166,7 +1165,6 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
     apartment_type: ApartmentType = ApartmentTypeFactory.create()
 
     data = {
-        "state": ApartmentState.SOLD.value,
         "type": {"id": apartment_type.uuid.hex},
         "surface_area": 69,
         "rooms": 88,
@@ -1230,7 +1228,6 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
 def get_minimal_apartment_data(data):
     return {
         "type": None,
-        "state": None,
         "surface_area": None,
         "shares": None,
         "address": {
@@ -1380,7 +1377,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             },
             "rooms": None,
             "shares": None,
-            "state": None,
+            "state": ApartmentState.FREE.value,
             "surface_area": None,
             "type": None,
             "conditions_of_sale": [],
@@ -1455,23 +1452,6 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                 invalid_data={"building": None},
                 fields=[
                     {"field": "building", "message": "This field is mandatory and cannot be null."},
-                ],
-            ),
-            "state blank": InvalidInput(
-                invalid_data={"state": ""},
-                fields=[
-                    {"field": "state", "message": "This field is mandatory and cannot be blank."},
-                ],
-            ),
-            "state invalid": InvalidInput(
-                invalid_data={"state": "invalid_state"},
-                fields=[
-                    {
-                        "field": "state",
-                        "message": (
-                            "Unsupported value 'invalid_state'. Supported values are: ['free', 'reserved', 'sold']."
-                        ),
-                    }
                 ],
             ),
             "surface_area not a number": InvalidInput(
@@ -1995,7 +1975,6 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
     ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
     data = {
-        "state": ApartmentState.SOLD.value,
         "type": {"id": ap.apartment_type.uuid.hex},
         "surface_area": 100,
         "rooms": 2,
@@ -2040,7 +2019,6 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
     assert response.status_code == status.HTTP_200_OK, response.json()
 
     ap.refresh_from_db()
-    assert ap.state.value == data["state"]
     assert ap.apartment_type.uuid.hex == data["type"]["id"]
     assert ap.surface_area == data["surface_area"]
     assert ap.share_number_start == data["shares"]["start"]
@@ -2176,6 +2154,7 @@ def test__api__apartment__update__overlapping_shares(
 
     data = ApartmentDetailSerializer(apartment_1).data
     del data["id"]
+    del data["state"]
     del data["type"]["value"]
     del data["type"]["description"]
     del data["type"]["code"]
