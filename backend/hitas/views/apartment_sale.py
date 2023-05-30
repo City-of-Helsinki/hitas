@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -154,6 +154,21 @@ class ApartmentSaleViewSet(HitasModelViewSet):
     serializer_class = ApartmentSaleSerializer
     create_serializer_class = ApartmentSaleCreateSerializer
     model_class = ApartmentSale
+
+    def perform_destroy(self, instance: ApartmentSale) -> None:
+        previous_sale: Optional[ApartmentSale] = (
+            ApartmentSale.objects.filter(apartment_id=instance.apartment_id)
+            .exclude(id=instance.id)
+            .prefetch_related(Prefetch("ownerships", Ownership.deleted_objects.all()))
+            .order_by("-purchase_date")
+            .first()
+        )
+
+        with transaction.atomic():
+            instance.delete()
+            # Activate previous sales ownerships
+            if previous_sale is not None:
+                previous_sale.ownerships.all().undelete()
 
     def get_default_queryset(self):
         apartment_id = lookup_model_id_by_uuid(self.kwargs["apartment_uuid"], Apartment)
