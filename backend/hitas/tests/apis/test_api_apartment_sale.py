@@ -1,7 +1,9 @@
 import datetime
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from hitas.models import Apartment, ApartmentSale, ConditionOfSale, Owner, Ownership
@@ -1259,8 +1261,12 @@ def test__api__apartment_sale__update__cannot_update_ownerships(api_client: Hita
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__first_sale(api_client: HitasAPIClient):
-    sale: ApartmentSale = ApartmentSaleFactory.create()
+def test__api__apartment_sale__delete__first_sale(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2023, 1, 1),
+    )
 
     sale_uuid = sale.uuid.hex
     apartment = sale.apartment
@@ -1294,7 +1300,9 @@ def test__api__apartment_sale__delete__first_sale(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__later_sale(api_client: HitasAPIClient):
+def test__api__apartment_sale__delete__later_sale(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
     apartment: Apartment = ApartmentFactory.create(sales=[])
     latest_sale: ApartmentSale = ApartmentSaleFactory.create(
         apartment=apartment,
@@ -1343,3 +1351,88 @@ def test__api__apartment_sale__delete__later_sale(api_client: HitasAPIClient):
     apartment.refresh_from_db()
     assert apartment.sales.count() == 1
     assert apartment.sales.first() == old_sale
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__delete__under_three_months(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    three_months = timezone.now().date() - relativedelta(months=3)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=three_months,
+    )
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": sale.apartment.uuid.hex,
+            "uuid": sale.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__delete__over_three_months(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=under_three_months,
+    )
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": sale.apartment.uuid.hex,
+            "uuid": sale.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "invalid",
+        "message": "This sale can no longer be cancelled",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__delete__cant_delete_sale_if_not_latest(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    apartment: Apartment = ApartmentFactory.create(sales=[])
+    ApartmentSaleFactory.create(  # Latest sale
+        apartment=apartment,
+        purchase_date=datetime.date(2023, 1, 1),
+    )
+
+    old_sale = ApartmentSaleFactory.create(  # Older sale
+        apartment=apartment,
+        purchase_date=datetime.date(2022, 1, 1),
+    )
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": old_sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": old_sale.apartment.uuid.hex,
+            "uuid": old_sale.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "invalid",
+        "message": "Cannot cancel a sale that is not the latest sale",
+        "reason": "Conflict",
+        "status": 409,
+    }

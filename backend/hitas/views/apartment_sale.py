@@ -1,11 +1,13 @@
 from typing import Any, Optional
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Prefetch, prefetch_related_objects
+from django.utils import timezone
 from rest_framework import serializers
 
-from hitas.exceptions import HitasModelNotFound
+from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models.apartment import Apartment, ApartmentSale
 from hitas.models.ownership import Ownership, OwnershipLike, check_ownership_percentages
 from hitas.services.apartment import get_latest_sale_purchase_date, prefetch_first_sale
@@ -156,11 +158,26 @@ class ApartmentSaleViewSet(HitasModelViewSet):
     model_class = ApartmentSale
 
     def perform_destroy(self, instance: ApartmentSale) -> None:
+        latest_sale_id: int = (
+            ApartmentSale.objects.filter(apartment=instance.apartment)
+            .order_by("-purchase_date", "-id")
+            .values_list("id", flat=True)
+            .first()
+        )
+        if latest_sale_id != instance.id:
+            raise ModelConflict("Cannot cancel a sale that is not the latest sale", error_code="invalid")
+
+        if instance.apartment.completion_date is not None:
+            comparison_date = max(instance.apartment.completion_date, instance.purchase_date)
+
+            if comparison_date < timezone.now().date() - relativedelta(months=3):
+                raise ModelConflict("This sale can no longer be cancelled", error_code="invalid")
+
         previous_sale: Optional[ApartmentSale] = (
-            ApartmentSale.objects.filter(apartment_id=instance.apartment_id)
+            ApartmentSale.objects.filter(apartment=instance.apartment)
             .exclude(id=instance.id)
             .prefetch_related(Prefetch("ownerships", Ownership.deleted_objects.all()))
-            .order_by("-purchase_date")
+            .order_by("-purchase_date", "-id")
             .first()
         )
 
@@ -172,9 +189,13 @@ class ApartmentSaleViewSet(HitasModelViewSet):
 
     def get_default_queryset(self):
         apartment_id = lookup_model_id_by_uuid(self.kwargs["apartment_uuid"], Apartment)
-        return ApartmentSale.objects.prefetch_related(
-            Prefetch(
-                "ownerships",
-                Ownership.objects.select_related("owner"),
-            ),
-        ).filter(apartment_id=apartment_id)
+        return (
+            ApartmentSale.objects.select_related("apartment")
+            .prefetch_related(
+                Prefetch(
+                    "ownerships",
+                    Ownership.objects.select_related("owner"),
+                ),
+            )
+            .filter(apartment_id=apartment_id)
+        )
