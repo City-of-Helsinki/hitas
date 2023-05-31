@@ -1,9 +1,7 @@
-import {useRef, useState} from "react";
-
 import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
-import {Link, useParams} from "react-router-dom";
-
+import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
+import {Link, useParams} from "react-router-dom";
 import {
     downloadApartmentMaximumPricePDF,
     downloadApartmentUnconfirmedMaximumPricePDF,
@@ -12,12 +10,14 @@ import {
 } from "../../app/services";
 import {DetailField, Divider, ImprovementsTable, QueryStateHandler} from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
+import {ModifyPersonInfoModal} from "../../common/components/ModifyPersonInfoModal";
 import {
     IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,
     IApartmentDetails,
     IApartmentUnconfirmedMaximumPrice,
     IHousingCompanyDetails,
+    IOwner,
     IOwnership,
 } from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney, hdsToast, today} from "../../common/utils";
@@ -431,6 +431,13 @@ const LoadedApartmentDetails = ({
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
 }): JSX.Element => {
+    const [isModifyPersonInfoModalVisible, setIsModifyPersonInfoModalVisible] = useState(false);
+    const [owner, setOwner] = useState<IOwner | undefined>(undefined);
+    const modifyPersonInfoHandler = (owner: IOwner) => {
+        setIsModifyPersonInfoModalVisible(true);
+        setOwner(owner);
+    };
+
     return (
         <>
             <ApartmentHeader showEditButton={housingCompany.regulation_status === "regulated"} />
@@ -492,7 +499,12 @@ const LoadedApartmentDetails = ({
                                                     key={ownership.owner.id}
                                                     className="detail-field-value"
                                                 >
-                                                    {ownership.owner.name} ({ownership.owner.identifier})
+                                                    <button
+                                                        className="text-button"
+                                                        onClick={() => modifyPersonInfoHandler(ownership.owner)}
+                                                    >
+                                                        {ownership.owner.name} ({ownership.owner.identifier})
+                                                    </button>
                                                     <span> {ownership.percentage}%</span>
                                                 </div>
                                             ))}
@@ -606,6 +618,11 @@ const LoadedApartmentDetails = ({
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
+                <ModifyPersonInfoModal
+                    owner={owner as IOwner}
+                    isVisible={isModifyPersonInfoModalVisible}
+                    setIsVisible={setIsModifyPersonInfoModalVisible}
+                />
                 <ImprovementsTable
                     data={apartment}
                     title="Asuntokohtaiset parannukset"
