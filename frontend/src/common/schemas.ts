@@ -335,7 +335,7 @@ const OwnerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     identifier: string({required_error: errorMessages.required}),
-    email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
+    email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")).optional(),
 });
 
 const ownershipSchema = object({
