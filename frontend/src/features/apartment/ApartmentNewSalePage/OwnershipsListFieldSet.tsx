@@ -5,7 +5,7 @@ import {v4 as uuidv4} from "uuid";
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {useRef, useState} from "react";
 import {z} from "zod";
-import {useCreateOwnerMutation, useGetOwnersQuery} from "../../../app/services";
+import {useGetOwnersQuery, useSaveOwnerMutation} from "../../../app/services";
 import {NumberInput, RelatedModelInput} from "../../../common/components/form";
 import TextInput from "../../../common/components/form/TextInput";
 import SaveButton from "../../../common/components/SaveButton";
@@ -15,7 +15,7 @@ import {formatOwner, hdsToast, validateSocialSecurityNumber} from "../../../comm
 const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, closeModalAction}) => {
     const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);
 
-    const [saveOwner, {isLoading: isSaveOwnerLoading}] = useCreateOwnerMutation();
+    const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
     const runSaveOwner = (data) => {
         saveOwner({data: data})
             .unwrap()

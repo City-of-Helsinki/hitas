@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 import {useImmer} from "use-immer";
 
-import {useCreateOwnerMutation} from "../../../app/services";
+import {useSaveOwnerMutation} from "../../../app/services";
 import {IOwner} from "../../schemas";
 import {doesAContainB, hitasToast, validateSocialSecurityNumber} from "../../utils";
 import QueryStateHandler from "../QueryStateHandler";
@@ -119,7 +119,7 @@ export default function FormOwnershipInputField({
         {skip: !isModalVisible}
     );
     const [formData, setFormData] = useImmer<IOwner>({name: "", identifier: "", email: ""});
-    const [createOwner, {data: createData, error: createError, isLoading: isCreating}] = useCreateOwnerMutation();
+    const [createOwner, {data: createData, error: createError, isLoading: isCreating}] = useSaveOwnerMutation();
 
     const openModal = () => setIsModalVisible(true);
 

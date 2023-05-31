@@ -245,7 +245,7 @@ const detailApi = hitasApi.injectEndpoints({
             query: (params: IApartmentQuery) => ({
                 url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
             }),
-            providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}],
+            providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}, {type: "Owner"}],
         }),
         getApartmentMaximumPrice: builder.query<IApartmentMaximumPrice, object>({
             query: ({
@@ -404,10 +404,10 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
-        createOwner: builder.mutation<IOwner, {data: IOwner}>({
+        saveOwner: builder.mutation<IOwner, {data: IOwner}>({
             query: ({data}) => ({
-                url: `owners`,
-                method: "POST",
+                url: `owners${idOrBlank(data.id)}`,
+                method: data.id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
@@ -508,7 +508,7 @@ export const {
     useDeleteBuildingMutation,
     useSaveApartmentMutation,
     useDeleteApartmentMutation,
-    useCreateOwnerMutation,
+    useSaveOwnerMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
     useCreateSaleMutation,
