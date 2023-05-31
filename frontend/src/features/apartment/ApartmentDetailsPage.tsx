@@ -8,9 +8,14 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, Divider, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {
+    DetailField,
+    Divider,
+    ImprovementsTable,
+    ModifyPersonInfoModal,
+    QueryStateHandler,
+} from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
-import {ModifyPersonInfoModal} from "../../common/components/ModifyPersonInfoModal";
 import {
     IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,

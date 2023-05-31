@@ -4,10 +4,10 @@ import {Dispatch, SetStateAction, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
-import TextInput from "../../common/components/form/TextInput";
-import SaveButton from "../../common/components/SaveButton";
-import {IOwner, OwnerSchema} from "../../common/schemas";
-import {hdsToast, validateSocialSecurityNumber} from "../../common/utils";
+import {IOwner, OwnerSchema} from "../schemas";
+import {hdsToast, validateSocialSecurityNumber} from "../utils";
+import TextInput from "./form/TextInput";
+import SaveButton from "./SaveButton";
 
 interface IOwnerMutateForm {
     owner: IOwner;
@@ -107,7 +107,8 @@ interface IModifyPersonInfoModalProps {
     isVisible: boolean;
     setIsVisible: Dispatch<SetStateAction<boolean>>;
 }
-export const ModifyPersonInfoModal = ({owner, isVisible, setIsVisible}: IModifyPersonInfoModalProps) => {
+
+export default function ModifyPersonInfoModal({owner, isVisible, setIsVisible}: IModifyPersonInfoModalProps) {
     return (
         <Dialog
             id="modify-person-info-modal"
@@ -129,4 +130,4 @@ export const ModifyPersonInfoModal = ({owner, isVisible, setIsVisible}: IModifyP
             </Dialog.Content>
         </Dialog>
     );
-};
+}
