@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, Dialog, IconArrowLeft} from "hds-react";
-import {Dispatch, SetStateAction, useRef, useState} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
@@ -15,6 +15,7 @@ interface IOwnerMutateForm {
 }
 const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
     const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
     const runSaveOwner = (data) => {
@@ -32,31 +33,14 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
             });
     };
 
-    const initialFormData = {...owner};
-
-    const resolver = (data, context, options) => {
-        return zodResolver(
-            OwnerSchema.superRefine((data, ctx) => {
-                if (!isInvalidSSNAllowed && !validateSocialSecurityNumber(data.identifier)) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ["identifier"],
-                        message: "Virheellinen sosiaaliturvatunnus",
-                    });
-                }
-            })
-        )(data, context, {...options, mode: "sync"});
-    };
-
     const ownerFormObject = useForm({
-        defaultValues: {...initialFormData},
+        defaultValues: owner,
         mode: "all",
-        resolver: resolver,
+        resolver: zodResolver(OwnerSchema),
     });
 
-    const formRef = useRef<HTMLFormElement | null>(null);
-
     const onFormSubmitValid = () => {
+        setIsSubmitted(true);
         runSaveOwner(ownerFormObject.getValues());
     };
 
@@ -66,17 +50,9 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         }
     };
 
-    const handleSaveButtonClick = () => {
-        // Dispatch submit event, as the "Tallenna"-button isn't inside the form element
-        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
-
     return (
         <>
-            <form
-                ref={formRef}
-                onSubmit={ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)}
-            >
+            <form onSubmit={ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)}>
                 <TextInput
                     name="name"
                     label="Nimi"
@@ -94,23 +70,34 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                     label="Sähköpostiosoite"
                     formObject={ownerFormObject}
                 />
+                {
+                    // If valid identifier values are required and the identifier
+                    // is not one, show prompt for confirmation when submitting
+                    isInvalidSSNAllowed &&
+                        !validateSocialSecurityNumber(ownerFormObject.getValues("identifier")) &&
+                        isSubmitted && (
+                            <p className="error-message">
+                                "{ownerFormObject.getValues("identifier")}" ei ole oikea sosiaaliturvatunnus.
+                                Tallennetaanko silti?
+                            </p>
+                        )
+                }
+                <div className="row row--buttons">
+                    <Button
+                        theme="black"
+                        iconLeft={<IconArrowLeft />}
+                        onClick={closeModalAction}
+                    >
+                        Peruuta
+                    </Button>
+                    <SaveButton
+                        isLoading={isSaveOwnerLoading}
+                        type="submit"
+                    />
+                </div>
             </form>
 
-            <Dialog.ActionButtons>
-                <Button
-                    theme="black"
-                    size="small"
-                    iconLeft={<IconArrowLeft />}
-                    onClick={closeModalAction}
-                >
-                    Peruuta
-                </Button>
-                <SaveButton
-                    onClick={handleSaveButtonClick}
-                    isLoading={isSaveOwnerLoading}
-                    size="small"
-                />
-            </Dialog.ActionButtons>
+            <Dialog.ActionButtons />
         </>
     );
 };
