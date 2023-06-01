@@ -580,7 +580,7 @@ const OwnershipsListSchema = object({
         if (elements.filter((e) => !e.owner.id).length) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Tyhjä omistaja kenttä",
+                message: `"Omistaja"-kenttä ei voi olla tyhjä`,
             });
             return;
         }

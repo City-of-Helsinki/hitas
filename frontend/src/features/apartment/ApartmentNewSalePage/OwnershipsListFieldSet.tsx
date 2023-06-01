@@ -110,7 +110,6 @@ const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, c
                 <SaveButton
                     onClick={handleSaveButtonClick}
                     isLoading={isSaveOwnerLoading}
-                    size="small"
                 />
             </Dialog.ActionButtons>
         </>
@@ -178,21 +177,18 @@ const OwnershipsListFieldSet = () => {
                                     onClick={() => remove(index)}
                                 />
                             </div>
+                            {!formErrors.success &&
+                                formErrors.error &&
+                                formErrors.error.issues.map((e) => (
+                                    <SimpleErrorMessage
+                                        key={`${e.code}-${e.message}`}
+                                        errorMessage={e.message}
+                                    />
+                                ))}
                         </li>
                     ))}
                 </>
             </ul>
-
-            <>
-                {!formErrors.success &&
-                    formErrors.error &&
-                    formErrors.error.issues.map((e) => (
-                        <SimpleErrorMessage
-                            key={`${e.code}-${e.message}`}
-                            errorMessage={e.message}
-                        />
-                    ))}
-            </>
 
             <div className="row row--buttons">
                 <Button
@@ -201,7 +197,7 @@ const OwnershipsListFieldSet = () => {
                     theme="black"
                     onClick={() => append(emptyOwnership)}
                 >
-                    Lisää uusi omistajuus rivi
+                    Lisää uusi omistajuusrivi
                 </Button>
             </div>
         </Fieldset>

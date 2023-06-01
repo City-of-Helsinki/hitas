@@ -176,7 +176,6 @@ const RelatedModelModal = ({
                             {RelatedModelMutateComponent ? (
                                 <Button
                                     theme="black"
-                                    size="small"
                                     iconLeft={<IconPlus />}
                                     onClick={() => setIsRelatedModelMutateVisible(true)}
                                 >
