@@ -54,6 +54,12 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     // * Form data and schema *
     // ************************
 
+    // Certain form errors should be able to be ignored.
+    const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
+    const noWarningsGiven = {purchase_price: false, catalog_acquisition_price: false};
+    const [warningsGiven, setWarningsGiven] = useState(noWarningsGiven);
+    const [warningMessage, setWarningMessage] = useState("");
+
     const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
         purchase_date: "",
@@ -128,10 +134,13 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     };
 
     const saleForm = useForm({
+        resolver: resolver,
         defaultValues: {...initialFormData, ownerships: initialFormOwnershipsList},
         mode: "all",
-        resolver: resolver,
     });
+
+    // We need a reference to the form-element to be able to dispatch a submit event dynamically
+    const formRef = useRef<HTMLFormElement | null>(null);
 
     // ***********************
     // * Creating a new sale *
@@ -139,20 +148,12 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
 
     const [createSale, {isLoading: isCreateSaleLoading}] = useCreateSaleMutation();
 
-    // Certain form errors should be able to be ignored.
-    const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
-    const noWarningsGiven = {purchase_price: false, catalog_acquisition_price: false};
-    const [warningsGiven, setWarningsGiven] = useState(noWarningsGiven);
-    const [warningMessage, setWarningMessage] = useState("");
-
     const closeWarningsModal = () => {
         setWarningsGiven(noWarningsGiven);
         setWarningMessage("");
         setIsWarningModalVisible(false);
     };
 
-    // We need a reference to the form-element to be able to dispatch a submit event dynamically
-    const formRef = useRef<HTMLFormElement | null>(null);
     const handleSaveButtonClick = () => {
         // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
@@ -226,25 +227,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             });
     };
 
-    // **************
-    // * Validation *
-    // **************
-
-    // Check if the parts of the sale form needed for a max price calculation are currently valid
-    const hasLoanValueChanged =
-        !isApartmentFirstSale &&
-        maximumPrices !== undefined &&
-        saleForm.getValues("apartment_share_of_housing_company_loans") !==
-            maximumPrices.apartmentShareOfHousingCompanyLoans;
-
-    // Disable the saving button when the form has errors or when there is no valid calculation
-    let isSavingDisabled = !RefinedApartmentSaleSchema.safeParse(saleForm.getValues()).success;
-    if (!isApartmentFirstSale) {
-        isSavingDisabled = isSavingDisabled || maximumPrices === undefined;
-    }
-
-    // Disable all fields not related to creating a calculation when it's missing (Does not apply for first sales)
-    const isMaximumPriceCalculationMissing = !isApartmentFirstSale && maximumPrices === undefined;
 
     return (
         <div className="view--apartment-conditions-of-sale">
@@ -260,7 +242,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 label="Ilmoituspäivämäärä"
                                 formObject={saleForm}
                                 maxDate={new Date()}
-                                disabled={isMaximumPriceCalculationMissing}
                                 required
                             />
                             <DateInput
@@ -272,26 +253,21 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                             />
                         </div>
                         <div className="row">
-                            <div>
-                                <NumberInput
-                                    name="purchase_price"
-                                    label="Kauppahinta"
-                                    formObject={saleForm}
-                                    unit="€"
-                                    fractionDigits={2}
-                                    disabled={isMaximumPriceCalculationMissing}
-                                    required
-                                />
-                            </div>
-                            <div className={hasLoanValueChanged ? "input-field--invalid" : ""}>
-                                <NumberInput
-                                    name="apartment_share_of_housing_company_loans"
-                                    label="Osuus yhtiön lainoista"
-                                    formObject={saleForm}
-                                    unit="€"
-                                    required
-                                />
-                            </div>
+                            <NumberInput
+                                name="purchase_price"
+                                label="Kauppahinta"
+                                formObject={saleForm}
+                                unit="€"
+                                fractionDigits={2}
+                                required
+                            />
+                            <NumberInput
+                                name="apartment_share_of_housing_company_loans"
+                                label="Osuus yhtiön lainoista"
+                                formObject={saleForm}
+                                unit="€"
+                                required
+                            />
                         </div>
                         {!isApartmentFirstSale ? (
                             <Checkbox
@@ -316,10 +292,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         saleForm={saleForm}
                     />
                 )}
-                <OwnershipsListFieldSet
-                    formObject={saleForm}
-                    disabled={isMaximumPriceCalculationMissing}
-                />
+                <OwnershipsListFieldSet formObject={saleForm} />
             </div>
 
             <div className="row row--buttons">
@@ -327,7 +300,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 <SaveButton
                     onClick={handleSaveButtonClick}
                     isLoading={isCreateSaleLoading}
-                    disabled={isSavingDisabled}
                 />
             </div>
 
@@ -336,7 +308,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 isLoading={isCreateSaleLoading}
                 isVisible={isWarningModalVisible}
                 setIsVisible={setIsWarningModalVisible}
-                modalText={`${warningMessage} Haluatko varmasti tallentaa kaupan?`}
+                modalText={`${warningMessage}. Haluatko varmasti tallentaa kaupan?`}
                 modalHeader="Vahvista kaupan tallennus"
                 cancelAction={closeWarningsModal}
                 confirmAction={handleSaveButtonClick}
