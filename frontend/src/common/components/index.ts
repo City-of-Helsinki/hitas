@@ -20,15 +20,17 @@ import QueryStateHandler from "./QueryStateHandler";
 import RemoveButton from "./RemoveButton";
 import SaveButton from "./SaveButton";
 import SaveDialogModal from "./SaveDialogModal";
+import SimpleErrorMessage from "./SimpleErrorMessage";
 
 export {
+    CloseButton,
     ConfirmDialogModal,
     DetailField,
     Divider,
     EditButton,
     FilterCheckboxField,
-    FilterSelectField,
     FilterIntegerField,
+    FilterSelectField,
     FilterTextInputField,
     FormInputField,
     Heading,
@@ -43,5 +45,5 @@ export {
     RemoveButton,
     SaveButton,
     SaveDialogModal,
-    CloseButton,
+    SimpleErrorMessage,
 };

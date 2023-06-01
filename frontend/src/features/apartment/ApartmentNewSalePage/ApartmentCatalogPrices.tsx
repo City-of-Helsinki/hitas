@@ -38,12 +38,7 @@ const ApartmentCatalogPrices = ({
                     </div>
                 </div>
 
-                {errorMessage ? (
-                    <p className="error-text">
-                        <IconAlertCircleFill />
-                        {errorMessage}
-                    </p>
-                ) : null}
+                <SimpleErrorMessage errorMessage={errorMessage} />
             </div>
         </Fieldset>
     );
