@@ -38,7 +38,7 @@ export default function Notifications(): JSX.Element {
                         key={`toast-message-${toast.id}-${toast.createdAt}`}
                         ref={ref}
                         style={{
-                            position: "absolute",
+                            position: "fixed",
                             top: "var(--spacing-layout-s)",
                             right: "var(--spacing-layout-s)",
                             width: "200px",
