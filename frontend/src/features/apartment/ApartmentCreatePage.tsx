@@ -331,6 +331,7 @@ const LoadedApartmentCreatePage = ({
             {apartment ? <ApartmentHeader /> : <Heading>Uusi asunto</Heading>}
             <form
                 ref={formRef}
+                // eslint-disable-next-line no-console
                 onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}
             >
                 <div className="field-sets">

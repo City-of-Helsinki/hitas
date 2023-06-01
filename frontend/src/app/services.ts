@@ -136,6 +136,7 @@ export const downloadRegulationResults = (calculationDate?: string) => {
     };
     fetch(url, init)
         .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
         .catch((error) => console.error(error));
 };
 
