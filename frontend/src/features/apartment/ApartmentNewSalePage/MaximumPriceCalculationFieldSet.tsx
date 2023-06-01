@@ -85,12 +85,7 @@ const MaximumPriceCalculationFieldSet = ({
                     : ""
             } *`}
         >
-            {errorMessage ? (
-                <p className="error-text">
-                    <IconAlertCircleFill />
-                    {errorMessage}
-                </p>
-            ) : null}
+            <SimpleErrorMessage errorMessage={errorMessage} />
             {hasApartmentConfirmedCalculation ? (
                 <MaximumPriceCalculationExists
                     apartment={apartment}
