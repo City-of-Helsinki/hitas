@@ -293,13 +293,14 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                 />
                             </div>
                         </div>
-                        <Checkbox
-                            name="exclude_from_statistics"
-                            label="Ei tilastoihin (esim. sukulaiskauppa)"
-                            formObject={saleForm}
-                            triggerField="purchase_price"
-                            disabled={isMaximumPriceCalculationMissing}
-                        />
+                        {!isApartmentFirstSale ? (
+                            <Checkbox
+                                name="exclude_from_statistics"
+                                label="Ei tilastoihin (esim. sukulaiskauppa)"
+                                formObject={saleForm}
+                                triggerField="purchase_price"
+                            />
+                        ) : null}
                     </form>
                 </Fieldset>
 
