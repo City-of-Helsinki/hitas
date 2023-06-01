@@ -6,7 +6,7 @@ import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {useRef, useState} from "react";
 import {z} from "zod";
 import {useGetOwnersQuery, useSaveOwnerMutation} from "../../../app/services";
-import {NumberInput, RelatedModelInput} from "../../../common/components/form";
+import {Checkbox, NumberInput, RelatedModelInput} from "../../../common/components/form";
 import TextInput from "../../../common/components/form/TextInput";
 import SaveButton from "../../../common/components/SaveButton";
 import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
@@ -96,12 +96,16 @@ const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, c
                     label="Sähköpostiosoite"
                     formObject={ownerFormObject}
                 />
+                <Checkbox
+                    name="non_disclosure"
+                    label="Turvakielto"
+                    formObject={ownerFormObject}
+                />
             </form>
 
             <Dialog.ActionButtons>
                 <Button
                     theme="black"
-                    size="small"
                     iconLeft={<IconArrowLeft />}
                     onClick={cancelButtonAction}
                 >

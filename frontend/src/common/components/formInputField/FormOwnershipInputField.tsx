@@ -118,7 +118,7 @@ export default function FormOwnershipInputField({
         (internalFilterValue.length >= MIN_LENGTH && {[relatedModelSearchField]: internalFilterValue}) || {},
         {skip: !isModalVisible}
     );
-    const [formData, setFormData] = useImmer<IOwner>({name: "", identifier: "", email: ""});
+    const [formData, setFormData] = useImmer<IOwner>({name: "", identifier: "", email: "", non_disclosure: false});
     const [createOwner, {data: createData, error: createError, isLoading: isCreating}] = useSaveOwnerMutation();
 
     const openModal = () => setIsModalVisible(true);
@@ -169,7 +169,7 @@ export default function FormOwnershipInputField({
 
     useEffect(() => {
         if (!isCreating && !createError && createData && doesAContainB(createData, formData)) {
-            setFormData({name: "", identifier: "", email: ""});
+            setFormData({name: "", identifier: "", email: "", non_disclosure: false});
             hitasToast("Omistaja lisätty onnistuneesti!");
             setDisplayedValue(`${createData.name} (${createData.identifier})`);
             setFieldValue(createData.id);

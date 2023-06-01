@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
 import {IOwner, OwnerSchema} from "../schemas";
 import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../utils";
-import TextInput from "./form/TextInput";
+import {Checkbox, TextInput} from "./form";
 import SaveButton from "./SaveButton";
 
 interface IOwnerMutateForm {
@@ -112,6 +112,11 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                 <TextInput
                     name="email"
                     label="Sähköpostiosoite"
+                    formObject={ownerFormObject}
+                />
+                <Checkbox
+                    label="Turvakielto"
+                    name="non_disclosure"
                     formObject={ownerFormObject}
                 />
                 {
