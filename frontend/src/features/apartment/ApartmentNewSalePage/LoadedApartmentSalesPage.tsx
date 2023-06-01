@@ -224,6 +224,10 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             hdsToast.error(errors.ownerships.message);
             return;
         }
+        if (errors.apartment_share_of_housing_company_loans) {
+            // hdsToast.error(errors.apartment_share_of_housing_company_loans.message);
+            return;
+        }
 
         // Handle Soft errors
         // If errors only include ones that can be ignored, show a warning modal and continue creation process
@@ -240,6 +244,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             setWarningMessage(errors.catalog_acquisition_price.message);
         } else {
             hdsToast.error(`Virhe luodessa asunnon kauppaa!`);
+            setIsWarningModalVisible(false);
             // eslint-disable-next-line no-console
             console.error(errors);
         }
