@@ -1,4 +1,4 @@
-import {Button, Dialog, Fieldset, IconAlertCircleFill, IconArrowLeft, IconCrossCircle, IconPlus} from "hds-react";
+import {Button, Dialog, Fieldset, IconArrowLeft, IconCrossCircle, IconPlus} from "hds-react";
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
@@ -9,6 +9,7 @@ import {useGetOwnersQuery, useSaveOwnerMutation} from "../../../app/services";
 import {NumberInput, RelatedModelInput} from "../../../common/components/form";
 import TextInput from "../../../common/components/form/TextInput";
 import SaveButton from "../../../common/components/SaveButton";
+import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
 import {IOwner, OwnerSchema, OwnershipsListSchema} from "../../../common/schemas";
 import {formatOwner, hdsToast, validateSocialSecurityNumber} from "../../../common/utils";
 
@@ -129,86 +130,74 @@ const OwnershipsListFieldSet = () => {
     // Blank Ownership. This is appended to the list when user clicks "New ownership"
     const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 100};
 
-    const ownerships = formObject.getValues("ownerships");
     const formErrors = OwnershipsListSchema.safeParse(formObject.getValues("ownerships"));
-    const isFormInvalid = !formErrors.success;
 
     return (
         <Fieldset
-            className={`ownerships-fieldset ${isFormInvalid ? "error" : ""}`}
+            className={`ownerships-fieldset ${formErrors.success ? "" : "error"}`}
             heading="Omistajuudet *"
         >
             <ul className="ownerships-list">
-                {ownerships.length ? (
-                    <>
-                        <li>
-                            <legend className="ownership-headings">
-                                <span>Omistaja *</span>
-                                <span>Osuus *</span>
-                            </legend>
-                        </li>
-                        {fields.map((field, index) => (
-                            <li
-                                className="ownership-item"
-                                key={field.id}
-                            >
-                                <div className="owner">
-                                    <RelatedModelInput
-                                        label="Omistaja"
-                                        required
-                                        queryFunction={useGetOwnersQuery}
-                                        relatedModelSearchField="name"
-                                        formObject={formObject}
-                                        formObjectFieldPath={`ownerships.${index}.owner`}
-                                        formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
-                                        RelatedModelMutateComponent={OwnerMutateForm}
-                                    />
-                                </div>
-                                <div className="percentage">
-                                    <NumberInput
-                                        name={`ownerships.${index}.percentage`}
-                                        fractionDigits={2}
-                                        formObject={formObject}
-                                        required
-                                    />
-                                    <span>%</span>
-                                </div>
-                                <div className="icon--remove">
-                                    <IconCrossCircle
-                                        size="m"
-                                        onClick={() => remove(index)}
-                                    />
-                                </div>
-                            </li>
-                        ))}
-                    </>
-                ) : (
-                    <div
-                        className={isFormInvalid ? "error-text" : ""}
-                        style={{textAlign: "center"}}
-                    >
-                        <IconAlertCircleFill />
-                        Asunnolla ei ole omistajuuksia
-                        <IconAlertCircleFill />
-                    </div>
-                )}
-            </ul>
-            {!formErrors.success && formErrors.error ? (
                 <>
-                    {formErrors.error.issues.map((e) => (
-                        <span
-                            key={`${e.code}-${e.message}`}
-                            className="error-text"
+                    <li>
+                        <legend className="ownership-headings">
+                            <span>Omistaja *</span>
+                            <span>Osuus *</span>
+                        </legend>
+                    </li>
+
+                    {fields.map((field, index) => (
+                        <li
+                            className="ownership-item"
+                            key={field.id}
                         >
-                            {e.message}
-                        </span>
+                            <div className="owner">
+                                <RelatedModelInput
+                                    label="Omistaja"
+                                    required
+                                    queryFunction={useGetOwnersQuery}
+                                    relatedModelSearchField="name"
+                                    formObject={formObject}
+                                    formObjectFieldPath={`ownerships.${index}.owner`}
+                                    formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
+                                    RelatedModelMutateComponent={OwnerMutateForm}
+                                />
+                            </div>
+                            <div className="percentage">
+                                <NumberInput
+                                    name={`ownerships.${index}.percentage`}
+                                    fractionDigits={2}
+                                    formObject={formObject}
+                                    required
+                                />
+                                <span>%</span>
+                            </div>
+                            <div className="icon--remove">
+                                <IconCrossCircle
+                                    size="m"
+                                    onClick={() => remove(index)}
+                                />
+                            </div>
+                        </li>
                     ))}
                 </>
-            ) : null}
+            </ul>
+
+            <>
+                {!formErrors.success &&
+                    formErrors.error &&
+                    formErrors.error.issues.map((e) => (
+                        <SimpleErrorMessage
+                            key={`${e.code}-${e.message}`}
+                            errorMessage={e.message}
+                        />
+                    ))}
+            </>
+
             <div className="row row--buttons">
                 <Button
                     iconLeft={<IconPlus />}
-                    variant={ownerships.length > 0 ? "secondary" : "primary"}
+                    variant={formObject.watch("ownerships").length > 0 ? "secondary" : "primary"}
                     theme="black"
                     onClick={() => append(emptyOwnership)}
                 >
