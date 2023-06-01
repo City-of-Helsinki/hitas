@@ -1,14 +1,14 @@
-import {Fieldset, IconAlertCircleFill} from "hds-react";
-import {IApartmentDetails} from "../../../common/schemas";
+import {Fieldset} from "hds-react";
+import {useContext} from "react";
+import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
 import {formatMoney} from "../../../common/utils";
+import {ApartmentSaleContext} from "./index";
 
-const ApartmentCatalogPrices = ({
-    apartment,
-    formExtraFieldErrorMessages,
-}: {
-    apartment: IApartmentDetails;
-    formExtraFieldErrorMessages: undefined | {catalog_acquisition_price?: string[]};
-}) => {
+const ApartmentCatalogPrices = () => {
+    const {apartment, formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
+
+    if (!apartment) return null;
+
     const maximumPrices = {
         maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
         debtFreePurchasePrice: apartment.prices.catalog_acquisition_price ?? 0,

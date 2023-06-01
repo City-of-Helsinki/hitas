@@ -1,18 +1,17 @@
-import {Button, IconAlertCircleFill} from "hds-react";
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
+import {useFormContext} from "react-hook-form";
 import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {getIndexType} from "../../../common/localisation";
 import {IApartmentMaximumPrice} from "../../../common/schemas";
 import {formatMoney, hdsToast} from "../../../common/utils";
+import {ApartmentSaleContext} from "./index";
 
 // Element to display when there is a valid maximum price calculation for the apartment
-const LoadedMaximumPriceCalculationExists = ({
-    saleForm,
-    maximumPriceCalculation,
-    handleCalculateButton,
-    isCalculationFormValid,
-}) => {
+const LoadedMaximumPriceCalculationExists = ({maximumPriceCalculation}) => {
+    const {formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
+    const {getValues} = useFormContext();
+
     const indexVariables = maximumPriceCalculation.calculations[maximumPriceCalculation.index].calculation_variables;
     const maximumPrices = {
         maximumPrice: maximumPriceCalculation.maximum_price,
@@ -22,20 +21,14 @@ const LoadedMaximumPriceCalculationExists = ({
         index: maximumPriceCalculation.index,
     };
 
-    const hasLoanValueChanged =
-        saleForm.getValues("apartment_share_of_housing_company_loans") !==
-        maximumPrices.apartmentShareOfHousingCompanyLoans;
+    const hasLoanValueChanged = formExtraFieldErrorMessages?.apartment_share_of_housing_company_loans;
 
     return (
         <div className={`max-prices${hasLoanValueChanged ? " expired" : ""}`}>
             <div className="row row--max-prices">
                 <div className="fieldset--max-prices__value">
                     <legend>Enimmäishinta (€)</legend>
-                    <span
-                        className={
-                            saleForm.getValues("purchase_price") > maximumPrices.maximumPrice ? "error-text" : ""
-                        }
-                    >
+                    <span className={getValues("purchase_price") > maximumPrices.maximumPrice ? "error-text" : ""}>
                         {formatMoney(maximumPrices.maximumPrice)}
                     </span>
                 </div>
@@ -59,45 +52,25 @@ const LoadedMaximumPriceCalculationExists = ({
                 </span>{" "}
                 lainaosuudella.
             </p>
-
-            {hasLoanValueChanged && (
-                <p className="error-text">
-                    <IconAlertCircleFill />
-                    <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
-                    <span> tee uusi enimmäishintalaskelma</span>.
-                </p>
-            )}
-
-            <Button
-                theme="black"
-                variant={hasLoanValueChanged ? "primary" : "secondary"}
-                onClick={handleCalculateButton}
-                disabled={!isCalculationFormValid}
-            >
-                Luo uusi enimmäishintalaskelma
-            </Button>
         </div>
     );
 };
 
-const MaximumPriceCalculationExists = ({
-    apartment,
-    saleForm,
-    setMaximumPrices,
-    handleCalculateButton,
-    isCalculationFormValid,
-}) => {
+const MaximumPriceCalculationExists = ({setMaximumPrices}) => {
+    const {apartment} = useContext(ApartmentSaleContext);
+    const {setValue} = useFormContext();
+
     const {
         data: maximumPriceCalculationData,
         error: maximumPriceError,
         isLoading: isMaximumPriceLoading,
     } = useGetApartmentMaximumPriceQuery(
         {
-            housingCompanyId: apartment.links.housing_company.id,
-            apartmentId: apartment.id,
-            priceId: apartment.prices.maximum_prices.confirmed?.id as string,
+            housingCompanyId: apartment?.links.housing_company.id,
+            apartmentId: apartment?.id,
+            priceId: apartment?.prices.maximum_prices.confirmed?.id as string,
         },
-        {skip: !apartment.prices.maximum_prices.confirmed?.id}
+        {skip: !apartment?.prices.maximum_prices.confirmed?.id}
     );
 
     const handleSetMaxPrices = (calculation: IApartmentMaximumPrice) => {
@@ -109,11 +82,8 @@ const MaximumPriceCalculationExists = ({
             index: calculation.index,
         });
 
-        saleForm.setValue("purchase_date", calculation.calculation_date);
-        saleForm.setValue(
-            "apartment_share_of_housing_company_loans",
-            indexVariables.apartment_share_of_housing_company_loans
-        );
+        setValue("purchase_date", calculation.calculation_date);
+        setValue("apartment_share_of_housing_company_loans", indexVariables.apartment_share_of_housing_company_loans);
     };
 
     useEffect(() => {
@@ -132,12 +102,7 @@ const MaximumPriceCalculationExists = ({
             error={maximumPriceError}
             isLoading={isMaximumPriceLoading}
         >
-            <LoadedMaximumPriceCalculationExists
-                saleForm={saleForm}
-                maximumPriceCalculation={maximumPriceCalculationData}
-                handleCalculateButton={handleCalculateButton}
-                isCalculationFormValid={isCalculationFormValid}
-            />
+            <LoadedMaximumPriceCalculationExists maximumPriceCalculation={maximumPriceCalculationData} />
         </QueryStateHandler>
     );
 };
