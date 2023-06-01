@@ -6,7 +6,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 
 import {IOwner, OwnerSchema} from "../schemas";
 import {validateSocialSecurityNumber} from "../utils";
-import {TextInput} from "./form";
+import {Checkbox, TextInput} from "./form";
 import {SaveButton} from "./index";
 
 type NewOwnerFormProps = {
@@ -22,6 +22,7 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
         name: "",
         identifier: "",
         email: "",
+        non_disclosure: false,
     };
 
     const formObject = useForm<IOwner>({
@@ -58,6 +59,11 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
             <TextInput
                 name="email"
                 label="Sähköpostiosoite"
+                formObject={formObject}
+            />
+            <Checkbox
+                name="non_disclosure"
+                label="Turvakielto"
                 formObject={formObject}
             />
             {
