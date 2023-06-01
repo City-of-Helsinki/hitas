@@ -116,7 +116,7 @@ const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, c
     );
 };
 
-const OwnershipsListFieldSet = ({formObject, disabled}) => {
+const OwnershipsListFieldSet = ({formObject}) => {
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,
@@ -159,7 +159,6 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                                         formObject={formObject}
                                         formObjectFieldPath={`ownerships.${index}.owner`}
                                         formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
-                                        disabled={disabled}
                                         RelatedModelMutateComponent={OwnerMutateForm}
                                     />
                                 </div>
@@ -169,14 +168,13 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                                         fractionDigits={2}
                                         formObject={formObject}
                                         required
-                                        disabled={disabled}
                                     />
                                     <span>%</span>
                                 </div>
-                                <div className={`icon--remove${disabled ? " disabled" : ""}`}>
+                                <div className="icon--remove">
                                     <IconCrossCircle
                                         size="m"
-                                        onClick={() => (disabled ? null : remove(index))}
+                                        onClick={() => remove(index)}
                                     />
                                 </div>
                             </li>
@@ -211,7 +209,6 @@ const OwnershipsListFieldSet = ({formObject, disabled}) => {
                     variant={ownerships.length > 0 ? "secondary" : "primary"}
                     theme="black"
                     onClick={() => append(emptyOwnership)}
-                    disabled={disabled}
                 >
                     Lisää uusi omistajuus rivi
                 </Button>
