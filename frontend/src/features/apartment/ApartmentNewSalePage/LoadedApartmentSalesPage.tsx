@@ -1,7 +1,7 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Fieldset} from "hds-react";
 import {useRef, useState} from "react";
-import {useForm} from "react-hook-form";
+import {FormProvider, useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
 import {z, ZodSchema} from "zod";
@@ -19,6 +19,7 @@ import {
 } from "../../../common/schemas";
 import {getApartmentUnconfirmedPrices, hdsToast, today} from "../../../common/utils";
 import ApartmentCatalogPrices from "./ApartmentCatalogPrices";
+import {ApartmentSaleContext} from "./index";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
@@ -272,69 +273,65 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     return (
         <div className="view--apartment-conditions-of-sale">
             <div className="fieldsets">
-                <Fieldset heading="Kaupan tiedot *">
-                    <form
-                        ref={formRef}
-                        onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
-                    >
-                        <div className="row">
-                            <DateInput
-                                name="notification_date"
-                                label="Ilmoituspäivämäärä"
-                                formObject={saleForm}
-                                maxDate={new Date()}
-                                required
-                            />
-                            <DateInput
-                                name="purchase_date"
-                                label="Kauppakirjan päivämäärä"
-                                formObject={saleForm}
-                                maxDate={new Date()}
-                                required
-                            />
-                        </div>
-                        <div className="row">
-                            <NumberInput
-                                name="purchase_price"
-                                label="Kauppahinta"
-                                formObject={saleForm}
-                                unit="€"
-                                fractionDigits={2}
-                                required
-                            />
-                            <NumberInput
-                                name="apartment_share_of_housing_company_loans"
-                                label="Osuus yhtiön lainoista"
-                                formObject={saleForm}
-                                unit="€"
-                                required
-                            />
-                        </div>
-                        {!isApartmentFirstSale ? (
-                            <Checkbox
-                                name="exclude_from_statistics"
-                                label="Ei tilastoihin (esim. sukulaiskauppa)"
-                                formObject={saleForm}
-                                triggerField="purchase_price"
-                            />
-                        ) : null}
-                    </form>
-                </Fieldset>
+                <ApartmentSaleContext.Provider value={{apartment, formExtraFieldErrorMessages}}>
+                    <FormProvider {...saleForm}>
+                        <Fieldset heading="Kaupan tiedot *">
+                            <form
+                                ref={formRef}
+                                onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
+                            >
+                                <div className="row">
+                                    <DateInput
+                                        name="notification_date"
+                                        label="Ilmoituspäivämäärä"
+                                        formObject={saleForm}
+                                        maxDate={new Date()}
+                                        required
+                                    />
+                                    <DateInput
+                                        name="purchase_date"
+                                        label="Kauppakirjan päivämäärä"
+                                        formObject={saleForm}
+                                        maxDate={new Date()}
+                                        required
+                                    />
+                                </div>
+                                <div className="row">
+                                    <NumberInput
+                                        name="purchase_price"
+                                        label="Kauppahinta"
+                                        formObject={saleForm}
+                                        unit="€"
+                                        fractionDigits={2}
+                                        required
+                                    />
+                                    <NumberInput
+                                        name="apartment_share_of_housing_company_loans"
+                                        label="Osuus yhtiön lainoista"
+                                        formObject={saleForm}
+                                        unit="€"
+                                        required
+                                    />
+                                </div>
+                                {!isApartmentFirstSale ? (
+                                    <Checkbox
+                                        name="exclude_from_statistics"
+                                        label="Ei tilastoihin (esim. sukulaiskauppa)"
+                                        formObject={saleForm}
+                                        triggerField="purchase_price"
+                                    />
+                                ) : null}
+                            </form>
+                        </Fieldset>
 
-                {isApartmentFirstSale ? (
-                    <ApartmentCatalogPrices
-                        apartment={apartment}
-                        formExtraFieldErrorMessages={formExtraFieldErrorMessages}
-                    />
-                ) : (
-                    <MaximumPriceCalculationFieldSet
-                        apartment={apartment}
-                        setMaximumPrices={setMaximumPrices}
-                        saleForm={saleForm}
-                        formExtraFieldErrorMessages={formExtraFieldErrorMessages}
-                    />
-                )}
-                <OwnershipsListFieldSet formObject={saleForm} />
+                        {isApartmentFirstSale ? (
+                            <ApartmentCatalogPrices />
+                        ) : (
+                            <MaximumPriceCalculationFieldSet setMaximumPrices={setMaximumPrices} />
+                        )}
+                        <OwnershipsListFieldSet />
+                    </FormProvider>
+                </ApartmentSaleContext.Provider>
             </div>
 
             <div className="row row--buttons">

@@ -1,17 +1,12 @@
-import {Button} from "hds-react";
-import {IApartmentDetails} from "../../../common/schemas";
+import {useContext} from "react";
 import {formatMoney, getApartmentUnconfirmedPrices} from "../../../common/utils";
+import {ApartmentSaleContext} from "./index";
 
 // Element to display when there is no valid maximum price calculation for the apartment
-const MaximumPriceCalculationMissing = ({
-    apartment,
-    handleCalculateButton,
-    isCalculationFormValid,
-}: {
-    apartment: IApartmentDetails;
-    handleCalculateButton: () => void;
-    isCalculationFormValid: boolean;
-}) => {
+const MaximumPriceCalculationMissing = () => {
+    const {apartment} = useContext(ApartmentSaleContext);
+    if (!apartment) return null;
+
     const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
 
     return (
@@ -23,14 +18,6 @@ const MaximumPriceCalculationMissing = ({
                 Mikäli asunnon velaton kauppahinta ylittää rajaneliöhinta-arvion, tulee asunnolle luoda vahvistettu
                 enimmäishintalaskelma.
             </p>
-
-            <Button
-                theme="black"
-                onClick={handleCalculateButton}
-                disabled={!isCalculationFormValid}
-            >
-                Luo enimmäishintalaskelma
-            </Button>
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import {Button, Dialog, Fieldset, IconAlertCircleFill, IconArrowLeft, IconCrossCircle, IconPlus} from "hds-react";
-import {useFieldArray, useForm} from "react-hook-form";
+import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
 
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
@@ -116,7 +116,9 @@ const OwnerMutateForm = ({formObject, formObjectFieldPath, cancelButtonAction, c
     );
 };
 
-const OwnershipsListFieldSet = ({formObject}) => {
+const OwnershipsListFieldSet = () => {
+    const formObject = useFormContext();
+
     const {fields, append, remove} = useFieldArray({
         name: "ownerships",
         control: formObject.control,

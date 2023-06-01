@@ -1,35 +1,30 @@
-import {Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
-import {useState} from "react";
+import {Button, Dialog, Fieldset} from "hds-react";
+import {useContext, useState} from "react";
+import {useFormContext} from "react-hook-form";
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
+import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
 import {
     ApartmentSaleFormSchema,
     IApartmentConfirmedMaximumPrice,
-    IApartmentDetails,
     IApartmentMaximumPrice,
 } from "../../../common/schemas";
 import {formatDate, hdsToast} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
+import {ApartmentSaleContext} from "./index";
 import {ISalesPageMaximumPrices} from "./LoadedApartmentSalesPage";
 import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
 import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 import MaximumPriceModalError from "./MaximumPriceModalError";
 
 const MaximumPriceCalculationFieldSet = ({
-    apartment,
     setMaximumPrices,
-    saleForm,
-    formExtraFieldErrorMessages,
 }: {
-    apartment: IApartmentDetails;
     setMaximumPrices: (maximumPrices: ISalesPageMaximumPrices) => void;
-    saleForm;
-    formExtraFieldErrorMessages: undefined | {maximum_price_calculation?: string[]};
 }) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-
-    const hasApartmentConfirmedCalculation =
-        apartment.prices.maximum_prices.confirmed && apartment.prices.maximum_prices.confirmed.valid.is_valid;
+    const {apartment, formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
+    const saleForm = useFormContext();
 
     const [
         saveMaximumPriceCalculation,
@@ -39,6 +34,11 @@ const MaximumPriceCalculationFieldSet = ({
             isLoading: isMaximumPriceCreateLoading,
         },
     ] = useSaveApartmentMaximumPriceMutation();
+
+    if (!apartment) return null;
+
+    const hasApartmentConfirmedCalculation =
+        apartment.prices.maximum_prices.confirmed && apartment.prices.maximum_prices.confirmed.valid.is_valid;
 
     const handleCreateNewCalculationButton = () => {
         if (isCalculationFormValid) {
@@ -66,14 +66,15 @@ const MaximumPriceCalculationFieldSet = ({
         }
     };
 
+    const hasLoanValueChanged = formExtraFieldErrorMessages?.apartment_share_of_housing_company_loans;
+    const maximumPriceCalculationErrorMessage =
+        formExtraFieldErrorMessages?.maximum_price_calculation &&
+        formExtraFieldErrorMessages.maximum_price_calculation[0];
+
     const isCalculationFormValid = ApartmentSaleFormSchema.partial().safeParse({
         purchase_date: saleForm.getValues("purchase_date"),
         apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
     }).success;
-
-    const errorMessage =
-        formExtraFieldErrorMessages?.maximum_price_calculation &&
-        formExtraFieldErrorMessages.maximum_price_calculation[0];
 
     return (
         <Fieldset
@@ -85,22 +86,32 @@ const MaximumPriceCalculationFieldSet = ({
                     : ""
             } *`}
         >
-            <SimpleErrorMessage errorMessage={errorMessage} />
             {hasApartmentConfirmedCalculation ? (
-                <MaximumPriceCalculationExists
-                    apartment={apartment}
-                    saleForm={saleForm}
-                    setMaximumPrices={setMaximumPrices}
-                    handleCalculateButton={handleCreateNewCalculationButton}
-                    isCalculationFormValid={isCalculationFormValid}
-                />
+                <MaximumPriceCalculationExists setMaximumPrices={setMaximumPrices} />
             ) : (
-                <MaximumPriceCalculationMissing
-                    apartment={apartment}
-                    handleCalculateButton={handleCreateNewCalculationButton}
-                    isCalculationFormValid={isCalculationFormValid}
-                />
+                <MaximumPriceCalculationMissing />
             )}
+
+            <SimpleErrorMessage errorMessage={maximumPriceCalculationErrorMessage} />
+            <SimpleErrorMessage
+                errorMessage={
+                    hasLoanValueChanged && (
+                        <>
+                            <span>Yhtiön lainaosuus</span> on muuttunut, ole hyvä ja
+                            <span> tee uusi enimmäishintalaskelma</span>.
+                        </>
+                    )
+                }
+            />
+
+            <Button
+                theme="black"
+                variant={hasLoanValueChanged ? "primary" : "secondary"}
+                onClick={handleCreateNewCalculationButton}
+                disabled={!isCalculationFormValid}
+            >
+                Luo uusi enimmäishintalaskelma
+            </Button>
 
             <Dialog
                 id="maximum-price-confirmation-modal"
