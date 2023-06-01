@@ -77,6 +77,7 @@ export const errorMessages = {
     APIIdMin: "Rajapinnan palauttamassa ID-arvossa liian vähän merkkejä",
     APIIdMax: "Rajapinnan palauttamassa ID-arvossa on liian monta merkkiä",
     overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
+    priceHigherThanUnconfirmedMaxPrice: "Velaton kauppahinta ylittää rajaneliöhinnan.",
     loanShareChanged: "Lainaosuus muuttunut laskelmasta",
     catalogOverMaxPrice: "Kauppahinta ylittää myyntihintaluettelon hinnan",
     catalogUnderMaxPrice: "Kauppahinta alittaa myyntihintaluettelon hinnan",
@@ -533,19 +534,19 @@ const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
 const ApartmentSaleFormSchema = object({
     key: string().optional(),
     notification_date: z
-        .string({required_error: errorMessages.required})
+        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
     purchase_date: z
-        .string({required_error: errorMessages.required})
+        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
     purchase_price: z
-        .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
         .nullish(),
     apartment_share_of_housing_company_loans: z
-        .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .gte(0, errorMessages.loanShareMin)
+        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+        .nonnegative(errorMessages.loanShareMin)
         .nullish(),
     exclude_from_statistics: boolean(),
 });
@@ -604,35 +605,23 @@ const OwnershipsListSchema = object({
 
 // Apartment Sale Form that can be submitted.
 // Other validations still need to be done, but those are out of scope for this schema.
-const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({purchase_price: true})
-    .and(
-        object({
-            id: string().optional(),
-            purchase_price: z
-                .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-                .nonnegative(errorMessages.priceMin)
-                .max(999999, errorMessages.priceMax),
-            ownerships: OwnershipsListSchema,
-        })
-    )
-    .superRefine((data, ctx) => {
-        // Price can be zero, but it can't be nullish.
-        if (data.purchase_price === undefined || data.purchase_price === null) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["purchase_price"],
-                message: errorMessages.required,
-            });
-        }
-        // Price can be zero only if sale is excluded from statistics.
-        if (!data.exclude_from_statistics && data.purchase_price === 0) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["purchase_price"],
-                message: "Pakollinen jos kauppa tilastoidaan.",
-            });
-        }
-    });
+
+const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
+    purchase_price: true,
+    apartment_share_of_housing_company_loans: true,
+}).and(
+    object({
+        id: string().optional(),
+        purchase_price: z
+            .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+            .nonnegative(errorMessages.priceMin)
+            .max(999999, errorMessages.priceMax),
+        apartment_share_of_housing_company_loans: z
+            .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+            .nonnegative(errorMessages.priceMin),
+        ownerships: OwnershipsListSchema,
+    })
+);
 
 const ApartmentSaleCreatedSchema = object({
     id: string(),

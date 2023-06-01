@@ -1,4 +1,4 @@
-import {Dialog, Fieldset} from "hds-react";
+import {Dialog, Fieldset, IconAlertCircleFill} from "hds-react";
 import {useState} from "react";
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
@@ -19,10 +19,12 @@ const MaximumPriceCalculationFieldSet = ({
     apartment,
     setMaximumPrices,
     saleForm,
+    formExtraFieldErrorMessages,
 }: {
     apartment: IApartmentDetails;
     setMaximumPrices: (maximumPrices: ISalesPageMaximumPrices) => void;
     saleForm;
+    formExtraFieldErrorMessages: undefined | {maximum_price_calculation?: string[]};
 }) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
@@ -69,6 +71,10 @@ const MaximumPriceCalculationFieldSet = ({
         apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
     }).success;
 
+    const errorMessage =
+        formExtraFieldErrorMessages?.maximum_price_calculation &&
+        formExtraFieldErrorMessages.maximum_price_calculation[0];
+
     return (
         <Fieldset
             heading={`Enimmäishintalaskelma${
@@ -79,6 +85,12 @@ const MaximumPriceCalculationFieldSet = ({
                     : ""
             } *`}
         >
+            {errorMessage ? (
+                <p className="error-text">
+                    <IconAlertCircleFill />
+                    {errorMessage}
+                </p>
+            ) : null}
             {hasApartmentConfirmedCalculation ? (
                 <MaximumPriceCalculationExists
                     apartment={apartment}
@@ -89,6 +101,7 @@ const MaximumPriceCalculationFieldSet = ({
                 />
             ) : (
                 <MaximumPriceCalculationMissing
+                    apartment={apartment}
                     handleCalculateButton={handleCreateNewCalculationButton}
                     isCalculationFormValid={isCalculationFormValid}
                 />
