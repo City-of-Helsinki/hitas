@@ -44,6 +44,7 @@ const DateInput = ({id, name, label, formObject, required, ...rest}: DateInputPr
         try {
             const convertedValue = format(valueAsDate, apiFormat);
             formObject.setValue(formDate.name, convertedValue, true);
+            formObject.clearErrors(name);
         } catch {
             formObject.setValue(formDate.name, newValue, true);
         }
@@ -62,7 +63,7 @@ const DateInput = ({id, name, label, formObject, required, ...rest}: DateInputPr
                 name={formDate.name}
                 label={label || ""}
                 onChange={handleOnChange}
-                onBlur={formDate.handleBlur}
+                onBlur={undefined} // formObject.onBlur will break date formatting
                 ref={formDate.ref}
                 value={getValue() ?? ""}
                 errorText={!!fieldError && fieldError.message}
