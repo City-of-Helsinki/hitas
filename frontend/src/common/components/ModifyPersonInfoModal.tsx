@@ -1,11 +1,11 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, Dialog, IconArrowLeft} from "hds-react";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
 import {IOwner, OwnerSchema} from "../schemas";
-import {hdsToast, validateSocialSecurityNumber} from "../utils";
+import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../utils";
 import TextInput from "./form/TextInput";
 import SaveButton from "./SaveButton";
 
@@ -14,39 +14,74 @@ interface IOwnerMutateForm {
     closeModalAction: () => void;
 }
 const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
-    const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
     const runSaveOwner = (data) => {
+        // submit the form values
         saveOwner({data: data})
             .unwrap()
             .then((payload) => {
-                hdsToast.success("Omistajan tiedot muutettu onnistuneesti!");
+                hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
             })
             .catch((error) => {
-                hdsToast.error("Virhe omistajan tietojen muuttamisessa!");
+                hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
                 error.data.fields.forEach((field) =>
-                    ownerFormObject.setError(field.field, {type: "custom", message: field.message})
+                    ownerFormObject.setError(field.field, {type: "backend", message: field.message})
                 );
             });
+    };
+
+    const resolver = (data, context, options) => {
+        // validate the identifier field
+        return zodResolver(
+            OwnerSchema.superRefine((data, ctx) => {
+                if (!validateSocialSecurityNumber(data.identifier) && !validateBusinessId(data.identifier)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["identifier"],
+                        message: "Virheellinen henkilö- tai Y-tunnus",
+                    });
+                }
+            })
+        )(data, context, {...options, mode: "sync"});
     };
 
     const ownerFormObject = useForm({
         defaultValues: owner,
         mode: "all",
-        resolver: zodResolver(OwnerSchema),
+        resolver: resolver,
     });
 
+    // helper values
+    const identifierValue = ownerFormObject.watch("identifier");
+    const hasFormChanged =
+        ownerFormObject.formState.isDirty && JSON.stringify(owner) !== JSON.stringify(ownerFormObject.getValues());
+    const isMalformedIdentifier = ownerFormObject.formState.errors.identifier?.type === "custom";
+    const isIdentifierEmpty = identifierValue === "";
+    const isBackendErrorInIdentifier = ownerFormObject.formState.errors.identifier?.type === "backend";
+    const isOtherErrorsThanIdentifier = Object.keys(ownerFormObject.formState.errors).some(
+        (field) => field !== "identifier"
+    );
+
+    // booleans to determine if submitting the form is enabled and with or without warnings
+    const isSaveWithWarning = isMalformedIdentifier && !isOtherErrorsThanIdentifier && !isIdentifierEmpty;
+    const isSaveDisabled =
+        isOtherErrorsThanIdentifier || isIdentifierEmpty || isBackendErrorInIdentifier || !hasFormChanged;
+
+    useEffect(() => {
+        // validate the initial form values
+        ownerFormObject.trigger();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const onFormSubmitValid = () => {
-        setIsSubmitted(true);
         runSaveOwner(ownerFormObject.getValues());
     };
 
     const onFormSubmitInvalid = (errors) => {
-        if (errors.identifier && errors.identifier.type === z.ZodIssueCode.custom) {
-            setIsInvalidSSNAllowed(true);
+        if (isSaveWithWarning) {
+            // submit with warning
+            runSaveOwner(ownerFormObject.getValues());
         }
     };
 
@@ -71,16 +106,12 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                     formObject={ownerFormObject}
                 />
                 {
-                    // If valid identifier values are required and the identifier
-                    // is not one, show prompt for confirmation when submitting
-                    isInvalidSSNAllowed &&
-                        !validateSocialSecurityNumber(ownerFormObject.getValues("identifier")) &&
-                        isSubmitted && (
-                            <p className="error-message">
-                                "{ownerFormObject.getValues("identifier")}" ei ole oikea sosiaaliturvatunnus.
-                                Tallennetaanko silti?
-                            </p>
-                        )
+                    // show warning when identifier is invalid
+                    isSaveWithWarning && !isSaveDisabled && (
+                        <p className="error-message">
+                            "{identifierValue}" on virheellinen henkilö- tai Y-tunnus. Tallennetaanko silti?
+                        </p>
+                    )
                 }
                 <div className="row row--buttons">
                     <Button
@@ -90,9 +121,12 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                     >
                         Peruuta
                     </Button>
+
                     <SaveButton
                         isLoading={isSaveOwnerLoading}
                         type="submit"
+                        buttonText={isSaveWithWarning ? "Tallenna silti" : "Tallenna"}
+                        disabled={isSaveDisabled}
                     />
                 </div>
             </form>
