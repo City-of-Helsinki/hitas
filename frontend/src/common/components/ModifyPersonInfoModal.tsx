@@ -52,8 +52,9 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         resolver: resolver,
     });
 
-    // helper values
     const identifierValue = ownerFormObject.watch("identifier");
+
+    // helper booleans
     const hasFormChanged =
         ownerFormObject.formState.isDirty && JSON.stringify(owner) !== JSON.stringify(ownerFormObject.getValues());
     const isMalformedIdentifier = ownerFormObject.formState.errors.identifier?.type === "custom";
