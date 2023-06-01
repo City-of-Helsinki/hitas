@@ -334,8 +334,9 @@ const ApartmentLinkedModelsSchema = object({
 const OwnerSchema = object({
     id: APIIdString.optional(),
     name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
-    identifier: string({required_error: errorMessages.required}),
+    identifier: string({required_error: errorMessages.required}).min(1, errorMessages.stringLength),
     email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")).optional(),
+    non_disclosure: boolean().optional(),
 });
 
 const ownershipSchema = object({
