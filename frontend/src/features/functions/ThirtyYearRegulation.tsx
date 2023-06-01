@@ -152,6 +152,7 @@ const ThirtyYearRegulation = () => {
                     hdsToast.success("Vertailu suoritettu onnistuneesti!");
                 })
                 .catch((error) => {
+                    // eslint-disable-next-line no-console
                     console.warn("Error:", error);
                     setIsErrorModalOpen(true);
                 });

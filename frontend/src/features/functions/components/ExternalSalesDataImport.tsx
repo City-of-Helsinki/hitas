@@ -27,6 +27,7 @@ export default function ExternalSalesDataImport({formDate}) {
             .unwrap()
             .then((data) => {
                 if ("error" in (data as object)) {
+                    // eslint-disable-next-line no-console
                     console.warn("Uncaught error:", data.error);
                     setIsModalOpen(true);
                 } else {
@@ -36,6 +37,7 @@ export default function ExternalSalesDataImport({formDate}) {
                 }
             })
             .catch((error) => {
+                // eslint-disable-next-line no-console
                 console.warn("Caught error:", error);
                 setIsModalOpen(true);
             });

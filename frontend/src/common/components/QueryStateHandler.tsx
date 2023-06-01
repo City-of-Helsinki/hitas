@@ -51,6 +51,7 @@ export default function QueryStateHandler({
     } else if (data && (!("contents" in data) || data.contents.length)) {
         return <>{children}</>;
     } else {
+        // eslint-disable-next-line no-console
         console.warn(`${attemptedAction ? attemptedAction + ": " : ""}Ei tuloksia!`);
         return <></>;
     }
