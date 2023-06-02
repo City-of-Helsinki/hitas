@@ -21,6 +21,9 @@ class OwnerSerializer(HitasModelSerializer):
         valid_identifier = check_social_security_number(value) or check_business_id(value)
         if self.instance is not None:  # update
             if value != self.instance.identifier:
+                if self.instance.valid_identifier and not valid_identifier:
+                    raise ValidationError("Previous identifier was valid. Cannot update to an invalid one.")
+
                 if valid_identifier and Owner.objects.filter(identifier=value).exists():
                     raise ValidationError("An owner with this identifier already exists.")
 
