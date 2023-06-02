@@ -72,7 +72,11 @@ class Owner(ExternalSafeDeleteHitasModel):
         return values
 
     @classmethod
-    def post_fetch_values_list_flat_hook(cls, value: Any, field: str) -> Any:
+    def post_fetch_values_list_flat_hook(cls, value: Any, field: str) -> None:
+        # Primary keys must be allowed so that 'bulk_create' works
+        if field == "pk":
+            return value
+
         raise RuntimeError(
             "Due to owner obfuscation, 'non_disclosure' field should always be included "
             "when fetching owners. When using .values_list(..., flat=True), this cannot be done."
