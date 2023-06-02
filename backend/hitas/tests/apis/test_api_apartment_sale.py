@@ -1611,6 +1611,7 @@ def test__api__apartment_sale__delete__under_three_months(api_client: HitasAPICl
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=three_months,
+        apartment__completion_date=three_months,
     )
 
     url = reverse(
@@ -1633,6 +1634,7 @@ def test__api__apartment_sale__delete__over_three_months(api_client: HitasAPICli
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=under_three_months,
+        apartment__completion_date=under_three_months,
     )
 
     url = reverse(

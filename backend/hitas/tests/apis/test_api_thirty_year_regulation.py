@@ -3049,7 +3049,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
@@ -3173,7 +3173,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
 
     # Create necessary external sales data (no external sales)
     ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
+        calculation_quarter=to_quarter(this_month),
         quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
         quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
         quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
