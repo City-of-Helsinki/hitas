@@ -3,7 +3,7 @@ import {Link, useLocation, useParams} from "react-router-dom";
 
 import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../../app/services";
 import {EditButton, Heading, QueryStateHandler} from "../../../common/components";
-import {getApartmentStateLabel, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
+import {getApartmentSoldStatusLabel, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
 import {IApartmentDetails, IHousingCompanyDetails} from "../../../common/schemas";
 import {formatAddress} from "../../../common/utils";
 
@@ -35,7 +35,7 @@ const ApartmentHeaderContent = ({
                 <span className="address">{apartment && formatAddress(apartment.address)}</span>
             )}
 
-            <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
+            <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
 
             {apartment.sell_by_date && (
                 <StatusLabel

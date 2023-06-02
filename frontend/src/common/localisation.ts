@@ -1,3 +1,5 @@
+import {IApartment, IApartmentDetails} from "./schemas";
+
 export const getHousingCompanyHitasTypeName = (state) => {
     switch (state) {
         case "non_hitas":
@@ -51,15 +53,9 @@ export function getIndexType(indexType: string) {
     }
 }
 
-export const getApartmentStateLabel = (state) => {
-    switch (state) {
-        case "free":
-            return "Vapaa";
-        case "reserved":
-            return "Varattu";
-        case "sold":
-            return "Myyty";
-        default:
-            return "VIRHE";
+export const getApartmentSoldStatusLabel = (apartment: IApartment | IApartmentDetails) => {
+    if (apartment.is_sold) {
+        return "Myyty";
     }
+    return "Vapaa";
 };

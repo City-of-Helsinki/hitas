@@ -29,9 +29,7 @@ import {
     TextAreaInput,
     TextInput,
 } from "../../common/components/form";
-import {getApartmentStateLabel} from "../../common/localisation";
 import {
-    apartmentStates,
     ApartmentWritableFormSchema,
     errorMessages,
     IApartmentDetails,
@@ -42,10 +40,6 @@ import {
 } from "../../common/schemas";
 import {hdsToast, isEmpty} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
-
-const apartmentStateOptions = apartmentStates.map((state) => {
-    return {label: getApartmentStateLabel(state), value: state};
-});
 
 const ApartmentDeleteButton = ({apartment}) => {
     const navigate = useNavigate();
@@ -102,7 +96,6 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
         return convertApartmentDetailToWritable(apartment);
     } else {
         return {
-            state: "free",
             type: null,
             surface_area: null,
             rooms: null,
@@ -393,20 +386,12 @@ const LoadedApartmentCreatePage = ({
                             />
                         </div>
                         <div className="row">
-                            <Select
-                                label="Tila"
-                                name="state"
-                                options={apartmentStateOptions}
-                                defaultValue={{label: "Vapaa", value: "free"}}
-                                formObject={formObject}
-                                required
-                                setDirectValue
-                            />
                             <DateInput
                                 label="Valmistumispäivä"
                                 name="completion_date"
                                 formObject={formObject}
                             />
+                            <div />
                         </div>
                     </Fieldset>
                     <Fieldset heading="">
