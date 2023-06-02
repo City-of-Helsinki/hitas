@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, Dialog, IconArrowLeft} from "hds-react";
-import {Dispatch, SetStateAction, useEffect} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
@@ -14,6 +14,7 @@ interface IOwnerMutateForm {
     closeModalAction: () => void;
 }
 const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
+    const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
     const runSaveOwner = (data) => {
         // submit the form values
@@ -31,8 +32,8 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
             });
     };
 
-    const resolver = (data, context, options) => {
-        // validate the identifier field
+    const resolver = async (data, context, options) => {
+        // validate the form
         return zodResolver(
             OwnerSchema.superRefine((data, ctx) => {
                 if (!validateSocialSecurityNumber(data.identifier) && !validateBusinessId(data.identifier)) {
@@ -51,10 +52,9 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         mode: "all",
         resolver: resolver,
     });
-
     const identifierValue = ownerFormObject.watch("identifier");
 
-    // helper booleans
+    // helper booleans for special saving controls with invalid data
     const hasFormChanged =
         ownerFormObject.formState.isDirty && JSON.stringify(owner) !== JSON.stringify(ownerFormObject.getValues());
     const isMalformedIdentifier = ownerFormObject.formState.errors.identifier?.type === "custom";
@@ -64,14 +64,22 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         (field) => field !== "identifier"
     );
 
-    // booleans to determine if submitting the form is enabled and with or without warnings
-    const isSaveWithWarning = isMalformedIdentifier && !isOtherErrorsThanIdentifier && !isIdentifierEmpty;
+    // enable submitting malformed non-empty identifier if it wasn't valid initially and other fields are valid
+    const isSaveWithWarning =
+        isMalformedIdentifier && !isInitialIdentifierValid && !isOtherErrorsThanIdentifier && !isIdentifierEmpty;
+    // disable submitting in the following cases:
     const isSaveDisabled =
-        isOtherErrorsThanIdentifier || isIdentifierEmpty || isBackendErrorInIdentifier || !hasFormChanged;
+        isOtherErrorsThanIdentifier ||
+        isIdentifierEmpty ||
+        (isMalformedIdentifier && isInitialIdentifierValid) ||
+        isBackendErrorInIdentifier ||
+        !hasFormChanged;
 
     useEffect(() => {
-        // validate the initial form values
-        ownerFormObject.trigger();
+        // validate the initial form values and set the initial identifier validity
+        ownerFormObject.trigger().then(() => {
+            setIsInitialIdentifierValid(!ownerFormObject.formState.errors.identifier);
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -107,7 +115,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                     formObject={ownerFormObject}
                 />
                 {
-                    // show warning when identifier is invalid
+                    // show warning when saving malformed identifier is enabled
                     isSaveWithWarning && !isSaveDisabled && (
                         <p className="error-message">
                             "{identifierValue}" on virheellinen henkilö- tai Y-tunnus. Tallennetaanko silti?
