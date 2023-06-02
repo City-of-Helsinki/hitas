@@ -14,6 +14,7 @@ import {
 import FilterCheckboxField from "../../common/components/FilterCheckboxField";
 import {getApartmentSoldStatusLabel} from "../../common/localisation";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
+import {formatDate} from "../../common/utils";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
 const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
@@ -21,6 +22,8 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     const ownershipsString = apartment.ownerships.length
         ? apartment.ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
         : "Ei omistajuuksia";
+
+    const isHousingCompanyReleased = apartment.links.housing_company.regulation_status.startsWith("released");
     return (
         <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
             <li className="results-list__item results-list__item--apartment">
@@ -47,13 +50,17 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     <div className="ownership">{`${ownershipsString}`}</div>
                     <div className="surface-area">
                         {`${apartment.surface_area ? apartment.surface_area + "m²" : ""}
-                        ${apartment.rooms || ""} ${apartment.type}`}
+                        ${apartment.rooms ?? ""} ${apartment.type ?? ""}`}
                     </div>
                 </div>
                 <div className="state">
-                    <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
-                    {apartment.links.housing_company.regulation_status.startsWith("released") && (
-                        <StatusLabel>Vapautunut</StatusLabel>
+                    <StatusLabel>
+                        {isHousingCompanyReleased ? "Vapautunut" : getApartmentSoldStatusLabel(apartment)}
+                    </StatusLabel>
+                    {!isHousingCompanyReleased && (
+                        <StatusLabel>
+                            {apartment.completion_date ? formatDate(apartment.completion_date) : "Ei valmis"}
+                        </StatusLabel>
                     )}
                 </div>
             </li>

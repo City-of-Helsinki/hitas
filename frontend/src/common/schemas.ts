@@ -470,7 +470,7 @@ const ApartmentSchema = object({
     surface_area: number(),
     rooms: number().nullable(),
     address: ApartmentAddressSchema,
-    completion_date: number().nullable(),
+    completion_date: string().nullable(),
     housing_company: string(),
     ownerships: ownershipsSchema,
     links: ApartmentLinkedModelsSchema,
