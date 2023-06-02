@@ -11,6 +11,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.parsers import BaseParser
+from rest_framework.renderers import BaseRenderer
 from rest_framework.serializers import Serializer
 
 
@@ -41,6 +42,20 @@ class OldExcelParser(_ExcelParser):
 
 class NewExcelParser(_ExcelParser):
     media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"  # .xlsx
+
+
+class ExcelRenderer(BaseRenderer):
+    media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    charset = None
+    format = "excel"
+
+    def render(
+        self,
+        data: bytes,
+        accepted_media_type: Optional[str] = None,
+        renderer_context: Optional[str] = None,
+    ) -> bytes:
+        return data
 
 
 def parse_excel_from_bytes(request: WSGIRequest) -> Workbook:
