@@ -172,3 +172,26 @@ def test_owner_obfuscation__values_list_flat():
 
     with pytest.raises(RuntimeError, match=re.escape(msg)):
         Owner.objects.values_list("name", flat=True).first()
+
+
+@pytest.mark.django_db
+def test_owner_obfuscation__values_list_flat__pk():
+    owner: Owner = OwnerFactory.create(
+        name="Testi Testinen",
+        identifier="123456-789A",
+        email=None,
+        non_disclosure=True,
+    )
+
+    # Primary keys can be fetched, since they are required for 'bulk_create' to work
+    pk = Owner.objects.values_list("pk", flat=True).first()
+    assert owner.pk == pk
+
+    # Check that bulk create works
+    Owner.objects.bulk_create(
+        [
+            Owner(name="Testi Testinen", identifier="123456-789A", email=None, non_disclosure=True),
+        ]
+    )
+
+    assert len(Owner.objects.all()) == 2
