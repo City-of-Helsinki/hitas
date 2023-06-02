@@ -420,7 +420,8 @@ def fetch_apartment(
                         queryset=(
                             Apartment.objects.filter(
                                 building__real_estate__housing_company__uuid=housing_company_uuid,
-                            ).annotate(
+                            )
+                            .annotate(
                                 _price=Case(
                                     When(
                                         condition=Q(sales__isnull=True),
@@ -430,6 +431,7 @@ def fetch_apartment(
                                     output_field=HitasModelDecimalField(),
                                 ),
                             )
+                            .distinct()
                         ),
                         sum_field="_price",
                     ),
@@ -444,7 +446,8 @@ def fetch_apartment(
                             Apartment.objects.filter(
                                 building__real_estate__housing_company__uuid=housing_company_uuid,
                                 completion_date=OuterRef("completion_date"),
-                            ).annotate(
+                            )
+                            .annotate(
                                 _price=Case(
                                     When(
                                         condition=Q(sales__isnull=True),
@@ -454,6 +457,7 @@ def fetch_apartment(
                                     output_field=HitasModelDecimalField(),
                                 ),
                             )
+                            .distinct()
                         ),
                         sum_field="_price",
                     ),
