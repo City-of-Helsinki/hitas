@@ -42,7 +42,6 @@ from hitas.models.apartment import (
     ApartmentWithAnnotations,
     DepreciationPercentage,
     ApartmentWithListAnnotations,
-    ApartmentState,
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType, RegulationStatus
@@ -618,7 +617,7 @@ class ApartmentConditionsOfSaleSerializer(EnumSupportSerializerMixin, HitasModel
 
 
 class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
-    state = serializers.SerializerMethodField()
+    is_sold = serializers.SerializerMethodField()
     type = ReadOnlyApartmentTypeSerializer(source="apartment_type", required=False, allow_null=True)
     address = ApartmentHitasAddressSerializer(source="*")
     completion_date = serializers.DateField(required=False, allow_null=True)
@@ -634,8 +633,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     sell_by_date = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_state(instance: ApartmentWithAnnotations) -> str:
-        return ApartmentState.SOLD.value if instance.sales.exists() else ApartmentState.FREE.value
+    def get_is_sold(instance: ApartmentWithAnnotations) -> bool:
+        return instance.sales.exists()
 
     @staticmethod
     def get_ownerships(instance: ApartmentWithAnnotations) -> list[dict[str, Any]]:
@@ -718,7 +717,7 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         model = Apartment
         fields = [
             "id",
-            "state",
+            "is_sold",
             "type",
             "surface_area",
             "rooms",
@@ -757,7 +756,7 @@ class ApartmentListSerializer(ApartmentDetailSerializer):
         model = Apartment
         fields = [
             "id",
-            "state",
+            "is_sold",
             "type",
             "surface_area",
             "rooms",

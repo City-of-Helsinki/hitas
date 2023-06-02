@@ -21,7 +21,7 @@ from hitas.models import (
     Ownership,
     RealEstate,
 )
-from hitas.models.apartment import ApartmentConstructionPriceImprovement, ApartmentState
+from hitas.models.apartment import ApartmentConstructionPriceImprovement
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
@@ -109,7 +109,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         "contents": [
             {
                 "id": ap1.uuid.hex,
-                "state": ApartmentState.SOLD.value,
+                "is_sold": True,
                 "type": ap1.apartment_type.value,
                 "surface_area": float(ap1.surface_area),
                 "rooms": ap1.rooms,
@@ -178,7 +178,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
             },
             {
                 "id": ap2.uuid.hex,
-                "state": ApartmentState.FREE.value,
+                "is_sold": False,
                 "type": ap2.apartment_type.value,
                 "surface_area": float(ap2.surface_area),
                 "rooms": ap2.rooms,
@@ -300,7 +300,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
     assert response.json()["contents"] == [
         {
             "id": ap1.uuid.hex,
-            "state": ApartmentState.FREE.value,
+            "is_sold": False,
             "type": ap1.apartment_type,
             "surface_area": ap1.surface_area,
             "rooms": ap1.rooms,
@@ -563,7 +563,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
         "id": ap1.uuid.hex,
-        "state": ApartmentState.SOLD.value,
+        "is_sold": True,
         "type": {
             "id": ap1.apartment_type.uuid.hex,
             "value": ap1.apartment_type.value,
@@ -1377,7 +1377,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             },
             "rooms": None,
             "shares": None,
-            "state": ApartmentState.FREE.value,
+            "is_sold": False,
             "surface_area": None,
             "type": None,
             "conditions_of_sale": [],
@@ -2154,7 +2154,7 @@ def test__api__apartment__update__overlapping_shares(
 
     data = ApartmentDetailSerializer(apartment_1).data
     del data["id"]
-    del data["state"]
+    del data["is_sold"]
     del data["type"]["value"]
     del data["type"]["description"]
     del data["type"]["code"]

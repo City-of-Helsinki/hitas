@@ -28,15 +28,6 @@ from hitas.types import HitasEncoder
 from hitas.utils import subquery_first_id
 
 
-class ApartmentState(Enum):
-    FREE = "free"
-    SOLD = "sold"
-
-    class Labels:
-        FREE = _("Free")
-        SOLD = _("Sold")
-
-
 # Huoneisto / Asunto
 class Apartment(ExternalSafeDeleteHitasModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
