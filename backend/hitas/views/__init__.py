@@ -20,5 +20,6 @@ from hitas.views.owner import DeObfuscatedOwnerView, OwnerViewSet
 from hitas.views.postal_code import HitasPostalCodeViewSet
 from hitas.views.property_manager import PropertyManagerViewSet
 from hitas.views.real_estate import RealEstateViewSet
+from hitas.views.reports import SalesReportView
 from hitas.views.sales_catalog import SalesCatalogCreateView, SalesCatalogValidateView
 from hitas.views.thirty_year_regulation import ThirtyYearRegulationPostalCodesView, ThirtyYearRegulationView

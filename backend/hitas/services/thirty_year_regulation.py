@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import string
 from decimal import Decimal
 from itertools import chain
 from typing import TYPE_CHECKING, Iterable, Literal, NamedTuple, Optional, TypedDict
@@ -771,7 +772,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     workbook = Workbook()
     worksheet: Worksheet = workbook.active
 
-    columns = ReportColumns(
+    column_headers = ReportColumns(
         display_name="Yhtiö",
         acquisition_price="Hankinta-arvo",
         apartment_count="Huoneistoja",
@@ -785,7 +786,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
         completion_date="Valmistumispäivä",
         age="Yhtiön ikä",
     )
-    worksheet.append(columns)
+    worksheet.append(column_headers)
 
     for row in results.rows.all():
         data = ReportColumns(
@@ -849,15 +850,17 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
         )
 
     euro_format = "#,##0.00\\ €"
+    euro_per_square_meter_format = "#,##0.00\\ \\€\\/\\m²"
     square_meter_format = "#,##0.00\\ \\m\\²"
+    column_letters = string.ascii_uppercase[: len(column_headers)]
 
     format_sheet(
         worksheet,
         formatting_rules={
             # Add a border to the header row
-            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
             # Add a border to the last data row
-            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in "ABCDEFGHIJKL"},
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
             # Align the summary titles to the right
             **{
                 f"A{summary_start + i}": {"alignment": Alignment(horizontal="right")}
@@ -868,7 +871,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
             "E": {"number_format": euro_format},
             "F": {"number_format": euro_format},
             "G": {"number_format": square_meter_format},
-            "H": {"number_format": euro_format},
+            "H": {"number_format": euro_per_square_meter_format},
             "I": {"number_format": euro_format},
             "J": {
                 "alignment": Alignment(horizontal="right"),

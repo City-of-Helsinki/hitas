@@ -50,6 +50,9 @@ router.register(
     basename="external-sales-data",
 )
 
+# /api/v1/reports/download-sales-report
+router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
