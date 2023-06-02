@@ -72,7 +72,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
     useEffect(() => {
         // validate the initial form values
         ownerFormObject.trigger();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line
     }, []);
 
     const onFormSubmitValid = () => {
