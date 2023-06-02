@@ -12,7 +12,7 @@ import {
     QueryStateHandler,
 } from "../../common/components";
 import FilterCheckboxField from "../../common/components/FilterCheckboxField";
-import {getApartmentStateLabel} from "../../common/localisation";
+import {getApartmentSoldStatusLabel} from "../../common/localisation";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
@@ -51,7 +51,7 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
                     </div>
                 </div>
                 <div className="state">
-                    <StatusLabel>{getApartmentStateLabel(apartment.state)}</StatusLabel>
+                    <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
                     {apartment.links.housing_company.regulation_status.startsWith("released") && (
                         <StatusLabel>Vapautunut</StatusLabel>
                     )}

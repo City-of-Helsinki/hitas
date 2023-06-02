@@ -4,8 +4,6 @@ import {boolean, literal, number, object, string, z} from "zod";
 // * Enumerations
 // ********************************
 
-export const apartmentStates = ["free", "reserved", "sold"] as const;
-
 export const housingCompanyHitasTypes = [
     "non_hitas",
     "hitas_1",
@@ -467,7 +465,7 @@ const ApartmentSharesSchema = object({
 
 const ApartmentSchema = object({
     id: string().nullable(),
-    state: z.enum(apartmentStates),
+    is_sold: boolean(),
     type: string(),
     surface_area: number(),
     rooms: number().nullable(),
@@ -483,7 +481,7 @@ const ApartmentSchema = object({
 
 const ApartmentDetailsSchema = object({
     id: APIIdString,
-    state: z.enum(apartmentStates),
+    is_sold: boolean(),
     type: CodeSchema,
     surface_area: number(),
     rooms: number().nullable(),
@@ -504,7 +502,6 @@ const ApartmentDetailsSchema = object({
 
 const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
-    state: z.enum(apartmentStates).nullable(),
     type: object({id: string()}).nullable(),
     surface_area: nullishNumber,
     rooms: nullishNumber,
