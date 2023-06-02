@@ -7,6 +7,7 @@ from django.utils.http import urlencode
 from rest_framework import status
 
 from hitas.models import Owner
+from hitas.models.utils import deobfuscate
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import OwnerFactory, OwnershipFactory
 
@@ -428,6 +429,171 @@ def test__api__owner__update__invalid_identifier_to_existing_invalid(api_client:
         "email": data["email"],
         "non_disclosure": data["non_disclosure"],
     } == response.json()
+
+
+@pytest.mark.django_db
+def test__api__owner__update__to_non_disclosure(api_client: HitasAPIClient):
+    # Owner not under non-disclosure
+    owner: Owner = OwnerFactory.create(
+        name="Matti Meikäläinen",
+        identifier="010199-123Y",
+        email="test@example.com",
+        bypass_conditions_of_sale=False,
+        non_disclosure=False,
+    )
+
+    data = {
+        "name": "Matti Meikäläinen",
+        "identifier": "010199-123Y",
+        "email": "test@example.com",
+        "non_disclosure": True,
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "",
+        "identifier": None,
+        "email": None,
+        "non_disclosure": True,
+    }
+
+    # Owner is obfuscated (needs to be re-fetched so that '_unobfuscated_data' is populated).
+    owner = Owner.objects.get(uuid=owner.uuid)
+    assert owner.name == ""
+    assert owner.identifier is None
+    assert owner.email is None
+    assert owner.non_disclosure is True
+
+    # Owner data is still in database
+    deobfuscate(owner)
+    assert owner.name == "Matti Meikäläinen"
+    assert owner.identifier == "010199-123Y"
+    assert owner.email == "test@example.com"
+    assert owner.non_disclosure is True
+
+
+@pytest.mark.django_db
+def test__api__owner__update__change_fields_while_under_non_disclosure(api_client: HitasAPIClient):
+    # Owner not under non-disclosure
+    owner: Owner = OwnerFactory.create(
+        name="Matti Meikäläinen",
+        identifier="010199-123Y",
+        email="test@example.com",
+        bypass_conditions_of_sale=False,
+        non_disclosure=True,
+    )
+
+    # Owner is obfuscated
+    assert owner.name == ""
+    assert owner.identifier is None
+    assert owner.email is None
+    assert owner.non_disclosure is True
+
+    # Also obfuscated in the API
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.get(url)
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "",
+        "identifier": None,
+        "email": None,
+        "non_disclosure": True,
+    }
+
+    # Try to update the owner while obfuscated
+    data = {
+        "name": "Matti Muukalainen",  # name changed
+        # Can use obfuscated values here, since they are not changed
+        # due to how 'hitas.models.utils.deobfuscate' works (it does not
+        # allow changing owner values to their obfuscated values to the database)
+        "identifier": None,
+        "email": None,
+        "non_disclosure": True,
+    }
+
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+
+    # Still get obfuscated values back
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "",
+        "identifier": None,
+        "email": None,
+        "non_disclosure": True,
+    }
+
+    # Owner is still obfuscated (needs to be re-fetched so that '_unobfuscated_data' is populated again).
+    owner = Owner.objects.get(uuid=owner.uuid)
+    assert owner.name == ""
+    assert owner.identifier is None
+    assert owner.email is None
+    assert owner.non_disclosure is True
+
+    # New owner data is in the database
+    deobfuscate(owner)
+    assert owner.name == "Matti Muukalainen"  # name changed
+    # not changed
+    assert owner.identifier == "010199-123Y"
+    assert owner.email == "test@example.com"
+    assert owner.non_disclosure is True
+
+
+@pytest.mark.django_db
+def test__api__owner__update__remove_non_disclosure(api_client: HitasAPIClient):
+    # Owner not under non-disclosure
+    owner: Owner = OwnerFactory.create(
+        name="Matti Meikäläinen",
+        identifier="010199-123Y",
+        email="test@example.com",
+        bypass_conditions_of_sale=False,
+        non_disclosure=True,
+    )
+
+    # Owner is obfuscated
+    assert owner.name == ""
+    assert owner.identifier is None
+    assert owner.email is None
+    assert owner.non_disclosure is True
+
+    # Also obfuscated in the API
+    url = reverse("hitas:owner-detail", kwargs={"uuid": owner.uuid.hex})
+    response = api_client.get(url)
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "",
+        "identifier": None,
+        "email": None,
+        "non_disclosure": True,
+    }
+
+    # When non-disclosure is removed, the owner data is restored
+    # This can be done with PUT using the obfuscated values, since
+    # 'hitas.models.utils.deobfuscate' does not allow changing the
+    # obfuscated fields to the values in the obfusation rules
+    # (while the owner is obfuscated).
+    data = {
+        "name": "",
+        "identifier": None,
+        "email": None,
+        "non_disclosure": False,
+    }
+
+    response = api_client.put(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == {
+        "id": owner.uuid.hex,
+        "name": "Matti Meikäläinen",
+        "identifier": "010199-123Y",
+        "email": "test@example.com",
+        "non_disclosure": False,
+    }
 
 
 # Delete tests

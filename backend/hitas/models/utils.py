@@ -182,7 +182,10 @@ def deobfuscate(
     obfuscated_data: dict[str, Any] = {}
     for field in fields:
         obfuscated_data[field] = getattr(instance, field)
-        setattr(instance, field, instance._unobfuscated_data[field])
+        # Restore the obfuscated value if the value for the field is still the obfuscated value.
+        # This allows the model to be saved with new values for the obfuscated fields.
+        if obfuscated_data[field] == instance.obfuscation_rules[field]:
+            setattr(instance, field, instance._unobfuscated_data[field])
 
     # Log the access to de-obfuscated fields
     if log_access:
