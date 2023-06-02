@@ -3,7 +3,7 @@ from typing import NamedTuple
 import pytest
 
 from hitas.models import Owner, Ownership
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
 from hitas.tests.apis.helpers import parametrize_helper
 from hitas.tests.factories import OwnerFactory, OwnershipFactory
@@ -96,6 +96,7 @@ def test_obfuscate_owners_without_regulated_apartments__housing_company_regulati
 ):
     ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=regulation_status,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()
@@ -115,9 +116,11 @@ def test_obfuscate_owners_without_regulated_apartments__housing_company_regulati
 def test_obfuscate_owners_without_regulated_apartments__one_owns_regulated():
     ownership: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()
@@ -133,13 +136,16 @@ def test_obfuscate_owners_without_regulated_apartments__one_owns_regulated():
 def test_obfuscate_owners_without_regulated_apartments__one_owns_one_regulated_and_one_released():
     ownership_1: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ownership_2: Ownership = OwnershipFactory.create(
         sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     OwnershipFactory.create(
         owner=ownership_1.owner,
         sale__apartment__building__real_estate__housing_company=ownership_2.apartment.housing_company,
+        sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
 
     owners = obfuscate_owners_without_regulated_apartments()

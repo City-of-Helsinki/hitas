@@ -4572,7 +4572,7 @@ components:
       additionalProperties: false
       required:
         - id
-        - state
+        - is_sold
         - surface_area
         - address
         - completion_date
@@ -4586,9 +4586,10 @@ components:
           description: Apartment ID
           type: string
           example: b477389cb3514fb1b444052a39bfb65d
-        state:
+        is_sold:
           readOnly: true
-          $ref: '#/components/schemas/ApartmentState'
+          description: Has this apartment ever been sold?
+          type: boolean
         type:
           description: Apartment type
           type: string
@@ -4643,7 +4644,7 @@ components:
       additionalProperties: false
       required:
         - id
-        - state
+        - is_sold
         - surface_area
         - shares
         - address
@@ -4661,9 +4662,10 @@ components:
           type: string
           readOnly: true
           example: b477389cb3514fb1b444052a39bfb65d
-        state:
+        is_sold:
           readOnly: true
-          $ref: '#/components/schemas/ApartmentState'
+          description: Has this apartment ever been sold?
+          type: boolean
         type:
           nullable: true
           $ref: '#/components/schemas/NullableReadOnlyCode'
@@ -6904,20 +6906,6 @@ components:
         - regulated
         - released_by_hitas
         - released_by_plot_department
-
-    ApartmentState:
-      description: |-
-        Apartment state
-
-        Can have the following values:
-        - free
-        - sold
-      type: string
-      nullable: true
-      example: sold
-      x-extensible-enum:
-        - free
-        - sold
 
     ApartmentSale:
       description: Apartment sale

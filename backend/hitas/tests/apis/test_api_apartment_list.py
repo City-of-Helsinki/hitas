@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
-from hitas.models.apartment import Apartment, ApartmentSale, ApartmentState, HousingCompany
+from hitas.models.apartment import Apartment, ApartmentSale, HousingCompany
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
 from hitas.models.housing_company import RegulationStatus
 from hitas.models.owner import Owner
@@ -65,7 +65,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
     assert response.json()["contents"] == [
         {
             "id": ap1.uuid.hex,
-            "state": ApartmentState.SOLD.value,
+            "is_sold": True,
             "type": ap1.apartment_type.value,
             "surface_area": float(ap1.surface_area),
             "address": {
@@ -133,7 +133,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
         },
         {
             "id": ap2.uuid.hex,
-            "state": ApartmentState.FREE.value,
+            "is_sold": False,
             "type": ap2.apartment_type.value,
             "surface_area": float(ap2.surface_area),
             "address": {
