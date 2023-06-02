@@ -447,19 +447,23 @@ const LoadedApartmentCreatePage = ({
                         </div>
                         <div className="row">
                             <NumberInput
-                                name="prices.construction.debt_free_purchase_price"
-                                label="Luovutushinta (RA)"
-                                unit="€"
-                                fractionDigits={2}
-                                formObject={formObject}
-                            />
-                            <NumberInput
                                 name="prices.construction.additional_work"
                                 label="Rakennusaikaiset lisätyöt"
                                 unit="€"
                                 fractionDigits={2}
                                 formObject={formObject}
                             />
+                            {apartment?.prices?.construction.debt_free_purchase_price ? (
+                                <NumberInput
+                                    name="prices.construction.debt_free_purchase_price"
+                                    label="Luovutushinta (RA)"
+                                    unit="€"
+                                    fractionDigits={2}
+                                    formObject={formObject}
+                                />
+                            ) : (
+                                <div />
+                            )}
                         </div>
                         <div className="row">
                             <TextAreaInput
