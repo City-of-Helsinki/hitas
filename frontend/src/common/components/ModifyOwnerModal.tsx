@@ -55,8 +55,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
     const identifierValue = ownerFormObject.watch("identifier");
 
     // helper booleans for special saving controls with invalid data
-    const hasFormChanged =
-        ownerFormObject.formState.isDirty && JSON.stringify(owner) !== JSON.stringify(ownerFormObject.getValues());
+    const hasFormChanged = Object.entries(owner).toString() !== Object.entries(ownerFormObject.getValues()).toString();
     const isMalformedIdentifier = ownerFormObject.formState.errors.identifier?.type === "custom";
     const isIdentifierEmpty = identifierValue === "";
     const isBackendErrorInIdentifier = ownerFormObject.formState.errors.identifier?.type === "backend";
@@ -156,7 +155,7 @@ interface IModifyPersonInfoModalProps {
     setIsVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function ModifyPersonInfoModal({owner, isVisible, setIsVisible}: IModifyPersonInfoModalProps) {
+export default function ModifyOwnerModal({owner, isVisible, setIsVisible}: IModifyPersonInfoModalProps) {
     return (
         <Dialog
             id="modify-person-info-modal"

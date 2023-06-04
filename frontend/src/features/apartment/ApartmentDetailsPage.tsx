@@ -8,13 +8,7 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {
-    DetailField,
-    Divider,
-    ImprovementsTable,
-    ModifyPersonInfoModal,
-    QueryStateHandler,
-} from "../../common/components";
+import {DetailField, Divider, ImprovementsTable, ModifyOwnerModal, QueryStateHandler} from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
 import {
     IApartmentConditionOfSale,
@@ -631,7 +625,7 @@ const LoadedApartmentDetails = ({
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
-                <ModifyPersonInfoModal
+                <ModifyOwnerModal
                     owner={owner as IOwner}
                     isVisible={isModifyPersonInfoModalVisible}
                     setIsVisible={setIsModifyPersonInfoModalVisible}
