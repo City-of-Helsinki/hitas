@@ -11,7 +11,7 @@ import FormInputField from "./formInputField/FormInputField";
 import Heading from "./Heading";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
-import ModifyPersonInfoModal from "./ModifyPersonInfoModal";
+import ModifyOwnerModal from "./ModifyOwnerModal";
 import NavigateBackButton from "./NavigateBackButton";
 import NewOwnerForm from "./NewOwnerForm";
 import Notifications from "./Notifications";
@@ -36,7 +36,7 @@ export {
     Heading,
     ImprovementsTable,
     ListPageNumbers,
-    ModifyPersonInfoModal,
+    ModifyOwnerModal,
     NavigateBackButton,
     NewOwnerForm,
     Notifications,
