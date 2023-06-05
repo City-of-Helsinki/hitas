@@ -205,10 +205,10 @@ def calculate_max_price(
             "shares": {
                 "start": apartment.share_number_start,
                 "end": apartment.share_number_end,
-                "total": apartment.share_number_end - apartment.share_number_start + 1,
+                "total": apartment.shares_count,
             },
             "rooms": apartment.rooms,
-            "type": apartment.apartment_type.value,
+            "type": safe_attrgetter(apartment, "apartment_type.value", default=None),
             "surface_area": apartment.surface_area,
             "address": {
                 "street_address": apartment.street_address,
