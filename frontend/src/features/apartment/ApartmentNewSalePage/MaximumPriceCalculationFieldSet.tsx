@@ -111,7 +111,7 @@ const MaximumPriceCalculationFieldSet = ({
                 theme="black"
                 variant={hasLoanValueChanged ? "primary" : "secondary"}
                 onClick={handleCreateNewCalculationButton}
-                disabled={!isCalculationFormValid}
+                disabled={!isCalculationFormValid || !apartment.surface_area}
             >
                 Luo uusi enimmäishintalaskelma
             </Button>

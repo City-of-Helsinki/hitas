@@ -412,7 +412,11 @@ const ApartmentMaximumPricesCard = ({
                     <Button
                         theme="black"
                         size="small"
-                        disabled={!apartment.completion_date || housingCompany.regulation_status !== "regulated"}
+                        disabled={
+                            !apartment.completion_date ||
+                            housingCompany.regulation_status !== "regulated" ||
+                            !apartment.prices.first_purchase_date
+                        }
                     >
                         Vahvista
                     </Button>
