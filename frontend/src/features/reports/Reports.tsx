@@ -1,5 +1,6 @@
 import {Tabs} from "hds-react";
 import {Heading} from "../../common/components";
+import HousingCompanyReports from "./HousingCompanyReports";
 import SalesReports from "./SalesReports";
 
 const Reports = () => {
@@ -8,16 +9,16 @@ const Reports = () => {
             <Heading>Raportit</Heading>
             <Tabs>
                 <Tabs.TabList>
-                    <Tabs.Tab>Kaupat</Tabs.Tab>
-                    <Tabs.Tab>Raportit 2</Tabs.Tab>
-                    <Tabs.Tab>Raportit 3</Tabs.Tab>
-                    <Tabs.Tab>Raportit 4</Tabs.Tab>
+                    <Tabs.Tab>Taloyhtiön raportit</Tabs.Tab>
+                    <Tabs.Tab>Toteutuneet kauppahinnat</Tabs.Tab>
+                    <Tabs.Tab>Rajahintalaskelmat</Tabs.Tab>
+                    <Tabs.Tab>Enimmäishintojen vertailu</Tabs.Tab>
                 </Tabs.TabList>
                 <Tabs.TabPanel>
-                    <SalesReports />
+                    <HousingCompanyReports />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel>
-                    <h2>Raportit 3</h2>
+                    <SalesReports />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel>
                     <h2>Raportit 3</h2>
