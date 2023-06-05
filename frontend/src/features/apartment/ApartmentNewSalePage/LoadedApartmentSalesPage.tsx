@@ -24,8 +24,8 @@ import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
 import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
 export interface ISalesPageMaximumPrices {
-    maximumPrice: number;
-    debtFreePurchasePrice: number;
+    maximumPrice: number | null;
+    debtFreePurchasePrice: number | null;
     apartmentShareOfHousingCompanyLoans: number;
     index: (typeof indexNames)[number] | "";
 }
@@ -81,6 +81,19 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         apartment_share_of_housing_company_loans: true,
         exclude_from_statistics: true,
     }).superRefine((data, ctx) => {
+        // Price can be zero only if sale is excluded from statistics.
+        if (!data.exclude_from_statistics && data.purchase_price === 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["purchase_price"],
+                message: "Pakollinen jos kauppa tilastoidaan.",
+            });
+        }
+
+        if (maximumPrices.debtFreePurchasePrice === null || maximumPrices.maximumPrice === null) {
+            return;
+        }
+
         const debtFreePurchasePrice = (data.purchase_price ?? 0) + (data.apartment_share_of_housing_company_loans ?? 0);
 
         // First sale
@@ -138,15 +151,6 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         message: errorMessages.overMaxPrice,
                     });
                 }
-            }
-
-            // Price can be zero only if sale is excluded from statistics.
-            if (!data.exclude_from_statistics && data.purchase_price === 0) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["purchase_price"],
-                    message: "Pakollinen jos kauppa tilastoidaan.",
-                });
             }
 
             // The apartment share of housing company loans must match the maximum price calculations or catalog loan value.
@@ -220,12 +224,20 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     // Sale form was submitted with errors
     const onSaleFormSubmitInvalid = (errors) => {
         // Handle Hard errors
-        if (errors.ownerships) {
-            hdsToast.error(errors.ownerships.message);
+        if (errors.notification_date) {
+            hdsToast.error(`Ilmoituspäivämäärä: ${errors.notification_date.message}`);
             return;
-        }
-        if (errors.apartment_share_of_housing_company_loans) {
-            // hdsToast.error(errors.apartment_share_of_housing_company_loans.message);
+        } else if (errors.purchase_date) {
+            hdsToast.error(`Kauppakirjan päivämäärä: ${errors.purchase_date.message}`);
+            return;
+        } else if (errors.purchase_price) {
+            hdsToast.error(`Kauppahinta: ${errors.purchase_price.message}`);
+            return;
+        } else if (errors.apartment_share_of_housing_company_loans) {
+            hdsToast.error(`Osuus yhtiön lainoista: ${errors.apartment_share_of_housing_company_loans.message}`);
+            return;
+        } else if (errors.ownerships) {
+            hdsToast.error(`Omistajuudet: ${errors.ownerships.message}`);
             return;
         }
 
