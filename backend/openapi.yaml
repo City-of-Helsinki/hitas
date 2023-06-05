@@ -3841,6 +3841,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/download-regulated-housing-companies-report:
+    get:
+      description: Download an Excel report of hitas regulated housing companies
+      operationId: fetch-regulated-housing-companies-report-excel
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successfully downloaded a regulated housing company report
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:

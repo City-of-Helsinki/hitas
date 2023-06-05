@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Dict, Optional
 
 from dateutil.relativedelta import relativedelta
-from django.db.models import F, OuterRef, Prefetch, Subquery, Sum
+from django.db.models import F, Prefetch, Sum
 from django.db.models.functions import Round
 from django.utils import timezone
 from django_filters.rest_framework import BooleanFilter
@@ -16,7 +16,6 @@ from rest_framework.viewsets import ViewSet
 from hitas.exceptions import ModelConflict
 from hitas.models import (
     Apartment,
-    ApartmentSale,
     Building,
     HousingCompany,
     HousingCompanyConstructionPriceImprovement,
@@ -25,6 +24,7 @@ from hitas.models import (
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.utils import validate_business_id
+from hitas.services.apartment import get_first_sale_acquisition_price
 from hitas.services.audit_log import last_log
 from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
 from hitas.services.housing_company import get_regulation_release_date
@@ -424,16 +424,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 "property_manager",
             )
             .alias(
-                _acquisition_price=Subquery(
-                    queryset=(
-                        ApartmentSale.objects.filter(apartment_id=OuterRef("real_estates__buildings__apartments__id"))
-                        .order_by("purchase_date", "id")
-                        .annotate(
-                            _acquisition_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans"))
-                        )
-                        .values_list("_acquisition_price", flat=True)[:1]
-                    ),
-                ),
+                _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
             )
             .annotate(
                 date=max_if_all_not_null(

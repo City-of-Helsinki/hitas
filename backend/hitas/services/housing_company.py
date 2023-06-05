@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Literal, Optional, TypeAlias, overload
 
 from django.db import models
-from django.db.models import ExpressionWrapper, F, OuterRef, Q, QuerySet, Subquery, Sum
+from django.db.models import Count, ExpressionWrapper, F, OuterRef, Q, QuerySet, Subquery, Sum
 from django.db.models.functions import Coalesce, NullIf, Round, TruncMonth
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -12,7 +12,13 @@ from rest_framework.settings import api_settings
 from hitas.exceptions import MissingValues
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
-from hitas.models.housing_company import HitasType, HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
+from hitas.models.housing_company import (
+    HitasType,
+    HousingCompany,
+    HousingCompanyWithAnnotations,
+    HousingCompanyWithReportAnnotations,
+    RegulationStatus,
+)
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRow
 from hitas.services.apartment import (
@@ -21,7 +27,7 @@ from hitas.services.apartment import (
     get_first_sale_purchase_date,
 )
 from hitas.services.audit_log import last_modified
-from hitas.utils import max_if_all_not_null, roundup
+from hitas.utils import RoundWithPrecision, max_if_all_not_null, roundup
 
 logger = logging.getLogger()
 
@@ -286,4 +292,37 @@ def get_number_of_unsold_apartments(housing_company: HousingCompany) -> int:
             _unsold=True,
         )
         .count()
+    )
+
+
+def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithReportAnnotations]:
+    return list(
+        HousingCompany.objects.select_related("postal_code")
+        .prefetch_related(
+            "real_estates__buildings__apartments",
+        )
+        .filter(
+            regulation_status=RegulationStatus.REGULATED,
+        )
+        .alias(
+            _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
+        )
+        .annotate(
+            completion_date=max_if_all_not_null(
+                ref="real_estates__buildings__apartments__completion_date",
+                max=datetime.date.max,
+                min=datetime.date.min,
+            ),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+            realized_acquisition_price=Sum("_acquisition_price"),
+            avg_price_per_square_meter=RoundWithPrecision(
+                F("realized_acquisition_price") / F("surface_area"),
+                precision=2,
+            ),
+            apartment_count=Count("real_estates__buildings__apartments"),
+        )
+        .order_by(
+            "postal_code__value",
+            "completion_date",
+        )
     )
