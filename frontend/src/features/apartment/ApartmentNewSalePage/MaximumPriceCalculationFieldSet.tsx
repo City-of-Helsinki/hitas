@@ -40,14 +40,27 @@ const MaximumPriceCalculationFieldSet = ({
     const hasApartmentConfirmedCalculation =
         apartment.prices.maximum_prices.confirmed && apartment.prices.maximum_prices.confirmed.valid.is_valid;
 
+    const apartmentShareOfLoans = saleForm.getValues("apartment_share_of_housing_company_loans");
+    const hasLoanValueChanged =
+        formExtraFieldErrorMessages?.apartment_share_of_housing_company_loans && apartmentShareOfLoans !== null;
+
+    const maximumPriceCalculationErrorMessage =
+        formExtraFieldErrorMessages?.maximum_price_calculation &&
+        formExtraFieldErrorMessages.maximum_price_calculation[0];
+
+    const isCalculationFormValid = ApartmentSaleFormSchema.partial().safeParse({
+        purchase_date: saleForm.getValues("purchase_date"),
+        apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
+    }).success;
+
     const handleCreateNewCalculationButton = () => {
         if (isCalculationFormValid) {
             const date = saleForm.getValues("purchase_date") ?? null;
-            const loanShare = saleForm.getValues("apartment_share_of_housing_company_loans") ?? 0;
+
             saveMaximumPriceCalculation({
                 data: {
                     calculation_date: date,
-                    apartment_share_of_housing_company_loans: loanShare,
+                    apartment_share_of_housing_company_loans: apartmentShareOfLoans ?? 0,
                     apartment_share_of_housing_company_loans_date: date,
                     additional_info: "",
                 },
@@ -65,16 +78,6 @@ const MaximumPriceCalculationFieldSet = ({
             );
         }
     };
-
-    const hasLoanValueChanged = formExtraFieldErrorMessages?.apartment_share_of_housing_company_loans;
-    const maximumPriceCalculationErrorMessage =
-        formExtraFieldErrorMessages?.maximum_price_calculation &&
-        formExtraFieldErrorMessages.maximum_price_calculation[0];
-
-    const isCalculationFormValid = ApartmentSaleFormSchema.partial().safeParse({
-        purchase_date: saleForm.getValues("purchase_date"),
-        apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
-    }).success;
 
     return (
         <Fieldset
