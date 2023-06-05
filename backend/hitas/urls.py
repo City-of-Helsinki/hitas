@@ -53,6 +53,13 @@ router.register(
 # /api/v1/reports/download-sales-report
 router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")
 
+# /api/v1/reports/download-regulated-housing-companies-report
+router.register(
+    r"reports/download-regulated-housing-companies-report",
+    views.RegulateHousingCompaniesReportView,
+    basename="regulated-housing-companies-report",
+)
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")

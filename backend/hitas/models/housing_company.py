@@ -260,6 +260,17 @@ class HousingCompanyWithAnnotations(HousingCompany):
         abstract = True
 
 
+class HousingCompanyWithReportAnnotations(HousingCompany):
+    completion_date: datetime.date
+    surface_area: Optional[Decimal]
+    realized_acquisition_price: Optional[Decimal]
+    avg_price_per_square_meter: Optional[Decimal]
+    apartment_count: int
+
+    class Meta:
+        abstract = True
+
+
 class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany",

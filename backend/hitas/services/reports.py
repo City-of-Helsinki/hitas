@@ -12,6 +12,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
 from hitas.models import ApartmentSale
+from hitas.models.housing_company import HousingCompanyWithReportAnnotations
 from hitas.utils import format_sheet, resize_columns
 
 
@@ -23,6 +24,16 @@ class SalesReportColumns(NamedTuple):
     purchase_date: datetime.date | str
     purchase_price_per_square_meter: Decimal | str
     total_price_per_square_meter: Decimal | str
+
+
+class RegulatedHousingCompaniesReportColumns(NamedTuple):
+    cost_area: int | str
+    postal_code: str
+    housing_company_name: str
+    address: str
+    completion_date: datetime.date | str
+    apartment_count: int | str
+    average_price_per_square_meter: Decimal | str
 
 
 T = TypeVar("T")
@@ -204,6 +215,74 @@ def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
             "G": {"number_format": euro_per_square_meter_format},
             # Reset number format for sales count cells
             **{f"{letter}{row}": {"number_format": "General"} for row in sales_count_rows for letter in "FG"},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
+
+
+def build_regulated_housing_companies_report_excel(
+    housing_companies: list[HousingCompanyWithReportAnnotations],
+) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = RegulatedHousingCompaniesReportColumns(
+        cost_area="Kalleusalue",
+        postal_code="Postinumero",
+        housing_company_name="Yhtiö",
+        address="Osoite",
+        completion_date="Valmistumispäivä",
+        apartment_count="Asuntojen lukumäärä",
+        average_price_per_square_meter="Keskineliöhinta",
+    )
+    worksheet.append(column_headers)
+
+    for housing_company in housing_companies:
+        worksheet.append(
+            RegulatedHousingCompaniesReportColumns(
+                cost_area=housing_company.postal_code.cost_area,
+                postal_code=housing_company.postal_code.value,
+                housing_company_name=housing_company.display_name,
+                address=housing_company.street_address,
+                completion_date=housing_company.completion_date,
+                apartment_count=housing_company.apartment_count,
+                average_price_per_square_meter=housing_company.avg_price_per_square_meter,
+            ),
+        )
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    empty_row = RegulatedHousingCompaniesReportColumns(
+        cost_area="",
+        postal_code="",
+        housing_company_name="",
+        address="",
+        completion_date="",
+        apartment_count="",
+        average_price_per_square_meter="",
+    )
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(empty_row)
+
+    euro_per_square_meter_format = "#,##0.00\\ \\€\\/\\m²"
+    date_format = "DD.MM.YYYY"
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            "B": {"alignment": Alignment(horizontal="right")},
+            "E": {"number_format": date_format},
+            "G": {"number_format": euro_per_square_meter_format},
         },
     )
 
