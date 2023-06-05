@@ -1,0 +1,19 @@
+@use "../imports" as *
+
+.view--reports
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  @include flex-grow(1)
+  [class^="Tabs-module"]
+    [id*="-panel"]
+      background: $codes-background-color
+      padding: 1px $spacing-m
+    [class*="tablistBar"]
+      background-color: white
+      padding: 0
+    [class*="active"]
+      background-color: $codes-background-color
+      span
+        font-weight: 700
+        &:before
+          display: none
