@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {Button, IconPlus, IconSearch, StatusLabel} from "hds-react";
+import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
@@ -65,19 +65,18 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                     <div className="list-header date">Valmistunut</div>
                     <div className="list-header housing-company-state">Tila</div>
                 </div>
-                <ul className="results-list">
-                    <QueryStateHandler
-                        data={data}
-                        error={undefined}
-                        isLoading={isFetching}
-                    >
-                        {data.contents.map((housingCompany: IHousingCompany) => (
-                            <HousingCompanyListItem
-                                key={housingCompany.id}
-                                housingCompany={housingCompany}
-                            />
-                        ))}
-                    </QueryStateHandler>
+                <ul className={`results-list${isFetching ? " results-list-blurred" : ""}`}>
+                    {isFetching && (
+                        <div className="results-list-overlay-spinner">
+                            <LoadingSpinner />
+                        </div>
+                    )}
+                    {data.contents.map((housingCompany: IHousingCompany) => (
+                        <HousingCompanyListItem
+                            key={housingCompany.id}
+                            housingCompany={housingCompany}
+                        />
+                    ))}
                 </ul>
             </>
         );

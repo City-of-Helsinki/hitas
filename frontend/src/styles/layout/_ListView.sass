@@ -48,6 +48,25 @@
       &:not(:last-child)
         border-bottom: 1px solid #ccc
 
+  &-list-blurred
+    -webkit-filter: blur(3px)
+    -moz-filter: blur(3px)
+    -o-filter: blur(3px)
+    -ms-filter: blur(3px)
+    filter: blur(3px) brightness(90%) opacity(90%)
+
+  &-list-overlay-spinner
+    position: relative
+    height: 0
+    width: 0
+    top: 50%
+    left: 50%
+    [class*="LoadingSpinner-module_loadingSpinner"]
+      transform: translate(-50%, -50%)
+      --spinner-size: 12rem
+      --spinner-thickness: 1.4rem
+      --spinner-color: var(--color-black-50)
+
 .list
   &-headers
     @include flexbox()
