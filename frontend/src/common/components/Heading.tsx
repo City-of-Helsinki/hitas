@@ -4,7 +4,7 @@ interface HeadingProps {
     type?: "main" | "list" | "body";
 }
 
-const Heading = ({children, className, type = "main"}: HeadingProps) => {
+const Heading = ({children, className = "", type = "main"}: HeadingProps) => {
     switch (type) {
         case "main":
             return <h1 className={`heading--${type} ${className}`}>{children}</h1>;
