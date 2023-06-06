@@ -129,10 +129,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                         value={`${housingCompany.summary?.total_shares} kpl`}
                                     />
                                     <DetailField
-                                        label="Huoneistojen lukumäärä"
-                                        value="TODO"
-                                    />
-                                    <DetailField
                                         label="Huoneistojen pinta-ala"
                                         value={`${housingCompany.summary?.total_surface_area} m²`}
                                     />
