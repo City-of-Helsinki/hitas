@@ -49,18 +49,20 @@
         border-bottom: 1px solid #ccc
 
 .list
-  &-amount
-    padding: 0 0 0 $spacing-layout-xs
-    margin: 0 0 $spacing-layout-l
-
   &-headers
     @include flexbox()
     @include justify-content(space-between)
+    margin-top: $spacing-m
     margin-bottom: $spacing-xs
     padding: 0 $spacing-layout-xs
 
   &-header
     @include flexbox()
+
+  &-amount
+    display: flex
+    justify-content: center
+    margin: $spacing-layout-m 0 $spacing-layout-2-xs 0
 
 .filters
   grid-row: 2

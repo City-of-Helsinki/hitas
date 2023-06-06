@@ -59,9 +59,6 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
     }) => {
         return (
             <>
-                <div className="list-amount">
-                    Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "yhtiötä" : "yhtiö"}
-                </div>
                 <div className="list-headers">
                     <div className="list-header name">Yhtiö</div>
                     <div className="list-header address">Osoite</div>
@@ -103,6 +100,12 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
                     pageInfo={(data as IHousingCompanyListResponse)?.page}
                 />
             </QueryStateHandler>
+
+            {!isLoading ? (
+                <div className="list-amount">
+                    Haun tulokset: {data?.page.total_items} {data?.page.total_items === 1 ? "yhtiö" : "yhtiötä"}
+                </div>
+            ) : null}
         </div>
     );
 };

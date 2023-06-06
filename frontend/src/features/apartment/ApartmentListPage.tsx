@@ -71,9 +71,6 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
 const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListResponse; isFetching: boolean}) => {
     return (
         <>
-            <div className="list-amount">
-                Haun tulokset: {data.page.total_items} {data.page.total_items > 1 ? "asuntoa" : "asunto"}
-            </div>
             <div className="list-headers">
                 <div className="list-header apartment-number">Asunto</div>
                 <div className="list-header address-and-housing-company">Osoite</div>
@@ -116,6 +113,11 @@ function result(data, error, isLoading, isFetching, currentPage, setCurrentPage)
                     pageInfo={data?.page}
                 />
             </QueryStateHandler>
+            {!isLoading ? (
+                <div className="list-amount">
+                    Haun tulokset: {data?.page.total_items} {data?.page.total_items === 1 ? "asunto" : "asuntoa"}
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -133,6 +135,7 @@ export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Elem
         housingCompanyId: housingCompanyId,
         params: {page: currentPage},
     });
+
     return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
