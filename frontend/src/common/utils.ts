@@ -62,7 +62,8 @@ export function formatDate(value: string | null): string {
 }
 
 export function validateBusinessId(value: string): boolean {
-    // e.g. '1234567-8'
+    // e.g. '1234567-1'
+    // This does not validate the check digit (last number), only the format
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
