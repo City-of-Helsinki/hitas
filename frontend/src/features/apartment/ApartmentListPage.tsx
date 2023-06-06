@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {IconSearch, StatusLabel} from "hds-react";
+import {IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
 import {
@@ -77,19 +77,18 @@ const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListRes
                 <div className="list-header owners-and-area">Omistajuudet / Asunnon tiedot</div>
                 <div className="list-header state">Tila</div>
             </div>
-            <ul className="results-list">
-                <QueryStateHandler
-                    data={data}
-                    error={undefined}
-                    isLoading={isFetching}
-                >
-                    {data.contents.map((item: IApartment) => (
-                        <ApartmentListItem
-                            key={item.id}
-                            apartment={item}
-                        />
-                    ))}
-                </QueryStateHandler>
+            <ul className={`results-list${isFetching ? " results-list-blurred" : ""}`}>
+                {isFetching && (
+                    <div className="results-list-overlay-spinner">
+                        <LoadingSpinner />
+                    </div>
+                )}
+                {data.contents.map((item: IApartment) => (
+                    <ApartmentListItem
+                        key={item.id}
+                        apartment={item}
+                    />
+                ))}
             </ul>
         </>
     );
