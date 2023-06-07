@@ -54,6 +54,7 @@ export default function ExternalSalesDataImport({formDate}) {
                 formObject={formObject}
                 label="Syötä postinumeroalueiden keskineliöhinnat"
                 tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
+                accept=".xlsx"
                 onChange={() => onSubmit(formObject.getValues())}
             />
             <SaveDialogModal

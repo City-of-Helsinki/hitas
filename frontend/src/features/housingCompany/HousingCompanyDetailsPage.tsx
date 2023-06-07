@@ -1,23 +1,52 @@
-import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
+import {Button, Dialog, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
+import {useState} from "react";
+import {useForm} from "react-hook-form";
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {DetailField, EditButton, Heading, ImprovementsTable, QueryStateHandler} from "../../common/components";
+import {
+    CloseButton,
+    DetailField,
+    EditButton,
+    Heading,
+    ImprovementsTable,
+    QueryStateHandler,
+} from "../../common/components";
+import {FileInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {IHousingCompanyDetails} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
+    const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
+    const {handleSubmit} = salesCatalogForm;
+    const saveSalesCatalog = (data: {salesCatalog: File | null}) => {
+        console.log(data);
+    };
+    const validateFile = () => setIsImportModalOpen(true);
     return (
         <>
             <Heading>
                 {housingCompany.name.display}
-                <EditButton
-                    state={{housingCompany: housingCompany}}
-                    disabled={housingCompany.regulation_status !== "regulated"}
-                />
+                <form
+                    className="buttons"
+                    onSubmit={handleSubmit(saveSalesCatalog)}
+                >
+                    <FileInput
+                        name="sales-catalog"
+                        formObject={salesCatalogForm}
+                        accept=".xlsx"
+                        buttonLabel="Lataa myyntihintaluettelo"
+                        onChange={validateFile}
+                    />
+                    <EditButton
+                        state={{housingCompany: housingCompany}}
+                        disabled={housingCompany.regulation_status !== "regulated"}
+                    />
+                </form>
             </Heading>
             <div className="company-status">
                 <StatusLabel>{getHousingCompanyHitasTypeName(housingCompany.hitas_type)}</StatusLabel>
@@ -233,6 +262,22 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     </div>
                 </div>
             </div>
+            <Dialog
+                id="import-sales-catalog-modal"
+                aria-labelledby="Sales catalog import modal"
+                isOpen={isImportModalOpen}
+            >
+                <Dialog.Header
+                    id="import-sales-catalog-modal"
+                    title="Myyntihintaluettelo"
+                />
+                <Dialog.Content>
+                    <p>Luodaanko myyntihintaluettelon pohjalta seuraavat asunnot:</p>
+                </Dialog.Content>
+                <Dialog.ActionButtons>
+                    <CloseButton onClick={() => setIsImportModalOpen(false)} />
+                </Dialog.ActionButtons>
+            </Dialog>
         </>
     );
 };
