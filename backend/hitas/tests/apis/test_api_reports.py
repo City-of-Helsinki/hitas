@@ -10,10 +10,17 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework import status
 
-from hitas.models import ApartmentSale, HousingCompany
+from hitas.models import (
+    Apartment,
+    ApartmentSale,
+    HousingCompany,
+    ThirtyYearRegulationResults,
+    ThirtyYearRegulationResultsRow,
+)
 from hitas.models.housing_company import RegulationStatus
+from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentSaleFactory, HousingCompanyFactory
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, HousingCompanyFactory
 
 # Sales report
 
@@ -597,4 +604,223 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
             int(sale_1.total_price / sale_1.apartment.surface_area),
         ),
         (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+    ]
+
+
+# Unregulated housing companies report
+
+
+@pytest.mark.django_db
+def test__api__unregulated_housing_companies_report__legacy_release_date(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        legacy_release_date=datetime.date(2022, 1, 1),
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2021, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:unregulated-housing-companies-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Yhtiö",
+            "Postinumero",
+            "Valmistumispäivä",
+            "Vapautumispäivä",
+            "Vapautettu tontit yksikön toimesta?",
+            "Asuntojen lukumäärä",
+        ),
+        (
+            housing_company.display_name,
+            housing_company.postal_code.value,
+            datetime.datetime.fromisoformat(apartment_2.completion_date.isoformat()),
+            datetime.datetime.fromisoformat(housing_company.legacy_release_date.isoformat()),
+            None,
+            2,
+        ),
+        (None, None, None, None, None, None),
+        ("Taloyhtiötä yhteensä", 1, None, None, None, None),
+        ("Asuntoja yhteensä", 2, None, None, None, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__unregulated_housing_companies_report__regulation_release_date(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+    )
+    apartment_1: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2021, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    results = ThirtyYearRegulationResults.objects.create(
+        calculation_month=datetime.date(2001, 1, 1),
+        regulation_month=datetime.date(2000, 1, 1),
+        surface_area_price_ceiling=None,
+        sales_data=FullSalesData(internal={}, external={}, price_by_area={}),
+        replacement_postal_codes=[],
+    )
+
+    ThirtyYearRegulationResultsRow.objects.create(
+        parent=results,
+        housing_company=housing_company,
+        completion_date=apartment_2.completion_date,
+        surface_area=apartment_1.surface_area + apartment_2.surface_area,
+        postal_code=housing_company.postal_code.value,
+        realized_acquisition_price=100,
+        unadjusted_average_price_per_square_meter=200,
+        adjusted_average_price_per_square_meter=300,
+        completion_month_index=400,
+        calculation_month_index=500,
+        regulation_result=RegulationResult.RELEASED_FROM_REGULATION,
+        letter_fetched=False,
+    )
+
+    url = reverse("hitas:unregulated-housing-companies-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Yhtiö",
+            "Postinumero",
+            "Valmistumispäivä",
+            "Vapautumispäivä",
+            "Vapautettu tontit yksikön toimesta?",
+            "Asuntojen lukumäärä",
+        ),
+        (
+            housing_company.display_name,
+            housing_company.postal_code.value,
+            datetime.datetime.fromisoformat(apartment_2.completion_date.isoformat()),
+            datetime.datetime.fromisoformat(results.calculation_month.isoformat()),
+            None,
+            2,
+        ),
+        (None, None, None, None, None, None),
+        ("Taloyhtiötä yhteensä", 1, None, None, None, None),
+        ("Asuntoja yhteensä", 2, None, None, None, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__unregulated_housing_companies_report__released_by_plot_department(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
+        legacy_release_date=datetime.date(2022, 1, 1),
+    )
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:unregulated-housing-companies-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Yhtiö",
+            "Postinumero",
+            "Valmistumispäivä",
+            "Vapautumispäivä",
+            "Vapautettu tontit yksikön toimesta?",
+            "Asuntojen lukumäärä",
+        ),
+        (
+            housing_company.display_name,
+            housing_company.postal_code.value,
+            datetime.datetime.fromisoformat(apartment.completion_date.isoformat()),
+            datetime.datetime.fromisoformat(housing_company.legacy_release_date.isoformat()),
+            "X",
+            1,
+        ),
+        (None, None, None, None, None, None),
+        ("Taloyhtiötä yhteensä", 1, None, None, None, None),
+        ("Asuntoja yhteensä", 1, None, None, None, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__unregulated_housing_companies_report__multiple_housing_companies(api_client: HitasAPIClient):
+    housing_company_1: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        legacy_release_date=datetime.date(2022, 1, 1),
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company_1,
+    )
+    apartment_2: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2021, 1, 1),
+        building__real_estate__housing_company=housing_company_1,
+    )
+
+    housing_company_2: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
+        legacy_release_date=datetime.date(2004, 1, 1),
+    )
+    apartment_3: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2000, 1, 1),
+        building__real_estate__housing_company=housing_company_2,
+    )
+
+    url = reverse("hitas:unregulated-housing-companies-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Yhtiö",
+            "Postinumero",
+            "Valmistumispäivä",
+            "Vapautumispäivä",
+            "Vapautettu tontit yksikön toimesta?",
+            "Asuntojen lukumäärä",
+        ),
+        (
+            housing_company_1.display_name,
+            housing_company_1.postal_code.value,
+            datetime.datetime.fromisoformat(apartment_2.completion_date.isoformat()),
+            datetime.datetime.fromisoformat(housing_company_1.legacy_release_date.isoformat()),
+            None,
+            2,
+        ),
+        (
+            housing_company_2.display_name,
+            housing_company_2.postal_code.value,
+            datetime.datetime.fromisoformat(apartment_3.completion_date.isoformat()),
+            datetime.datetime.fromisoformat(housing_company_2.legacy_release_date.isoformat()),
+            "X",
+            1,
+        ),
+        (None, None, None, None, None, None),
+        ("Taloyhtiötä yhteensä", 2, None, None, None, None),
+        ("Asuntoja yhteensä", 3, None, None, None, None),
     ]

@@ -60,6 +60,13 @@ router.register(
     basename="regulated-housing-companies-report",
 )
 
+# /api/v1/reports/download-unregulated-housing-companies-report
+router.register(
+    r"reports/download-unregulated-housing-companies-report",
+    views.UnregulatedHousingCompaniesReportView,
+    basename="unregulated-housing-companies-report",
+)
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")

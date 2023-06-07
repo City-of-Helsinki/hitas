@@ -12,7 +12,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
 from hitas.models import ApartmentSale
-from hitas.models.housing_company import HousingCompanyWithReportAnnotations
+from hitas.models.housing_company import (
+    HousingCompanyWithRegulatedReportAnnotations,
+    HousingCompanyWithUnregulatedReportAnnotations,
+    RegulationStatus,
+)
 from hitas.utils import format_sheet, resize_columns
 
 
@@ -34,6 +38,15 @@ class RegulatedHousingCompaniesReportColumns(NamedTuple):
     completion_date: datetime.date | str
     apartment_count: int | str
     average_price_per_square_meter: Decimal | str
+
+
+class UnregulatedHousingCompaniesReportColumns(NamedTuple):
+    housing_company_name: str
+    postal_code: str | int
+    completion_date: datetime.date | str
+    release_date: datetime.date | str
+    released_by_ploy_department: str
+    apartment_count: int | str
 
 
 T = TypeVar("T")
@@ -224,7 +237,7 @@ def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
 
 
 def build_regulated_housing_companies_report_excel(
-    housing_companies: list[HousingCompanyWithReportAnnotations],
+    housing_companies: list[HousingCompanyWithRegulatedReportAnnotations],
 ) -> Workbook:
     workbook = Workbook()
     worksheet: Worksheet = workbook.active
@@ -283,6 +296,94 @@ def build_regulated_housing_companies_report_excel(
             "B": {"alignment": Alignment(horizontal="right")},
             "E": {"number_format": date_format},
             "G": {"number_format": euro_per_square_meter_format},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
+
+
+def build_unregulated_housing_companies_report_excel(
+    housing_companies: list[HousingCompanyWithUnregulatedReportAnnotations],
+) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = UnregulatedHousingCompaniesReportColumns(
+        housing_company_name="Yhtiö",
+        postal_code="Postinumero",
+        completion_date="Valmistumispäivä",
+        release_date="Vapautumispäivä",
+        released_by_ploy_department="Vapautettu tontit yksikön toimesta?",
+        apartment_count="Asuntojen lukumäärä",
+    )
+    worksheet.append(column_headers)
+
+    for housing_company in housing_companies:
+        worksheet.append(
+            UnregulatedHousingCompaniesReportColumns(
+                housing_company_name=housing_company.display_name,
+                postal_code=housing_company.postal_code.value,
+                completion_date=housing_company.completion_date,
+                release_date=housing_company.release_date,
+                released_by_ploy_department=(
+                    "X" if housing_company.regulation_status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT else ""
+                ),
+                apartment_count=housing_company.apartment_count,
+            )
+        )
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    empty_row = UnregulatedHousingCompaniesReportColumns(
+        housing_company_name="",
+        postal_code="",
+        completion_date="",
+        release_date="",
+        released_by_ploy_department="",
+        apartment_count="",
+    )
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(empty_row)
+
+    # Add summary rows
+    worksheet.append(
+        UnregulatedHousingCompaniesReportColumns(
+            housing_company_name="Taloyhtiötä yhteensä",
+            postal_code=len(housing_companies),
+            completion_date="",
+            release_date="",
+            released_by_ploy_department="",
+            apartment_count="",
+        ),
+    )
+    worksheet.append(
+        UnregulatedHousingCompaniesReportColumns(
+            housing_company_name="Asuntoja yhteensä",
+            postal_code=sum(housing_company.apartment_count for housing_company in housing_companies),
+            completion_date="",
+            release_date="",
+            released_by_ploy_department="",
+            apartment_count="",
+        ),
+    )
+
+    date_format = "DD.MM.YYYY"
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            "B": {"alignment": Alignment(horizontal="right")},
+            "C": {"number_format": date_format},
+            "D": {"number_format": date_format},
         },
     )
 
