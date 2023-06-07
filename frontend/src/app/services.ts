@@ -552,6 +552,26 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error && result ? [{type: "ExternalSaleData", id: arg.calculation_date}] : [],
         }),
+        validateSalesCatalog: builder.mutation({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/sales-catalog-validate`,
+                method: "POST",
+                body: data,
+                params: {housing_company_id: housingCompanyId},
+                headers: mutationApiExcelHeaders(),
+            }),
+        }),
+        createSalesCatalog: builder.mutation({
+            query: ({data, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/sales-catalog-validate`,
+                method: "POST",
+                body: data,
+                params: {housing_company_id: housingCompanyId},
+                headers: mutationApiExcelHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) =>
+                !error && result ? [{type: "HousingCompany", id: arg.housingCompanyId}] : [],
+        }),
     }),
 });
 
@@ -596,4 +616,6 @@ export const {
     useCreateConditionOfSaleMutation,
     useCreateThirtyYearRegulationMutation,
     useSaveExternalSalesDataMutation,
+    useValidateSalesCatalogMutation,
+    useCreateSalesCatalogMutation,
 } = mutationApi;
