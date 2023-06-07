@@ -4,6 +4,7 @@ import {FormInputProps} from "./";
 
 interface FileInputProps extends FormInputProps {
     buttonLabel?: string;
+    accept?: string;
 }
 const FileInput = ({
     name,
