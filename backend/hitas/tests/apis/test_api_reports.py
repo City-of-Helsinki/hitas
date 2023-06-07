@@ -17,7 +17,7 @@ from hitas.models import (
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
 )
-from hitas.models.housing_company import RegulationStatus
+from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, HousingCompanyFactory
@@ -823,4 +823,196 @@ def test__api__unregulated_housing_companies_report__multiple_housing_companies(
         (None, None, None, None, None, None),
         ("Taloyhtiötä yhteensä", 2, None, None, None, None),
         ("Asuntoja yhteensä", 3, None, None, None, None),
+    ]
+
+
+# Housing company state report
+
+
+@pytest.mark.django_db
+def test__api__housing_company_states_report__not_completed(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+    # This apartment is not ready, so housing company is not ready either
+    ApartmentFactory.create(
+        completion_date=None,
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:housing-company-states-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Taloyhtiön tila", "Taloyhtiöiden lukumäärä", "Asuntojen lukumäärä"),
+        ("Ei valmis", 1, 2),
+        ("Sääntelyn piirissä", 0, 0),
+        ("Sääntelystä vapautuneet", 0, 0),
+        ("Vapautuneet tontit-yksikön päätöksellä", 0, 0),
+        ("Puoli-Hitas yhtiöt", 0, 0),
+        (None, None, None),
+        ("Yhtiöitä yhteensä", 1, None),
+        ("Asuntoja yhteensä", 2, None),
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "status",
+    [
+        RegulationStatus.REGULATED,
+        RegulationStatus.RELEASED_BY_HITAS,
+        RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
+    ],
+)
+def test__api__housing_company_states_report__completed_over_30_years(api_client: HitasAPIClient, status):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=status,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:housing-company-states-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Taloyhtiön tila", "Taloyhtiöiden lukumäärä", "Asuntojen lukumäärä"),
+        ("Ei valmis", 0, 0),
+        (
+            "Sääntelyn piirissä",
+            1 if status == RegulationStatus.REGULATED else 0,
+            2 if status == RegulationStatus.REGULATED else 0,
+        ),
+        (
+            "Sääntelystä vapautuneet",
+            1 if status == RegulationStatus.RELEASED_BY_HITAS else 0,
+            2 if status == RegulationStatus.RELEASED_BY_HITAS else 0,
+        ),
+        (
+            "Vapautuneet tontit-yksikön päätöksellä",
+            1 if status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT else 0,
+            2 if status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT else 0,
+        ),
+        ("Puoli-Hitas yhtiöt", 0, 0),
+        (None, None, None),
+        ("Yhtiöitä yhteensä", 1, None),
+        ("Asuntoja yhteensä", 2, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__housing_company_states_report__half_hitas(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:housing-company-states-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Taloyhtiön tila", "Taloyhtiöiden lukumäärä", "Asuntojen lukumäärä"),
+        ("Ei valmis", 0, 0),
+        ("Sääntelyn piirissä", 0, 0),
+        ("Sääntelystä vapautuneet", 0, 0),
+        ("Vapautuneet tontit-yksikön päätöksellä", 0, 0),
+        ("Puoli-Hitas yhtiöt", 1, 2),
+        (None, None, None),
+        ("Yhtiöitä yhteensä", 1, None),
+        ("Asuntoja yhteensä", 2, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__housing_company_states_report__one_of_each(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=None,
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:housing-company-states-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Taloyhtiön tila", "Taloyhtiöiden lukumäärä", "Asuntojen lukumäärä"),
+        ("Ei valmis", 1, 1),
+        ("Sääntelyn piirissä", 1, 1),
+        ("Sääntelystä vapautuneet", 1, 1),
+        ("Vapautuneet tontit-yksikön päätöksellä", 1, 1),
+        ("Puoli-Hitas yhtiöt", 1, 1),
+        (None, None, None),
+        ("Yhtiöitä yhteensä", 5, None),
+        ("Asuntoja yhteensä", 5, None),
     ]
