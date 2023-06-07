@@ -260,11 +260,20 @@ class HousingCompanyWithAnnotations(HousingCompany):
         abstract = True
 
 
-class HousingCompanyWithReportAnnotations(HousingCompany):
+class HousingCompanyWithRegulatedReportAnnotations(HousingCompany):
     completion_date: datetime.date
     surface_area: Optional[Decimal]
     realized_acquisition_price: Optional[Decimal]
     avg_price_per_square_meter: Optional[Decimal]
+    apartment_count: int
+
+    class Meta:
+        abstract = True
+
+
+class HousingCompanyWithUnregulatedReportAnnotations(HousingCompany):
+    completion_date: datetime.date
+    release_date: Optional[datetime.date]
     apartment_count: int
 
     class Meta:

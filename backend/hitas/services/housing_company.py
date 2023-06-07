@@ -16,7 +16,8 @@ from hitas.models.housing_company import (
     HitasType,
     HousingCompany,
     HousingCompanyWithAnnotations,
-    HousingCompanyWithReportAnnotations,
+    HousingCompanyWithRegulatedReportAnnotations,
+    HousingCompanyWithUnregulatedReportAnnotations,
     RegulationStatus,
 )
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
@@ -295,7 +296,7 @@ def get_number_of_unsold_apartments(housing_company: HousingCompany) -> int:
     )
 
 
-def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithReportAnnotations]:
+def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
     return list(
         HousingCompany.objects.select_related("postal_code")
         .prefetch_related(
@@ -325,4 +326,22 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
             "postal_code__value",
             "completion_date",
         )
+    )
+
+
+def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWithUnregulatedReportAnnotations]:
+    return list(
+        HousingCompany.objects.select_related("postal_code")
+        .prefetch_related("real_estates__buildings__apartments")
+        .exclude(regulation_status=RegulationStatus.REGULATED)
+        .annotate(
+            completion_date=max_if_all_not_null(
+                ref="real_estates__buildings__apartments__completion_date",
+                max=datetime.date.max,
+                min=datetime.date.min,
+            ),
+            apartment_count=Count("real_estates__buildings__apartments"),
+            _release_date=get_regulation_release_date("id"),
+        )
+        .order_by("-completion_date")
     )
