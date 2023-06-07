@@ -17,6 +17,7 @@ from hitas.models.housing_company import (
     HousingCompany,
     HousingCompanyWithAnnotations,
     HousingCompanyWithRegulatedReportAnnotations,
+    HousingCompanyWithStateReportAnnotations,
     HousingCompanyWithUnregulatedReportAnnotations,
     RegulationStatus,
 )
@@ -344,4 +345,17 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
             _release_date=get_regulation_release_date("id"),
         )
         .order_by("-completion_date")
+    )
+
+
+def find_housing_companies_for_state_reporting() -> list[HousingCompanyWithStateReportAnnotations]:
+    return list(
+        HousingCompany.objects.annotate(
+            completion_date=max_if_all_not_null(
+                ref="real_estates__buildings__apartments__completion_date",
+                max=datetime.date.max,
+                min=datetime.date.min,
+            ),
+            apartment_count=Count("real_estates__buildings__apartments"),
+        )
     )

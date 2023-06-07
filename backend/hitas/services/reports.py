@@ -1,9 +1,10 @@
 import datetime
 import string
 from decimal import Decimal
+from enum import Enum
 from functools import cache
 from statistics import mean
-from typing import Any, Callable, Iterable, NamedTuple, TypeVar
+from typing import Any, Callable, Iterable, NamedTuple, TypedDict, TypeVar
 
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
@@ -13,7 +14,9 @@ from rest_framework.settings import api_settings
 
 from hitas.models import ApartmentSale
 from hitas.models.housing_company import (
+    HitasType,
     HousingCompanyWithRegulatedReportAnnotations,
+    HousingCompanyWithStateReportAnnotations,
     HousingCompanyWithUnregulatedReportAnnotations,
     RegulationStatus,
 )
@@ -49,6 +52,17 @@ class UnregulatedHousingCompaniesReportColumns(NamedTuple):
     apartment_count: int | str
 
 
+class HousingCompanyStatesCount(TypedDict):
+    housing_company_count: int
+    apartment_count: int
+
+
+class HousingCompanyStatesReportColumns(NamedTuple):
+    state: str
+    housing_company_count: int | str
+    apartment_count: int | str
+
+
 T = TypeVar("T")
 
 
@@ -56,6 +70,14 @@ class SalesReportSummaryDefinition(NamedTuple):
     func: Callable[[Iterable[T]], T]
     title: str = ""
     subtitle: str = ""
+
+
+class ReportState(str, Enum):
+    NOT_READY = "Ei valmis"
+    REGULATED = "Sääntelyn piirissä"
+    RELEASED_BY_HITAS = "Sääntelystä vapautuneet"
+    RELEASED_BY_PLOT_DEPARTMENT = "Vapautuneet tontit-yksikön päätöksellä"
+    HALF_HITAS = "Puoli-Hitas yhtiöt"
 
 
 def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
@@ -384,6 +406,102 @@ def build_unregulated_housing_companies_report_excel(
             "B": {"alignment": Alignment(horizontal="right")},
             "C": {"number_format": date_format},
             "D": {"number_format": date_format},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
+
+
+def build_housing_company_state_report_excel(
+    housing_companies: list[HousingCompanyWithStateReportAnnotations],
+) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = HousingCompanyStatesReportColumns(
+        state="Taloyhtiön tila",
+        housing_company_count="Taloyhtiöiden lukumäärä",
+        apartment_count="Asuntojen lukumäärä",
+    )
+    worksheet.append(column_headers)
+
+    states: dict[ReportState, HousingCompanyStatesCount] = {
+        name: HousingCompanyStatesCount(
+            housing_company_count=0,
+            apartment_count=0,
+        )
+        for name in ReportState
+    }
+
+    for housing_company in housing_companies:
+        if housing_company.hitas_type == HitasType.HALF_HITAS:
+            states[ReportState.HALF_HITAS]["housing_company_count"] += 1
+            states[ReportState.HALF_HITAS]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.completion_date is None:
+            states[ReportState.NOT_READY]["housing_company_count"] += 1
+            states[ReportState.NOT_READY]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.REGULATED:
+            states[ReportState.REGULATED]["housing_company_count"] += 1
+            states[ReportState.REGULATED]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS:
+            states[ReportState.RELEASED_BY_HITAS]["housing_company_count"] += 1
+            states[ReportState.RELEASED_BY_HITAS]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT:
+            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["housing_company_count"] += 1
+            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["apartment_count"] += housing_company.apartment_count
+
+    for state, counts in states.items():
+        worksheet.append(
+            HousingCompanyStatesReportColumns(
+                state=state.value,
+                housing_company_count=counts["housing_company_count"],
+                apartment_count=counts["apartment_count"],
+            )
+        )
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    empty_row = HousingCompanyStatesReportColumns(
+        state="",
+        housing_company_count="",
+        apartment_count="",
+    )
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(empty_row)
+
+    # Add summary rows
+    worksheet.append(
+        HousingCompanyStatesReportColumns(
+            state="Yhtiöitä yhteensä",
+            housing_company_count=len(housing_companies),
+            apartment_count="",
+        ),
+    )
+    worksheet.append(
+        HousingCompanyStatesReportColumns(
+            state="Asuntoja yhteensä",
+            housing_company_count=sum(housing_company.apartment_count for housing_company in housing_companies),
+            apartment_count="",
+        ),
+    )
+
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
         },
     )
 

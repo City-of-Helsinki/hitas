@@ -3883,6 +3883,27 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/download-housing-company-states-report:
+    get:
+      description: Download an Excel report of housing company states
+      operationId: fetch-housing-company-states-report-excel
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successfully downloaded a report of housing company states
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:

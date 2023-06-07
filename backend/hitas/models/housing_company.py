@@ -280,6 +280,14 @@ class HousingCompanyWithUnregulatedReportAnnotations(HousingCompany):
         abstract = True
 
 
+class HousingCompanyWithStateReportAnnotations(HousingCompany):
+    completion_date: datetime.date
+    apartment_count: int
+
+    class Meta:
+        abstract = True
+
+
 class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany",
