@@ -1,4 +1,5 @@
 import Codes from "./Codes";
 import IndicesList from "./IndicesList";
+import OwnersList from "./OwnersList";
 
-export {Codes, IndicesList};
+export {Codes, IndicesList, OwnersList};

@@ -55,8 +55,8 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
     const identifierValue = ownerFormObject.watch("identifier");
 
     // helper booleans for special saving controls with invalid data
-    const hasFormChanged = Object.entries(owner).toString() !== Object.entries(ownerFormObject.getValues()).toString();
-    const isMalformedIdentifier = ownerFormObject.formState.errors.identifier?.type === "custom";
+    const hasFormChanged = ownerFormObject.formState.isDirty;
+    const isMalformedIdentifier = !!ownerFormObject.formState.errors.identifier;
     const isIdentifierEmpty = identifierValue === "";
     const isBackendErrorInIdentifier = ownerFormObject.formState.errors.identifier?.type === "backend";
     const isOtherErrorsThanIdentifier = Object.keys(ownerFormObject.formState.errors).some(
@@ -75,9 +75,12 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         !hasFormChanged;
 
     useEffect(() => {
-        // validate the initial form values and set the initial identifier validity
+        // validate the initial form values
         ownerFormObject.trigger().then(() => {
+            // set the initial identifier validity
             setIsInitialIdentifierValid(!ownerFormObject.formState.errors.identifier);
+            // set initial focus
+            setTimeout(() => ownerFormObject.setFocus("name"), 5);
         });
         // eslint-disable-next-line
     }, []);
