@@ -3,7 +3,7 @@ import {Link, useParams} from "react-router-dom";
 
 import {useState} from "react";
 import {useForm} from "react-hook-form";
-import {useGetHousingCompanyDetailQuery} from "../../app/services";
+import {useGetHousingCompanyDetailQuery, useValidateSalesCatalogMutation} from "../../app/services";
 import {
     CloseButton,
     DetailField,
@@ -22,11 +22,22 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
+    const [validateSalesCatalog] = useValidateSalesCatalogMutation(); // , {data: validateData, isLoading: isValidating, error: validateError}] =
     const {handleSubmit} = salesCatalogForm;
     const saveSalesCatalog = (data: {salesCatalog: File | null}) => {
         console.log(data);
     };
-    const validateFile = () => setIsImportModalOpen(true);
+    const onSubmit = (data) => {
+        console.log(data);
+        validateSalesCatalog({
+            body: data.salesCatalog,
+            housingCompanyId: params.housingCompanyId,
+        })
+            .then((data) => console.log(data))
+            .catch((e) => console.warn(e));
+
+        setIsImportModalOpen(true);
+    };
     return (
         <>
             <Heading>
@@ -36,11 +47,11 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     onSubmit={handleSubmit(saveSalesCatalog)}
                 >
                     <FileInput
-                        name="sales-catalog"
+                        name="salesCatalog"
                         formObject={salesCatalogForm}
                         accept=".xlsx"
                         buttonLabel="Lataa myyntihintaluettelo"
-                        onChange={validateFile}
+                        onChange={() => onSubmit(salesCatalogForm.getValues())}
                     />
                     <EditButton
                         state={{housingCompany: housingCompany}}
