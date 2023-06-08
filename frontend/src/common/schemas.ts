@@ -54,8 +54,9 @@ export const errorMessages = {
     required: "Pakollinen kenttä",
     postalCodeFormat: "Virheellinen postinumero",
     stringLength: "Liian lyhyt arvo",
-    stringMin: "Liian vähän kirjaimia",
-    stringMax: "Liian monta kirjainta",
+    stringMin: "Liian lyhyt arvo",
+    stringMax: "Liian monta merkkiä",
+    stringMaxIs: "Maksimimerkkimäärä on ",
     numberLength: "Liian lyhyt arvo",
     numberType: "Arvon pitää olla numero",
     numberMin: "Liian pieni arvo",
@@ -332,8 +333,12 @@ const ApartmentLinkedModelsSchema = object({
 
 const OwnerSchema = object({
     id: APIIdString.optional(),
-    name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
-    identifier: string({required_error: errorMessages.required}).min(1, errorMessages.stringLength),
+    name: string({required_error: errorMessages.required})
+        .min(2, errorMessages.stringLength)
+        .max(256, errorMessages.stringMaxIs + "256"),
+    identifier: string({required_error: errorMessages.required})
+        .min(1, errorMessages.stringLength)
+        .max(11, errorMessages.stringMaxIs + "11"),
     email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
     non_disclosure: boolean().optional(),
 });
@@ -990,6 +995,11 @@ const IndexResponseSchema = object({
     contents: IndexSchema.array(),
 });
 
+const OwnersResponseSchema = object({
+    page: PageInfoSchema,
+    contents: OwnerSchema.array(),
+});
+
 // Query Parameters
 
 const HousingCompanyApartmentQuerySchema = object({
@@ -1023,6 +1033,14 @@ const ThirtyYearRegulationQuerySchema = object({
         .optional(),
 });
 
+const FilterOwnersQuerySchema = object({
+    name: string().optional(),
+    identifier: string().optional(),
+    email: string().optional(),
+    limit: number().int().optional(),
+    page: number().int().optional(),
+});
+
 // ********************************
 // * Exports
 // ********************************
@@ -1049,11 +1067,13 @@ export {
     HousingCompanyListResponseSchema,
     ApartmentListResponseSchema,
     CodeResponseSchema,
+    OwnersResponseSchema,
     PostalCodeResponseSchema,
     IndexResponseSchema,
     HousingCompanyApartmentQuerySchema,
     ApartmentQuerySchema,
     IndexQuerySchema,
+    FilterOwnersQuerySchema,
     ApartmentSaleFormSchema,
     OwnerSchema,
     OwnershipFormSchema,
@@ -1120,11 +1140,13 @@ export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
 export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
+export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
 export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
 export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
 export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
 export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
+export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
