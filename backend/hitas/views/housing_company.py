@@ -8,6 +8,7 @@ from django.utils import timezone
 from django_filters.rest_framework import BooleanFilter
 from enumfields.drf.serializers import EnumSupportSerializerMixin
 from rest_framework import serializers, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -28,6 +29,7 @@ from hitas.services.apartment import get_first_sale_acquisition_price
 from hitas.services.audit_log import last_log
 from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
 from hitas.services.housing_company import get_regulation_release_date
+from hitas.services.validation import lookup_id_to_uuid
 from hitas.utils import RoundWithPrecision, max_date_if_all_not_null
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
@@ -440,3 +442,48 @@ class HousingCompanyViewSet(HitasModelViewSet):
     @staticmethod
     def get_filterset_class():
         return HousingCompanyFilterSet
+
+    @action(detail=True, methods=["PATCH"], url_path="batch-complete-apartments")
+    def batch_complete_apartments(self, request, **kwargs) -> Response:
+        housing_company_uuid = lookup_id_to_uuid(self.kwargs["uuid"], HousingCompany)
+
+        input_data = BatchCompleteApartmentsSerializer(data=request.data)
+        input_data.is_valid(raise_exception=True)
+
+        data = input_data.validated_data
+
+        query_set = Apartment.objects.filter(
+            building__real_estate__housing_company__uuid=housing_company_uuid,
+        )
+        if data["apartment_number_start"] is not None:
+            query_set = query_set.filter(
+                apartment_number__gte=data["apartment_number_start"],
+            )
+        if data["apartment_number_end"] is not None:
+            query_set = query_set.filter(
+                apartment_number__lte=data["apartment_number_end"],
+            )
+
+        completed_apartment_count = query_set.update(completion_date=data["completion_date"])
+
+        result = {
+            "completed_apartment_count": completed_apartment_count,
+        }
+        return Response(data=result, status=status.HTTP_200_OK)
+
+
+class BatchCompleteApartmentsSerializer(serializers.Serializer):
+    completion_date = serializers.DateField(allow_null=True)
+    apartment_number_start = serializers.IntegerField(min_value=0, allow_null=True)
+    apartment_number_end = serializers.IntegerField(min_value=0, allow_null=True)
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        if (
+            attrs["apartment_number_start"] is not None
+            and attrs["apartment_number_end"] is not None
+            and attrs["apartment_number_start"] > attrs["apartment_number_end"]
+        ):
+            raise serializers.ValidationError(
+                "Starting apartment number must be less than or equal to the ending apartment number.",
+            )
+        return attrs
