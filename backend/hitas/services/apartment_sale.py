@@ -15,5 +15,6 @@ def find_sales_on_interval_for_reporting(start_date: datetime.date, end_date: da
         .order_by(
             "apartment__building__real_estate__housing_company__postal_code__cost_area",
             "apartment__building__real_estate__housing_company__postal_code__value",
+            "apartment__rooms",
         )
     )

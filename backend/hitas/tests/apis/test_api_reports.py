@@ -1096,3 +1096,244 @@ def test__api__housing_company_states_report__json_endpoint(api_client: HitasAPI
             "apartment_count": 1,
         },
     ]
+
+
+# Sales by area report
+
+
+@pytest.mark.django_db
+def test__api__sales_by_area_report__no_surface_area(api_client: HitasAPIClient):
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=None,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-01-31",
+    }
+    url = reverse("hitas:sales-by-postal-code-and-area-report-list") + "?" + urlencode(data)
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "non_field_errors",
+                "message": (
+                    f"Surface are zero or missing for apartment {sale.apartment.address!r}. "
+                    f"Cannot calculate price per square meter."
+                ),
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
+@pytest.mark.parametrize(
+    ["rooms", "expected_label"],
+    [
+        [1, "1h"],
+        [2, "2h"],
+        [3, "3h+"],
+        [4, "3h+"],
+    ],
+)
+@pytest.mark.django_db
+def test__api__sales_by_area_report__rooms(api_client: HitasAPIClient, rooms, expected_label):
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__rooms=rooms,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-01-31",
+    }
+    url = reverse("hitas:sales-by-postal-code-and-area-report-list") + "?" + urlencode(data)
+    response: HttpResponse = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Kalleusalue",
+            "Postinumero",
+            "Huoneluku",
+            "Kauppojen lukumäärä",
+            "Keskineliöhinta",
+            "Alin neliöhinta",
+            "Ylin neliöhinta",
+        ),
+        (1, "00001", expected_label, 1, 600, 600, 600),
+        (None, None, None, None, None, None, None),
+        (None, None, "Koko Helsingin alue", 1, 600, 600, 600),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__sales_by_area_report__multiple__same_postal_code__same_room_count(api_client: HitasAPIClient):
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=20_000,
+        apartment_share_of_housing_company_loans=5_000,
+        apartment__surface_area=80,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-01-31",
+    }
+    url = reverse("hitas:sales-by-postal-code-and-area-report-list") + "?" + urlencode(data)
+    response: HttpResponse = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Kalleusalue",
+            "Postinumero",
+            "Huoneluku",
+            "Kauppojen lukumäärä",
+            "Keskineliöhinta",
+            "Alin neliöhinta",
+            "Ylin neliöhinta",
+        ),
+        (1, "00001", "1h", 2, 456.25, 312.5, 600),
+        (None, None, None, None, None, None, None),
+        (None, None, "Koko Helsingin alue", 2, 456.25, 312.5, 600),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__sales_by_area_report__multiple__same_postal_code__different_room_count(api_client: HitasAPIClient):
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=20_000,
+        apartment_share_of_housing_company_loans=5_000,
+        apartment__surface_area=80,
+        apartment__rooms=2,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-01-31",
+    }
+    url = reverse("hitas:sales-by-postal-code-and-area-report-list") + "?" + urlencode(data)
+    response: HttpResponse = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Kalleusalue",
+            "Postinumero",
+            "Huoneluku",
+            "Kauppojen lukumäärä",
+            "Keskineliöhinta",
+            "Alin neliöhinta",
+            "Ylin neliöhinta",
+        ),
+        (1, "00001", "1h", 1, 600, 600, 600),
+        (1, "00001", "2h", 1, 312.5, 312.5, 312.5),
+        (None, None, None, None, None, None, None),
+        (None, None, "Koko Helsingin alue", 2, 456.25, 312.5, 600),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__sales_by_area_report__multiple__different_postal_code(api_client: HitasAPIClient):
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00001",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=20_000,
+        apartment_share_of_housing_company_loans=5_000,
+        apartment__surface_area=80,
+        apartment__rooms=1,
+        apartment__building__real_estate__housing_company__postal_code__value="00002",
+        apartment__building__real_estate__housing_company__postal_code__cost_area=1,
+    )
+
+    data = {
+        "start_date": "2020-01-01",
+        "end_date": "2020-01-31",
+    }
+    url = reverse("hitas:sales-by-postal-code-and-area-report-list") + "?" + urlencode(data)
+    response: HttpResponse = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Kalleusalue",
+            "Postinumero",
+            "Huoneluku",
+            "Kauppojen lukumäärä",
+            "Keskineliöhinta",
+            "Alin neliöhinta",
+            "Ylin neliöhinta",
+        ),
+        (1, "00001", "1h", 1, 600, 600, 600),
+        (1, "00002", "1h", 1, 312.5, 312.5, 312.5),
+        (None, None, None, None, None, None, None),
+        (None, None, "Koko Helsingin alue", 2, 456.25, 312.5, 600),
+    ]

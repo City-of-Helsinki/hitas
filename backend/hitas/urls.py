@@ -81,6 +81,13 @@ router.register(
     basename="housing-company-states-report",
 )
 
+# /api/v1/reports/download-sales-by-postal-code-and-area-report
+router.register(
+    r"reports/download-sales-by-postal-code-and-area-report",
+    views.SalesByPostalCodeAndAreaReportView,
+    basename="sales-by-postal-code-and-area-report",
+)
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
