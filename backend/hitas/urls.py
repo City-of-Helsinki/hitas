@@ -67,6 +67,13 @@ router.register(
     basename="unregulated-housing-companies-report",
 )
 
+# /api/v1/reports/housing-company-states
+router.register(
+    r"reports/housing-company-states",
+    views.HousingCompanyStatesJSONReportView,
+    basename="housing-company-states",
+)
+
 # /api/v1/reports/download-housing-company-states-report
 router.register(
     r"reports/download-housing-company-states-report",

@@ -873,7 +873,7 @@ def test__api__housing_company_states_report__not_completed(api_client: HitasAPI
         RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
     ],
 )
-def test__api__housing_company_states_report__completed_over_30_years(api_client: HitasAPIClient, status):
+def test__api__housing_company_states_report__regulation_status(api_client: HitasAPIClient, status):
     housing_company: HousingCompany = HousingCompanyFactory.create(
         regulation_status=status,
         hitas_type=HitasType.NEW_HITAS_I,
@@ -1015,4 +1015,84 @@ def test__api__housing_company_states_report__one_of_each(api_client: HitasAPICl
         (None, None, None),
         ("Yhtiöitä yhteensä", 5, None),
         ("Asuntoja yhteensä", 5, None),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__housing_company_states_report__json_endpoint(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=None,
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.REGULATED,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        regulation_status=RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT,
+        hitas_type=HitasType.NEW_HITAS_I,
+    )
+    ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        building__real_estate__housing_company=housing_company,
+    )
+
+    url = reverse("hitas:housing-company-states-list")
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == [
+        {
+            "status": "Ei valmis",
+            "housing_company_count": 1,
+            "apartment_count": 1,
+        },
+        {
+            "status": "Sääntelyn piirissä",
+            "housing_company_count": 1,
+            "apartment_count": 1,
+        },
+        {
+            "status": "Sääntelystä vapautuneet",
+            "housing_company_count": 1,
+            "apartment_count": 1,
+        },
+        {
+            "status": "Vapautuneet tontit-yksikön päätöksellä",
+            "housing_company_count": 1,
+            "apartment_count": 1,
+        },
+        {
+            "status": "Puoli-Hitas yhtiöt",
+            "housing_company_count": 1,
+            "apartment_count": 1,
+        },
     ]
