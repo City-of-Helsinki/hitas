@@ -2,8 +2,9 @@ import datetime
 from typing import Any
 
 from django.http import HttpResponse
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.services.apartment_sale import find_sales_on_interval_for_reporting
@@ -17,6 +18,7 @@ from hitas.services.reports import (
     build_regulated_housing_companies_report_excel,
     build_sales_report_excel,
     build_unregulated_housing_companies_report_excel,
+    sort_housing_companies_by_state,
 )
 from hitas.types import HitasJSONRenderer
 from hitas.views.utils.excel import ExcelRenderer, get_excel_response
@@ -76,3 +78,20 @@ class HousingCompanyStatesReportView(ViewSet):
         workbook = build_housing_company_state_report_excel(housing_companies)
         filename = "Yhtiöiden tilat.xlsx"
         return get_excel_response(filename=filename, excel=workbook)
+
+
+class HousingCompanyStatesJSONReportView(ViewSet):
+    def list(self, request: Request, *args, **kwargs) -> Response:
+        housing_companies = find_housing_companies_for_state_reporting()
+        by_state = sort_housing_companies_by_state(housing_companies)
+
+        data = [
+            {
+                "status": name.value,
+                "housing_company_count": info["housing_company_count"],
+                "apartment_count": info["apartment_count"],
+            }
+            for name, info in by_state.items()
+        ]
+
+        return Response(data=data, status=status.HTTP_200_OK)

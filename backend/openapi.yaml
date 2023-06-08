@@ -3883,6 +3883,29 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/housing-company-states:
+    get:
+      description: Get housing companies counted by their states
+      operationId: fetch-housing-company-states
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successfully fetched housing companies counted by their states
+          content:
+            application/json:
+              schema:
+                description: List of states and their housing company and apartment counts
+                type: array
+                items:
+                  $ref: '#/components/schemas/HousingCompaniesInState'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/reports/download-housing-company-states-report:
     get:
       description: Download an Excel report of housing company states
@@ -7901,6 +7924,43 @@ components:
           description: Market price index for the month the calculation was made
           type: number
           example: 200.0
+
+    HousingCompaniesInState:
+      description: Count of housing companies in a specific state
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - housing_company_count
+        - apartment_count
+      properties:
+        status:
+          description: |-
+            State in question
+
+            Can have the following values:
+              - "Ei valmis"
+              - "Sääntelyn piirissä"
+              - "Sääntelystä vapautuneet"
+              - "Vapautuneet tontit-yksikön päätöksellä"
+              - "Puoli-Hitas yhtiöt"
+          type: string
+          example: "Ei Valmis"
+          x-extensible-enum:
+            - "Ei valmis"
+            - "Sääntelyn piirissä"
+            - "Sääntelystä vapautuneet"
+            - "Vapautuneet tontit-yksikön päätöksellä"
+            - "Puoli-Hitas yhtiöt"
+        housing_company_count:
+          description: Count of housing companies in this state
+          type: integer
+          example: 123
+        apartment_count:
+          description: Count of apartments in this state
+          type: integer
+          example: 2384
+
 
     # Errors
 

@@ -427,34 +427,7 @@ def build_housing_company_state_report_excel(
     )
     worksheet.append(column_headers)
 
-    states: dict[ReportState, HousingCompanyStatesCount] = {
-        name: HousingCompanyStatesCount(
-            housing_company_count=0,
-            apartment_count=0,
-        )
-        for name in ReportState
-    }
-
-    for housing_company in housing_companies:
-        if housing_company.hitas_type == HitasType.HALF_HITAS:
-            states[ReportState.HALF_HITAS]["housing_company_count"] += 1
-            states[ReportState.HALF_HITAS]["apartment_count"] += housing_company.apartment_count
-
-        elif housing_company.completion_date is None:
-            states[ReportState.NOT_READY]["housing_company_count"] += 1
-            states[ReportState.NOT_READY]["apartment_count"] += housing_company.apartment_count
-
-        elif housing_company.regulation_status == RegulationStatus.REGULATED:
-            states[ReportState.REGULATED]["housing_company_count"] += 1
-            states[ReportState.REGULATED]["apartment_count"] += housing_company.apartment_count
-
-        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS:
-            states[ReportState.RELEASED_BY_HITAS]["housing_company_count"] += 1
-            states[ReportState.RELEASED_BY_HITAS]["apartment_count"] += housing_company.apartment_count
-
-        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT:
-            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["housing_company_count"] += 1
-            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["apartment_count"] += housing_company.apartment_count
+    states = sort_housing_companies_by_state(housing_companies)
 
     for state, counts in states.items():
         worksheet.append(
@@ -508,3 +481,38 @@ def build_housing_company_state_report_excel(
     resize_columns(worksheet)
     worksheet.protection.sheet = True
     return workbook
+
+
+def sort_housing_companies_by_state(
+    housing_companies: list[HousingCompanyWithStateReportAnnotations],
+) -> dict[ReportState, HousingCompanyStatesCount]:
+    states: dict[ReportState, HousingCompanyStatesCount] = {
+        name: HousingCompanyStatesCount(
+            housing_company_count=0,
+            apartment_count=0,
+        )
+        for name in ReportState
+    }
+
+    for housing_company in housing_companies:
+        if housing_company.hitas_type == HitasType.HALF_HITAS:
+            states[ReportState.HALF_HITAS]["housing_company_count"] += 1
+            states[ReportState.HALF_HITAS]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.completion_date is None:
+            states[ReportState.NOT_READY]["housing_company_count"] += 1
+            states[ReportState.NOT_READY]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.REGULATED:
+            states[ReportState.REGULATED]["housing_company_count"] += 1
+            states[ReportState.REGULATED]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS:
+            states[ReportState.RELEASED_BY_HITAS]["housing_company_count"] += 1
+            states[ReportState.RELEASED_BY_HITAS]["apartment_count"] += housing_company.apartment_count
+
+        elif housing_company.regulation_status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT:
+            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["housing_company_count"] += 1
+            states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["apartment_count"] += housing_company.apartment_count
+
+    return states
