@@ -4,7 +4,7 @@ from decimal import Decimal
 from enum import Enum
 from functools import cache
 from statistics import mean
-from typing import Any, Callable, Iterable, NamedTuple, TypedDict, TypeVar
+from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar
 
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
@@ -21,6 +21,11 @@ from hitas.models.housing_company import (
     RegulationStatus,
 )
 from hitas.utils import format_sheet, resize_columns
+
+T = TypeVar("T")
+CostAreaT: TypeAlias = Literal[1, 2, 3, 4]
+PostalCodeT: TypeAlias = str  # e.g. '00100'
+RoomLabelT: TypeAlias = Literal["1h", "2h", "3h+"]
 
 
 class SalesReportColumns(NamedTuple):
@@ -63,9 +68,6 @@ class HousingCompanyStatesReportColumns(NamedTuple):
     apartment_count: int | str
 
 
-T = TypeVar("T")
-
-
 class SalesReportSummaryDefinition(NamedTuple):
     func: Callable[[Iterable[T]], T]
     title: str = ""
@@ -78,6 +80,42 @@ class ReportState(str, Enum):
     RELEASED_BY_HITAS = "Sääntelystä vapautuneet"
     RELEASED_BY_PLOT_DEPARTMENT = "Vapautuneet tontit-yksikön päätöksellä"
     HALF_HITAS = "Puoli-Hitas yhtiöt"
+
+
+class SalesInfo(TypedDict):
+    sales_count: int
+    sum: Decimal
+    minimum: Decimal
+    maximum: Decimal
+
+
+SalesInfoByRoomCount = TypedDict(
+    "SalesInfoByRoomCount",
+    {
+        "1h": SalesInfo,
+        "2h": SalesInfo,
+        "3h+": SalesInfo,
+    },
+    total=False,
+)
+
+
+class SalesByCostAreaColumns(NamedTuple):
+    cost_area: CostAreaT | str
+    postal_code: PostalCodeT | str
+    room_label: RoomLabelT | str
+    sales_count: int | str
+    average_price_per_square_meter: Decimal | str
+    minimum_price_per_square_meter: Decimal | str
+    maximum_price_per_square_meter: Decimal | str
+
+
+class SalesByCostArea(NamedTuple):
+    sales_by_cost_area: dict[CostAreaT, dict[PostalCodeT, SalesInfoByRoomCount]]
+    overall_count: int
+    overall_average: Decimal
+    overall_minimum: Decimal
+    overall_maximum: Decimal
 
 
 def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
@@ -516,3 +554,147 @@ def sort_housing_companies_by_state(
             states[ReportState.RELEASED_BY_PLOT_DEPARTMENT]["apartment_count"] += housing_company.apartment_count
 
     return states
+
+
+def build_sales_by_postal_code_and_area_report_excel(sales: list[ApartmentSale]) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = SalesByCostAreaColumns(
+        cost_area="Kalleusalue",
+        postal_code="Postinumero",
+        room_label="Huoneluku",
+        sales_count="Kauppojen lukumäärä",
+        average_price_per_square_meter="Keskineliöhinta",
+        minimum_price_per_square_meter="Alin neliöhinta",
+        maximum_price_per_square_meter="Ylin neliöhinta",
+    )
+    worksheet.append(column_headers)
+
+    results = sort_sales_by_cost_area(sales)
+
+    for cost_area, sales_info_by_room_label_by_postal_code in results.sales_by_cost_area.items():
+        for postal_code, sales_info_by_room_label in sales_info_by_room_label_by_postal_code.items():
+            for room_label, sales_info in sales_info_by_room_label.items():
+                worksheet.append(
+                    SalesByCostAreaColumns(
+                        cost_area=cost_area,
+                        postal_code=postal_code,
+                        room_label=room_label,
+                        sales_count=sales_info["sales_count"],
+                        average_price_per_square_meter=sales_info["sum"] / sales_info["sales_count"],
+                        minimum_price_per_square_meter=sales_info["minimum"],
+                        maximum_price_per_square_meter=sales_info["maximum"],
+                    )
+                )
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    empty_row = SalesByCostAreaColumns(
+        cost_area="",
+        postal_code="",
+        room_label="",
+        sales_count="",
+        average_price_per_square_meter="",
+        minimum_price_per_square_meter="",
+        maximum_price_per_square_meter="",
+    )
+
+    # There needs to be an empty row for sorting and filtering to work properly
+    worksheet.append(empty_row)
+
+    # Add summary rows
+    worksheet.append(
+        SalesByCostAreaColumns(
+            cost_area="",
+            postal_code="",
+            room_label="Koko Helsingin alue",
+            sales_count=results.overall_count,
+            average_price_per_square_meter=results.overall_average,
+            minimum_price_per_square_meter=results.overall_minimum,
+            maximum_price_per_square_meter=results.overall_maximum,
+        )
+    )
+
+    euro_per_square_meter_format = "#,##0.00\\ \\€\\/\\m²"
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            "B": {"alignment": Alignment(horizontal="right")},
+            "C": {"alignment": Alignment(horizontal="right")},
+            "E": {"number_format": euro_per_square_meter_format},
+            "F": {"number_format": euro_per_square_meter_format},
+            "G": {"number_format": euro_per_square_meter_format},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook
+
+
+def sort_sales_by_cost_area(sales: list[ApartmentSale]) -> SalesByCostArea:
+    sales_by_cost_area: dict[CostAreaT, dict[PostalCodeT, SalesInfoByRoomCount]] = {}
+    rooms_to_label = {1: "1h", 2: "2h"}  # >=3 not found -> sorted to 3h+
+    overall_count = 0
+    overall_average = Decimal("0")
+    overall_minimum = Decimal("inf")
+    overall_maximum = Decimal("-inf")
+    for sale in sales:
+        if not sale.apartment.surface_area:
+            raise ValidationError(
+                detail={
+                    api_settings.NON_FIELD_ERRORS_KEY: (
+                        f"Surface are zero or missing for apartment {sale.apartment.address!r}. "
+                        f"Cannot calculate price per square meter."
+                    )
+                },
+            )
+
+        cost_area: CostAreaT = sale.apartment.postal_code.cost_area  # type: ignore
+        postal_code: PostalCodeT = sale.apartment.postal_code.value
+        price_per_square_meter: Decimal = sale.total_price / sale.apartment.surface_area
+        room_label: RoomLabelT = rooms_to_label.get(sale.apartment.rooms, "3h+")
+
+        sales_by_cost_area.setdefault(cost_area, {})
+        sales_by_cost_area[cost_area].setdefault(postal_code, {})
+        sales_by_cost_area[cost_area][postal_code].setdefault(
+            room_label,
+            SalesInfo(
+                sales_count=0,
+                sum=Decimal("0"),
+                minimum=Decimal("inf"),
+                maximum=Decimal("-inf"),
+            ),
+        )
+
+        sales_by_cost_area[cost_area][postal_code][room_label]["sales_count"] += 1
+        sales_by_cost_area[cost_area][postal_code][room_label]["sum"] += price_per_square_meter
+        if price_per_square_meter < sales_by_cost_area[cost_area][postal_code][room_label]["minimum"]:
+            sales_by_cost_area[cost_area][postal_code][room_label]["minimum"] = price_per_square_meter
+        if price_per_square_meter > sales_by_cost_area[cost_area][postal_code][room_label]["maximum"]:
+            sales_by_cost_area[cost_area][postal_code][room_label]["maximum"] = price_per_square_meter
+
+        overall_count += 1
+        overall_average += price_per_square_meter
+        if price_per_square_meter < overall_minimum:
+            overall_minimum = price_per_square_meter
+        if price_per_square_meter > overall_maximum:
+            overall_maximum = price_per_square_meter
+
+    overall_average /= overall_count
+
+    return SalesByCostArea(
+        sales_by_cost_area=sales_by_cost_area,
+        overall_count=overall_count,
+        overall_average=overall_average,
+        overall_minimum=overall_minimum,
+        overall_maximum=overall_maximum,
+    )

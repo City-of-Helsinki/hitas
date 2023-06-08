@@ -24,6 +24,7 @@ from hitas.views.reports import (
     HousingCompanyStatesJSONReportView,
     HousingCompanyStatesReportView,
     RegulateHousingCompaniesReportView,
+    SalesByPostalCodeAndAreaReportView,
     SalesReportView,
     UnregulatedHousingCompaniesReportView,
 )

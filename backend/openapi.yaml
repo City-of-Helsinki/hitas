@@ -3927,6 +3927,42 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/download-sales-by-postal-code-and-area-report:
+    get:
+      description: Download hitas sales by area and postal code on a defined interval as an Excel report
+      operationId: fetch-sales-by-postal-code-and-area-report-excel
+      tags:
+        - Reports
+      parameters:
+        - name: start_date
+          required: true
+          in: query
+          description: Start date for the sales report
+          schema:
+            type: string
+            example: 2022-02-01
+        - name: end_date
+          required: true
+          in: query
+          description: End date for the sales report
+          schema:
+            type: string
+            example: 2023-02-01
+      responses:
+        '200':
+          description: Successfully downloaded a sales report by area and postal code
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
