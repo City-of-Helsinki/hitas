@@ -7,6 +7,9 @@ info:
   version: 1.0.0
   description: API definitions for Hitas Helsinki project.
 paths:
+
+  # Housing companies
+
   /api/v1/housing-companies:
     get:
       description: Fetch housing companies
@@ -271,6 +274,42 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/housing-companies/{housing_company_id}/batch-complete-apartments:
+    patch:
+      description: Mark multiple apartments in this housing company as completed
+      operationId: partial-update-batch-complete-apartments
+      tags:
+        - Housing companies
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/BatchCompleteDetails'
+      responses:
+        '200':
+          description: Successfully read a housing company details
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/BatchCompleteResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -4648,6 +4687,50 @@ components:
                     example: 13359.75
                   completion_date:
                     $ref: '#/components/schemas/YearMonth'
+
+    BatchCompleteDetails:
+      description: Results from housing company apartment batch completion endpoint
+      type: object
+      additionalProperties: false
+      required:
+        - completion_date
+        - apartment_number_start
+        - apartment_number_end
+      properties:
+        completion_date:
+          description: Completion date for all the apartments. If null, mark apartments as not completed.
+          type: string
+          nullable: true
+          format: date
+          example: 2022-01-01
+        apartment_number_start:
+          description: |-
+            Mark apartments as completed starting from this apartment number.
+            If 'apartment_number_end' is null, and this is given, mark all apartments starting from this apartment as completed.
+            If this and 'apartment_number_end' are null, mark all apartments as completed.
+          type: integer
+          nullable: true
+          example: 1
+        apartment_number_end:
+          description: |-
+            Mark apartment as completed ending at this apartment number.
+            If 'apartment_number_start' is null, and this is given, mark all apartments until this apartment as completed.
+            If this and 'apartment_number_start' are null, mark all apartments as completed.
+          type: integer
+          nullable: true
+          example: 10
+
+    BatchCompleteResult:
+      description: Results from housing company apartment batch completion endpoint
+      type: object
+      additionalProperties: false
+      required:
+        - completed_apartment_count
+      properties:
+        completed_apartment_count:
+          description: How many apartments were marked as completed?
+          type: integer
+          example: 12
 
     RealEstate:
       description: Single real estate
