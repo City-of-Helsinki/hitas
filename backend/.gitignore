@@ -1,2 +1,6 @@
+static
 /oracle-data
+.pytest_cache
+.ruff_cache
 **.xlsx
+!**/*.po

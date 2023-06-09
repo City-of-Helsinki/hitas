@@ -1,0 +1,373 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-15 11:33+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: config/settings.py:196
+msgid "Finnish"
+msgstr "Suomi"
+
+#: config/settings.py:197
+msgid "English"
+msgstr "Englanti"
+
+#: hitas/migrations/0001_initial.py:37
+msgid "Not Ready"
+msgstr "Ei valmis"
+
+#: hitas/migrations/0001_initial.py:38
+msgid "Less than 30 years"
+msgstr "Alle 30 vuotta"
+
+#: hitas/migrations/0001_initial.py:39
+msgid "Greater than 30 years, not free"
+msgstr "Yli 30 vuotta, ei vapaa"
+
+#: hitas/migrations/0001_initial.py:40
+msgid "Greater than 30 years, free"
+msgstr "Yli 30 vuotta, vapaa"
+
+#: hitas/migrations/0001_initial.py:41
+msgid "Greater than 30 years, plot department notification"
+msgstr "Yli 30 vuotta, tontityksikön ilmoitus"
+
+#: hitas/migrations/0001_initial.py:42
+msgid "Half hitas"
+msgstr "Puolihitas"
+
+#: hitas/migrations/0001_initial.py:43
+msgid "Ready, no statistics"
+msgstr "Valmis, ei tilastoihin"
+
+#: hitas/migrations/0001_initial.py:52
+msgid "Free"
+msgstr "Vapaa"
+
+#: hitas/migrations/0001_initial.py:53
+msgid "Reserved"
+msgstr "Varattu"
+
+#: hitas/migrations/0001_initial.py:54
+msgid "Sold"
+msgstr "Myyty"
+
+#: hitas/models/apartment.py:309
+msgid "Apartment"
+msgstr "Asunto"
+
+#: hitas/models/apartment.py:310
+msgid "Apartments"
+msgstr "Asunnot"
+
+#: hitas/models/apartment.py:440
+msgid "Apartment maximum price calculation"
+msgstr "Asunnon enimmäishintalaskelma"
+
+#: hitas/models/apartment.py:441
+msgid "Apartment maximum price calculations"
+msgstr "Asunnon enimmäishintalaskelmat"
+
+#: hitas/models/apartment_sale.py:43
+msgid "Apartment sale"
+msgstr "Asunnon kauppatapahtuma"
+
+#: hitas/models/apartment_sale.py:44
+msgid "Apartment sales"
+msgstr "Asunnon kauppatapahtumat"
+
+#: hitas/models/building.py:27
+msgid "Format: 100012345A or 91-17-16-1 S 001"
+msgstr "Muoto: 100012345A tai 91-17-16-1 S 001"
+
+#: hitas/models/building.py:39
+msgid "Building"
+msgstr "Rakennus"
+
+#: hitas/models/building.py:40
+msgid "Buildings"
+msgstr "Rakennukset"
+
+#: hitas/models/codes.py:36
+msgid "Building type"
+msgstr "Rakennuksen tyyppi"
+
+#: hitas/models/codes.py:37
+msgid "Building types"
+msgstr "Rakennuksen tyypit"
+
+#: hitas/models/codes.py:43
+msgid "Developer"
+msgstr "Rakennuttaja"
+
+#: hitas/models/codes.py:44
+msgid "Developers"
+msgstr "Rakennuttajat"
+
+#: hitas/models/codes.py:50
+msgid "Apartment type"
+msgstr "Asunnon tyyppi"
+
+#: hitas/models/codes.py:51
+msgid "Apartment types"
+msgstr "Asunnon tyypit"
+
+#: hitas/models/condition_of_sale.py:19
+msgid "Not given"
+msgstr "Ei myönnetty"
+
+#: hitas/models/condition_of_sale.py:20
+msgid "Three months"
+msgstr "Kolme kuukautta"
+
+#: hitas/models/condition_of_sale.py:21
+msgid "Six months"
+msgstr "Kuusi kuukautta"
+
+#: hitas/models/condition_of_sale.py:41
+msgid "Condition of Sale"
+msgstr "Myyntiehto"
+
+#: hitas/models/condition_of_sale.py:42
+msgid "Conditions of Sale"
+msgstr "Myyntiehdot"
+
+#: hitas/models/external_sales_data.py:44
+msgid "External sales data"
+msgstr "Tilastokeskuksen asuntokauppatilasto"
+
+#: hitas/models/external_sales_data.py:45
+msgid "External sales datas"
+msgstr "Tilastokeskuksen asuntokauppatilastot"
+
+#: hitas/models/housing_company.py:47
+msgid "Ei Hitas"
+msgstr "Ei Hitas"
+
+#: hitas/models/housing_company.py:48
+msgid "Hitas I"
+msgstr "Hitas I"
+
+#: hitas/models/housing_company.py:49
+msgid "Hitas II"
+msgstr "Hitas II"
+
+#: hitas/models/housing_company.py:50
+msgid "Hitas I, Ei korkoja"
+msgstr "Hitas I, Ei korkoja"
+
+#: hitas/models/housing_company.py:51
+msgid "Hitas II, Ei korkoja"
+msgstr "Hitas II, Ei korkoja"
+
+#: hitas/models/housing_company.py:52
+msgid "Uusi Hitas I"
+msgstr "Uusi Hitas I"
+
+#: hitas/models/housing_company.py:53
+msgid "Uusi Hitas II"
+msgstr "Uusi Hitas II"
+
+#: hitas/models/housing_company.py:54
+msgid "Puolihitas"
+msgstr "Puolihitas"
+
+#: hitas/models/housing_company.py:55
+msgid "Vuokratalo Hitas I"
+msgstr "Vuokratalo Hitas I"
+
+#: hitas/models/housing_company.py:56
+msgid "Vuokratalo Hitas II"
+msgstr "Vuoakratalo Hitas II"
+
+#: hitas/models/housing_company.py:110
+msgid "Regulated"
+msgstr "Sääntelyn piirissä"
+
+#: hitas/models/housing_company.py:111
+msgid "Released by Hitas"
+msgstr "Vapautettu sääntelystä"
+
+#: hitas/models/housing_company.py:112
+msgid "Released by Plot Department"
+msgstr "Vapautettu sääntelystä tontityksikön päätöksellä"
+
+#: hitas/models/housing_company.py:129
+msgid "Format: 1234567-1"
+msgstr "Muoto: 1234567-1"
+
+#: hitas/models/housing_company.py:239
+msgid "Housing company"
+msgstr "Taloyhtiö"
+
+#: hitas/models/housing_company.py:240
+msgid "Housing companies"
+msgstr "Taloyhtiöt"
+
+#: hitas/models/indices.py:24
+msgid "Maximum price index"
+msgstr "Enimmäishintaindeksi"
+
+#: hitas/models/indices.py:25
+msgid "Maximum price indices"
+msgstr "Enimmäishintaindeksit"
+
+#: hitas/models/indices.py:34
+msgid "Market price index for apartments constructed before January 2011"
+msgstr "Markkinahintaindeksi asunnoille, jotka on rakennettu ennen tammikuuta 2011"
+
+#: hitas/models/indices.py:35
+msgid "Market price indices for apartment constructed before January 2011"
+msgstr "Markkinahintaindeksit asunnoille, jotka on rakennettu ennen tammikuuta 2011"
+
+#: hitas/models/indices.py:43
+msgid "Market price index for apartments constructed in January 2011 onwards"
+msgstr "Markkinahintaindeksi asunnoille, jotka on rakennettu tammikuusta 2011 alkaen"
+
+#: hitas/models/indices.py:44
+msgid "Market price indices for apartment constructed in January 2011 onwards"
+msgstr "Markkinahintaindeksit asunnoille, jotka on rakennettu tammikuusta 2011 alkaen"
+
+#: hitas/models/indices.py:53
+msgid "Construction price index for apartments constructed before January 2011"
+msgstr "Rakenuskustannusindeksi asunnoille, jotka on rakennettu ennen tammikuuta 2011"
+
+#: hitas/models/indices.py:54
+msgid ""
+"Construction price indices for apartments constructed before January 2011"
+msgstr "Rakenuskustannusindeksit asunnoille, jotka on rakennettu ennen tammikuuta 2011"
+
+#: hitas/models/indices.py:62
+msgid ""
+"Construction price index year for apartments constructed in January 2005 "
+"onwards"
+msgstr "Rakenuskustannusindeksi asunnoille, jotka on rakennettu tammikuusta 2005 alkaen"
+
+#: hitas/models/indices.py:63
+msgid ""
+"Construction price indices for apartments constructed in January 2005 onwards"
+msgstr "Rakenuskustannusindeksit asunnoille, jotka on rakennettu tammikuusta 2005 alkaen"
+
+#: hitas/models/indices.py:72 hitas/models/indices.py:73
+msgid "Surface area price ceiling"
+msgstr "Rajaneliöhinta"
+
+#: hitas/models/indices.py:102 hitas/models/indices.py:103
+msgid "Surface area price ceiling calculation data"
+msgstr "Rajaneliöhinnan laskentatiedot"
+
+#: hitas/models/job_performance.py:29
+msgid "Job performance"
+msgstr "Suorite"
+
+#: hitas/models/job_performance.py:30
+msgid "Job performances"
+msgstr "Suoritteet"
+
+#: hitas/models/owner.py:87
+msgid "Owner"
+msgstr "Omistaja"
+
+#: hitas/models/owner.py:88
+msgid "Owners"
+msgstr "Omistajat"
+
+#: hitas/models/ownership.py:50
+msgid "Ownership"
+msgstr "Omistus"
+
+#: hitas/models/ownership.py:51
+msgid "Ownerships"
+msgstr "Omistukset"
+
+#: hitas/models/postal_code.py:16
+msgid "Postal code"
+msgstr "Postinumero"
+
+#: hitas/models/postal_code.py:17
+msgid "Postal codes"
+msgstr "Postinumerot"
+
+#: hitas/models/property_manager.py:17
+msgid "Property manager"
+msgstr "Isännöitsijä"
+
+#: hitas/models/property_manager.py:18
+msgid "Property managers"
+msgstr "Isännöitsijät"
+
+#: hitas/models/real_estate.py:25
+msgid "Format: 1234-1234-1234-1234"
+msgstr "Muoto: 1234-1234-1234-1234"
+
+#: hitas/models/real_estate.py:41
+msgid "Real estate"
+msgstr "Kiinteistö"
+
+#: hitas/models/real_estate.py:42
+msgid "Real estates"
+msgstr "Kiiinteistöt"
+
+#: hitas/models/thirty_year_regulation.py:58
+msgid "Thirty Year Regulation Results Row"
+msgstr "30v vertailun tulos rivi"
+
+#: hitas/models/thirty_year_regulation.py:59
+msgid "Thirty Year Regulation Results Rows"
+msgstr "30v vertailun tulos rivit"
+
+#: hitas/models/thirty_year_regulation.py:95
+#: hitas/models/thirty_year_regulation.py:96
+msgid "Thirty Year Regulation Results"
+msgstr "30v vertailun tulokset"
+
+#: hitas/models/utils.py:25
+#, python-format
+msgid "%(value)s is not an valid property id"
+msgstr "%(value)s ei ole kelvollinen kiinteistön id"
+
+#: hitas/models/utils.py:89
+#, python-format
+msgid "%(value)s is not a valid building id"
+msgstr "%(value)s ei ole kelvollinen rakennuksen id"
+
+#: hitas/oracle_migration/utils.py:84
+msgid "not_ready"
+msgstr "not_ready"
+
+#: hitas/oracle_migration/utils.py:85
+msgid "active"
+msgstr "active"
+
+#: hitas/oracle_migration/utils.py:86
+msgid "cancelled"
+msgstr "cancelled"
+
+#: hitas/oracle_migration/utils.py:87
+msgid "complete"
+msgstr "complete"
+
+#: hitas/oracle_migration/utils.py:88
+msgid "relative_sale"
+msgstr "relative_sale"
+
+#: users/models.py:20
+msgid "User"
+msgstr "Käyttäjä"
+
+#: users/models.py:21
+msgid "Users"
+msgstr "Käyttäjät"
