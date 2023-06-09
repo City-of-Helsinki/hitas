@@ -1,114 +1,92 @@
 FROM python:3.10-slim-bullseye AS base
 
-#
-# Set python defaults
-#
-ENV PYTHONUNBUFFERED 1 \
-    PYTHONFAULTHANDLER 1 \
+# Setup environment variables.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random
 
-#
-# Create user and directory for hitas
-#
-RUN mkdir /hitas && \
-    addgroup --gid 1000 hitas && \
-    adduser --disabled-login --ingroup hitas --no-create-home --home /nonexistent --gecos "hitas user" --shell /bin/false --uid 1000 hitas && \
-    chown hitas:hitas /hitas
+# Setup directory, group, and user - then install common dependencies.
+RUN mkdir -p /hitas/backend \
+    && addgroup \
+      --gid 1000 hitas \
+    && adduser \
+      --disabled-login \
+      --ingroup hitas \
+      --no-create-home \
+      --home /nonexistent \
+      --gecos "hitas user" \
+      --shell /bin/false \
+      --uid 1000 hitas \
+    && chown hitas:hitas /hitas \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+      libpq5 \
+      gettext \
+      mime-support \
+      libpcre3 \
+      libpcre3-dev \
+      postgresql
 
-#
-# Install common depedencies
-#
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libpq5 \
-        gettext \
-        mime-support \
-        libpcre3 libpcre3-dev \
-        postgresql
-
-#
-# Build virtualenv
-#
 FROM base AS builder
 
-#
-# Install depedencies for building
-#
+# Setup environment variables for poetry.
+ENV POETRY_VERSION=1.3.1
+ENV POETRY_HOME=/usr/pypoetry
+ENV PATH=$POETRY_HOME/bin:$PATH
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+
+# Install build dependencies
 RUN apt-get install -y --no-install-recommends \
-        libpq-dev \
-        build-essential
+      curl \
+      libpq-dev \
+      build-essential
 
-#
-# Set defaults for pip and poetry
-#
-ENV POETRY_VERSION=1.3.1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+# Install poetry.
+RUN curl -sSL https://install.python-poetry.org | python -
 
-#
-# Poetry installation
-#
-RUN pip install "poetry==$POETRY_VERSION"
+# Copy poetry files.
+COPY poetry.lock pyproject.toml /
 
+# Create virtualenv.
+RUN python -m venv /hitas/venv
 
-#
-# Create virtualenv and install dependencies
-#
-USER hitas
-RUN python -m venv /hitas/venv && /hitas/venv/bin/pip install wheel
+# Activate virtualenv by setting some environment variables.
+ENV PATH=/hitas/venv/bin:$PATH
+ENV VIRTUAL_ENV=/hitas/venv
 
-RUN mkdir /hitas/build
-WORKDIR /hitas/build
-COPY --chown=hitas:hitas poetry.lock pyproject.toml ./
-RUN poetry export --without-hashes | /hitas/venv/bin/pip install -r /dev/stdin
+# Install production dependencies (to previously created virtualenv).
+RUN poetry install --no-root --only main
 
-#
-# Build image for django static content and translations
-#
 FROM base AS django-build-static
 
-# Copy virtualenv
-COPY --from=builder --chown=hitas:hitas /hitas/venv /hitas/venv
+# Copy virtualenv.
+COPY --chown=hitas:hitas --from=builder /hitas/venv /hitas/venv
 
-RUN mkdir -p /hitas/backend
-WORKDIR /hitas/backend
+# Activate virtualenv by setting some environment variables.
+ENV PATH=/hitas/venv/bin:$PATH
+ENV VIRTUAL_ENV=/hitas/venv
+ENV SECRET_KEY=xxx
 
-COPY manage.py ./
-COPY hitas ./hitas
-COPY config ./config
-COPY users ./users
+# Change working directory to project directory.
+WORKDIR /hitas/backend/
 
-RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py collectstatic --clear --no-input --verbosity=0
-RUN . /hitas/venv/bin/activate && SECRET_KEY=xxx ./manage.py compilemessages -l "fi"
+# Copy project files.
+COPY . .
 
-#
-# Build nginx image
-#
-FROM nginx:1.23-alpine AS nginx
+# Collect static files and compile translations
+RUN python manage.py collectstatic --clear --no-input --verbosity=2  \
+    && python manage.py compilemessages -l "fi"
 
-ADD nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=django-build-static --chown=nginx:nginx /hitas/backend/var/static /media/static
+FROM base AS production
 
-#
-# Build the backend image
-#
-FROM base
-
-# Copy virtualenv
-COPY --from=builder --chown=hitas:hitas /hitas/venv /hitas/venv
-
+# Switch to restricted user and working directory.
 USER hitas
-RUN mkdir -p /hitas/backend
-WORKDIR /hitas/backend
-COPY --chown=hitas:hitas docker-entrypoint.sh ./
+WORKDIR /hitas/backend/
+
+# Copy project files, virtualenv, static files, and translations.
+COPY --chown=hitas:hitas . .
+COPY --chown=hitas:hitas --from=builder /hitas/venv /hitas/venv
+COPY --chown=hitas:hitas --from=django-build-static /hitas/backend/static /hitas/backend/static
+
 ENTRYPOINT ["/hitas/backend/docker-entrypoint.sh"]
-
-COPY --chown=hitas:hitas manage.py uwsgi.ini ./
-COPY --chown=hitas:hitas hitas ./hitas
-COPY --chown=hitas:hitas config ./config
-COPY --from=django-build-static --chown=hitas:hitas /hitas/backend/config/locale ./config/
-COPY --chown=hitas:hitas templates ./templates
-COPY --chown=hitas:hitas users ./users
-COPY --chown=hitas:hitas initial.json ./
-
-EXPOSE 8888 8080

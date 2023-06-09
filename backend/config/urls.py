@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
+from django.views.static import serve
 from helusers import views
 
 from hitas.views.health import HealthCheckView
@@ -23,7 +24,6 @@ helusers_pattern = (
     ],
     "helusers",
 )
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("hitas.urls")),
@@ -31,6 +31,9 @@ urlpatterns = [
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include(helusers_pattern)),
     path("helauth/userinfo/", UserInfoView.as_view(), name="userinfo"),
+    # Static files can be served using django's built in static file server
+    # since they are only used to serve admin panel assets.
+    path(f"{settings.STATIC_URL.lstrip('/').rstrip('/')}/<path:path>", serve, {"document_root": settings.STATIC_ROOT}),
 ]
 
 if settings.DEBUG_TOOLBAR:

@@ -1,20 +1,16 @@
-import os
 import re
+from pathlib import Path
 
 import environ
 from dateutil.relativedelta import relativedelta
 from django.utils.log import DEFAULT_LOGGING
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy
 from helusers import defaults
 from rest_framework.authentication import TokenAuthentication
 
 # ----- ENV Setup --------------------------------------------------------------------------------------
 
-root = environ.Path(__file__) - 2
-assert os.path.exists(root("manage.py"))
-var_root = root("var")
-
-BASE_DIR = root()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def relativedelta_months(value: int) -> relativedelta:
@@ -26,9 +22,6 @@ env = environ.Env(
     SECRET_KEY=(str, None),
     ALLOWED_HOSTS=(list, []),
     DATABASE_URL=(str, "postgres:///hitas"),
-    VAR_ROOT=(str, var_root),
-    STATIC_URL=(str, "/static/"),
-    MEDIA_URL=(str, "/media/"),
     CORS_ALLOWED_ORIGINS=(list, []),
     UWSGI_WARMUP=(bool, True),
     DJANGO_LOG_LEVEL=(str, "INFO"),
@@ -48,7 +41,7 @@ env = environ.Env(
     SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, ["localhost:3000"]),
     ALLOWED_AD_GROUPS=(list, []),
 )
-env.read_env(os.path.join(BASE_DIR, ".env"))
+env.read_env(BASE_DIR / ".env")
 
 
 # ----- Basic settings  --------------------------------------------------------------------------------
@@ -56,11 +49,6 @@ env.read_env(os.path.join(BASE_DIR, ".env"))
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
-var_root = env.path("VAR_ROOT")
-STATIC_ROOT = var_root("static")
-MEDIA_ROOT = var_root("media")
-STATIC_URL = env("STATIC_URL")
-MEDIA_URL = env("MEDIA_URL")
 UWSGI_WARMUP = env("UWSGI_WARMUP")
 
 ROOT_URLCONF = "config.urls"
@@ -157,6 +145,11 @@ TEMPLATES = [
     },
 ]
 
+# ----- Static files -----------------------------------------------------------------------------------
+
+STATIC_ROOT = BASE_DIR / "static"
+STATIC_URL = "static/"
+
 # ----- Logging ----------------------------------------------------------------------------------------
 
 LOGGING = {
@@ -195,15 +188,17 @@ if env("SENTRY_DSN"):
 # ----- Internationalization ---------------------------------------------------------------------------
 
 LANGUAGE_CODE = "fi"
-LANGUAGES = [
-    ("fi", _("Finnish")),
-    ("en", _("English")),
-]
-LOCALE_PATHS = ["./templates/locale"]
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = False
 USE_L10N = True
 USE_TZ = True
+LANGUAGES = [
+    ("fi", gettext_lazy("Finnish")),
+    ("en", gettext_lazy("English")),
+]
+LOCALE_PATHS = [
+    BASE_DIR / "static" / "locale",
+]
 
 # ----- Django Rest Framework --------------------------------------------------------------------------
 

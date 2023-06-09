@@ -19,6 +19,8 @@ define helptext
  format                             Format code with pre-commit.
  dump                               Create a database dump with the current schema.
  hitasmigrate                       Migrate oracle database.
+ bash                               Enter bash in the backend container.
+ translate                          Make and complile translations.
 
 endef
 
@@ -38,18 +40,25 @@ docker-build-backend-only:
 	docker-compose up --detach hitas-backend
 
 tests:
-	./manage.py makemigrations --check --no-color --no-input --dry-run
+	poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
 	pytest --cov
 
 format:
-	pre-commit run --all-files
+	poetry run pre-commit run --all-files
 
 dump:
-	./manage.py dumpdata users authtoken hitas > initial.json
+	poetry run python manage.py dumpdata users authtoken hitas > initial.json
 	cat initial.json | jq '.|=sort_by(.model, .pk)' > initial-formatted.json
 	mv initial-formatted.json initial.json
 
 hitasmigrate:
-	./manage.py hitasmigrate --truncate
-	DJANGO_SUPERUSER_PASSWORD=hitas python manage.py createsuperuser --username hitas --email foo@example.com --no-input
-	./manage.py token --username hitas --set 52bf0606e0a0075c990fecc0afa555e5dae56404
+	poetry run python manage.py hitasmigrate --truncate
+	DJANGO_SUPERUSER_PASSWORD=hitas poetry run python manage.py createsuperuser --username hitas --email foo@example.com --no-input
+	poetry run python manage.py token --username hitas --set 52bf0606e0a0075c990fecc0afa555e5dae56404
+
+bash:
+	docker compose exec hitas-backend bash
+
+translate:
+	poetry run python manage.py makemessages -l "fi"
+	poetry run python manage.py compilemessages -l "fi"
