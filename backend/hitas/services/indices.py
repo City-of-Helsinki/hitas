@@ -48,6 +48,7 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
     housing_companies = get_completed_housing_companies(
         completion_month=calculation_month,
         include_excluded_from_statistics=True,
+        include_rental_hitas=False,
     )
 
     if not housing_companies:
