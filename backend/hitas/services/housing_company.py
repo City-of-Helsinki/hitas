@@ -12,7 +12,7 @@ from rest_framework.settings import api_settings
 from hitas.exceptions import MissingValues
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
-from hitas.models.housing_company import HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
+from hitas.models.housing_company import HitasType, HousingCompany, HousingCompanyWithAnnotations, RegulationStatus
 from hitas.models.indices import MarketPriceIndex, MarketPriceIndex2005Equal100
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRow
 from hitas.services.apartment import (
@@ -33,6 +33,7 @@ ApartmentAddressT: TypeAlias = str
 def get_completed_housing_companies(
     completion_month: datetime.date,
     include_excluded_from_statistics: bool = False,
+    include_rental_hitas: bool = True,
 ) -> list[HousingCompanyWithAnnotations]:
     """
     Get all housing companies completed before the given month (YYYY-MM-01) which are in the given states.
@@ -82,6 +83,11 @@ def get_completed_housing_companies(
 
     if not include_excluded_from_statistics:
         housing_company_queryset = housing_company_queryset.filter(exclude_from_statistics=False)
+
+    if not include_rental_hitas:
+        housing_company_queryset = housing_company_queryset.filter(
+            ~Q(hitas_type__in=[HitasType.RENTAL_HITAS_I, HitasType.RENTAL_HITAS_II]),
+        )
 
     housing_companies = list(housing_company_queryset)
     if not housing_companies:

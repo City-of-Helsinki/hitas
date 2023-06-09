@@ -234,6 +234,52 @@ def test__api__indices__create__surface_area_price_ceiling__wrong_status(api_cli
     }
 
 
+@pytest.mark.parametrize(
+    "hitas_type",
+    [HitasType.RENTAL_HITAS_I, HitasType.RENTAL_HITAS_II],
+)
+@pytest.mark.django_db
+def test__api__indices__create__surface_area_price_ceiling__dont_include_rental_hitas(
+    api_client: HitasAPIClient,
+    freezer,
+    hitas_type,
+):
+    day = datetime.datetime(2023, 2, 1)
+    freezer.move_to(day)
+
+    this_month = day.date()
+    completion_month = this_month - relativedelta(years=1)
+
+    # Create necessary indices
+    MarketPriceIndex2005Equal100Factory.create(month=completion_month, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=this_month, value=200)
+
+    # Sale in a finished housing company.
+    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    ApartmentSaleFactory.create(
+        purchase_date=completion_month,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=completion_month,
+        apartment__building__real_estate__housing_company__hitas_type=hitas_type,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    url = reverse("hitas:surface-area-price-ceiling-list")
+    data = {}
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing",
+        "message": "No regulated housing companies completed before '2023-02-01'.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
 @pytest.mark.django_db
 def test__api__indices__create__surface_area_price_ceiling__single(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
