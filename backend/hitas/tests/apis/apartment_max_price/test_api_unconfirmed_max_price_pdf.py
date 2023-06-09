@@ -84,7 +84,6 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
-        Helsingin kaupunki
         {apartment.address}
         {apartment.postal_code.value} HELSINKI
         HITAS-HUONEISTON ENIMMÄISHINTA
@@ -298,7 +297,6 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
-        Helsingin kaupunki
         {apartment.address}
         {apartment.postal_code.value} HELSINKI
         HITAS-HUONEISTON ENIMMÄISHINTA

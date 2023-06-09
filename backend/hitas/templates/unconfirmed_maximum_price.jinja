@@ -10,8 +10,6 @@
 {% endif %}
 
 {% block content %}
-    {% set address = "" %}
-    <h3>Helsingin kaupunki</h3>
     <h3>
         {{ apartment.address.street_address }} {{ apartment.address.stair }} {{ apartment.address.apartment_number }}
         <br>{{ apartment.address.postal_code }} {{ apartment.address.city|upper }}
