@@ -64,7 +64,7 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
                         {isHousingCompanyReleased ? "Vapautettu" : "Vapauta"}
                     </Button>
                 )}
-                {!isHousingCompanyReleased && (
+                {company.current_regulation_status !== "released_by_plot_department" && (
                     <Button
                         theme="black"
                         onClick={handleClickDownloadPDFButton}

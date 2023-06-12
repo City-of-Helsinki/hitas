@@ -8,20 +8,28 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
     const releasedFromRegulation = data?.released_from_regulation ?? [];
     const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];
     const stayingCompanies = data?.stays_regulated ?? [];
+    const manuallyReleasedCompanies = stayingCompanies.filter(
+        (company) => company.current_regulation_status !== "regulated"
+    );
+    const displayedStayingCompanies = stayingCompanies.filter(
+        (company) => company.current_regulation_status === "regulated"
+    );
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
     const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
 
     const ResultsList = ({category}) => {
-        const companies = category === "freed" ? releasedCompanies : stayingCompanies;
+        const companies = category === "freed" ? releasedCompanies : displayedStayingCompanies;
+        const hasManuallyReleasedCompanies = category === "freed" && manuallyReleasedCompanies.length > 0;
         return (
             <div className={`companies companies--${category}`}>
                 <Heading type="body">
-                    {category === "freed" ? "Valvonnasta vapautuvat " : "Valvonnan piiriin jäävät "}
+                    {category === "freed" ? "Valvonnasta vapautetut " : "Valvonnan piiriin jäävät "}
                     yhtiöt
                 </Heading>
                 <div className="list">
+                    {hasManuallyReleasedCompanies && <h3>Vertailussa vapautuneet yhtiöt</h3>}
                     {companies.length > 0 ? (
                         <div className="list-headers">
                             <div className="list-header name">Nimi ja osoite</div>
@@ -45,6 +53,21 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                             />
                         ))}
                     </ul>
+                    {hasManuallyReleasedCompanies && (
+                        <>
+                            <h3>Tontit-yksikön päätöksellä vapautetut yhtiöt</h3>
+                            <ul className="results-list">
+                                {manuallyReleasedCompanies.map((item, idx) => (
+                                    <ThirtyYearResultListItem
+                                        company={item}
+                                        calculationDate={calculationDate}
+                                        category={category}
+                                        key={idx}
+                                    />
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
             </div>
         );
@@ -99,7 +122,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                     <Dialog.Content>
                         Vertailun yhteydessä obfuskoidut omistajat:
                         <ul>
-                            {obfuscatedOwners.sort().map((owner, idx) => (
+                            {obfuscatedOwners.map((owner, idx) => (
                                 <li key={idx}>{owner.name}</li>
                             ))}
                         </ul>
