@@ -28,7 +28,7 @@ from hitas.services.apartment import get_first_sale_acquisition_price
 from hitas.services.audit_log import last_log
 from hitas.services.condition_of_sale import fulfill_conditions_of_sales_for_housing_companies
 from hitas.services.housing_company import get_regulation_release_date
-from hitas.utils import RoundWithPrecision, max_if_all_not_null
+from hitas.utils import RoundWithPrecision, max_date_if_all_not_null
 from hitas.views.codes import (
     ReadOnlyBuildingTypeSerializer,
     ReadOnlyDeveloperSerializer,
@@ -383,13 +383,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
     def get_list_queryset(self):
         return (
             HousingCompany.objects.select_related("postal_code")
-            .annotate(
-                date=max_if_all_not_null(
-                    ref="real_estates__buildings__apartments__completion_date",
-                    max=datetime.date.max,
-                    min=datetime.date.min,
-                )
-            )
+            .annotate(date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
             .order_by(F("date").desc(nulls_last=False))
         )
 
@@ -427,11 +421,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
             )
             .annotate(
-                date=max_if_all_not_null(
-                    ref="real_estates__buildings__apartments__completion_date",
-                    max=datetime.date.max,
-                    min=datetime.date.min,
-                ),
+                date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
                 sum_surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
                 sum_acquisition_price=Sum("_acquisition_price"),
                 avg_price_per_square_meter=RoundWithPrecision(

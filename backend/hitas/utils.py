@@ -2,6 +2,7 @@ import datetime
 import operator
 import re
 from decimal import ROUND_HALF_UP, Decimal
+from functools import partial
 from typing import Any, Iterable, Optional, overload
 from uuid import UUID
 
@@ -95,6 +96,9 @@ def max_if_all_not_null(ref: str, max: Any, min: Any) -> NullIf:
         ),
         min,
     )
+
+
+max_date_if_all_not_null = partial(max_if_all_not_null, max=datetime.date.max, min=datetime.date.min)
 
 
 def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:

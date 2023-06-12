@@ -29,7 +29,7 @@ from hitas.services.apartment import (
     get_first_sale_purchase_date,
 )
 from hitas.services.audit_log import last_modified
-from hitas.utils import RoundWithPrecision, max_if_all_not_null, roundup
+from hitas.utils import RoundWithPrecision, max_date_if_all_not_null, roundup
 
 logger = logging.getLogger()
 
@@ -66,11 +66,7 @@ def get_completed_housing_companies(
                 output_field=HitasModelDecimalField(),
             ),
             surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
-            completion_date=max_if_all_not_null(
-                ref="real_estates__buildings__apartments__completion_date",
-                max=datetime.date.max,
-                min=datetime.date.min,
-            ),
+            completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             completion_month=TruncMonth("completion_date"),
             avg_price_per_square_meter=(
                 F("realized_acquisition_price")
@@ -310,11 +306,7 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
             _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
         )
         .annotate(
-            completion_date=max_if_all_not_null(
-                ref="real_estates__buildings__apartments__completion_date",
-                max=datetime.date.max,
-                min=datetime.date.min,
-            ),
+            completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
             realized_acquisition_price=Sum("_acquisition_price"),
             avg_price_per_square_meter=RoundWithPrecision(
@@ -336,11 +328,7 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
         .prefetch_related("real_estates__buildings__apartments")
         .exclude(regulation_status=RegulationStatus.REGULATED)
         .annotate(
-            completion_date=max_if_all_not_null(
-                ref="real_estates__buildings__apartments__completion_date",
-                max=datetime.date.max,
-                min=datetime.date.min,
-            ),
+            completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             apartment_count=Count("real_estates__buildings__apartments"),
             _release_date=get_regulation_release_date("id"),
         )
@@ -351,11 +339,7 @@ def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWit
 def find_housing_companies_for_state_reporting() -> list[HousingCompanyWithStateReportAnnotations]:
     return list(
         HousingCompany.objects.annotate(
-            completion_date=max_if_all_not_null(
-                ref="real_estates__buildings__apartments__completion_date",
-                max=datetime.date.max,
-                min=datetime.date.min,
-            ),
+            completion_date=max_date_if_all_not_null(ref="real_estates__buildings__apartments__completion_date"),
             apartment_count=Count("real_estates__buildings__apartments"),
         )
     )
