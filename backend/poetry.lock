@@ -658,14 +658,14 @@ files = [
 
 [[package]]
 name = "django-environ"
-version = "0.9.0"
+version = "0.10.0"
 description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
 category = "main"
 optional = false
-python-versions = ">=3.4,<4"
+python-versions = ">=3.5,<4"
 files = [
-    {file = "django-environ-0.9.0.tar.gz", hash = "sha256:bff5381533056328c9ac02f71790bd5bf1cea81b1beeb648f28b81c9e83e0a21"},
-    {file = "django_environ-0.9.0-py2.py3-none-any.whl", hash = "sha256:f21a5ef8cc603da1870bbf9a09b7e5577ab5f6da451b843dbcc721a7bca6b3d9"},
+    {file = "django-environ-0.10.0.tar.gz", hash = "sha256:b3559a91439c9d774a9e0c1ced872364772c612cdf6dc919506a2b13f7a77225"},
+    {file = "django_environ-0.10.0-py2.py3-none-any.whl", hash = "sha256:510f8c9c1d0a38b0815f91504270c29440a0cf44fab07f55942fa8d31bbb9be6"},
 ]
 
 [package.extras]
@@ -675,14 +675,14 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
 name = "django-filter"
-version = "22.1"
+version = "23.2"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "django-filter-22.1.tar.gz", hash = "sha256:ed473b76e84f7e83b2511bb2050c3efb36d135207d0128dfe3ae4b36e3594ba5"},
-    {file = "django_filter-22.1-py3-none-any.whl", hash = "sha256:ed429e34760127e3520a67f415bec4c905d4649fbe45d0d6da37e6ff5e0287eb"},
+    {file = "django-filter-23.2.tar.gz", hash = "sha256:2fe15f78108475eda525692813205fa6f9e8c1caf1ae65daa5862d403c6dbf00"},
+    {file = "django_filter-23.2-py3-none-any.whl", hash = "sha256:d12d8e0fc6d3eb26641e553e5d53b191eb8cec611427d4bdce0becb1f7c172b5"},
 ]
 
 [package.dependencies]
@@ -709,20 +709,20 @@ test = ["celery", "pytest", "pytest-cov", "pytest-django", "redis"]
 
 [[package]]
 name = "django-helusers"
-version = "0.7.1"
+version = "0.8.1"
 description = "Django app for the user infrastructure of the City of Helsinki"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-helusers-0.7.1.tar.gz", hash = "sha256:7c63ff403d3db5136fbc61dbb96db7858a74157c832953c1f9dd9032ffac7236"},
-    {file = "django_helusers-0.7.1-py3-none-any.whl", hash = "sha256:de84fde5449556622cb1364fd93bde6c58e6037aac64cc72880fccee564776bb"},
+    {file = "django-helusers-0.8.1.tar.gz", hash = "sha256:4b8a4566a1548405c03fc88fce971c04aef7210ac638a038d67c2ee52779e573"},
+    {file = "django_helusers-0.8.1-py3-none-any.whl", hash = "sha256:15f5747ab4dba992ec652f40c4c388fdb3d6c0ebeb3256d0346cd78d446175f2"},
 ]
 
 [package.dependencies]
 cachetools = ">=3.0.0"
 deprecation = ">=2"
-Django = ">=2.2,<4"
+Django = ">=3.0"
 python-jose = "*"
 requests = "*"
 
@@ -3174,4 +3174,4 @@ svglib = ">=1.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4455004be9d122e72cc0ed442b02d24fc87a5c7a47f706ba7b126f1735b4a19f"
+content-hash = "c5eb7350c189536ca20c0b1d581d06d0b70f7109e136db352c909cb1993fc85d"
