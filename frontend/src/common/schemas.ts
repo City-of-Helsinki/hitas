@@ -956,7 +956,7 @@ const PageInfoSchema = object({
 });
 
 const ErrorResponseSchema = object({
-    error: string().email(),
+    error: string(),
     status: number(),
     reason: string(),
     message: string(),
@@ -966,6 +966,15 @@ const ErrorResponseSchema = object({
     })
         .array()
         .optional(),
+    data: object({
+        status: number(),
+        data: object({
+            error: string(),
+            message: string(),
+            reason: string(),
+            status: number(),
+        }),
+    }).optional(),
 });
 
 // List responses
