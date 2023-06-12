@@ -49,6 +49,11 @@ router.register(
     views.ExternalSalesDataView,
     basename="external-sales-data",
 )
+router.register(
+    r"email-templates",
+    views.EmailTemplateViewSet,
+    basename="email-template",
+)
 
 # /api/v1/reports/download-sales-report
 router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")
