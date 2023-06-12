@@ -12,6 +12,7 @@ from hitas.tests.factories.codes import (
     DeveloperFactory,
 )
 from hitas.tests.factories.condition_of_sale import ConditionOfSaleFactory
+from hitas.tests.factories.email_template import EmailTemplateFactory
 from hitas.tests.factories.housing_company import (
     BuildingFactory,
     HousingCompanyConstructionPriceImprovementFactory,
