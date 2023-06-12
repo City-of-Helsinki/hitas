@@ -5,8 +5,8 @@
         "es2021": true
     },
     "extends": [
-        "react-app",
         "eslint:recommended",
+        "plugin:react/recommended",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "google",
@@ -29,6 +29,9 @@
         "require-jsdoc": 0,
         "max-len": [0, 120, 2],
         "object-curly-spacing": 0,
+        "react/react-in-jsx-scope": 0, // No need to import React in files
+        "react/no-unescaped-entities": 0, // Allow unescaped entities in JSX
+        "react/prop-types": 0, // No need to declare prop types
         "react/jsx-curly-brace-presence": ["error", {"props": "never", "children": "never"}],
         "react/self-closing-comp": ["error", {"component": true, "html": true}],
         "@typescript-eslint/naming-convention": [
