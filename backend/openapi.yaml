@@ -3963,6 +3963,176 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # Email templates
+
+  /api/v1/email-templates:
+    get:
+      description: Fetch all email templates
+      operationId: list-email-templates
+      tags:
+        - Email Templates
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of email templates
+          content:
+            application/json:
+              schema:
+                description: Single page of email templates
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of email templates
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmailTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new email template.
+      operationId: create-email-template
+      tags:
+        - Email Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/EmailTemplate'
+      responses:
+        '201':
+          description: Successfully added a new email template.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/EmailTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/email-templates/{email_template_id}:
+    get:
+      description: Fetch a single real estate by id
+      operationId: read-email-template
+      tags:
+        - Email Templates
+      parameters:
+        - name: email_template_id
+          required: true
+          in: path
+          description: Email template ID
+          schema:
+            type: string
+            example: 03240471596e4d8ca9eb6598f8f51486
+      responses:
+        '200':
+          description: Successfully read an email template.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/EmailTemplate'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update email template
+      operationId: update-email-template
+      tags:
+        - Email Templates
+      parameters:
+        - name: email_template_id
+          required: true
+          in: path
+          description: Email template ID
+          schema:
+            type: string
+            example: 03240471596e4d8ca9eb6598f8f51486
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/EmailTemplate'
+      responses:
+        '200':
+          description: Successfully updated an email template.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/EmailTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove email template
+      operationId: delete-email-template
+      tags:
+        - Email Templates
+      parameters:
+        - name: email_template_id
+          required: true
+          in: path
+          description: Email Template ID
+          schema:
+            type: string
+            example: 03240471596e4d8ca9eb6598f8f51486
+      responses:
+        '204':
+          description: Email template successfully removed.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
@@ -7997,6 +8167,31 @@ components:
           type: integer
           example: 2384
 
+    EmailTemplate:
+      description: Count of housing companies in a specific state
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - text
+      properties:
+        name:
+          description: |-
+            Name of this email template.
+
+            Can have the following values:
+              - "confirmed_max_price_calculation"
+              - "unconfirmed_max_price_calculation"
+          type: string
+          example: "confirmed_max_price_calculation"
+          x-extensible-enum:
+            - "confirmed_max_price_calculation"
+            - "unconfirmed_max_price_calculation"
+        text:
+          description: Email template text.
+          type: string
+          maxLength: 10000
+          example: Template text.
 
     # Errors
 
