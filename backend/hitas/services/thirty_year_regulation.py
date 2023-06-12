@@ -936,7 +936,7 @@ def convert_thirty_year_regulation_results_to_comparison_data(
                         postal_code=row.housing_company.property_manager.postal_code,
                         city=row.housing_company.property_manager.city,
                     ),
-                    last_modified=row.last_modified.date(),
+                    last_modified=row.last_modified.date() if row.last_modified else None,
                 ),
                 letter_fetched=row.letter_fetched,
                 current_regulation_status=row.housing_company.regulation_status.value,
