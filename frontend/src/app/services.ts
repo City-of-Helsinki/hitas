@@ -178,7 +178,7 @@ export const hitasApi = createApi({
         ...(!Config.token && {credentials: "include"}),
     }),
     tagTypes: ["HousingCompany", "Apartment", "Index", "Owner", "ExternalSaleData", "ThirtyYearRegulation"],
-    endpoints: (builder) => ({}),
+    endpoints: () => ({}),
 });
 
 // Mutations are used to allow invalidating cache when PDF is downloaded
@@ -228,7 +228,7 @@ const listApi = hitasApi.injectEndpoints({
                 url: "owners",
                 params: params,
             }),
-            providesTags: (result, error, arg) => [{type: "Owner"}],
+            providesTags: () => [{type: "Owner", id: "LIST"}],
         }),
         getPropertyManagers: builder.query<IApartmentListResponse, object>({
             query: (params: object) => ({
@@ -353,7 +353,7 @@ const mutationApi = hitasApi.injectEndpoints({
             IHousingCompanyDetails,
             {housingCompanyId: string; calculationDate: string}
         >({
-            query: ({housingCompanyId, calculationDate}) => ({
+            query: ({housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}`,
                 method: "PATCH",
                 body: {regulation_status: "released_by_plot_department"},
@@ -482,7 +482,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
+            invalidatesTags: () => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
         }),
         createSale: builder.mutation<
             IApartmentSaleCreated,

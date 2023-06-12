@@ -41,6 +41,7 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
     return (
         <form
             className="hitas-form hitas-form--owner"
+            // eslint-disable-next-line no-console
             onSubmit={formObject.handleSubmit(onValidSubmit, (errors) => console.log(errors))}
         >
             <TextInput

@@ -150,7 +150,7 @@ const ThirtyYearRegulation = () => {
                 },
             })
                 .unwrap()
-                .then((data) => {
+                .then(() => {
                     hdsToast.success("Vertailu suoritettu onnistuneesti!");
                 })
                 .catch((error) => {
