@@ -65,7 +65,11 @@ const Select = ({
                         onChange={handleChange}
                         invalid={invalid ?? !!errors[name]}
                     />
-                    {!!fieldError && <p className="text-input_hds-text-input__error-text">{fieldError.message}</p>}
+                    {!!fieldError && (
+                        <p className="text-input_hds-text-input__error-text">
+                            {(fieldError as {message: string}).message}
+                        </p>
+                    )}
                 </>
             )}
         </div>

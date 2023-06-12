@@ -9,7 +9,7 @@ import {
     IOwner,
 } from "./schemas";
 
-export function dotted(obj: object, path: string | string[], value?: number | string | null | object) {
+export function dotted(obj: object, path: string | string[], value?: number | string | null | object): unknown {
     /*
      Dotted getter and setter
      refs. https://stackoverflow.com/a/6394168/12730861

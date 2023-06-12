@@ -52,7 +52,7 @@ const NumberInput = ({
                 onChange={formNumber.onChange}
                 onBlur={formNumber.onBlur}
                 onWheel={handleWheel}
-                errorText={!!fieldError && fieldError.message}
+                errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={invalid ?? !!fieldError}
                 required={required}
                 {...rest}

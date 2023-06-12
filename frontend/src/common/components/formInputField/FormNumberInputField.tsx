@@ -3,7 +3,7 @@ import {NumberInput} from "hds-react";
 import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormNumberInputFieldProps extends Omit<CommonFormInputFieldProps, "value"> {
-    value: number;
+    value: number | "" | undefined;
     fractionDigits?: number;
     unit?: string;
 }
