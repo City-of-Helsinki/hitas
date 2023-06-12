@@ -5,18 +5,19 @@ import {FormInputProps} from "./";
 
 interface FormNumberInputProps extends FormInputProps {
     unit?: string;
-    fractionDigits?: number;
     field?: object;
+    fractionDigits?: number;
 }
 
 const NumberInput = ({
     name,
     label = "",
     unit,
-    fractionDigits = 0,
     required,
     invalid,
     formObject,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fractionDigits = 0, // TODO: Add support for this
     ...rest
 }: FormNumberInputProps) => {
     const {

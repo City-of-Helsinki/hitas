@@ -20,7 +20,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         // submit the form values
         saveOwner({data: data})
             .unwrap()
-            .then((payload) => {
+            .then(() => {
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
             })
@@ -89,7 +89,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
         runSaveOwner(ownerFormObject.getValues());
     };
 
-    const onFormSubmitInvalid = (errors) => {
+    const onFormSubmitInvalid = () => {
         if (isSaveWithWarning) {
             // submit with warning
             runSaveOwner(ownerFormObject.getValues());

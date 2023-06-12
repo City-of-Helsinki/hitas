@@ -14,7 +14,7 @@ export default function CancelButton({
     disabled = false,
     buttonText,
     size = "default",
-}: CancelButtonProps): JSX.Element {
+}: CancelButtonProps) {
     return (
         <Button
             className="cancel-button"
@@ -23,6 +23,7 @@ export default function CancelButton({
             isLoading={isLoading}
             size={size}
             onClick={onClick}
+            disabled={disabled}
         >
             {buttonText ?? "Peruuta"}
         </Button>

@@ -9,7 +9,6 @@ const FileInput = ({
     name,
     id = name,
     label = "",
-    invalid,
     required,
     formObject,
     onChange,

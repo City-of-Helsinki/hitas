@@ -60,7 +60,7 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
     );
 };
 
-const ActionFailed = ({error, setIsVisible}) => {
+const ActionFailed = ({error}) => {
     const errorStatus = error?.data?.status + ":" ?? "";
     const errorFields = error?.data?.fields ?? [];
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
@@ -128,12 +128,7 @@ export default function SaveDialogModal({
                 data={data}
                 error={error}
                 isLoading={isLoading}
-                errorComponent={
-                    <ActionFailed
-                        error={error}
-                        setIsVisible={setIsVisible}
-                    />
-                }
+                errorComponent={<ActionFailed error={error} />}
             >
                 <ActionSuccess
                     linkURL={linkURL}
