@@ -51,7 +51,7 @@ const RelatedModelTextInput = ({
             onKeyDown={(e) => handleKeyDown(e)}
             buttonIcon={isFieldClearable ? <IconCrossCircle /> : <IconSearch />}
             onButtonClick={isFieldClearable ? clearFieldValue : openModal}
-            errorText={!!fieldError && fieldError.message}
+            errorText={fieldError ? (fieldError as {message: string}).message : ""}
             invalid={!!fieldError}
         />
     );

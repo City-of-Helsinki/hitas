@@ -13,7 +13,7 @@ export interface CommonFormInputFieldProps {
     id: string;
     key: string;
     label: string;
-    value: string;
+    value;
     required?: boolean;
     setFieldValue: (value) => void;
     tooltipText?: string;
@@ -156,6 +156,7 @@ export default function FormInputField({
         return (
             <FormNumberInputField
                 {...commonProps}
+                value={value as number | "" | undefined}
                 unit={unit}
                 {...rest}
             />

@@ -20,7 +20,7 @@ const TextInput = ({name, id = name, label = "", required, invalid, formObject, 
                 onChange={formText.onChange}
                 onBlur={formText.onBlur}
                 ref={formText.ref}
-                errorText={!!fieldError && fieldError.message}
+                errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={invalid ?? !!fieldError}
                 required={required}
                 {...rest}

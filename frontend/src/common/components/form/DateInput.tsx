@@ -66,7 +66,7 @@ const DateInput = ({id, name, label, formObject, required, ...rest}: DateInputPr
                 onBlur={undefined} // formObject.onBlur will break date formatting
                 ref={formDate.ref}
                 value={getValue() ?? ""}
-                errorText={!!fieldError && fieldError.message}
+                errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={!!fieldError}
                 required={required}
                 {...rest}
