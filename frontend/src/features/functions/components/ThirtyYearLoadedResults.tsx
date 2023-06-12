@@ -99,8 +99,8 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                     <Dialog.Content>
                         Vertailun yhteydessä obfuskoidut omistajat:
                         <ul>
-                            {obfuscatedOwners.map((owner) => (
-                                <li key={owner.id}>{owner.name}</li>
+                            {obfuscatedOwners.sort().map((owner, idx) => (
+                                <li key={idx}>{owner.name}</li>
                             ))}
                         </ul>
                     </Dialog.Content>

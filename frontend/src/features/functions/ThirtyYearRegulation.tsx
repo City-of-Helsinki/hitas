@@ -133,15 +133,15 @@ const ThirtyYearRegulation = () => {
     const onCompareButtonClick = (data) => {
         // format eventual skipped data to match the API format
         const skippedArray: {postalCode: string; replacements: string[]}[] = [];
-        if (data.skipped) {
-            data.skipped.forEach((skipped) => {
+        if (data?.skipped) {
+            data?.skipped.forEach((skipped) => {
                 skippedArray.push({
                     postalCode: skipped.missingCode,
                     replacements: [skipped.postalCode1, skipped.postalCode2],
                 });
             });
         } else
-            makeRegulation({
+            return makeRegulation({
                 data: {
                     calculationDate: formDate,
                     replacementPostalCodes: skippedArray,
@@ -158,8 +158,7 @@ const ThirtyYearRegulation = () => {
                 });
     };
 
-    const hasRegulationResults =
-        (!isGetRegulationLoading && !getRegulationError && !!getRegulationData) || !!regulationData;
+    const hasRegulationResults = (!getRegulationError && !!getRegulationData) || !!regulationData;
     const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
 
     return (
@@ -238,7 +237,7 @@ const ThirtyYearRegulation = () => {
                         </div>
                         <ThirtyYearResults
                             hasResults={hasRegulationResults}
-                            hasData={hasExternalSalesData}
+                            hasExternalSalesData={hasExternalSalesData}
                             data={regulationData}
                             error={regulationError}
                             isLoading={isRegulationLoading}
