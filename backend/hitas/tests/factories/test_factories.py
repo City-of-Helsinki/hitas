@@ -22,6 +22,7 @@ from hitas.tests import factories
         factories.ApartmentSaleFactory,
         factories.ConditionOfSaleFactory,
         factories.EmailTemplateFactory,
+        factories.PDFBodyFactory,
     ],
 )
 def test__factory__simple_create(factory_class):

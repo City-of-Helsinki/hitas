@@ -21,6 +21,7 @@ from hitas.tests.factories.housing_company import (
     RealEstateFactory,
 )
 from hitas.tests.factories.owner import OwnerFactory, OwnershipFactory
+from hitas.tests.factories.pdf_body import PDFBodyFactory
 from hitas.tests.factories.postal_code import HitasPostalCodeFactory
 from hitas.tests.factories.property_manager import PropertyManagerFactory
 from hitas.tests.factories.user import UserFactory
