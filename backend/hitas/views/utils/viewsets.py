@@ -62,12 +62,16 @@ class HitasModelMixin:
 
     def get_object(self):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        if lookup_url_kwarg == "uuid":
-            self.kwargs[lookup_url_kwarg] = lookup_id_to_uuid(self.kwargs[lookup_url_kwarg], self.model_class)
+        self.kwargs[lookup_url_kwarg] = self.validate_lookup_id(lookup_url_kwarg)
         try:
             return super().get_object()
         except Http404 as error:
             raise HitasModelNotFound(model=self.model_class) from error
+
+    def validate_lookup_id(self, lookup_field: str):
+        if lookup_field == "uuid":
+            self.kwargs[lookup_field] = lookup_id_to_uuid(self.kwargs[lookup_field], self.model_class)
+        return self.kwargs[lookup_field]
 
     def get_serializer_class(self):
         if self.action == "list" and self.list_serializer_class is not None:

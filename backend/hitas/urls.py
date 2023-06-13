@@ -54,6 +54,11 @@ router.register(
     views.EmailTemplateViewSet,
     basename="email-template",
 )
+router.register(
+    r"pdf-bodies",
+    views.PDFBodyViewSet,
+    basename="pdf-body",
+)
 
 # /api/v1/reports/download-sales-report
 router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")

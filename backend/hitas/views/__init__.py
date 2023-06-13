@@ -18,6 +18,7 @@ from hitas.views.indices import (
     SurfaceAreaPriceCeilingViewSet,
 )
 from hitas.views.owner import DeObfuscatedOwnerView, OwnerViewSet
+from hitas.views.pdf_body import PDFBodyViewSet
 from hitas.views.postal_code import HitasPostalCodeViewSet
 from hitas.views.property_manager import PropertyManagerViewSet
 from hitas.views.real_estate import RealEstateViewSet
