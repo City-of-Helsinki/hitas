@@ -20,7 +20,7 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 
 from hitas.calculations.exceptions import IndexMissingException
-from hitas.exceptions import HitasModelNotFound
+from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -35,6 +35,7 @@ from hitas.models import (
     Ownership,
     SurfaceAreaPriceCeiling,
     JobPerformance,
+    PDFBody,
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
@@ -46,6 +47,7 @@ from hitas.models.apartment import (
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.job_performance import JobPerformanceSource
+from hitas.models.pdf_body import PDFBodyName
 from hitas.services.apartment import (
     get_first_sale_purchase_date,
     get_first_sale_loan_amount,
@@ -941,6 +943,13 @@ class ApartmentViewSet(HitasModelViewSet):
             raise IndexMissingException(error_code="sapc", date=this_month)
 
         sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month)
+        body_parts: Optional[list[str]] = (
+            PDFBody.objects.filter(name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION)
+            .values_list("texts", flat=True)
+            .first()
+        )
+        if body_parts is None:
+            raise ModelConflict("Missing body template", error_code="missing")
 
         filename = f"Hinta-arvio {apartment.address}.pdf"
         context = {
@@ -949,6 +958,7 @@ class ApartmentViewSet(HitasModelViewSet):
             "surface_area_price_ceiling": sapc.value,
             "old_hitas_ruleset": apartment.old_hitas_ruleset,
             "user": request.user,
+            "body_parts": body_parts,
         }
         pdf = get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
@@ -978,10 +988,19 @@ class ApartmentViewSet(HitasModelViewSet):
         if mpc is None:
             raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
 
+        body_parts: Optional[list[str]] = (
+            PDFBody.objects.filter(name=PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION)
+            .values_list("texts", flat=True)
+            .first()
+        )
+        if body_parts is None:
+            raise ModelConflict("Missing body template", error_code="missing")
+
         filename = f"Enimmäishintalaskelma {mpc.apartment.address}.pdf"
         context = {
             "maximum_price_calculation": mpc,
             "user": request.user,
+            "body_parts": body_parts,
         }
         pdf = get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
 

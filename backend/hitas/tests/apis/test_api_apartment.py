@@ -24,6 +24,7 @@ from hitas.models import (
 from hitas.models.apartment import ApartmentConstructionPriceImprovement
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import HitasType
+from hitas.models.pdf_body import PDFBodyName
 from hitas.tests.apis.helpers import HitasAPIClient, InvalidInput, parametrize_helper
 from hitas.tests.factories import (
     ApartmentConstructionPriceImprovementFactory,
@@ -36,6 +37,7 @@ from hitas.tests.factories import (
     HousingCompanyFactory,
     OwnerFactory,
     OwnershipFactory,
+    PDFBodyFactory,
     RealEstateFactory,
 )
 from hitas.tests.factories.apartment import ApartmentMaximumPriceCalculationFactory
@@ -849,6 +851,8 @@ def _test_max_prices(
         ),
         sales=[],
     )
+
+    PDFBodyFactory.create(name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION, texts=["||foo||", "||bar||", "||baz||"])
 
     if not null_values:
         ApartmentSaleFactory.create(apartment=ap, purchase_price=80000, apartment_share_of_housing_company_loans=15000)

@@ -15020,6 +15020,22 @@
     }
   },
   {
+    "model": "hitas.pdfbody",
+    "pk": 1,
+    "fields": {
+      "name": "confirmed_max_price_calculation",
+      "texts": "[\"Jos huoneiston osuus yhti\\u00f6n lainoista on muuttunut ilmoitetusta m\\u00e4\\u00e4r\\u00e4st\\u00e4, tulee kaupantekohetkell\\u00e4 huoneistolle kuuluva osuus ottaa huomioon siten, ettei enimm\\u00e4ishintalaskelmassa (liite 1) mainittu osakkeiden velaton hinta ylity.\\r\\n\\r\\nEnimm\\u00e4ishintalaskelman uudistuksen voi tilata puhelimitse. Rajahinta tarkistetaan ja markkinahintaindeksi julkaistaan nelj\\u00e4nnesvuosittain 1.2., 1.5., 1.8. ja 1. 11.\\r\\n\\r\\nKaupungilla on yhti\\u00f6j\\u00e4rjestykseen perustuva oikeus lunastaa huoneiston hallintaan oikeuttavat osakkeet kaupan tapahduttua. Hitas-asunto voidaan myyd\\u00e4 vain luonnolliselle henkil\\u00f6lle (ei yritykselle).\\r\\n\\r\\nEnimm\\u00e4ishintalaskelma on tulostettu Hitas-rekisterist\\u00e4 ja perustuu huoneiston ja yhti\\u00f6n tietoihin.\"]"
+    }
+  },
+  {
+    "model": "hitas.pdfbody",
+    "pk": 2,
+    "fields": {
+      "name": "unconfirmed_max_price_calculation",
+      "texts": "[\"Mik\\u00e4li tarvitsette huoneistonne vahvistetun enimm\\u00e4ishinnan, teid\\u00e4n tulee toimittaa is\\u00e4nn\\u00f6itsij\\u00e4ntodistus tai Hitas-enimm\\u00e4ishinnan vahvistamislomake. N\\u00e4iden tietojen perusteella vahvistetaan huoneistonne lopullinen enimm\\u00e4ishinta. Laskelma tulee huoneistoa myyt\\u00e4ess\\u00e4 esitt\\u00e4\\u00e4 ostajille.\", \"Teill\\u00e4 on mahdollisuus myyd\\u00e4 huoneistonne my\\u00f6s ilman enimm\\u00e4ishinnan vahvistamista enint\\u00e4\\u00e4n kaupantekoajankohtana voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyj\\u00e4n ja ostajan v\\u00e4lill\\u00e4 sopia vapaasti. \\r\\n\\r\\nMik\\u00e4li osakkeisiin kohdistuu yhti\\u00f6lainaosuutta, tulee sen osuus v\\u00e4hent\\u00e4\\u00e4 huoneiston velattomasta hinnasta kauppahintaa laskettaessa.\", \"Rajahintaa tarkistetaan nelj\\u00e4nnesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.\"]"
+    }
+  },
+  {
     "model": "hitas.conditionofsale",
     "pk": 1,
     "fields": {
