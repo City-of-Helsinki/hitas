@@ -1,4 +1,4 @@
-import {Dialog} from "hds-react";
+import {Button, Dialog} from "hds-react";
 import {useState} from "react";
 import {CloseButton, Heading} from "../../../common/components";
 import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./";
@@ -16,8 +16,20 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
     );
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
-    const [isModalOpen, setIsModalOpen] = useState(obfuscatedOwners.length > 0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
+
+    const ListHeaders = () => (
+        <div className="list-headers">
+            <div className="list-header name">Nimi ja osoite</div>
+            <div className="list-header date">Valmistumispäivä</div>
+            <div className="list-header property-manager">
+                Isännöitsijätiedot
+                <br />
+                päivitetty viimeksi
+            </div>
+        </div>
+    );
 
     const ResultsList = ({category}) => {
         const companies = category === "freed" ? releasedCompanies : displayedStayingCompanies;
@@ -27,32 +39,35 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                 <Heading type="body">
                     {category === "freed" ? "Valvonnasta vapautetut " : "Valvonnan piiriin jäävät "}
                     yhtiöt
+                    {category === "freed" && obfuscatedOwners.length > 0 && (
+                        <Button
+                            theme="black"
+                            variant="secondary"
+                            size="small"
+                            onClick={() => setIsModalOpen((prev) => !prev)}
+                        >
+                            Obfuskoidut omistajat
+                        </Button>
+                    )}
                 </Heading>
                 <div className="list">
-                    {hasManuallyReleasedCompanies && <h3>Vertailussa vapautuneet yhtiöt</h3>}
+                    <ListHeaders />
                     {companies.length > 0 ? (
-                        <div className="list-headers">
-                            <div className="list-header name">Nimi ja osoite</div>
-                            <div className="list-header date">Valmistumispäivä</div>
-                            <div className="list-header property-manager">
-                                Isännöitsijätiedot
-                                <br />
-                                päivitetty viimeksi
-                            </div>
-                        </div>
+                        <>
+                            <ul className="results-list">
+                                {companies.map((item, idx) => (
+                                    <ThirtyYearResultListItem
+                                        company={item}
+                                        calculationDate={calculationDate}
+                                        category={category}
+                                        key={idx}
+                                    />
+                                ))}
+                            </ul>
+                        </>
                     ) : (
-                        <p>Ei listattavia yhtiöitä.</p>
+                        <p>Vertailussa ei automaattisesti vapautunut yhtiöitä.</p>
                     )}
-                    <ul className="results-list">
-                        {companies.map((item, idx) => (
-                            <ThirtyYearResultListItem
-                                company={item}
-                                calculationDate={calculationDate}
-                                category={category}
-                                key={idx}
-                            />
-                        ))}
-                    </ul>
                     {hasManuallyReleasedCompanies && (
                         <>
                             <h3>Tontit-yksikön päätöksellä vapautetut yhtiöt</h3>

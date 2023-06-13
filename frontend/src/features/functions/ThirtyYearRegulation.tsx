@@ -125,6 +125,8 @@ const ThirtyYearRegulation = () => {
     const regulationData: object | undefined = getRegulationData ?? makeRegulationData;
     const isRegulationLoading = isGetRegulationLoading ?? isMakeRegulationLoading;
     const regulationError = getRegulationError ?? makeRegulationError;
+    const hasRegulationResults = (!getRegulationError && !!getRegulationData) || !!regulationData;
+    const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
 
     // ******************
     // * Event handlers *
@@ -157,9 +159,6 @@ const ThirtyYearRegulation = () => {
                     setIsErrorModalOpen(true);
                 });
     };
-
-    const hasRegulationResults = (!getRegulationError && !!getRegulationData) || !!regulationData;
-    const hasExternalSalesData = !isExternalSalesDataLoading && !externalSalesDataLoadError && !!externalSalesData;
 
     return (
         <div className="view--functions__thirty-year-regulation">
