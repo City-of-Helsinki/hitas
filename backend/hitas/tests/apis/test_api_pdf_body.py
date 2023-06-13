@@ -111,6 +111,44 @@ def test__api__pdf_body__create__invalid_name(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.parametrize(
+    ["name", "error"],
+    [
+        [
+            PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+            "Unconfirmed max price calculation must have exactly 3 body texts.",
+        ],
+        [
+            PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION,
+            "Confirmed max price calculation must have exactly 1 body text.",
+        ],
+    ],
+)
+@pytest.mark.django_db
+def test__api__pdf_body__create__invalid_text_size(api_client: HitasAPIClient, name: PDFBodyName, error: str):
+    data = {
+        "name": name.value,
+        "texts": ["foo"] * 10,
+    }
+
+    url = reverse("hitas:pdf-body-list")
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "texts",
+                "message": error,
+            },
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Retrieve tests
 
 
@@ -174,6 +212,45 @@ def test__api__pdf_body__update(api_client: HitasAPIClient):
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == data
+
+
+@pytest.mark.parametrize(
+    ["name", "error"],
+    [
+        [
+            PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+            "Unconfirmed max price calculation must have exactly 3 body texts.",
+        ],
+        [
+            PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION,
+            "Confirmed max price calculation must have exactly 1 body text.",
+        ],
+    ],
+)
+@pytest.mark.django_db
+def test__api__pdf_body__update__invalid_text_size(api_client: HitasAPIClient, name: PDFBodyName, error: str):
+    body: PDFBody = PDFBodyFactory.create(name=name)
+    data = {
+        "name": name.value,
+        "texts": ["foo"] * 10,
+    }
+
+    url = reverse("hitas:pdf-body-detail", kwargs={"name": body.name.value})
+    response = api_client.put(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "texts",
+                "message": error,
+            },
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 # Delete tests
