@@ -4203,6 +4203,173 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # PDF bodies
+
+  /api/v1/pdf-bodies:
+    get:
+      description: Fetch all PDF bodies
+      operationId: list-pdf-bodies
+      tags:
+        - PDF Bodies
+      parameters:
+        - $ref: '#/components/parameters/PagingLimitParameter'
+        - $ref: '#/components/parameters/PagingPageParameter'
+      responses:
+        '200':
+          description: Successfully fetched list of PDF bodies
+          content:
+            application/json:
+              schema:
+                description: Single page of PDF bodies
+                type: object
+                additionalProperties: false
+                required:
+                  - page
+                  - contents
+                properties:
+                  page:
+                    $ref: '#/components/schemas/PageInfo'
+                  contents:
+                    description: List of PDF bodies
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PDFBody'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      description: Add a new pdf body.
+      operationId: create-pdf-body
+      tags:
+        - PDF Bodies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/PDFBody'
+      responses:
+        '201':
+          description: Successfully added a new email template.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/PDFBody'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/pdf-bodies/{name}:
+    get:
+      description: Fetch a single PDF body by name.
+      operationId: read-pdf-body
+      tags:
+        - PDF Bodies
+      parameters:
+        - name: name
+          required: true
+          in: path
+          description: PDF body name
+          schema:
+            $ref: '#/components/schemas/PDFBodyName'
+      responses:
+        '200':
+          description: Successfully read a PDF body.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/PDFBody'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      description: Update a PDF body.
+      operationId: update-pdf-body
+      tags:
+        - PDF Bodies
+      parameters:
+        - name: name
+          required: true
+          in: path
+          description: PDF body name
+          schema:
+            $ref: '#/components/schemas/PDFBodyName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              additionalProperties: false
+              $ref: '#/components/schemas/PDFBody'
+      responses:
+        '200':
+          description: Successfully updated a PDF body.
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/PDFBody'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      description: Remove a PDF body.
+      operationId: delete-pdf-body
+      tags:
+        - PDF Bodies
+      parameters:
+        - name: name
+          required: true
+          in: path
+          description: PDF body name
+          schema:
+            $ref: '#/components/schemas/PDFBodyName'
+      responses:
+        '204':
+          description: PDF body successfully removed.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   parameters:
     PagingLimitParameter:
@@ -8282,7 +8449,7 @@ components:
           example: 2384
 
     EmailTemplate:
-      description: Count of housing companies in a specific state
+      description: Email template.
       type: object
       additionalProperties: false
       required:
@@ -8307,6 +8474,39 @@ components:
     EmailTemplateType:
       description: |-
         Name of this email template.
+
+        Can have the following values:
+          - "confirmed_max_price_calculation"
+          - "unconfirmed_max_price_calculation"
+      type: string
+      example: "confirmed_max_price_calculation"
+      x-extensible-enum:
+        - "confirmed_max_price_calculation"
+        - "unconfirmed_max_price_calculation"
+
+    PDFBody:
+      description: PDF body.
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - texts
+      properties:
+        name:
+          $ref: '#/components/schemas/PDFBodyName'
+        texts:
+          description: PDF body texts.
+          type: array
+          minItems: 1
+          items:
+            description: PDF body text.
+            type: string
+            maxLength: 10000
+            example: Template text.
+
+    PDFBodyName:
+      description: |-
+        Name of this pdf body.
 
         Can have the following values:
           - "confirmed_max_price_calculation"
