@@ -366,7 +366,7 @@ const LoadedApartmentCreatePage = ({
                                 name="surface_area"
                                 label="Pinta-ala"
                                 formObject={formObject}
-                                fractionDigits={2}
+                                allowDecimals
                                 unit="m²"
                             />
                         </div>
@@ -412,21 +412,21 @@ const LoadedApartmentCreatePage = ({
                                 name="prices.construction.loans"
                                 label="Rakennusaikaiset lainat"
                                 unit="€"
-                                fractionDigits={2}
+                                allowDecimals
                                 formObject={formObject}
                             />
                             <NumberInput
                                 name="prices.construction.interest.rate_6"
                                 label="Rak.aik. korko (6%)"
                                 unit="€"
-                                fractionDigits={2}
+                                allowDecimals
                                 formObject={formObject}
                             />
                             <NumberInput
                                 name="prices.construction.interest.rate_14"
                                 label="Rak.aik. korko (14%)"
                                 unit="€"
-                                fractionDigits={2}
+                                allowDecimals
                                 formObject={formObject}
                             />
                         </div>
@@ -435,7 +435,7 @@ const LoadedApartmentCreatePage = ({
                                 name="prices.construction.additional_work"
                                 label="Rakennusaikaiset lisätyöt"
                                 unit="€"
-                                fractionDigits={2}
+                                allowDecimals
                                 formObject={formObject}
                             />
                             {apartment?.prices?.construction.debt_free_purchase_price ? (
@@ -443,7 +443,7 @@ const LoadedApartmentCreatePage = ({
                                     name="prices.construction.debt_free_purchase_price"
                                     label="Luovutushinta (RA)"
                                     unit="€"
-                                    fractionDigits={2}
+                                    allowDecimals
                                     formObject={formObject}
                                 />
                             ) : (

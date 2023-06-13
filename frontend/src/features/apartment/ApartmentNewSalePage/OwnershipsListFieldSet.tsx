@@ -165,7 +165,7 @@ const OwnershipsListFieldSet = () => {
                             <div className="percentage">
                                 <NumberInput
                                     name={`ownerships.${index}.percentage`}
-                                    fractionDigits={2}
+                                    allowDecimals
                                     formObject={formObject}
                                     required
                                 />
