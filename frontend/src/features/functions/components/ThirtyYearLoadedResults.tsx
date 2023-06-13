@@ -3,6 +3,18 @@ import {useState} from "react";
 import {CloseButton, Heading} from "../../../common/components";
 import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./";
 
+const ListHeaders = () => (
+    <div className="list-headers">
+        <div className="list-header name">Nimi ja osoite</div>
+        <div className="list-header date">Valmistumispäivä</div>
+        <div className="list-header property-manager">
+            Isännöitsijätiedot
+            <br />
+            päivitetty viimeksi
+        </div>
+    </div>
+);
+
 const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.Element => {
     const automaticallyReleased = data?.automatically_released ?? [];
     const releasedFromRegulation = data?.released_from_regulation ?? [];
@@ -18,18 +30,6 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNoCompaniesModalOpen, setIsNoCompaniesModalOpen] = useState(true);
-
-    const ListHeaders = () => (
-        <div className="list-headers">
-            <div className="list-header name">Nimi ja osoite</div>
-            <div className="list-header date">Valmistumispäivä</div>
-            <div className="list-header property-manager">
-                Isännöitsijätiedot
-                <br />
-                päivitetty viimeksi
-            </div>
-        </div>
-    );
 
     const ResultsList = ({category}) => {
         const companies = category === "freed" ? releasedCompanies : displayedStayingCompanies;
@@ -55,12 +55,12 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                     {companies.length > 0 ? (
                         <>
                             <ul className="results-list">
-                                {companies.map((item, idx) => (
+                                {companies.map((item) => (
                                     <ThirtyYearResultListItem
                                         company={item}
                                         calculationDate={calculationDate}
                                         category={category}
-                                        key={idx}
+                                        key={item.id}
                                     />
                                 ))}
                             </ul>
@@ -72,12 +72,12 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                         <>
                             <h3>Tontit-yksikön päätöksellä vapautetut yhtiöt</h3>
                             <ul className="results-list">
-                                {manuallyReleasedCompanies.map((item, idx) => (
+                                {manuallyReleasedCompanies.map((item) => (
                                     <ThirtyYearResultListItem
                                         company={item}
                                         calculationDate={calculationDate}
                                         category={category}
-                                        key={idx}
+                                        key={item.id}
                                     />
                                 ))}
                             </ul>
@@ -137,8 +137,8 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                     <Dialog.Content>
                         Vertailun yhteydessä obfuskoidut omistajat:
                         <ul>
-                            {obfuscatedOwners.map((owner, idx) => (
-                                <li key={idx}>{owner.name}</li>
+                            {obfuscatedOwners.map((owner) => (
+                                <li key={owner.id}>{owner.name}</li>
                             ))}
                         </ul>
                     </Dialog.Content>
