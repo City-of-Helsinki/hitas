@@ -32,6 +32,7 @@ tomli = "^2.0.1"
 openpyxl = "^3.1.2"
 django-auditlog = "^2.3.0"
 django-post-fetch-hook = "0.0.1"
+django-subforms = "^0.2.0"
 
 [tool.poetry.dependencies.uWSGI]
 version = "^2.0.21"

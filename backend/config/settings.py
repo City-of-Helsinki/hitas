@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     "health_check",
     "corsheaders",
     "safedelete",
+    "subforms",
 ]
 
 # ----- Middleware -------------------------------------------------------------------------------------
