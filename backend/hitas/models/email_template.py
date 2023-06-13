@@ -4,7 +4,7 @@ from enumfields import Enum, EnumField
 from hitas.models._base import HitasModel
 
 
-class EmailTemplateName(Enum):
+class EmailTemplateType(Enum):
     CONFIRMED_MAX_PRICE_CALCULATION = "confirmed_max_price_calculation"
     UNCONFIRMED_MAX_PRICE_CALCULATION = "unconfirmed_max_price_calculation"
 
@@ -14,12 +14,19 @@ class EmailTemplateName(Enum):
 
 
 class EmailTemplate(HitasModel):
-    name: EmailTemplateName = EnumField(EmailTemplateName, max_length=33, unique=True)
+    name: str = models.CharField(max_length=256)
+    type: EmailTemplateType = EnumField(EmailTemplateType, max_length=33)
     text: str = models.TextField(max_length=10_000)
 
     class Meta:
         verbose_name = "Email template"
         verbose_name_plural = "Email templates"
+        constraints = [
+            models.UniqueConstraint(
+                name="%(app_label)s_%(class)s_unique_name_type",
+                fields=("name", "type"),
+            ),
+        ]
 
     def __str__(self) -> str:
-        return str(self.name)
+        return f"{self.name} ({self.type})"

@@ -6,4 +6,4 @@ from hitas.models.email_template import EmailTemplate
 
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
-    list_display = ["name"]
+    list_display = ["name", "type"]
