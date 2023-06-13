@@ -6,7 +6,7 @@ import {FormInputProps} from "./";
 interface FormNumberInputProps extends FormInputProps {
     unit?: string;
     field?: object;
-    fractionDigits?: number;
+    allowDecimals?: boolean;
 }
 
 const NumberInput = ({
@@ -16,8 +16,7 @@ const NumberInput = ({
     required,
     invalid,
     formObject,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fractionDigits = 0, // TODO: Add support for this
+    allowDecimals,
     ...rest
 }: FormNumberInputProps) => {
     const {
@@ -30,6 +29,17 @@ const NumberInput = ({
     });
     const fieldError = dotted(errors, formNumber.name);
     watch(name);
+
+    // React Hook Form doesn't like us manually setting the value of the input field,
+    // this is a bit hacky way of doing this, but it works in most cases.
+    // These characters are valid in the NumberField, but we don't want to allow them to be entered
+    const bannedCharacters = ["e", "E", "+", "-"];
+    if (!allowDecimals) bannedCharacters.push(".", ",");
+    const handleKeyDown = (e) => {
+        if (bannedCharacters.includes(e.key)) {
+            e.preventDefault();
+        }
+    };
 
     const handleWheel = (e) => {
         if (document.activeElement === e.target) {
@@ -53,6 +63,7 @@ const NumberInput = ({
                 onChange={formNumber.onChange}
                 onBlur={formNumber.onBlur}
                 onWheel={handleWheel}
+                onKeyDown={handleKeyDown}
                 errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={invalid ?? !!fieldError}
                 required={required}

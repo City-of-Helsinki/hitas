@@ -319,7 +319,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                         label="Kauppahinta"
                                         formObject={saleForm}
                                         unit="€"
-                                        fractionDigits={2}
+                                        allowDecimals
                                         required
                                     />
                                     <NumberInput
