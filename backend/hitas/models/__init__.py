@@ -29,6 +29,7 @@ from hitas.models.job_performance import JobPerformance
 from hitas.models.migration_done import MigrationDone
 from hitas.models.owner import Owner
 from hitas.models.ownership import Ownership
+from hitas.models.pdf_body import PDFBody
 from hitas.models.postal_code import HitasPostalCode
 from hitas.models.property_manager import PropertyManager
 from hitas.models.real_estate import RealEstate
