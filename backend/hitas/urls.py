@@ -50,7 +50,7 @@ router.register(
     basename="external-sales-data",
 )
 router.register(
-    r"email-templates",
+    r"email-templates/(?P<type>\w+)",
     views.EmailTemplateViewSet,
     basename="email-template",
 )

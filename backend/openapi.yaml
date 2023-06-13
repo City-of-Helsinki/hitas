@@ -4004,13 +4004,19 @@ paths:
 
   # Email templates
 
-  /api/v1/email-templates:
+  /api/v1/email-templates/{type}:
     get:
-      description: Fetch all email templates
+      description: Fetch all email templates of a given type
       operationId: list-email-templates
       tags:
         - Email Templates
       parameters:
+        - name: type
+          required: true
+          in: path
+          description: Email template type
+          schema:
+            $ref: '#/components/schemas/EmailTemplateType'
         - $ref: '#/components/parameters/PagingLimitParameter'
         - $ref: '#/components/parameters/PagingPageParameter'
       responses:
@@ -4045,10 +4051,17 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     post:
-      description: Add a new email template.
+      description: Add a new email template for a given type.
       operationId: create-email-template
       tags:
         - Email Templates
+      parameters:
+        - name: type
+          required: true
+          in: path
+          description: Email template type
+          schema:
+            $ref: '#/components/schemas/EmailTemplateType'
       requestBody:
         required: true
         content:
@@ -4077,20 +4090,26 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/email-templates/{email_template_id}:
+  /api/v1/email-templates/{type}/{name}:
     get:
-      description: Fetch a single real estate by id
+      description: Fetch a single real estate by type and name.
       operationId: read-email-template
       tags:
         - Email Templates
       parameters:
-        - name: email_template_id
+        - name: type
           required: true
           in: path
-          description: Email template ID
+          description: Email template type
+          schema:
+            $ref: '#/components/schemas/EmailTemplateType'
+        - name: name
+          required: true
+          in: path
+          description: Email template name
           schema:
             type: string
-            example: 03240471596e4d8ca9eb6598f8f51486
+            example: "template 1"
       responses:
         '200':
           description: Successfully read an email template.
@@ -4112,13 +4131,19 @@ paths:
       tags:
         - Email Templates
       parameters:
-        - name: email_template_id
+        - name: type
           required: true
           in: path
-          description: Email template ID
+          description: Email template type
+          schema:
+            $ref: '#/components/schemas/EmailTemplateType'
+        - name: name
+          required: true
+          in: path
+          description: Email template name
           schema:
             type: string
-            example: 03240471596e4d8ca9eb6598f8f51486
+            example: "template 1"
       requestBody:
         required: true
         content:
@@ -4153,13 +4178,19 @@ paths:
       tags:
         - Email Templates
       parameters:
-        - name: email_template_id
+        - name: type
           required: true
           in: path
-          description: Email Template ID
+          description: Email template type
+          schema:
+            $ref: '#/components/schemas/EmailTemplateType'
+        - name: name
+          required: true
+          in: path
+          description: Email template name
           schema:
             type: string
-            example: 03240471596e4d8ca9eb6598f8f51486
+            example: "template 1"
       responses:
         '204':
           description: Email template successfully removed.
@@ -8256,25 +8287,35 @@ components:
       additionalProperties: false
       required:
         - name
+        - type
         - text
       properties:
         name:
-          description: |-
-            Name of this email template.
-
-            Can have the following values:
-              - "confirmed_max_price_calculation"
-              - "unconfirmed_max_price_calculation"
+          description: Email template name.
           type: string
-          example: "confirmed_max_price_calculation"
-          x-extensible-enum:
-            - "confirmed_max_price_calculation"
-            - "unconfirmed_max_price_calculation"
+          maxLength: 256
+          example: Template 1
+        type:
+          readOnly: true
+          $ref: '#/components/schemas/EmailTemplateType'
         text:
           description: Email template text.
           type: string
           maxLength: 10000
           example: Template text.
+
+    EmailTemplateType:
+      description: |-
+        Name of this email template.
+
+        Can have the following values:
+          - "confirmed_max_price_calculation"
+          - "unconfirmed_max_price_calculation"
+      type: string
+      example: "confirmed_max_price_calculation"
+      x-extensible-enum:
+        - "confirmed_max_price_calculation"
+        - "unconfirmed_max_price_calculation"
 
     # Errors
 
