@@ -85,6 +85,7 @@ export const errorMessages = {
     sharesStartGreaterThanEnd: "Osakkeiden lopun on oltava suurempi kuin alun",
     constructionInterestEmpty: "Toinen korkokenttä on tyhjä",
     constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
+    maxTwoDecimalPlaces: "Anna arvo enintän kahden desimaalin tarkkuudella",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -126,6 +127,11 @@ const APIIdString = string().min(32, errorMessages.APIIdMin).max(32, errorMessag
 const addAPIId = (zodObject) => zodObject.merge(APIIdString);
 
 const nullishNumber = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+    .nonnegative(errorMessages.numberPositive)
+    .nullish();
+
+const nullishDecimal = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+    .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
     .nonnegative(errorMessages.numberPositive)
     .nullish();
 
@@ -431,13 +437,13 @@ const ApartmentPricesSchema = object({
     catalog_share_of_housing_company_loans: number().nullable(), // Read only
     catalog_acquisition_price: number().nullable(), // Read only. (purchase_price + share_of_hosing_company_loans)
     construction: object({
-        loans: nullishNumber,
-        additional_work: nullishNumber,
+        loans: nullishDecimal,
+        additional_work: nullishDecimal,
         interest: object({
-            rate_6: nullishNumber,
-            rate_14: nullishNumber,
+            rate_6: nullishDecimal,
+            rate_14: nullishDecimal,
         }).optional(),
-        debt_free_purchase_price: nullishNumber,
+        debt_free_purchase_price: nullishDecimal,
     }),
     maximum_prices: object({
         // Read only
@@ -508,7 +514,7 @@ const ApartmentDetailsSchema = object({
 const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
     type: object({id: string()}).nullable(),
-    surface_area: nullishNumber,
+    surface_area: nullishDecimal,
     rooms: nullishNumber,
     shares: ApartmentSharesSchema.omit({total: true}),
     address: ApartmentAddressSchema,
@@ -545,10 +551,12 @@ const ApartmentSaleFormSchema = object({
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
+        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
         .nullish(),
     apartment_share_of_housing_company_loans: z
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.loanShareMin)
+        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
         .nullish(),
     exclude_from_statistics: boolean(),
 });
@@ -556,7 +564,9 @@ const ApartmentSaleFormSchema = object({
 // Writable list of ownerships
 const OwnershipsListSchema = object({
     owner: object({id: APIIdString.optional().or(z.literal(""))}),
-    percentage: number(),
+    percentage: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
+        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
+        .positive(errorMessages.numberPositive),
 })
     .array()
     .superRefine((elements, ctx) => {
