@@ -104,17 +104,11 @@
 
     <br>
 
-    <p>
-    Mikäli tarvitsette huoneistonne vahvistetun enimmäishinnan, teidän tulee toimittaa
-    isännöitsijäntodistus tai Hitas-enimmäishinnan vahvistamislomake. Näiden tietojen perusteella
-    vahvistetaan huoneistonne lopullinen enimmäishinta. Laskelma tulee huoneistoa myytäessä
-    esittää ostajille.
-    </p>
+    <p>{{ body_parts.0|linebreaks }}</p>
 
     {% if prices.surface_area_price_ceiling.maximum %}
-        <p>Teillä on mahdollisuus myydä huoneistonne myös ilman enimmäishinnan vahvistamista enintään kaupantekoajankohtana voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyjän ja ostajan välillä sopia vapaasti.</p>
-        <p>Mikäli osakkeisiin kohdistuu yhtiölainaosuutta, tulee sen osuus vähentää huoneiston velattomasta hinnasta kauppahintaa laskettaessa.</p>
-        <b>Rajahintaa tarkistetaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.</b>
+        <p>{{ body_parts.1|linebreaks }}</p>
+        <b>{{ body_parts.2|linebreaks }}</b>
     {% endif %}
     <br>
     <br>

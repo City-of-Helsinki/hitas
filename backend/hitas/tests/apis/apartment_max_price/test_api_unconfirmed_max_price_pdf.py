@@ -11,8 +11,9 @@ from rest_framework import status
 
 from hitas.models import Apartment, Ownership
 from hitas.models.housing_company import HitasType
+from hitas.models.pdf_body import PDFBodyName
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
-from hitas.tests.factories import ApartmentFactory
+from hitas.tests.factories import ApartmentFactory, PDFBodyFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     MarketPriceIndex2005Equal100Factory,
@@ -38,6 +39,11 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
     )
 
     ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
+
+    body = PDFBodyFactory.create(
+        name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+        texts=["||foo||", "||bar||", "||baz||"],
+    )
 
     this_month = datetime.date.today().replace(day=1)
     completion_month = apartment.completion_date.replace(day=1)
@@ -111,15 +117,9 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         150 000,00
         This is additional information
         Hitas-huoneistonne velaton enimmäishinta on 150 000 euroa rakennuskustannusindeksillä laskettuna.
-        Mikäli tarvitsette huoneistonne vahvistetun enimmäishinnan, teidän tulee toimittaa isännöitsijäntodistus tai
-        Hitas-enimmäishinnan vahvistamislomake. Näiden tietojen perusteella vahvistetaan huoneistonne lopullinen
-        enimmäishinta. Laskelma tulee huoneistoa myytäessä esittää ostajille.
-        Teillä on mahdollisuus myydä huoneistonne myös ilman enimmäishinnan vahvistamista enintään kaupantekoajankohtana
-        voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyjän ja ostajan välillä
-        sopia vapaasti.
-        Mikäli osakkeisiin kohdistuu yhtiölainaosuutta, tulee sen osuus vähentää huoneiston velattomasta hinnasta kauppahintaa
-        laskettaessa.
-        Rajahintaa tarkistetaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.
+        {body.texts[0]}
+        {body.texts[1]}
+        {body.texts[2]}
         {api_user.first_name} {api_user.last_name}
         {api_user.title}
         """
@@ -190,6 +190,11 @@ def test__api__unconfirmed_max_price_pdf__indices_missing(
         sales__apartment_share_of_housing_company_loans=15000,
     )
 
+    PDFBodyFactory.create(
+        name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+        texts=["||foo||", "||bar||", "||baz||"],
+    )
+
     this_month = datetime.date.today().replace(day=1)
     completion_month = apartment.completion_date.replace(day=1)
 
@@ -245,6 +250,11 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
     )
 
     ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
+
+    body = PDFBodyFactory.create(
+        name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+        texts=["||foo||", "||bar||", "||baz||"],
+    )
 
     this_month = datetime.date.today().replace(day=1)
     past_month = datetime.date(2021, 5, 1)
@@ -324,15 +334,9 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         150 000,00
         This is additional information
         Hitas-huoneistonne velaton enimmäishinta on 150 000 euroa rakennuskustannusindeksillä laskettuna.
-        Mikäli tarvitsette huoneistonne vahvistetun enimmäishinnan, teidän tulee toimittaa isännöitsijäntodistus tai
-        Hitas-enimmäishinnan vahvistamislomake. Näiden tietojen perusteella vahvistetaan huoneistonne lopullinen
-        enimmäishinta. Laskelma tulee huoneistoa myytäessä esittää ostajille.
-        Teillä on mahdollisuus myydä huoneistonne myös ilman enimmäishinnan vahvistamista enintään kaupantekoajankohtana
-        voimassaolevalla rajahinnalla. Rajahinnan alittavasta velattomasta huoneiston hinnasta voidaan myyjän ja ostajan välillä
-        sopia vapaasti.
-        Mikäli osakkeisiin kohdistuu yhtiölainaosuutta, tulee sen osuus vähentää huoneiston velattomasta hinnasta kauppahintaa
-        laskettaessa.
-        Rajahintaa tarkistetaan neljännesvuosittain 1.2., 1.5., 1.8. ja 1.11. ja se on voimassa kolme kuukautta kerrallaan.
+        {body.texts[0]}
+        {body.texts[1]}
+        {body.texts[2]}
         {api_user.first_name} {api_user.last_name}
         {api_user.title}
         """
@@ -427,4 +431,51 @@ def test__api__unconfirmed_max_price_pdf__calculation_date_in_the_future(api_cli
         "message": "Bad request",
         "reason": "Bad Request",
         "status": 400,
+    }
+
+
+@pytest.mark.django_db
+def test__api__unconfirmed_max_price_pdf__missing_template(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2022-01-01")
+
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2021, 1, 1),
+        additional_work_during_construction=5000,
+        interest_during_construction_6=1000,
+        interest_during_construction_14=2000,
+        surface_area=50,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        sales__purchase_price=80000,
+        sales__apartment_share_of_housing_company_loans=15000,
+    )
+
+    this_month = datetime.date.today().replace(day=1)
+    completion_month = apartment.completion_date.replace(day=1)
+
+    # Completion month indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=completion_month, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=completion_month, value=200)
+    # Current month indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=this_month, value=150)
+    MarketPriceIndex2005Equal100Factory.create(month=this_month, value=250)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=3000)
+
+    url = reverse(
+        "hitas:apartment-download-latest-unconfirmed-prices",
+        kwargs={"housing_company_uuid": apartment.housing_company.uuid.hex, "uuid": apartment.uuid.hex},
+    )
+
+    data = {
+        "request_date": "2022-01-01",
+        "additional_info": "This is additional information",
+    }
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing",
+        "message": "Missing body template",
+        "reason": "Conflict",
+        "status": 409,
     }
