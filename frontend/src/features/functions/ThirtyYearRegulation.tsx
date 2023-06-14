@@ -7,31 +7,13 @@ import {
     downloadRegulationResults,
     useCreateThirtyYearRegulationMutation,
     useGetExternalSalesDataQuery,
+    useGetIndexQuery,
     useGetThirtyYearRegulationQuery,
 } from "../../app/services";
-import {Divider, Heading} from "../../common/components";
+import {Divider, Heading, QueryStateHandler} from "../../common/components";
 import {Select, ToggleInput} from "../../common/components/form";
 import {hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
-
-const priceCeilings = {
-    2023: {
-        "02-01": 4621,
-        "05-01": 4622,
-    },
-    2022: {
-        "02-01": 2201,
-        "05-01": 2202,
-        "08-01": 2203,
-        "11-01": 2204,
-    },
-    2021: {
-        "02-01": 2101,
-        "05-01": 2102,
-        "08-01": 2103,
-        "11-01": 2104,
-    },
-};
 
 const ThirtyYearRegulation = () => {
     const currentTime = new Date();
@@ -119,10 +101,17 @@ const ThirtyYearRegulation = () => {
     );
     const [makeRegulation, {data: makeRegulationData, isLoading: isMakeRegulationLoading, error: makeRegulationError}] =
         useCreateThirtyYearRegulationMutation();
+    const {
+        currentData: priceCeilingData,
+        isFetching: isPriceCeilingLoading,
+        error: priceCeilingError,
+    } = useGetIndexQuery({
+        indexType: "surface-area-price-ceiling",
+        month: formDate.substring(0, 7),
+    });
 
-    // TODO: Use proper price ceiling data from API, now using simulated API response
-    const priceCeiling = priceCeilings[formYear][formTimePeriod.value];
-    const regulationData: object | undefined = getRegulationData ?? makeRegulationData;
+    const hasSkippedCompanies = makeRegulationData?.skipped?.length;
+    const regulationData: object | undefined = hasSkippedCompanies ? makeRegulationData : getRegulationData;
     const isRegulationLoading = isGetRegulationLoading ?? isMakeRegulationLoading;
     const regulationError = getRegulationError ?? makeRegulationError;
     const hasRegulationResults = (!getRegulationError && !!getRegulationData) || !!regulationData;
@@ -215,7 +204,16 @@ const ThirtyYearRegulation = () => {
                                     Rajaneliöhinta
                                     {` (${formObject.getValues("quarter").label}${formYear})`}
                                 </label>
-                                <div className="value">{priceCeiling ?? "---"} €/m²</div>
+                                <QueryStateHandler
+                                    data={priceCeilingData}
+                                    error={priceCeilingError}
+                                    isLoading={isPriceCeilingLoading}
+                                >
+                                    <div className="value">
+                                        <>{(priceCeilingData?.value ?? "---") + " "}</>
+                                        €/m²
+                                    </div>
+                                </QueryStateHandler>
                                 {hasRegulationResults && (
                                     <Button
                                         theme="black"
@@ -241,7 +239,7 @@ const ThirtyYearRegulation = () => {
                             error={regulationError}
                             isLoading={isRegulationLoading}
                             date={formDate}
-                            priceCeiling={priceCeiling}
+                            priceCeilingValue={priceCeilingData?.value}
                             compareFn={onCompareButtonClick}
                         />
                         <ThirtyYearErrorModal
