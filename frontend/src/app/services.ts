@@ -223,7 +223,10 @@ const listApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${params.housingCompanyId}/apartments`,
                 params: params.params,
             }),
-            providesTags: [{type: "Apartment", id: "LIST"}],
+            providesTags: (result, error, arg) => [
+                {type: "Apartment", id: "LIST"},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+            ],
         }),
         getOwners: builder.query<IOwnersResponse, IFilterOwnersQuery>({
             query: (params: IFilterOwnersQuery) => ({
@@ -506,8 +509,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) => [
-                {type: "Apartment", id: "LIST"},
-                {type: "Apartment", id: arg.apartmentId},
+                {type: "Apartment"},
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
@@ -560,15 +562,15 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: mutationApiExcelHeaders(),
             }),
         }),
-        createSalesCatalog: builder.mutation({
+        createFromSalesCatalog: builder.mutation({
             query: ({data, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/sales-catalog-validate`,
+                url: `housing-companies/${housingCompanyId}/sales-catalog-create`,
                 method: "POST",
                 body: data,
-                headers: mutationApiExcelHeaders(),
+                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
-                !error && result ? [{type: "HousingCompany", id: arg.housingCompanyId}] : [],
+                !error ? [{type: "HousingCompany", id: arg.housingCompanyId}, {type: "Apartment"}] : [],
         }),
     }),
 });
@@ -615,5 +617,5 @@ export const {
     useCreateThirtyYearRegulationMutation,
     useSaveExternalSalesDataMutation,
     useValidateSalesCatalogMutation,
-    useCreateSalesCatalogMutation,
+    useCreateFromSalesCatalogMutation,
 } = mutationApi;

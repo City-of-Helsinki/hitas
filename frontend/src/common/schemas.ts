@@ -1021,7 +1021,7 @@ const OwnersResponseSchema = object({
     contents: OwnerSchema.array(),
 });
 
-const SalesCatalogApartment = object({
+const SalesCatalogApartmentSchema = object({
     row: number(),
     stair: string(),
     floor: string(),
@@ -1042,7 +1042,7 @@ const SalesCatalogApartment = object({
 });
 
 const SalesCatalogValidationResponseSchema = object({
-    apartments: SalesCatalogApartment.array(),
+    apartments: SalesCatalogApartmentSchema.array(),
     confirmation_date: string(),
     total_surface_area: number(),
     total_acquisition_price: number(),
@@ -1125,7 +1125,6 @@ export {
     PostalCodeResponseSchema,
     IndexListResponseSchema,
     IndexResponseSchema,
-    SalesCatalogApartment,
     SalesCatalogValidationResponseSchema,
     HousingCompanyApartmentQuerySchema,
     ApartmentQuerySchema,
@@ -1199,6 +1198,7 @@ export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
 export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
 export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
+export type ISalesCatalogApartment = z.infer<typeof SalesCatalogApartmentSchema>;
 export type ISalesCatalogValidationResponse = z.infer<typeof SalesCatalogValidationResponseSchema>;
 export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
 export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
