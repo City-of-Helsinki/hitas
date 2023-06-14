@@ -17,13 +17,13 @@ import {
     QueryStateHandler,
     SaveButton,
 } from "../../common/components";
-import {FileInput} from "../../common/components/form";
+import {FileInput, NumberInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {IHousingCompanyDetails, ISalesCatalogApartment} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 
-const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
+const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): JSX.Element => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
@@ -52,7 +52,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             housingCompanyId: params.housingCompanyId,
         })
             .then(() => {
-                hdsToast.success("Asuntojen tuonti onnistui");
+                hdsToast.success("Asuntojen tuonti onnistui.");
                 setIsImportModalOpen(false);
             })
             .catch((e) => {
@@ -72,6 +72,13 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             // eslint-disable-next-line no-console
             .catch((e) => console.warn(e));
     };
+    const groupCompleteForm = useForm({
+        defaultValues: {
+            start: 0,
+            end: 0,
+        },
+        mode: "all",
+    });
     return (
         <>
             <Heading>
@@ -174,11 +181,11 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                         value={
                                             housingCompany.property_manager &&
                                             `${housingCompany.property_manager.name}
-                                            ${
-                                                housingCompany.property_manager.email
-                                                    ? `(${housingCompany.property_manager.email})`
-                                                    : ""
-                                            }`
+                                        ${
+                                            housingCompany.property_manager.email
+                                                ? `(${housingCompany.property_manager.email})`
+                                                : ""
+                                        }`
                                         }
                                     />
                                     <div>
@@ -291,6 +298,24 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                 <div className="list-wrapper list-wrapper--apartments">
                     <Heading type="list">
                         <span>Asunnot</span>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <NumberInput
+                                name="start"
+                                formObject={groupCompleteForm}
+                            />
+                            <NumberInput
+                                name="end"
+                                formObject={groupCompleteForm}
+                            />
+                            <Button
+                                theme="black"
+                                size="small"
+                                type="submit"
+                                disabled={groupCompleteForm.getValues("end") === 0}
+                            >
+                                Merkitse valmiiksi
+                            </Button>
+                        </form>
                         <Link to="apartments/create">
                             <Button
                                 theme="black"
@@ -340,7 +365,14 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                             <div>{apartment.apartment_number}</div>
                                             <div>{apartment.floor}</div>
                                             <div>
-                                                {apartment.rooms} {(apartment.apartment_type as {value: string}).value}
+                                                {apartment.rooms}{" "}
+                                                {
+                                                    (
+                                                        apartment.apartment_type as {
+                                                            value: string;
+                                                        }
+                                                    ).value
+                                                }
                                             </div>
                                             <div>{apartment.surface_area}</div>
                                             <div>{`${apartment.share_number_start} - ${apartment.share_number_end}`}</div>
