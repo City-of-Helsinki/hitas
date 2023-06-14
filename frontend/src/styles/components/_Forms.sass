@@ -45,3 +45,18 @@ div .disabled
   li
     background-color: $color-engel-light
     width: auto !important
+
+[class^="heading--"] form
+  @include flexbox()
+  @include flex-flow(row nowrap)
+  font-size: $fontsize-body-m
+  .input-field
+    height: 56px
+    margin-bottom: 0
+    width: 90px
+    margin-left: $spacing-s
+  button
+    position: relative
+    top: 7px
+    height: 56px
+    margin-left: $spacing-s
