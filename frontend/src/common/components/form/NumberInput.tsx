@@ -33,7 +33,7 @@ const NumberInput = ({
     // React Hook Form doesn't like us manually setting the value of the input field,
     // this is a bit hacky way of doing this, but it works in most cases.
     // These characters are valid in the NumberField, but we don't want to allow them to be entered
-    const bannedCharacters = ["e", "E", "+", "-"];
+    const bannedCharacters = ["ArrowUp", "ArrowDown", "e", "E", "+", "-"];
     if (!allowDecimals) bannedCharacters.push(".", ",");
     const handleKeyDown = (e) => {
         if (bannedCharacters.includes(e.key)) {
