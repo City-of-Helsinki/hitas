@@ -10,7 +10,7 @@ export default function ThirtyYearResults({
     error,
     isLoading,
     date,
-    priceCeiling,
+    priceCeilingValue,
     compareFn,
 }) {
     // Because the compareFn doesn't play ball with isLoading, we need to keep track of whether the button has been
@@ -50,7 +50,7 @@ export default function ThirtyYearResults({
                         theme="black"
                         onClick={handleCompareButton}
                         type="submit"
-                        disabled={!priceCeiling || !hasExternalSalesData || isButtonClicked} // Disable button if no price ceiling or no external sales data, or it has been clicked
+                        disabled={!priceCeilingValue || !hasExternalSalesData || isButtonClicked} // Disable button if no price ceiling or no external sales data, or it has been clicked
                         isLoading={isButtonClicked} // show loading spinner while the comparison is running
                     >
                         Aloita vertailu

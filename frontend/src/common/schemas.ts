@@ -903,6 +903,8 @@ const ApartmentMaximumPriceWritableSchema = object({
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
 
+const IndexResponseSchema = object({indexType: string(), value: number(), valid_until: string()});
+
 const ThirtyYearRegulationCompanySchema = object({
     id: string(),
     display_name: string(),
@@ -1009,7 +1011,7 @@ const PostalCodeResponseSchema = object({
     contents: PostalCodeSchema.array(),
 });
 
-const IndexResponseSchema = object({
+const IndexListResponseSchema = object({
     page: PageInfoSchema,
     contents: IndexSchema.array(),
 });
@@ -1033,13 +1035,18 @@ const ApartmentQuerySchema = object({
     apartmentId: string(),
 });
 
-const IndexQuerySchema = object({
+const IndexListQuerySchema = object({
     indexType: string(),
     params: object({
         page: number(),
         limit: number(),
         year: string(),
     }),
+});
+
+const IndexQuerySchema = object({
+    indexType: string(),
+    month: string(),
 });
 
 const ThirtyYearRegulationQuerySchema = object({
@@ -1088,10 +1095,10 @@ export {
     CodeResponseSchema,
     OwnersResponseSchema,
     PostalCodeResponseSchema,
-    IndexResponseSchema,
+    IndexListResponseSchema,
     HousingCompanyApartmentQuerySchema,
     ApartmentQuerySchema,
-    IndexQuerySchema,
+    IndexListQuerySchema,
     FilterOwnersQuerySchema,
     ApartmentSaleFormSchema,
     OwnerSchema,
@@ -1161,10 +1168,12 @@ export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
 export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
 export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
-export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
+export type IIndexListResponse = z.infer<typeof IndexListResponseSchema>;
 export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
 export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
+export type IIndexListQuery = z.infer<typeof IndexListQuerySchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
+export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
 export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;

@@ -22,6 +22,8 @@ import {
     IHousingCompanyListResponse,
     IHousingCompanyWritable,
     IIndex,
+    IIndexListQuery,
+    IIndexListResponse,
     IIndexQuery,
     IIndexResponse,
     IOwner,
@@ -243,8 +245,8 @@ const listApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
-        getIndices: builder.query<IIndexResponse, IIndexQuery>({
-            query: (params: IIndexQuery) => ({
+        getIndices: builder.query<IIndexListResponse, IIndexListQuery>({
+            query: (params: IIndexListQuery) => ({
                 url: `indices/${params.indexType}`,
                 params: params.params,
             }),
@@ -317,6 +319,11 @@ const detailApi = hitasApi.injectEndpoints({
                 },
             }),
             providesTags: (result, error, arg) => [{type: "ThirtyYearRegulation", id: arg.calculationDate}],
+        }),
+        getIndex: builder.query<IIndexResponse, IIndexQuery>({
+            query: (params: IIndexQuery) => ({
+                url: `indices/${params.indexType}/${params.month}`,
+            }),
         }),
     }),
 });
@@ -570,6 +577,7 @@ export const {
     useGetApartmentMaximumPriceQuery,
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
+    useGetIndexQuery,
 } = detailApi;
 
 export const {
