@@ -557,7 +557,6 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/sales-catalog-validate`,
                 method: "POST",
                 body: data,
-                params: {housing_company_id: housingCompanyId},
                 headers: mutationApiExcelHeaders(),
             }),
         }),
@@ -566,7 +565,6 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/sales-catalog-validate`,
                 method: "POST",
                 body: data,
-                params: {housing_company_id: housingCompanyId},
                 headers: mutationApiExcelHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
