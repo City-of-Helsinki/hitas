@@ -16,6 +16,7 @@ import {
     ImprovementsTable,
     QueryStateHandler,
     SaveButton,
+    SaveDialogModal,
 } from "../../common/components";
 import {FileInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
@@ -25,6 +26,7 @@ import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
@@ -66,8 +68,10 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             data: data.salesCatalog,
             housingCompanyId: params.housingCompanyId,
         })
-            .then(() => {
-                setIsImportModalOpen(true);
+            .then((e) => {
+                console.log(e);
+                if ("error" in e) setIsErrorModalOpen(true);
+                else setIsImportModalOpen(true);
             })
             .catch((e) => console.warn(e));
     };
@@ -358,6 +362,13 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     />
                 </Dialog.ActionButtons>
             </Dialog>
+            <SaveDialogModal
+                data={validateData}
+                error={validateError}
+                isLoading={isValidating}
+                isVisible={isErrorModalOpen}
+                setIsVisible={setIsErrorModalOpen}
+            />
         </>
     );
 };
