@@ -8,7 +8,14 @@ import {
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
 } from "../../app/services";
-import {DetailField, Divider, ImprovementsTable, ModifyOwnerModal, QueryStateHandler} from "../../common/components";
+import {
+    DetailField,
+    Divider,
+    ImprovementsTable,
+    ModifyManagerModal,
+    ModifyOwnerModal,
+    QueryStateHandler,
+} from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
 import {
     IApartmentConditionOfSale,
@@ -18,6 +25,7 @@ import {
     IHousingCompanyDetails,
     IOwner,
     IOwnership,
+    IPropertyManager,
 } from "../../common/schemas";
 import {
     formatAddress,
@@ -438,11 +446,21 @@ const LoadedApartmentDetails = ({
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
 }): JSX.Element => {
+    // Handle visibility of the modify person info modal
     const [isModifyPersonInfoModalVisible, setIsModifyPersonInfoModalVisible] = useState(false);
     const [owner, setOwner] = useState<IOwner | undefined>(undefined);
     const modifyPersonInfoHandler = (owner: IOwner) => {
         setIsModifyPersonInfoModalVisible(true);
         setOwner(owner);
+    };
+    // Handle visibility of the modify manager info modal
+    const [isModifyManagerModalVisible, setIsModifyManagerModalVisible] = useState(false);
+    const [manager, setManager] = useState<IPropertyManager | undefined>(undefined);
+    const modifyManagerInfoHandler = (manager: IPropertyManager | undefined) => {
+        if (manager) {
+            setIsModifyManagerModalVisible(true);
+            setManager(manager);
+        }
     };
 
     return (
@@ -516,10 +534,25 @@ const LoadedApartmentDetails = ({
                                                 </div>
                                             ))}
                                         </div>
-                                        <DetailField
-                                            label="Isännöitsijä"
-                                            value={housingCompany?.property_manager?.name}
-                                        />
+                                        <div>
+                                            <label className="detail-field-label">Isännöitsijä</label>
+                                            <div className="detail-field-value">
+                                                {housingCompany?.property_manager ? (
+                                                    <button
+                                                        className="text-button"
+                                                        onClick={() =>
+                                                            modifyManagerInfoHandler(
+                                                                housingCompany?.property_manager || undefined
+                                                            )
+                                                        }
+                                                    >
+                                                        {housingCompany?.property_manager?.name || " "}
+                                                    </button>
+                                                ) : (
+                                                    "-"
+                                                )}
+                                            </div>
+                                        </div>
                                         <DetailField
                                             label="Osakkeet"
                                             value={
@@ -629,6 +662,11 @@ const LoadedApartmentDetails = ({
                     owner={owner as IOwner}
                     isVisible={isModifyPersonInfoModalVisible}
                     setIsVisible={setIsModifyPersonInfoModalVisible}
+                />
+                <ModifyManagerModal
+                    manager={manager as IPropertyManager}
+                    isVisible={isModifyManagerModalVisible}
+                    setIsVisible={setIsModifyManagerModalVisible}
                 />
                 <ImprovementsTable
                     data={apartment}

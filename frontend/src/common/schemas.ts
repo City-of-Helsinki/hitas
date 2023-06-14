@@ -178,9 +178,8 @@ const AddressSchema = object({
 
 const PropertyManagerSchema = object({
     id: string(),
-    name: string(),
-    email: string(),
-    address: AddressSchema,
+    name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
+    email: string().email(errorMessages.emailInvalid).or(z.literal("")),
 });
 
 const ImprovementSchema = object({
@@ -1132,6 +1131,7 @@ export {
     FilterOwnersQuerySchema,
     ApartmentSaleFormSchema,
     OwnerSchema,
+    PropertyManagerSchema,
     OwnershipFormSchema,
     ownerAPISchema,
     ownershipsSchema,
