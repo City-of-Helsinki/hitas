@@ -9,7 +9,7 @@ import {TextInput} from "./form";
 import SaveButton from "./SaveButton";
 
 interface IManagerMutateForm {
-    manager: IPropertyManager;
+    manager?: IPropertyManager;
     closeModalAction: () => void;
 }
 const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
@@ -33,7 +33,7 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
     };
 
     const managerFormObject = useForm({
-        defaultValues: manager,
+        ...(manager && {defaultValues: manager}),
         mode: "all",
         resolver: zodResolver(PropertyManagerSchema),
     });
@@ -67,7 +67,7 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
                 />
                 {
                     // show info about the disabled saving of the unmodified form
-                    !managerFormObject.formState.isDirty && (
+                    !managerFormObject.formState.isDirty && manager && (
                         <p className="error-message">Lomakkeen tietoja ei ole muutettu</p>
                     )
                 }
@@ -94,7 +94,7 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
 };
 
 interface IModifyManagerModalProps {
-    manager: IPropertyManager;
+    manager?: IPropertyManager;
     isVisible: boolean;
     setIsVisible: Dispatch<SetStateAction<boolean>>;
 }
@@ -111,11 +111,11 @@ export default function ModifyManagerModal({manager, isVisible, setIsVisible}: I
         >
             <Dialog.Header
                 id="modify-manager-info-modal__header"
-                title="Muokkaa isännöitsijän tietoja"
+                title={manager ? "Muokkaa isännöitsijän tietoja" : "Lisää isännöitsijä"}
             />
             <Dialog.Content>
                 <ManagerMutateForm
-                    manager={manager}
+                    {...(manager && {manager: manager})}
                     closeModalAction={() => setIsVisible(false)}
                 />
             </Dialog.Content>

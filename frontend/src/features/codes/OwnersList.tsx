@@ -50,9 +50,11 @@ const OwnerResultList: React.FC<{params: IFilterOwnersQuery}> = ({params}) => {
                     </div>
                 ))}
             </ul>
-            <span className="list-footer">
-                Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
-            </span>
+            <div className="list-footer">
+                <div className="list-footer-item">
+                    Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
+                </div>
+            </div>
             <ModifyOwnerModal
                 owner={owner as IOwner}
                 isVisible={isModifyOwnerModalOpen}

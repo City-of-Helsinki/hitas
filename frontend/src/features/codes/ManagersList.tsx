@@ -1,4 +1,4 @@
-import {IconCrossCircle, IconSearch, TextInput} from "hds-react";
+import {Button, IconCrossCircle, IconPlus, IconSearch, TextInput} from "hds-react";
 import {useCallback, useRef, useState} from "react";
 import {useGetPropertyManagersQuery} from "../../app/services";
 import {ModifyManagerModal, QueryStateHandler} from "../../common/components";
@@ -16,8 +16,9 @@ const ManagerResultList: React.FC<{params: IFilterManagersQuery}> = ({params}) =
     // get the data
     const {data, error, isLoading} = useGetPropertyManagersQuery({...params, limit: MAX_ROWS});
 
-    // state for the modal
+    // state for the modals
     const [isModifyManagerModalOpen, setIsModifyManagerModalOpen] = useState(false);
+    const [isAddNewManagerModalOpen, setIsAddNewManagerModalOpen] = useState(false);
     const [manager, setManager] = useState<IPropertyManager | undefined>(undefined);
 
     // action for the row click
@@ -50,13 +51,28 @@ const ManagerResultList: React.FC<{params: IFilterManagersQuery}> = ({params}) =
                     </div>
                 ))}
             </ul>
-            <span className="list-footer">
-                Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
-            </span>
+            <div className="list-footer">
+                <div className="list-footer-item">
+                    Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
+                </div>
+                <div className="list-footer-item">
+                    <Button
+                        theme="black"
+                        iconLeft={<IconPlus />}
+                        onClick={() => setIsAddNewManagerModalOpen(true)}
+                    >
+                        Luo uusi
+                    </Button>
+                </div>
+            </div>
             <ModifyManagerModal
                 manager={manager as IPropertyManager}
                 isVisible={isModifyManagerModalOpen}
                 setIsVisible={setIsModifyManagerModalOpen}
+            />
+            <ModifyManagerModal
+                isVisible={isAddNewManagerModalOpen}
+                setIsVisible={setIsAddNewManagerModalOpen}
             />
         </QueryStateHandler>
     );
