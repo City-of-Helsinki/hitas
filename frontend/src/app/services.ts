@@ -16,6 +16,7 @@ import {
     IConditionOfSale,
     ICreateConditionOfSale,
     IExternalSalesDataResponse,
+    IFilterManagersQuery,
     IFilterOwnersQuery,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
@@ -26,6 +27,7 @@ import {
     IIndexListResponse,
     IIndexQuery,
     IIndexResponse,
+    IManagersResponse,
     IOwner,
     IOwnersResponse,
     IPostalCodeResponse,
@@ -236,8 +238,8 @@ const listApi = hitasApi.injectEndpoints({
             }),
             providesTags: [{type: "Owner", id: "LIST"}],
         }),
-        getPropertyManagers: builder.query<IApartmentListResponse, object>({
-            query: (params: object) => ({
+        getPropertyManagers: builder.query<IManagersResponse, IFilterManagersQuery>({
+            query: (params: IFilterManagersQuery) => ({
                 url: "property-managers",
                 params: params,
             }),

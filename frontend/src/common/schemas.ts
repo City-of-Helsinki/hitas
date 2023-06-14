@@ -1048,6 +1048,11 @@ const SalesCatalogValidationResponseSchema = object({
     acquisition_price_limit: number(),
 });
 
+const ManagersResponseSchema = object({
+    page: PageInfoSchema,
+    contents: PropertyManagerSchema.array(),
+});
+
 // Query Parameters
 
 const HousingCompanyApartmentQuerySchema = object({
@@ -1094,6 +1099,13 @@ const FilterOwnersQuerySchema = object({
     page: number().int().optional(),
 });
 
+const FilterManagersQuerySchema = object({
+    name: string().optional(),
+    email: string().optional(),
+    limit: number().int().optional(),
+    page: number().int().optional(),
+});
+
 // ********************************
 // * Exports
 // ********************************
@@ -1121,6 +1133,7 @@ export {
     ApartmentListResponseSchema,
     CodeResponseSchema,
     OwnersResponseSchema,
+    ManagersResponseSchema,
     PostalCodeResponseSchema,
     IndexListResponseSchema,
     IndexResponseSchema,
@@ -1129,6 +1142,7 @@ export {
     ApartmentQuerySchema,
     IndexListQuerySchema,
     FilterOwnersQuerySchema,
+    FilterManagersQuerySchema,
     ApartmentSaleFormSchema,
     OwnerSchema,
     PropertyManagerSchema,
@@ -1197,6 +1211,7 @@ export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListRespo
 export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
 export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
+export type IManagersResponse = z.infer<typeof ManagersResponseSchema>;
 export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
 export type ISalesCatalogApartment = z.infer<typeof SalesCatalogApartmentSchema>;
 export type ISalesCatalogValidationResponse = z.infer<typeof SalesCatalogValidationResponseSchema>;
@@ -1207,6 +1222,7 @@ export type IIndexListResponse = z.infer<typeof IndexListResponseSchema>;
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
 export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
+export type IFilterManagersQuery = z.infer<typeof FilterManagersQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
