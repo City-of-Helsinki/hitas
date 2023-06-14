@@ -422,7 +422,10 @@ def test__api__housing_company__retrieve_rounding(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__housing_company__retrieve__release_date__legacy(api_client: HitasAPIClient):
-    housing_company: HousingCompany = HousingCompanyFactory.create(legacy_release_date=date(2022, 1, 1))
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        legacy_release_date=date(2022, 1, 1),
+        regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+    )
 
     response = api_client.get(reverse("hitas:housing-company-detail", args=[housing_company.uuid.hex]))
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -431,7 +434,7 @@ def test__api__housing_company__retrieve__release_date__legacy(api_client: Hitas
 
 @pytest.mark.django_db
 def test__api__housing_company__retrieve__release_date__regulation(api_client: HitasAPIClient):
-    housing_company: HousingCompany = HousingCompanyFactory.create()
+    housing_company: HousingCompany = HousingCompanyFactory.create(regulation_status=RegulationStatus.RELEASED_BY_HITAS)
     results = ThirtyYearRegulationResults.objects.create(
         calculation_month=date(2022, 1, 1),
         regulation_month=date(2000, 1, 1),

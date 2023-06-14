@@ -227,6 +227,9 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
 
     @property
     def release_date(self) -> Optional[datetime.date]:
+        if self.regulation_status == RegulationStatus.REGULATED:
+            return None
+
         # Legacy release date overrides dynamic release date from regulation model
         _release_date: Optional[datetime.date] = self.legacy_release_date
         if _release_date:
