@@ -238,7 +238,6 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
             "official_name": a.housing_company.official_name,
             "property_manager": {
                 "name": a.housing_company.property_manager.name,
-                "street_address": a.housing_company.property_manager.street_address,
             },
         },
         "additional_info": "Example",
@@ -347,7 +346,6 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
             "archive_id": a.housing_company.id,
             "property_manager": {
                 "name": a.housing_company.property_manager.name,
-                "street_address": a.housing_company.property_manager.street_address,
             },
         },
         "additional_info": "Example",
@@ -563,7 +561,6 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "archive_id": a.housing_company.id,
             "property_manager": {
                 "name": a.housing_company.property_manager.name,
-                "street_address": a.housing_company.property_manager.street_address,
             },
         },
         "additional_info": "Example",
@@ -859,7 +856,6 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "archive_id": a.housing_company.id,
             "property_manager": {
                 "name": a.housing_company.property_manager.name,
-                "street_address": a.housing_company.property_manager.street_address,
             },
         },
         "additional_info": "Example",
@@ -1207,7 +1203,6 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
             "archive_id": a.housing_company.id,
             "property_manager": {
                 "name": a.housing_company.property_manager.name,
-                "street_address": a.housing_company.property_manager.street_address,
             },
         },
         "additional_info": "Example",
@@ -1539,4 +1534,4 @@ def test__api__apartment_max_price__missing_property_manager(api_client: HitasAP
     )
     assert response.status_code == status.HTTP_200_OK, response.json()
 
-    assert response.json()["housing_company"]["property_manager"] == {"name": "", "street_address": ""}
+    assert response.json()["housing_company"]["property_manager"] == {"name": ""}

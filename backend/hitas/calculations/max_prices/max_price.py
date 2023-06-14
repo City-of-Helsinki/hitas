@@ -233,11 +233,6 @@ def calculate_max_price(
                     "property_manager.name",
                     default="",
                 ),
-                "street_address": safe_attrgetter(
-                    apartment.housing_company,
-                    "property_manager.street_address",
-                    default="",
-                ),
             },
         },
         "additional_info": additional_info,
