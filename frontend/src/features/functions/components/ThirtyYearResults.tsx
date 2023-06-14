@@ -33,7 +33,7 @@ export default function ThirtyYearResults({
                 (hasExternalSalesData && hasResults && (
                     <QueryStateHandler
                         data={data}
-                        error={data ? undefined : error}
+                        error={error}
                         isLoading={isLoading}
                         attemptedAction="hae suoritetun vertailun tulokset"
                     >

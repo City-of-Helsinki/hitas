@@ -45,6 +45,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                             variant="secondary"
                             size="small"
                             onClick={() => setIsModalOpen((prev) => !prev)}
+                            className="obfuscated-owners-button"
                         >
                             Obfuskoidut omistajat
                         </Button>
@@ -66,7 +67,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.El
                             </ul>
                         </>
                     ) : (
-                        <p>Vertailussa ei automaattisesti vapautunut yhtiöitä.</p>
+                        <p>Vertailussa ei vapautunut yhtiöitä.</p>
                     )}
                     {hasManuallyReleasedCompanies && (
                         <>

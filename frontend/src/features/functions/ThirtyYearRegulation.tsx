@@ -187,6 +187,7 @@ const ThirtyYearRegulation = () => {
                                     formObject={formObject}
                                     defaultValue={years[0]}
                                     setDirectValue={true}
+                                    disabled={hasSkippedCompanies}
                                     required
                                 />
                                 <Select
@@ -196,6 +197,7 @@ const ThirtyYearRegulation = () => {
                                     formObject={formObject}
                                     defaultValue={hitasQuarterOptions[hitasQuarterOptions.length - 1]}
                                     value={formTimePeriod}
+                                    disabled={hasSkippedCompanies}
                                     required
                                 />
                             </div>
