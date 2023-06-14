@@ -19,6 +19,7 @@ from hitas.models._base import (
     HitasModelDecimalField,
 )
 from hitas.models.utils import validate_business_id
+from hitas.utils import max_date_if_all_not_null
 
 
 class HitasType(Enum):
@@ -208,15 +209,21 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
 
     @property
     def is_completed(self) -> bool:
-        from hitas.models import Apartment
+        return self.completion_date is not None
 
-        newest_apartment: Optional[Apartment] = (
-            Apartment.objects.filter(building__real_estate__housing_company=self).order_by("-completion_date").first()
+    @property
+    def completion_date(self) -> datetime.date:
+        # Allow caches for the instance
+        if hasattr(self, "_completion_date"):
+            return self._completion_date
+
+        self._completion_date = (
+            HousingCompany.objects.filter(id=self.id)
+            .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
+            .values_list("_completion_date", flat=True)
+            .first()
         )
-        if not newest_apartment:
-            return False
-
-        return bool(newest_apartment.completion_date)
+        return self._completion_date
 
     @property
     def release_date(self) -> Optional[datetime.date]:

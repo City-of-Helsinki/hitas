@@ -105,11 +105,18 @@ def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> Apa
 
     # Create max price calculation
     mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(**kwargs)
+    housing_company_completion_date = mpc.apartment.housing_company.completion_date
     mpc.json = calculate_max_price(
-        apartment=fetch_apartment(mpc.apartment.housing_company.uuid, mpc.apartment.uuid, mpc.calculation_date),
+        apartment=fetch_apartment(
+            housing_company_uuid=mpc.apartment.housing_company.uuid,
+            apartment_uuid=mpc.apartment.uuid,
+            calculation_month=monthify(mpc.calculation_date),
+            housing_company_completion_month=monthify(housing_company_completion_date),
+        ),
         apartment_share_of_housing_company_loans=fuzzy.FuzzyInteger(0, 5000).fuzz(),
         apartment_share_of_housing_company_loans_date=fuzzy.FuzzyDate(date(2020, 1, 1)).fuzz(),
         calculation_date=mpc.calculation_date,
+        housing_company_completion_date=housing_company_completion_date,
     )
     mpc.save()
     # Refresh to make sure the JSON is encoded

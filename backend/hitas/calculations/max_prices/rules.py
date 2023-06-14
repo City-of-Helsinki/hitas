@@ -21,6 +21,7 @@ class CalculatorRules:
         apartment_improvements: List,
         housing_company_improvements: List,
         calculation_date: datetime.date,
+        housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
         raise NotImplementedError()
 
@@ -33,6 +34,7 @@ class CalculatorRules:
         apartment_improvements: List,
         housing_company_improvements: List,
         calculation_date: datetime.date,
+        housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
         raise NotImplementedError()
 

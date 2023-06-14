@@ -34,9 +34,8 @@ def test__api__apartment_max_price__confirm(api_client: HitasAPIClient):
     )
     unconfirmed_mpc_other_apartment: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None,
-        apartment=ApartmentFactory.create(
-            building__real_estate__housing_company=a.housing_company,
-        ),
+        apartment__completion_date=datetime.date(2019, 11, 27),
+        apartment__building__real_estate__housing_company=a.housing_company,
     )
     unconfirmed_mpc_other_hc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(
         confirmed_at=None

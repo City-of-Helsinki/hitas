@@ -43,6 +43,7 @@ class RulesPre2011(CalculatorRules):
         apartment_improvements: List,
         housing_company_improvements: List,
         calculation_date: datetime.date,
+        housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
         if not apartment.realized_housing_company_acquisition_price:
             raise InvalidCalculationResultException(error_code="missing_realized_housing_company_acquisition_price")
@@ -146,7 +147,7 @@ class RulesPre2011(CalculatorRules):
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
-                completion_date=apartment.completion_date,
+                completion_date=housing_company_completion_date,
                 completion_date_index=apartment.completion_date_cpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_cpi,
@@ -162,6 +163,7 @@ class RulesPre2011(CalculatorRules):
         apartment_improvements: List,
         housing_company_improvements: List,
         calculation_date: datetime.date,
+        housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
         # Start calculations
 
@@ -244,7 +246,7 @@ class RulesPre2011(CalculatorRules):
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
-                completion_date=apartment.completion_date,
+                completion_date=housing_company_completion_date,
                 completion_date_index=apartment.completion_date_mpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_mpi,
