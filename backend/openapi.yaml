@@ -1440,7 +1440,6 @@ paths:
                       official_name: Example housing company Oy
                       property_manager:
                         name: Example property manager Oy
-                        street_address: Example street address 123 B 9 90100 Oulu
                     id: bd8ba72c19764af0a3edffa11260a9eb
                     index: construction_price_index
                     maximum_price: 223558.72
@@ -1605,7 +1604,6 @@ paths:
                       official_name: foo
                       property_manager:
                         name: foo
-                        street_address: foo
                     id: 95b342b0dfac42b5a2165c641488cc55
                     index: market_price_index
                     maximum_price: 289735.91
@@ -6644,16 +6642,11 @@ components:
               additionalProperties: false
               required:
                 - name
-                - street_address
               properties:
                 name:
                   description: Name of this property manager
                   type: string
                   example: Isännöinti Isät Oy
-                street_address:
-                  description: Property manager's street address
-                  type: string
-                  example: Isätie 42
         additional_info:
           description: Additional information to be displayed on the generated PDF
           type: string
@@ -7418,7 +7411,6 @@ components:
         - id
         - name
         - email
-        - address
       properties:
         id:
           description: ID of this property manager
@@ -7434,9 +7426,6 @@ components:
           type: string
           readOnly: true
           example: ismo@example.com
-        address:
-          readOnly: true
-          $ref: '#/components/schemas/ReadOnlyAddress'
 
     PropertyManager:
       description: Property manager information
@@ -7446,7 +7435,6 @@ components:
         - id
         - name
         - email
-        - address
       properties:
         id:
           description: ID of this property manager
@@ -7461,8 +7449,6 @@ components:
           description: Email for this property manager
           type: string
           example: ismo@example.com
-        address:
-          $ref: '#/components/schemas/Address'
 
     YearMonth:
       description: Year and month
@@ -8254,7 +8240,6 @@ components:
         - id
         - name
         - email
-        - address
         - last_modified
       properties:
         id:
@@ -8269,8 +8254,6 @@ components:
           description: Email for this property manager
           type: string
           example: ismo@example.com
-        address:
-          $ref: '#/components/schemas/ReadOnlyAddress'
         last_modified:
           description: When this property manager was last modified on a given housing company?
           type: string

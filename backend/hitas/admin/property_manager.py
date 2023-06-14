@@ -9,9 +9,6 @@ class PropertyManagerAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
     list_display = [
         "name",
         "email",
-        "street_address",
-        "postal_code",
-        "city",
     ]
     fields = ["uuid"] + list_display
     readonly_fields = ("uuid",)

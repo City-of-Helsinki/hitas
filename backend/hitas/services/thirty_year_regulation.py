@@ -71,7 +71,6 @@ class PropertyManagerInfo(TypedDict):
     id: str
     name: str
     email: str
-    address: AddressInfo
     last_modified: datetime.date | str | None
 
 
@@ -320,11 +319,6 @@ def _split_automatically_released(
                         id=housing_company.property_manager.uuid.hex,
                         name=housing_company.property_manager.name,
                         email=housing_company.property_manager.email,
-                        address=AddressInfo(
-                            street_address=housing_company.property_manager.street_address,
-                            postal_code=housing_company.property_manager.postal_code,
-                            city=housing_company.property_manager.city,
-                        ),
                         last_modified=(
                             housing_company.property_manager_last_edited.date()
                             if housing_company.property_manager_last_edited
@@ -368,11 +362,6 @@ def _get_comparison_values(
                 id=housing_company.property_manager.uuid.hex,
                 name=housing_company.property_manager.name,
                 email=housing_company.property_manager.email,
-                address=AddressInfo(
-                    street_address=housing_company.property_manager.street_address,
-                    postal_code=housing_company.property_manager.postal_code,
-                    city=housing_company.property_manager.city,
-                ),
                 last_modified=(
                     housing_company.property_manager_last_edited.date()
                     if housing_company.property_manager_last_edited
@@ -931,11 +920,6 @@ def convert_thirty_year_regulation_results_to_comparison_data(
                     id=row.housing_company.property_manager.uuid.hex,
                     name=row.housing_company.property_manager.name,
                     email=row.housing_company.property_manager.email,
-                    address=AddressInfo(
-                        street_address=row.housing_company.property_manager.street_address,
-                        postal_code=row.housing_company.property_manager.postal_code,
-                        city=row.housing_company.property_manager.city,
-                    ),
                     last_modified=row.last_modified.date() if row.last_modified else None,
                 ),
                 letter_fetched=row.letter_fetched,

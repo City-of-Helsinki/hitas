@@ -361,11 +361,6 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         },
         "property_manager": {
             "id": hc1.property_manager.uuid.hex,
-            "address": {
-                "street_address": hc1.property_manager.street_address,
-                "postal_code": hc1.property_manager.postal_code,
-                "city": hc1.property_manager.city,
-            },
             "name": hc1.property_manager.name,
             "email": hc1.property_manager.email,
         },
