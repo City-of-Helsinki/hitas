@@ -80,3 +80,36 @@
 
     &.state
       width: 10%
+
+#import-sales-catalog-modal
+  width: auto
+  .sales-catalog-import-list
+    width: calc(700px + $spacing-m * 2)
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    border: 1px solid $color-black-50
+    ul
+      margin: 0
+    li
+      @include flexbox()
+      @include justify-content(space-between)
+      width: 100%
+      padding: 5px $spacing-layout-xs
+      &:nth-child(odd)
+        background-color: $color-black-5
+    li  > div, .list-headers div
+        width: 100px
+        @include flexbox()
+        @include justify-content(center)
+        &:first-child
+          @include justify-content(flex-start)
+        &:last-child
+          @include justify-content(flex-end)
+  .list-headers
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    padding: $spacing-layout-xs
+    margin: 0
+    background-color: $color-black
+    color: $color-white
+
