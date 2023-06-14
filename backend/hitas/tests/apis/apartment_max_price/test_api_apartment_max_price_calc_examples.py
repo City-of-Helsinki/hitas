@@ -47,15 +47,23 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
-    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=datetime.date(2019, 11, 27),
+        surface_area=4302,
+    )
 
     cpi_improvement: HousingCompanyConstructionPriceImprovement = (
         HousingCompanyConstructionPriceImprovementFactory.create(
-            housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+            housing_company=a.housing_company,
+            value=150000,
+            completion_date=datetime.date(2020, 5, 21),
         )
     )
     mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
-        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+        housing_company=a.housing_company,
+        value=150000,
+        completion_date=datetime.date(2020, 5, 21),
     )
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
@@ -267,7 +275,11 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
-    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
+    ApartmentFactory.create(
+        completion_date=datetime.date(2014, 8, 27),
+        building__real_estate__housing_company=a.housing_company,
+        surface_area=2655,
+    )
 
     cpi_improvement: HousingCompanyConstructionPriceImprovement = (
         HousingCompanyConstructionPriceImprovementFactory.create(
@@ -464,6 +476,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
     )
     # Create another apartment with rest of the surface area
     ApartmentFactory.create(
+        completion_date=datetime.date(2003, 5, 9),
         building__real_estate__housing_company=a.housing_company,
         surface_area=3336,
         share_number_start=3,
@@ -763,10 +776,13 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         sales__purchase_price=16551639.5,
         sales__apartment_share_of_housing_company_loans=0.5,
     )
-    # Create another apartment with different completion date and rest of the acquisition price
+    # Create another apartment with a later completion date and rest of the acquisition price.
+    # Now the completion date used in the calculation should be this apartments completion date, since
+    # it becomes the latest apartment in the housing company, and thus its completion date is used for the
+    # housing company's completion date.
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
-        completion_date=datetime.date(2011, 12, 30),
+        completion_date=datetime.date(2012, 7, 28),
         surface_area=0.0,
         sales__purchase_price=20545029.0,
         sales__apartment_share_of_housing_company_loans=1.0,
@@ -792,9 +808,9 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     )
     o1: Ownership = OwnershipFactory.create(percentage=100.0, sale=sale)
 
-    # Create necessary apartment's completion date indices
-    ConstructionPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=296.10)
-    MarketPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=263.60)
+    # Create necessary housing company's completion date indices
+    ConstructionPriceIndexFactory.create(month=datetime.date(2012, 7, 1), value=296.10)
+    MarketPriceIndexFactory.create(month=datetime.date(2012, 7, 1), value=263.60)
 
     # Create necessary calculation date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2022, 11, 1), value=364.60)
@@ -914,7 +930,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "debt_free_price_m2": 5228.62,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
-            "completion_date": "2012-06-28",
+            "completion_date": "2012-07-28",
             "completion_date_index": 296.10,
             "calculation_date": "2022-11-21",
             "calculation_date_index": 364.6,
@@ -966,7 +982,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "debt_free_price_m2": 8564.47,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
-            "completion_date": "2012-06-28",
+            "completion_date": "2012-07-28",
             "completion_date_index": 263.6,
             "calculation_date": "2022-11-21",
             "calculation_date_index": 567.1,
@@ -1137,7 +1153,11 @@ def test__api__apartment_max_price__surface_area_price_ceiling(api_client: Hitas
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
-    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=2655)
+    ApartmentFactory.create(
+        completion_date=datetime.date(2012, 1, 13),
+        building__real_estate__housing_company=a.housing_company,
+        surface_area=2655,
+    )
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         apartment=a,
@@ -1490,7 +1510,11 @@ def test__api__apartment_max_price__missing_property_manager(api_client: HitasAP
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     # Create another apartment with rest of the surface area
-    ApartmentFactory.create(building__real_estate__housing_company=a.housing_company, surface_area=4302)
+    ApartmentFactory.create(
+        completion_date=datetime.date(2019, 11, 27),
+        building__real_estate__housing_company=a.housing_company,
+        surface_area=4302,
+    )
 
     HousingCompanyConstructionPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
