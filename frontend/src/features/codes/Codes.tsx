@@ -1,5 +1,5 @@
 import {Tabs} from "hds-react";
-import {IndicesList, OwnersList} from "./";
+import {IndicesList, ManagersList, OwnersList} from "./";
 
 const Codes = (): JSX.Element => {
     return (
@@ -9,8 +9,9 @@ const Codes = (): JSX.Element => {
                 <Tabs.TabList>
                     <Tabs.Tab>Indeksit</Tabs.Tab>
                     <Tabs.Tab>Postinumerot</Tabs.Tab>
-                    <Tabs.Tab>Omistajat</Tabs.Tab>
                     <Tabs.Tab>Rahoitusmuodot</Tabs.Tab>
+                    <Tabs.Tab>Omistajat</Tabs.Tab>
+                    <Tabs.Tab>Isännöitsijät</Tabs.Tab>
                 </Tabs.TabList>
                 <Tabs.TabPanel className="view--codes__tab--indices">
                     <IndicesList />
@@ -18,11 +19,14 @@ const Codes = (): JSX.Element => {
                 <Tabs.TabPanel className="view--codes__tab--postalcodes">
                     <h1>Postinumerot</h1>
                 </Tabs.TabPanel>
+                <Tabs.TabPanel className="view--codes__tab--financing-methods">
+                    <h1>Rahoitusmuodot</h1>
+                </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--owners">
                     <OwnersList />
                 </Tabs.TabPanel>
-                <Tabs.TabPanel className="view--codes__tab--financing-methods">
-                    <h1>Rahoitusmuodot</h1>
+                <Tabs.TabPanel className="view--codes__tab--managers">
+                    <ManagersList />
                 </Tabs.TabPanel>
             </Tabs>
         </div>
