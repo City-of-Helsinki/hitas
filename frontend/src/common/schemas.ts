@@ -86,6 +86,7 @@ export const errorMessages = {
     constructionInterestEmpty: "Toinen korkokenttä on tyhjä",
     constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
     maxTwoDecimalPlaces: "Anna arvo enintän kahden desimaalin tarkkuudella",
+    noDecimalPlaces: "Anna arvo kokonaislukuna",
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
@@ -569,12 +570,12 @@ const ApartmentSaleFormSchema = object({
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)
         .max(999999, errorMessages.priceMax)
-        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
+        .multipleOf(1, errorMessages.noDecimalPlaces)
         .nullish(),
     apartment_share_of_housing_company_loans: z
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.loanShareMin)
-        .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
+        .multipleOf(1, errorMessages.noDecimalPlaces)
         .nullish(),
     exclude_from_statistics: boolean(),
 });
