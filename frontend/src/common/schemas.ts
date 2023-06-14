@@ -177,8 +177,8 @@ const AddressSchema = object({
 });
 
 const PropertyManagerSchema = object({
-    id: string(),
-    name: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
+    id: string().optional(),
+    name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
     email: string().email(errorMessages.emailInvalid).or(z.literal("")),
 });
 
@@ -308,7 +308,7 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
         id: APIIdString.optional(),
         building_type: object({id: string()}),
         developer: object({id: string()}),
-        property_manager: object({id: string()}).nullable(),
+        property_manager: object({id: string().optional()}).nullable(),
     })
 );
 
