@@ -129,6 +129,10 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                         </p>
                     )
                 }
+                {
+                    // show info about the disabled saving of the unmodified form
+                    !hasFormChanged && <p className="error-message">Lomakkeen tietoja ei ole muutettu</p>
+                }
                 <div className="row row--buttons">
                     <Button
                         theme="black"
