@@ -17,6 +17,12 @@ from hitas.models import Apartment, HousingCompany
 from hitas.models.apartment import ApartmentMaximumPriceCalculation
 
 
+def serialize_calculation(ampc: ApartmentMaximumPriceCalculation):
+    data = ampc.json
+    data["confirmed_at"] = ampc.confirmed_at
+    return data
+
+
 class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet):
     def create(self, request, *args, **kwargs):
         serializer = CreateCalculationSerializer(data=request.data)
@@ -49,20 +55,20 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         with model_or_404(ApartmentMaximumPriceCalculation):
             try:
                 uuid.UUID(hex=kwargs["pk"])
-            except ValueError:
-                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
+            except ValueError as e:
+                raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation) from e
 
-            mpc = ApartmentMaximumPriceCalculation.objects.only(
+            ampc = ApartmentMaximumPriceCalculation.objects.only(
                 "json_version", "json", "confirmed_at", "apartment_id"
             ).get(
                 apartment_id=apartment_id,
                 uuid=kwargs["pk"],
                 json_version=ApartmentMaximumPriceCalculation.CURRENT_JSON_VERSION,
             )
-            if mpc.json_version is None:
+            if ampc.json_version is None:
                 raise HitasModelNotFound(model=ApartmentMaximumPriceCalculation)
 
-            return self.response(mpc)
+            return Response(serialize_calculation(ampc))
 
     def update(self, request, *args, **kwargs):
         serializer = ConfirmSerializer(data=request.data)
@@ -109,7 +115,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 apartment_id=apartment_id, confirmed_at__isnull=True
             ).delete()
 
-            return self.response(ampc)
+            return Response(serialize_calculation(ampc))
         else:
             # In case the user wanted not to confirm we will delete the calculation
             ampc.delete()
@@ -125,12 +131,6 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
                 uuid=kwargs["apartment_uuid"], building__real_estate__housing_company_id=hc_id
             )
         return hc_id, apartment_id
-
-    @staticmethod
-    def response(ampc):
-        retval = ampc.json
-        retval["confirmed_at"] = ampc.confirmed_at
-        return Response(retval)
 
 
 class ConfirmSerializer(Serializer):
