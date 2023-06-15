@@ -9,11 +9,13 @@ from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelSeriali
 
 class PropertyManagerFilterSet(HitasFilterSet):
     name = HitasCharFilter(lookup_expr="icontains")
+    email = HitasCharFilter(lookup_expr="icontains")
 
     class Meta:
         model = PropertyManager
         fields = [
             "name",
+            "email",
         ]
 
 
