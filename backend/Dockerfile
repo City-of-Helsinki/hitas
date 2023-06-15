@@ -34,7 +34,10 @@ FROM base AS builder
 ENV POETRY_VERSION=1.3.1
 ENV POETRY_HOME=/usr/pypoetry
 ENV PATH=$POETRY_HOME/bin:$PATH
+# Set so that poetry uses venv created in '/hitas/venv'.
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+# Disable parallel installer to avoid out-of-memory errors in Azure Pipelines.
+ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install build dependencies
 RUN apt-get install -y --no-install-recommends \
