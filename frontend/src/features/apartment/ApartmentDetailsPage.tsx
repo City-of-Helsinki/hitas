@@ -99,8 +99,8 @@ const ApartmentConditionsOfSaleCard = ({
     });
 
     const ApartmentSalesPageLinkButton = () => {
-        // If apartment has been sold for the first time, and it's still not completed, it can not be re-sold
-        if (!apartment.completion_date && apartment.prices.first_purchase_date) {
+        // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
+        if (!housingCompany.date && apartment.prices.first_purchase_date) {
             return (
                 <Button
                     theme="black"
@@ -420,7 +420,7 @@ const ApartmentMaximumPricesCard = ({
                         theme="black"
                         size="small"
                         disabled={
-                            !apartment.completion_date ||
+                            !housingCompany.date ||
                             housingCompany.regulation_status !== "regulated" ||
                             !apartment.prices.first_purchase_date
                         }
