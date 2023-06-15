@@ -187,20 +187,23 @@ def test__api__property_manager__delete(api_client: HitasAPIClient):
 
 
 @pytest.mark.parametrize(
-    "selected_filter",
+    ["selected_filter", "results"],
     [
-        {"name": "TestName"},
-        {"name": "TestN"},
-        {"name": "testname"},
-        {"name": "stNa"},
+        [{"name": "TestName"}, 1],
+        [{"name": "TestN"}, 1],
+        [{"name": "testname"}, 1],
+        [{"name": "stNa"}, 1],
+        [{"email": "test@email.com"}, 1],
+        [{"email": "test@email.fi"}, 1],
+        [{"email": "test@email"}, 2],
     ],
 )
 @pytest.mark.django_db
-def test__api__property_manager__filter(api_client: HitasAPIClient, selected_filter):
-    PropertyManagerFactory.create(name="TestName")
-    PropertyManagerFactory.create(name="foo")
+def test__api__property_manager__filter(api_client: HitasAPIClient, selected_filter, results):
+    PropertyManagerFactory.create(name="TestName", email="test@email.com")
+    PropertyManagerFactory.create(name="foo", email="test@email.fi")
 
     url = reverse("hitas:property-manager-list") + "?" + urlencode(selected_filter)
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK, response.json()
-    assert len(response.json()["contents"]) == 1, response.json()
+    assert len(response.json()["contents"]) == results, response.json()
