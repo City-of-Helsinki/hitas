@@ -7,6 +7,7 @@ interface RemoveButtonProps {
     disabled?: boolean;
     variant?: "primary" | "secondary" | "success" | "danger";
     className?: string;
+    size?: "small" | "default";
 }
 
 export default function RemoveButton({

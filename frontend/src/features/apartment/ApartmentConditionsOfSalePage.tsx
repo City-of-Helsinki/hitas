@@ -24,7 +24,14 @@ import {
     useLazyGetConditionOfSaleQuery,
     useUpdateConditionOfSaleMutation,
 } from "../../app/services";
-import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
+import {
+    FormInputField,
+    Heading,
+    NavigateBackButton,
+    QueryStateHandler,
+    RemoveButton,
+    SaveButton,
+} from "../../common/components";
 import {IApartmentConditionOfSale, IApartmentDetails, IConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
@@ -397,6 +404,13 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             </div>
                             <div className="input-wrap sell-by-date">{formatDate(cos.sell_by_date)} </div>
                             <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
+                            <RemoveButton
+                                onClick={() => {
+                                    return;
+                                }}
+                                isLoading={false}
+                                size="small"
+                            />
                         </li>
                     ))}
                 </ul>
