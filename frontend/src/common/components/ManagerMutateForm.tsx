@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Button, Dialog, IconArrowLeft} from "hds-react";
-import {Dispatch, SetStateAction, useEffect} from "react";
+import {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {useSaveManagerMutation} from "../../app/services";
 import {IPropertyManager, PropertyManagerSchema} from "../schemas";
@@ -9,10 +9,15 @@ import {TextInput} from "./form";
 import SaveButton from "./SaveButton";
 
 interface IManagerMutateForm {
-    manager?: IPropertyManager;
+    defaultObject?: IPropertyManager;
     closeModalAction: () => void;
+    setDefaultFilterParams?: () => void;
 }
-const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
+export default function ManagerMutateForm({
+    defaultObject: manager,
+    closeModalAction,
+    setDefaultFilterParams,
+}: IManagerMutateForm) {
     const [saveManager, {isLoading: isSaveManagerLoading}] = useSaveManagerMutation();
     const runSaveManager = (data) => {
         // submit the form values
@@ -21,6 +26,7 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
             .then(() => {
                 hdsToast.success("Isännöitsijän tiedot tallennettu onnistuneesti!");
                 closeModalAction();
+                setDefaultFilterParams && setDefaultFilterParams();
             })
             .catch((error) => {
                 hdsToast.error("Virhe isännöitsijän tietojen tallentamisessa!");
@@ -75,7 +81,12 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
                     <Button
                         theme="black"
                         iconLeft={<IconArrowLeft />}
-                        onClick={closeModalAction}
+                        onClick={() => {
+                            closeModalAction();
+                            if (setDefaultFilterParams && !manager) {
+                                setDefaultFilterParams();
+                            }
+                        }}
                     >
                         Peruuta
                     </Button>
@@ -90,35 +101,5 @@ const ManagerMutateForm = ({manager, closeModalAction}: IManagerMutateForm) => {
 
             <Dialog.ActionButtons />
         </>
-    );
-};
-
-interface IModifyManagerModalProps {
-    manager?: IPropertyManager;
-    isVisible: boolean;
-    setIsVisible: Dispatch<SetStateAction<boolean>>;
-}
-
-export default function ModifyManagerModal({manager, isVisible, setIsVisible}: IModifyManagerModalProps) {
-    return (
-        <Dialog
-            id="modify-manager-info-modal"
-            closeButtonLabelText=""
-            aria-labelledby=""
-            isOpen={isVisible}
-            close={() => setIsVisible(false)}
-            boxShadow
-        >
-            <Dialog.Header
-                id="modify-manager-info-modal__header"
-                title={manager ? "Muokkaa isännöitsijän tietoja" : "Lisää isännöitsijä"}
-            />
-            <Dialog.Content>
-                <ManagerMutateForm
-                    {...(manager && {manager: manager})}
-                    closeModalAction={() => setIsVisible(false)}
-                />
-            </Dialog.Content>
-        </Dialog>
     );
 }

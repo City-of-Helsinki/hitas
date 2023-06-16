@@ -11,11 +11,13 @@ import FormInputField from "./formInputField/FormInputField";
 import Heading from "./Heading";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
-import ModifyManagerModal from "./ModifyManagerModal";
-import ModifyOwnerModal from "./ModifyOwnerModal";
+import ManagerMutateForm from "./ManagerMutateForm";
+import MutateModal from "./MutateModal";
+import MutateSearchList from "./MutateSearchList";
 import NavigateBackButton from "./NavigateBackButton";
 import NewOwnerForm from "./NewOwnerForm";
 import Notifications from "./Notifications";
+import OwnerMutateForm from "./OwnerMutateForm";
 import QueryStateError from "./QueryStateError";
 import QueryStateHandler from "./QueryStateHandler";
 import RemoveButton from "./RemoveButton";
@@ -37,8 +39,10 @@ export {
     Heading,
     ImprovementsTable,
     ListPageNumbers,
-    ModifyOwnerModal,
-    ModifyManagerModal,
+    MutateModal,
+    OwnerMutateForm,
+    MutateSearchList,
+    ManagerMutateForm,
     NavigateBackButton,
     NewOwnerForm,
     Notifications,
