@@ -572,6 +572,15 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error ? [{type: "HousingCompany", id: arg.housingCompanyId}, {type: "Apartment"}] : [],
         }),
+        batchCompleteApartments: builder.mutation({
+            query: (arg) => ({
+                url: `housing-companies/${arg.housing_company_id}/batch-complete-apartments`,
+                method: "PATCH",
+                headers: mutationApiJsonHeaders(),
+                body: arg.data,
+            }),
+            invalidatesTags: (result, error) => (!error && result ? [{type: "Apartment", id: "LIST"}] : []),
+        }),
     }),
 });
 
@@ -618,4 +627,5 @@ export const {
     useSaveExternalSalesDataMutation,
     useValidateSalesCatalogMutation,
     useCreateFromSalesCatalogMutation,
+    useBatchCompleteApartmentsMutation,
 } = mutationApi;
