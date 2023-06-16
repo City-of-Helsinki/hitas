@@ -2,29 +2,31 @@ import {Button, Dialog} from "hds-react";
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useBatchCompleteApartmentsMutation} from "../../app/services";
-import {CloseButton} from "../../common/components";
+import {CloseButton, SaveDialogModal} from "../../common/components";
 import {NumberInput} from "../../common/components/form";
 import {hdsToast, today} from "../../common/utils";
 
 const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [batchComplete] = useBatchCompleteApartmentsMutation();
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    const [batchComplete, {data, error, isLoading}] = useBatchCompleteApartmentsMutation();
     const groupCompleteForm = useForm({
         defaultValues: {
-            start: undefined,
-            end: undefined,
+            start: null,
+            end: null,
         },
         mode: "all",
     });
     const {handleSubmit, setFocus} = groupCompleteForm;
     const formStart = groupCompleteForm.watch("start");
     const formEnd = groupCompleteForm.watch("end");
-    const onSubmit = (data: {start: number | undefined; end: number | undefined}) => {
+
+    const onSubmit = (data: {start: number | null; end: number | null}) => {
         const submitData = {
             housing_company_id: housingCompanyId,
             data: {
-                apartment_number_start: Number(data.start),
-                apartment_number_end: Number(data.end),
+                apartment_number_start: data.start !== undefined && data.start !== null ? Number(data.start) : null,
+                apartment_number_end: data.end !== undefined && data.end !== null ? Number(data.end) : null,
                 completion_date: today(),
             },
         };
@@ -36,11 +38,12 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                     (data as {data: {completed_apartment_count: number}}).data.completed_apartment_count +
                         " asuntoa merkitty onnistuneesti valmiiksi"
                 );
-                setIsOpen(false);
+                setIsFormOpen(false);
             })
             .catch((e) => {
                 // eslint-disable-next-line no-console
                 console.warn(e);
+                setIsErrorModalOpen(true);
                 hdsToast.error("Asuntojen merkitseminen valmiiksi epäonnistui");
             });
     };
@@ -52,7 +55,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 size="small"
                 variant="secondary"
                 onClick={() => {
-                    setIsOpen(true);
+                    setIsFormOpen(true);
                     setFocus("end"); // FIXME: This doesn't work :/
                 }}
             >
@@ -61,7 +64,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
             <Dialog
                 id="batch-complete-modal"
                 aria-labelledby="batch-complete-modal"
-                isOpen={isOpen}
+                isOpen={isFormOpen}
             >
                 <Dialog.Header
                     title="Merkitse asunnot valmiiksi"
@@ -73,7 +76,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                         <>
                             <p>
                                 Jos et halua rajata pelkkää alku- tai loppupäätä jätä kenttä tyhjäksi. Jos kumpikin
-                                kenttä on tyhjä valitaan kaikki yhtiön asunnot. Numerot koskevat kaikkia rappuja.
+                                kenttä on tyhjä valitaan kaikki yhtiön asunnot.
                             </p>
                             <div className="apartment-numbers">
                                 <div className={formStart ? "toggled" : undefined}>
@@ -82,7 +85,6 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                                         label="Asuntonumero alku"
                                         formObject={groupCompleteForm}
                                         tooltipText="Jätä kenttä tyhjäksi, jos haluat merkitä valmiiksi kaikki asunnot ennen viimeistä huoneistonumeroa"
-                                        value={formStart ? formStart : "-"}
                                     />
                                 </div>
                                 <div className={formEnd ? "toggled" : undefined}>
@@ -97,7 +99,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                         </>
                     </Dialog.Content>
                     <Dialog.ActionButtons>
-                        <CloseButton onClick={() => setIsOpen(false)} />
+                        <CloseButton onClick={() => setIsFormOpen(false)} />
                         <Button
                             theme="black"
                             type="submit"
@@ -107,6 +109,14 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                     </Dialog.ActionButtons>
                 </form>
             </Dialog>
+            <SaveDialogModal
+                data={data}
+                error={error}
+                isLoading={isLoading}
+                isVisible={isErrorModalOpen}
+                setIsVisible={setIsErrorModalOpen}
+                className="batch-complete-error-modal"
+            />
         </>
     );
 };
