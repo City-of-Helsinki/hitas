@@ -60,6 +60,10 @@ from hitas.services.apartment import (
 )
 
 from hitas.services.condition_of_sale import condition_of_sale_queryset
+from hitas.services.indices import (
+    subquery_apartment_current_surface_area_price,
+    subquery_apartment_first_sale_acquisition_price_index_adjusted,
+)
 from hitas.utils import RoundWithPrecision, check_for_overlap, valid_uuid, monthify
 from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
@@ -783,95 +787,6 @@ class ApartmentViewSet(HitasModelViewSet):
         return ApartmentFilterSet
 
     @staticmethod
-    def select_index(
-        table: Union[
-            type[MarketPriceIndex],
-            type[MarketPriceIndex2005Equal100],
-            type[ConstructionPriceIndex],
-            type[ConstructionPriceIndex2005Equal100],
-        ],
-        completion_date: Optional[datetime.date] = None,
-        calculation_month: Optional[datetime.date] = None,
-    ) -> RoundWithPrecision:
-        calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
-
-        original_value = Subquery(
-            table.objects.filter(month=OuterRef("completion_month")).values("value"),
-            output_field=HitasModelDecimalField(),
-        )
-
-        current_value = Subquery(
-            table.objects.filter(month=calculation_month).values("value"),
-            output_field=HitasModelDecimalField(),
-        )
-
-        depreciation: Value = Value(1, output_field=HitasModelDecimalField())
-        interest: Union[Case, Value] = Value(0, output_field=HitasModelDecimalField())
-
-        if issubclass(table, MarketPriceIndex):
-            interest = Case(
-                When(
-                    condition=~Q(
-                        building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
-                    ),
-                    then=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
-                ),
-                default=0,
-                output_field=HitasModelDecimalField(),
-            )
-        elif issubclass(table, ConstructionPriceIndex):
-            # If 'completion_date' is missing, calculating index for that month will fail
-            # and index price will be null, so we can skip this calculation freely
-            if completion_date is not None:
-                depreciation = Value(
-                    depreciation_multiplier(months_between_dates(completion_date, calculation_month)),
-                    output_field=HitasModelDecimalField(),
-                )
-                print(depreciation)
-
-            interest = Case(
-                # Check for exceptions where old ruleset is not used
-                When(
-                    condition=Q(
-                        building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
-                    ),
-                    then=0,
-                ),
-                When(
-                    condition=Q(completion_date__lt=datetime.date(2005, 1, 1)),
-                    then=Coalesce(F("interest_during_construction_14"), 0, output_field=HitasModelDecimalField()),
-                ),
-                default=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
-                output_field=HitasModelDecimalField(),
-            )
-
-        return RoundWithPrecision(
-            (
-                F("_first_sale_purchase_price")
-                + F("_first_sale_share_of_housing_company_loans")
-                + F("additional_work_during_construction")
-                + interest
-            )
-            * depreciation
-            * current_value
-            / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors
-            precision=2,
-        )
-
-    @staticmethod
-    def select_sapc(calculation_month: datetime.date) -> RoundWithPrecision:
-        current_month = TruncMonth(Now()) if calculation_month is None else calculation_month
-        current_value = Subquery(
-            SurfaceAreaPriceCeiling.objects.filter(month=current_month).values("value"),
-            output_field=HitasModelDecimalField(),
-        )
-
-        return RoundWithPrecision(
-            F("surface_area") * current_value,
-            precision=2,
-        )
-
-    @staticmethod
     def get_base_queryset():
         return (
             Apartment.objects.prefetch_related(
@@ -934,27 +849,29 @@ class ApartmentViewSet(HitasModelViewSet):
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
-            cpi=self.select_index(
+            cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
                 completion_date=completion_date,
                 calculation_month=calculation_month,
             ),
-            cpi_2005_100=self.select_index(
+            cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex2005Equal100,
                 completion_date=completion_date,
                 calculation_month=calculation_month,
             ),
-            mpi=self.select_index(
+            mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex,
                 completion_date=completion_date,
                 calculation_month=calculation_month,
             ),
-            mpi_2005_100=self.select_index(
+            mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex2005Equal100,
                 completion_date=completion_date,
                 calculation_month=calculation_month,
             ),
-            sapc=self.select_sapc(calculation_month=calculation_month),
+            sapc=subquery_apartment_current_surface_area_price(
+                calculation_month=calculation_month,
+            ),
         )
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
