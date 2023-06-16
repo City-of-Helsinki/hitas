@@ -20,7 +20,7 @@ class ApartmentSaleFactory(DjangoModelFactory):
     notification_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     purchase_date = fuzzy.FuzzyDate(date(2010, 1, 1))
     purchase_price = fuzzy.FuzzyDecimal(100_000, 200_000)
-    apartment_share_of_housing_company_loans = fuzzy.FuzzyDecimal(100_000, 200_000)
+    apartment_share_of_housing_company_loans = fuzzy.FuzzyDecimal(10000, 20000)
     exclude_from_statistics = False
 
     @factory.post_generation
