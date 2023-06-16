@@ -1,14 +1,18 @@
 import datetime
 import logging
 from decimal import Decimal
-from typing import Literal, NamedTuple, Optional
+from typing import Literal, NamedTuple, Optional, Union
 
 from dateutil.relativedelta import relativedelta
-from django.db.models import Case, OuterRef, Q, Subquery, When
+from django.db.models import Case, F, OuterRef, Q, Subquery, Value, When
+from django.db.models.functions import Coalesce, NullIf
+from django.utils import timezone
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
+from hitas.calculations.helpers import months_between_dates
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     ConstructionPriceIndex,
@@ -20,11 +24,13 @@ from hitas.models.housing_company import HitasType, HousingCompanyWithAnnotation
 from hitas.models.indices import (
     CalculationData,
     HousingCompanyData,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
     SurfaceAreaPriceCeilingCalculationData,
     SurfaceAreaPriceCeilingResult,
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
-from hitas.utils import format_sheet, hitas_calculation_quarter, resize_columns, roundup
+from hitas.utils import RoundWithPrecision, format_sheet, hitas_calculation_quarter, monthify, resize_columns, roundup
 
 logger = logging.getLogger()
 
@@ -276,3 +282,94 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
     resize_columns(worksheet)
     worksheet.protection.sheet = True
     return workbook
+
+
+def subquery_apartment_current_surface_area_price(
+    calculation_month: Optional[datetime.date] = None,
+) -> RoundWithPrecision:
+    calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
+
+    current_value = Subquery(
+        SurfaceAreaPriceCeiling.objects.filter(month=calculation_month).values("value"),
+        output_field=HitasModelDecimalField(),
+    )
+
+    return RoundWithPrecision(
+        F("surface_area") * current_value,
+        precision=2,
+    )
+
+
+def subquery_apartment_first_sale_acquisition_price_index_adjusted(
+    table: Union[
+        type[MarketPriceIndex],
+        type[MarketPriceIndex2005Equal100],
+        type[ConstructionPriceIndex],
+        type[ConstructionPriceIndex2005Equal100],
+    ],
+    completion_date: Optional[datetime.date] = None,
+    calculation_month: Optional[datetime.date] = None,
+) -> RoundWithPrecision:
+    calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
+
+    original_value = Subquery(
+        table.objects.filter(month=OuterRef("completion_month")).values("value"),
+        output_field=HitasModelDecimalField(),
+    )
+
+    current_value = Subquery(
+        table.objects.filter(month=calculation_month).values("value"),
+        output_field=HitasModelDecimalField(),
+    )
+
+    depreciation: Value = Value(1, output_field=HitasModelDecimalField())
+    interest: Union[Case, Value] = Value(0, output_field=HitasModelDecimalField())
+
+    if issubclass(table, MarketPriceIndex):
+        interest = Case(
+            When(
+                condition=~Q(
+                    building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
+                ),
+                then=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
+            ),
+            default=0,
+            output_field=HitasModelDecimalField(),
+        )
+    elif issubclass(table, ConstructionPriceIndex):
+        # If 'completion_date' is missing, calculating index for that month will fail
+        # and index price will be null, so we can skip this calculation freely
+        if completion_date is not None:
+            depreciation = Value(
+                depreciation_multiplier(months_between_dates(completion_date, calculation_month)),
+                output_field=HitasModelDecimalField(),
+            )
+
+        interest = Case(
+            # Check for exceptions where old ruleset is not used
+            When(
+                condition=Q(
+                    building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
+                ),
+                then=0,
+            ),
+            When(
+                condition=Q(completion_date__lt=datetime.date(2005, 1, 1)),
+                then=Coalesce(F("interest_during_construction_14"), 0, output_field=HitasModelDecimalField()),
+            ),
+            default=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
+            output_field=HitasModelDecimalField(),
+        )
+
+    return RoundWithPrecision(
+        (
+            F("_first_sale_purchase_price")
+            + F("_first_sale_share_of_housing_company_loans")
+            + F("additional_work_during_construction")
+            + interest
+        )
+        * depreciation
+        * current_value
+        / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors
+        precision=2,
+    )
