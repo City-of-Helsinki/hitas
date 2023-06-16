@@ -30,6 +30,7 @@ interface SaveStateProps {
     isVisible: boolean;
     setIsVisible;
     title?: string;
+    className?: string;
 }
 
 const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
@@ -109,6 +110,7 @@ export default function SaveDialogModal({
     isVisible,
     setIsVisible,
     title,
+    className,
 }: SaveStateProps): JSX.Element {
     return (
         <Dialog
@@ -117,7 +119,7 @@ export default function SaveDialogModal({
             aria-labelledby="finish-modal"
             isOpen={isVisible}
             close={() => setIsVisible(false)}
-            className={error && "error-modal"}
+            className={error ? className + " error-modal" : className}
             boxShadow
         >
             <Dialog.Header
