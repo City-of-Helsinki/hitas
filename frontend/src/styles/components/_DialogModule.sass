@@ -29,8 +29,19 @@
     align-self: center
 
 #batch-complete-modal
+  .input-field
+    width: 100%
+    height: auto
   .apartment-numbers
     margin-top: $spacing-m
     @include flexbox()
     @include justify-content(space-between)
-    gap: $spacing-layout-2-xl
+    @include flex-flow(row nowrap)
+    gap: $spacing-2-xs
+    > div
+      @include flexbox()
+      @include flex-flow(row)
+      align-items: flex-start
+      label
+        width: 100%
+        flex-grow: 1

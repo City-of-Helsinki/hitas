@@ -11,26 +11,32 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
     const [batchComplete] = useBatchCompleteApartmentsMutation();
     const groupCompleteForm = useForm({
         defaultValues: {
-            start: 1,
-            end: null,
+            start: undefined,
+            end: undefined,
         },
         mode: "all",
     });
     const {handleSubmit, setFocus} = groupCompleteForm;
-    const onSubmit = (data: {start: number | null; end: number | null}) => {
+    const formStart = groupCompleteForm.watch("start");
+    const formEnd = groupCompleteForm.watch("end");
+    const onSubmit = (data: {start: number | undefined; end: number | undefined}) => {
         const submitData = {
             housing_company_id: housingCompanyId,
             data: {
-                apartment_number_start: data.start as number,
-                apartment_number_end: data.end as number,
+                apartment_number_start: Number(data.start),
+                apartment_number_end: Number(data.end),
                 completion_date: today(),
             },
         };
         console.log("To API:", submitData);
-        batchComplete({data: submitData})
+        batchComplete(submitData)
             .then((data) => {
                 console.log("API response:", data);
-                hdsToast.success("Asunnot merkitty valmiiksi");
+                hdsToast.success(
+                    (data as {data: {completed_apartment_count: number}}).data.completed_apartment_count +
+                        " asuntoa merkitty onnistuneesti valmiiksi"
+                );
+                setIsOpen(false);
             })
             .catch((e) => {
                 // eslint-disable-next-line no-console
@@ -38,6 +44,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 hdsToast.error("Asuntojen merkitseminen valmiiksi epäonnistui");
             });
     };
+    console.log(JSON.stringify(groupCompleteForm.getValues()));
     return (
         <>
             <Button
@@ -57,32 +64,43 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 isOpen={isOpen}
             >
                 <Dialog.Header
-                    title="Merkitse sarja valmiiksi"
+                    title="Merkitse asunnot valmiiksi"
                     id="batch-complete-modal__header"
                 />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Dialog.Content>
-                        <div className="apartment-numbers">
-                            <NumberInput
-                                name="start"
-                                label="Asunnosta"
-                                formObject={groupCompleteForm}
-                                required
-                            />
-                            <NumberInput
-                                name="end"
-                                label="Asuntoon"
-                                formObject={groupCompleteForm}
-                                required
-                            />
-                        </div>
+                        <p>Määritä asunnot, jotka haluat merkitä valmiiksi.</p>
+                        <>
+                            <p>
+                                Jos kumpikin kenttä on tyhjä, valitaan kaikki asunnot. Jos et halua rajata alku tai
+                                loppupäätä, jätä kenttä tyhjäksi.
+                            </p>
+                            <div className="apartment-numbers">
+                                <div className={formStart ? "toggled" : undefined}>
+                                    <NumberInput
+                                        name="start"
+                                        label="Asuntonumero alku"
+                                        formObject={groupCompleteForm}
+                                        tooltipText="Jätä kenttä tyhjäksi, jos haluat merkitä valmiiksi kaikki asunnot ennen viimeistä huoneistonumeroa"
+                                        value={formStart ? formStart : "-"}
+                                    />
+                                </div>
+                                <div className={formEnd ? "toggled" : undefined}>
+                                    <NumberInput
+                                        name="end"
+                                        label="Asuntonumero loppu"
+                                        formObject={groupCompleteForm}
+                                        tooltipText="Jätä kenttä tyhjäksi, jos haluat merkitä kaikki ensimmäisen valitun jälkeiset asunnot valmiiksi"
+                                    />
+                                </div>
+                            </div>
+                        </>
                     </Dialog.Content>
                     <Dialog.ActionButtons>
                         <CloseButton onClick={() => setIsOpen(false)} />
                         <Button
                             theme="black"
                             type="submit"
-                            disabled={groupCompleteForm.getValues("end") === null}
                         >
                             Merkitse valmiiksi
                         </Button>
