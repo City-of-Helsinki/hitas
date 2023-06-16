@@ -72,6 +72,9 @@ def max_if_all_not_null(ref: str, max: Any, min: Any) -> NullIf:
     the array). If the 'min' values would be the largest value (e.g. there are only empty relations), replace
     the 'min' value with nulls instead.
 
+    Also, any soft-deleted relations will be replaced with the supplied 'min' value, resulting in the same effect
+    as described above.
+
     :param ref: Reference to an array of items to aggregate.
     :param max: Highest possible value, which will replace nulls, e.g., 'datetime.max'.
     :param min: Lowest possible value, used when there are empty relations, e.g. 'datetime.min'.
@@ -81,6 +84,10 @@ def max_if_all_not_null(ref: str, max: Any, min: Any) -> NullIf:
         NullIf(
             Max(
                 Case(
+                    When(
+                        condition=~Q(**{f"{parent_ref}__deleted": None}),
+                        then=min,
+                    ),
                     When(
                         condition=Q(**{f"{parent_ref}__isnull": True}),
                         then=min,
