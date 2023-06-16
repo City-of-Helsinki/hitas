@@ -30,10 +30,8 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 completion_date: today(),
             },
         };
-        console.log("To API:", submitData);
         batchComplete(submitData)
             .then((data) => {
-                console.log("API response:", data);
                 hdsToast.success(
                     (data as {data: {completed_apartment_count: number}}).data.completed_apartment_count +
                         " asuntoa merkitty onnistuneesti valmiiksi"
@@ -47,7 +45,6 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 hdsToast.error("Asuntojen merkitseminen valmiiksi epäonnistui");
             });
     };
-    console.log(JSON.stringify(groupCompleteForm.getValues()));
     return (
         <>
             <Button

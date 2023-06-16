@@ -62,13 +62,13 @@ const ActionSuccess = ({linkURL, linkText, baseURL, data}) => {
 };
 
 const ActionFailed = ({error}) => {
-    const errorStatus = error?.data?.status + ":" ?? "";
+    const errorStatus = error?.data?.status ?? "";
     const errorFields = error?.data?.fields ?? [];
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
     return (
         <Dialog.Content>
             <h3>
-                {errorStatus} {nonFieldError}
+                {errorStatus} : {nonFieldError}
             </h3>
             {errorFields.length > 1 ? (
                 <Accordion
