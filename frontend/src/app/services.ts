@@ -579,7 +579,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 headers: mutationApiJsonHeaders(),
                 body: arg.data,
             }),
-            invalidatesTags: (result, error) => (!error && result ? [{type: "Apartment", id: "LIST"}] : []),
+            invalidatesTags: (result, error) => (!error && result ? [{type: "Apartment"}] : []),
         }),
     }),
 });

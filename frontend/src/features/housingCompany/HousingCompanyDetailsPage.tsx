@@ -345,14 +345,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                             <div>{apartment.apartment_number}</div>
                                             <div>{apartment.floor}</div>
                                             <div>
-                                                {apartment.rooms}{" "}
-                                                {
-                                                    (
-                                                        apartment.apartment_type as {
-                                                            value: string;
-                                                        }
-                                                    ).value
-                                                }
+                                                {apartment.rooms} {(apartment.apartment_type as {value: string}).value}
                                             </div>
                                             <div>{apartment.surface_area}</div>
                                             <div>{`${apartment.share_number_start} - ${apartment.share_number_end}`}</div>
