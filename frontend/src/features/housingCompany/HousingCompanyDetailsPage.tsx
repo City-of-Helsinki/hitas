@@ -17,11 +17,12 @@ import {
     QueryStateHandler,
     SaveButton,
 } from "../../common/components";
-import {FileInput, NumberInput} from "../../common/components/form";
+import {FileInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {IHousingCompanyDetails, ISalesCatalogApartment} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
+import {BatchCompleteApartmentsModal} from "./";
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): JSX.Element => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -79,6 +80,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
         },
         mode: "all",
     });
+
     return (
         <>
             <Heading>
@@ -298,34 +300,19 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                 <div className="list-wrapper list-wrapper--apartments">
                     <Heading type="list">
                         <span>Asunnot</span>
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <NumberInput
-                                name="start"
-                                formObject={groupCompleteForm}
-                            />
-                            <NumberInput
-                                name="end"
-                                formObject={groupCompleteForm}
-                            />
-                            <Button
-                                theme="black"
-                                size="small"
-                                type="submit"
-                                disabled={groupCompleteForm.getValues("end") === 0}
-                            >
-                                Merkitse valmiiksi
-                            </Button>
-                        </form>
-                        <Link to="apartments/create">
-                            <Button
-                                theme="black"
-                                size="small"
-                                iconLeft={<IconPlus />}
-                                disabled={housingCompany.regulation_status !== "regulated"}
-                            >
-                                Lisää asunto
-                            </Button>
-                        </Link>
+                        <div className="buttons">
+                            <BatchCompleteApartmentsModal housingCompanyId={params.housingCompanyId} />
+                            <Link to="apartments/create">
+                                <Button
+                                    theme="black"
+                                    size="small"
+                                    iconLeft={<IconPlus />}
+                                    disabled={housingCompany.regulation_status !== "regulated"}
+                                >
+                                    Lisää asunto
+                                </Button>
+                            </Link>
+                        </div>
                     </Heading>
                     <div className="listing">
                         <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />

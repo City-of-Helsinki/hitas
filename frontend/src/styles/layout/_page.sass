@@ -40,3 +40,9 @@ footer
 .error-modal
   background: $color-error-light !important
   border-color: $color-error !important
+
+[class^="heading--"]
+  .buttons
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    gap: $spacing-m
