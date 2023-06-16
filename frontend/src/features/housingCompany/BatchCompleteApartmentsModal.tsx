@@ -72,8 +72,8 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                         <p>Määritä asunnot, jotka haluat merkitä valmiiksi.</p>
                         <>
                             <p>
-                                Jos kumpikin kenttä on tyhjä, valitaan kaikki asunnot. Jos et halua rajata alku tai
-                                loppupäätä, jätä kenttä tyhjäksi.
+                                Jos et halua rajata pelkkää alku- tai loppupäätä jätä kenttä tyhjäksi. Jos kumpikin
+                                kenttä on tyhjä valitaan kaikki yhtiön asunnot. Numerot koskevat kaikkia rappuja.
                             </p>
                             <div className="apartment-numbers">
                                 <div className={formStart ? "toggled" : undefined}>
