@@ -15067,10 +15067,7 @@
       "deleted_by_cascade": false,
       "uuid": "2d9a7fac-81e5-426d-b3b3-3d6ad6ca9949",
       "name": "EA-isännöinti Oy",
-      "email": "not-known@example.com",
-      "street_address": "Värikuja 1 B 13",
-      "postal_code": "1",
-      "city": ""
+      "email": "not-known@example.com"
     }
   },
   {
@@ -15081,10 +15078,7 @@
       "deleted_by_cascade": false,
       "uuid": "f66e2df2-fda8-455b-8795-cbb7dec6e449",
       "name": "Maria Rossi-Karvonen",
-      "email": "yleinonen@example.org",
-      "street_address": "Porinpolku 7",
-      "postal_code": "7",
-      "city": ""
+      "email": "yleinonen@example.org"
     }
   },
   {
@@ -15095,10 +15089,7 @@
       "deleted_by_cascade": false,
       "uuid": "511bea85-ea99-4814-9ec9-51aec40b9e2f",
       "name": "Leena Vartiainen",
-      "email": "sara15@example.net",
-      "street_address": "Taimistonkuja 28",
-      "postal_code": "13",
-      "city": ""
+      "email": "sara15@example.net"
     }
   },
   {
@@ -15109,10 +15100,7 @@
       "deleted_by_cascade": false,
       "uuid": "6821c8a7-cfbc-49aa-be36-c4be850c5bf9",
       "name": "Jukka Ruotsalainen-Reinikainen",
-      "email": "karjalainenkristian@example.net",
-      "street_address": "Walentin Chorellin polku 2",
-      "postal_code": "18",
-      "city": ""
+      "email": "karjalainenkristian@example.net"
     }
   },
   {
@@ -15123,10 +15111,7 @@
       "deleted_by_cascade": false,
       "uuid": "f902d9d8-8e19-4122-9d8b-6ffa3ef45703",
       "name": "Ilkka Salonen",
-      "email": "nylundsanna@example.org",
-      "street_address": "Franzéninkatu 1",
-      "postal_code": "24",
-      "city": ""
+      "email": "nylundsanna@example.org"
     }
   },
   {
@@ -15137,10 +15122,7 @@
       "deleted_by_cascade": false,
       "uuid": "34139541-b598-4658-a1cf-ead48164e7e3",
       "name": "Tuulikki Salo",
-      "email": "erkki98@example.net",
-      "street_address": "Nervanderinpolku 06",
-      "postal_code": "29",
-      "city": ""
+      "email": "erkki98@example.net"
     }
   },
   {
@@ -15151,10 +15133,7 @@
       "deleted_by_cascade": false,
       "uuid": "6ce63974-cfcc-48c9-94c8-d44443339991",
       "name": "Hannu Räsänen",
-      "email": "pentti86@example.com",
-      "street_address": "Ostoskuja 1",
-      "postal_code": "17",
-      "city": ""
+      "email": "pentti86@example.com"
     }
   },
   {
@@ -15165,10 +15144,7 @@
       "deleted_by_cascade": false,
       "uuid": "a32fb176-5c70-4488-bca5-7b56c5fe7f21",
       "name": "Kyllikki Saarinen",
-      "email": "uusitaloelisabeth@example.net",
-      "street_address": "Taavetti Laitisen polku 6",
-      "postal_code": "38",
-      "city": ""
+      "email": "uusitaloelisabeth@example.net"
     }
   },
   {
