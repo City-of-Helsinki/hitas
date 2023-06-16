@@ -111,28 +111,25 @@ class ThirtyYearRegulationView(ViewSet):
 
         if results.regulation_result == RegulationResult.STAYS_REGULATED:
             choice = "jatkumisesta"
-            released_body_parts = []
-            regulated_body_parts: Optional[list[str]] = (
+            body_parts: Optional[list[str]] = (
                 PDFBody.objects.filter(name=PDFBodyName.STAYS_REGULATED).values_list("texts", flat=True).first()
             )
-            if regulated_body_parts is None:
+            if body_parts is None:
                 raise ModelConflict("Missing regulated body template", error_code="missing")
         else:
             choice = "pättymisestä"
-            regulated_body_parts = []
-            released_body_parts: Optional[list[str]] = (
+            body_parts: Optional[list[str]] = (
                 PDFBody.objects.filter(name=PDFBodyName.RELEASED_FROM_REGULATION)
                 .values_list("texts", flat=True)
                 .first()
             )
-            if released_body_parts is None:
+            if body_parts is None:
                 raise ModelConflict("Missing released body template", error_code="missing")
 
         context = {
             "results": results,
             "user": request.user,
-            "regulated_body_parts": regulated_body_parts,
-            "released_body_parts": released_body_parts,
+            "body_parts": body_parts,
         }
 
         filename = f"Tiedote sääntelyn {choice} - {results.housing_company.display_name}.pdf"
