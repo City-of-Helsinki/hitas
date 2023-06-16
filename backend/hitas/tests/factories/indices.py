@@ -21,6 +21,7 @@ faker = Faker(locale="fi_FI")
 class AbstractIndexFactory(DjangoModelFactory):
     class Meta:
         abstract = True
+        django_get_or_create = ["month"]
 
     month = factory.Sequence(lambda n: datetime.date(2000, 1, 1) + relativedelta(months=n))
     value = fuzzy.FuzzyDecimal(low=100, high=1000)
