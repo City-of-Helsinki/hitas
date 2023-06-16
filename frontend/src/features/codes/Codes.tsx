@@ -1,5 +1,7 @@
 import {Tabs} from "hds-react";
-import {IndicesList, ManagersList, OwnersList} from "./";
+import {useGetOwnersQuery, useGetPropertyManagersQuery} from "../../app/services";
+import {ManagerMutateForm, MutateSearchList, OwnerMutateForm} from "../../common/components";
+import {IndicesList} from "./";
 
 const Codes = (): JSX.Element => {
     return (
@@ -23,10 +25,26 @@ const Codes = (): JSX.Element => {
                     <h1>Rahoitusmuodot</h1>
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--owners">
-                    <OwnersList />
+                    <MutateSearchList
+                        listFieldsWithTitles={{name: "Nimi", identifier: "Henkilö- tai Y-tunnus"}}
+                        searchStringMinLength={2}
+                        resultListMaxRows={12}
+                        useGetQuery={useGetOwnersQuery}
+                        MutateFormComponent={OwnerMutateForm}
+                        defaultFilterParams={{name: "", identifier: ""}}
+                        dialogTitles={{modify: "Muokkaa henkilötietoja"}}
+                    />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--managers">
-                    <ManagersList />
+                    <MutateSearchList
+                        listFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
+                        searchStringMinLength={2}
+                        resultListMaxRows={12}
+                        useGetQuery={useGetPropertyManagersQuery}
+                        MutateFormComponent={ManagerMutateForm}
+                        defaultFilterParams={{name: "", email: ""}}
+                        dialogTitles={{modify: "Muokkaa isännöitsijän tietoja", new: "Lisää isännöitsijä"}}
+                    />
                 </Tabs.TabPanel>
             </Tabs>
         </div>

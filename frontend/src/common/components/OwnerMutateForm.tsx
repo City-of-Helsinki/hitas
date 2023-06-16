@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, Dialog, IconArrowLeft} from "hds-react";
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {useSaveOwnerMutation} from "../../app/services";
@@ -10,10 +10,15 @@ import {Checkbox, TextInput} from "./form";
 import SaveButton from "./SaveButton";
 
 interface IOwnerMutateForm {
-    owner: IOwner;
+    defaultObject?: IOwner;
     closeModalAction: () => void;
+    setDefaultFilterParams?: () => void;
 }
-const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
+export default function OwnerMutateForm({
+    defaultObject: owner,
+    closeModalAction,
+    setDefaultFilterParams,
+}: IOwnerMutateForm) {
     const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
     const runSaveOwner = (data) => {
@@ -23,6 +28,7 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
             .then(() => {
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
+                setDefaultFilterParams && setDefaultFilterParams();
             })
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
@@ -137,7 +143,12 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
                     <Button
                         theme="black"
                         iconLeft={<IconArrowLeft />}
-                        onClick={closeModalAction}
+                        onClick={() => {
+                            closeModalAction();
+                            if (setDefaultFilterParams && !owner) {
+                                setDefaultFilterParams();
+                            }
+                        }}
                     >
                         Peruuta
                     </Button>
@@ -153,35 +164,5 @@ const OwnerMutateForm = ({owner, closeModalAction}: IOwnerMutateForm) => {
 
             <Dialog.ActionButtons />
         </>
-    );
-};
-
-interface IModifyPersonInfoModalProps {
-    owner: IOwner;
-    isVisible: boolean;
-    setIsVisible: Dispatch<SetStateAction<boolean>>;
-}
-
-export default function ModifyOwnerModal({owner, isVisible, setIsVisible}: IModifyPersonInfoModalProps) {
-    return (
-        <Dialog
-            id="modify-person-info-modal"
-            closeButtonLabelText=""
-            aria-labelledby=""
-            isOpen={isVisible}
-            close={() => setIsVisible(false)}
-            boxShadow
-        >
-            <Dialog.Header
-                id="modify-person-info-modal__header"
-                title="Muokkaa henkilötietoja"
-            />
-            <Dialog.Content>
-                <OwnerMutateForm
-                    owner={owner}
-                    closeModalAction={() => setIsVisible(false)}
-                />
-            </Dialog.Content>
-        </Dialog>
     );
 }

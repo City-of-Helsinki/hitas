@@ -12,8 +12,9 @@ import {
     DetailField,
     Divider,
     ImprovementsTable,
-    ModifyManagerModal,
-    ModifyOwnerModal,
+    ManagerMutateForm,
+    MutateModal,
+    OwnerMutateForm,
     QueryStateHandler,
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
@@ -446,20 +447,20 @@ const LoadedApartmentDetails = ({
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
 }): JSX.Element => {
-    // Handle visibility of the modify person info modal
-    const [isModifyPersonInfoModalVisible, setIsModifyPersonInfoModalVisible] = useState(false);
+    // Handle visibility of the modify owner info modal
+    const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
     const [owner, setOwner] = useState<IOwner | undefined>(undefined);
-    const modifyPersonInfoHandler = (owner: IOwner) => {
-        setIsModifyPersonInfoModalVisible(true);
-        setOwner(owner);
+    const modifyOwnerHandler = (selectedOwner: IOwner) => {
+        setIsModifyOwnerModalVisible(true);
+        setOwner(selectedOwner);
     };
     // Handle visibility of the modify manager info modal
     const [isModifyManagerModalVisible, setIsModifyManagerModalVisible] = useState(false);
     const [manager, setManager] = useState<IPropertyManager | undefined>(undefined);
-    const modifyManagerInfoHandler = (manager: IPropertyManager | undefined) => {
-        if (manager) {
+    const modifyManagerInfoHandler = (selectedManager: IPropertyManager | undefined) => {
+        if (selectedManager) {
             setIsModifyManagerModalVisible(true);
-            setManager(manager);
+            setManager(selectedManager);
         }
     };
 
@@ -526,7 +527,7 @@ const LoadedApartmentDetails = ({
                                                 >
                                                     <button
                                                         className="text-button"
-                                                        onClick={() => modifyPersonInfoHandler(ownership.owner)}
+                                                        onClick={() => modifyOwnerHandler(ownership.owner)}
                                                     >
                                                         {ownership.owner.name} ({ownership.owner.identifier})
                                                     </button>
@@ -658,15 +659,19 @@ const LoadedApartmentDetails = ({
                         </Tabs.TabPanel>
                     </Tabs>
                 </div>
-                <ModifyOwnerModal
-                    owner={owner as IOwner}
-                    isVisible={isModifyPersonInfoModalVisible}
-                    setIsVisible={setIsModifyPersonInfoModalVisible}
+                <MutateModal
+                    defaultObject={owner as IOwner}
+                    MutateFormComponent={OwnerMutateForm}
+                    dialogTitles={{modify: "Muokkaa henkilötietoja"}}
+                    isVisible={isModifyOwnerModalVisible}
+                    closeModalAction={() => setIsModifyOwnerModalVisible(false)}
                 />
-                <ModifyManagerModal
-                    manager={manager as IPropertyManager}
+                <MutateModal
+                    defaultObject={manager as IPropertyManager}
+                    MutateFormComponent={ManagerMutateForm}
+                    dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
                     isVisible={isModifyManagerModalVisible}
-                    setIsVisible={setIsModifyManagerModalVisible}
+                    closeModalAction={() => setIsModifyManagerModalVisible(false)}
                 />
                 <ImprovementsTable
                     data={apartment}
