@@ -16,7 +16,6 @@ import {
     ImprovementsTable,
     QueryStateHandler,
     SaveButton,
-    SaveDialogModal,
 } from "../../common/components";
 import {FileInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
@@ -26,7 +25,6 @@ import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
@@ -49,7 +47,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                 catalog_primary_loan_amount: apartment.catalog_primary_loan_amount,
             });
         });
-        console.log("importedApartments:", importedApartments);
         createImportedApartments({
             data: importedApartments,
             housingCompanyId: params.housingCompanyId,
@@ -60,6 +57,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             })
             .catch((e) => {
                 hdsToast.error("Asuntojen tuonti epäonnistui: " + e.message);
+                // eslint-disable-next-line no-console
                 console.warn(e, createError);
             });
     };
@@ -68,11 +66,10 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             data: data.salesCatalog,
             housingCompanyId: params.housingCompanyId,
         })
-            .then((e) => {
-                console.log(e);
-                if ("error" in e) setIsErrorModalOpen(true);
-                else setIsImportModalOpen(true);
+            .then(() => {
+                setIsImportModalOpen(true);
             })
+            // eslint-disable-next-line no-console
             .catch((e) => console.warn(e));
     };
     return (
@@ -362,13 +359,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     />
                 </Dialog.ActionButtons>
             </Dialog>
-            <SaveDialogModal
-                data={validateData}
-                error={validateError}
-                isLoading={isValidating}
-                isVisible={isErrorModalOpen}
-                setIsVisible={setIsErrorModalOpen}
-            />
         </>
     );
 };
