@@ -73,13 +73,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
             // eslint-disable-next-line no-console
             .catch((e) => console.warn(e));
     };
-    const groupCompleteForm = useForm({
-        defaultValues: {
-            start: 0,
-            end: 0,
-        },
-        mode: "all",
-    });
 
     return (
         <>
