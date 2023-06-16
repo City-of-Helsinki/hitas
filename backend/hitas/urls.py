@@ -59,6 +59,21 @@ router.register(
     views.PDFBodyViewSet,
     basename="pdf-body",
 )
+router.register(
+    r"email/send-confirmed-max-price-calculation-pdf",
+    views.ConfirmedMaxPriceCalculationEmailViewSet,
+    basename="confirmed-max-price-calculation-email",
+)
+router.register(
+    r"email/send-unconfirmed-max-price-calculation-pdf",
+    views.UnconfirmedMaxPriceCalculationEmailViewSet,
+    basename="unconfirmed-max-price-calculation-email",
+)
+router.register(
+    r"email/send-regulation-letter",
+    views.RegulationLetterEmailViewSet,
+    basename="regulation-letter-email",
+)
 
 # /api/v1/reports/download-sales-report
 router.register(r"reports/download-sales-report", views.SalesReportView, basename="sales-report")

@@ -135,9 +135,9 @@
       <td class="first-column"><b>Hintasääntelystä vapautuminen</b></td>
       <td>
         {% if regulated %}
-          {{ regulated_body_parts.0|linebreaks }}
+          {{ body_parts.0|linebreaks }}
         {% elif released %}
-          {{ released_body_parts.0|linebreaks }}
+          {{ body_parts.0|linebreaks }}
         {% endif %}
       </td>
     </tr>
@@ -145,13 +145,13 @@
     <tr>
       <td class="first-column"><b>Tontin maanvuokra</b></td>
       <td>
-          {{ regulated_body_parts.1|linebreaks }}
+          {{ body_parts.1|linebreaks }}
       </td>
     </tr>
     <tr>
       <td class="first-column"><b>Hintasääntelyn jatkuminen</b></td>
       <td>
-          {{ regulated_body_parts.2|linebreaks }}
+          {{ body_parts.2|linebreaks }}
       </td>
     {% endif %}
     </tr>

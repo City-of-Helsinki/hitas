@@ -7,10 +7,14 @@ from hitas.models._base import HitasModel
 class EmailTemplateType(Enum):
     CONFIRMED_MAX_PRICE_CALCULATION = "confirmed_max_price_calculation"
     UNCONFIRMED_MAX_PRICE_CALCULATION = "unconfirmed_max_price_calculation"
+    STAYS_REGULATED = "STAYS_REGULATED"
+    RELEASED_FROM_REGULATION = "RELEASED_FROM_REGULATION"
 
     class Labels:
         CONFIRMED_MAX_PRICE_CALCULATION = "Enimmäishintalaskelma"
         UNCONFIRMED_MAX_PRICE_CALCULATION = "Hinta-arvio"
+        STAYS_REGULATED = "Jää sääntelyn piiriin"
+        RELEASED_FROM_REGULATION = "Vapautuu sääntelystä"
 
 
 class EmailTemplate(HitasModel):
