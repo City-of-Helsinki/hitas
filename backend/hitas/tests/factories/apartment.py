@@ -80,15 +80,14 @@ class ApartmentConstructionPriceImprovementFactory(AbstractImprovementFactory):
 
 
 def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> ApartmentMaximumPriceCalculation:
-    if "apartment__completion_date" not in kwargs:
-        kwargs["apartment__completion_date"] = FuzzyDate(date(2011, 1, 1), date(2015, 1, 1)).fuzz()
+    if "apartment" not in kwargs:
+        kwargs["apartment"] = ApartmentFactory.create(
+            completion_date=FuzzyDate(date(2011, 1, 1), date(2020, 1, 1)).fuzz(),
+            building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+        )
+
     if "calculation_date" not in kwargs:
         kwargs["calculation_date"] = FuzzyDate(date(2015, 1, 1)).fuzz()
-
-    if kwargs["calculation_date"] < date(2011, 1, 1):
-        kwargs["apartment__building__real_estate__housing_company__hitas_type"] = HitasType.HITAS_I
-    else:
-        kwargs["apartment__building__real_estate__housing_company__hitas_type"] = HitasType.NEW_HITAS_I
 
     # Create indices for `calculate_max_price`
     if create_indices:
@@ -97,31 +96,35 @@ def create_apartment_max_price_calculation(create_indices=True, **kwargs) -> Apa
             MarketPriceIndex2005Equal100Factory,
             SurfaceAreaPriceCeilingFactory,
         ]:
-            completion_date_index = index_factory.create(month=monthify(kwargs["apartment__completion_date"]))
+            completion_date_index = index_factory.create(month=monthify(kwargs["apartment"].completion_date))
             index_factory.create(
                 month=monthify(kwargs["calculation_date"]),
                 value=completion_date_index.value + FuzzyDecimal(100, 300).fuzz(),
             )
 
     # Create max price calculation
-    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculationFactory.create(**kwargs)
-    housing_company_completion_date = mpc.apartment.housing_company.completion_date
-    mpc.json = calculate_max_price(
+
+    calculation = calculate_max_price(
         apartment=fetch_apartment(
-            housing_company_uuid=mpc.apartment.housing_company.uuid,
-            apartment_uuid=mpc.apartment.uuid,
-            calculation_month=monthify(mpc.calculation_date),
-            housing_company_completion_month=monthify(housing_company_completion_date),
+            housing_company_uuid=kwargs["apartment"].housing_company.uuid,
+            apartment_uuid=kwargs["apartment"].uuid,
+            calculation_month=monthify(kwargs["calculation_date"]),
+            housing_company_completion_month=monthify(kwargs["apartment"].housing_company.completion_date),
         ),
         apartment_share_of_housing_company_loans=fuzzy.FuzzyInteger(0, 5000).fuzz(),
-        apartment_share_of_housing_company_loans_date=fuzzy.FuzzyDate(date(2020, 1, 1)).fuzz(),
-        calculation_date=mpc.calculation_date,
-        housing_company_completion_date=housing_company_completion_date,
+        apartment_share_of_housing_company_loans_date=kwargs["calculation_date"],
+        calculation_date=kwargs["calculation_date"],
+        housing_company_completion_date=kwargs["apartment"].housing_company.completion_date,
     )
-    mpc.save()
-    # Refresh to make sure the JSON is encoded
-    mpc.refresh_from_db()
+    kwargs["uuid"] = calculation["id"]
+    kwargs.setdefault("maximum_price", calculation["maximum_price"])
+    kwargs.setdefault("created_at", calculation["created_at"])
+    kwargs.setdefault("confirmed_at", calculation["created_at"])
+    kwargs.setdefault("valid_until", calculation["valid_until"])
+    kwargs.setdefault("json", calculation)
 
+    mpc: ApartmentMaximumPriceCalculation = ApartmentMaximumPriceCalculation.objects.create(**kwargs)
+    mpc.refresh_from_db()  # Refresh to make sure the JSON is encoded
     return mpc
 
 
