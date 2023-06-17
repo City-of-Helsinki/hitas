@@ -1094,6 +1094,68 @@ paths:
 
   # Apartment maximum price
 
+  /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/retrieve-unconfirmed-prices-for-date:
+    get:
+      description: Retrieve a single apartment's latest unconfirmed maximum prices for a date
+      operationId: read-apartment-unconfirmed-maximum-prices-for-date
+      tags:
+        - Apartments
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+        - name: apartment_id
+          required: true
+          in: path
+          description: Apartment ID
+          schema:
+            type: string
+            example: b477389cb3514fb1b444052a39bfb65d
+        - name: request_date
+          description: The date for which the maximum prices are requested
+          required: true
+          in: query
+          schema:
+            type: string
+            format: date
+            example: 2022-07-05
+            nullable: false
+      responses:
+        "200":
+          description: Successfully read an apartment details
+          content:
+            application/json:
+              schema:
+                description: Apartment's unconfirmed maximum prices
+                type: object
+                nullable: true
+                additionalProperties: false
+                required:
+                  - construction_price_index
+                  - market_price_index
+                  - surface_area_price_ceiling
+                properties:
+                  construction_price_index:
+                    $ref: "#/components/schemas/MaximumValue"
+                  market_price_index:
+                    $ref: "#/components/schemas/MaximumValue"
+                  surface_area_price_ceiling:
+                    $ref: "#/components/schemas/MaximumValue"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/reports/download-latest-confirmed-prices:
     post:
       description: Download a single apartment's latest maximum price calculation's PDF

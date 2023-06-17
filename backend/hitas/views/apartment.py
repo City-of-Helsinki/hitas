@@ -881,6 +881,18 @@ class ApartmentViewSet(HitasModelViewSet):
             ),
         )
 
+    @action(detail=True, methods=["GET"], url_path="retrieve-unconfirmed-prices-for-date")
+    def retrieve_unconfirmed_prices_for_date(self, request, **kwargs):
+        input_data = UnconfirmedPriceSerializer(data=request.query_params)
+        input_data.is_valid(raise_exception=True)
+
+        self.kwargs["calculation_month"] = this_month = monthify(input_data.validated_data["request_date"])
+
+        apartment = self.get_object()
+        apartment_data = ApartmentDetailSerializer(apartment).data
+        ump = _validate_apartment_unconfirmed_prices(apartment_data, this_month)
+        return Response(ump)
+
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
     def download_latest_unconfirmed_prices(self, request, **kwargs) -> Union[HttpResponse, Response]:
         input_data = UnconfirmedPriceSerializer(data=request.data)
@@ -891,16 +903,7 @@ class ApartmentViewSet(HitasModelViewSet):
 
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
-        ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
-        is_pre_2011 = ump["pre_2011"] is not None
-        ump = ump["pre_2011"] if is_pre_2011 else ump["onwards_2011"]
-
-        if ump["construction_price_index"]["value"] is None:
-            raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=this_month)
-        if ump["market_price_index"]["value"] is None:
-            raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=this_month)
-        if ump["surface_area_price_ceiling"]["value"] is None:
-            raise IndexMissingException(error_code="sapc", date=this_month)
+        _validate_apartment_unconfirmed_prices(apartment_data, this_month)
 
         surface_area_price_ceiling: Decimal = (
             SurfaceAreaPriceCeiling.objects.filter(month=this_month).values_list("value", flat=True).first()
@@ -998,3 +1001,18 @@ class UnconfirmedPriceSerializer(ConfirmedPriceSerializer):
         if value > timezone.now().date():
             raise serializers.ValidationError("Date cannot be in the future.")
         return value
+
+
+def _validate_apartment_unconfirmed_prices(apartment_data, calculation_month: datetime.date) -> None:
+    ump = apartment_data["prices"]["maximum_prices"]["unconfirmed"]
+    is_pre_2011 = ump["pre_2011"] is not None
+    ump = ump["pre_2011"] if is_pre_2011 else ump["onwards_2011"]
+
+    if ump["construction_price_index"]["value"] is None:
+        raise IndexMissingException(error_code="cpi" if is_pre_2011 else "cpi2005eq100", date=calculation_month)
+    if ump["market_price_index"]["value"] is None:
+        raise IndexMissingException(error_code="mpi" if is_pre_2011 else "mpi2005eq100", date=calculation_month)
+    if ump["surface_area_price_ceiling"]["value"] is None:
+        raise IndexMissingException(error_code="sapc", date=calculation_month)
+
+    return ump
