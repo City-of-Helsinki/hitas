@@ -7,7 +7,6 @@ info:
   version: 1.0.0
   description: API definitions for Hitas Helsinki project.
 paths:
-
   # Housing companies
 
   /api/v1/housing-companies:
@@ -17,8 +16,8 @@ paths:
       tags:
         - Housing companies
       parameters:
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
         - name: display_name
           description: Search housing companies with display name containing the given search string (case-insensitive)
           required: false
@@ -78,7 +77,7 @@ paths:
           schema:
             type: boolean
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of housing companies
           content:
             application/json:
@@ -91,22 +90,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of housing companies
                     type: array
                     items:
-                      $ref: '#/components/schemas/HousingCompany'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/HousingCompany"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new housing company
@@ -119,27 +118,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/HousingCompanyDetails'
+              $ref: "#/components/schemas/HousingCompanyDetails"
       responses:
-        '201':
+        "201":
           description: Successfully added a new housing company
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/HousingCompanyDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HousingCompanyDetails"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}:
     get:
@@ -156,19 +155,19 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a housing company details
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/HousingCompanyDetails'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HousingCompanyDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a housing company
@@ -189,27 +188,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/HousingCompanyDetails'
+              $ref: "#/components/schemas/HousingCompanyDetails"
       responses:
-        '200':
+        "200":
           description: Successfully updated a housing company
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/HousingCompanyDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HousingCompanyDetails"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     patch:
       description: Update a housing company partially
@@ -230,27 +229,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/HousingCompanyPartialUpdateDetails'
+              $ref: "#/components/schemas/HousingCompanyPartialUpdateDetails"
       responses:
-        '200':
+        "200":
           description: Successfully updated a housing company
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/HousingCompanyDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HousingCompanyDetails"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a housing company
@@ -266,16 +265,16 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Housing company successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/batch-complete-apartments:
     patch:
@@ -297,21 +296,21 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/BatchCompleteDetails'
+              $ref: "#/components/schemas/BatchCompleteDetails"
       responses:
-        '200':
+        "200":
           description: Successfully read a housing company details
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/BatchCompleteResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/BatchCompleteResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Real Estate
 
@@ -329,10 +328,10 @@ paths:
           schema:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of real estates
           content:
             application/json:
@@ -345,23 +344,23 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of real estates
                     type: array
                     additionalProperties: false
                     items:
-                      $ref: '#/components/schemas/RealEstate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/RealEstate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new real estate for a housing company
@@ -382,27 +381,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/RealEstate'
+              $ref: "#/components/schemas/RealEstate"
       responses:
-        '201':
+        "201":
           description: Successfully added a new real estate for a housing company
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/RealEstate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/RealEstate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}:
     get:
@@ -426,19 +425,19 @@ paths:
             type: string
             example: c86eaa399ce141d89d962d46bb81ab2b
       responses:
-        '200':
+        "200":
           description: Successfully read a housing company's real estate
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/RealEstate'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/RealEstate"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a real estate for a housing company
@@ -466,27 +465,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/RealEstate'
+              $ref: "#/components/schemas/RealEstate"
       responses:
-        '200':
+        "200":
           description: Successfully updated an existing real estate for a housing company
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/RealEstate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/RealEstate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a real estate
@@ -509,16 +508,16 @@ paths:
             type: string
             example: c86eaa399ce141d89d962d46bb81ab2b
       responses:
-        '204':
+        "204":
           description: Real estate successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Building
 
@@ -543,10 +542,10 @@ paths:
           schema:
             type: string
             example: c86eaa399ce141d89d962d46bb81ab2b
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of buildings
           content:
             application/json:
@@ -559,22 +558,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of buildings
                     type: array
                     items:
-                      $ref: '#/components/schemas/Building'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Building"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new building for a housing company's real estate
@@ -602,27 +601,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/Building'
+              $ref: "#/components/schemas/Building"
       responses:
-        '201':
+        "201":
           description: Successfully added a new building for a housing company real estate
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/Building'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Building"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/real-estates/{real_estate_id}/buildings/{building_id}:
     get:
@@ -653,19 +652,19 @@ paths:
             type: string
             example: dc1072975bab4ba69f64814f021c6785
       responses:
-        '200':
+        "200":
           description: Successfully read a building details.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/Building'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Building"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a building for a housing company's real estate
@@ -700,27 +699,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/Building'
+              $ref: "#/components/schemas/Building"
       responses:
-        '200':
+        "200":
           description: Successfully updated an existing building for a housing company's real estate
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/Building'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Building"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a building
@@ -750,21 +749,20 @@ paths:
             type: string
             example: dc1072975bab4ba69f64814f021c6785
       responses:
-        '204':
+        "204":
           description: Building successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Sales catalog
 
   /api/v1/housing-companies/{housing_company_id}/sales-catalog-validate:
-
     post:
       description: Read new apartments from a sales catalog, but do not save them
       operationId: read-sales-catalog
@@ -790,28 +788,27 @@ paths:
               type: string
               format: binary
       responses:
-        '200':
+        "200":
           description: Successfully read sales sheet
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/SalesCatalog'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptableExcel'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaTypeExcel'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/SalesCatalog"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptableExcel"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeExcel"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/sales-catalog-create:
-
     post:
       description: |-
         Add apartments from sales catalog to the first real estate and building on this housing company.
@@ -836,22 +833,22 @@ paths:
               type: array
               minItems: 1
               items:
-                $ref: '#/components/schemas/SalesCatalogApartmentCreate'
+                $ref: "#/components/schemas/SalesCatalogApartmentCreate"
       responses:
-        '201':
+        "201":
           description: Successfully created apartments from sales catalog
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Apartment
 
@@ -862,8 +859,8 @@ paths:
       tags:
         - Apartments
       parameters:
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
         - name: housing_company_id
           required: true
           in: path
@@ -911,7 +908,7 @@ paths:
             type: boolean
             example: true
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of apartments
           content:
             application/json:
@@ -924,22 +921,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/Apartment'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Apartment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new apartment for a housing company
@@ -960,27 +957,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ApartmentDetails'
+              $ref: "#/components/schemas/ApartmentDetails"
       responses:
-        '201':
+        "201":
           description: Successfully added a new apartment
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentDetails"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}:
     get:
@@ -1004,19 +1001,19 @@ paths:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
       responses:
-        '200':
+        "200":
           description: Successfully read an apartment details
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentDetails'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentDetails"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update an apartment
@@ -1044,26 +1041,26 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ApartmentDetails'
+              $ref: "#/components/schemas/ApartmentDetails"
       responses:
-        '200':
+        "200":
           description: Successfully updated an apartment
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApartmentDetails'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentDetails"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove an apartment
@@ -1086,14 +1083,14 @@ paths:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
       responses:
-        '204':
+        "204":
           description: Apartment successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Apartment maximum price
 
@@ -1133,21 +1130,21 @@ paths:
                   format: date
                   example: Example text
       responses:
-        '200':
+        "200":
           description: Successfully downloaded an apartment's maximum price calculation's PDF
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/reports/download-latest-unconfirmed-prices:
     post:
@@ -1192,21 +1189,21 @@ paths:
                   type: string
                   example: Example text
       responses:
-        '200':
+        "200":
           description: Successfully downloaded an apartment's unconfirmed maximum price calculation's PDF
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-prices:
     post:
@@ -1275,23 +1272,23 @@ paths:
                   type: string
                   example: Example text
       responses:
-        '200':
+        "200":
           description: Successfully created an apartment's maximum price calculation
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaximumPrice'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentMaximumPrice"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/maximum-prices/{calculation_id}:
     get:
@@ -1322,13 +1319,13 @@ paths:
             type: string
             example: e65579e3ed0a4cc0b693d9910b41ab08
       responses:
-        '200':
+        "200":
           description: Successfully read an apartment's maximum price calculation
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaximumPrice'
+                $ref: "#/components/schemas/ApartmentMaximumPrice"
               examples:
                 Apartment completed 2011-01 onwards:
                   value:
@@ -1337,15 +1334,15 @@ paths:
                       address:
                         apartment_number: 1
                         city: Oulu
-                        floor: '1'
-                        postal_code: '90100'
+                        floor: "1"
+                        postal_code: "90100"
                         stair: A
                         street_address: Example street
                       ownerships:
-                      - name: Erkki Esimerkki
-                        percentage: 50.0
-                      - name: Eija Esimerkki
-                        percentage: 50.0
+                        - name: Erkki Esimerkki
+                          percentage: 50.0
+                        - name: Eija Esimerkki
+                          percentage: 50.0
                       rooms: 2
                       shares:
                         end: 150
@@ -1353,7 +1350,7 @@ paths:
                         total: 150
                       surface_area: 30.0
                       type: h+kk
-                    calculation_date: '2022-07-05'
+                    calculation_date: "2022-07-05"
                     calculations:
                       construction_price_index:
                         maximum_price: 223558.72
@@ -1434,7 +1431,7 @@ paths:
                           apartment_share_of_housing_company_loans: 2500
                           apartment_share_of_housing_company_loans_date: "2022-07-28"
                     confirmed_at: null
-                    created_at: '2022-12-05T08:13:25.380594Z'
+                    created_at: "2022-12-05T08:13:25.380594Z"
                     housing_company:
                       archive_id: 124
                       official_name: Example housing company Oy
@@ -1444,7 +1441,7 @@ paths:
                     index: construction_price_index
                     maximum_price: 223558.72
                     new_hitas: true
-                    valid_until: '2022-10-05'
+                    valid_until: "2022-10-05"
                 Apartment completed before 2011-01:
                   value:
                     additional_info: This is an example additional info string
@@ -1452,15 +1449,15 @@ paths:
                       address:
                         apartment_number: 1
                         city: Oulu
-                        floor: '1'
-                        postal_code: '90100'
+                        floor: "1"
+                        postal_code: "90100"
                         stair: A
                         street_address: Example street
                       ownerships:
-                      - name: Erkki Esimerkki
-                        percentage: 50.0
-                      - name: Eija Esimerkki
-                        percentage: 50.0
+                        - name: Erkki Esimerkki
+                          percentage: 50.0
+                        - name: Eija Esimerkki
+                          percentage: 50.0
                       rooms: 2
                       shares:
                         end: 1888
@@ -1468,7 +1465,7 @@ paths:
                         total: 160
                       surface_area: 54.5
                       type: "h+kk"
-                    calculation_date: '2022-09-07'
+                    calculation_date: "2022-09-07"
                     calculations:
                       construction_price_index:
                         calculation_variables:
@@ -1598,7 +1595,7 @@ paths:
                           apartment_share_of_housing_company_loans: 0
                           apartment_share_of_housing_company_loans_date: "2022-09-05"
                     confirmed_at: null
-                    created_at: '2022-12-05T08:23:28.109872Z'
+                    created_at: "2022-12-05T08:23:28.109872Z"
                     housing_company:
                       archive_id: 1
                       official_name: foo
@@ -1608,15 +1605,15 @@ paths:
                     index: market_price_index
                     maximum_price: 289735.91
                     new_hitas: false
-                    valid_until: '2022-12-07'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    valid_until: "2022-12-07"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Confirm a single apartment's maximum price calculation
@@ -1661,25 +1658,25 @@ paths:
                   type: boolean
                   example: true
       responses:
-        '200':
+        "200":
           description: Successfully created an apartment's maximum price calculation
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentMaximumPrice'
-        '204':
+                $ref: "#/components/schemas/ApartmentMaximumPrice"
+        "204":
           description: Calculation was successfully rejected and removed.
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Apartment sales
 
@@ -1705,7 +1702,7 @@ paths:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of sales
           content:
             application/json:
@@ -1718,22 +1715,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/ApartmentSale'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/ApartmentSale"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new sale for an apartment
@@ -1761,29 +1758,29 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ApartmentSaleCreate'
+              $ref: "#/components/schemas/ApartmentSaleCreate"
       responses:
-        '201':
+        "201":
           description: Successfully fetched list of sales
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentSaleCreated'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentSaleCreated"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/housing-companies/{housing_company_id}/apartments/{apartment_id}/sales/{sale_id}:
     get:
@@ -1814,21 +1811,21 @@ paths:
             type: string
             example: e65579e3ed0a4cc0b693d9910b41ab08
       responses:
-        '200':
+        "200":
           description: Successfully read an apartments sale
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentSale'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentSale"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a sale for an apartment
@@ -1863,27 +1860,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ApartmentSaleUpdate'
+              $ref: "#/components/schemas/ApartmentSaleUpdate"
       responses:
-        '200':
+        "200":
           description: Successfully updated an apartments sale
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ApartmentSale'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ApartmentSale"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a sale for an apartment
@@ -1913,16 +1910,16 @@ paths:
             type: string
             example: e65579e3ed0a4cc0b693d9910b41ab08
       responses:
-        '204':
+        "204":
           description: Apartment sale successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Apartment
 
@@ -1933,8 +1930,8 @@ paths:
       tags:
         - Apartments
       parameters:
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
         - name: housing_company_name
           description: Search apartments that belong to housing companies with display name containing the given search string (case-insensitive)
           required: false
@@ -1983,7 +1980,7 @@ paths:
             type: boolean
             example: true
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of apartments
           content:
             application/json:
@@ -1996,22 +1993,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/Apartment'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Apartment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Owner
 
@@ -2047,10 +2044,10 @@ paths:
             type: string
             minLength: 2
             example: matti.meikalainen@example.com
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of owners
           content:
             application/json:
@@ -2063,22 +2060,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of owners
                     type: array
                     items:
-                      $ref: '#/components/schemas/Owner'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Owner"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new owner
@@ -2090,26 +2087,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Owner'
+              $ref: "#/components/schemas/Owner"
       responses:
-        '201':
+        "201":
           description: Successfully added a new owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Owner'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Owner"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/owners/{owner_id}:
     get:
@@ -2126,18 +2123,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a owner details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Owner'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Owner"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a owner
@@ -2157,26 +2154,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Owner'
+              $ref: "#/components/schemas/Owner"
       responses:
-        '200':
+        "200":
           description: Successfully updated a owner
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Owner'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Owner"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a owner
@@ -2192,16 +2189,16 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Owner successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # De-obfuscated owner access
 
@@ -2220,18 +2217,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read an owner's details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Owner'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Owner"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Condition of Sale
 
@@ -2242,7 +2239,7 @@ paths:
       tags:
         - Condition of Sale
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of conditions of sale
           content:
             application/json:
@@ -2255,20 +2252,20 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of apartments
                     type: array
                     items:
-                      $ref: '#/components/schemas/ConditionOfSale'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/ConditionOfSale"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Create new conditions of sale for a household
@@ -2280,9 +2277,9 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ConditionOfSaleCreate'
+              $ref: "#/components/schemas/ConditionOfSaleCreate"
       responses:
-        '201':
+        "201":
           description: All conditions of sale for the owners in the given household, old and new
           content:
             application/json:
@@ -2297,19 +2294,19 @@ paths:
                     description: List of created conditions of sale
                     type: array
                     items:
-                      $ref: '#/components/schemas/ConditionOfSale'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/ConditionOfSale"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/conditions-of-sale/{condition_of_sale_id}:
     get:
@@ -2326,21 +2323,21 @@ paths:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
       responses:
-        '200':
+        "200":
           description: Successfully read a condition of sale
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ConditionOfSale'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ConditionOfSale"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a condition of sale
@@ -2360,27 +2357,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ConditionOfSale'
+              $ref: "#/components/schemas/ConditionOfSale"
       responses:
-        '200':
+        "200":
           description: Successfully updated a condition of sale
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ConditionOfSale'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ConditionOfSale"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a condition of sale
@@ -2396,21 +2393,20 @@ paths:
             type: string
             example: b477389cb3514fb1b444052a39bfb65d
       responses:
-        '204':
+        "204":
           description: Condition of sale successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # External Sales Data
 
   /api/v1/external-sales-data:
-
     get:
       description: Read external sales data for the quarter
       operationId: read-external-sales-data
@@ -2425,21 +2421,21 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully read external sales data for the quarter
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ExternalSalesData'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ExternalSalesData"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Read cost area sales catalog from statistics center to external sales data
@@ -2466,27 +2462,27 @@ paths:
               type: string
               format: binary
       responses:
-        '201':
+        "201":
           description: Successfully read excel sheet
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ExternalSalesData'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptableExcel'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaTypeExcel'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ExternalSalesData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptableExcel"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeExcel"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Thirty Year Regulation
 
@@ -2505,23 +2501,23 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully read thirty-year regulation results
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ThirtyYearRegulationResults'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ThirtyYearRegulationResults"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Perform thirty-year regulation for housing companies
@@ -2533,27 +2529,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/ThirtyYearRegulationParameters'
+              $ref: "#/components/schemas/ThirtyYearRegulationParameters"
       responses:
-        '200':
+        "200":
           description: Successfully performed thirty-year regulation for housing companies
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/ThirtyYearRegulationResults'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/ThirtyYearRegulationResults"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/thirty-year-regulation/reports/download-regulation-letter:
     get:
@@ -2577,21 +2573,21 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a regulation letter
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/thirty-year-regulation/reports/download-regulation-results:
     get:
@@ -2608,21 +2604,21 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a regulation report
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/thirty-year-regulation/postal-codes:
     get:
@@ -2639,7 +2635,7 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully read postal codes
           content:
             application/json:
@@ -2647,13 +2643,13 @@ paths:
                 description: List of postal codes with additional information
                 type: array
                 items:
-                  $ref: '#/components/schemas/ThirtyYearRegulationPostalCodes'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/ThirtyYearRegulationPostalCodes"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Property Manager
 
@@ -2672,10 +2668,10 @@ paths:
             type: string
             minLength: 2
             example: Matti
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of property managers
           content:
             application/json:
@@ -2688,22 +2684,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of property managers
                     type: array
                     items:
-                      $ref: '#/components/schemas/PropertyManager'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/PropertyManager"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new property manager
@@ -2715,26 +2711,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PropertyManager'
+              $ref: "#/components/schemas/PropertyManager"
       responses:
-        '201':
+        "201":
           description: Successfully added a new property manager
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PropertyManager'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PropertyManager"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/property-managers/{property_manager_id}:
     get:
@@ -2751,18 +2747,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a property manager details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PropertyManager'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PropertyManager"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a property manager
@@ -2782,26 +2778,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PropertyManager'
+              $ref: "#/components/schemas/PropertyManager"
       responses:
-        '200':
+        "200":
           description: Successfully updated a property manager
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PropertyManager'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PropertyManager"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a property manager
@@ -2817,14 +2813,14 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Housing company successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Codes
 
@@ -2843,10 +2839,10 @@ paths:
             type: string
             minLength: 2
             example: Sato
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of developers
           content:
             application/json:
@@ -2859,22 +2855,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of developers
                     type: array
                     items:
-                      $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new developer
@@ -2886,26 +2882,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '201':
+        "201":
           description: Successfully added a new developer
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/developers/{developer_id}:
     get:
@@ -2922,18 +2918,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a developer details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a developer
@@ -2953,26 +2949,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '200':
+        "200":
           description: Successfully updated a developer
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a developer
@@ -2988,15 +2984,14 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Housing company successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/postal-codes:
     get:
@@ -3005,10 +3000,10 @@ paths:
       tags:
         - Postal codes
       parameters:
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of postal codes
           content:
             application/json:
@@ -3021,22 +3016,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of postal codes
                     type: array
                     items:
-                      $ref: '#/components/schemas/HitasPostalCode'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/HitasPostalCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new postal code
@@ -3048,26 +3043,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HitasPostalCode'
+              $ref: "#/components/schemas/HitasPostalCode"
       responses:
-        '201':
+        "201":
           description: Successfully added a new postal code
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HitasPostalCode'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HitasPostalCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/postal-codes/{postal_code_id}:
     get:
@@ -3084,18 +3079,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a postal code details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HitasPostalCode'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HitasPostalCode"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a postal code
@@ -3115,26 +3110,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HitasPostalCode'
+              $ref: "#/components/schemas/HitasPostalCode"
       responses:
-        '200':
+        "200":
           description: Successfully updated a postal code
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HitasPostalCode'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/HitasPostalCode"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a postal code
@@ -3150,15 +3145,14 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Postal code successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/building-types:
     get:
@@ -3175,10 +3169,10 @@ paths:
             type: string
             minLength: 2
             example: kerrostalo
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of building types
           content:
             application/json:
@@ -3191,22 +3185,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of building types
                     type: array
                     items:
-                      $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new building type
@@ -3218,26 +3212,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '201':
+        "201":
           description: Successfully added a new building type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/building-types/{building_type_id}:
     get:
@@ -3254,18 +3248,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read a building type details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a building type
@@ -3285,26 +3279,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '200':
+        "200":
           description: Successfully updated a building type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a building type
@@ -3320,15 +3314,14 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Housing company successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/apartment-types:
     get:
@@ -3345,10 +3338,10 @@ paths:
             type: string
             minLength: 2
             example: h+kk
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of apartment types
           content:
             application/json:
@@ -3361,22 +3354,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of apartment types
                     type: array
                     items:
-                      $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new apartment type
@@ -3388,26 +3381,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '201':
+        "201":
           description: Successfully added a new apartment type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/apartment-types/{apartment_type_id}:
     get:
@@ -3424,18 +3417,18 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '200':
+        "200":
           description: Successfully read an apartment type details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update an apartment type
@@ -3455,26 +3448,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Code'
+              $ref: "#/components/schemas/Code"
       responses:
-        '200':
+        "200":
           description: Successfully updated an apartment type
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Code'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Code"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove an apartment type
@@ -3490,14 +3483,14 @@ paths:
             type: string
             example: a3181b8fa60b47df8ccba0d554a913bb
       responses:
-        '204':
+        "204":
           description: Housing company successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/hitas-types:
     get:
@@ -3506,7 +3499,7 @@ paths:
       tags:
         - Hitas types
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of hitas types
           content:
             application/json:
@@ -3514,11 +3507,11 @@ paths:
                 description: List of hitas types
                 type: array
                 items:
-                  $ref: '#/components/schemas/HitasTypeItem'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/HitasTypeItem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/regulation-statuses:
     get:
@@ -3527,7 +3520,7 @@ paths:
       tags:
         - Regulation statuses
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of regulation statuses
           content:
             application/json:
@@ -3535,11 +3528,11 @@ paths:
                 description: List of hitas types
                 type: array
                 items:
-                  $ref: '#/components/schemas/RegulationStatusItem'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/RegulationStatusItem"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Indices
 
@@ -3550,9 +3543,9 @@ paths:
       tags:
         - Indices
       parameters:
-        - $ref: '#/components/parameters/IndexNameParameter'
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/IndexNameParameter"
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
         - name: year
           required: false
           in: query
@@ -3564,7 +3557,7 @@ paths:
             maximum: 2099
             example: 2022-01
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of indices
           content:
             application/json:
@@ -3577,20 +3570,20 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of indices
                     type: array
                     items:
-                      $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/Index"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/indices/surface-area-price-ceiling:
     post:
@@ -3612,7 +3605,7 @@ paths:
                   type: string
                   example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully created surface area price ceiling for the next three months
           content:
             application/json:
@@ -3622,17 +3615,17 @@ paths:
                 minItems: 3
                 maxItems: 3
                 items:
-                  $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/Index"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/indices/surface-area-price-ceiling/reports/download-surface-area-price-ceiling-results:
     get:
@@ -3649,17 +3642,17 @@ paths:
             type: string
             example: 2023-01-01
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a surface area price ceiling report
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /api/v1/indices/surface-area-price-ceiling-calculation-data:
     get:
@@ -3668,7 +3661,7 @@ paths:
       tags:
         - Indices
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of surface area price ceiling calculation data
           content:
             application/json:
@@ -3681,20 +3674,20 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of surface area price ceiling calculation data
                     type: array
                     items:
-                      $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/SurfaceAreaPriceCeilingCalculationResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/indices/surface-area-price-ceiling-calculation-data/{calculation_month}:
     get:
@@ -3712,20 +3705,20 @@ paths:
             format: date
             example: 2023-02-01
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of surface area price ceiling calculation data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationResult'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/SurfaceAreaPriceCeilingCalculationResult"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/indices/{index}/{month}:
     get:
@@ -3734,28 +3727,28 @@ paths:
       tags:
         - Indices
       parameters:
-        - $ref: '#/components/parameters/IndexNameParameter'
+        - $ref: "#/components/parameters/IndexNameParameter"
         - name: month
           required: true
           in: path
           description: Month
           schema:
-            $ref: '#/components/schemas/YearMonth'
+            $ref: "#/components/schemas/YearMonth"
       responses:
-        '200':
+        "200":
           description: Successfully read a single index
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Index"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update index by month
@@ -3763,34 +3756,34 @@ paths:
       tags:
         - Indices
       parameters:
-        - $ref: '#/components/parameters/IndexNameParameter'
+        - $ref: "#/components/parameters/IndexNameParameter"
         - name: month
           required: true
           in: path
           description: Month
           schema:
-            $ref: '#/components/schemas/YearMonth'
+            $ref: "#/components/schemas/YearMonth"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Index'
+              $ref: "#/components/schemas/Index"
       responses:
-        '200':
+        "200":
           description: Successfully updated a single index
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Index'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Index"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Helsinki profile authentication
 
@@ -3801,7 +3794,7 @@ paths:
       tags:
         - Helauth
       responses:
-        '200':
+        "200":
           description: Successfully fetched user info
           content:
             application/json:
@@ -3829,16 +3822,16 @@ paths:
                     type: string
                     nullable: true
                     example: maija.meikalainen@example.com
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Reports
 
@@ -3864,19 +3857,19 @@ paths:
             type: string
             example: 2023-02-01
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a sales report
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/download-regulated-housing-companies-report:
     get:
@@ -3885,19 +3878,19 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a regulated housing company report
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/download-unregulated-housing-companies-report:
     get:
@@ -3906,19 +3899,19 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a report of housing companies released from regulation
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/housing-company-states:
     get:
@@ -3927,7 +3920,7 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successfully fetched housing companies counted by their states
           content:
             application/json:
@@ -3935,13 +3928,13 @@ paths:
                 description: List of states and their housing company and apartment counts
                 type: array
                 items:
-                  $ref: '#/components/schemas/HousingCompaniesInState'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/HousingCompaniesInState"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/download-housing-company-states-report:
     get:
@@ -3950,19 +3943,19 @@ paths:
       tags:
         - Reports
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a report of housing company states
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/download-sales-by-postal-code-and-area-report:
     get:
@@ -3986,19 +3979,19 @@ paths:
             type: string
             example: 2023-02-01
       responses:
-        '200':
+        "200":
           description: Successfully downloaded a sales report by area and postal code
           content:
             application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
               schema:
                 type: string
                 format: binary
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/reports/download-multiple-ownerships-report:
     get:
@@ -4035,11 +4028,11 @@ paths:
           in: path
           description: Email template type
           schema:
-            $ref: '#/components/schemas/EmailTemplateType'
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+            $ref: "#/components/schemas/EmailTemplateType"
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of email templates
           content:
             application/json:
@@ -4052,22 +4045,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of email templates
                     type: array
                     items:
-                      $ref: '#/components/schemas/EmailTemplate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new email template for a given type.
@@ -4080,34 +4073,34 @@ paths:
           in: path
           description: Email template type
           schema:
-            $ref: '#/components/schemas/EmailTemplateType'
+            $ref: "#/components/schemas/EmailTemplateType"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/EmailTemplate'
+              $ref: "#/components/schemas/EmailTemplate"
       responses:
-        '201':
+        "201":
           description: Successfully added a new email template.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/EmailTemplate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/email-templates/{type}/{name}:
     get:
@@ -4121,7 +4114,7 @@ paths:
           in: path
           description: Email template type
           schema:
-            $ref: '#/components/schemas/EmailTemplateType'
+            $ref: "#/components/schemas/EmailTemplateType"
         - name: name
           required: true
           in: path
@@ -4130,19 +4123,19 @@ paths:
             type: string
             example: "template 1"
       responses:
-        '200':
+        "200":
           description: Successfully read an email template.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/EmailTemplate'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/EmailTemplate"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update email template
@@ -4155,7 +4148,7 @@ paths:
           in: path
           description: Email template type
           schema:
-            $ref: '#/components/schemas/EmailTemplateType'
+            $ref: "#/components/schemas/EmailTemplateType"
         - name: name
           required: true
           in: path
@@ -4169,27 +4162,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/EmailTemplate'
+              $ref: "#/components/schemas/EmailTemplate"
       responses:
-        '200':
+        "200":
           description: Successfully updated an email template.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/EmailTemplate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/EmailTemplate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove email template
@@ -4202,7 +4195,7 @@ paths:
           in: path
           description: Email template type
           schema:
-            $ref: '#/components/schemas/EmailTemplateType'
+            $ref: "#/components/schemas/EmailTemplateType"
         - name: name
           required: true
           in: path
@@ -4211,16 +4204,16 @@ paths:
             type: string
             example: "template 1"
       responses:
-        '204':
+        "204":
           description: Email template successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # PDF bodies
 
@@ -4231,10 +4224,10 @@ paths:
       tags:
         - PDF Bodies
       parameters:
-        - $ref: '#/components/parameters/PagingLimitParameter'
-        - $ref: '#/components/parameters/PagingPageParameter'
+        - $ref: "#/components/parameters/PagingLimitParameter"
+        - $ref: "#/components/parameters/PagingPageParameter"
       responses:
-        '200':
+        "200":
           description: Successfully fetched list of PDF bodies
           content:
             application/json:
@@ -4247,22 +4240,22 @@ paths:
                   - contents
                 properties:
                   page:
-                    $ref: '#/components/schemas/PageInfo'
+                    $ref: "#/components/schemas/PageInfo"
                   contents:
                     description: List of PDF bodies
                     type: array
                     items:
-                      $ref: '#/components/schemas/PDFBody'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/PDFBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       description: Add a new pdf body.
@@ -4275,27 +4268,27 @@ paths:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/PDFBody'
+              $ref: "#/components/schemas/PDFBody"
       responses:
-        '201':
+        "201":
           description: Successfully added a new email template.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/PDFBody'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PDFBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /api/v1/pdf-bodies/{name}:
     get:
@@ -4309,21 +4302,21 @@ paths:
           in: path
           description: PDF body name
           schema:
-            $ref: '#/components/schemas/PDFBodyName'
+            $ref: "#/components/schemas/PDFBodyName"
       responses:
-        '200':
+        "200":
           description: Successfully read a PDF body.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/PDFBody'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PDFBody"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     put:
       description: Update a PDF body.
@@ -4336,34 +4329,34 @@ paths:
           in: path
           description: PDF body name
           schema:
-            $ref: '#/components/schemas/PDFBodyName'
+            $ref: "#/components/schemas/PDFBodyName"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               additionalProperties: false
-              $ref: '#/components/schemas/PDFBody'
+              $ref: "#/components/schemas/PDFBody"
       responses:
-        '200':
+        "200":
           description: Successfully updated a PDF body.
           content:
             application/json:
               schema:
                 additionalProperties: false
-                $ref: '#/components/schemas/PDFBody'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '406':
-          $ref: '#/components/responses/NotAcceptable'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/PDFBody"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     delete:
       description: Remove a PDF body.
@@ -4376,18 +4369,18 @@ paths:
           in: path
           description: PDF body name
           schema:
-            $ref: '#/components/schemas/PDFBodyName'
+            $ref: "#/components/schemas/PDFBodyName"
       responses:
-        '204':
+        "204":
           description: PDF body successfully removed.
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   # Emailing
 
@@ -4573,12 +4566,12 @@ components:
               description: Link to next page
               type: string
               nullable: true
-              example: 'https://example.com/api/v1/housing-companies?page=4'
+              example: "https://example.com/api/v1/housing-companies?page=4"
             previous:
               description: Link to previous page
               type: string
               nullable: true
-              example: 'https://example.com/api/v1/housing-companies?page=2'
+              example: "https://example.com/api/v1/housing-companies?page=2"
 
     HousingCompany:
       description: Single housing company
@@ -4607,13 +4600,13 @@ components:
           example: Taloyhtiö Helmi
           maxLength: 1024
         hitas_type:
-          $ref: '#/components/schemas/HitasType'
+          $ref: "#/components/schemas/HitasType"
         exclude_from_statistics:
           description: Should this housing company's apartments' sales be excluded from statistics?
           type: boolean
           example: false
         regulation_status:
-          $ref: '#/components/schemas/RegulationStatus'
+          $ref: "#/components/schemas/RegulationStatus"
         over_thirty_years_old:
           description: Is this housing company over 30 year old?
           type: boolean
@@ -4623,7 +4616,7 @@ components:
           type: boolean
           example: false
         address:
-          $ref: '#/components/schemas/HitasHousingCompanyAddress'
+          $ref: "#/components/schemas/HitasHousingCompanyAddress"
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -4696,13 +4689,13 @@ components:
           pattern: '^$|^\d{7}-\d$'
           example: 1234567-1
         hitas_type:
-          $ref: '#/components/schemas/HitasType'
+          $ref: "#/components/schemas/HitasType"
         exclude_from_statistics:
           description: Should this housing company's apartments' sales be excluded from statistics?
           type: boolean
           example: false
         regulation_status:
-          $ref: '#/components/schemas/RegulationStatus'
+          $ref: "#/components/schemas/RegulationStatus"
         over_thirty_years_old:
           description: Is this housing company over 30 year old?
           type: boolean
@@ -4712,7 +4705,7 @@ components:
           type: boolean
           example: false
         address:
-          $ref: '#/components/schemas/HitasHousingCompanyAddress'
+          $ref: "#/components/schemas/HitasHousingCompanyAddress"
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -4740,12 +4733,12 @@ components:
           nullable: true
           readOnly: true
         building_type:
-          $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: "#/components/schemas/ReadOnlyCode"
         developer:
-          $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: "#/components/schemas/ReadOnlyCode"
         property_manager:
           nullable: true
-          $ref: '#/components/schemas/ReadOnlyPropertyManager'
+          $ref: "#/components/schemas/ReadOnlyPropertyManager"
         summary:
           description: Summary data for this housing company across all apartments
           type: object
@@ -4849,7 +4842,7 @@ components:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/RealEstate'
+            $ref: "#/components/schemas/RealEstate"
         improvements:
           description: Contains housing company improvements
           type: object
@@ -4880,7 +4873,7 @@ components:
                     minimum: 0
                     example: 78284.25
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
                   no_deductions:
                     description: Should this improvement be exempt from all deductions (excess, deprecation)
                     type: boolean
@@ -4906,7 +4899,7 @@ components:
                     minimum: 0
                     example: 13359.75
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
 
     HousingCompanyPartialUpdateDetails:
       description: Single housing company's details
@@ -4952,13 +4945,13 @@ components:
           pattern: '^$|^\d{7}-\d$'
           example: 1234567-1
         hitas_type:
-          $ref: '#/components/schemas/HitasType'
+          $ref: "#/components/schemas/HitasType"
         exclude_from_statistics:
           description: Should this housing company's apartments' sales be excluded from statistics?
           type: boolean
           example: false
         regulation_status:
-          $ref: '#/components/schemas/RegulationStatus'
+          $ref: "#/components/schemas/RegulationStatus"
         over_thirty_years_old:
           description: Is this housing company over 30 year old?
           type: boolean
@@ -4968,7 +4961,7 @@ components:
           type: boolean
           example: false
         address:
-          $ref: '#/components/schemas/HitasHousingCompanyAddress'
+          $ref: "#/components/schemas/HitasHousingCompanyAddress"
         area:
           description: Hitas cost area information related to the housing company
           type: object
@@ -4996,12 +4989,12 @@ components:
           nullable: true
           readOnly: true
         building_type:
-          $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: "#/components/schemas/ReadOnlyCode"
         developer:
-          $ref: '#/components/schemas/ReadOnlyCode'
+          $ref: "#/components/schemas/ReadOnlyCode"
         property_manager:
           nullable: true
-          $ref: '#/components/schemas/ReadOnlyPropertyManager'
+          $ref: "#/components/schemas/ReadOnlyPropertyManager"
         summary:
           description: Summary data for this housing company across all apartments
           type: object
@@ -5105,7 +5098,7 @@ components:
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/RealEstate'
+            $ref: "#/components/schemas/RealEstate"
         improvements:
           description: Contains housing company improvements
           type: object
@@ -5136,7 +5129,7 @@ components:
                     minimum: 0
                     example: 78284.25
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
                   no_deductions:
                     description: Should this improvement be exempt from all deductions (excess, deprecation)
                     type: boolean
@@ -5162,7 +5155,7 @@ components:
                     minimum: 0
                     example: 13359.75
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
 
     BatchCompleteDetails:
       description: Results from housing company apartment batch completion endpoint
@@ -5229,13 +5222,13 @@ components:
           pattern: '^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$'
         address:
           readOnly: true
-          $ref: '#/components/schemas/RealEstateAddress'
+          $ref: "#/components/schemas/RealEstateAddress"
         buildings:
           description: List of buildings this real estate has
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/Building'
+            $ref: "#/components/schemas/Building"
 
     Building:
       description: Single building
@@ -5251,7 +5244,7 @@ components:
           readOnly: true
           example: 9d0ac35b01eb44829bc84c25f7c1813a
         address:
-          $ref: '#/components/schemas/BuildingAddress'
+          $ref: "#/components/schemas/BuildingAddress"
         building_identifier:
           description: This building's official identifier
           type: string
@@ -5330,7 +5323,7 @@ components:
           minimum: 1
           example: 4
         address:
-          $ref: '#/components/schemas/ApartmentAddress'
+          $ref: "#/components/schemas/ApartmentAddress"
         completion_date:
           description: Date that the apartment was completed on
           type: string
@@ -5340,7 +5333,7 @@ components:
           description: List of apartment's ownerships
           type: array
           items:
-            $ref: '#/components/schemas/Ownership'
+            $ref: "#/components/schemas/Ownership"
         has_conditions_of_sale:
           description: Does this apartment have any conditions of sale
           type: boolean
@@ -5358,7 +5351,7 @@ components:
           readOnly: true
         links:
           readOnly: true
-          $ref: '#/components/schemas/ApartmentLinks'
+          $ref: "#/components/schemas/ApartmentLinks"
 
     ApartmentDetails:
       description: Single apartment details
@@ -5390,7 +5383,7 @@ components:
           type: boolean
         type:
           nullable: true
-          $ref: '#/components/schemas/NullableReadOnlyCode'
+          $ref: "#/components/schemas/NullableReadOnlyCode"
         surface_area:
           description: Surface area of the apartment measured in square meters
           type: number
@@ -5432,23 +5425,23 @@ components:
               readOnly: true
               example: 50
         address:
-          $ref: '#/components/schemas/ApartmentAddress'
+          $ref: "#/components/schemas/ApartmentAddress"
         completion_date:
           description: Date that the apartment's building was completed on
           type: string
           format: date
           nullable: true
         prices:
-          $ref: '#/components/schemas/ApartmentPrices'
+          $ref: "#/components/schemas/ApartmentPrices"
         ownerships:
           description: List of apartment's ownerships
           type: array
           readOnly: true
           items:
-            $ref: '#/components/schemas/Ownership'
+            $ref: "#/components/schemas/Ownership"
         links:
           readOnly: true
-          $ref: '#/components/schemas/ApartmentLinks'
+          $ref: "#/components/schemas/ApartmentLinks"
         building:
           description: Building this apartment is associated with
           type: object
@@ -5495,7 +5488,7 @@ components:
                     minimum: 0
                     example: 78284.61
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
                   no_deductions:
                     description: Should this improvement be exempt from all deductions (excess, deprecation)
                     type: boolean
@@ -5522,7 +5515,7 @@ components:
                     minimum: 0
                     example: 13359.98
                   completion_date:
-                    $ref: '#/components/schemas/YearMonth'
+                    $ref: "#/components/schemas/YearMonth"
                   depreciation_percentage:
                     description: |-
                       Depreciation percentage.
@@ -5541,7 +5534,7 @@ components:
           readOnly: true
           type: array
           items:
-            $ref: '#/components/schemas/ApartmentConditionOfSale'
+            $ref: "#/components/schemas/ApartmentConditionOfSale"
         sell_by_date:
           description: |-
             The date when this apartment needs to be sold to fulfill a condition of sale linked to this apartment's
@@ -5564,9 +5557,9 @@ components:
       properties:
         calculation_variables:
           oneOf:
-            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVars2011Onwards'
-            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011MarketPriceIndex'
-            - $ref: '#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011ConstructionPriceIndex'
+            - $ref: "#/components/schemas/ApartmentMaximumPriceCalculationVars2011Onwards"
+            - $ref: "#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011MarketPriceIndex"
+            - $ref: "#/components/schemas/ApartmentMaximumPriceCalculationVarsBefore2011ConstructionPriceIndex"
         maximum_price:
           description: Maximum price for this index
           type: number
@@ -5626,7 +5619,7 @@ components:
           minimum: 0
           example: 26401.54
         housing_company_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceImprovements2011Onwards'
+          $ref: "#/components/schemas/ApartmentMaximumPriceImprovements2011Onwards"
         debt_free_price:
           description: |-
             Sum of basic price, index adjustment, apartment improvements and housing company
@@ -5723,9 +5716,9 @@ components:
           minimum: 0
           example: 26401.54
         apartment_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceMarketPriceIndexApartmentImprovements'
+          $ref: "#/components/schemas/ApartmentMaximumPriceMarketPriceIndexApartmentImprovements"
         housing_company_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceMarketPriceIndexHousingCompanyImprovements'
+          $ref: "#/components/schemas/ApartmentMaximumPriceMarketPriceIndexHousingCompanyImprovements"
         debt_free_price:
           description: |-
             Sum of basic price, index adjustment, apartment improvements and housing company
@@ -5823,9 +5816,9 @@ components:
           minimum: 0
           example: 0.0
         apartment_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexApartmentImprovements'
+          $ref: "#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexApartmentImprovements"
         housing_company_improvements:
-          $ref: '#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexHousingCompanyImprovements'
+          $ref: "#/components/schemas/ApartmentMaximumPriceConstructionPriceIndexHousingCompanyImprovements"
         debt_free_price:
           description: |-
             Sum of basic price, index adjustment, apartment improvements and housing company
@@ -6546,9 +6539,9 @@ components:
             - surface_area_price_ceiling
           properties:
             construction_price_index:
-              $ref: '#/components/schemas/ApartmentMaximumPriceCalculation'
+              $ref: "#/components/schemas/ApartmentMaximumPriceCalculation"
             market_price_index:
-              $ref: '#/components/schemas/ApartmentMaximumPriceCalculation'
+              $ref: "#/components/schemas/ApartmentMaximumPriceCalculation"
             surface_area_price_ceiling:
               description: Calculations for particular index
               type: object
@@ -6791,7 +6784,7 @@ components:
               type: string
               example: Taloyhtiö Helmi
             regulation_status:
-              $ref: '#/components/schemas/RegulationStatus'
+              $ref: "#/components/schemas/RegulationStatus"
             link:
               description: API link to housing company
               type: string
@@ -6995,11 +6988,11 @@ components:
                     - surface_area_price_ceiling
                   properties:
                     construction_price_index:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
                     market_price_index:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
                     surface_area_price_ceiling:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
                 onwards_2011:
                   description: Apartment's maximum Hitas prices for apartments constructed 2011 onwards
                   type: object
@@ -7011,11 +7004,11 @@ components:
                     - surface_area_price_ceiling
                   properties:
                     construction_price_index:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
                     market_price_index:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
                     surface_area_price_ceiling:
-                      $ref: '#/components/schemas/MaximumValue'
+                      $ref: "#/components/schemas/MaximumValue"
         construction:
           description: Single apartment construction price information
           type: object
@@ -7091,7 +7084,7 @@ components:
         - percentage
       properties:
         owner:
-          $ref: '#/components/schemas/ReadOnlyOwner'
+          $ref: "#/components/schemas/ReadOnlyOwner"
         percentage:
           description: Percentage that the owner owns of the apartment
           type: number
@@ -7470,7 +7463,7 @@ components:
         - no_interest
       properties:
         value:
-          $ref: '#/components/schemas/HitasType'
+          $ref: "#/components/schemas/HitasType"
         label:
           description: Readable name of the Hitas type
           type: string
@@ -7582,7 +7575,7 @@ components:
         month:
           readOnly: true
           allOf:
-            - $ref: '#/components/schemas/YearMonth'
+            - $ref: "#/components/schemas/YearMonth"
         value:
           description: Value for this index
           type: number
@@ -7590,7 +7583,7 @@ components:
           nullable: true
           example: 127.12
         valid_until:
-          $ref: '#/components/schemas/YearMonth'
+          $ref: "#/components/schemas/YearMonth"
 
     RegulationStatusItem:
       description: Regulation status
@@ -7601,7 +7594,7 @@ components:
         - label
       properties:
         value:
-          $ref: '#/components/schemas/RegulationStatus'
+          $ref: "#/components/schemas/RegulationStatus"
         label:
           description: Readable name of the Regulation status
           type: string
@@ -7643,7 +7636,7 @@ components:
           description: List of ownerships resulting from this sale
           type: array
           items:
-            $ref: '#/components/schemas/Ownership'
+            $ref: "#/components/schemas/Ownership"
         notification_date:
           description: Sale notification date
           type: string
@@ -7685,7 +7678,7 @@ components:
           description: List of ownerships resulting from this sale
           type: array
           items:
-            $ref: '#/components/schemas/Ownership'
+            $ref: "#/components/schemas/Ownership"
         notification_date:
           description: Sale notification date
           type: string
@@ -7733,7 +7726,7 @@ components:
           description: List of ownerships resulting from this sale
           type: array
           items:
-            $ref: '#/components/schemas/Ownership'
+            $ref: "#/components/schemas/Ownership"
         notification_date:
           description: Sale notification date
           type: string
@@ -7818,12 +7811,12 @@ components:
           example: dc1072975bab4ba69f64814f021c6785
         owner:
           readOnly: true
-          $ref: '#/components/schemas/ReadOnlyOwner'
+          $ref: "#/components/schemas/ReadOnlyOwner"
         apartment:
           readOnly: true
-          $ref: '#/components/schemas/ConditionOfSaleApartment'
+          $ref: "#/components/schemas/ConditionOfSaleApartment"
         grace_period:
-          $ref: '#/components/schemas/GracePeriod'
+          $ref: "#/components/schemas/GracePeriod"
         fulfilled:
           description: When this condition of sale was fulfilled, null if not fulfilled yet
           type: string
@@ -7859,12 +7852,12 @@ components:
           example: dc1072975bab4ba69f64814f021c6785
         new_ownership:
           readOnly: true
-          $ref: '#/components/schemas/ConditionOfSaleOwnership'
+          $ref: "#/components/schemas/ConditionOfSaleOwnership"
         old_ownership:
           readOnly: true
-          $ref: '#/components/schemas/ConditionOfSaleOwnership'
+          $ref: "#/components/schemas/ConditionOfSaleOwnership"
         grace_period:
-          $ref: '#/components/schemas/GracePeriod'
+          $ref: "#/components/schemas/GracePeriod"
         fulfilled:
           description: When this condition of sale was fulfilled, null if not fulfilled yet
           type: string
@@ -7907,9 +7900,9 @@ components:
           maximum: 100
           example: 100
         apartment:
-          $ref: '#/components/schemas/ConditionOfSaleApartment'
+          $ref: "#/components/schemas/ConditionOfSaleApartment"
         owner:
-          $ref: '#/components/schemas/ReadOnlyOwner'
+          $ref: "#/components/schemas/ReadOnlyOwner"
 
     ConditionOfSaleApartment:
       description: Minimal apartment address information
@@ -7926,7 +7919,7 @@ components:
           readOnly: true
           example: dc1072975bab4ba69f64814f021c6785
         address:
-          $ref: '#/components/schemas/ApartmentAddress'
+          $ref: "#/components/schemas/ApartmentAddress"
         housing_company:
           description: Links to apartment's housing company
           type: object
@@ -7975,7 +7968,7 @@ components:
           description: Apartments read from the sheet
           type: array
           items:
-            $ref: '#/components/schemas/SalesCatalogApartment'
+            $ref: "#/components/schemas/SalesCatalogApartment"
         confirmation_date:
           description: Sales catalog confirmation date
           type: string
@@ -8169,13 +8162,13 @@ components:
           type: string
           example: 2022Q1
         quarter_1:
-          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+          $ref: "#/components/schemas/ExternalSalesDataQuarter"
         quarter_2:
-          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+          $ref: "#/components/schemas/ExternalSalesDataQuarter"
         quarter_3:
-          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+          $ref: "#/components/schemas/ExternalSalesDataQuarter"
         quarter_4:
-          $ref: '#/components/schemas/ExternalSalesDataQuarter'
+          $ref: "#/components/schemas/ExternalSalesDataQuarter"
 
     ExternalSalesDataQuarter:
       description: External sales data quarter
@@ -8193,7 +8186,7 @@ components:
           description: Cost areas for this quarter.
           type: array
           items:
-            $ref: '#/components/schemas/ExternalSalesDataCostAreaData'
+            $ref: "#/components/schemas/ExternalSalesDataCostAreaData"
 
     ExternalSalesDataCostAreaData:
       description: External sales data quarter cost areas
@@ -8271,27 +8264,27 @@ components:
           description: Housing Companies that are release from regulation automatically.
           type: array
           items:
-            $ref: '#/components/schemas/ThirtyYearRegulationData'
+            $ref: "#/components/schemas/ThirtyYearRegulationData"
         released_from_regulation:
           description: Housing Companies that are released from regulation based on 30 year comparison.
           type: array
           items:
-            $ref: '#/components/schemas/ThirtyYearRegulationData'
+            $ref: "#/components/schemas/ThirtyYearRegulationData"
         stays_regulated:
           description: Housing Companies that stay regulated.
           type: array
           items:
-            $ref: '#/components/schemas/ThirtyYearRegulationData'
+            $ref: "#/components/schemas/ThirtyYearRegulationData"
         skipped:
           description: Housing Companies that could not be checked for regulation.
           type: array
           items:
-            $ref: '#/components/schemas/ThirtyYearRegulationData'
+            $ref: "#/components/schemas/ThirtyYearRegulationData"
         obfuscated_owners:
           description: Owners that have been obfuscated due to no longer owning any regulated apartments
           type: array
           items:
-            $ref: '#/components/schemas/ObfuscatedOwner'
+            $ref: "#/components/schemas/ObfuscatedOwner"
 
     ThirtyYearRegulationData:
       description: Thirty year regulation data for a checked housing company
@@ -8317,7 +8310,7 @@ components:
           type: string
           example: Taloyhtiö Helmi
         address:
-          $ref: '#/components/schemas/HitasHousingCompanyAddress'
+          $ref: "#/components/schemas/HitasHousingCompanyAddress"
         price:
           description: |-
             Average price per square meter for all apartments in the housing company,
@@ -8338,13 +8331,13 @@ components:
           format: date
           example: 2023-02-01
         property_manager:
-          $ref: '#/components/schemas/PropertyManagerWithEditInfo'
+          $ref: "#/components/schemas/PropertyManagerWithEditInfo"
         letter_fetched:
           description: Has the regulation letter been fetched for this housing company?
           type: boolean
           example: false
         current_regulation_status:
-          $ref: '#/components/schemas/RegulationStatus'
+          $ref: "#/components/schemas/RegulationStatus"
 
     PropertyManagerWithEditInfo:
       description: Property manager information with the date it was last modified on a given housing company
@@ -8441,7 +8434,7 @@ components:
           format: date
           example: 2023-02-01
         data:
-          $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationData'
+          $ref: "#/components/schemas/SurfaceAreaPriceCeilingCalculationData"
 
     SurfaceAreaPriceCeilingCalculationData:
       description: Surface area price ceiling calculation data
@@ -8454,13 +8447,13 @@ components:
         housing_company_data:
           type: array
           items:
-            $ref: '#/components/schemas/SurfaceAreaPriceCeilingCalculationHousingCompanyData'
+            $ref: "#/components/schemas/SurfaceAreaPriceCeilingCalculationHousingCompanyData"
         created_surface_area_price_ceilings:
           type: array
           minItems: 3
           maxItems: 3
           items:
-            $ref: '#/components/schemas/Index'
+            $ref: "#/components/schemas/Index"
 
     SurfaceAreaPriceCeilingCalculationHousingCompanyData:
       description: Surface area price ceiling calculation data
@@ -8562,7 +8555,7 @@ components:
           example: Template 1
         type:
           readOnly: true
-          $ref: '#/components/schemas/EmailTemplateType'
+          $ref: "#/components/schemas/EmailTemplateType"
         text:
           description: Email template text.
           type: string
@@ -8591,7 +8584,7 @@ components:
         - texts
       properties:
         name:
-          $ref: '#/components/schemas/PDFBodyName'
+          $ref: "#/components/schemas/PDFBodyName"
         texts:
           description: PDF body texts.
           type: array
@@ -9007,13 +9000,12 @@ components:
           example: internal_server_error
 
   responses:
-
     BadRequest:
       description: The request was malformed
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BadRequestError'
+            $ref: "#/components/schemas/BadRequestError"
           example:
             status: 400
             reason: Bad Request
@@ -9032,7 +9024,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UnauthorizedError'
+            $ref: "#/components/schemas/UnauthorizedError"
           example:
             status: 401
             reason: Unauthorized
@@ -9044,7 +9036,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotFoundError'
+            $ref: "#/components/schemas/NotFoundError"
           example:
             status: 404
             reason: Not Found
@@ -9056,7 +9048,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotAcceptableError'
+            $ref: "#/components/schemas/NotAcceptableError"
           example:
             status: 406
             reason: Not Acceptable
@@ -9071,7 +9063,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/NotAcceptableError'
+            $ref: "#/components/schemas/NotAcceptableError"
           example:
             status: 406
             reason: Not Acceptable
@@ -9086,7 +9078,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ConflictError'
+            $ref: "#/components/schemas/ConflictError"
           example:
             status: 409
             reason: Conflict
@@ -9098,7 +9090,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+            $ref: "#/components/schemas/UnsupportedMediaTypeError"
           example:
             status: 415
             reason: Unsupported Media Type
@@ -9113,7 +9105,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UnsupportedMediaTypeError'
+            $ref: "#/components/schemas/UnsupportedMediaTypeError"
           example:
             status: 415
             reason: Unsupported Media Type
@@ -9128,7 +9120,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/InternalServerError'
+            $ref: "#/components/schemas/InternalServerError"
           example:
             status: 500
             reason: Internal Server Error
