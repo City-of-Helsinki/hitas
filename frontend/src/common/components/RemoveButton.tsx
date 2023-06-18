@@ -14,7 +14,7 @@ export default function RemoveButton({
     onClick,
     isLoading,
     disabled = false,
-    buttonText = "Poista",
+    buttonText,
     ...rest
 }: RemoveButtonProps): JSX.Element {
     return (

@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
 import {z, ZodSchema} from "zod";
 import {useCreateSaleMutation} from "../../../app/services";
-import {NavigateBackButton, SaveButton} from "../../../common/components";
+import {NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
 import {Checkbox, DateInput, NumberInput} from "../../../common/components/form";
 import {
@@ -16,12 +16,12 @@ import {
     IApartmentDetails,
     IApartmentSaleForm,
     indexNames,
+    OwnershipsListSchema,
 } from "../../../common/schemas";
 import {getApartmentUnconfirmedPrices, hdsToast, today} from "../../../common/utils";
 import ApartmentCatalogPrices from "./ApartmentCatalogPrices";
 import {ApartmentSaleContext} from "./index";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
-import OwnershipsListFieldSet from "./OwnershipsListFieldSet";
 
 export interface ISalesPageMaximumPrices {
     maximumPrice: number | null;
@@ -346,7 +346,14 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                         ) : (
                             <MaximumPriceCalculationFieldSet setMaximumPrices={setMaximumPrices} />
                         )}
-                        <OwnershipsListFieldSet />
+                        <Fieldset
+                            className={`ownerships-fieldset ${
+                                OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success ? "" : "error"
+                            }`}
+                            heading="Omistajuudet *"
+                        >
+                            <OwnershipList />
+                        </Fieldset>
                     </FormProvider>
                 </ApartmentSaleContext.Provider>
             </div>

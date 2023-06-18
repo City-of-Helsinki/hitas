@@ -18,6 +18,7 @@ import NavigateBackButton from "./NavigateBackButton";
 import NewOwnerForm from "./NewOwnerForm";
 import Notifications from "./Notifications";
 import OwnerMutateForm from "./OwnerMutateForm";
+import OwnershipList from "./OwnershipList";
 import QueryStateError from "./QueryStateError";
 import QueryStateHandler from "./QueryStateHandler";
 import RemoveButton from "./RemoveButton";
@@ -41,11 +42,12 @@ export {
     ListPageNumbers,
     MutateModal,
     MutateForm,
-    OwnerMutateForm,
     MutateSearchList,
     NavigateBackButton,
     NewOwnerForm,
     Notifications,
+    OwnerMutateForm,
+    OwnershipList,
     QueryStateError,
     QueryStateHandler,
     RemoveButton,
