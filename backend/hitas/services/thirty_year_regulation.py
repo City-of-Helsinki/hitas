@@ -606,7 +606,7 @@ def _save_regulation_results(  # NOSONAR
     """
     Save regulation results for reporting.
     """
-    thirty_year_regulation_results, created = ThirtyYearRegulationResults.objects.update_or_create(
+    thirty_year_regulation_results, created = ThirtyYearRegulationResults.objects.get_or_create(
         calculation_month=calculation_month,
         defaults={
             "regulation_month": regulation_month,
