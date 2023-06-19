@@ -707,6 +707,7 @@ def get_thirty_year_regulation_results_for_housing_company(
     housing_company_uuid: UUID,
     calculation_date: datetime.date,
 ) -> ThirtyYearRegulationResultsRowWithAnnotations:
+    hitas_quarter = hitas_calculation_quarter(calculation_date)
     results = (
         ThirtyYearRegulationResultsRow.objects.select_related(
             "parent",
@@ -718,13 +719,13 @@ def get_thirty_year_regulation_results_for_housing_company(
         )
         .filter(
             housing_company__uuid=housing_company_uuid,
-            parent__calculation_month=hitas_calculation_quarter(calculation_date),
+            parent__calculation_month=hitas_quarter,
         )
         .annotate(
             check_count=subquery_count(
                 ThirtyYearRegulationResultsRow,
                 "housing_company__uuid",
-                parent__calculation_month__lte=hitas_calculation_quarter(calculation_date),
+                parent__calculation_month__lte=hitas_quarter,
             ),
             min_share=Min("housing_company__real_estates__buildings__apartments__share_number_start"),
             max_share=Max("housing_company__real_estates__buildings__apartments__share_number_end"),

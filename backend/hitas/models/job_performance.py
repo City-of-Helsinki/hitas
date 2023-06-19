@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from django.conf import settings
 from django.db import models
@@ -21,6 +22,14 @@ class JobPerformance(HitasModel):
         related_name="job_performances",
         editable=False,
     )
+    object_type = models.ForeignKey(
+        to="contenttypes.ContentType",
+        on_delete=models.CASCADE,
+        related_name="+",
+        editable=False,
+        null=True,
+    )
+    object_id: Optional[int] = models.PositiveBigIntegerField(editable=False, null=True)
     source: JobPerformanceSource = EnumField(JobPerformanceSource, max_length=21)
     request_date: datetime.date = models.DateField(editable=False)
     delivery_date: datetime.date = models.DateField(editable=False)

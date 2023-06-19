@@ -4457,7 +4457,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-
 components:
   parameters:
     PagingLimitParameter:
@@ -8600,6 +8599,7 @@ components:
       additionalProperties: false
       required:
         - calculation_id
+        - request_date
         - template_name
         - recipients
       properties:
@@ -8607,6 +8607,11 @@ components:
           description: Apartment max price calculation id
           type: string
           example: 123e4567e89b12d3a456426655440000
+        request_date:
+          description: When was this document requested?
+          type: string
+          format: date
+          example: Example text
         template_name:
           description: Email template name.
           type: string
@@ -8626,7 +8631,7 @@ components:
       additionalProperties: false
       required:
         - apartment_id
-        - calculation_date
+        - request_date
         - additional_info
         - template_name
         - recipients
@@ -8636,10 +8641,15 @@ components:
           type: string
           example: 123e4567e89b12d3a456426655440000
         calculation_date:
-          description: Date for which the calculation is made for.
+          description: Date for which the calculation is made for. Current date if not given.
           type: string
           format: date
           example: 2022-01-01
+        request_date:
+          description: When was this document requested?
+          type: string
+          format: date
+          example: Example text
         additional_info:
           description: Additional information to be displayed on the generated PDF.
           type: string
@@ -8663,7 +8673,6 @@ components:
       additionalProperties: false
       required:
         - housing_company_id
-        - calculation_date
         - template_name
         - recipients
       properties:
@@ -8672,7 +8681,7 @@ components:
           type: string
           example: 123e4567e89b12d3a456426655440000
         calculation_date:
-          description: Date of the regulation results.
+          description: Date of the regulation results. Current Hitas Quarter if not given.
           type: string
           format: date
           example: 2022-01-01

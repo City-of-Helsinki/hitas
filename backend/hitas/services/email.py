@@ -3,6 +3,7 @@ from typing import Literal, Optional
 from uuid import UUID
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
 from django.db.models.functions import TruncMonth
@@ -15,6 +16,7 @@ from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
     EmailTemplate,
+    JobPerformance,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
     Ownership,
@@ -23,6 +25,7 @@ from hitas.models import (
 )
 from hitas.models.apartment import ApartmentWithAnnotations
 from hitas.models.email_template import EmailTemplateType
+from hitas.models.job_performance import JobPerformanceSource
 from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRowWithAnnotations
 from hitas.services.apartment import (
@@ -47,6 +50,7 @@ from users.models import User
 
 def send_confirmed_max_price_calculation_email(
     calculation_id: UUID,
+    request_date: datetime.date,
     template_name: str,
     recipients: list[str],
     user: User,
@@ -60,6 +64,15 @@ def send_confirmed_max_price_calculation_email(
         type=EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION,
     )
     send_pdf_via_email(body=template.text, recipients=recipients, filename=filename, pdf=pdf)
+
+    JobPerformance.objects.get_or_create(
+        user=user,
+        request_date=request_date,
+        delivery_date=timezone.now().date(),
+        source=JobPerformanceSource.CONFIRMED_MAX_PRICE,
+        object_type=ContentType.objects.get_for_model(confirmed_max_price_calculation),
+        object_id=confirmed_max_price_calculation.id,
+    )
 
 
 def render_confirmed_max_price_calculation_pdf(
@@ -79,35 +92,10 @@ def render_confirmed_max_price_calculation_pdf(
     return filename, pdf
 
 
-def send_unconfirmed_max_price_calculation_email(
+def get_apartment_for_unconfirmed_max_price_calculation(
     apartment_id: UUID,
     calculation_date: datetime.date,
-    additional_info: str,
-    template_name: str,
-    recipients: list[str],
-    user: User,
-) -> None:
-    filename, pdf = render_unconfirmed_max_price_calculation_pdf(
-        apartment_id=apartment_id,
-        calculation_date=calculation_date,
-        additional_info=additional_info,
-        user=user,
-    )
-
-    template = get_hitas_object_or_404(
-        EmailTemplate,
-        name=template_name,
-        type=EmailTemplateType.UNCONFIRMED_MAX_PRICE_CALCULATION,
-    )
-    send_pdf_via_email(body=template.text, recipients=recipients, filename=filename, pdf=pdf)
-
-
-def render_unconfirmed_max_price_calculation_pdf(
-    apartment_id: UUID,
-    calculation_date: datetime.date,
-    additional_info: str,
-    user: User,
-) -> tuple[str, bytes]:
+) -> ApartmentWithAnnotations:
     calculation_month = monthify(calculation_date)
     completion_date: Optional[datetime.date] = (
         Apartment.objects.filter(uuid=apartment_id).values_list("completion_date", flat=True).first()
@@ -184,6 +172,51 @@ def render_unconfirmed_max_price_calculation_pdf(
         if apartment.mpi_2005_100 is None:
             raise HitasModelNotFound(MarketPriceIndex2005Equal100)
 
+    return apartment
+
+
+def send_unconfirmed_max_price_calculation_email(
+    apartment_id: UUID,
+    calculation_date: datetime.date,
+    request_date: datetime.date,
+    additional_info: str,
+    template_name: str,
+    recipients: list[str],
+    user: User,
+) -> None:
+    calculation_month = monthify(calculation_date)
+    apartment = get_apartment_for_unconfirmed_max_price_calculation(apartment_id, calculation_month)
+
+    filename, pdf = render_unconfirmed_max_price_calculation_pdf(
+        apartment=apartment,
+        calculation_month=calculation_month,
+        additional_info=additional_info,
+        user=user,
+    )
+
+    template = get_hitas_object_or_404(
+        EmailTemplate,
+        name=template_name,
+        type=EmailTemplateType.UNCONFIRMED_MAX_PRICE_CALCULATION,
+    )
+    send_pdf_via_email(body=template.text, recipients=recipients, filename=filename, pdf=pdf)
+
+    JobPerformance.objects.get_or_create(
+        user=user,
+        request_date=request_date,
+        delivery_date=timezone.now().date(),
+        source=JobPerformanceSource.UNCONFIRMED_MAX_PRICE,
+        object_type=ContentType.objects.get_for_model(apartment),
+        object_id=apartment.id,
+    )
+
+
+def render_unconfirmed_max_price_calculation_pdf(
+    apartment: ApartmentWithAnnotations,
+    calculation_month: datetime.date,
+    additional_info: str,
+    user: User,
+) -> tuple[str, bytes]:
     apartment_data = ApartmentDetailSerializer(apartment).data
     pdf_body = get_hitas_object_or_404(PDFBody, name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION)
     surface_area_price_ceiling = get_hitas_object_or_404(SurfaceAreaPriceCeiling, month=calculation_month)

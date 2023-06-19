@@ -66,8 +66,13 @@ def test__api__email_template__list__single(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__email_template__list__multiple(api_client: HitasAPIClient):
-    template_1: EmailTemplate = EmailTemplateFactory.create(type=EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION)
-    template_2: EmailTemplate = EmailTemplateFactory.create(type=EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION)
+    template_1: EmailTemplate = EmailTemplateFactory.create(
+        name="foo",
+        type=EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION,
+    )
+    template_2: EmailTemplate = EmailTemplateFactory.create(
+        name="bar", type=EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION
+    )
 
     url = reverse("hitas:email-template-list", kwargs={"type": EmailTemplateType.CONFIRMED_MAX_PRICE_CALCULATION.value})
     response = api_client.get(url)
