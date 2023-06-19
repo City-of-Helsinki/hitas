@@ -3,7 +3,7 @@ import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useBatchCompleteApartmentsMutation} from "../../app/services";
 import {CloseButton, SaveDialogModal} from "../../common/components";
-import {NumberInput} from "../../common/components/form";
+import {DateInput, NumberInput} from "../../common/components/form";
 import {hdsToast, today} from "../../common/utils";
 
 const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
@@ -14,20 +14,21 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
         defaultValues: {
             start: null,
             end: null,
+            completion_date: today(),
         },
         mode: "all",
     });
-    const {handleSubmit, setFocus} = groupCompleteForm;
+    const {handleSubmit} = groupCompleteForm;
     const formStart = groupCompleteForm.watch("start");
     const formEnd = groupCompleteForm.watch("end");
 
-    const onSubmit = (data: {start: number | null; end: number | null}) => {
+    const onSubmit = (data: {start: number | null; end: number | null; completion_date: string}) => {
         const submitData = {
             housing_company_id: housingCompanyId,
             data: {
                 apartment_number_start: data.start !== undefined && data.start !== null ? Number(data.start) : null,
                 apartment_number_end: data.end !== undefined && data.end !== null ? Number(data.end) : null,
-                completion_date: today(),
+                completion_date: data.completion_date,
             },
         };
         batchComplete(submitData)
@@ -53,7 +54,6 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 variant="secondary"
                 onClick={() => {
                     setIsFormOpen(true);
-                    setFocus("end"); // FIXME: This doesn't work :/
                 }}
             >
                 Merkitse valmiiksi
@@ -73,7 +73,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                         <>
                             <p>
                                 Jos et halua rajata pelkkää alku- tai loppupäätä jätä kenttä tyhjäksi. Jos kumpikin
-                                kenttä on tyhjä valitaan kaikki yhtiön asunnot.
+                                kenttä on tyhjä valitaan kaikki yhtiön asunnot. Valinta koskee kaikkia rappuja.
                             </p>
                             <div className="apartment-numbers">
                                 <div className={formStart ? "toggled" : undefined}>
@@ -93,6 +93,13 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                                     />
                                 </div>
                             </div>
+                            <DateInput
+                                name="completion_date"
+                                label="Valmistumispäivä"
+                                formObject={groupCompleteForm}
+                                maxDate={new Date()}
+                                defaultValue={new Date()}
+                            />
                         </>
                     </Dialog.Content>
                     <Dialog.ActionButtons>
