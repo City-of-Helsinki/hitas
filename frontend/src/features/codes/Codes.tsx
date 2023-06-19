@@ -1,6 +1,6 @@
 import {Tabs} from "hds-react";
 import {useGetOwnersQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {ManagerMutateForm, MutateSearchList, OwnerMutateForm} from "../../common/components";
+import {MutateSearchList, OwnerMutateForm, PropertyManagerMutateForm} from "../../common/components";
 import {IndicesList} from "./";
 
 const Codes = (): JSX.Element => {
@@ -41,7 +41,7 @@ const Codes = (): JSX.Element => {
                         searchStringMinLength={2}
                         resultListMaxRows={12}
                         useGetQuery={useGetPropertyManagersQuery}
-                        MutateFormComponent={ManagerMutateForm}
+                        MutateFormComponent={PropertyManagerMutateForm}
                         defaultFilterParams={{name: "", email: ""}}
                         dialogTitles={{modify: "Muokkaa isännöitsijän tietoja", new: "Lisää isännöitsijä"}}
                     />

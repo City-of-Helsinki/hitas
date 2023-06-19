@@ -16,8 +16,8 @@ import {
     IConditionOfSale,
     ICreateConditionOfSale,
     IExternalSalesDataResponse,
-    IFilterManagersQuery,
     IFilterOwnersQuery,
+    IFilterPropertyManagersQuery,
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
@@ -27,11 +27,11 @@ import {
     IIndexListResponse,
     IIndexQuery,
     IIndexResponse,
-    IManagersResponse,
     IOwner,
     IOwnersResponse,
     IPostalCodeResponse,
     IPropertyManager,
+    IPropertyManagersResponse,
     IRealEstate,
     IThirtyYearAvailablePostalCodesResponse,
     IThirtyYearRegulationQuery,
@@ -182,7 +182,15 @@ export const hitasApi = createApi({
         },
         ...(!Config.token && {credentials: "include"}),
     }),
-    tagTypes: ["HousingCompany", "Apartment", "Index", "Owner", "Manager", "ExternalSaleData", "ThirtyYearRegulation"],
+    tagTypes: [
+        "HousingCompany",
+        "Apartment",
+        "Index",
+        "Owner",
+        "PropertyManager",
+        "ExternalSaleData",
+        "ThirtyYearRegulation",
+    ],
     endpoints: () => ({}),
 });
 
@@ -238,12 +246,12 @@ const listApi = hitasApi.injectEndpoints({
             }),
             providesTags: [{type: "Owner", id: "LIST"}],
         }),
-        getPropertyManagers: builder.query<IManagersResponse, IFilterManagersQuery>({
-            query: (params: IFilterManagersQuery) => ({
+        getPropertyManagers: builder.query<IPropertyManagersResponse, IFilterPropertyManagersQuery>({
+            query: (params: IFilterPropertyManagersQuery) => ({
                 url: "property-managers",
                 params: params,
             }),
-            providesTags: [{type: "Manager"}],
+            providesTags: [{type: "PropertyManager", id: "LIST"}],
         }),
         // Codes
         getPostalCodes: builder.query<IPostalCodeResponse, object>({
@@ -290,7 +298,10 @@ const detailApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
         getHousingCompanyDetail: builder.query<IHousingCompanyDetails, string>({
             query: (id) => `housing-companies/${id}`,
-            providesTags: (result, error, arg) => [{type: "HousingCompany", id: arg}, {type: "Manager"}],
+            providesTags: (result, error, arg) => [
+                {type: "HousingCompany", id: arg},
+                {type: "PropertyManager", id: result?.property_manager?.id},
+            ],
         }),
         getApartmentDetail: builder.query<IApartmentDetails, IApartmentQuery>({
             query: (params: IApartmentQuery) => ({
@@ -489,14 +500,17 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: () => [{type: "Owner"}],
         }),
-        saveManager: builder.mutation<IPropertyManager, IPropertyManager>({
+        savePropertyManager: builder.mutation<IPropertyManager, IPropertyManager>({
             query: (data) => ({
                 url: `property-managers${idOrBlank(data.id)}`,
                 method: data.id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: () => [{type: "Manager"}],
+            invalidatesTags: (response) => [
+                {type: "PropertyManager", id: response?.id},
+                {type: "PropertyManager", id: "LIST"},
+            ],
         }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
@@ -632,7 +646,7 @@ export const {
     useSaveApartmentMutation,
     useDeleteApartmentMutation,
     useSaveOwnerMutation,
-    useSaveManagerMutation,
+    useSavePropertyManagerMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
     useCreateSaleMutation,

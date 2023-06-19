@@ -14,18 +14,21 @@ import {
     EditButton,
     Heading,
     ImprovementsTable,
+    MutateModal,
+    PropertyManagerMutateForm,
     QueryStateHandler,
     SaveButton,
 } from "../../common/components";
 import {FileInput} from "../../common/components/form";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
-import {IHousingCompanyDetails, ISalesCatalogApartment} from "../../common/schemas";
+import {IHousingCompanyDetails, IPropertyManager, ISalesCatalogApartment} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 import {BatchCompleteApartmentsModal} from "./";
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): JSX.Element => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
@@ -171,18 +174,23 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                     />
                                 </div>
                                 <div className="column">
-                                    <DetailField
-                                        label="Isännöitsijä"
-                                        value={
-                                            housingCompany.property_manager &&
-                                            `${housingCompany.property_manager.name}
-                                        ${
-                                            housingCompany.property_manager.email
-                                                ? `(${housingCompany.property_manager.email})`
-                                                : ""
-                                        }`
-                                        }
-                                    />
+                                    <div>
+                                        <label className="detail-field-label">Isännöitsijä</label>
+                                        <div className="detail-field-value">
+                                            {housingCompany.property_manager ? (
+                                                <button
+                                                    className="text-button"
+                                                    onClick={() => setIsModifyPropertyManagerModalVisible(true)}
+                                                >
+                                                    {`${housingCompany.property_manager.name} (${
+                                                        housingCompany.property_manager.email ?? ""
+                                                    })`}
+                                                </button>
+                                            ) : (
+                                                "-"
+                                            )}
+                                        </div>
+                                    </div>
                                     <div>
                                         <label className="detail-field-label">Huomioitavaa</label>
                                         <textarea
@@ -237,6 +245,14 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                             <div className="company-details__tab documents">Dokumentit</div>
                         </Tabs.TabPanel>
                     </Tabs>
+                    <MutateModal
+                        // Modify property manager modal
+                        defaultObject={housingCompany.property_manager as IPropertyManager}
+                        MutateFormComponent={PropertyManagerMutateForm}
+                        dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
+                        isVisible={isModifyPropertyManagerModalVisible}
+                        closeModalAction={() => setIsModifyPropertyManagerModalVisible(false)}
+                    />
                 </div>
                 <ImprovementsTable
                     data={housingCompany}
