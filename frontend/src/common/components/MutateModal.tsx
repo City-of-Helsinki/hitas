@@ -33,7 +33,7 @@ export default function MutateModal<T>({
         >
             <Dialog.Header
                 id="mutate-info-modal__header"
-                title={defaultObject ? dialogTitles?.modify || "Muokkaa tietoja" : dialogTitles?.new || "Lisää uusi"}
+                title={defaultObject ? dialogTitles?.modify ?? "Muokkaa tietoja" : dialogTitles?.new ?? "Lisää uusi"}
             />
             <Dialog.Content>
                 <MutateFormComponent

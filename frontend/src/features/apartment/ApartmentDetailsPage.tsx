@@ -12,9 +12,9 @@ import {
     DetailField,
     Divider,
     ImprovementsTable,
-    ManagerMutateForm,
     MutateModal,
     OwnerMutateForm,
+    PropertyManagerMutateForm,
     QueryStateHandler,
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
@@ -454,15 +454,8 @@ const LoadedApartmentDetails = ({
         setIsModifyOwnerModalVisible(true);
         setOwner(selectedOwner);
     };
-    // Handle visibility of the modify manager info modal
-    const [isModifyManagerModalVisible, setIsModifyManagerModalVisible] = useState(false);
-    const [manager, setManager] = useState<IPropertyManager | undefined>(undefined);
-    const modifyManagerInfoHandler = (selectedManager: IPropertyManager | undefined) => {
-        if (selectedManager) {
-            setIsModifyManagerModalVisible(true);
-            setManager(selectedManager);
-        }
-    };
+    // Handle visibility of the modify property manager info modal
+    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
 
     return (
         <>
@@ -541,11 +534,7 @@ const LoadedApartmentDetails = ({
                                                 {housingCompany?.property_manager ? (
                                                     <button
                                                         className="text-button"
-                                                        onClick={() =>
-                                                            modifyManagerInfoHandler(
-                                                                housingCompany?.property_manager || undefined
-                                                            )
-                                                        }
+                                                        onClick={() => setIsModifyPropertyManagerModalVisible(true)}
                                                     >
                                                         {housingCompany?.property_manager?.name || " "}
                                                     </button>
@@ -660,6 +649,7 @@ const LoadedApartmentDetails = ({
                     </Tabs>
                 </div>
                 <MutateModal
+                    // Modify owner modal
                     defaultObject={owner as IOwner}
                     MutateFormComponent={OwnerMutateForm}
                     dialogTitles={{modify: "Muokkaa henkilötietoja"}}
@@ -667,11 +657,12 @@ const LoadedApartmentDetails = ({
                     closeModalAction={() => setIsModifyOwnerModalVisible(false)}
                 />
                 <MutateModal
-                    defaultObject={manager as IPropertyManager}
-                    MutateFormComponent={ManagerMutateForm}
+                    // Modify property manager modal
+                    defaultObject={housingCompany?.property_manager as IPropertyManager}
+                    MutateFormComponent={PropertyManagerMutateForm}
                     dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
-                    isVisible={isModifyManagerModalVisible}
-                    closeModalAction={() => setIsModifyManagerModalVisible(false)}
+                    isVisible={isModifyPropertyManagerModalVisible}
+                    closeModalAction={() => setIsModifyPropertyManagerModalVisible(false)}
                 />
                 <ImprovementsTable
                     data={apartment}

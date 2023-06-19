@@ -1,5 +1,5 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
-import {Button, Dialog, IconArrowLeft} from "hds-react";
+import {Button, IconArrowLeft} from "hds-react";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
@@ -28,7 +28,7 @@ export default function OwnerMutateForm({
             .then(() => {
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
-                setDefaultFilterParams && setDefaultFilterParams();
+                setDefaultFilterParams?.();
             })
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
@@ -77,8 +77,7 @@ export default function OwnerMutateForm({
         isOtherErrorsThanIdentifier ||
         isIdentifierEmpty ||
         (isMalformedIdentifier && isInitialIdentifierValid) ||
-        isBackendErrorInIdentifier ||
-        !hasFormChanged;
+        isBackendErrorInIdentifier;
 
     useEffect(() => {
         // validate the initial form values
@@ -92,19 +91,37 @@ export default function OwnerMutateForm({
     }, []);
 
     const onFormSubmitValid = () => {
+        // save the data
         runSaveOwner(ownerFormObject.getValues());
     };
 
     const onFormSubmitInvalid = () => {
         if (isSaveWithWarning) {
-            // submit with warning
+            // save with warning
             runSaveOwner(ownerFormObject.getValues());
         }
     };
 
+    const onFormSubmitUnchanged = () => {
+        // close without saving if the data has not changed
+        hdsToast.success("Ei muutoksia omistajan tiedoissa.");
+        close();
+    };
+
+    const close = () => {
+        closeModalAction();
+        !owner && setDefaultFilterParams?.();
+    };
+
     return (
         <>
-            <form onSubmit={ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)}>
+            <form
+                onSubmit={
+                    hasFormChanged
+                        ? ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)
+                        : ownerFormObject.handleSubmit(onFormSubmitUnchanged, onFormSubmitUnchanged)
+                }
+            >
                 <TextInput
                     name="name"
                     label="Nimi"
@@ -135,20 +152,11 @@ export default function OwnerMutateForm({
                         </p>
                     )
                 }
-                {
-                    // show info about the disabled saving of the unmodified form
-                    !hasFormChanged && <p className="error-message">Lomakkeen tietoja ei ole muutettu</p>
-                }
                 <div className="row row--buttons">
                     <Button
                         theme="black"
                         iconLeft={<IconArrowLeft />}
-                        onClick={() => {
-                            closeModalAction();
-                            if (setDefaultFilterParams && !owner) {
-                                setDefaultFilterParams();
-                            }
-                        }}
+                        onClick={close}
                     >
                         Peruuta
                     </Button>
@@ -161,8 +169,6 @@ export default function OwnerMutateForm({
                     />
                 </div>
             </form>
-
-            <Dialog.ActionButtons />
         </>
     );
 }

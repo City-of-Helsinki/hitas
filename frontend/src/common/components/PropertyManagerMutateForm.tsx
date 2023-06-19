@@ -1,105 +1,110 @@
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Button, Dialog, IconArrowLeft} from "hds-react";
+import {Button, IconArrowLeft} from "hds-react";
 import {useEffect} from "react";
 import {useForm} from "react-hook-form";
-import {useSaveManagerMutation} from "../../app/services";
+import {useSavePropertyManagerMutation} from "../../app/services";
 import {IPropertyManager, PropertyManagerSchema} from "../schemas";
 import {hdsToast} from "../utils";
 import {TextInput} from "./form";
 import SaveButton from "./SaveButton";
 
-interface IManagerMutateForm {
+interface IPropertyManagerMutateForm {
     defaultObject?: IPropertyManager;
     closeModalAction: () => void;
     setDefaultFilterParams?: () => void;
 }
-export default function ManagerMutateForm({
-    defaultObject: manager,
+export default function PropertyManagerMutateForm({
+    defaultObject: propertyManager,
     closeModalAction,
     setDefaultFilterParams,
-}: IManagerMutateForm) {
-    const [saveManager, {isLoading: isSaveManagerLoading}] = useSaveManagerMutation();
-    const runSaveManager = (data) => {
+}: IPropertyManagerMutateForm) {
+    const [savePropertyManager, {isLoading: isSavePropertyManagerLoading}] = useSavePropertyManagerMutation();
+    const runSavePropertyManager = (data) => {
         // submit the form values
-        saveManager(data)
+        savePropertyManager(data)
             .unwrap()
             .then(() => {
                 hdsToast.success("Isännöitsijän tiedot tallennettu onnistuneesti!");
                 closeModalAction();
-                setDefaultFilterParams && setDefaultFilterParams();
+                setDefaultFilterParams?.();
             })
             .catch((error) => {
                 hdsToast.error("Virhe isännöitsijän tietojen tallentamisessa!");
-                if (error.data.fields && error.data.fields.length > 0) {
+                if (error.data.fields?.length > 0) {
                     error.data.fields.forEach((field) =>
-                        managerFormObject.setError(field.field, {type: "backend", message: field.message})
+                        propertyManagerFormObject.setError(field.field, {type: "backend", message: field.message})
                     );
                 }
             });
     };
 
-    const managerFormObject = useForm({
-        ...(manager && {defaultValues: manager}),
+    const propertyManagerFormObject = useForm({
+        defaultValues: propertyManager,
         mode: "all",
         resolver: zodResolver(PropertyManagerSchema),
     });
 
     useEffect(() => {
         // validate the initial form values
-        managerFormObject.trigger().then(() => {
+        propertyManagerFormObject.trigger().then(() => {
             // set initial focus
-            setTimeout(() => managerFormObject.setFocus("name"), 5);
+            setTimeout(() => propertyManagerFormObject.setFocus("name"), 5);
         });
         // eslint-disable-next-line
     }, []);
 
     const onFormSubmitValid = () => {
-        runSaveManager(managerFormObject.getValues());
+        // save the data
+        runSavePropertyManager(propertyManagerFormObject.getValues());
+    };
+
+    const onFormSubmitUnchanged = () => {
+        // close without saving if the data has not changed
+        hdsToast.success("Ei muutoksia isännöitsijän tiedoissa.");
+        close();
+    };
+
+    const close = () => {
+        closeModalAction();
+        !propertyManager && setDefaultFilterParams?.();
     };
 
     return (
         <>
-            <form onSubmit={managerFormObject.handleSubmit(onFormSubmitValid)}>
+            <form
+                onSubmit={
+                    propertyManagerFormObject.formState.isDirty
+                        ? propertyManagerFormObject.handleSubmit(onFormSubmitValid)
+                        : propertyManagerFormObject.handleSubmit(onFormSubmitUnchanged)
+                }
+            >
                 <TextInput
                     name="name"
                     label="Nimi"
-                    formObject={managerFormObject}
+                    formObject={propertyManagerFormObject}
                     required
                 />
                 <TextInput
                     name="email"
                     label="Sähköpostiosoite"
-                    formObject={managerFormObject}
+                    formObject={propertyManagerFormObject}
                 />
-                {
-                    // show info about the disabled saving of the unmodified form
-                    !managerFormObject.formState.isDirty && manager && (
-                        <p className="error-message">Lomakkeen tietoja ei ole muutettu</p>
-                    )
-                }
                 <div className="row row--buttons">
                     <Button
                         theme="black"
                         iconLeft={<IconArrowLeft />}
-                        onClick={() => {
-                            closeModalAction();
-                            if (setDefaultFilterParams && !manager) {
-                                setDefaultFilterParams();
-                            }
-                        }}
+                        onClick={close}
                     >
                         Peruuta
                     </Button>
                     <SaveButton
-                        isLoading={isSaveManagerLoading}
+                        isLoading={isSavePropertyManagerLoading}
                         type="submit"
                         buttonText="Tallenna"
-                        disabled={!managerFormObject.formState.isDirty || !managerFormObject.formState.isValid}
+                        disabled={!propertyManagerFormObject.formState.isValid}
                     />
                 </div>
             </form>
-
-            <Dialog.ActionButtons />
         </>
     );
 }
