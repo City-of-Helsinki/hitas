@@ -12,6 +12,7 @@ from hitas.models import (
     ApartmentMaximumPriceCalculation,
     ApartmentSale,
     ConstructionPriceIndex2005Equal100,
+    JobPerformance,
     MarketPriceIndex2005Equal100,
     SurfaceAreaPriceCeiling,
     ThirtyYearRegulationResults,
@@ -46,6 +47,7 @@ def test__api__send_confirmed_max_price_email(api_client: HitasAPIClient):
     url = reverse("hitas:confirmed-max-price-calculation-email-list")
     data = {
         "calculation_id": max_price_calculation.uuid.hex,
+        "request_date": datetime.date.today().isoformat(),
         "template_name": template.name,
         "recipients": ["test@email.com"],
     }
@@ -62,6 +64,8 @@ def test__api__send_confirmed_max_price_email(api_client: HitasAPIClient):
 
     assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
+    assert JobPerformance.objects.count() == 1
+
 
 @pytest.mark.django_db
 def test__api__send_confirmed_max_price_email__pdf_body_not_found(api_client: HitasAPIClient):
@@ -74,6 +78,7 @@ def test__api__send_confirmed_max_price_email__pdf_body_not_found(api_client: Hi
     url = reverse("hitas:confirmed-max-price-calculation-email-list")
     data = {
         "calculation_id": max_price_calculation.uuid.hex,
+        "request_date": datetime.date.today().isoformat(),
         "template_name": template.name,
         "recipients": ["test@email.com"],
     }
@@ -101,6 +106,7 @@ def test__api__send_confirmed_max_price_email__email_template_not_found(api_clie
     url = reverse("hitas:confirmed-max-price-calculation-email-list")
     data = {
         "calculation_id": max_price_calculation.uuid.hex,
+        "request_date": datetime.date.today().isoformat(),
         "template_name": "foo",
         "recipients": ["test@email.com"],
     }
@@ -147,6 +153,7 @@ def test__api__send_unconfirmed_max_price_email(api_client: HitasAPIClient, free
     data = {
         "apartment_id": apartment.uuid.hex,
         "calculation_date": this_month.isoformat(),
+        "request_date": datetime.date.today().isoformat(),
         "additional_info": "foo",
         "template_name": template.name,
         "recipients": ["test@email.com"],
@@ -163,6 +170,8 @@ def test__api__send_unconfirmed_max_price_email(api_client: HitasAPIClient, free
     )
 
     assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    assert JobPerformance.objects.count() == 1
 
 
 @pytest.mark.django_db
@@ -191,6 +200,7 @@ def test__api__send_unconfirmed_max_price_email__pdf_body_not_found(api_client: 
     data = {
         "apartment_id": apartment.uuid.hex,
         "calculation_date": this_month.isoformat(),
+        "request_date": datetime.date.today().isoformat(),
         "additional_info": "foo",
         "template_name": template.name,
         "recipients": ["test@email.com"],
@@ -234,6 +244,7 @@ def test__api__send_unconfirmed_max_price_email__email_template_not_found(api_cl
     data = {
         "apartment_id": apartment.uuid.hex,
         "calculation_date": this_month.isoformat(),
+        "request_date": datetime.date.today().isoformat(),
         "additional_info": "foo",
         "template_name": "foo",
         "recipients": ["test@email.com"],
@@ -316,6 +327,7 @@ def test__api__send_unconfirmed_max_price_email__indices_missing(api_client: Hit
     data = {
         "apartment_id": apartment.uuid.hex,
         "calculation_date": this_month.isoformat(),
+        "request_date": datetime.date.today().isoformat(),
         "additional_info": "foo",
         "template_name": template.name,
         "recipients": ["test@email.com"],

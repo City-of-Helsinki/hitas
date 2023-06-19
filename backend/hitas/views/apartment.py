@@ -4,6 +4,7 @@ from decimal import Decimal
 from itertools import chain
 from typing import Any, Dict, Iterable, Optional, Union
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q
@@ -914,11 +915,13 @@ class ApartmentViewSet(HitasModelViewSet):
         }
         pdf = get_pdf_response(filename=filename, template="unconfirmed_maximum_price.jinja", context=context)
 
-        JobPerformance.objects.create(
+        JobPerformance.objects.get_or_create(
             user=request.user,
             request_date=input_data.data["request_date"],
             delivery_date=timezone.now().date(),
             source=JobPerformanceSource.UNCONFIRMED_MAX_PRICE,
+            object_type=ContentType.objects.get_for_model(apartment),
+            object_id=apartment.id,
         )
         return pdf
 
@@ -956,11 +959,13 @@ class ApartmentViewSet(HitasModelViewSet):
         }
         pdf = get_pdf_response(filename=filename, template="confirmed_maximum_price.jinja", context=context)
 
-        JobPerformance.objects.create(
+        JobPerformance.objects.get_or_create(
             user=request.user,
             request_date=input_data.data["request_date"],
             delivery_date=timezone.now().date(),
             source=JobPerformanceSource.CONFIRMED_MAX_PRICE,
+            object_type=ContentType.objects.get_for_model(mpc),
+            object_id=mpc.id,
         )
         return pdf
 
