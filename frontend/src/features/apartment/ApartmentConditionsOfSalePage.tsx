@@ -19,12 +19,14 @@ import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/dist/query/react";
 import {
     useCreateConditionOfSaleMutation,
+    useDeleteConditionOfSaleMutation,
     useGetApartmentDetailQuery,
     useGetOwnersQuery,
     useLazyGetConditionOfSaleQuery,
     useUpdateConditionOfSaleMutation,
 } from "../../app/services";
 import {
+    ConfirmDialogModal,
     FormInputField,
     Heading,
     NavigateBackButton,
@@ -369,6 +371,23 @@ const GracePeriodEntry = ({
 
 const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
     const [isHoverExtendGracePeriodButton, setIsHoverExtendGracePeriodButton] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [idToRemove, setIdToRemove] = useState<string | null>(null);
+    const [deleteConditionOfSale, {data, error, isLoading}] = useDeleteConditionOfSaleMutation();
+    const handleDeleteConditionOfSale = (id: string) => {
+        deleteConditionOfSale({id})
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Myyntiehto poistettu onnistuneesti.");
+                setIdToRemove(null);
+                setIsModalOpen(false);
+            })
+            .catch((e) => {
+                hdsToast.error("Myyntiehdon poisto epäonnistui.");
+                // es-lint-disable-next-line no-console
+                console.warn(e);
+            });
+    };
     return (
         <>
             {apartment.conditions_of_sale.length ? (
@@ -385,11 +404,11 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             key={`conditions-of-sale-item-${cos.id}`}
                             className={`conditions-of-sale-list-item${cos.fulfilled ? " resolved" : " unresolved"}`}
                         >
-                            <div className="input-wrap">
+                            <div className="input-wrap name">
                                 <div className="icon-wrap">{cos.fulfilled ? <IconLockOpen /> : <IconLock />}</div>
                                 {cos.owner.name} ({cos.owner.identifier})
                             </div>
-                            <div className="input-wrap">
+                            <div className="input-wrap address">
                                 <Link
                                     to={`/housing-companies/${cos.apartment.housing_company.id}/apartments/${cos.apartment.id}`}
                                 >
@@ -404,9 +423,11 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             </div>
                             <div className="input-wrap sell-by-date">{formatDate(cos.sell_by_date)} </div>
                             <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
+                            {/* TODO: show conditionally based on whether the CoS owner is an owner of the apartment */}
                             <RemoveButton
                                 onClick={() => {
-                                    return;
+                                    setIdToRemove(cos.id);
+                                    setIsModalOpen(true);
                                 }}
                                 isLoading={false}
                                 size="small"
@@ -417,6 +438,18 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
             ) : (
                 <div>Ei myyntiehtoja</div>
             )}
+            <ConfirmDialogModal
+                data={data}
+                error={error}
+                isLoading={isLoading}
+                isVisible={isModalOpen}
+                setIsVisible={setIsModalOpen}
+                modalHeader="Poista myyntiehto"
+                modalText="Oletko varma, että haluat poistaa myyntiehdon?"
+                buttonText="Poista"
+                confirmAction={() => handleDeleteConditionOfSale(idToRemove as string)}
+                cancelAction={() => setIsModalOpen(false)}
+            />
         </>
     );
 };
