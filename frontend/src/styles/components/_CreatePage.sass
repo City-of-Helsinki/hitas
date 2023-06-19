@@ -240,6 +240,7 @@
       .fulfillment-date
         align-items: center
         margin: 0 auto
+        text-decoration: none
       .input-wrap
         @include flexbox()
         @include align-items(center)
@@ -251,8 +252,11 @@
     .unresolved
       color: $color-black-60
     .resolved
-      color: $color-black-30
-      text-decoration: line-through
+      .name, .address, .grace-period
+        text-decoration: line-through
+        color: $color-black-30
+      button
+        display: none
     .unresolved a:hover
       color: $color-black
     .resolved a:hover

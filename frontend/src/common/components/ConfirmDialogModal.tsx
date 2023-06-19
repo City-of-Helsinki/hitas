@@ -21,6 +21,7 @@ interface ConfirmDialogModalProps {
     confirmAction?;
     cancelAction?;
     children?: React.ReactNode;
+    className?: string;
 }
 
 const ActionFailed = ({error, setIsVisible}) => {
@@ -79,6 +80,7 @@ const ConfirmDialogModal = ({
     setIsVisible,
     confirmAction,
     cancelAction,
+    className,
     children,
 }: ConfirmDialogModalProps) => {
     const DefaultDialogContent = () => (
@@ -112,6 +114,7 @@ const ConfirmDialogModal = ({
             aria-labelledby="confirm-modal"
             isOpen={isVisible || false}
             close={() => setIsVisible(false)}
+            className={error ? "error-modal " + className : className}
             boxShadow
         >
             <Dialog.Header

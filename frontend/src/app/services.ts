@@ -615,6 +615,14 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 !error && result ? [{type: "Apartment"}, {type: "ConditionOfSale", id: arg.id}] : [],
         }),
+        deleteConditionOfSale: builder.mutation<object, {id: string}>({
+            query: ({id}) => ({
+                url: `conditions-of-sale/${id}`,
+                method: "DELETE",
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: () => [{type: "Apartment"}],
+        }),
         createThirtyYearRegulation: builder.mutation<IThirtyYearRegulationResponse, {data: IThirtyYearRegulationQuery}>(
             {
                 query: ({data}) => ({
@@ -727,6 +735,7 @@ export const {
     useDeleteSaleMutation,
     useCreateConditionOfSaleMutation,
     useUpdateConditionOfSaleMutation,
+    useDeleteConditionOfSaleMutation,
     useCreateThirtyYearRegulationMutation,
     useSaveExternalSalesDataMutation,
     useValidateSalesCatalogMutation,
