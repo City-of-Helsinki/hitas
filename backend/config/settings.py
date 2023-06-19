@@ -41,6 +41,11 @@ env = environ.Env(
     SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, ["localhost:3000"]),
     ALLOWED_AD_GROUPS=(list, []),
     DEFAULT_FROM_EMAIL=(str, "hitas@hel.fi"),
+    EMAIL_HOST=(str, "smtp.gmail.com"),
+    EMAIL_PORT=(int, 587),
+    EMAIL_HOST_USER=(str, ""),
+    EMAIL_HOST_PASSWORD=(str, ""),
+    EMAIL_USE_TLS=(bool, True),
 )
 env.read_env(BASE_DIR / ".env")
 
@@ -55,7 +60,6 @@ UWSGI_WARMUP = env("UWSGI_WARMUP")
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 TEST_RUNNER = "hitas.tests.runner.HitasDatabaseRunner"
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 # How long to show fulfilled (=deleted) conditions of sale from the endpoints
 SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS: relativedelta = env("SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS")
@@ -151,6 +155,16 @@ TEMPLATES = [
 
 STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "static/"
+
+# ----- Email ------------------------------------------------------------------------------------------
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env("EMAIL_PORT")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 # ----- Logging ----------------------------------------------------------------------------------------
 
