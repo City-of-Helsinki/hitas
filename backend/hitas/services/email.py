@@ -2,9 +2,11 @@ import datetime
 from typing import Literal, Optional
 from uuid import UUID
 
+from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
 from django.db.models.functions import TruncMonth
+from django.utils import timezone
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
 from hitas.models import (
@@ -70,6 +72,8 @@ def render_confirmed_max_price_calculation_pdf(
         "maximum_price_calculation": confirmed_max_price_calculation,
         "user": user,
         "body_parts": pdf_body.texts,
+        "title": filename,
+        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
     }
     pdf = render_to_pdf(template="confirmed_maximum_price.jinja", context=context)
     return filename, pdf
@@ -192,6 +196,7 @@ def render_unconfirmed_max_price_calculation_pdf(
         "old_hitas_ruleset": apartment.old_hitas_ruleset,
         "user": user,
         "body_parts": pdf_body.texts,
+        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
     }
 
     pdf = render_to_pdf(template="unconfirmed_maximum_price.jinja", context=context)
@@ -240,6 +245,7 @@ def render_regulation_letter_pdf(
         "user": user,
         "title": filename,
         "body_parts": pdf_body.texts,
+        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
     }
     pdf = render_to_pdf(template="regulation_letter.jinja", context=context)
     return filename, pdf
@@ -250,6 +256,7 @@ def send_pdf_via_email(body: str, recipients: list[str], filename: str, pdf: byt
         subject=filename.removesuffix(".pdf"),
         body=body,
         to=recipients,
+        bcc=[settings.DEFAULT_FROM_EMAIL],
         attachments=[(filename, pdf, "application/pdf")],
     )
     retries = 2
