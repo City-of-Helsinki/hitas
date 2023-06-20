@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from dateutil.relativedelta import relativedelta
@@ -9,6 +10,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
+from hitas.exceptions import ModelConflict
+from hitas.models import PDFBody
+from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import RegulationResult, ReplacementPostalCodes
 from hitas.services.thirty_year_regulation import (
     PostalCodeT,
@@ -105,8 +109,32 @@ class ThirtyYearRegulationView(ViewSet):
 
         results = get_thirty_year_regulation_results_for_housing_company(housing_company_uuid, calculation_date)
 
-        context = {"results": results, "user": request.user}
-        choice = "jatkumisesta" if results.regulation_result == RegulationResult.STAYS_REGULATED else "pättymisestä"
+        if results.regulation_result == RegulationResult.STAYS_REGULATED:
+            choice = "jatkumisesta"
+            released_body_parts = []
+            regulated_body_parts: Optional[list[str]] = (
+                PDFBody.objects.filter(name=PDFBodyName.STAYS_REGULATED).values_list("texts", flat=True).first()
+            )
+            if regulated_body_parts is None:
+                raise ModelConflict("Missing regulated body template", error_code="missing")
+        else:
+            choice = "pättymisestä"
+            regulated_body_parts = []
+            released_body_parts: Optional[list[str]] = (
+                PDFBody.objects.filter(name=PDFBodyName.RELEASED_FROM_REGULATION)
+                .values_list("texts", flat=True)
+                .first()
+            )
+            if released_body_parts is None:
+                raise ModelConflict("Missing released body template", error_code="missing")
+
+        context = {
+            "results": results,
+            "user": request.user,
+            "regulated_body_parts": regulated_body_parts,
+            "released_body_parts": released_body_parts,
+        }
+
         filename = f"Tiedote sääntelyn {choice} - {results.housing_company.display_name}.pdf"
         response = get_pdf_response(filename=filename, template="regulation_letter.jinja", context=context)
 

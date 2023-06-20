@@ -8494,11 +8494,15 @@ components:
         Can have the following values:
           - "confirmed_max_price_calculation"
           - "unconfirmed_max_price_calculation"
+          - "stays_regulated"
+          - "released_from_regulation"
       type: string
       example: "confirmed_max_price_calculation"
       x-extensible-enum:
         - "confirmed_max_price_calculation"
         - "unconfirmed_max_price_calculation"
+        - "stays_regulated"
+        - "released_from_regulation"
 
     # Errors
 

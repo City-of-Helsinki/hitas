@@ -15,13 +15,14 @@ from rest_framework.reverse import reverse
 
 from hitas.models import ApartmentSale
 from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import (
     RegulationResult,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
 )
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentSaleFactory
+from hitas.tests.factories import ApartmentSaleFactory, PDFBodyFactory
 from users.models import User
 
 # Regulation letters
@@ -73,6 +74,8 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         regulation_result=RegulationResult.STAYS_REGULATED,
         letter_fetched=False,
     )
+
+    body = PDFBodyFactory.create(name=PDFBodyName.STAYS_REGULATED, texts=["||foo||", "||bar||", "||baz||"])
 
     url = (
         reverse("hitas:thirty-year-regulation-letter")
@@ -140,16 +143,12 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         keskineliöhinnan.
         Hintasääntelystä
         vapautuminen
-        Yhtiönne voi hakea Hitas-sääntelystä vapautumista
+        {body.texts[0]}
         Tontin maanvuokra
-        Tontin maanvuokraa tarkistetaan hintasääntelystä vapautumisen yhteydessä 0 - 30
-        prosentilla kiinteistölautakunnan erikseen päättämien ohjeiden mukaisesti. Lisätietoja saa
-        kaupunkiympäristön tontit-yksiköstä.
+        {body.texts[1]}
         Hintasääntelyn
         jatkuminen
-        Mikäli yhtiönne ei hae Hitas-sääntelystä vapautumista, hintavertailu tehdään neljä kertaa
-        vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
-        neljännesvuosivertailun jälkeen.
+        {body.texts[2]}
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
         Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE
@@ -277,6 +276,8 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         regulation_result=RegulationResult.RELEASED_FROM_REGULATION,
     )
 
+    body = PDFBodyFactory.create(name=PDFBodyName.RELEASED_FROM_REGULATION, texts=["||foo||"])
+
     url = (
         reverse("hitas:thirty-year-regulation-letter")
         + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
@@ -343,11 +344,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         keskineliöhinnan.
         Hintasääntelystä
         vapautuminen
-        Kun yhtiö on kaupunginvaltuuston 3.6.2009 (136 §) päätöksen perusteella vapautunut
-        hintojen sääntelystä, kaupungin puolesta ei ole estettä sille, että yhtiöjärjestykseen otetut
-        kaupungin lunastusoikeutta koskevat pykälät poistetaan yhtiöjärjestyksestä.
-        Tämän ilmoituksen jälkeen yhtiön asuntojen enimmäishintoja ei enää vahvisteta, eikä tietoja
-        tapahtuneista kaupoista ilmoiteta.
+        {body.texts[0]}
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
         Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE
@@ -502,6 +499,8 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         regulation_result=RegulationResult.STAYS_REGULATED,
     )
 
+    body = PDFBodyFactory.create(name=PDFBodyName.STAYS_REGULATED, texts=["||foo||", "||bar||", "||baz||"])
+
     url = (
         reverse("hitas:thirty-year-regulation-letter")
         + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
@@ -565,16 +564,12 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         keskineliöhinnan.
         Hintasääntelystä
         vapautuminen
-        Yhtiönne voi hakea Hitas-sääntelystä vapautumista
+        {body.texts[0]}
         Tontin maanvuokra
-        Tontin maanvuokraa tarkistetaan hintasääntelystä vapautumisen yhteydessä 0 - 30
-        prosentilla kiinteistölautakunnan erikseen päättämien ohjeiden mukaisesti. Lisätietoja saa
-        kaupunkiympäristön tontit-yksiköstä.
+        {body.texts[1]}
         Hintasääntelyn
         jatkuminen
-        Mikäli yhtiönne ei hae Hitas-sääntelystä vapautumista, hintavertailu tehdään neljä kertaa
-        vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
-        neljännesvuosivertailun jälkeen.
+        {body.texts[2]}
         Hintasääntelyilmoitus on tulostettu Hitas-rekisteristä.
         Lisätiedot: {api_user.first_name} {api_user.last_name}, {api_user.title}, puhelin {api_user.phone}
         LIITE

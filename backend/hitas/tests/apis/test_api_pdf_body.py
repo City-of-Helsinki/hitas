@@ -43,10 +43,61 @@ def test__api__pdf_body__list(api_client: HitasAPIClient):
 
 
 @pytest.mark.django_db
-def test__api__pdf_body__create(api_client: HitasAPIClient):
+def test__api__pdf_body__create__unconfirmed_max_price(api_client: HitasAPIClient):
     data = {
         "name": PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION.value,
         "texts": ["text 1", "text 2", "text 3"],
+    }
+
+    url = reverse("hitas:pdf-body-list")
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert response.json() == {
+        "name": data["name"],
+        "texts": data["texts"],
+    }
+
+
+@pytest.mark.django_db
+def test__api__pdf_body__create__confirmed_max_price(api_client: HitasAPIClient):
+    data = {
+        "name": PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION.value,
+        "texts": ["text 1"],
+    }
+
+    url = reverse("hitas:pdf-body-list")
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert response.json() == {
+        "name": data["name"],
+        "texts": data["texts"],
+    }
+
+
+@pytest.mark.django_db
+def test__api__pdf_body__create__regulation_letter__stays_regulated(api_client: HitasAPIClient):
+    data = {
+        "name": PDFBodyName.STAYS_REGULATED.value,
+        "texts": ["text 1", "text 2", "text 3"],
+    }
+
+    url = reverse("hitas:pdf-body-list")
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_201_CREATED, response.json()
+    assert response.json() == {
+        "name": data["name"],
+        "texts": data["texts"],
+    }
+
+
+@pytest.mark.django_db
+def test__api__pdf_body__create__regulation_letter__released_from_regulation(api_client: HitasAPIClient):
+    data = {
+        "name": PDFBodyName.RELEASED_FROM_REGULATION.value,
+        "texts": ["text 1"],
     }
 
     url = reverse("hitas:pdf-body-list")
@@ -121,6 +172,14 @@ def test__api__pdf_body__create__invalid_name(api_client: HitasAPIClient):
         [
             PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION,
             "Confirmed max price calculation must have exactly 1 body text.",
+        ],
+        [
+            PDFBodyName.STAYS_REGULATED,
+            "Regulation continuation letter must have exactly 3 body texts.",
+        ],
+        [
+            PDFBodyName.RELEASED_FROM_REGULATION,
+            "Regulation release letter must have exactly 1 body text.",
         ],
     ],
 )
