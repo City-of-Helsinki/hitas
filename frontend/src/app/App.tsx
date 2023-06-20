@@ -25,6 +25,26 @@ const App = (): JSX.Element => {
     const [userTitle, setUserTitle] = useState<string | number>(0);
     const dispatch = useAppDispatch();
 
+    // Get the current environment from the url
+    const getEnvironment = () => {
+        const url = window.location.href;
+        const domain = url.split("/")[2];
+        const environment = domain.split(":")[0] === "localhost" ? "local" : domain.split(".")[1];
+        let name = environment;
+        switch (name) {
+            case "stage":
+                name = "staging";
+                break;
+            case "dev":
+                name = "development";
+                break;
+        }
+        const hasDevelopmentBanner =
+            name === "local" || name === "development" || name === "test" || name === "staging";
+        return {name: name, hasDevelopmentBanner: hasDevelopmentBanner};
+    };
+    const environment = getEnvironment();
+
     // Check the authentication and get the username
     useEffect(() => {
         // UserInfo endpoint should not be called when using token authentication in development
@@ -52,6 +72,7 @@ const App = (): JSX.Element => {
     // Layout
     return (
         <div className="App">
+            {environment.hasDevelopmentBanner && <div className="development-banner">{environment.name}</div>}
             <Navigation
                 title="Asuntopalvelut"
                 menuToggleAriaLabel=""
