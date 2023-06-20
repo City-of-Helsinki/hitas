@@ -12,7 +12,7 @@ import {
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler} from "../../common/components";
 import {Select, ToggleInput} from "../../common/components/form";
-import {hdsToast} from "../../common/utils";
+import {getHitasQuarter, hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
 
 const ThirtyYearRegulation = () => {
@@ -23,31 +23,12 @@ const ThirtyYearRegulation = () => {
         {label: "2022", value: "2022"},
         {label: "2021", value: "2021"},
     ];
-    let defaultQuarter = {label: "1.2. - 30.4.", value: "02-01"};
-    // set the correct selected quarter based on date
-    switch (currentTime.getMonth()) {
-        case 0:
-        case 10:
-        case 11:
-            defaultQuarter = {label: "1.11. - 31.1.", value: "11-01"};
-            break;
-        case 4:
-        case 5:
-        case 6:
-            defaultQuarter = {label: "1.5. - 31.7.", value: "05-01"};
-            break;
-        case 7:
-        case 8:
-        case 9:
-            defaultQuarter = {label: "1.8. - 31.10.", value: "08-01"};
-            break;
-    }
 
     // React hook form
     const formObject = useForm({
         defaultValues: {
             year: years[0].value,
-            quarter: defaultQuarter,
+            quarter: getHitasQuarter(),
             file: undefined,
             test: false,
         },
