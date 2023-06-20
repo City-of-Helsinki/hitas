@@ -135,16 +135,9 @@
       <td class="first-column"><b>Hintasääntelystä vapautuminen</b></td>
       <td>
         {% if regulated %}
-          Yhtiönne voi hakea Hitas-sääntelystä vapautumista
+          {{ regulated_body_parts.0|linebreaks }}
         {% elif released %}
-          Kun yhtiö on kaupunginvaltuuston 3.6.2009 (136 §) päätöksen perusteella
-          vapautunut hintojen sääntelystä, kaupungin puolesta ei ole estettä sille, että
-          yhtiöjärjestykseen otetut kaupungin lunastusoikeutta koskevat pykälät poistetaan
-          yhtiöjärjestyksestä.
-          <br>
-          <br>
-          Tämän ilmoituksen jälkeen yhtiön asuntojen enimmäishintoja ei enää vahvisteta, eikä
-          tietoja tapahtuneista kaupoista ilmoiteta.
+          {{ released_body_parts.0|linebreaks }}
         {% endif %}
       </td>
     </tr>
@@ -152,17 +145,13 @@
     <tr>
       <td class="first-column"><b>Tontin maanvuokra</b></td>
       <td>
-        Tontin maanvuokraa tarkistetaan hintasääntelystä vapautumisen yhteydessä 0 - 30
-        prosentilla kiinteistölautakunnan erikseen päättämien ohjeiden mukaisesti. Lisätietoja
-        saa kaupunkiympäristön tontit-yksiköstä.
+          {{ regulated_body_parts.1|linebreaks }}
       </td>
     </tr>
     <tr>
       <td class="first-column"><b>Hintasääntelyn jatkuminen</b></td>
       <td>
-          Mikäli yhtiönne ei hae Hitas-sääntelystä vapautumista, hintavertailu tehdään neljä
-          kertaa vuodessa ja yhtiönne tilanne ilmoitetaan hintasääntelyn osalta seuraavan
-          neljännesvuosivertailun jälkeen.
+          {{ regulated_body_parts.2|linebreaks }}
       </td>
     {% endif %}
     </tr>

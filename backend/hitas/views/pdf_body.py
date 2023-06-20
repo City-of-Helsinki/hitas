@@ -29,6 +29,10 @@ class PDFBodySerializer(EnumSupportSerializerMixin, ModelSerializer):
             validated_data["name"] == PDFBodyName.CONFIRMED_MAX_PRICE_CALCULATION and len(validated_data["texts"]) != 1
         ):
             raise ValidationError({"texts": "Confirmed max price calculation must have exactly 1 body text."})
+        elif validated_data["name"] == PDFBodyName.STAYS_REGULATED and len(validated_data["texts"]) != 3:
+            raise ValidationError({"texts": "Regulation continuation letter must have exactly 3 body texts."})
+        elif validated_data["name"] == PDFBodyName.RELEASED_FROM_REGULATION and len(validated_data["texts"]) != 1:
+            raise ValidationError({"texts": "Regulation release letter must have exactly 1 body text."})
 
     class Meta:
         model = PDFBody

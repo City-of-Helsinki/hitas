@@ -8,10 +8,14 @@ from hitas.models._base import HitasModel
 class PDFBodyName(Enum):
     CONFIRMED_MAX_PRICE_CALCULATION = "confirmed_max_price_calculation"
     UNCONFIRMED_MAX_PRICE_CALCULATION = "unconfirmed_max_price_calculation"
+    STAYS_REGULATED = "stays_regulated"
+    RELEASED_FROM_REGULATION = "released_from_regulation"
 
     class Labels:
         CONFIRMED_MAX_PRICE_CALCULATION = "Enimmäishintalaskelma"
         UNCONFIRMED_MAX_PRICE_CALCULATION = "Hinta-arvio"
+        STAYS_REGULATED = "Jää sääntelyn piiriin"
+        RELEASED_FROM_REGULATION = "Vapautuu sääntelystä"
 
 
 class PDFBody(HitasModel):
