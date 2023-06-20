@@ -6,6 +6,16 @@
   @include align-items(center)
   min-height: 100vh
 
+  .development-banner
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    @include align-items(center)
+    width: 100%
+    padding: $spacing-xs
+    background: $color-success
+    color: white
+    text-transform: uppercase
+
 .main-content
   @include flexbox()
   @include flex-flow(column nowrap)
