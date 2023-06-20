@@ -75,7 +75,7 @@ const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListRes
                 <div className="list-header apartment-number">Asunto</div>
                 <div className="list-header address-and-housing-company">Osoite</div>
                 <div className="list-header owners-and-area">Omistajuudet / Asunnon tiedot</div>
-                <div className="list-header state">Tila</div>
+                <div className="list-header state">Tila / Valmistumispvm</div>
             </div>
             <ul className={`results-list${isFetching ? " results-list-blurred" : ""}`}>
                 {isFetching && (
