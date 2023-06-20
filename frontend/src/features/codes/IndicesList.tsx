@@ -3,10 +3,12 @@ import {useEffect, useState} from "react";
 import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
+import {useForm} from "react-hook-form";
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FilterTextInputField, FormInputField, QueryStateHandler, SaveButton} from "../../common/components";
+import {FilterTextInputField, QueryStateHandler, SaveButton} from "../../common/components";
+import {NumberInput, TextInput} from "../../common/components/form";
 import {IIndex} from "../../common/schemas";
-import {hitasToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
 
 const indexOptions: {label: string; value: string}[] = [
     {label: "Markkinahintaindeksi 1983", value: "market-price-index"},
@@ -91,6 +93,7 @@ const IndicesList = (): JSX.Element => {
 
     const [filterParams, setFilterParams] = useState({});
     const [currentIndexType, setCurrentIndexType] = useState(indexOptions[0]);
+
     const [formData, setFormData] = useImmer(initialSaveData);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -135,7 +138,6 @@ const IndicesList = (): JSX.Element => {
             <EditIndexModal
                 indexType={currentIndexType}
                 formData={formData}
-                setFormData={setFormData}
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
             />
@@ -143,8 +145,13 @@ const IndicesList = (): JSX.Element => {
     );
 };
 
-const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeModal}) => {
+const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
     const [saveIndex, {data, error, isLoading}] = useSaveIndexMutation();
+    const editIndexForm = useForm({
+        defaultValues: formData,
+        mode: "all",
+    });
+    const {handleSubmit} = editIndexForm;
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
@@ -156,10 +163,11 @@ const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeMod
     useEffect(() => {
         if (isLoading || !data) return;
         if (data && !error) {
-            hitasToast("Indeksi tallennettu onnistuneesti", "success");
+            hdsToast.success("Indeksi tallennettu onnistuneesti");
+            editIndexForm.reset();
             closeModal();
         } else {
-            hitasToast("Indeksin tallennus epäonnistui", "error");
+            hdsToast.error("Indeksin tallennus epäonnistui");
         }
         // eslint-disable-next-line
     }, [isLoading, error, data]);
@@ -177,38 +185,37 @@ const EditIndexModal = ({indexType, formData, setFormData, isModalOpen, closeMod
                 id="index-creation-header"
                 title={`Tallenna ${indexType.label}`}
             />
-            <Dialog.Content>
-                <FormInputField
-                    label="Kuukausi"
-                    fieldPath="month"
-                    formData={formData}
-                    setFormData={setFormData}
-                    error={error}
-                    tooltipText="Esim 2022-12"
-                />
-                <FormInputField
-                    label="Arvo"
-                    inputType="number"
-                    fractionDigits={2}
-                    fieldPath="value"
-                    formData={formData}
-                    setFormData={setFormData}
-                    error={error}
-                />
-            </Dialog.Content>
-            <Dialog.ActionButtons>
-                <Button
-                    onClick={() => closeModal()}
-                    theme="black"
-                    variant="secondary"
-                >
-                    Peruuta
-                </Button>
-                <SaveButton
-                    onClick={handleSaveIndex}
-                    isLoading={isLoading}
-                />
-            </Dialog.ActionButtons>
+            <form onSubmit={handleSubmit(handleSaveIndex)}>
+                <Dialog.Content>
+                    <TextInput
+                        label="Kuukausi (VVVV-KK)"
+                        name="month"
+                        formObject={editIndexForm}
+                        tooltipText="Esim 2022-12"
+                        required
+                    />
+                    <NumberInput
+                        label="Arvo"
+                        allowDecimals={true}
+                        name="value"
+                        formObject={editIndexForm}
+                        required
+                    />
+                </Dialog.Content>
+                <Dialog.ActionButtons>
+                    <Button
+                        onClick={() => closeModal()}
+                        theme="black"
+                        variant="secondary"
+                    >
+                        Peruuta
+                    </Button>
+                    <SaveButton
+                        type="submit"
+                        isLoading={isLoading}
+                    />
+                </Dialog.ActionButtons>
+            </form>
         </Dialog>
     );
 };
