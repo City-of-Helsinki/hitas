@@ -205,3 +205,28 @@ export const getApartmentUnconfirmedPrices = (
     if (isPre2011) return apartment.prices.maximum_prices.unconfirmed.pre_2011;
     else return apartment.prices.maximum_prices.unconfirmed.onwards_2011;
 };
+
+// Takes a date and returns the hitasQuarter it belongs to. Returns current quarter if no date is given.
+export const getHitasQuarter = (date?) => {
+    const time = date ? Number(date.slice("-")[1]) : new Date().getMonth() + 1;
+    let defaultQuarter = {label: "1.2. - 30.4.", value: "02-01"};
+    // FIXME: The +2 is a hack to get the next quarter as a return value for testing. Remove before commit!
+    switch (time + 2) {
+        case 0:
+        case 10:
+        case 11:
+            defaultQuarter = {label: "1.11. - 31.1.", value: "11-01"};
+            break;
+        case 4:
+        case 5:
+        case 6:
+            defaultQuarter = {label: "1.5. - 31.7.", value: "05-01"};
+            break;
+        case 7:
+        case 8:
+        case 9:
+            defaultQuarter = {label: "1.8. - 31.10.", value: "08-01"};
+            break;
+    }
+    return defaultQuarter;
+};
