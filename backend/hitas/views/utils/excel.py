@@ -77,6 +77,8 @@ ExtraFormat: TypeAlias = dict[RowNumber, dict[FieldName, ColumnLetter]]
 ErrorText: TypeAlias = str
 ErrorData: TypeAlias = dict[FieldName, list[ErrorText]]
 
+MISSING_DATA_ERROR: str = "Missing data in cell"
+
 
 class RowPostValidator(Protocol):
     def __call__(self, row_data: list[dict[str, Any]], row_format: RowFormat, errors: ErrorData) -> None:
@@ -133,14 +135,20 @@ def parse_sheet(  # NOSONAR
         rules = extra_format.get(row_number)
         if rules is not None:
             for key, column in rules.items():
-                extra_data[key] = cells[column_index_from_string(column) - 1].value
+                try:
+                    extra_data[key] = cells[column_index_from_string(column) - 1].value
+                except IndexError:
+                    errors[f"{field_name_to_cell[key]}.{key}"] = [MISSING_DATA_ERROR]
             continue
 
         final_row = all(cells[i].value is None for i in range(len(cells)) if i not in non_empty_columns)
         if final_row:
             for key, column in extra_format.get("final", {}).items():
                 field_name_to_cell[key] += row_number  # add row number for error formatting
-                extra_data[key] = cells[column_index_from_string(column) - 1].value
+                try:
+                    extra_data[key] = cells[column_index_from_string(column) - 1].value
+                except IndexError:
+                    errors[f"{field_name_to_cell[key]}.{key}"] = [MISSING_DATA_ERROR]
             break
 
         row_data.append(_parse_row(cells, row_format, row_serializer, errors))
@@ -175,10 +183,15 @@ def _parse_row(
     row_serializer: type[Serializer],
     errors: ErrorData,
 ) -> dict[str, Any]:
-    row_data: dict[str, Any] = {
-        field_name: cells[column_index_from_string(column) - 1].value for field_name, column in row_format.items()
-    }
+    row_data: dict[str, Any] = {}
     row_data["row"] = row_number = cells[0].row  # add row number for post validators
+
+    for field_name, column in row_format.items():
+        try:
+            row_data[field_name] = cells[column_index_from_string(column) - 1].value
+        except IndexError:
+            errors[error_key(field_name, row_number, row_format)] = [MISSING_DATA_ERROR]
+            continue
 
     row = row_serializer(data=row_data)
     if row.is_valid():
