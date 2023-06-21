@@ -71,50 +71,52 @@ const App = (): JSX.Element => {
 
     // Layout
     return (
-        <div className="App">
+        <div className="app-container">
             {environment.hasDevelopmentBanner && <div className="development-banner">{environment.name}</div>}
-            <Navigation
-                title="Asuntopalvelut"
-                menuToggleAriaLabel=""
-                skipTo=""
-                skipToContentLabel=""
-                titleUrl="/"
-            >
-                {!isUserInfoLoading && !token && (
-                    <Navigation.Actions>
-                        <Navigation.User
-                            authenticated={isAuthenticated && userTitle !== 0}
-                            buttonAriaLabel={`Käyttäjä ${userTitle}`}
-                            label="Kirjaudu sisään"
-                            onSignIn={signIn}
-                            userName={userTitle}
-                        >
-                            <Navigation.Item
-                                onClick={logOut}
-                                variant="supplementary"
-                                label="Kirjaudu ulos"
-                                icon={<IconSignout aria-hidden />}
-                            />
-                        </Navigation.User>
-                    </Navigation.Actions>
-                )}
-                <Navigation.Row ariaLabel="Main navigation">
-                    <Link to="housing-companies">Yhtiöt</Link>
-                    <Link to="apartments">Asunnot</Link>
-                    <Link to="reports">Raportit</Link>
-                    <Link to="documents">Dokumentit</Link>
-                    <Link to="codes">Koodisto</Link>
-                    <Link to="functions">Toiminnot</Link>
-                </Navigation.Row>
-            </Navigation>
+            <div className="App">
+                <Navigation
+                    title="Asuntopalvelut"
+                    menuToggleAriaLabel=""
+                    skipTo=""
+                    skipToContentLabel=""
+                    titleUrl="/"
+                >
+                    {!isUserInfoLoading && !token && (
+                        <Navigation.Actions>
+                            <Navigation.User
+                                authenticated={isAuthenticated && userTitle !== 0}
+                                buttonAriaLabel={`Käyttäjä ${userTitle}`}
+                                label="Kirjaudu sisään"
+                                onSignIn={signIn}
+                                userName={userTitle}
+                            >
+                                <Navigation.Item
+                                    onClick={logOut}
+                                    variant="supplementary"
+                                    label="Kirjaudu ulos"
+                                    icon={<IconSignout aria-hidden />}
+                                />
+                            </Navigation.User>
+                        </Navigation.Actions>
+                    )}
+                    <Navigation.Row ariaLabel="Main navigation">
+                        <Link to="housing-companies">Yhtiöt</Link>
+                        <Link to="apartments">Asunnot</Link>
+                        <Link to="reports">Raportit</Link>
+                        <Link to="documents">Dokumentit</Link>
+                        <Link to="codes">Koodisto</Link>
+                        <Link to="functions">Toiminnot</Link>
+                    </Navigation.Row>
+                </Navigation>
 
-            <Container className="main-content">
-                {isAuthenticating || isUserInfoLoading ? <Spinner /> : <Outlet />}
-            </Container>
+                <Container className="main-content">
+                    {isAuthenticating || isUserInfoLoading ? <Spinner /> : <Outlet />}
+                </Container>
 
-            <Notifications />
+                <Notifications />
 
-            <Footer />
+                <Footer />
+            </div>
         </div>
     );
 };
