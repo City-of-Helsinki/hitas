@@ -149,6 +149,19 @@ export const downloadRegulationResults = (calculationDate?: string) => {
         .catch((error) => console.error(error));
 };
 
+export const downloadSurfaceAreaPriceCeilingResults = (calculationDate?: string) => {
+    const params = `calculation_date=${calculationDate}`;
+    const url = `${Config.api_v1_url}/indices/surface-area-price-ceiling/reports/download-surface-area-price-ceiling-results?${params}`;
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error(error));
+};
+
 // ///////////
 // Auth API //
 // ///////////

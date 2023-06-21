@@ -33,10 +33,25 @@
     background: $color-black-10
     .price-ceiling-calculation
       @include flexbox()
+      @include flex-flow(row nowrap)
       @include justify-content(space-between)
       margin-bottom: $spacing-layout-m
+    .price-ceiling-value
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include justify-content(space-between)
+        span
+          font-size: $fontsize-heading-l
+          font-weight: 700
+          margin-top: $spacing-xs
+          &::after
+            content: "€/m²"
+            font-size: $fontsize-heading-s
+            font-weight: 400
+            margin-left: $spacing-xs
     .calculate-button
       height: 56px
+      width: 250px
     .year-filter
       width: 200px
       margin: 0 auto
