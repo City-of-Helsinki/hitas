@@ -624,6 +624,15 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error) => (!error && result ? [{type: "Apartment"}] : []),
         }),
+        calculatePriceCeiling: builder.mutation({
+            query: ({data}) => ({
+                url: "indices/surface-area-price-ceiling",
+                method: "POST",
+                headers: mutationApiJsonHeaders(),
+                body: data,
+            }),
+            invalidatesTags: (result, error) => (!error && result ? [{type: "Index", id: "LIST"}] : []),
+        }),
     }),
 });
 
@@ -673,4 +682,5 @@ export const {
     useValidateSalesCatalogMutation,
     useCreateFromSalesCatalogMutation,
     useBatchCompleteApartmentsMutation,
+    useCalculatePriceCeilingMutation,
 } = mutationApi;
