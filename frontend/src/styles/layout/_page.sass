@@ -1,20 +1,27 @@
 @use '../imports' as *
 
+.app-container
+  @include flexbox()
+  @include flex-flow(column nowrap)
+  height: 100vh
+  overflow: hidden
+
+  .development-banner
+      @include flexbox()
+      @include flex-flow(column nowrap)
+      @include align-items(center)
+      width: 100%
+      padding: $spacing-xs
+      background: $color-success
+      color: white
+      text-transform: uppercase
+
 .App
   @include flexbox()
   @include flex-flow(column nowrap)
   @include align-items(center)
-  min-height: 100vh
-
-  .development-banner
-    @include flexbox()
-    @include flex-flow(column nowrap)
-    @include align-items(center)
-    width: 100%
-    padding: $spacing-xs
-    background: $color-success
-    color: white
-    text-transform: uppercase
+  @include flex-grow(1)
+  overflow: auto
 
 .main-content
   @include flexbox()
