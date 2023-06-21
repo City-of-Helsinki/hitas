@@ -31,19 +31,12 @@
   &__price-ceiling-per-square
     padding: $spacing-m
     background: $color-black-10
+    .price-ceiling-calculation
+      @include flexbox()
+      @include justify-content(space-between)
+      margin-bottom: $spacing-layout-m
     .calculate-button
-      margin: -10px 0
-      min-height: auto
-      span
-        @include flexbox()
-        @include flex-flow(row nowrap)
-        @include align-items(center)
-        height: 38px
-        margin: 0
-        padding: 7px 0
-      &:not(:disabled):hover
-        background-color: black
-        color: white
+      height: 56px
     .year-filter
       width: 200px
       margin: 0 auto
