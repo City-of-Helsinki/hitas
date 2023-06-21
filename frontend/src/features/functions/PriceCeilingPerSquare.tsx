@@ -2,9 +2,9 @@ import {Button} from "hds-react";
 import {useState} from "react";
 
 import {
+    downloadSurfaceAreaPriceCeilingResults,
     useCalculatePriceCeilingMutation,
     useGetIndicesQuery,
-    useGetPriceCeilingCalculationDataQuery,
 } from "../../app/services";
 import {FilterTextInputField, Heading, QueryStateHandler} from "../../common/components";
 import {getHitasQuarter, hdsToast, today} from "../../common/utils";
@@ -29,7 +29,6 @@ const LoadedPriceCeilingPerSquareResultsList = ({data}) => {
                     <ListItem
                         key={item.month}
                         month={item.month}
-                        year={item.year}
                         value={item.value}
                     />
                 ))}
@@ -38,35 +37,38 @@ const LoadedPriceCeilingPerSquareResultsList = ({data}) => {
     );
 };
 
-const ListItem = ({month, year, value}) => {
-    return (
+const ListItem = ({month, value}) => {
+    const year = month.slice(0, 4);
+    let timePeriod;
+    switch (month.slice(-2)) {
+        case "01":
+            timePeriod = `${getHitasQuarter(month).label.split(" ")[0]}${Number(year) - 1} - ${
+                getHitasQuarter(month).label.split("-")[1]
+            }${year}`;
+            break;
+        case "02":
+        case "05":
+        case "08":
+            timePeriod = `${getHitasQuarter(month).label}${year}`;
+            break;
+        case "11":
+            timePeriod = `${getHitasQuarter(month).label.split(" ")[0]}${year} - ${
+                getHitasQuarter(month).label.split("-")[1]
+            }${Number(year) + 1}`;
+            break;
+        default:
+            return <></>;
+    }
+    return timePeriod !== undefined ? (
         <li className="results-list__item">
-            <div className="period">
-                {month}
-                {years[new Date().getFullYear() - year]?.label}
-            </div>
+            <div className="period">{timePeriod}</div>
             <div className="value">{value}</div>
         </li>
+    ) : (
+        <></>
     );
 };
 
-const PriceCeilingCalculationResult = ({data, currentMonth}) => {
-    const {
-        data: calculationData,
-        error,
-        isLoading,
-    } = useGetPriceCeilingCalculationDataQuery({calculationMonth: currentMonth});
-    return (
-        <QueryStateHandler
-            data={calculationData}
-            error={error}
-            isLoading={isLoading}
-        >
-            <span>Tälle neljännekselle on laskettu rajaneliöhinta:</span>
-            <span>{data.contents[0].value}</span>
-        </QueryStateHandler>
-    );
-};
 const PriceCeilingCalculationSection = ({data, currentMonth}) => {
     const [calculatePriceCeiling] = useCalculatePriceCeilingMutation();
     const handleCalculateButton = () => {
@@ -91,17 +93,23 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
             <span>Laske rajaneliöhinta</span>
         </Button>
     );
+
     return (
         <div className="price-ceiling-calculation">
             {data.contents.some((item) => item.month === currentMonth) ? (
                 <>
-                    <span>Tälle neljännekselle on laskettu rajaneliöhinta:</span>
-                    <span>{data.contents[0].value}</span>
-                    <PriceCeilingCalculationResult
-                        data={data}
-                        currentMonth={currentMonth}
-                    />
-                    <CalculateButton />
+                    <div className="price-ceiling-value">
+                        <label>
+                            Rajaneliöhinta (<>{getHitasQuarter(currentMonth + "-01").label}</>)
+                        </label>
+                        <span>{data.contents[0].value}</span>
+                    </div>
+                    <Button
+                        theme="black"
+                        onClick={() => downloadSurfaceAreaPriceCeilingResults(currentMonth + "-01")}
+                    >
+                        Lataa laskentaraportti
+                    </Button>
                 </>
             ) : (
                 <>
@@ -114,18 +122,16 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
 };
 
 const PriceCeilingPerSquare = () => {
-    // FIXME: use today().slice(0, 7) for the current Month, the +3 is a hack for testing
-    const currentMonth = new Date().getFullYear() + "-" + ("0" + (new Date().getMonth() + 1)).slice(-2);
+    const currentMonth = today().slice(0, 7);
     const [filterParams, setFilterParams] = useState({year: new Date().getFullYear().toString()});
     const {data, error, isLoading} = useGetIndicesQuery({
         indexType: "surface-area-price-ceiling",
         params: {...filterParams, limit: 12, page: 1},
     });
-    console.log(data?.contents[0].month, currentMonth, today().slice(0, 7));
 
     return (
         <div className="view--functions__price-ceiling-per-square">
-            <Heading type="body">Rajaneliöhinnan laskenta</Heading>
+            <Heading type="body">Nykyisen neljänneksen rajaneliöhinta</Heading>
             <QueryStateHandler
                 data={data}
                 error={error}
