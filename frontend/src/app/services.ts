@@ -347,6 +347,11 @@ const detailApi = hitasApi.injectEndpoints({
                 url: `indices/${params.indexType}/${params.month}`,
             }),
         }),
+        getPriceCeilingCalculationData: builder.query<{calculationMonth: string}, object>({
+            query: (params: {calculationMonth: string}) => ({
+                url: `indices/surface-area-price-ceiling-calculation-data/${params.calculationMonth}-01`,
+            }),
+        }),
     }),
 });
 
@@ -659,6 +664,7 @@ export const {
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
     useGetIndexQuery,
+    useGetPriceCeilingCalculationDataQuery,
 } = detailApi;
 
 export const {
