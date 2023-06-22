@@ -12,12 +12,12 @@ import SaveButton from "./SaveButton";
 interface IOwnerMutateForm {
     defaultObject?: IOwner;
     closeModalAction: () => void;
-    setDefaultFilterParams?: () => void;
+    setEmptyFilterParams?: () => void;
 }
 export default function OwnerMutateForm({
     defaultObject: owner,
     closeModalAction,
-    setDefaultFilterParams,
+    setEmptyFilterParams,
 }: IOwnerMutateForm) {
     const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
@@ -28,7 +28,7 @@ export default function OwnerMutateForm({
             .then(() => {
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
-                setDefaultFilterParams?.();
+                setEmptyFilterParams?.();
             })
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
@@ -110,7 +110,7 @@ export default function OwnerMutateForm({
 
     const close = () => {
         closeModalAction();
-        !owner && setDefaultFilterParams?.();
+        !owner && setEmptyFilterParams?.();
     };
 
     return (

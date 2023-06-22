@@ -1,22 +1,35 @@
 import {Button, IconCrossCircle, IconPlus, IconSearch, TextInput} from "hds-react";
-import React, {useCallback, useRef, useState} from "react";
-import {MutateModal, QueryStateHandler} from "../../common/components";
-
-interface IResultListProps<TFilterQueryParams extends object, TListFieldsWithTitles extends object> {
+import {useCallback, useRef, useState} from "react";
+import {MutateForm, MutateModal, QueryStateHandler} from "./";
+interface IResultListProps<
+    TFilterQueryParams extends object,
+    TListFieldsWithTitles extends object,
+    TFormFieldsWithTitles extends object
+> {
     listFieldsWithTitles: TListFieldsWithTitles;
     params: TFilterQueryParams;
     searchStringMinLength: number;
     resultListMaxRows: number;
     useGetQuery;
-    MutateFormComponent: React.FC<{defaultObject?: TListFieldsWithTitles; closeModalAction: () => void}>;
+    MutateFormComponent;
     dialogTitles?: {modify?: string; new?: string};
-    setDefaultFilterParams?: () => void;
+    setEmptyFilterParams?: () => void;
+    isMutateForm: boolean;
+    useSaveMutation?;
+    formObjectSchema?;
+    successMessage?: string;
+    errorMessage?: string;
+    notModifiedMessage?: string;
+    defaultFocusFieldName?: string;
+    formFieldsWithTitles?: TFormFieldsWithTitles;
+    requiredFields?: string[];
 }
 
 function ResultList<
     TFilterQueryParams extends object,
     TDefaultObject extends object,
-    TListFieldsWithTitles extends object
+    TListFieldsWithTitles extends object,
+    TFormFieldsWithTitles extends object
 >({
     listFieldsWithTitles,
     params,
@@ -25,8 +38,17 @@ function ResultList<
     useGetQuery,
     MutateFormComponent,
     dialogTitles,
-    setDefaultFilterParams,
-}: IResultListProps<TFilterQueryParams, TListFieldsWithTitles>) {
+    setEmptyFilterParams,
+    isMutateForm,
+    formObjectSchema,
+    useSaveMutation,
+    successMessage,
+    errorMessage,
+    notModifiedMessage,
+    defaultFocusFieldName,
+    formFieldsWithTitles,
+    requiredFields,
+}: IResultListProps<TFilterQueryParams, TListFieldsWithTitles, TFormFieldsWithTitles>) {
     // ensure the params have minimum length
     Object.keys(params).forEach(
         (key) => params[key]?.length && params[key]?.length < searchStringMinLength && delete params[key]
@@ -39,10 +61,31 @@ function ResultList<
     const [defaultObject, setDefaultObject] = useState(undefined);
 
     // action for the row click
-    const editFn = (rowObject) => {
+    const editFn = (e, rowObject) => {
+        e.preventDefault();
         setIsMutateModalVisible(true);
         setDefaultObject(rowObject);
     };
+
+    // generic MutateForm component -specific props
+    const mutateFormProps = {
+        formObjectSchema,
+        useSaveMutation,
+        successMessage,
+        errorMessage,
+        notModifiedMessage,
+        defaultFocusFieldName,
+        formFieldsWithTitles,
+        requiredFields,
+    };
+
+    // To decide if the row is clickable
+    const isModify = dialogTitles && "modify" in dialogTitles ? true : false;
+    const itemClassName = isModify ? "results-list__item" : "results-list__no-mod-item";
+
+    // To decide whether to show the create new -button
+    const isNew = dialogTitles && "new" in dialogTitles ? true : false;
+
     return (
         <QueryStateHandler
             data={data}
@@ -58,11 +101,8 @@ function ResultList<
                 {data?.contents.map((rowObject: TDefaultObject) => (
                     <div
                         key={rowObject["id"]}
-                        className="results-list__item"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            editFn(rowObject);
-                        }}
+                        className={itemClassName}
+                        {...(isModify && {onClick: (e) => editFn(e, rowObject)})}
                     >
                         {Object.keys(listFieldsWithTitles).map((field) => (
                             <span key={field}>{rowObject[field]}</span>
@@ -74,15 +114,17 @@ function ResultList<
                 <div className="list-footer-item">
                     Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta
                 </div>
-                <div className="list-footer-item">
-                    <Button
-                        theme="black"
-                        iconLeft={<IconPlus />}
-                        onClick={() => setIsMutateModalVisible(true)}
-                    >
-                        Luo uusi
-                    </Button>
-                </div>
+                {isNew && (
+                    <div className="list-footer-item">
+                        <Button
+                            theme="black"
+                            iconLeft={<IconPlus />}
+                            onClick={() => setIsMutateModalVisible(true)}
+                        >
+                            Luo uusi
+                        </Button>
+                    </div>
+                )}
             </div>
             <MutateModal
                 defaultObject={isMutateModalVisible ? defaultObject : undefined}
@@ -93,33 +135,63 @@ function ResultList<
                     setIsMutateModalVisible(false);
                     setDefaultObject(undefined);
                 }}
-                setDefaultFilterParams={setDefaultFilterParams}
+                setEmptyFilterParams={setEmptyFilterParams}
+                {...(isMutateForm && mutateFormProps)}
             />
         </QueryStateHandler>
     );
 }
 
-interface IMutateSearchListProps<TListFieldsWithTitles extends object, TFilterQueryParams extends object> {
+interface IMutateSearchListProps<
+    TListFieldsWithTitles extends object,
+    TFilterQueryParams extends object,
+    TFormFieldsWithTitles extends object
+> {
     listFieldsWithTitles: TListFieldsWithTitles;
     searchStringMinLength: number;
     resultListMaxRows: number;
     useGetQuery;
-    MutateFormComponent: React.FC<{defaultObject?: TListFieldsWithTitles; closeModalAction: () => void}>;
-    defaultFilterParams: TFilterQueryParams;
+    MutateFormComponent;
+    emptyFilterParams: TFilterQueryParams;
     dialogTitles?: {modify?: string; new?: string};
+    formObjectSchema?;
+    useSaveMutation?;
+    saveDataFunction?;
+    isSaveDataLoading?: boolean;
+    successMessage?: string;
+    errorMessage?: string;
+    notModifiedMessage?: string;
+    defaultFocusFieldName?: string;
+    formFieldsWithTitles?: TFormFieldsWithTitles;
+    requiredFields?: string[];
 }
 
-export default function MutateSearchList<TListFieldsWithTitles extends object, TFilterQueryParams extends object>({
+/* Generic list for searching data and for opening modal to add or modify the data
+ *  - Modification or addition is enabled only if the corresponding dialogTitles -property is defined
+ *  - Search fields are created for all emptyFilterParams -fields */
+export default function MutateSearchList<
+    TListFieldsWithTitles extends object,
+    TFilterQueryParams extends object,
+    TFormFieldsWithTitles extends object
+>({
     listFieldsWithTitles,
     searchStringMinLength,
     resultListMaxRows,
     useGetQuery,
     MutateFormComponent,
-    defaultFilterParams,
+    emptyFilterParams,
     dialogTitles,
-}: IMutateSearchListProps<TListFieldsWithTitles, TFilterQueryParams>) {
+    formObjectSchema,
+    useSaveMutation,
+    successMessage,
+    errorMessage,
+    notModifiedMessage,
+    defaultFocusFieldName,
+    formFieldsWithTitles,
+    requiredFields,
+}: IMutateSearchListProps<TListFieldsWithTitles, TFilterQueryParams, TFormFieldsWithTitles>) {
     // search strings
-    const [filterParams, setFilterParams] = useState<TFilterQueryParams>(defaultFilterParams);
+    const [filterParams, setFilterParams] = useState<TFilterQueryParams>(emptyFilterParams);
 
     // focus the field when clicking its cross circle icon
     const ref = useRef({});
@@ -134,10 +206,24 @@ export default function MutateSearchList<TListFieldsWithTitles extends object, T
         focus(field);
     };
 
+    const mutateFormProps = {
+        formObjectSchema,
+        useSaveMutation,
+        successMessage,
+        errorMessage,
+        notModifiedMessage,
+        defaultFocusFieldName,
+        formFieldsWithTitles,
+        requiredFields,
+    };
+
+    // check if the MutateFormComponent is MutateForm
+    const isMutateForm = (<MutateForm />).type === (<MutateFormComponent />).type;
+
     return (
         <div className="listing">
             <div className="filters">
-                {Object.entries(listFieldsWithTitles).map(([field, title], i) => (
+                {Object.entries(emptyFilterParams).map(([field, title], i) => (
                     <TextInput
                         key={field}
                         id="filter__name"
@@ -159,7 +245,9 @@ export default function MutateSearchList<TListFieldsWithTitles extends object, T
                 MutateFormComponent={MutateFormComponent}
                 dialogTitles={dialogTitles}
                 listFieldsWithTitles={listFieldsWithTitles}
-                setDefaultFilterParams={() => setFilterParams(defaultFilterParams)}
+                setEmptyFilterParams={() => setFilterParams(emptyFilterParams)}
+                isMutateForm={isMutateForm}
+                {...(isMutateForm && mutateFormProps)}
             />
         </div>
     );

@@ -176,12 +176,6 @@ const AddressSchema = object({
     city: string().min(2, errorMessages.stringLength).optional(),
 });
 
-const PropertyManagerSchema = object({
-    id: string().optional(),
-    name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
-    email: string().email(errorMessages.emailInvalid).or(z.literal("")),
-});
-
 const ImprovementSchema = object({
     name: string(),
     value: number(),
@@ -247,6 +241,23 @@ const RealEstateSchema = object({
     property_identifier: string(),
     address: AddressSchema,
     buildings: BuildingSchema.array(),
+});
+
+const PropertyManagerSchema = object({
+    id: APIIdString.optional(),
+    name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
+    email: string().email(errorMessages.emailInvalid).or(z.literal("")),
+});
+
+const DeveloperSchema = object({
+    id: APIIdString.optional(),
+    value: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
+    description: string()
+        .nonempty(errorMessages.required)
+        .min(2, errorMessages.stringLength)
+        .max(256, errorMessages.stringMaxIs + "256")
+        .nullable(),
+    code: string().nonempty(errorMessages.required),
 });
 
 const HousingCompanyDetailsSchema = object({
@@ -1106,6 +1117,12 @@ const FilterPropertyManagersQuerySchema = object({
     page: number().int().optional(),
 });
 
+const FilterDevelopersQuerySchema = object({
+    value: string().optional(),
+    limit: number().int().optional(),
+    page: number().int().optional(),
+});
+
 // ********************************
 // * Exports
 // ********************************
@@ -1143,9 +1160,12 @@ export {
     IndexListQuerySchema,
     FilterOwnersQuerySchema,
     FilterPropertyManagersQuerySchema,
+    FilterDevelopersQuerySchema,
     ApartmentSaleFormSchema,
     OwnerSchema,
     PropertyManagerSchema,
+    CodeSchema,
+    DeveloperSchema,
     OwnershipFormSchema,
     ownerAPISchema,
     ownershipsSchema,
@@ -1201,6 +1221,7 @@ export type ICode = z.infer<typeof CodeSchema>;
 export type IPostalCode = z.infer<typeof PostalCodeSchema>;
 export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
 export type IOwner = z.infer<typeof OwnerSchema>;
+export type IDeveloper = z.infer<typeof DeveloperSchema>;
 export type IOwnership = z.infer<typeof ownershipSchema>;
 
 // Query/list responses & paging
@@ -1223,6 +1244,7 @@ export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
 export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
 export type IFilterPropertyManagersQuery = z.infer<typeof FilterPropertyManagersQuerySchema>;
+export type IFilterDevelopersQuery = z.infer<typeof FilterDevelopersQuerySchema>;
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
