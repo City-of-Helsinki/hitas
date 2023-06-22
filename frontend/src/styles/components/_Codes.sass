@@ -72,6 +72,14 @@
           &:hover
             background-color: $color-engel-medium-light
 
+      &__no-mod-item
+        position: relative
+        padding: $spacing-xs $spacing-m
+        &:not(:last-child)
+          border: none
+        &:nth-child(odd)
+          background-color: $color-engel-light
+
   &__tab--indices
     @include flexbox()
     @include flex-flow(column nowrap)
@@ -84,7 +92,7 @@
       grid-template-rows: auto
       grid-template-columns: 50% 50%
 
-    .list-headers, .results-list__item
+    .list-headers, .results-list__item, .results-list__no-mod-item
       @include flexbox()
       @include justify-content(space-between)
       .index

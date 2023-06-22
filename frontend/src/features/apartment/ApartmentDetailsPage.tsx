@@ -7,14 +7,15 @@ import {
     downloadApartmentUnconfirmedMaximumPricePDF,
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
+    useSavePropertyManagerMutation,
 } from "../../app/services";
 import {
     DetailField,
     Divider,
     ImprovementsTable,
+    MutateForm,
     MutateModal,
     OwnerMutateForm,
-    PropertyManagerMutateForm,
     QueryStateHandler,
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
@@ -27,6 +28,7 @@ import {
     IOwner,
     IOwnership,
     IPropertyManager,
+    PropertyManagerSchema,
 } from "../../common/schemas";
 import {
     formatAddress,
@@ -659,10 +661,18 @@ const LoadedApartmentDetails = ({
                 <MutateModal
                     // Modify property manager modal
                     defaultObject={housingCompany?.property_manager as IPropertyManager}
-                    MutateFormComponent={PropertyManagerMutateForm}
+                    MutateFormComponent={MutateForm}
                     dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
                     isVisible={isModifyPropertyManagerModalVisible}
                     closeModalAction={() => setIsModifyPropertyManagerModalVisible(false)}
+                    formObjectSchema={PropertyManagerSchema}
+                    useSaveMutation={useSavePropertyManagerMutation}
+                    successMessage="Isännöitsijän tiedot tallennettu onnistuneesti!"
+                    errorMessage="Virhe isännöitsijän tietojen tallentamisessa!"
+                    notModifiedMessage="Ei muutoksia isännöitsijän tiedoissa."
+                    defaultFocusFieldName="name"
+                    formFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
+                    requiredFields={["name"]}
                 />
                 <ImprovementsTable
                     data={apartment}

@@ -15,7 +15,9 @@ import {
     ICodeResponse,
     IConditionOfSale,
     ICreateConditionOfSale,
+    IDeveloper,
     IExternalSalesDataResponse,
+    IFilterDevelopersQuery,
     IFilterOwnersQuery,
     IFilterPropertyManagersQuery,
     IHousingCompanyApartmentQuery,
@@ -188,6 +190,7 @@ export const hitasApi = createApi({
         "Index",
         "Owner",
         "PropertyManager",
+        "Developer",
         "ExternalSaleData",
         "ThirtyYearRegulation",
     ],
@@ -240,14 +243,14 @@ const listApi = hitasApi.injectEndpoints({
             ],
         }),
         getOwners: builder.query<IOwnersResponse, IFilterOwnersQuery>({
-            query: (params: IFilterOwnersQuery) => ({
+            query: (params) => ({
                 url: "owners",
                 params: params,
             }),
             providesTags: [{type: "Owner", id: "LIST"}],
         }),
         getPropertyManagers: builder.query<IPropertyManagersResponse, IFilterPropertyManagersQuery>({
-            query: (params: IFilterPropertyManagersQuery) => ({
+            query: (params) => ({
                 url: "property-managers",
                 params: params,
             }),
@@ -267,11 +270,12 @@ const listApi = hitasApi.injectEndpoints({
             }),
             providesTags: [{type: "Index", id: "LIST"}],
         }),
-        getDevelopers: builder.query<ICodeResponse, object>({
-            query: (params: object) => ({
+        getDevelopers: builder.query<ICodeResponse, IFilterDevelopersQuery>({
+            query: (params) => ({
                 url: "developers",
                 params: params,
             }),
+            providesTags: [{type: "Developer", id: "LIST"}],
         }),
         getBuildingTypes: builder.query<ICodeResponse, object>({
             query: (params: object) => ({
@@ -512,6 +516,18 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "PropertyManager", id: "LIST"},
             ],
         }),
+        saveDeveloper: builder.mutation<IDeveloper, IDeveloper>({
+            query: (data) => ({
+                url: `developers${idOrBlank(data.id)}`,
+                method: data.id === undefined ? "POST" : "PUT",
+                body: data,
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (response) => [
+                {type: "Developer", id: response?.id},
+                {type: "Developer", id: "LIST"},
+            ],
+        }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
                 url: `indices/${index}/${month}`,
@@ -647,6 +663,7 @@ export const {
     useDeleteApartmentMutation,
     useSaveOwnerMutation,
     useSavePropertyManagerMutation,
+    useSaveDeveloperMutation,
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
     useCreateSaleMutation,
