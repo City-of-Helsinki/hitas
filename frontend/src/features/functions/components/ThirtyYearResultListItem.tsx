@@ -1,4 +1,4 @@
-import {Button, IconDocument, IconLockOpen} from "hds-react";
+import {Button, IconLockOpen} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {
@@ -6,6 +6,7 @@ import {
     useReleaseHousingCompanyFromRegulationMutation,
 } from "../../../app/services";
 import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
+import DownloadButton from "../../../common/components/DownloadButton";
 import {formatDate, hdsToast} from "../../../common/utils";
 
 const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
@@ -65,20 +66,18 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
                     </Button>
                 )}
                 {company.current_regulation_status !== "released_by_plot_department" && (
-                    <Button
-                        theme="black"
-                        onClick={handleClickDownloadPDFButton}
+                    <DownloadButton
+                        buttonText="Lataa tiedote"
+                        downloadFn={handleClickDownloadPDFButton}
                         variant={company.letter_fetched ? "secondary" : "primary"}
                         className="download-button"
-                        iconLeft={<IconDocument />}
-                    >
-                        Lataa tiedote
-                    </Button>
+                    />
                 )}
             </div>
             <ConfirmDialogModal
                 modalHeader={`Vapauta ${company.display_name}?`}
-                modalText={`Olet manuaalisesti vapauttamassa yhtiötä (esim tontit-yksikön päätöksestä). Haluatko varmasti, että ${company.display_name} vapautetaan sääntelyn piiristä?`}
+                modalText={`Olet manuaalisesti vapauttamassa yhtiötä (esim tontit-yksikön päätöksestä). Haluatko 
+                    varmasti, että ${company.display_name} vapautetaan sääntelyn piiristä?`}
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
                 buttonText="Vapauta"

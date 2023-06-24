@@ -40,7 +40,7 @@ import {
     IThirtyYearRegulationResponse,
     IUserInfoResponse,
 } from "../common/schemas";
-import {hitasToast} from "../common/utils";
+import {hdsToast} from "../common/utils";
 
 // /////////
 // Config //
@@ -86,7 +86,7 @@ const handleDownloadPDF = (response) => {
         .then((blob) => {
             const filename = response.headers.get("Content-Disposition")?.split("=")[1];
             if (filename === undefined) {
-                hitasToast("Virhe tiedostoa ladattaessa.", "error");
+                hdsToast.error("Virhe ladattaessa tiedostoa.");
                 return;
             }
 
@@ -128,7 +128,7 @@ export const downloadApartmentUnconfirmedMaximumPricePDF = (
 
 export const downloadApartmentMaximumPricePDF = (apartment: IApartmentDetails, requestDate?: string) => {
     if (!apartment.prices.maximum_prices.confirmed) {
-        hitasToast("Enimmäishintalaskelmaa ei ole olemassa", "error");
+        hdsToast.error("Enimmäishintalaskelmaa ei ole olemassa.");
         return;
     }
     const url = `${Config.api_v1_url}/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}/reports/download-latest-confirmed-prices`;
