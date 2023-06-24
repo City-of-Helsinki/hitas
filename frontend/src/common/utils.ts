@@ -2,6 +2,7 @@ import toast, {ToastOptions} from "react-hot-toast";
 
 import {Config} from "../app/services";
 import {
+    hitasQuarters,
     IAddress,
     IApartmentAddress,
     IApartmentDetails,
@@ -206,26 +207,35 @@ export const getApartmentUnconfirmedPrices = (
     else return apartment.prices.maximum_prices.unconfirmed.onwards_2011;
 };
 
-// Takes a date and returns the hitasQuarter it belongs to. Returns current quarter if no date is given.
+// Takes a date in YYYY-MM-DD format (with the day being optional), and returns the hitas-quarter the date belongs to.
+// Returns the current hitas-quarter if no date is supplied.
 export const getHitasQuarter = (date?) => {
-    const time = date ? Number(date.split("-")[1]) : new Date().getMonth() + 1;
-    let defaultQuarter = {label: "1.11. - 31.1.", value: "11-01"};
-    switch (time) {
+    // Extract month from date, or use current month if there's no date (getMonth returns a 0-indexed value, so add 1)
+    const month = date ? Number(date.split("-")[1]) : new Date().getMonth() + 1;
+    const quarter = {number: NaN};
+    switch (month) {
+        case 1:
+        case 11:
+        case 12:
+            quarter.number = 3;
+            break;
         case 2:
         case 3:
         case 4:
-            defaultQuarter = {label: "1.2. - 30.4.", value: "02-01"};
+            quarter.number = 0;
             break;
         case 5:
         case 6:
         case 7:
-            defaultQuarter = {label: "1.5. - 31.7.", value: "05-01"};
+            quarter.number = 1;
             break;
         case 8:
         case 9:
         case 10:
-            defaultQuarter = {label: "1.8. - 31.10.", value: "08-01"};
+            quarter.number = 2;
             break;
+        default:
+            return {label: "Virheellinen kuukausi!", value: "---"};
     }
-    return defaultQuarter;
+    return hitasQuarters[quarter.number];
 };
