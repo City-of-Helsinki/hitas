@@ -7,6 +7,7 @@ import {
     useGetIndicesQuery,
 } from "../../app/services";
 import {FilterTextInputField, Heading, QueryStateHandler} from "../../common/components";
+import DownloadButton from "../../common/components/DownloadButton";
 import {getHitasQuarter, hdsToast, today} from "../../common/utils";
 
 export const years = Array.from({length: 34}, (_, index) => {
@@ -78,11 +79,11 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
         calculatePriceCeiling({
             data: {calculation_month: currentMonth},
         })
-            .then((data) => {
-                console.log(data);
+            .then(() => {
                 hdsToast.success("Rajahinnan laskenta onnistui");
             })
             .catch((e) => {
+                // eslint-disable-next-line no-console
                 console.warn(e);
                 hdsToast.error("Rajahinnan laskenta epäonnistui");
             });
@@ -103,16 +104,14 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
                 <>
                     <div className="price-ceiling-value">
                         <label>
-                            Rajaneliöhinta (<>{getHitasQuarter(currentMonth + "-01").label}</>)
+                            Rajaneliöhinta (<>{getHitasQuarter().label}</>)
                         </label>
                         <span>{data.contents[0].value}</span>
                     </div>
-                    <Button
-                        theme="black"
-                        onClick={() => downloadSurfaceAreaPriceCeilingResults(currentMonth + "-01")}
-                    >
-                        Lataa laskentaraportti
-                    </Button>
+                    <DownloadButton
+                        downloadFn={() => downloadSurfaceAreaPriceCeilingResults(currentMonth + "-01")}
+                        buttonText="Lataa laskentaraportti"
+                    />
                 </>
             ) : (
                 <>

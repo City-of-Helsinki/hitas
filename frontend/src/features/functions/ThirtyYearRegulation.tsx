@@ -1,4 +1,4 @@
-import {Button, Tooltip} from "hds-react";
+import {Tooltip} from "hds-react";
 import {useForm} from "react-hook-form";
 import {hitasQuarters} from "../../common/schemas";
 
@@ -11,6 +11,7 @@ import {
     useGetThirtyYearRegulationQuery,
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler} from "../../common/components";
+import DownloadButton from "../../common/components/DownloadButton";
 import {Select, ToggleInput} from "../../common/components/form";
 import {getHitasQuarter, hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
@@ -18,6 +19,7 @@ import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, Thir
 const ThirtyYearRegulation = () => {
     const currentTime = new Date();
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+    // TODO: populate the years options with years starting from 2023, when testing is done
     const years = [
         {label: "2023", value: "2023"},
         {label: "2022", value: "2022"},
@@ -155,10 +157,10 @@ const ThirtyYearRegulation = () => {
                         <div className="actions">
                             <div className="time-period">
                                 <label>
-                                    Ajanjakso
+                                    Vuosineljännes
                                     <Tooltip placement="bottom-start">
-                                        Valitse vuosi ja jakso jonka vapautumisia haluat tarkastella, tai jolle haluat
-                                        suorittaa vertailun mikäli sitä ei ole vielä tehty.
+                                        Valitse vuosi ja neljännes jonka vapautumisia haluat tarkastella, tai jolle
+                                        haluat suorittaa vertailun mikäli sitä ei ole vielä tehty.
                                     </Tooltip>
                                 </label>
                                 <Select
@@ -198,23 +200,21 @@ const ThirtyYearRegulation = () => {
                                     </div>
                                 </QueryStateHandler>
                                 {hasRegulationResults && (
-                                    <Button
-                                        theme="black"
-                                        onClick={() => downloadRegulationResults(formDate)}
-                                    >
-                                        Lataa kokonaisraportti
-                                    </Button>
+                                    <DownloadButton
+                                        downloadFn={() => downloadRegulationResults(formDate)}
+                                        buttonText="Lataa kokonaisraportti"
+                                    />
                                 )}
                             </div>
                         </div>
-                        <Divider size="l" />
-                        <div className="external-sales-data-import">
-                            {hasExternalSalesData ? (
-                                <h3 className="external-sales-data-exists">{`Ajanjaksolle ${formTimePeriod.label} on tallennettu postinumeroalueiden keskineliöhinnat.`}</h3>
-                            ) : (
-                                <ExternalSalesDataImport formDate={formDate} />
-                            )}
-                        </div>
+                        {!hasExternalSalesData && (
+                            <>
+                                <Divider size="l" />
+                                <div className="external-sales-data-import">
+                                    <ExternalSalesDataImport formDate={formDate} />
+                                </div>
+                            </>
+                        )}
                         <ThirtyYearResults
                             hasResults={hasRegulationResults}
                             hasExternalSalesData={hasExternalSalesData}

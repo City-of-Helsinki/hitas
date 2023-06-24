@@ -52,7 +52,7 @@ export default function ExternalSalesDataImport({formDate}) {
                 id="file-input"
                 buttonLabel="Valitse tiedosto"
                 formObject={formObject}
-                label="Syötä postinumeroalueiden keskineliöhinnat"
+                label="Postinumeroalueiden keskineliöhinnat *"
                 tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
                 accept=".xlsx"
                 onChange={() => onSubmit(formObject.getValues())}

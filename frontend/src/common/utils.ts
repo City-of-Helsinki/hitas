@@ -154,6 +154,7 @@ export function hitasToast(
     toast(message, {...opts, className: type});
 }
 
+// Toast hook with easier Notification typing
 export const hdsToast = {
     success: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "success"}),
     info: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
@@ -177,6 +178,7 @@ export function doesAContainB(A: object, B: object): boolean {
     return true;
 }
 
+// Returns true if obj is empty, false otherwise. Returns true if obj is undefined or null.
 export function isEmpty(obj: object | undefined | null): boolean {
     if (obj === undefined || obj === null) return true;
     return Object.keys(obj).length === 0;
@@ -199,6 +201,7 @@ export const getLogOutUrl = (): string => {
     return Config.api_auth_url + "/logout?next=" + callBackUrl;
 };
 
+// Returns apartment's maximum unconfirmed prices, whether they are pre-2011 or onwards-2011
 export const getApartmentUnconfirmedPrices = (
     apartment: IApartmentDetails
 ): IApartmentUnconfirmedMaximumPriceIndices => {
@@ -212,11 +215,11 @@ export const getApartmentUnconfirmedPrices = (
 export const getHitasQuarter = (date?) => {
     // Extract month from date, or use current month if there's no date (getMonth returns a 0-indexed value, so add 1)
     const month = date ? Number(date.split("-")[1]) : new Date().getMonth() + 1;
-    const quarter = {number: NaN};
+    const quarter: Record<"number", number> = {number: 0};
     switch (month) {
-        case 1:
         case 11:
         case 12:
+        case 1:
             quarter.number = 3;
             break;
         case 2:
