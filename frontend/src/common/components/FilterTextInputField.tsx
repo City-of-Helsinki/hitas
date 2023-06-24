@@ -9,6 +9,8 @@ interface FilterTextInputFieldProps {
     setFilterParams: (object) => void;
     minLength?: number;
     maxLength?: number;
+    defaultValue?: string;
+    required?: boolean;
 }
 
 export default function FilterTextInputField({
@@ -18,6 +20,7 @@ export default function FilterTextInputField({
     setFilterParams,
     minLength = 3,
     maxLength,
+    ...rest
 }: FilterTextInputFieldProps): JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
 
@@ -51,6 +54,7 @@ export default function FilterTextInputField({
             onFocus={() => setIsInvalid(false)}
             invalid={isInvalid}
             maxLength={maxLength}
+            {...rest}
         />
     );
 }

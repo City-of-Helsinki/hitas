@@ -52,6 +52,14 @@
     .calculate-button
       height: 56px
       width: 250px
+    .price-ceiling-results
+      @include flexbox()
+      @include flex-flow(row nowrap)
+      gap: $spacing-m
+      > :last-child
+        width: 80%
+      > :only-child
+        width: 20%
     .year-filter
       width: 200px
       margin: 0 auto
@@ -59,6 +67,11 @@
       margin-bottom: $spacing-m
       &__item
         @include align-items(center)
+        cursor: default
+        &:hover
+            background: $color-white
+    .list-headers
+      margin-top: 0
     form
       @include flexbox()
       @include justify-content(center)
@@ -220,6 +233,7 @@
           width: 63%
         .buttons
           @include flexbox()
+          @include justify-content(flex-end)
           width: 37%
           padding: $spacing-m
           *:only-child
