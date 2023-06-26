@@ -204,7 +204,7 @@
           cursor: pointer
           color: $color-black-70
 
-    .row
+    .top-row
       @include justify-content(space-between)
 
       .detail-field-horizontal
@@ -215,6 +215,9 @@
 
       .detail-field-value
         font-size: $fontsize-heading-m
+
+    .row
+      @include justify-content(space-between)
 
   [class^="Tabs-module_tablistBar"]
     background: white
