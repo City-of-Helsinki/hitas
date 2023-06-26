@@ -441,6 +441,7 @@ const ApartmentPricesSchema = object({
     first_sale_share_of_housing_company_loans: number().nullable(), // Read only
     first_sale_acquisition_price: number().optional(), // Read only. (purchase_price + share_of_housing_company_loans)
     first_purchase_date: string().nullable(), // Read only
+    latest_sale_id: string().nullable(), // Read only
     latest_sale_purchase_price: number().nullable(), // Read only
     latest_purchase_date: string().nullable(), // Read only
     catalog_purchase_price: number().nullable(), // Read only

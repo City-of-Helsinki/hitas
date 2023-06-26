@@ -581,6 +581,17 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
+        deleteSale: builder.mutation<unknown, {housingCompanyId: string; apartmentId: string; saleId: string}>({
+            query: ({housingCompanyId, apartmentId, saleId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales/${saleId}`,
+                method: "DELETE",
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {type: "Apartment"},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+            ],
+        }),
         createConditionOfSale: builder.mutation<
             {conditions_of_sale: IConditionOfSale[]},
             {data: ICreateConditionOfSale}
@@ -713,6 +724,7 @@ export const {
     useSaveApartmentMaximumPriceMutation,
     useSaveIndexMutation,
     useCreateSaleMutation,
+    useDeleteSaleMutation,
     useCreateConditionOfSaleMutation,
     useUpdateConditionOfSaleMutation,
     useCreateThirtyYearRegulationMutation,
