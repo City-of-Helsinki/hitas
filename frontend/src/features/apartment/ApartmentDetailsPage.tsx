@@ -5,6 +5,7 @@ import {Link, useParams} from "react-router-dom";
 import {
     downloadApartmentMaximumPricePDF,
     downloadApartmentUnconfirmedMaximumPricePDF,
+    useDeleteSaleMutation,
     useGetApartmentDetailQuery,
     useGetHousingCompanyDetailQuery,
     useSavePropertyManagerMutation,
@@ -459,7 +460,21 @@ const LoadedApartmentDetails = ({
         setIsModifyOwnerModalVisible(true);
         setOwner(selectedOwner);
     };
+    const [removeSale, {isLoading}] = useDeleteSaleMutation();
     const handleRemoveSaleButtonClick = () => {
+        removeSale({
+            housingCompanyId: housingCompany.id,
+            apartmentId: apartment.id,
+            saleId: apartment.prices.latest_sale_id,
+        })
+            .then(() => {
+                hdsToast.success("Viimeisin kauppa peruttu onnistuneesti");
+            })
+            .catch((e) => {
+                hdsToast.error("Viimeisimmän kaupan peruminen epäonnistui");
+                // eslint-disable-next-line no-console
+                console.warn(e);
+            });
         setIsRemoveSaleModalVisible(false);
     };
 
@@ -573,7 +588,7 @@ const LoadedApartmentDetails = ({
                                             />
                                             <RemoveButton
                                                 onClick={() => setIsRemoveSaleModalVisible(true)}
-                                                isLoading={false}
+                                                isLoading={isLoading}
                                                 buttonText="Peru kauppa"
                                             />
                                             <Dialog
@@ -603,7 +618,7 @@ const LoadedApartmentDetails = ({
                                                     </Button>
                                                     <RemoveButton
                                                         onClick={handleRemoveSaleButtonClick}
-                                                        isLoading={false}
+                                                        isLoading={isLoading}
                                                         buttonText="Peru kauppa"
                                                     />
                                                 </Dialog.ActionButtons>
