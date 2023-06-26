@@ -3,10 +3,16 @@ import {Button, IconCrossCircleFill} from "hds-react";
 interface RemoveButtonProps {
     onClick: () => void;
     isLoading: boolean;
+    buttonText?: string;
     disabled?: boolean;
 }
 
-export default function RemoveButton({onClick, isLoading, disabled = false}: RemoveButtonProps): JSX.Element {
+export default function RemoveButton({
+    onClick,
+    isLoading,
+    disabled = false,
+    buttonText = "Poista",
+}: RemoveButtonProps): JSX.Element {
     return (
         <Button
             iconLeft={<IconCrossCircleFill />}
@@ -15,7 +21,7 @@ export default function RemoveButton({onClick, isLoading, disabled = false}: Rem
             isLoading={isLoading}
             disabled={disabled}
         >
-            Poista
+            {buttonText}
         </Button>
     );
 }

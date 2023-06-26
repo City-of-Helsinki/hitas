@@ -574,6 +574,7 @@ const LoadedApartmentDetails = ({
                                             <RemoveButton
                                                 onClick={() => setIsRemoveSaleModalVisible(true)}
                                                 isLoading={false}
+                                                buttonText="Peru kauppa"
                                             />
                                             <Dialog
                                                 id="remove-sale-modal"
@@ -603,6 +604,7 @@ const LoadedApartmentDetails = ({
                                                     <RemoveButton
                                                         onClick={handleRemoveSaleButtonClick}
                                                         isLoading={false}
+                                                        buttonText="Peru kauppa"
                                                     />
                                                 </Dialog.ActionButtons>
                                             </Dialog>
