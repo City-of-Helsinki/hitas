@@ -17,6 +17,7 @@ import {
     MutateModal,
     OwnerMutateForm,
     QueryStateHandler,
+    RemoveButton,
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
 import {
@@ -449,15 +450,18 @@ const LoadedApartmentDetails = ({
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
 }): JSX.Element => {
-    // Handle visibility of the modify owner info modal
+    // Handle visibility of the relevant modals
     const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
+    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
+    const [isRemoveSaleModalVisible, setIsRemoveSaleModalVisible] = useState(false);
     const [owner, setOwner] = useState<IOwner | undefined>(undefined);
     const modifyOwnerHandler = (selectedOwner: IOwner) => {
         setIsModifyOwnerModalVisible(true);
         setOwner(selectedOwner);
     };
-    // Handle visibility of the modify property manager info modal
-    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
+    const handleRemoveSaleButtonClick = () => {
+        setIsRemoveSaleModalVisible(false);
+    };
 
     return (
         <>
@@ -493,7 +497,7 @@ const LoadedApartmentDetails = ({
                         </Tabs.TabList>
                         <Tabs.TabPanel>
                             <div className="apartment-details__tab basic-details">
-                                <div className="row">
+                                <div className="row top-row">
                                     <DetailField
                                         label="Viimeisin kauppahinta"
                                         value={formatMoney(apartment.prices.latest_sale_purchase_price)}
@@ -562,11 +566,47 @@ const LoadedApartmentDetails = ({
                                         </div>
                                     </div>
                                     <div className="column">
-                                        <DetailField
-                                            label="Viimeisin kauppapäivä"
-                                            value={formatDate(apartment.prices.latest_purchase_date)}
-                                        />
-
+                                        <div className="row">
+                                            <DetailField
+                                                label="Viimeisin kauppapäivä"
+                                                value={formatDate(apartment.prices.latest_purchase_date)}
+                                            />
+                                            <RemoveButton
+                                                onClick={() => setIsRemoveSaleModalVisible(true)}
+                                                isLoading={false}
+                                            />
+                                            <Dialog
+                                                id="remove-sale-modal"
+                                                aria-labelledby="remove-sale-modal"
+                                                isOpen={isRemoveSaleModalVisible}
+                                            >
+                                                <Dialog.Header
+                                                    title="Viimeisimmän kaupan peruminen"
+                                                    id="remove-sale-modal-header"
+                                                />
+                                                <Dialog.Content>
+                                                    <p>
+                                                        Haluatko varmasti perua viimeisimmän kaupan?
+                                                        <br />(
+                                                        {formatDate(apartment.prices.latest_purchase_date) + ", "}
+                                                        {formatMoney(apartment.prices.latest_sale_purchase_price)})
+                                                    </p>
+                                                </Dialog.Content>
+                                                <Dialog.ActionButtons>
+                                                    <Button
+                                                        theme="black"
+                                                        variant="secondary"
+                                                        onClick={() => setIsRemoveSaleModalVisible(false)}
+                                                    >
+                                                        Peruuta
+                                                    </Button>
+                                                    <RemoveButton
+                                                        onClick={handleRemoveSaleButtonClick}
+                                                        isLoading={false}
+                                                    />
+                                                </Dialog.ActionButtons>
+                                            </Dialog>
+                                        </div>
                                         <Divider size="s" />
 
                                         <DetailField
