@@ -200,18 +200,20 @@
   .conditions-of-sale-headers
     position: relative
     display: grid
-    grid-template-columns: auto 500px 150px 150px 100px
+    grid-template-columns: auto 400px 120px 150px 100px 120px
     gap: $spacing-layout-2-xs
     grid-row: 1
     height: $spacing-layout-s
     font-size: $fontsize-body-s
     font-weight: 700
+    padding-left: $spacing-2-xs
     span
       font-size: $fontsize-body-l
       line-height: 0
 
   .conditions-of-sale-list
     padding: $spacing-layout-s
+    padding-left: $spacing-layout-m
     background: $color-engel-medium-light
     display: grid
     grid-template-rows: $spacing-layout-2-xs auto
@@ -220,14 +222,14 @@
     &-item
       background: white
       display: grid
-      grid-template-columns: auto 500px 150px 150px 100px
+      grid-template-columns: auto 400px 120px 150px 100px 120px
       gap: 1em
-      height: $spacing-layout-m
+      min-height: $spacing-layout-m
       @include align-items(center)
       .grace-period
         padding-left: 18px
         .text-button
-          margin-left: $spacing-m
+          margin-left: $spacing-xs
           &:hover
             cursor: pointer
           .icon
@@ -245,9 +247,14 @@
         @include flexbox()
         @include align-items(center)
       .icon-wrap
-        margin: 0 14px 0 -28px
+        margin: 0 20px 0 -34px
+      button
+        margin: $spacing-xs
+        margin-left: 0
+        svg
+          height: 22px
     svg
-      height: 22px
+      height: 32px
       vertical-align: text-bottom
     .unresolved
       color: $color-black-60
