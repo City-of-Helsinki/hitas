@@ -471,6 +471,7 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
     first_sale_share_of_housing_company_loans: true,
     first_sale_acquisition_price: true,
     first_purchase_date: true,
+    latest_sale_id: true,
     latest_sale_purchase_price: true,
     latest_purchase_date: true,
     maximum_prices: true,

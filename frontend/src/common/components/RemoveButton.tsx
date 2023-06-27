@@ -5,6 +5,8 @@ interface RemoveButtonProps {
     isLoading: boolean;
     buttonText?: string;
     disabled?: boolean;
+    variant?: "primary" | "secondary" | "success" | "danger";
+    className?: string;
 }
 
 export default function RemoveButton({
@@ -12,6 +14,7 @@ export default function RemoveButton({
     isLoading,
     disabled = false,
     buttonText = "Poista",
+    ...rest
 }: RemoveButtonProps): JSX.Element {
     return (
         <Button
@@ -20,6 +23,7 @@ export default function RemoveButton({
             onClick={onClick}
             isLoading={isLoading}
             disabled={disabled}
+            {...rest}
         >
             {buttonText}
         </Button>
