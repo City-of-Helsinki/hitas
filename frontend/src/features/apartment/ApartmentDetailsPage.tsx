@@ -466,7 +466,7 @@ const LoadedApartmentDetails = ({
         removeSale({
             housingCompanyId: housingCompany.id,
             apartmentId: apartment.id,
-            saleId: apartment.prices.latest_sale_id as string,
+            saleId: apartment.prices.current_sale_id as string,
         })
             .unwrap()
             .then(() => {
@@ -594,7 +594,7 @@ const LoadedApartmentDetails = ({
                                                 buttonText="Peru kauppa"
                                                 variant="secondary"
                                                 className="delete-sale-button"
-                                                disabled={!apartment.prices.latest_sale_id}
+                                                disabled={!apartment.prices.current_sale_id}
                                             />
                                         </div>
                                         <Divider size="s" />

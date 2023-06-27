@@ -6890,7 +6890,7 @@ components:
           minimum: 0
           nullable: true
           example: 55430
-        latest_sale_id:
+        current_sale_id:
           description: ID of the latest sale, ALSO counting first sale (used for cancelling sales)
           type: string
           nullable: true
