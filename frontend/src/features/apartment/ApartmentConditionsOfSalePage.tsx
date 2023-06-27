@@ -423,15 +423,17 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             </div>
                             <div className="input-wrap sell-by-date">{formatDate(cos.sell_by_date)} </div>
                             <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
-                            {/* TODO: show conditionally based on whether the CoS owner is an owner of the apartment */}
-                            <RemoveButton
-                                onClick={() => {
-                                    setIdToRemove(cos.id);
-                                    setIsModalOpen(true);
-                                }}
-                                isLoading={false}
-                                size="small"
-                            />
+                            {apartment.ownerships.find((ownership) => ownership.owner.id === cos.owner.id) &&
+                                !cos.fulfilled && ( // CoS removable only if current owner and not already fulfilled
+                                    <RemoveButton
+                                        onClick={() => {
+                                            setIdToRemove(cos.id);
+                                            setIsModalOpen(true);
+                                        }}
+                                        isLoading={false}
+                                        size="small"
+                                    />
+                                )}
                         </li>
                     ))}
                 </ul>
