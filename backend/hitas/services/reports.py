@@ -20,6 +20,7 @@ from hitas.models.housing_company import (
     HousingCompanyWithUnregulatedReportAnnotations,
     RegulationStatus,
 )
+from hitas.models.ownership import OwnershipWithApartmentCount
 from hitas.utils import format_sheet, resize_columns
 
 T = TypeVar("T")
@@ -87,6 +88,13 @@ class SalesInfo(TypedDict):
     sum: Decimal
     minimum: Decimal
     maximum: Decimal
+
+
+class MultipleOwnershipReportColumns(NamedTuple):
+    owner_name: str
+    apartment_address: str
+    postal_code: str
+    apartment_count: int | str
 
 
 SalesInfoByRoomCount = TypedDict(
@@ -698,3 +706,45 @@ def sort_sales_by_cost_area(sales: list[ApartmentSale]) -> SalesByCostArea:
         overall_minimum=overall_minimum,
         overall_maximum=overall_maximum,
     )
+
+
+def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartmentCount]) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+
+    column_headers = MultipleOwnershipReportColumns(
+        owner_name="Omistajan nimi",
+        apartment_address="Asunnon osoite",
+        postal_code="Postinumero",
+        apartment_count="Omistajan asuntojen lukumäärä",
+    )
+    worksheet.append(column_headers)
+
+    for ownership in ownerships:
+        worksheet.append(
+            MultipleOwnershipReportColumns(
+                owner_name=ownership.owner.name,
+                apartment_address=ownership.apartment.address,
+                postal_code=ownership.apartment.postal_code.value,
+                apartment_count=ownership.apartment_count,
+            )
+        )
+
+    column_letters = string.ascii_uppercase[: len(column_headers)]
+
+    last_row = worksheet.max_row
+    worksheet.auto_filter.ref = worksheet.dimensions
+
+    format_sheet(
+        worksheet,
+        formatting_rules={
+            # Add a border to the header row
+            **{f"{letter}1": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+            # Add a border to the last data row
+            **{f"{letter}{last_row}": {"border": Border(bottom=Side(style="thin"))} for letter in column_letters},
+        },
+    )
+
+    resize_columns(worksheet)
+    worksheet.protection.sheet = True
+    return workbook

@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
-from hitas.models.ownership import Ownership
-from hitas.utils import SQSum
+from hitas.models.ownership import Ownership, OwnershipWithApartmentCount
+from hitas.utils import SQSum, subquery_count
 
 
 def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
@@ -76,3 +76,24 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
         )
 
     return obfuscated_owners
+
+
+def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
+    return list(
+        Ownership.objects.select_related(
+            "owner",
+            "sale__apartment__building__real_estate__housing_company__postal_code",
+        )
+        .annotate(
+            apartment_count=subquery_count(Ownership, "owner"),
+        )
+        .filter(
+            sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+            apartment_count__gt=1,
+        )
+        .order_by(
+            "owner__name",
+            "sale__apartment__building__real_estate__housing_company__postal_code__value",
+            "sale__apartment__street_address",
+        )
+    )

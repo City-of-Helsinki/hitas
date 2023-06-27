@@ -30,6 +30,7 @@ from hitas.views.real_estate import RealEstateViewSet
 from hitas.views.reports import (
     HousingCompanyStatesJSONReportView,
     HousingCompanyStatesReportView,
+    MultipleOwnershipsReportView,
     RegulateHousingCompaniesReportView,
     SalesByPostalCodeAndAreaReportView,
     SalesReportView,
