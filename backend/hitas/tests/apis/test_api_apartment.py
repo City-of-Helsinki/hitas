@@ -516,6 +516,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
         additional_work_during_construction=4999.9,
         surface_area=50.5,
         sales=[],
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
     ap2: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2020, 1, 1),
@@ -833,12 +834,11 @@ def _test_max_prices(
     null_values: bool = False,
     old_hitas_ruleset: bool = False,
 ):
-    pre_2011: bool = completion_date < datetime.date(2011, 1, 1)
     pre_2005: bool = completion_date < datetime.date(2005, 1, 1)
 
     # Setup test
-    cpi_factory = ConstructionPriceIndexFactory if pre_2011 else ConstructionPriceIndex2005Equal100Factory
-    mpi_factory = MarketPriceIndexFactory if pre_2011 else MarketPriceIndex2005Equal100Factory
+    cpi_factory = ConstructionPriceIndexFactory if old_hitas_ruleset else ConstructionPriceIndex2005Equal100Factory
+    mpi_factory = MarketPriceIndexFactory if old_hitas_ruleset else MarketPriceIndex2005Equal100Factory
 
     ap: Apartment = ApartmentFactory.create(
         completion_date=completion_date,
@@ -878,36 +878,38 @@ def _test_max_prices(
     values = {
         "construction_price_index": {
             "value": (
-                153000  # (80000 + 15000 + 5000 + 2000) * 150 / 100
+                143728.20  # (80000 + 15000 + 5000 + 2000) * 0.9394 * 150 / 100
                 if old_hitas_ruleset and pre_2005
-                else 151500  # (80000 + 15000 + 5000 + 1000) * 150 / 100
+                else 148500.30  # (80000 + 15000 + 5000 + 1000) * 0.9802 * 150 / 100
                 if old_hitas_ruleset
-                else 150000  # (80000 + 15000 + 5000) * 150 / 100
+                else 150000.00  # (80000 + 15000 + 5000) * 150 / 100
                 if create_current_indices and create_completion_indices and not null_values
                 else None
             ),
-            "maximum": create_current_indices and create_completion_indices and not null_values,
+            "maximum": (
+                create_current_indices and create_completion_indices and not old_hitas_ruleset and not null_values
+            ),
         },
         "market_price_index": {
             "value": (
-                126250  # (80000 + 15000 + 5000 + 1000) * 250 / 200
+                126250.00  # (80000 + 15000 + 5000 + 1000) * 250 / 200
                 if old_hitas_ruleset
-                else 125000  # (80000 + 15000 + 5000) * 250 / 200
+                else 125000.00  # (80000 + 15000 + 5000) * 250 / 200
                 if create_current_indices and create_completion_indices and not null_values
                 else None
             ),
             "maximum": False,
         },
         "surface_area_price_ceiling": {
-            "value": 150000 if create_current_indices and not null_values else None,
-            "maximum": create_current_indices and not null_values and not old_hitas_ruleset and not pre_2005,
+            "value": 150000.00 if create_current_indices and not null_values else None,
+            "maximum": create_current_indices and not null_values,
         },
     }
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json()["prices"]["maximum_prices"]["unconfirmed"] == {
-        "pre_2011": values if pre_2011 else None,
-        "onwards_2011": None if pre_2011 else values,
+        "pre_2011": values if old_hitas_ruleset else None,
+        "onwards_2011": None if old_hitas_ruleset else values,
     }
 
     # Validate fetching PDF report of unconfirmed prices
@@ -1304,7 +1306,7 @@ def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
 @pytest.mark.parametrize("minimal_data", [True, False])
 @pytest.mark.django_db
 def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool):
-    b = BuildingFactory.create()
+    b = BuildingFactory.create(real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I)
 
     data = get_apartment_create_data(b)
     post_response = api_client.post(

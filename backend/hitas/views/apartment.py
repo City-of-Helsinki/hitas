@@ -19,7 +19,9 @@ from rest_framework.decorators import action
 from rest_framework.fields import empty
 from rest_framework.response import Response
 
+from hitas.calculations.depreciation_percentage import depreciation_multiplier
 from hitas.calculations.exceptions import IndexMissingException
+from hitas.calculations.helpers import months_between_dates
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     Apartment,
@@ -487,7 +489,7 @@ class PricesSerializer(serializers.Serializer):
         def value_obj(v: float, max_value: float):
             return {"value": v, "maximum": v is not None and v == max_value}
 
-        if instance.completion_date and instance.completion_date < datetime.date(2011, 1, 1):
+        if instance.housing_company.hitas_type.old_hitas_ruleset:
             # Handle apartments completed before year 2011
             cpi, mpi, sapc = instance_values(["cpi", "mpi", "sapc"])
             maximum = max_with_nones(cpi, mpi, sapc)
@@ -788,20 +790,24 @@ class ApartmentViewSet(HitasModelViewSet):
             type[ConstructionPriceIndex],
             type[ConstructionPriceIndex2005Equal100],
         ],
+        completion_date: Optional[datetime.date] = None,
         calculation_month: Optional[datetime.date] = None,
     ) -> RoundWithPrecision:
+        calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
+
         original_value = Subquery(
             table.objects.filter(month=OuterRef("completion_month")).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
-        current_month = TruncMonth(Now()) if calculation_month is None else calculation_month
         current_value = Subquery(
-            table.objects.filter(month=current_month).values("value"),
+            table.objects.filter(month=calculation_month).values("value"),
             output_field=HitasModelDecimalField(),
         )
 
+        depreciation: Value = Value(1, output_field=HitasModelDecimalField())
         interest: Union[Case, Value] = Value(0, output_field=HitasModelDecimalField())
+
         if issubclass(table, MarketPriceIndex):
             interest = Case(
                 When(
@@ -814,6 +820,15 @@ class ApartmentViewSet(HitasModelViewSet):
                 output_field=HitasModelDecimalField(),
             )
         elif issubclass(table, ConstructionPriceIndex):
+            # If 'completion_date' is missing, calculating index for that month will fail
+            # and index price will be null, so we can skip this calculation freely
+            if completion_date is not None:
+                depreciation = Value(
+                    depreciation_multiplier(months_between_dates(completion_date, calculation_month)),
+                    output_field=HitasModelDecimalField(),
+                )
+                print(depreciation)
+
             interest = Case(
                 # Check for exceptions where old ruleset is not used
                 When(
@@ -837,6 +852,7 @@ class ApartmentViewSet(HitasModelViewSet):
                 + F("additional_work_during_construction")
                 + interest
             )
+            * depreciation
             * current_value
             / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors
             precision=2,
@@ -908,6 +924,9 @@ class ApartmentViewSet(HitasModelViewSet):
 
     def get_detail_queryset(self):
         calculation_month: Optional[datetime.date] = self.kwargs.get("calculation_month")
+        completion_date: Optional[datetime.date] = (
+            Apartment.objects.filter(uuid=self.kwargs["uuid"]).values_list("completion_date", flat=True).first()
+        )
         return self.get_list_queryset().annotate(
             _first_sale_purchase_price=get_first_sale_purchase_price("id"),
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
@@ -915,10 +934,26 @@ class ApartmentViewSet(HitasModelViewSet):
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
             completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
-            cpi=self.select_index(ConstructionPriceIndex, calculation_month=calculation_month),
-            cpi_2005_100=self.select_index(ConstructionPriceIndex2005Equal100, calculation_month=calculation_month),
-            mpi=self.select_index(MarketPriceIndex, calculation_month=calculation_month),
-            mpi_2005_100=self.select_index(MarketPriceIndex2005Equal100, calculation_month=calculation_month),
+            cpi=self.select_index(
+                ConstructionPriceIndex,
+                completion_date=completion_date,
+                calculation_month=calculation_month,
+            ),
+            cpi_2005_100=self.select_index(
+                ConstructionPriceIndex2005Equal100,
+                completion_date=completion_date,
+                calculation_month=calculation_month,
+            ),
+            mpi=self.select_index(
+                MarketPriceIndex,
+                completion_date=completion_date,
+                calculation_month=calculation_month,
+            ),
+            mpi_2005_100=self.select_index(
+                MarketPriceIndex2005Equal100,
+                completion_date=completion_date,
+                calculation_month=calculation_month,
+            ),
             sapc=self.select_sapc(calculation_month=calculation_month),
         )
 

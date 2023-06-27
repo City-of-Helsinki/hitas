@@ -16,7 +16,9 @@ from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
 from hitas.tests.factories import ApartmentFactory, PDFBodyFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
+    ConstructionPriceIndexFactory,
     MarketPriceIndex2005Equal100Factory,
+    MarketPriceIndexFactory,
     SurfaceAreaPriceCeilingFactory,
 )
 from users.models import User
@@ -33,7 +35,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
         surface_area=50,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales__purchase_price=80000,
         sales__apartment_share_of_housing_company_loans=15000,
     )
@@ -110,13 +112,116 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         95 000,00
         Rakennuttajalta tilatut lisä- ja muutostyöt
         5 000,00
-        Rakennusaikainen korko, euroa
-        1 000,00
         Hitas-huoneiston hinta rakennuskustannusindeksillä
         laskettuna, euroa
         150 000,00
         This is additional information
         Hitas-huoneistonne velaton enimmäishinta on 150 000 euroa rakennuskustannusindeksillä laskettuna.
+        {body.texts[0]}
+        {body.texts[1]}
+        {body.texts[2]}
+        {api_user.first_name} {api_user.last_name}
+        {api_user.title}
+        """
+    )
+
+
+@pytest.mark.django_db
+def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2022-01-01")
+    api_user: User = api_client.handler._force_user
+
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2010, 1, 1),
+        additional_work_during_construction=5000,
+        interest_during_construction_6=1000,
+        interest_during_construction_14=2000,
+        surface_area=50,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        sales__purchase_price=80000,
+        sales__apartment_share_of_housing_company_loans=15000,
+    )
+
+    ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
+
+    body = PDFBodyFactory.create(
+        name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
+        texts=["||foo||", "||bar||", "||baz||"],
+    )
+
+    this_month = datetime.date.today().replace(day=1)
+    completion_month = apartment.completion_date.replace(day=1)
+
+    # Completion month indices
+    ConstructionPriceIndexFactory.create(month=completion_month, value=100)
+    MarketPriceIndexFactory.create(month=completion_month, value=200)
+    # Current month indices
+    ConstructionPriceIndexFactory.create(month=this_month, value=150)
+    MarketPriceIndexFactory.create(month=this_month, value=250)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=3000)
+
+    url = reverse(
+        "hitas:apartment-download-latest-unconfirmed-prices",
+        kwargs={"housing_company_uuid": apartment.housing_company.uuid.hex, "uuid": apartment.uuid.hex},
+    )
+
+    data = {
+        "request_date": "2022-01-01",
+        "additional_info": "This is additional information",
+    }
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response["content-type"] == "application/pdf"
+
+    letter = PdfReader(BytesIO(response.content))
+    assert len(letter.pages) == 1
+
+    page_1 = letter.pages[0].extract_text()
+    page_1 = cleandoc("\n".join(item.strip() for item in page_1.split("\n")))
+
+    assert page_1 == cleandoc(
+        f"""
+        01.01.2022
+        Postiosoite
+        Käyntiosoite
+        Puh. (09) 310 13033
+        Asuntopalvelut
+        Työpajankatu 8
+        Email hitas@hel.fi
+        PL 58231
+        00580 Helsinki
+        Url http://www.hel.fi/hitas
+        00099 HELSINGIN KAUPUNKI
+        {apartment.address}
+        {apartment.postal_code.value} HELSINKI
+        HITAS-HUONEISTON ENIMMÄISHINTA
+        \x7f ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta
+        Omistaja ja omistusosuus (%)
+        {ownership.owner.name}
+        {float(ownership.percentage):.2f}
+
+        Asunto-osakeyhtiö
+        {apartment.housing_company.display_name}, Helsinki
+        Huoneiston osoite
+        {apartment.address}, {apartment.postal_code.value} HELSINKI
+        Huoneiston valmistumisajankohta
+        {apartment.completion_date.strftime("%d.%m.%Y")}
+        Huoneiston ensimmäinen kaupantekoajankohta
+        {apartment.first_sale().purchase_date.strftime("%d.%m.%Y")}
+        Alkuperäinen velaton hankintahinta, euroa
+        95 000,00
+        Rakennuttajalta tilatut lisä- ja muutostyöt
+        5 000,00
+        Rakennusaikainen korko, euroa
+        1 000,00
+        Hitas-huoneiston hinta rakennuskustannusindeksillä
+        laskettuna, euroa
+        148 863,90
+        This is additional information
+        Hitas-huoneistonne velaton enimmäishinta on 150 000 euroa. Velaton enimmäishinta on laskettu
+        voimassaolevan rajahinnan perusteella (50.00 m² * 3000.00 euroa).
         {body.texts[0]}
         {body.texts[1]}
         {body.texts[2]}
@@ -185,7 +290,7 @@ def test__api__unconfirmed_max_price_pdf__indices_missing(
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
         surface_area=50,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales__purchase_price=80000,
         sales__apartment_share_of_housing_company_loans=15000,
     )
@@ -244,7 +349,7 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
         surface_area=50,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales__purchase_price=80000,
         sales__apartment_share_of_housing_company_loans=15000,
     )
@@ -327,8 +432,6 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         95 000,00
         Rakennuttajalta tilatut lisä- ja muutostyöt
         5 000,00
-        Rakennusaikainen korko, euroa
-        1 000,00
         Hitas-huoneiston hinta rakennuskustannusindeksillä
         laskettuna, euroa
         150 000,00
@@ -444,7 +547,7 @@ def test__api__unconfirmed_max_price_pdf__missing_template(api_client: HitasAPIC
         interest_during_construction_6=1000,
         interest_during_construction_14=2000,
         surface_area=50,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales__purchase_price=80000,
         sales__apartment_share_of_housing_company_loans=15000,
     )
