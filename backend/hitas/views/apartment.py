@@ -379,7 +379,7 @@ class PricesSerializer(serializers.Serializer):
     catalog_share_of_housing_company_loans = serializers.SerializerMethodField()
     catalog_acquisition_price = serializers.SerializerMethodField()
     first_purchase_date = serializers.SerializerMethodField()
-    latest_sale_id = serializers.SerializerMethodField()
+    current_sale_id = serializers.SerializerMethodField()
     latest_sale_purchase_price = serializers.SerializerMethodField()
     latest_purchase_date = serializers.SerializerMethodField()
     construction = ConstructionPrices(source="*", required=False, allow_null=True)
@@ -414,7 +414,7 @@ class PricesSerializer(serializers.Serializer):
         return instance.first_purchase_date
 
     @staticmethod
-    def get_latest_sale_id(instance: ApartmentWithAnnotations) -> Optional[str]:
+    def get_current_sale_id(instance: ApartmentWithAnnotations) -> Optional[str]:
         # This id is from the latest sale, ALSO counting the first sale.
         return instance.sales.first().uuid.hex if instance.sales.exists() else None
 
