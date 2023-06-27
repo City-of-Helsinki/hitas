@@ -7,6 +7,7 @@ from django.db.models import Prefetch
 from enumfields.drf import EnumField, EnumSupportSerializerMixin
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
+from safedelete import HARD_DELETE
 
 from hitas.exceptions import ModelConflict
 from hitas.models.apartment import Apartment
@@ -141,7 +142,7 @@ class ConditionOfSaleViewSet(HitasModelViewSet):
         if instance.new_ownership.owner == instance.old_ownership.owner:
             raise ModelConflict("Cannot delete condition of sale between the same owner.", error_code="invalid")
 
-        super().perform_destroy(instance)
+        instance.delete(force_policy=HARD_DELETE)
 
     def get_queryset(self):
         return condition_of_sale_queryset()
