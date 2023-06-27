@@ -538,6 +538,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
 
     sale_1: ApartmentSale = ApartmentSaleFactory.create(
         apartment=ap1,
+        purchase_date=datetime.date(2020, 1, 1),
         purchase_price=80000.1,
         apartment_share_of_housing_company_loans=15000.3,
         ownerships=[],
@@ -597,6 +598,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "catalog_share_of_housing_company_loans": float(ap1.catalog_primary_loan_amount),
             "catalog_acquisition_price": float(ap1.catalog_acquisition_price),
             "first_purchase_date": str(ap1.first_purchase_date),
+            "latest_sale_id": sale_1.uuid.hex,
             "latest_sale_purchase_price": ap1.latest_sale_purchase_price,
             "latest_purchase_date": ap1.latest_purchase_date,
             "construction": {
@@ -1361,6 +1363,7 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                 "catalog_share_of_housing_company_loans": None,
                 "catalog_acquisition_price": None,
                 "first_purchase_date": None,
+                "latest_sale_id": None,
                 "latest_sale_purchase_price": None,
                 "latest_purchase_date": None,
                 "construction": {

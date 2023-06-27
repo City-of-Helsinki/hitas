@@ -6890,20 +6890,25 @@ components:
           minimum: 0
           nullable: true
           example: 55430
+        latest_sale_id:
+          description: ID of the latest sale, ALSO counting first sale (used for cancelling sales)
+          type: string
+          nullable: true
+          example: a3181b8fa60b47df8ccba0d554a913bb
         latest_sale_purchase_price:
-          description: TBD
+          description: Purchase price from the latest sale, NOT counting first sale
           type: number
           minimum: 0
           nullable: true
           example: 51222
         first_purchase_date:
-          description: TBD
+          description: Date of the first purchase for this apartment
           type: string
           format: date
           nullable: true
           example: 1985-12-10
         latest_purchase_date:
-          description: TBD
+          description: Date of the latest purchase for this apartment, NOT counting first sale
           type: string
           format: date
           nullable: true
