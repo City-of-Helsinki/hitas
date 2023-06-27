@@ -39,12 +39,12 @@ class RoundWithPrecision(Round):
         return source.output_field
 
 
-def subquery_count(model: type[Model], outer_field: str, **kwargs) -> Subquery:
+def subquery_count(model: type[Model], *outer_fields: str, **kwargs) -> Subquery:
     """Annotates the number of rows on the model (with references to outer_field) to the queryset."""
     return Subquery(
         queryset=(
-            model.objects.filter(**{outer_field: OuterRef(outer_field)}, **kwargs)
-            .values(outer_field)  # fixes grouping
+            model.objects.filter(**{outer_field: OuterRef(outer_field) for outer_field in outer_fields}, **kwargs)
+            .values(*outer_fields)  # fixes grouping
             .annotate(__count=Count("*"))
             .values("__count")
         ),

@@ -14,13 +14,21 @@ from hitas.models import (
     Apartment,
     ApartmentSale,
     HousingCompany,
+    Owner,
+    Ownership,
     ThirtyYearRegulationResults,
     ThirtyYearRegulationResultsRow,
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, HousingCompanyFactory
+from hitas.tests.factories import (
+    ApartmentFactory,
+    ApartmentSaleFactory,
+    HousingCompanyFactory,
+    OwnerFactory,
+    OwnershipFactory,
+)
 
 # Sales report
 
@@ -1336,4 +1344,87 @@ def test__api__sales_by_area_report__multiple__different_postal_code(api_client:
         (1, "00002", "1h", 1, 312.5, 312.5, 312.5),
         (None, None, None, None, None, None, None),
         (None, None, "Koko Helsingin alue", 2, 456.25, 312.5, 600),
+    ]
+
+
+# Multiple ownerships report
+
+
+@pytest.mark.django_db
+def test__api__multiple_ownerships_report__no_owners(api_client: HitasAPIClient):
+    url = reverse("hitas:multiple-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClient):
+    owner: Owner = OwnerFactory.create()
+    ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+    )
+    ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+    )
+
+    url = reverse("hitas:multiple-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
+        (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
+        (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
+    ]
+
+
+@pytest.mark.django_db
+def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIClient):
+    owner_1: Owner = OwnerFactory.create(name="Owner 1")
+    ownership_1: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+    )
+    ownership_2: Ownership = OwnershipFactory.create(
+        owner=owner_1,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+    )
+
+    owner_2: Owner = OwnerFactory.create(name="Owner 2")
+    ownership_3: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
+    )
+    ownership_4: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
+    )
+    ownership_5: Ownership = OwnershipFactory.create(
+        owner=owner_2,
+        sale__apartment__building__real_estate__housing_company__postal_code__value="00003",
+    )
+
+    url = reverse("hitas:multiple-ownerships-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
+        (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
+        (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
+        (ownership_3.owner.name, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
+        (ownership_4.owner.name, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
+        (ownership_5.owner.name, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
     ]

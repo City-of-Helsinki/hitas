@@ -73,6 +73,14 @@ class Ownership(HitasSafeDeleteModel):
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
 
 
+# This is for typing only
+class OwnershipWithApartmentCount(Ownership):
+    apartment_count: int
+
+    class Meta:
+        abstract = True
+
+
 class OwnershipLike(TypedDict):
     percentage: Decimal
     owner: "Owner"

@@ -13,8 +13,10 @@ from hitas.services.housing_company import (
     find_regulated_housing_companies_for_reporting,
     find_unregulated_housing_companies_for_reporting,
 )
+from hitas.services.owner import find_owners_with_multiple_ownerships
 from hitas.services.reports import (
     build_housing_company_state_report_excel,
+    build_multiple_ownerships_report_excel,
     build_regulated_housing_companies_report_excel,
     build_sales_by_postal_code_and_area_report_excel,
     build_sales_report_excel,
@@ -111,4 +113,14 @@ class SalesByPostalCodeAndAreaReportView(ViewSet):
         sales = find_sales_on_interval_for_reporting(start, end)
         workbook = build_sales_by_postal_code_and_area_report_excel(sales)
         filename = f"Yhtiöt postinumero ja kalleusalueittain aikavälillä {start.isoformat()} - {end.isoformat()}.xlsx"
+        return get_excel_response(filename=filename, excel=workbook)
+
+
+class MultipleOwnershipsReportView(ViewSet):
+    renderer_classes = [HitasJSONRenderer, ExcelRenderer]
+
+    def list(self, request: Request, *args, **kwargs) -> HttpResponse:
+        ownerships = find_owners_with_multiple_ownerships()
+        workbook = build_multiple_ownerships_report_excel(ownerships)
+        filename = "Useamman sääntelyn piirissä olevan asunnon omistavat omistajat.xlsx"
         return get_excel_response(filename=filename, excel=workbook)

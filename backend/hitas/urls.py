@@ -113,6 +113,13 @@ router.register(
     basename="sales-by-postal-code-and-area-report",
 )
 
+# /api/v1/reports/download-multiple-ownerships-report
+router.register(
+    r"reports/download-multiple-ownerships-report",
+    views.MultipleOwnershipsReportView,
+    basename="multiple-ownerships-report",
+)
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")
