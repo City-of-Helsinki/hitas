@@ -1392,7 +1392,6 @@ def test__api__condition_of_sale__update__invalid(api_client: HitasAPIClient, in
 @pytest.mark.django_db
 def test__api__condition_of_sale__delete__different_owners(api_client: HitasAPIClient, freezer, settings):
     freezer.move_to("2023-01-01 00:00:00+00:00")
-    old_time = timezone.now()
 
     owner_1: Owner = OwnerFactory.create()
     owner_2: Owner = OwnerFactory.create()
@@ -1412,15 +1411,7 @@ def test__api__condition_of_sale__delete__different_owners(api_client: HitasAPIC
     # Deletion is allowed since the old and new owners are not the same (created through a household)
     assert response_1.status_code == status.HTTP_204_NO_CONTENT, response_1.json()
 
-    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS)
-
-    # You can still find it 3 months after
-    response_2 = api_client.get(url)
-    assert response_2.status_code == status.HTTP_200_OK, response_2.json()
-
-    freezer.move_to(old_time + settings.SHOW_FULFILLED_CONDITIONS_OF_SALE_FOR_MONTHS + relativedelta(seconds=1))
-
-    # Can't find it over 3 months after
+    # The condition of sale is hard deleted
     response_2 = api_client.get(url)
     assert response_2.status_code == status.HTTP_404_NOT_FOUND, response_2.json()
 
