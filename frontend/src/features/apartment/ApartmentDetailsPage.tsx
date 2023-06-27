@@ -455,6 +455,7 @@ const LoadedApartmentDetails = ({
     const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
     const [isRemoveSaleModalVisible, setIsRemoveSaleModalVisible] = useState(false);
+
     const [owner, setOwner] = useState<IOwner | undefined>(undefined);
     const modifyOwnerHandler = (selectedOwner: IOwner) => {
         setIsModifyOwnerModalVisible(true);
@@ -465,8 +466,9 @@ const LoadedApartmentDetails = ({
         removeSale({
             housingCompanyId: housingCompany.id,
             apartmentId: apartment.id,
-            saleId: apartment.prices.latest_sale_id,
+            saleId: apartment.prices.latest_sale_id as string,
         })
+            .unwrap()
             .then(() => {
                 hdsToast.success("Viimeisin kauppa peruttu onnistuneesti");
             })
@@ -590,39 +592,10 @@ const LoadedApartmentDetails = ({
                                                 onClick={() => setIsRemoveSaleModalVisible(true)}
                                                 isLoading={isLoading}
                                                 buttonText="Peru kauppa"
+                                                variant="secondary"
+                                                className="delete-sale-button"
+                                                disabled={!apartment.prices.latest_sale_id}
                                             />
-                                            <Dialog
-                                                id="remove-sale-modal"
-                                                aria-labelledby="remove-sale-modal"
-                                                isOpen={isRemoveSaleModalVisible}
-                                            >
-                                                <Dialog.Header
-                                                    title="Viimeisimmän kaupan peruminen"
-                                                    id="remove-sale-modal-header"
-                                                />
-                                                <Dialog.Content>
-                                                    <p>
-                                                        Haluatko varmasti perua viimeisimmän kaupan?
-                                                        <br />(
-                                                        {formatDate(apartment.prices.latest_purchase_date) + ", "}
-                                                        {formatMoney(apartment.prices.latest_sale_purchase_price)})
-                                                    </p>
-                                                </Dialog.Content>
-                                                <Dialog.ActionButtons>
-                                                    <Button
-                                                        theme="black"
-                                                        variant="secondary"
-                                                        onClick={() => setIsRemoveSaleModalVisible(false)}
-                                                    >
-                                                        Peruuta
-                                                    </Button>
-                                                    <RemoveButton
-                                                        onClick={handleRemoveSaleButtonClick}
-                                                        isLoading={isLoading}
-                                                        buttonText="Peru kauppa"
-                                                    />
-                                                </Dialog.ActionButtons>
-                                            </Dialog>
                                         </div>
                                         <Divider size="s" />
 
@@ -743,6 +716,40 @@ const LoadedApartmentDetails = ({
                     editPath={`/housing-companies/${housingCompany.id}/improvements`}
                 />
             </div>
+            <Dialog
+                id="remove-sale-modal"
+                aria-labelledby="remove-sale-modal"
+                isOpen={isRemoveSaleModalVisible}
+            >
+                <Dialog.Header
+                    title="Viimeisimmän kaupan peruminen"
+                    id="remove-sale-modal-header"
+                />
+                <Dialog.Content>
+                    <p>
+                        Haluatko varmasti perua viimeisimmän kaupan?
+                        <br />({formatDate(apartment.prices.latest_purchase_date) + ", "}
+                        {formatMoney(
+                            apartment.prices.latest_sale_purchase_price ?? apartment.prices.first_sale_purchase_price
+                        )}
+                        )
+                    </p>
+                </Dialog.Content>
+                <Dialog.ActionButtons>
+                    <Button
+                        theme="black"
+                        variant="secondary"
+                        onClick={() => setIsRemoveSaleModalVisible(false)}
+                    >
+                        Peruuta
+                    </Button>
+                    <RemoveButton
+                        onClick={handleRemoveSaleButtonClick}
+                        isLoading={isLoading}
+                        buttonText="Vahvista kaupan peruminen"
+                    />
+                </Dialog.ActionButtons>
+            </Dialog>
         </>
     );
 };

@@ -218,6 +218,15 @@
 
     .row
       @include justify-content(space-between)
+      .delete-sale-button
+        opacity: 0.6
+        &:not(:disabled):hover
+          opacity: 1
+
+  .delete-sale-button
+    border-color: $color-black-70
+    &:hover
+      border-color: $color-black
 
   [class^="Tabs-module_tablistBar"]
     background: white
