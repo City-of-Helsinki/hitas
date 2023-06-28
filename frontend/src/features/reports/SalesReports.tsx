@@ -1,5 +1,5 @@
-import {Button} from "hds-react";
 import {useForm} from "react-hook-form";
+import DownloadButton from "../../common/components/DownloadButton";
 import {DateInput} from "../../common/components/form";
 import {today} from "../../common/utils";
 
@@ -32,13 +32,11 @@ const SalesReports = () => {
                 tooltipText="Viimeinen päivä, jolta raportti lasketaan."
                 required
             />
-            <Button
-                theme="black"
+            <DownloadButton
+                buttonText="Lataa raportti"
                 type="submit"
                 disabled={!watch("startDate") || !watch("endDate")}
-            >
-                Lataa raportti
-            </Button>
+            />
         </form>
     );
 };
