@@ -21,9 +21,9 @@ export default function OwnerMutateForm({
 }: IOwnerMutateForm) {
     const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
-    const runSaveOwner = (data) => {
+    const runSaveOwner = (data: IOwner) => {
         // submit the form values
-        saveOwner({data: data})
+        saveOwner({data})
             .unwrap()
             .then(() => {
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");

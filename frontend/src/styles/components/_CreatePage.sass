@@ -200,7 +200,7 @@
   .conditions-of-sale-headers
     position: relative
     display: grid
-    grid-template-columns: auto 500px 150px 100px
+    grid-template-columns: auto 500px 150px 150px 100px
     gap: $spacing-layout-2-xs
     grid-row: 1
     height: $spacing-layout-s
@@ -220,12 +220,23 @@
     &-item
       background: white
       display: grid
-      grid-template-columns: auto 500px 150px 100px
+      grid-template-columns: auto 500px 150px 150px 100px
       gap: 1em
       height: $spacing-layout-m
       @include align-items(center)
       .grace-period
         padding-left: 18px
+        .text-button
+          margin-left: $spacing-m
+          &:hover
+            cursor: pointer
+          .icon
+            width: $spacing-m
+            height: $spacing-m
+            &:hover
+              width: $spacing-l
+              height: $spacing-l
+
       .fulfillment-date
         align-items: center
         margin: 0 auto

@@ -397,7 +397,7 @@ const ApartmentConditionOfSaleSchema = object({
 });
 
 const ConditionOfSaleSchema = object({
-    id: string(),
+    id: string().optional(),
     new_ownership: ownershipSchema.and(
         object({
             apartment: object({
@@ -417,7 +417,7 @@ const ConditionOfSaleSchema = object({
         })
     ),
     grace_period: z.enum(["not_given", "three_months", "six_months"]),
-    fulfilled: string().nullable(),
+    fulfilled: string().nullable().optional(),
 });
 const ApartmentUnconfirmedMaximumPriceSchema = object({maximum: boolean(), value: number()});
 
