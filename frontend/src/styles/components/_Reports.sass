@@ -4,16 +4,21 @@
   @include flexbox()
   @include flex-flow(column nowrap)
   @include flex-grow(1)
-  [class^="Tabs-module"]
-    [id*="-panel"]
-      background: $codes-background-color
-      padding: 1px $spacing-m
-    [class*="tablistBar"]
-      background-color: white
-      padding: 0
-    [class*="active"]
-      background-color: $codes-background-color
-      span
-        font-weight: 700
-        &:before
-          display: none
+  .reports-card
+    background: $color-black-10
+    padding: $spacing-m
+  [id^="accordion"]
+    &:last-child
+      border-bottom: 0
+    [class*="accordionContent"]
+      background: white
+      padding: $spacing-s $spacing-m
+      margin-bottom: $spacing-s
+    [class*="headingContainer"][aria-expanded="true"]
+      font-weight: 700
+  form
+    @include flexbox()
+    @include flex-flow(row wrap)
+    @include justify-content(space-between)
+    @include align-items(center)
+    gap: 1rem
