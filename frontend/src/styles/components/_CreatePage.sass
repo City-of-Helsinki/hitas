@@ -218,13 +218,13 @@
     display: grid
     grid-template-rows: $spacing-layout-2-xs auto
     grid-template-columns: 100%
-    row-gap: 1em
+    row-gap: 0.3em
     &-item
       background: white
       display: grid
       grid-template-columns: auto 400px 120px 150px 100px 120px
       gap: 1em
-      min-height: $spacing-layout-m
+      height: $spacing-layout-l
       @include align-items(center)
       .grace-period
         padding-left: 18px
@@ -247,7 +247,14 @@
         @include flexbox()
         @include align-items(center)
       .icon-wrap
-        margin: 0 20px 0 -34px
+        margin: 0 20px 0 -40px
+        svg
+          background: $color-error
+          color: $color-white
+        &.fulfilled svg
+          background: $color-black-5
+          color: $color-black-50
+          //opacity: 0.5
       button
         margin: $spacing-xs
         margin-left: 0
@@ -255,6 +262,7 @@
           height: 22px
     svg
       height: 32px
+      width: auto
       vertical-align: text-bottom
     .unresolved
       color: $color-black-60
