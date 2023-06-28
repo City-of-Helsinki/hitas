@@ -397,6 +397,14 @@ class ApartmentMarketPriceImprovement(HitasMarketPriceImprovement):
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="market_price_improvements")
 
 
+# This is for typing only
+class ApartmentMarketPriceImprovementWithIndex(ApartmentMarketPriceImprovement):
+    completion_date_index: Decimal
+
+    class Meta:
+        abstract = True
+
+
 class DepreciationPercentage(Enum):
     ZERO = Decimal(0)
     TWO_AND_HALF = Decimal("2.5")
@@ -412,6 +420,14 @@ class ApartmentConstructionPriceImprovement(HitasImprovement):
     apartment = models.ForeignKey("Apartment", on_delete=models.CASCADE, related_name="construction_price_improvements")
 
     depreciation_percentage = EnumField(DepreciationPercentage, default=DepreciationPercentage.TEN)
+
+
+# This is for typing only
+class ApartmentConstructionPriceImprovementWithIndex(ApartmentConstructionPriceImprovement):
+    completion_date_index: Decimal
+
+    class Meta:
+        abstract = True
 
 
 class ApartmentMaximumPriceCalculation(HitasModel):

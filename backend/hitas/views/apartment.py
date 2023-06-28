@@ -19,6 +19,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.fields import empty
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 
 from hitas.calculations.exceptions import IndexMissingException
 from hitas.calculations.max_prices.max_price import get_housing_company_completion_date
@@ -679,6 +680,15 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
 
+        if (mpi or cpi) and not validated_data["building"].real_estate.housing_company.hitas_type.old_hitas_ruleset:
+            raise serializers.ValidationError(
+                {
+                    api_settings.NON_FIELD_ERRORS_KEY: (
+                        "Cannot create apartment improvements for a housing company using new hitas rules."
+                    )
+                }
+            )
+
         instance: Apartment = super().create(validated_data)
 
         for improvement in mpi:
@@ -691,6 +701,15 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
     def update(self, instance: ApartmentWithAnnotations, validated_data: dict[str, Any]) -> Apartment:
         mpi = validated_data.pop("market_price_improvements")
         cpi = validated_data.pop("construction_price_improvements")
+
+        if (mpi or cpi) and not instance.building.real_estate.housing_company.hitas_type.old_hitas_ruleset:
+            raise serializers.ValidationError(
+                {
+                    api_settings.NON_FIELD_ERRORS_KEY: (
+                        "Cannot create apartment improvements for a housing company using new hitas rules."
+                    )
+                }
+            )
 
         instance: Apartment = super().update(instance, validated_data)
 

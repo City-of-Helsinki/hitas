@@ -306,12 +306,30 @@ class HousingCompanyMarketPriceImprovement(HitasMarketPriceImprovement):
     )
 
 
+# This is for typing only
+class HousingCompanyMarketPriceImprovementWithIndex(HousingCompanyMarketPriceImprovement):
+    completion_date_index: Decimal
+    completion_date_index_2005eq100: Decimal
+
+    class Meta:
+        abstract = True
+
+
 class HousingCompanyConstructionPriceImprovement(HitasImprovement):
     housing_company = models.ForeignKey(
         "HousingCompany",
         on_delete=models.CASCADE,
         related_name="construction_price_improvements",
     )
+
+
+# This is for typing only
+class HousingCompanyConstructionPriceImprovementWithIndex(HousingCompanyConstructionPriceImprovement):
+    completion_date_index: Decimal
+    completion_date_index_2005eq100: Decimal
+
+    class Meta:
+        abstract = True
 
 
 auditlog.register(HousingCompany)

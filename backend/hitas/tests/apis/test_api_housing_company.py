@@ -529,7 +529,7 @@ def get_housing_company_create_data() -> dict[str, Any]:
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
         "regulation_status": RegulationStatus.REGULATED.value,
-        "hitas_type": "hitas_1",
+        "hitas_type": HitasType.HITAS_I.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
             "construction_price_index": [
@@ -788,12 +788,35 @@ def test__api__housing_company__create__invalid_data(api_client: HitasAPIClient,
     }
 
 
+@pytest.mark.django_db
+def test__api__housing_company__create__new_hitas_construction_price_improvement(api_client: HitasAPIClient):
+    data = get_housing_company_create_data()
+    data["hitas_type"] = HitasType.NEW_HITAS_I.value
+
+    url = reverse("hitas:housing-company-list")
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "construction_price_improvements",
+                "message": "Cannot create construction price improvements for a housing company using new hitas rules.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 # Update tests
 
 
 @pytest.mark.django_db
 def test__api__housing_company__update(api_client: HitasAPIClient):
-    hc: HousingCompany = HousingCompanyFactory.create()
+    hc: HousingCompany = HousingCompanyFactory.create(hitas_type=HitasType.HITAS_I)
     ApartmentFactory.create(building__real_estate__housing_company=hc)
     postal_code: HitasPostalCode = HitasPostalCodeFactory.create(value="99999")
     property_manager: PropertyManager = PropertyManagerFactory.create()
@@ -814,7 +837,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
         "notes": "",
         "primary_loan": 10.00,
         "property_manager": {"id": property_manager.uuid.hex},
-        "hitas_type": HitasType.HITAS_I.value,
+        "hitas_type": hc.hitas_type.value,
         "sales_price_catalogue_confirmation_date": "2022-01-01",
         "improvements": {
             "construction_price_index": [
@@ -846,7 +869,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
 
 @pytest.mark.django_db
 def test__api__housing_company__update__improvements(api_client: HitasAPIClient):
-    hc: HousingCompany = HousingCompanyFactory.create()
+    hc: HousingCompany = HousingCompanyFactory.create(hitas_type=HitasType.HITAS_I)
     mpi1: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=hc, completion_date=date(2010, 1, 1)
     )
@@ -887,7 +910,7 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
         "notes": hc.notes,
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
-        "hitas_type": HitasType.HITAS_I.value,
+        "hitas_type": hc.hitas_type.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
             "construction_price_index": list(
@@ -906,7 +929,7 @@ def test__api__housing_company__update__improvements(api_client: HitasAPIClient)
 
 @pytest.mark.django_db
 def test__api__housing_company__update__add_improvement(api_client: HitasAPIClient):
-    hc: HousingCompany = HousingCompanyFactory.create()
+    hc: HousingCompany = HousingCompanyFactory.create(hitas_type=HitasType.HITAS_I)
     mpi1: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=hc, completion_date=date(2010, 1, 1)
     )
@@ -940,7 +963,7 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
         "notes": hc.notes,
         "primary_loan": hc.primary_loan,
         "property_manager": {"id": hc.property_manager.uuid.hex},
-        "hitas_type": HitasType.HITAS_I.value,
+        "hitas_type": hc.hitas_type.value,
         "sales_price_catalogue_confirmation_date": hc.sales_price_catalogue_confirmation_date,
         "improvements": {
             "construction_price_index": list(map(improvement_to_dict, [cpi1, cpi2])),
@@ -953,6 +976,60 @@ def test__api__housing_company__update__add_improvement(api_client: HitasAPIClie
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert get_response.json() == get_response.json()
+
+
+@pytest.mark.django_db
+def test__api__housing_company__update__new_hitas_construction_price_improvement(api_client: HitasAPIClient):
+    housing_company: HousingCompany = HousingCompanyFactory.create(hitas_type=HitasType.NEW_HITAS_I)
+    improvement: HousingCompanyConstructionPriceImprovement
+    improvement = HousingCompanyConstructionPriceImprovementFactory.create(housing_company=housing_company)
+
+    data = {
+        "acquisition_price": housing_company.acquisition_price,
+        "address": {
+            "street_address": housing_company.street_address,
+            "postal_code": housing_company.postal_code.value,
+        },
+        "building_type": {"id": housing_company.building_type.uuid.hex},
+        "business_id": housing_company.business_id,
+        "developer": {"id": housing_company.developer.uuid.hex},
+        "name": {
+            "display": housing_company.display_name,
+            "official": housing_company.official_name,
+        },
+        "notes": housing_company.notes,
+        "primary_loan": housing_company.primary_loan,
+        "property_manager": {"id": housing_company.property_manager.uuid.hex},
+        "hitas_type": housing_company.hitas_type.value,
+        "sales_price_catalogue_confirmation_date": housing_company.sales_price_catalogue_confirmation_date,
+        "improvements": {
+            "construction_price_index": [
+                {
+                    "value": improvement.value,
+                    "completion_date": improvement.completion_date.strftime("%Y-%m"),
+                    "name": improvement.name,
+                }
+            ],
+            "market_price_index": [],
+        },
+    }
+
+    url = reverse("hitas:housing-company-detail", kwargs={"uuid": housing_company.uuid.hex})
+    response = api_client.put(url, data=data, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "construction_price_improvements",
+                "message": "Cannot create construction price improvements for a housing company using new hitas rules.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 @pytest.mark.django_db

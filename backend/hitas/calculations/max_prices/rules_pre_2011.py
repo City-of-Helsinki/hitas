@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import List
+from typing import Iterable
 
 from dateutil.relativedelta import relativedelta
 
@@ -18,7 +18,15 @@ from hitas.calculations.improvements.rules_pre_2011_mpi import (
 )
 from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
-from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
+from hitas.models.apartment import (
+    ApartmentConstructionPriceImprovementWithIndex,
+    ApartmentMarketPriceImprovementWithIndex,
+    ApartmentWithAnnotationsMaxPrice,
+)
+from hitas.models.housing_company import (
+    HousingCompanyConstructionPriceImprovementWithIndex,
+    HousingCompanyMarketPriceImprovementWithIndex,
+)
 
 
 class RulesPre2011(CalculatorRules):
@@ -40,8 +48,8 @@ class RulesPre2011(CalculatorRules):
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentConstructionPriceImprovementWithIndex],
+        housing_company_improvements: Iterable[HousingCompanyConstructionPriceImprovementWithIndex],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
@@ -170,8 +178,8 @@ class RulesPre2011(CalculatorRules):
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentMarketPriceImprovementWithIndex],
+        housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovementWithIndex],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:

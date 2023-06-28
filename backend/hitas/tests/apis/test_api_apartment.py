@@ -1282,7 +1282,7 @@ def get_minimal_apartment_data(data):
 @pytest.mark.parametrize("data_extent", ["full", "nulled", "missing"])
 @pytest.mark.django_db
 def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
-    b = BuildingFactory.create()
+    b = BuildingFactory.create(real_estate__housing_company__hitas_type=HitasType.HITAS_I)
 
     data = get_apartment_create_data(b)
     if data_extent == "nulled":
@@ -1313,93 +1313,33 @@ def test__api__apartment__create(api_client: HitasAPIClient, data_extent: str):
     assert response.json() == get_response.json()
 
 
-@pytest.mark.parametrize("minimal_data", [True, False])
 @pytest.mark.django_db
-def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool):
+def test__api__apartment__create__new_hitas_no_apartment_improvements(api_client: HitasAPIClient):
     b = BuildingFactory.create(real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I)
 
     data = get_apartment_create_data(b)
-    post_response = api_client.post(
-        reverse(
-            "hitas:apartment-list",
-            args=[b.real_estate.housing_company.uuid.hex],
-        ),
-        data=data,
-        format="json",
-    )
-    assert post_response.status_code == status.HTTP_201_CREATED, post_response.json()
 
-    if minimal_data:
-        data.update(get_minimal_apartment_data(data))
-    response = api_client.put(
-        reverse(
-            "hitas:apartment-detail",
-            args=[b.real_estate.housing_company.uuid.hex, Apartment.objects.first().uuid.hex],
-        ),
-        data=data,
-        format="json",
+    url = reverse(
+        "hitas:apartment-list",
+        kwargs={
+            "housing_company_uuid": b.real_estate.housing_company.uuid.hex,
+        },
     )
-    res = response.json()
 
-    if not minimal_data:
-        assert post_response.json() == res
-    else:
-        ap = Apartment.objects.first()
-        del res["links"]
-        assert res == {
-            "address": {
-                "apartment_number": ap.apartment_number,
-                "city": "Helsinki",
-                "floor": None,
-                "postal_code": ap.postal_code.value,
-                "stair": ap.stair,
-                "street_address": ap.street_address,
-            },
-            "completion_date": None,
-            "id": ap.uuid.hex,
-            "improvements": {
-                "construction_price_index": [],
-                "market_price_index": [],
-            },
-            "notes": None,
-            "ownerships": [],
-            "prices": {
-                "first_sale_purchase_price": None,
-                "first_sale_share_of_housing_company_loans": None,
-                "first_sale_acquisition_price": None,
-                "catalog_purchase_price": None,
-                "catalog_share_of_housing_company_loans": None,
-                "catalog_acquisition_price": None,
-                "first_purchase_date": None,
-                "current_sale_id": None,
-                "latest_sale_purchase_price": None,
-                "latest_purchase_date": None,
-                "construction": {
-                    "additional_work": None,
-                    "debt_free_purchase_price": None,
-                    "interest": None,
-                    "loans": None,
-                },
-                "maximum_prices": {
-                    "confirmed": None,
-                    "unconfirmed": {
-                        "onwards_2011": {
-                            "construction_price_index": {"maximum": False, "value": None},
-                            "market_price_index": {"maximum": False, "value": None},
-                            "surface_area_price_ceiling": {"maximum": False, "value": None},
-                        },
-                        "pre_2011": None,
-                    },
-                },
-            },
-            "rooms": None,
-            "shares": None,
-            "is_sold": False,
-            "surface_area": None,
-            "type": None,
-            "conditions_of_sale": [],
-            "sell_by_date": None,
-        }
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "non_field_errors",
+                "message": "Cannot create apartment improvements for a housing company using new hitas rules.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
 
 
 @pytest.mark.parametrize(
@@ -1863,77 +1803,73 @@ def test__api__apartment__create__incorrect_building_id(api_client: HitasAPIClie
     }
 
 
+class OverlappingSharesInput(NamedTuple):
+    start_1: int
+    end_1: int
+    start_2: int
+    end_2: int
+    fields: list[dict[str, str]]
+
+
 @pytest.mark.parametrize(
-    [
-        "start_1",
-        "end_1",
-        "start_2",
-        "end_2",
-        "fields",
-    ],
-    [
-        [
-            1,  # start_1
-            20,  # end_1
-            100,  # start_2
-            120,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            21,  # end_1
-            99,  # start_2
-            120,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
-                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            30,  # start_1
-            40,  # end_1
-            80,  # start_2
-            90,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
-                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            2,  # end_1
-            10,  # start_2
-            110,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            2,  # end_1
-            20,  # start_2
-            100,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
-            ],
-        ],
-    ],
-    ids=[
-        "Single overlapping, start and end are inclusive in both ends",
-        "Multiple overlapping, partially outside range from both ends",
-        "Multiple overlapping, inside new range from both ends",
-        "Multiple overlapping, over new range from both ends",
-        "Multiple overlapping, same range",
-    ],
+    **parametrize_helper(
+        {
+            "Single overlapping, start and end are inclusive in both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=20,
+                start_2=100,
+                end_2=120,
+                fields=[
+                    {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, partially outside range from both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=21,
+                start_2=99,
+                end_2=120,
+                fields=[  # fields
+                    {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
+                    {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, inside new range from both ends": OverlappingSharesInput(
+                start_1=30,
+                end_1=40,
+                start_2=80,
+                end_2=90,
+                fields=[  # fields
+                    {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
+                    {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, over new range from both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=2,
+                start_2=10,
+                end_2=110,
+                fields=[  # fields
+                    {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, same range": OverlappingSharesInput(
+                start_1=1,
+                end_1=2,
+                start_2=20,
+                end_2=100,
+                fields=[  # fields
+                    {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
+                ],
+            ),
+        }
+    )
 )
 @pytest.mark.django_db
 def test__api__apartment__create__overlapping_shares(
@@ -1985,9 +1921,129 @@ def test__api__apartment__create__overlapping_shares(
 # Update tests
 
 
+@pytest.mark.parametrize("minimal_data", [True, False])
+@pytest.mark.django_db
+def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool):
+    b = BuildingFactory.create(real_estate__housing_company__hitas_type=HitasType.HITAS_I)
+
+    data = get_apartment_create_data(b)
+    post_response = api_client.post(
+        reverse(
+            "hitas:apartment-list",
+            args=[b.real_estate.housing_company.uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    assert post_response.status_code == status.HTTP_201_CREATED, post_response.json()
+
+    if minimal_data:
+        data.update(get_minimal_apartment_data(data))
+    response = api_client.put(
+        reverse(
+            "hitas:apartment-detail",
+            args=[b.real_estate.housing_company.uuid.hex, Apartment.objects.first().uuid.hex],
+        ),
+        data=data,
+        format="json",
+    )
+    res = response.json()
+
+    if not minimal_data:
+        assert post_response.json() == res
+    else:
+        ap = Apartment.objects.first()
+        del res["links"]
+        assert res == {
+            "address": {
+                "apartment_number": ap.apartment_number,
+                "city": "Helsinki",
+                "floor": None,
+                "postal_code": ap.postal_code.value,
+                "stair": ap.stair,
+                "street_address": ap.street_address,
+            },
+            "completion_date": None,
+            "id": ap.uuid.hex,
+            "improvements": {
+                "construction_price_index": [],
+                "market_price_index": [],
+            },
+            "notes": None,
+            "ownerships": [],
+            "prices": {
+                "first_sale_purchase_price": None,
+                "first_sale_share_of_housing_company_loans": None,
+                "first_sale_acquisition_price": None,
+                "catalog_purchase_price": None,
+                "catalog_share_of_housing_company_loans": None,
+                "catalog_acquisition_price": None,
+                "first_purchase_date": None,
+                "latest_sale_purchase_price": None,
+                "latest_purchase_date": None,
+                "construction": {
+                    "additional_work": None,
+                    "debt_free_purchase_price": None,
+                    "interest": None,
+                    "loans": None,
+                },
+                "maximum_prices": {
+                    "confirmed": None,
+                    "unconfirmed": {
+                        "onwards_2011": None,
+                        "pre_2011": {
+                            "construction_price_index": {"maximum": False, "value": None},
+                            "market_price_index": {"maximum": False, "value": None},
+                            "surface_area_price_ceiling": {"maximum": False, "value": None},
+                        },
+                    },
+                },
+            },
+            "rooms": None,
+            "shares": None,
+            "is_sold": False,
+            "surface_area": None,
+            "type": None,
+            "conditions_of_sale": [],
+            "sell_by_date": None,
+        }
+
+
+@pytest.mark.django_db
+def test__api__apartment__update__new_hitas_no_apartment_improvements(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+    )
+
+    data = get_apartment_create_data(apartment.building)
+
+    url = reverse(
+        "hitas:apartment-detail",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "uuid": apartment.uuid.hex,
+        },
+    )
+
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
+    assert response.json() == {
+        "error": "bad_request",
+        "fields": [
+            {
+                "field": "non_field_errors",
+                "message": "Cannot create apartment improvements for a housing company using new hitas rules.",
+            }
+        ],
+        "message": "Bad request",
+        "reason": "Bad Request",
+        "status": 400,
+    }
+
+
 @pytest.mark.django_db
 def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient):
-    ap: Apartment = ApartmentFactory.create()
+    ap: Apartment = ApartmentFactory.create(building__real_estate__housing_company__hitas_type=HitasType.HITAS_I)
     ApartmentConstructionPriceImprovementFactory.create(apartment=ap)
     ApartmentMarketPriceImprovementFactory.create(apartment=ap)
 
@@ -2063,76 +2119,64 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
 
 
 @pytest.mark.parametrize(
-    [
-        "start_1",
-        "end_1",
-        "start_2",
-        "end_2",
-        "fields",
-    ],
-    [
-        [
-            1,  # start_1
-            20,  # end_1
-            100,  # start_2
-            120,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            21,  # end_1
-            99,  # start_2
-            120,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
-                {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            30,  # start_1
-            40,  # end_1
-            80,  # start_2
-            90,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
-                {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
-                {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            2,  # end_1
-            10,  # start_2
-            110,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
-            ],
-        ],
-        [
-            1,  # start_1
-            2,  # end_1
-            20,  # start_2
-            100,  # end_2
-            [  # fields
-                {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
-                {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
-            ],
-        ],
-    ],
-    ids=[
-        "Single overlapping, start and end are inclusive in both ends",
-        "Multiple overlapping, partially outside range from both ends",
-        "Multiple overlapping, inside new range from both ends",
-        "Multiple overlapping, over new range from both ends",
-        "Multiple overlapping, same range",
-    ],
+    **parametrize_helper(
+        {
+            "Single overlapping, start and end are inclusive in both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=20,
+                start_2=100,
+                end_2=120,
+                fields=[
+                    {"field": "shares.start", "message": "Share 20 has already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Share 100 has already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, partially outside range from both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=21,
+                start_2=99,
+                end_2=120,
+                fields=[
+                    {"field": "shares.start", "message": "Shares 20-21 have already been taken by foo a 1."},
+                    {"field": "shares.start", "message": "Shares 99-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-21 have already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Shares 99-100 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, inside new range from both ends": OverlappingSharesInput(
+                start_1=30,
+                end_1=40,
+                start_2=80,
+                end_2=90,
+                fields=[
+                    {"field": "shares.start", "message": "Shares 30-40 have already been taken by foo a 1."},
+                    {"field": "shares.start", "message": "Shares 80-90 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 30-40 have already been taken by foo a 1."},
+                    {"field": "shares.end", "message": "Shares 80-90 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, over new range from both ends": OverlappingSharesInput(
+                start_1=1,
+                end_1=2,
+                start_2=10,
+                end_2=110,
+                fields=[
+                    {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
+                ],
+            ),
+            "Multiple overlapping, same range": OverlappingSharesInput(
+                start_1=1,
+                end_1=2,
+                start_2=20,
+                end_2=100,
+                fields=[
+                    {"field": "shares.start", "message": "Shares 20-100 have already been taken by bar b 2."},
+                    {"field": "shares.end", "message": "Shares 20-100 have already been taken by bar b 2."},
+                ],
+            ),
+        }
+    )
 )
 @pytest.mark.django_db
 def test__api__apartment__update__overlapping_shares(

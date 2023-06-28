@@ -53,12 +53,11 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         surface_area=4302,
     )
 
-    cpi_improvement: HousingCompanyConstructionPriceImprovement = (
-        HousingCompanyConstructionPriceImprovementFactory.create(
-            housing_company=a.housing_company,
-            value=150000,
-            completion_date=datetime.date(2020, 5, 21),
-        )
+    # Construction price improvement is not used, since this apartment's housing company is using new hitas rules!
+    HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=a.housing_company,
+        value=150000,
+        completion_date=datetime.date(2020, 5, 21),
     )
     mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company,
@@ -108,15 +107,15 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
 
     expected_response = {
         "confirmed_at": None,
-        "maximum_price": 223558.72,
-        "maximum_price_per_square": 7451.96,
+        "maximum_price": 223520.28,
+        "maximum_price_per_square": 7450.68,
         "calculation_date": "2022-07-05",
         "valid_until": "2022-10-05",
         "index": "construction_price_index",
         "new_hitas": True,
         "calculations": {
             "construction_price_index": {
-                "maximum_price": 223558.72,
+                "maximum_price": 223520.28,
                 "valid_until": "2022-10-05",
                 "maximum": True,
                 "calculation_variables": {
@@ -127,12 +126,12 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                     "housing_company_improvements": {
                         "items": [
                             {
-                                "name": cpi_improvement.name,
-                                "value": 150_000.0,
-                                "completion_date": "2020-05-21",
+                                "name": mpi_improvement.name,
+                                "value": float(mpi_improvement.value),
+                                "completion_date": mpi_improvement.completion_date.isoformat(),
                                 "value_added": 20040.0,
-                                "value_for_housing_company": 22707.86,
-                                "value_for_apartment": 157.26,
+                                "value_for_apartment": 118.82,
+                                "value_for_housing_company": 17157.05,
                             }
                         ],
                         "summary": {
@@ -143,12 +142,12 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                                 "value_per_square_meter": 30.0,
                                 "total": 129960.0,
                             },
-                            "value_for_housing_company": 22707.86,
-                            "value_for_apartment": 157.26,
+                            "value_for_apartment": 118.82,
+                            "value_for_housing_company": 17157.05,
                         },
                     },
-                    "debt_free_price": 226058.72,
-                    "debt_free_price_m2": 7535.29,
+                    "debt_free_price": 226020.28,
+                    "debt_free_price_m2": 7534.01,
                     "apartment_share_of_housing_company_loans": 2500,
                     "apartment_share_of_housing_company_loans_date": "2022-07-28",
                     "completion_date": "2019-11-27",
@@ -170,8 +169,8 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
                         "items": [
                             {
                                 "name": mpi_improvement.name,
-                                "value": 150_000.0,
-                                "completion_date": "2020-05-21",
+                                "value": float(mpi_improvement.value),
+                                "completion_date": mpi_improvement.completion_date.isoformat(),
                                 "value_added": 20040.0,
                                 "value_for_housing_company": 22161.19,
                                 "value_for_apartment": 153.47,
@@ -281,11 +280,11 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
         surface_area=2655,
     )
 
-    cpi_improvement: HousingCompanyConstructionPriceImprovement = (
-        HousingCompanyConstructionPriceImprovementFactory.create(
-            housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
-        )
+    # Construction price improvement is not used, since this apartment's housing company is using new hitas rules!
+    HousingCompanyConstructionPriceImprovementFactory.create(
+        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
+
     mpi_improvement: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
     )
@@ -371,12 +370,12 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
             "housing_company_improvements": {
                 "items": [
                     {
-                        "name": cpi_improvement.name,
-                        "value": 150_000.0,
-                        "completion_date": "2020-05-21",
+                        "name": mpi_improvement.name,
+                        "value": float(mpi_improvement.value),
+                        "completion_date": mpi_improvement.completion_date.isoformat(),
                         "value_added": 68910.0,
-                        "value_for_housing_company": 78083.78,
-                        "value_for_apartment": 1386.62,
+                        "value_for_apartment": 1047.66,
+                        "value_for_housing_company": 58996.63,
                     }
                 ],
                 "summary": {
@@ -387,12 +386,12 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
                         "value_per_square_meter": 30.0,
                         "total": 81090.0,
                     },
-                    "value_for_housing_company": 78083.78,
-                    "value_for_apartment": 1386.62,
+                    "value_for_apartment": 1047.66,
+                    "value_for_housing_company": 58996.63,
                 },
             },
-            "debt_free_price": 262963.7,
-            "debt_free_price_m2": 5478.41,
+            "debt_free_price": 262624.75,
+            "debt_free_price_m2": 5471.35,
             "apartment_share_of_housing_company_loans": 2500,
             "apartment_share_of_housing_company_loans_date": "2022-07-28",
             "completion_date": "2014-08-27",
@@ -400,7 +399,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
             "calculation_date": "2022-07-05",
             "calculation_date_index": 146.4,
         },
-        "maximum_price": 260463.7,
+        "maximum_price": 260124.75,
         "valid_until": "2022-10-05",
         "maximum": False,
     }
@@ -414,8 +413,8 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
                 "items": [
                     {
                         "name": mpi_improvement.name,
-                        "value": 150_000.0,
-                        "completion_date": "2020-05-21",
+                        "value": float(mpi_improvement.value),
+                        "completion_date": mpi_improvement.completion_date.isoformat(),
                         "value_added": 68910.0,
                         "value_for_housing_company": 76203.98,
                         "value_for_apartment": 1353.23,

@@ -160,13 +160,8 @@ def calculate_max_price(
     )
 
     # Select calculator
-    max_price_calculator: Rules2011Onwards | RulesPre2011
-    if not apartment.housing_company.hitas_type.old_hitas_ruleset:
-        max_price_calculator = Rules2011Onwards()
-        new_hitas_rules = True
-    else:
-        max_price_calculator = RulesPre2011()
-        new_hitas_rules = False
+    new_hitas_ruleset = apartment.housing_company.hitas_type.new_hitas_ruleset
+    max_price_calculator = Rules2011Onwards() if new_hitas_ruleset else RulesPre2011()
 
     #
     # Check we found the necessary indices
@@ -182,7 +177,12 @@ def calculate_max_price(
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
         apartment.construction_price_improvements.all(),
-        apartment.housing_company.construction_price_improvements.all(),
+        (
+            # For hitas apartments using the new rules, market price improvements are used for both indices
+            apartment.housing_company.market_price_improvements.all()
+            if new_hitas_ruleset
+            else apartment.housing_company.construction_price_improvements.all()
+        ),
         calculation_date,
         housing_company_completion_date,
     )
@@ -237,7 +237,7 @@ def calculate_max_price(
         "maximum_price": max_price,
         "maximum_price_per_square": max_price / apartment.surface_area,
         "index": max_index,
-        "new_hitas": new_hitas_rules,
+        "new_hitas": new_hitas_ruleset,
         "calculations": {
             "construction_price_index": dataclasses.asdict(construction_price_index),
             "market_price_index": dataclasses.asdict(market_price_index),

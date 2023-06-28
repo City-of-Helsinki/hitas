@@ -207,6 +207,15 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         mpi: list = validated_data.pop("market_price_improvements")
         cpi: list = validated_data.pop("construction_price_improvements")
 
+        if cpi and not validated_data["hitas_type"].old_hitas_ruleset:
+            raise serializers.ValidationError(
+                {
+                    "construction_price_improvements": (
+                        "Cannot create construction price improvements for a housing company using new hitas rules."
+                    )
+                }
+            )
+
         instance: HousingCompany = super().create(validated_data)
 
         for improvement in mpi:
@@ -220,6 +229,15 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         # Optional, since patch re-uses code from here
         mpi: Optional[list[dict[str, Any]]] = validated_data.pop("market_price_improvements")
         cpi: Optional[list[dict[str, Any]]] = validated_data.pop("construction_price_improvements")
+
+        if cpi and not instance.hitas_type.old_hitas_ruleset:
+            raise serializers.ValidationError(
+                {
+                    "construction_price_improvements": (
+                        "Cannot create construction price improvements for a housing company using new hitas rules."
+                    )
+                }
+            )
 
         should_fulfill_conditions_of_sale = (
             instance.regulation_status == RegulationStatus.REGULATED
