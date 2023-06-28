@@ -405,7 +405,9 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             className={`conditions-of-sale-list-item${cos.fulfilled ? " resolved" : " unresolved"}`}
                         >
                             <div className="input-wrap name">
-                                <div className="icon-wrap">{cos.fulfilled ? <IconLockOpen /> : <IconLock />}</div>
+                                <div className={cos.fulfilled ? "icon-wrap fulfilled" : "icon-wrap"}>
+                                    {cos.fulfilled ? <IconLockOpen /> : <IconLock />}
+                                </div>
                                 {cos.owner.name} ({cos.owner.identifier})
                             </div>
                             <div className="input-wrap address">
