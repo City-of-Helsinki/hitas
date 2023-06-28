@@ -199,6 +199,7 @@ export const hitasApi = createApi({
     }),
     tagTypes: [
         "HousingCompany",
+        "ConditionOfSale",
         "Apartment",
         "Index",
         "Owner",
@@ -325,6 +326,12 @@ const detailApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
             }),
             providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}, {type: "Owner"}],
+        }),
+        getConditionOfSale: builder.query<IConditionOfSale, string>({
+            query: (id) => ({
+                url: `conditions-of-sale/${id}`,
+            }),
+            providesTags: (result, error, arg) => [{type: "ConditionOfSale", id: arg}],
         }),
         getApartmentMaximumPrice: builder.query<IApartmentMaximumPrice, object>({
             query: ({
@@ -587,6 +594,16 @@ const mutationApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error) =>
                 !error && result && result.conditions_of_sale.length ? [{type: "Apartment"}] : [],
         }),
+        updateConditionOfSale: builder.mutation<IConditionOfSale, IConditionOfSale>({
+            query: (conditionOfSale) => ({
+                url: `conditions-of-sale${idOrBlank(conditionOfSale.id)}`,
+                method: "PUT",
+                body: conditionOfSale,
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) =>
+                !error && result ? [{type: "Apartment"}, {type: "ConditionOfSale", id: arg.id}] : [],
+        }),
         createThirtyYearRegulation: builder.mutation<IThirtyYearRegulationResponse, {data: IThirtyYearRegulationQuery}>(
             {
                 query: ({data}) => ({
@@ -672,6 +689,7 @@ export const {
 
 export const {
     useGetHousingCompanyDetailQuery,
+    useLazyGetConditionOfSaleQuery,
     useGetApartmentDetailQuery,
     useGetApartmentMaximumPriceQuery,
     useGetExternalSalesDataQuery,
@@ -696,6 +714,7 @@ export const {
     useSaveIndexMutation,
     useCreateSaleMutation,
     useCreateConditionOfSaleMutation,
+    useUpdateConditionOfSaleMutation,
     useCreateThirtyYearRegulationMutation,
     useSaveExternalSalesDataMutation,
     useValidateSalesCatalogMutation,

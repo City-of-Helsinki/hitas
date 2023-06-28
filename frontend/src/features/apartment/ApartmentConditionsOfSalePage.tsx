@@ -1,13 +1,31 @@
-import {useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 
-import {Button, Dialog, IconCheck, IconCross, IconCrossCircle, IconLock, IconLockOpen, IconPlus} from "hds-react";
+import {
+    Button,
+    Dialog,
+    IconArrowLeft,
+    IconCross,
+    IconCrossCircle,
+    IconLock,
+    IconLockOpen,
+    IconPlus,
+    IconPlusCircleFill,
+} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useCreateConditionOfSaleMutation, useGetApartmentDetailQuery, useGetOwnersQuery} from "../../app/services";
+import {SerializedError} from "@reduxjs/toolkit";
+import {FetchBaseQueryError} from "@reduxjs/toolkit/dist/query/react";
+import {
+    useCreateConditionOfSaleMutation,
+    useGetApartmentDetailQuery,
+    useGetOwnersQuery,
+    useLazyGetConditionOfSaleQuery,
+    useUpdateConditionOfSaleMutation,
+} from "../../app/services";
 import {FormInputField, Heading, NavigateBackButton, QueryStateHandler, SaveButton} from "../../common/components";
-import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
+import {IApartmentConditionOfSale, IApartmentDetails, IConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 
@@ -156,28 +174,194 @@ const CreateConditionOfSaleModal = ({apartment, isModalOpen, closeModal}) => {
     );
 };
 
-const GracePeriodEntry = (gracePeriod) => {
-    switch (gracePeriod) {
-        case "not_given":
-            return <IconCross />;
-        case "three_months":
-            return (
-                <>
-                    <IconCheck /> 3kk
-                </>
-            );
-        case "six_months":
-            return (
-                <>
-                    <IconCheck /> 6kk
-                </>
-            );
-        default:
-            return <IconCross />;
-    }
+const ExtendGracePeriodModal = ({
+    conditionOfSale,
+    error,
+    isLoading,
+    apartmentConditionOfSale,
+    isExtendGracePeriodModalOpen,
+    closeModal,
+}: {
+    conditionOfSale: IConditionOfSale;
+    error: FetchBaseQueryError | SerializedError | undefined;
+    isLoading: boolean;
+    apartmentConditionOfSale: IApartmentConditionOfSale;
+    isExtendGracePeriodModalOpen: boolean;
+    closeModal: () => void;
+}) => {
+    // Update the conditions of sale object when the update button is clicked
+    const [extendGracePeriod, {error: updateError, isLoading: isUpdateLoading}] = useUpdateConditionOfSaleMutation();
+    const handleExtendGracePeriod = () => {
+        if (conditionOfSale) {
+            let updatedConditionOfSale: IConditionOfSale | undefined = undefined;
+            switch (conditionOfSale.grace_period) {
+                case "not_given":
+                    updatedConditionOfSale = {...conditionOfSale, grace_period: "three_months"};
+                    break;
+                case "three_months":
+                    updatedConditionOfSale = {...conditionOfSale, grace_period: "six_months"};
+                    break;
+            }
+            if (updatedConditionOfSale) {
+                extendGracePeriod(updatedConditionOfSale)
+                    .unwrap()
+                    .then(() => {
+                        hdsToast.success("Lisäaika myönnetty onnistuneesti!");
+                        closeModal();
+                    })
+                    .catch(() => {
+                        hdsToast.error("Virhe lisäajan myöntämisessä! ");
+                    });
+            } else {
+                // if maximum extension has been reached, show error message in the toast and close the modal
+                hdsToast.error("Lisäaikaa ei voi enää myöntää!");
+                closeModal();
+            }
+        }
+    };
+
+    return (
+        <div className="extend-grace-period-modal">
+            <Dialog
+                id="extend-grace-period-dialog"
+                closeButtonLabelText=""
+                aria-labelledby=""
+                isOpen={isExtendGracePeriodModalOpen}
+                close={closeModal}
+                boxShadow
+            >
+                <Dialog.Header
+                    id="extend-grace-period-dialog__header"
+                    title="Myönnä lisäaikaa"
+                />
+                <Dialog.Content id="extend-grace-period-dialog__content">
+                    <div>
+                        {error && "status" in error && "data" in error && (
+                            <p className="error-message">
+                                Myyntiehtojen hakemisessa tapahtui virhe: {error.status} {JSON.stringify(error.data)}
+                            </p>
+                        )}
+                        {updateError && "status" in updateError && "data" in updateError && (
+                            <p className="error-message">
+                                Lisäajan tallentamisessa tapahtui virhe: {updateError.status}{" "}
+                                {JSON.stringify(updateError.data)}
+                            </p>
+                        )}
+                        <ul className="info-text">
+                            <li>
+                                <span className="title">Omistaja:</span> {apartmentConditionOfSale.owner.name} (
+                                {apartmentConditionOfSale.owner.identifier})
+                            </li>
+                            <li>
+                                <span className="title">Asunto:</span>{" "}
+                                {formatAddress(apartmentConditionOfSale.apartment.address)}
+                            </li>
+                            <li>
+                                <span className="title">Myytävä viimeistään: </span>
+                                {formatDate(apartmentConditionOfSale.sell_by_date)}
+                            </li>
+                        </ul>
+                        {apartmentConditionOfSale.grace_period === "not_given" && (
+                            <p>Lisäaikaa ei ole vielä myönnetty. Myönnetäänkö 3kk lisäaikaa asunnon myyntiehtoon? </p>
+                        )}
+                        {apartmentConditionOfSale.grace_period === "three_months" && (
+                            <p>Lisäaikaa on jo myönnetty 3kk. Myönnetäänkö 3kk lisää aikaa asunnon myyntiehtoon?</p>
+                        )}
+                        {apartmentConditionOfSale.grace_period === "six_months" && (
+                            <p>Lisäaikaa asunnon myyntiehtoon on jo myönnetty 6kk, enempää ei voi myöntää.</p>
+                        )}
+                    </div>
+                </Dialog.Content>
+                <Dialog.ActionButtons>
+                    <Button
+                        theme="black"
+                        iconLeft={<IconArrowLeft />}
+                        variant="secondary"
+                        onClick={closeModal}
+                    >
+                        Peruuta
+                    </Button>
+
+                    <SaveButton
+                        onClick={handleExtendGracePeriod}
+                        buttonText="Hyväksy"
+                        isLoading={isLoading || isUpdateLoading}
+                        disabled={!!error || isLoading || isUpdateLoading}
+                    />
+                </Dialog.ActionButtons>{" "}
+            </Dialog>
+        </div>
+    );
+};
+
+const ExtendGracePeriodButton = ({handleExtendGracePeriodButtonClick, setIsHoverExtendGracePeriodButton}) => {
+    return (
+        <button
+            className="text-button"
+            onClick={handleExtendGracePeriodButtonClick}
+        >
+            <IconPlusCircleFill
+                className="icon"
+                aria-label="Myönnä lisäaikaa"
+                onMouseEnter={() => setIsHoverExtendGracePeriodButton(true)}
+                onMouseLeave={() => setIsHoverExtendGracePeriodButton(false)}
+            />
+        </button>
+    );
+};
+
+const GracePeriodEntry = ({
+    apartmentConditionOfSale,
+    setIsHoverExtendGracePeriodButton,
+}: {
+    apartmentConditionOfSale: IApartmentConditionOfSale;
+    setIsHoverExtendGracePeriodButton: Dispatch<SetStateAction<boolean>>;
+}) => {
+    // Handle the visibility of the modal
+    const [isExtendGracePeriodModalOpen, setIsExtendGracePeriodModalOpen] = useState<boolean>(false);
+    const closeModal = () => {
+        setIsExtendGracePeriodModalOpen(false);
+        setIsHoverExtendGracePeriodButton(false);
+    };
+
+    // Get the corresponding conditions of sale object when the extend grace period button is clicked
+    const [getConditionOfSale, {data: conditionOfSale, error, isLoading}] = useLazyGetConditionOfSaleQuery();
+    const handleExtendGracePeriodButtonClick = () => {
+        getConditionOfSale(apartmentConditionOfSale.id);
+        setIsExtendGracePeriodModalOpen(true);
+    };
+
+    // booleans to determine the grace period entry
+    const hasThreeMonthsGracePeriod = apartmentConditionOfSale.grace_period === "three_months";
+    const hasSixMonthsGracePeriod = apartmentConditionOfSale.grace_period === "six_months";
+    const hasNoGracePeriod =
+        apartmentConditionOfSale.grace_period === "not_given" ||
+        (!hasThreeMonthsGracePeriod && !hasSixMonthsGracePeriod);
+
+    return (
+        <>
+            {hasNoGracePeriod && <IconCross />}
+            {hasThreeMonthsGracePeriod && <span>3kk</span>}
+            {hasSixMonthsGracePeriod && <span>6kk</span>}
+            {(hasNoGracePeriod || hasThreeMonthsGracePeriod) && (
+                <ExtendGracePeriodButton {...{handleExtendGracePeriodButtonClick, setIsHoverExtendGracePeriodButton}} />
+            )}
+            <ExtendGracePeriodModal
+                conditionOfSale={conditionOfSale as IConditionOfSale}
+                {...{
+                    error,
+                    isLoading,
+                    apartmentConditionOfSale,
+                    isExtendGracePeriodModalOpen,
+                    closeModal,
+                }}
+            />
+        </>
+    );
 };
 
 const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
+    const [isHoverExtendGracePeriodButton, setIsHoverExtendGracePeriodButton] = useState(false);
     return (
         <>
             {apartment.conditions_of_sale.length ? (
@@ -185,7 +369,8 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                     <li className="conditions-of-sale-headers">
                         <header>Omistaja</header>
                         <header>Asunto</header>
-                        <header>Lisäaika</header>
+                        <header>{isHoverExtendGracePeriodButton ? "Myönnä lisäaikaa" : "Lisäaika"}</header>
+                        <header>Myytävä viimeistään</header>
                         <header>Toteutunut</header>
                     </li>
                     {apartment.conditions_of_sale.map((cos: IApartmentConditionOfSale) => (
@@ -205,8 +390,12 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                                 </Link>
                             </div>
                             <div className="input-wrap grace-period">
-                                <GracePeriodEntry gracePeriod={cos.grace_period} />
+                                <GracePeriodEntry
+                                    setIsHoverExtendGracePeriodButton={setIsHoverExtendGracePeriodButton}
+                                    apartmentConditionOfSale={cos}
+                                />
                             </div>
+                            <div className="input-wrap sell-by-date">{formatDate(cos.sell_by_date)} </div>
                             <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
                         </li>
                     ))}
