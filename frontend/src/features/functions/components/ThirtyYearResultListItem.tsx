@@ -76,7 +76,7 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
             </div>
             <ConfirmDialogModal
                 modalHeader={`Vapauta ${company.display_name}?`}
-                modalText={`Olet manuaalisesti vapauttamassa yhtiötä (esim tontit-yksikön päätöksestä). Haluatko 
+                modalText={`Olet manuaalisesti vapauttamassa yhtiötä (esim tontit-yksikön päätöksestä). Haluatko
                     varmasti, että ${company.display_name} vapautetaan sääntelyn piiristä?`}
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
