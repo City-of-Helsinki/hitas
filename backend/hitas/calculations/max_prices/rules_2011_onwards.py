@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import List
+from typing import Iterable
 
 from dateutil.relativedelta import relativedelta
 
@@ -9,7 +9,14 @@ from hitas.calculations.improvements.common import ImprovementData
 from hitas.calculations.improvements.rules_2011_onwards import calculate_housing_company_improvements_2011_onwards
 from hitas.calculations.max_prices.rules import CalculatorRules
 from hitas.calculations.max_prices.types import IndexCalculation
-from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
+from hitas.models.apartment import (
+    ApartmentConstructionPriceImprovementWithIndex,
+    ApartmentMarketPriceImprovementWithIndex,
+    ApartmentWithAnnotationsMaxPrice,
+)
+from hitas.models.housing_company import (
+    HousingCompanyMarketPriceImprovementWithIndex,
+)
 
 
 class Rules2011Onwards(CalculatorRules):
@@ -31,11 +38,12 @@ class Rules2011Onwards(CalculatorRules):
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentConstructionPriceImprovementWithIndex],
+        housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovementWithIndex],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
+        # Improvement calculation done using the market price index
         return self._calculate_max_price(
             apartment,
             apartment.calculation_date_cpi_2005eq100,
@@ -46,7 +54,7 @@ class Rules2011Onwards(CalculatorRules):
             housing_company_improvements,
             calculation_date,
             housing_company_completion_date,
-            "cpi2005eq100",
+            "mpi2005eq100",
         )
 
     def calculate_market_price_index_max_price(
@@ -55,8 +63,8 @@ class Rules2011Onwards(CalculatorRules):
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentMarketPriceImprovementWithIndex],
+        housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovementWithIndex],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
@@ -81,7 +89,7 @@ class Rules2011Onwards(CalculatorRules):
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        housing_company_improvements: List,
+        housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovementWithIndex],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
         index_name: str,

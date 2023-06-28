@@ -1,11 +1,16 @@
 import datetime
 from decimal import Decimal
-from typing import List
+from typing import Iterable
 
 from dateutil.relativedelta import relativedelta
 
 from hitas.calculations.max_prices.types import IndexCalculation, SurfaceAreaPriceCeilingCalculation
-from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
+from hitas.models import HousingCompanyConstructionPriceImprovement, HousingCompanyMarketPriceImprovement
+from hitas.models.apartment import (
+    ApartmentConstructionPriceImprovement,
+    ApartmentMarketPriceImprovement,
+    ApartmentWithAnnotationsMaxPrice,
+)
 
 
 class CalculatorRules:
@@ -18,8 +23,8 @@ class CalculatorRules:
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentConstructionPriceImprovement],
+        housing_company_improvements: Iterable[HousingCompanyConstructionPriceImprovement],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
@@ -31,8 +36,8 @@ class CalculatorRules:
         total_surface_area: Decimal,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
-        apartment_improvements: List,
-        housing_company_improvements: List,
+        apartment_improvements: Iterable[ApartmentMarketPriceImprovement],
+        housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovement],
         calculation_date: datetime.date,
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:

@@ -11,7 +11,6 @@ from hitas.tests.apis.apartment_max_price.utils import create_necessary_indices
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
-    HousingCompanyConstructionPriceImprovementFactory,
     HousingCompanyMarketPriceImprovementFactory,
 )
 from hitas.tests.factories.indices import (
@@ -101,51 +100,56 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, d
         ("cpi_calculation_date", "cpi2005eq100.2022-07"),
         ("mpi_calculation_date", "mpi2005eq100.2022-07"),
         ("sapc", "sapc.2022-07"),
-        ("improvement_cpi", "cpi2005eq100.2020-05"),
         ("improvement_mpi", "mpi2005eq100.2020-05"),
     ],
 )
 @pytest.mark.django_db
 def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, missing_index: str, error_msg: str):
-    a: Apartment = ApartmentFactory.create(
-        completion_date=datetime.date(2014, 8, 27),
+    calculation_date = datetime.date(2022, 7, 5)
+    apartment_completion_date = datetime.date(2014, 8, 27)
+    improvement_completion_date = datetime.date(2020, 5, 21)
+
+    apartment: Apartment = ApartmentFactory.create(
+        completion_date=apartment_completion_date,
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
-    HousingCompanyConstructionPriceImprovementFactory.create(
-        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
-    )
+    # Construction price improvement is not used since this is a new hitas apartment
     HousingCompanyMarketPriceImprovementFactory.create(
-        housing_company=a.housing_company, value=150000, completion_date=datetime.date(2020, 5, 21)
+        housing_company=apartment.housing_company,
+        value=150000,
+        completion_date=improvement_completion_date,
     )
 
     # Create necessary apartment's completion date indices
     if missing_index != "cpi_completion_date":
-        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=129.29)
+        ConstructionPriceIndex2005Equal100Factory.create(month=monthify(apartment_completion_date), value=129.29)
     if missing_index != "mpi_completion_date":
-        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2014, 8, 1), value=167.9)
+        MarketPriceIndex2005Equal100Factory.create(month=monthify(apartment_completion_date), value=167.9)
     if missing_index != "cpi_calculation_date":
-        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
+        ConstructionPriceIndex2005Equal100Factory.create(month=monthify(calculation_date), value=146.4)
     if missing_index != "mpi_calculation_date":
-        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
+        MarketPriceIndex2005Equal100Factory.create(month=monthify(calculation_date), value=189.1)
     if missing_index != "sapc":
-        SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
-    if missing_index != "improvement_cpi":
-        ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=129.20)
+        SurfaceAreaPriceCeilingFactory.create(month=monthify(calculation_date), value=4869)
     if missing_index != "improvement_mpi":
-        MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=171.0)
+        MarketPriceIndex2005Equal100Factory.create(month=monthify(improvement_completion_date), value=171.0)
 
     data = {
-        "calculation_date": "2022-07-05",
+        "calculation_date": calculation_date.isoformat(),
     }
 
-    response = api_client.post(
-        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    url = reverse(
+        "hitas:maximum-price-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
     )
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
-    response_json = response.json()
+    response = api_client.post(url, data=data, format="json")
 
-    assert response_json.pop("error") == error_msg
-    assert response_json == {
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": error_msg,
         "message": "One or more indices required for max price calculation is missing.",
         "reason": "Conflict",
         "status": 409,
