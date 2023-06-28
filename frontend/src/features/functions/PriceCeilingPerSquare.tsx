@@ -79,6 +79,7 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
         calculatePriceCeiling({
             data: {calculation_month: currentMonth},
         })
+            .unwrap()
             .then(() => {
                 hdsToast.success("Rajahinnan laskenta onnistui");
             })
