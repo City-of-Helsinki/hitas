@@ -1,12 +1,11 @@
 import {Button, IconDownload} from "hds-react";
 
-const DownloadButton = ({downloadFn, buttonText, ...buttonProps}) => {
+const DownloadButton = ({buttonText, ...rest}) => {
     return (
         <Button
-            onClick={downloadFn}
             theme="black"
             iconLeft={<IconDownload />}
-            {...buttonProps}
+            {...rest}
         >
             {buttonText}
         </Button>
