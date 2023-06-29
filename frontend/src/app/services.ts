@@ -188,6 +188,27 @@ export const downloadSalesByPostalCodeAndAreaReportPDF = (startDate: string, end
         .catch((error) => console.error(error));
 };
 
+const noParamsPDFDownload = (url: string) => {
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error(error));
+};
+
+export const downloadRegulatedHousingCompaniesReportPDF = noParamsPDFDownload(
+    `${Config.api_v1_url}/reports/download-regulated-housing-companies-report`
+);
+
+export const downloadUnregulatedHousingCompaniesReportPDF = noParamsPDFDownload(
+    `${Config.api_v1_url}/reports/download-unregulated-housing-companies-report`
+};
+
+export const downloadHousingCompanyStatesReportPDF = noParamsPDFDownload(`${Config.api_v1_url}/reports/download-housing-company-states-report`);
+
 // ///////////
 // Auth API //
 // ///////////
