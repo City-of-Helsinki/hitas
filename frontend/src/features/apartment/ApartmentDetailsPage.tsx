@@ -594,7 +594,10 @@ const LoadedApartmentDetails = ({
                                                 buttonText="Peru kauppa"
                                                 variant="secondary"
                                                 className="delete-sale-button"
-                                                disabled={!apartment.prices.current_sale_id}
+                                                disabled={
+                                                    !apartment.prices.current_sale_id ||
+                                                    !apartment.prices.latest_purchase_date
+                                                }
                                             />
                                         </div>
                                         <Divider size="s" />
