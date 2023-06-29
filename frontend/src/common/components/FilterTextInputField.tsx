@@ -11,6 +11,7 @@ interface FilterTextInputFieldProps {
     maxLength?: number;
     defaultValue?: string;
     required?: boolean;
+    tooltipText?: string;
 }
 
 export default function FilterTextInputField({

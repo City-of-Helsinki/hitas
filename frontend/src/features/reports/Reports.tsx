@@ -1,6 +1,9 @@
 import {Accordion} from "hds-react";
+import {downloadSurfaceAreaPriceCeilingResults} from "../../app/services";
 import {Heading} from "../../common/components";
+import PriceCeilingsList from "../../common/components/PriceCeilingsList";
 import HousingCompanyReports from "./HousingCompanyReports";
+import OwnerReports from "./OwnerReports";
 import SalesReports from "./SalesReports";
 
 const Reports = () => {
@@ -9,28 +12,28 @@ const Reports = () => {
             <Heading>Raportit</Heading>
             <div className="reports-card">
                 <Accordion
+                    heading="Kaupat"
                     closeButton={false}
-                    heading="Toteutuneet kauppahinnat"
                 >
                     <SalesReports />
                 </Accordion>
                 <Accordion
+                    heading="Taloyhtiöt"
                     closeButton={false}
-                    heading="Yhtiön ja asuntojen raportit"
                 >
                     <HousingCompanyReports />
                 </Accordion>
                 <Accordion
-                    closeButton={false}
                     heading="Rajahintalaskelmat"
+                    closeButton={false}
                 >
-                    <h2>Raportit 3</h2>
+                    <PriceCeilingsList callbackFn={downloadSurfaceAreaPriceCeilingResults} />
                 </Accordion>
                 <Accordion
+                    heading="Omistajien raportit"
                     closeButton={false}
-                    heading="Enimmäishintojen vertailu"
                 >
-                    <h2>Raportit 4</h2>
+                    <OwnerReports />
                 </Accordion>
             </div>
         </div>

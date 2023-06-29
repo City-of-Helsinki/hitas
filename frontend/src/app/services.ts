@@ -199,15 +199,17 @@ const noParamsPDFDownload = (url: string) => {
         .catch((error) => console.error(error));
 };
 
-export const downloadRegulatedHousingCompaniesReportPDF = noParamsPDFDownload(
-    `${Config.api_v1_url}/reports/download-regulated-housing-companies-report`
-);
+export const downloadRegulatedHousingCompaniesPDF = () =>
+    noParamsPDFDownload(`${Config.api_v1_url}/reports/download-regulated-housing-companies-report`);
 
-export const downloadUnregulatedHousingCompaniesReportPDF = noParamsPDFDownload(
-    `${Config.api_v1_url}/reports/download-unregulated-housing-companies-report`
-};
+export const downloadUnregulatedHousingCompaniesPDF = () =>
+    noParamsPDFDownload(`${Config.api_v1_url}/reports/download-unregulated-housing-companies-report`);
 
-export const downloadHousingCompanyStatesReportPDF = noParamsPDFDownload(`${Config.api_v1_url}/reports/download-housing-company-states-report`);
+export const downloadHousingCompanyStatesReportPDF = () =>
+    noParamsPDFDownload(`${Config.api_v1_url}/reports/download-housing-company-states-report`);
+
+export const downloadMultipleOwnershipsReportPDF = () =>
+    noParamsPDFDownload(`${Config.api_v1_url}/reports/download-multiple-ownerships-report`);
 
 // ///////////
 // Auth API //
@@ -354,6 +356,12 @@ const listApi = hitasApi.injectEndpoints({
             query: (params: object) => ({
                 url: "thirty-year-regulation/postal-codes",
                 params: params,
+            }),
+        }),
+        getHousingCompanyStates: builder.query({
+            query: (arg) => ({
+                url: "reports/housing-company-states",
+                params: arg,
             }),
         }),
     }),
@@ -751,6 +759,7 @@ export const {
     useGetBuildingTypesQuery,
     useGetApartmentTypesQuery,
     useGetAvailablePostalCodesQuery,
+    useGetHousingCompanyStatesQuery,
 } = listApi;
 
 export const {

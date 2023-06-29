@@ -5,22 +5,81 @@
   @include flex-flow(column nowrap)
   @include flex-grow(1)
   .reports-card
-    background: $color-black-10
-    padding: $spacing-m
-  [id^="accordion"]
+    // background: $color-engel
+    // padding: $spacing-m
+  [id^="accordion-"]
+    border-bottom: 0px !important
+    .divider-horizontal-s:first-child
+      margin-top: 0
     &:last-child
       border-bottom: 0
-    [class*="accordionContent"]
-      background: white
-      padding: $spacing-s $spacing-m
-      margin-bottom: $spacing-s
     [class*="headingContainer"][aria-expanded="true"]
+      font-weight: 700
+      &:hover
+        background: $color-engel
+  [class*="Accordion-module_accordion_"]
+    background: $color-engel-medium-light
+    margin-bottom: $spacing-m
+    padding: 0
+    border-bottom: 0
+  [class*="Accordion-module_accordionHeader"]
+    padding-top: 0
+    padding-bottom: 0
+  [class*="Accordion-module_accordionContent"]
+    padding-left: $spacing-m
+    padding-right: $spacing-m
+  [class*="Accordion-module_headingContainer"]
+    padding: $spacing-m
+    &:hover
+      background: $color-engel
       font-weight: 700
   form
     @include flexbox()
     @include flex-flow(row wrap)
     @include justify-content(space-between)
     @include align-items(center)
+    background: white
+    padding: $spacing-s $spacing-m
     gap: 1rem
+    h3
+      width: 100%
+      margin-top: 0
+  .date-input-wrap
+    @include flexbox()
+    @include flex-flow(row wrap)
+    @include justify-content(space-between)
+    gap: 40px
   .input-field
-    width: 200px
+    height: auto
+    // width: 200px
+  .price-ceiling-per-square-list
+    width: 100%
+    padding: 0
+    .results-list
+      margin-bottom: 0
+  .state-list
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    @include justify-content(space-between)
+    @include align-items(center)
+    width: 100%
+    border: 1px solid $color-black-50
+    &-headers
+      background: $color-black
+      color: $color-white
+      padding: $spacing-2-xs 0 $spacing-2-xs $spacing-m
+    li
+      @include flexbox()
+      @include flex-flow(row wrap)
+      @include justify-content(space-between)
+      @include align-items(center)
+      width: 100%
+      padding: $spacing-2-xs 0 $spacing-2-xs $spacing-m
+      border-bottom: 1px solid $color-black-50
+  .row--buttons
+    margin: 0
+  .state-values
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    @include justify-content(space-evenly)
+    width: 250px
