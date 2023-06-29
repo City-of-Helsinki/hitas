@@ -96,7 +96,6 @@ def get_apartment_for_unconfirmed_max_price_calculation(
     apartment_id: UUID,
     calculation_date: datetime.date,
 ) -> ApartmentWithAnnotations:
-    calculation_month = monthify(calculation_date)
     completion_date: Optional[datetime.date] = (
         Apartment.objects.filter(uuid=apartment_id).values_list("completion_date", flat=True).first()
     )
@@ -135,25 +134,25 @@ def get_apartment_for_unconfirmed_max_price_calculation(
             cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex2005Equal100,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex2005Equal100,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             sapc=subquery_apartment_current_surface_area_price(
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
         )
         .first()

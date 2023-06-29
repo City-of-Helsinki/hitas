@@ -285,9 +285,9 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
 
 
 def subquery_apartment_current_surface_area_price(
-    calculation_month: Optional[datetime.date] = None,
+    calculation_date: Optional[datetime.date] = None,
 ) -> RoundWithPrecision:
-    calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
+    calculation_month = monthify(timezone.now().date()) if calculation_date is None else monthify(calculation_date)
 
     current_value = Subquery(
         SurfaceAreaPriceCeiling.objects.filter(month=calculation_month).values("value"),
@@ -308,9 +308,10 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
         type[ConstructionPriceIndex2005Equal100],
     ],
     completion_date: Optional[datetime.date] = None,
-    calculation_month: Optional[datetime.date] = None,
+    calculation_date: Optional[datetime.date] = None,
 ) -> RoundWithPrecision:
-    calculation_month = monthify(timezone.now().date()) if calculation_month is None else calculation_month
+    calculation_date = timezone.now().date() if calculation_date is None else calculation_date
+    calculation_month = monthify(calculation_date)
 
     original_value = Subquery(
         table.objects.filter(month=OuterRef("completion_month")).values("value"),
@@ -341,7 +342,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
         # and index price will be null, so we can skip this calculation freely
         if completion_date is not None:
             depreciation = Value(
-                depreciation_multiplier(months_between_dates(completion_date, calculation_month)),
+                depreciation_multiplier(months_between_dates(completion_date, calculation_date)),
                 output_field=HitasModelDecimalField(),
             )
 
