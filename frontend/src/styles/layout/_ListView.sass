@@ -42,8 +42,10 @@
       cursor: pointer
       padding: $spacing-layout-2-xs $spacing-layout-xs
 
-      &:hover
-        background: $color-black-5
+      &.clickable
+        cursor: pointer
+        &:hover
+          background: $color-black-5
 
       &:not(:last-child)
         border-bottom: 1px solid #ccc

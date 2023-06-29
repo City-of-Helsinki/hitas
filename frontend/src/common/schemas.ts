@@ -323,6 +323,12 @@ const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     })
 );
 
+const HousingCompanyStateSchema = object({
+    status: string(),
+    housing_company_count: number(),
+    apartment_count: number(),
+});
+
 // ********************************
 // * Apartment Schemas
 // ********************************
@@ -1182,6 +1188,7 @@ export type IImprovement = z.infer<typeof ImprovementSchema>;
 export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
 export type IHousingCompanyDetails = z.infer<typeof HousingCompanyDetailsSchema>;
 export type IHousingCompanyWritable = z.infer<typeof HousingCompanyWritableSchema>;
+export type IHousingCompanyState = z.infer<typeof HousingCompanyStateSchema>;
 export type IRealEstate = z.infer<typeof RealEstateSchema>;
 export type IBuilding = z.infer<typeof BuildingSchema>;
 export type IBuildingWritable = z.infer<typeof BuildingWritableSchema>;

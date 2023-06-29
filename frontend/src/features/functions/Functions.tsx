@@ -1,6 +1,6 @@
 import {Tabs} from "hds-react";
 import Heading from "../../common/components/Heading";
-import {PriceCeilingPerSquare, ThirtyYearRegulation} from "./";
+import {CalculatePriceCeiling, ThirtyYearRegulation} from "./";
 
 const Functions = () => {
     return (
@@ -12,7 +12,7 @@ const Functions = () => {
                     <Tabs.Tab>Vapautumisen tarkistus</Tabs.Tab>
                 </Tabs.TabList>
                 <Tabs.TabPanel>
-                    <PriceCeilingPerSquare />
+                    <CalculatePriceCeiling />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel>
                     <ThirtyYearRegulation />
