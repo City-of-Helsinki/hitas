@@ -8,8 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q
-from django.db.models.expressions import Case, F, OuterRef, Subquery, Value, When
-from django.db.models.functions import Coalesce, Now, NullIf, TruncMonth
+from django.db.models.expressions import Case, F, Subquery, When
+from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -20,9 +20,7 @@ from rest_framework.decorators import action
 from rest_framework.fields import empty
 from rest_framework.response import Response
 
-from hitas.calculations.depreciation_percentage import depreciation_multiplier
 from hitas.calculations.exceptions import IndexMissingException
-from hitas.calculations.helpers import months_between_dates
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     Apartment,
@@ -40,7 +38,6 @@ from hitas.models import (
     JobPerformance,
     PDFBody,
 )
-from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import (
     ApartmentMarketPriceImprovement,
     ApartmentWithAnnotations,
@@ -48,7 +45,7 @@ from hitas.models.apartment import (
     ApartmentWithListAnnotations,
 )
 from hitas.models.condition_of_sale import GracePeriod
-from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.housing_company import RegulationStatus
 from hitas.models.job_performance import JobPerformanceSource
 from hitas.models.pdf_body import PDFBodyName
 from hitas.services.apartment import (
@@ -65,7 +62,7 @@ from hitas.services.indices import (
     subquery_apartment_current_surface_area_price,
     subquery_apartment_first_sale_acquisition_price_index_adjusted,
 )
-from hitas.utils import RoundWithPrecision, check_for_overlap, valid_uuid, monthify
+from hitas.utils import check_for_overlap, valid_uuid, monthify, from_iso_format_or_today_if_none
 from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
@@ -73,7 +70,6 @@ from hitas.views.ownership import OwnershipSerializer
 from hitas.views.utils import (
     HitasCharFilter,
     HitasDecimalField,
-    HitasEnumField,
     HitasFilterSet,
     HitasModelSerializer,
     HitasModelViewSet,
@@ -839,7 +835,9 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
-        calculation_month: Optional[datetime.date] = self.kwargs.get("calculation_month")
+        calculation_date: datetime.date = self.kwargs.get("calculation_date") or from_iso_format_or_today_if_none(
+            self.request.query_params.get("calculation_date")
+        )
         completion_date: Optional[datetime.date] = (
             Apartment.objects.filter(uuid=self.kwargs["uuid"]).values_list("completion_date", flat=True).first()
         )
@@ -853,25 +851,25 @@ class ApartmentViewSet(HitasModelViewSet):
             cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex2005Equal100,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex2005Equal100,
                 completion_date=completion_date,
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
             sapc=subquery_apartment_current_surface_area_price(
-                calculation_month=calculation_month,
+                calculation_date=calculation_date,
             ),
         )
 
@@ -880,7 +878,8 @@ class ApartmentViewSet(HitasModelViewSet):
         input_data = UnconfirmedPriceSerializer(data=request.data)
         input_data.is_valid(raise_exception=True)
 
-        self.kwargs["calculation_month"] = this_month = monthify(input_data.validated_data["calculation_date"])
+        self.kwargs["calculation_date"] = input_data.validated_data["calculation_date"]
+        this_month = monthify(self.kwargs["calculation_date"])
 
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
@@ -895,7 +894,9 @@ class ApartmentViewSet(HitasModelViewSet):
         if ump["surface_area_price_ceiling"]["value"] is None:
             raise IndexMissingException(error_code="sapc", date=this_month)
 
-        sapc = SurfaceAreaPriceCeiling.objects.only("value").get(month=this_month)
+        surface_area_price_ceiling: Decimal = (
+            SurfaceAreaPriceCeiling.objects.filter(month=this_month).values_list("value", flat=True).first()
+        )
         body_parts: Optional[list[str]] = (
             PDFBody.objects.filter(name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION)
             .values_list("texts", flat=True)
@@ -908,7 +909,7 @@ class ApartmentViewSet(HitasModelViewSet):
         context = {
             "apartment": apartment_data,
             "additional_info": request.data.get("additional_info", ""),
-            "surface_area_price_ceiling": sapc.value,
+            "surface_area_price_ceiling": surface_area_price_ceiling,
             "old_hitas_ruleset": apartment.old_hitas_ruleset,
             "user": request.user,
             "body_parts": body_parts,
