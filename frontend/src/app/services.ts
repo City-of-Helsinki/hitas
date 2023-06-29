@@ -162,6 +162,32 @@ export const downloadSurfaceAreaPriceCeilingResults = (calculationDate?: string)
         .catch((error) => console.error(error));
 };
 
+export const downloadSalesReportPDF = (startDate: string, endDate: string) => {
+    const params = `start_date=${startDate}&end_date=${endDate}`;
+    const url = `${Config.api_v1_url}/reports/download-sales-report?${params}`;
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error(error));
+};
+
+export const downloadSalesByPostalCodeAndAreaReportPDF = (startDate: string, endDate: string) => {
+    const params = `start_date=${startDate}&end_date=${endDate}`;
+    const url = `${Config.api_v1_url}/reports/download-sales-by-postal-code-and-area-report?${params}`;
+    const init = {
+        ...getFetchInit(),
+        method: "GET",
+    };
+    fetch(url, init)
+        .then(handleDownloadPDF)
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error(error));
+};
+
 // ///////////
 // Auth API //
 // ///////////
