@@ -271,13 +271,13 @@ const ExtendGracePeriodModal = ({
                             </li>
                         </ul>
                         {apartmentConditionOfSale.grace_period === "not_given" && (
-                            <p>Lisäaikaa ei ole vielä myönnetty. Myönnetäänkö 3kk lisäaikaa asunnon myyntiehtoon? </p>
+                            <p>Lisäaikaa ei ole vielä myönnetty. Myönnetäänkö 3kk lisäaikaa asunnon myymiseen? </p>
                         )}
                         {apartmentConditionOfSale.grace_period === "three_months" && (
-                            <p>Lisäaikaa on jo myönnetty 3kk. Myönnetäänkö 3kk lisää aikaa asunnon myyntiehtoon?</p>
+                            <p>Lisäaikaa on jo myönnetty 3kk. Myönnetäänkö vielä 3kk lisäaikaa asunnon myymiseen?</p>
                         )}
                         {apartmentConditionOfSale.grace_period === "six_months" && (
-                            <p>Lisäaikaa asunnon myyntiehtoon on jo myönnetty 6kk, enempää ei voi myöntää.</p>
+                            <p>Lisäaikaa asunnon myymiseen on jo myönnetty 6kk, enempää ei voi myöntää.</p>
                         )}
                     </div>
                 </Dialog.Content>
