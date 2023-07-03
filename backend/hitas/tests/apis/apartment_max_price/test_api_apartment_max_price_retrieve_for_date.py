@@ -50,7 +50,7 @@ def test__api__apartment_unconfirmed_max_price__retrieve_for_date(api_client: Hi
             "hitas:apartment-retrieve-unconfirmed-prices-for-date",
             args=[apartment.housing_company.uuid.hex, apartment.uuid.hex],
         )
-        + f"?request_date={past_month.isoformat()}"
+        + f"?calculation_date={past_month.isoformat()}"
     )
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == {
