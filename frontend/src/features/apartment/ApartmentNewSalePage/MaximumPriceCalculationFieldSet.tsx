@@ -68,7 +68,10 @@ const MaximumPriceCalculationFieldSet = ({
                 housingCompanyId: apartment.links.housing_company.id,
             })
                 .then(() => setIsCreateModalVisible(true))
-                .catch(() => hdsToast.error("Enimmäishintalaskelman luominen epäonnistui!"));
+                .catch(() => {
+                    // eslint-disable-next-line no-console
+                    hdsToast.error("Enimmäishintalaskelman luominen epäonnistui!");
+                });
         } else {
             hdsToast.error(
                 <>
