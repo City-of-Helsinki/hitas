@@ -425,7 +425,7 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                             </div>
                             <div className="input-wrap sell-by-date">{formatDate(cos.sell_by_date)} </div>
                             <div className="input-wrap fulfillment-date">{formatDate(cos.fulfilled)} </div>
-                            {apartment.ownerships.find((ownership) => ownership.owner.id === cos.owner.id) &&
+                            {!apartment.ownerships.find((ownership) => ownership.owner.id === cos.owner.id) &&
                                 !cos.fulfilled && ( // CoS removable only if current owner and not already fulfilled
                                     <RemoveButton
                                         onClick={() => {
@@ -434,6 +434,7 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                                         }}
                                         isLoading={false}
                                         size="small"
+                                        buttonText="Poista"
                                     />
                                 )}
                         </li>
