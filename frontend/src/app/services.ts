@@ -9,6 +9,7 @@ import {
     IApartmentQuery,
     IApartmentSale,
     IApartmentSaleCreated,
+    IApartmentUnconfirmedMaximumPriceIndices,
     IApartmentWritable,
     IBuilding,
     IBuildingWritable,
@@ -401,6 +402,20 @@ const detailApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices/${priceId}`,
             }),
         }),
+        getApartmentUnconfirmedMaximumPriceForDate: builder.query<IApartmentUnconfirmedMaximumPriceIndices, object>({
+            query: ({
+                housingCompanyId,
+                apartmentId,
+                date,
+            }: {
+                housingCompanyId: string;
+                apartmentId: string;
+                date: string;
+            }) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/retrieve-unconfirmed-prices-for-date`,
+                params: {request_date: date},
+            }),
+        }),
         getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({
             query: (params: {calculation_date: string}) => ({
                 url: "external-sales-data",
@@ -767,6 +782,7 @@ export const {
     useLazyGetConditionOfSaleQuery,
     useGetApartmentDetailQuery,
     useGetApartmentMaximumPriceQuery,
+    useGetApartmentUnconfirmedMaximumPriceForDateQuery,
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
     useGetIndexQuery,

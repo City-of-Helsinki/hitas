@@ -1,11 +1,21 @@
 import {Fieldset} from "hds-react";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import SimpleErrorMessage from "../../../../common/components/SimpleErrorMessage";
 import {formatMoney} from "../../../../common/utils";
 import {ApartmentSaleContext} from "../utils";
 
 const ApartmentCatalogPricesFieldSet = () => {
-    const {apartment, formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
+    const {apartment, formExtraFieldErrorMessages, setMaximumPrices} = useContext(ApartmentSaleContext);
+
+    // Set maximum prices to state when component is loaded
+    useEffect(() => {
+        setMaximumPrices({
+            maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
+            debtFreePurchasePrice: apartment.prices.catalog_acquisition_price ?? 0,
+            apartmentShareOfHousingCompanyLoans: apartment.prices.catalog_share_of_housing_company_loans ?? 0,
+            index: "",
+        });
+    }, []);
 
     const maximumPrices = {
         maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
