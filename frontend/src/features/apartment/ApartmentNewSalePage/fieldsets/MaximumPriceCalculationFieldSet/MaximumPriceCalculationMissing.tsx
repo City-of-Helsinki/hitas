@@ -6,6 +6,21 @@ import {ApartmentSaleFormSchema} from "../../../../../common/schemas";
 import {formatMoney, hdsToast, today} from "../../../../../common/utils";
 import {ApartmentSaleContext} from "../../utils";
 
+const UnconfirmedMaximumPriceError = ({error}) => {
+    return (
+        <>
+            <p>
+                <span className="error-text">Enimmäishinta-arvion hakeminen epäonnistui.</span>
+            </p>
+            <p className="error-text">
+                Virhe: {error?.status}
+                <br />
+                {error?.data?.message ?? "Tuntematon virhe"} ({error?.data?.error ?? "?"})
+            </p>
+        </>
+    );
+};
+
 const MaximumPriceCalculationMissing = () => {
     const {apartment, setMaximumPrices} = useContext(ApartmentSaleContext);
     const {watch} = useFormContext();
@@ -47,6 +62,7 @@ const MaximumPriceCalculationMissing = () => {
                 data={maximumPriceData}
                 error={maximumPriceError}
                 isLoading={isMaximumPriceLoading}
+                errorComponent={<UnconfirmedMaximumPriceError error={maximumPriceError} />}
             >
                 <p>Asunnosta ei ole vahvistettua enimmäishintalaskelmaa valitulle kauppakirjan päivämäärälle.</p>
                 {maximumPriceData?.surface_area_price_ceiling.value ? (

@@ -2,12 +2,15 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}) => {
-    const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
+    const nonFieldError = error?.data?.message ?? "";
+    const errorCode = error?.data?.error ?? "";
     return (
         <>
             <Dialog.Content>
                 <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
-                <p>{nonFieldError}</p>
+                <p>
+                    {nonFieldError} {errorCode ? `(${errorCode})` : ""}
+                </p>
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
