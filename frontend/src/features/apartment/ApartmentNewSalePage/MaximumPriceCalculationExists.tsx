@@ -4,7 +4,7 @@ import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {getIndexType} from "../../../common/localisation";
 import {IApartmentMaximumPriceCalculationDetails} from "../../../common/schemas";
-import {formatMoney, hdsToast} from "../../../common/utils";
+import {formatDate, formatMoney, hdsToast} from "../../../common/utils";
 import {ApartmentSaleContext} from "./index";
 
 // Element to display when there is a valid maximum price calculation for the apartment
@@ -55,6 +55,11 @@ const LoadedMaximumPriceCalculationExists = ({
                         : formatMoney(maximumPrices.apartmentShareOfHousingCompanyLoans)}
                 </span>{" "}
                 lainaosuudella.
+                <br />
+                Laskelma on voimassa <span>{formatDate(maximumPriceCalculation.calculation_date)}</span> ─{" "}
+                <span>{formatDate(maximumPriceCalculation.valid_until)}</span>.
+                <br />
+                Vahvistettu <span>{formatDate(maximumPriceCalculation.confirmed_at)}</span>.
             </p>
         </div>
     );
