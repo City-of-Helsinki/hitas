@@ -1,11 +1,3 @@
-import {createContext} from "react";
-import {IApartmentDetails} from "../../../common/schemas";
-import ApartmentNewSalePage from "./ApartmentNewSalePage";
+import ApartmentSalePage from "./ApartmentSalePage";
 
-export default ApartmentNewSalePage;
-
-export const ApartmentSaleContext = createContext<{
-    apartment?: IApartmentDetails;
-    saleForm?;
-    formExtraFieldErrorMessages?;
-}>({});
+export default ApartmentSalePage;

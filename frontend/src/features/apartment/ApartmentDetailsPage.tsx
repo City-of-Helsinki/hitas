@@ -117,7 +117,7 @@ const ApartmentConditionsOfSaleCard = ({
                     <Button
                         theme="black"
                         iconLeft={<IconGlyphEuro />}
-                        disabled={housingCompany.regulation_status !== "regulated"}
+                        disabled={housingCompany.regulation_status !== "regulated" || !apartment.surface_area}
                     >
                         Kauppatapahtuma
                     </Button>

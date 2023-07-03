@@ -558,29 +558,6 @@ const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
     })
 );
 
-// Writable Apartment Sale Form
-const ApartmentSaleFormSchema = object({
-    key: string().optional(),
-    notification_date: z
-        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
-    purchase_date: z
-        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
-    purchase_price: z
-        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .nonnegative(errorMessages.priceMin)
-        .max(999999, errorMessages.priceMax)
-        .multipleOf(1, errorMessages.noDecimalPlaces)
-        .nullish(),
-    apartment_share_of_housing_company_loans: z
-        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .nonnegative(errorMessages.loanShareMin)
-        .multipleOf(1, errorMessages.noDecimalPlaces)
-        .nullish(),
-    exclude_from_statistics: boolean(),
-});
-
 // Writable list of ownerships
 const OwnershipsListSchema = object({
     owner: object({id: APIIdString.optional().or(z.literal(""))}),
@@ -635,12 +612,37 @@ const OwnershipsListSchema = object({
         }
     });
 
+// Writable Apartment Sale Form
+const ApartmentSaleFormSchema = object({
+    key: string().optional(),
+    notification_date: z
+        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
+    purchase_date: z
+        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
+    purchase_price: z
+        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+        .nonnegative(errorMessages.priceMin)
+        .max(999999, errorMessages.priceMax)
+        .multipleOf(1, errorMessages.noDecimalPlaces)
+        .nullish(),
+    apartment_share_of_housing_company_loans: z
+        .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
+        .nonnegative(errorMessages.loanShareMin)
+        .multipleOf(1, errorMessages.noDecimalPlaces)
+        .nullish(),
+    exclude_from_statistics: boolean(),
+    ownerships: OwnershipsListSchema.optional(),
+});
+
 // Apartment Sale Form that can be submitted.
 // Other validations still need to be done, but those are out of scope for this schema.
 
 const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
     purchase_price: true,
     apartment_share_of_housing_company_loans: true,
+    ownerships: true,
 }).and(
     object({
         id: string().optional(),

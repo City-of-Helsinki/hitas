@@ -1,13 +1,11 @@
 import {Fieldset} from "hds-react";
 import {useContext} from "react";
-import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
-import {formatMoney} from "../../../common/utils";
-import {ApartmentSaleContext} from "./index";
+import SimpleErrorMessage from "../../../../common/components/SimpleErrorMessage";
+import {formatMoney} from "../../../../common/utils";
+import {ApartmentSaleContext} from "../utils";
 
-const ApartmentCatalogPrices = () => {
+const ApartmentCatalogPricesFieldSet = () => {
     const {apartment, formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
-
-    if (!apartment) return null;
 
     const maximumPrices = {
         maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
@@ -44,4 +42,4 @@ const ApartmentCatalogPrices = () => {
     );
 };
 
-export default ApartmentCatalogPrices;
+export default ApartmentCatalogPricesFieldSet;

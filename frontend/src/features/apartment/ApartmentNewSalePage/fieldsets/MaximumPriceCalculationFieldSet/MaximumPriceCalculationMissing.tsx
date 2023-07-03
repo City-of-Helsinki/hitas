@@ -1,11 +1,10 @@
 import {useContext} from "react";
-import {formatMoney, getApartmentUnconfirmedPrices} from "../../../common/utils";
-import {ApartmentSaleContext} from "./index";
+import {formatMoney, getApartmentUnconfirmedPrices} from "../../../../../common/utils";
+import {ApartmentSaleContext} from "../../utils";
 
 // Element to display when there is no valid maximum price calculation for the apartment
 const MaximumPriceCalculationMissing = () => {
     const {apartment} = useContext(ApartmentSaleContext);
-    if (!apartment) return null;
 
     const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
 
