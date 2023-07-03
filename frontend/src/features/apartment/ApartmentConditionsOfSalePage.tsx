@@ -384,7 +384,7 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
             })
             .catch((e) => {
                 hdsToast.error("Myyntiehdon poisto epäonnistui.");
-                // es-lint-disable-next-line no-console
+                // eslint-disable-next-line no-console
                 console.warn(e);
             });
     };
