@@ -11,7 +11,7 @@ import {
 export interface ISalesPageMaximumPrices {
     maximumPrice: number | null;
     debtFreePurchasePrice: number | null;
-    apartmentShareOfHousingCompanyLoans: number;
+    apartmentShareOfHousingCompanyLoans: number | null;
     index: (typeof indexNames)[number] | "";
 }
 
@@ -27,7 +27,9 @@ export const ApartmentSaleContext = createContext<{
 export const isApartmentMaxPriceCalculationValid = (apartment, purchaseDate: string | undefined | null) => {
     if (apartment.prices.maximum_prices.confirmed) {
         const comparisonDate = purchaseDate ? new Date(purchaseDate) : new Date();
-        return comparisonDate <= new Date(apartment.prices.maximum_prices.confirmed.valid.valid_until);
+        const calculationDate = new Date(apartment.prices.maximum_prices.confirmed.calculation_date);
+        const validUntil = new Date(apartment.prices.maximum_prices.confirmed.valid.valid_until);
+        return calculationDate <= comparisonDate && comparisonDate <= validUntil;
     }
     return false;
 };

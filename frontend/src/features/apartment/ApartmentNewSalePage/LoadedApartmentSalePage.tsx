@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Fieldset} from "hds-react";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
@@ -8,7 +8,7 @@ import {z, ZodSchema} from "zod";
 import {useCreateSaleMutation} from "../../../app/services";
 import {ConfirmDialogModal, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
 import {IApartmentDetails, IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
-import {getApartmentUnconfirmedPrices, hdsToast, today} from "../../../common/utils";
+import {hdsToast, today} from "../../../common/utils";
 import {ApartmentCatalogPricesFieldSet, ApartmentSaleFormFieldSet, MaximumPriceCalculationFieldSet} from "./fieldsets";
 import {ApartmentSaleContext, getRefinedApartmentSaleFormSchema, ISalesPageMaximumPrices} from "./utils";
 
@@ -19,23 +19,12 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
     // * States *
     // **********
 
-    const isApartmentFirstSale = !apartment.prices.first_purchase_date;
-    const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
-    const [maximumPrices, setMaximumPrices] = useState<ISalesPageMaximumPrices>(
-        isApartmentFirstSale
-            ? {
-                  maximumPrice: apartment.prices.catalog_purchase_price ?? 0,
-                  debtFreePurchasePrice: apartment.prices.catalog_acquisition_price ?? 0,
-                  apartmentShareOfHousingCompanyLoans: apartment.prices.catalog_share_of_housing_company_loans ?? 0,
-                  index: "",
-              }
-            : {
-                  maximumPrice: unconfirmedPrices.surface_area_price_ceiling.value,
-                  debtFreePurchasePrice: unconfirmedPrices.surface_area_price_ceiling.value,
-                  apartmentShareOfHousingCompanyLoans: 0,
-                  index: "surface_area_price_ceiling",
-              }
-    );
+    const [maximumPrices, setMaximumPrices] = useState<ISalesPageMaximumPrices>({
+        maximumPrice: null,
+        debtFreePurchasePrice: null,
+        apartmentShareOfHousingCompanyLoans: null,
+        index: "",
+    });
 
     // ************
     // * Warnings *
@@ -56,6 +45,7 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
     // * Form initialization *
     // ***********************
 
+    const isApartmentFirstSale = !apartment.prices.first_purchase_date;
     const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
         purchase_date: "",
@@ -89,6 +79,13 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
         // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
+
+    // Re-validate form due to maximum prices changing, only if purchase_price has a value
+    useEffect(() => {
+        if (maximumPrices.maximumPrice !== null && saleForm.getValues("purchase_price")) {
+            saleForm.trigger();
+        }
+    }, [maximumPrices]);
 
     // ************************
     // * Form submit handling *
