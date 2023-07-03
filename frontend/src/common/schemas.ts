@@ -78,6 +78,7 @@ export const errorMessages = {
     overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
     priceHigherThanUnconfirmedMaxPrice: "Velaton kauppahinta ylittää rajaneliöhinnan.",
     loanShareChanged: "Lainaosuus muuttunut laskelmasta",
+    loanShareChangedCatalog: "Lainaosuus muuttunut myyntihintaluettelon tiedoista",
     catalogOverMaxPrice: "Kauppahinta ylittää myyntihintaluettelon hinnan",
     catalogUnderMaxPrice: "Kauppahinta alittaa myyntihintaluettelon hinnan",
     catalogPricesMissing: "Myyntihintaluettelon hinnat puuttuvat",

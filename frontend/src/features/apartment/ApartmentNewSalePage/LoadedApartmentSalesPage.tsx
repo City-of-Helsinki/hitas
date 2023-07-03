@@ -22,6 +22,7 @@ import {getApartmentUnconfirmedPrices, hdsToast, today} from "../../../common/ut
 import ApartmentCatalogPrices from "./ApartmentCatalogPrices";
 import {ApartmentSaleContext} from "./index";
 import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
+import {isApartmentMaxPriceCalculationValid} from "./utils";
 
 export interface ISalesPageMaximumPrices {
     maximumPrice: number | null;
@@ -32,9 +33,8 @@ export interface ISalesPageMaximumPrices {
 
 const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) => {
     const navigate = useNavigate();
-
     const isApartmentFirstSale = !apartment.prices.first_purchase_date;
-    const isApartmentMaxPriceCalculationValid = !!apartment.prices.maximum_prices.confirmed?.valid.is_valid;
+
     const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
 
     const [maximumPrices, setMaximumPrices] = useState<ISalesPageMaximumPrices>(
@@ -75,8 +75,52 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
     const initialFormOwnershipsList = apartment.ownerships.map((o) => ({...o, key: uuidv4()}));
 
     // superRefine does not run if the schema validation fails early.
-    // Use as simple as possible schema for the form to allow superRefine to always run.
-    const RefinedApartmentSaleFormSchema: ZodSchema = ApartmentSaleFormSchema.pick({
+    // Use as simple as possible schemas for the form to allow superRefine to always run.
+    const ApartmentFirstSaleFormSchema: ZodSchema = ApartmentSaleFormSchema.pick({
+        purchase_price: true,
+        apartment_share_of_housing_company_loans: true,
+    }).superRefine((data, ctx) => {
+        if (maximumPrices.debtFreePurchasePrice === null || maximumPrices.maximumPrice === null) return;
+        const debtFreePurchasePrice = (data.purchase_price ?? 0) + (data.apartment_share_of_housing_company_loans ?? 0);
+
+        // We should show a warning and ask for confirmation if catalog prices are missing
+        if (!warningsGiven.catalog_acquisition_price) {
+            if (apartment.prices.catalog_acquisition_price === null) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["catalog_acquisition_price"],
+                    message: errorMessages.catalogPricesMissing,
+                });
+            } else if (debtFreePurchasePrice < apartment.prices.catalog_acquisition_price) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["catalog_acquisition_price"],
+                    message: errorMessages.catalogUnderMaxPrice,
+                });
+            } else if (debtFreePurchasePrice > apartment.prices.catalog_acquisition_price) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["catalog_acquisition_price"],
+                    message: errorMessages.catalogOverMaxPrice,
+                });
+            }
+        }
+
+        // The apartment share of housing company loans must match the sales catalog price.
+        if (
+            !warningsGiven.maximum_price_calculation &&
+            data.apartment_share_of_housing_company_loans !== null &&
+            data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["apartment_share_of_housing_company_loans"],
+                message: errorMessages.loanShareChangedCatalog,
+            });
+        }
+    });
+    const ApartmentReSaleFormSchema: ZodSchema = ApartmentSaleFormSchema.pick({
+        purchase_date: true,
         purchase_price: true,
         apartment_share_of_housing_company_loans: true,
         exclude_from_statistics: true,
@@ -90,39 +134,16 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             });
         }
 
-        if (maximumPrices.debtFreePurchasePrice === null || maximumPrices.maximumPrice === null) {
-            return;
-        }
+        if (data.exclude_from_statistics) return; // No need to validate further.
 
+        if (maximumPrices.debtFreePurchasePrice === null || maximumPrices.maximumPrice === null) return;
         const debtFreePurchasePrice = (data.purchase_price ?? 0) + (data.apartment_share_of_housing_company_loans ?? 0);
 
-        // First sale
-        if (isApartmentFirstSale) {
-            // We should show a warning and ask for confirmation if catalog prices are missing
-            if (!warningsGiven.catalog_acquisition_price) {
-                if (apartment.prices.catalog_acquisition_price === null) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ["catalog_acquisition_price"],
-                        message: errorMessages.catalogPricesMissing,
-                    });
-                } else if (debtFreePurchasePrice < apartment.prices.catalog_acquisition_price) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ["catalog_acquisition_price"],
-                        message: errorMessages.catalogUnderMaxPrice,
-                    });
-                } else if (debtFreePurchasePrice > apartment.prices.catalog_acquisition_price) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ["catalog_acquisition_price"],
-                        message: errorMessages.catalogOverMaxPrice,
-                    });
-                }
-            }
-        } else if (!warningsGiven.maximum_price_calculation) {
+        const isCalculationValid = isApartmentMaxPriceCalculationValid(apartment, data.purchase_date);
+
+        if (!warningsGiven.maximum_price_calculation) {
             // Normal apartment sale without confirmed maximum price calculation
-            if (!isApartmentMaxPriceCalculationValid) {
+            if (!isCalculationValid) {
                 if (debtFreePurchasePrice > maximumPrices.debtFreePurchasePrice) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
@@ -142,33 +163,36 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                 if (data.purchase_price && data.purchase_price > maximumPrices.maximumPrice) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
-                        path: ["purchase_price"],
+                        path: ["maximum_price_calculation"],
                         message: errorMessages.overMaxPrice,
                     });
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
-                        path: ["maximum_price_calculation"],
+                        path: ["purchase_price"],
                         message: errorMessages.overMaxPrice,
                     });
                 }
             }
+        }
 
-            // The apartment share of housing company loans must match the maximum price calculations or catalog loan value.
-            if (
-                isApartmentMaxPriceCalculationValid &&
-                data.apartment_share_of_housing_company_loans !== null &&
-                data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans
-            ) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ["apartment_share_of_housing_company_loans"],
-                    message: errorMessages.loanShareChanged,
-                });
-            }
+        // The apartment share of housing company loans must match the maximum price calculations value
+        if (
+            isCalculationValid &&
+            data.apartment_share_of_housing_company_loans !== null &&
+            data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["apartment_share_of_housing_company_loans"],
+                message: errorMessages.loanShareChanged,
+            });
         }
     });
     // Merge the schemas to get access to all the errors at the same time.
-    const RefinedApartmentSaleSchema: ZodSchema = z.intersection(ApartmentSaleSchema, RefinedApartmentSaleFormSchema);
+    const RefinedApartmentSaleSchema: ZodSchema = z.intersection(
+        ApartmentSaleSchema,
+        isApartmentFirstSale ? ApartmentFirstSaleFormSchema : ApartmentReSaleFormSchema
+    );
 
     const resolver = (data, context, options) => {
         return zodResolver(RefinedApartmentSaleSchema)(data, context, {
@@ -230,7 +254,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
         } else if (errors.purchase_date) {
             hdsToast.error(`Kauppakirjan päivämäärä: ${errors.purchase_date.message}`);
             return;
-        } else if (errors.purchase_price) {
+        } else if (errors.purchase_price && !errors.maximum_price_calculation) {
             hdsToast.error(`Kauppahinta: ${errors.purchase_price.message}`);
             return;
         } else if (errors.apartment_share_of_housing_company_loans) {
@@ -287,6 +311,9 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
             });
     };
 
+    const isFormDateFieldsInvalid =
+        formExtraFieldErrorMessages &&
+        !!(formExtraFieldErrorMessages.purchase_date || formExtraFieldErrorMessages.notification_date);
     return (
         <div className="view--apartment-conditions-of-sale">
             <div className="fieldsets">
@@ -320,6 +347,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                         formObject={saleForm}
                                         unit="€"
                                         required
+                                        disabled={isFormDateFieldsInvalid}
                                     />
                                     <NumberInput
                                         name="apartment_share_of_housing_company_loans"
@@ -327,6 +355,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                         formObject={saleForm}
                                         unit="€"
                                         required
+                                        disabled={isFormDateFieldsInvalid}
                                     />
                                 </div>
                                 {!isApartmentFirstSale ? (
@@ -335,6 +364,7 @@ const LoadedApartmentSalesPage = ({apartment}: {apartment: IApartmentDetails}) =
                                         label="Ei tilastoihin (esim. sukulaiskauppa)"
                                         formObject={saleForm}
                                         triggerField="purchase_price"
+                                        disabled={isFormDateFieldsInvalid}
                                     />
                                 ) : null}
                             </form>

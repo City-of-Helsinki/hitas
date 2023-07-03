@@ -10,21 +10,24 @@ const MaximumPriceCalculationMissing = () => {
     const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
 
     return (
-        <div className="row row--prompt">
-            <p>
-                Asunnosta ei ole vahvistettua enimmäishintalaskelmaa.
+        <div className="row row--max-prices--unconfirmed">
+            <>
+                <p>Asunnosta ei ole vahvistettua enimmäishintalaskelmaa valitulle kauppakirjan päivämäärälle.</p>
                 {unconfirmedPrices.surface_area_price_ceiling.value ? (
                     <>
-                        Enimmäishintana käytetään asunnon rajaneliöhinta-arviota
-                        <b> {formatMoney(unconfirmedPrices.surface_area_price_ceiling.value)}.</b>
-                        <br />
-                        Mikäli asunnon velaton kauppahinta ylittää rajaneliöhinta-arvion, tulee asunnolle luoda
-                        vahvistettu enimmäishintalaskelma.
+                        <p>
+                            Enimmäishintana käytetään asunnon rajaneliöhinta-arviota
+                            <span> {formatMoney(unconfirmedPrices.surface_area_price_ceiling.value)}.</span>
+                        </p>
+                        <p>
+                            Mikäli asunnon velaton kauppahinta ylittää rajaneliöhinta-arvion, tulee asunnolle luoda
+                            vahvistettu enimmäishintalaskelma.
+                        </p>
                     </>
                 ) : (
                     <b> Asunnon rajaneliöhinta-arviota ei voitu laskea.</b>
                 )}
-            </p>
+            </>
         </div>
     );
 };

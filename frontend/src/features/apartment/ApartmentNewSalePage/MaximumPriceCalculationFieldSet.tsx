@@ -4,18 +4,15 @@ import {useFormContext} from "react-hook-form";
 import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
-import {
-    ApartmentSaleFormSchema,
-    IApartmentConfirmedMaximumPrice,
-    IApartmentMaximumPriceCalculationDetails,
-} from "../../../common/schemas";
-import {formatDate, hdsToast} from "../../../common/utils";
+import {ApartmentSaleFormSchema, IApartmentMaximumPriceCalculationDetails} from "../../../common/schemas";
+import {hdsToast} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentSaleContext} from "./index";
 import {ISalesPageMaximumPrices} from "./LoadedApartmentSalesPage";
 import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
 import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 import MaximumPriceModalError from "./MaximumPriceModalError";
+import {isApartmentMaxPriceCalculationValid} from "./utils";
 
 const MaximumPriceCalculationFieldSet = ({
     setMaximumPrices,
@@ -35,10 +32,9 @@ const MaximumPriceCalculationFieldSet = ({
         },
     ] = useSaveApartmentMaximumPriceMutation();
 
-    if (!apartment) return null;
+    if (!apartment) return null; // In reality this will never happen, but TS doesn't know that :)
 
-    const hasApartmentConfirmedCalculation =
-        apartment.prices.maximum_prices.confirmed && apartment.prices.maximum_prices.confirmed.valid.is_valid;
+    const isCalculationValid = isApartmentMaxPriceCalculationValid(apartment, saleForm.watch("purchase_date"));
 
     const apartmentShareOfLoans = saleForm.getValues("apartment_share_of_housing_company_loans");
     const hasLoanValueChanged =
@@ -83,16 +79,8 @@ const MaximumPriceCalculationFieldSet = ({
     };
 
     return (
-        <Fieldset
-            heading={`Enimmäishintalaskelma${
-                hasApartmentConfirmedCalculation
-                    ? ` (vahvistettu ${formatDate(
-                          (apartment.prices.maximum_prices.confirmed as IApartmentConfirmedMaximumPrice).confirmed_at
-                      )})`
-                    : ""
-            } *`}
-        >
-            {hasApartmentConfirmedCalculation ? (
+        <Fieldset heading="Enimmäishintalaskelma *">
+            {isCalculationValid ? (
                 <MaximumPriceCalculationExists setMaximumPrices={setMaximumPrices} />
             ) : (
                 <MaximumPriceCalculationMissing />
