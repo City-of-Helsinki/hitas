@@ -413,7 +413,7 @@ const detailApi = hitasApi.injectEndpoints({
                 date: string;
             }) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/retrieve-unconfirmed-prices-for-date`,
-                params: {request_date: date},
+                params: {calculation_date: date},
             }),
         }),
         getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({

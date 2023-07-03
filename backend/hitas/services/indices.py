@@ -287,7 +287,8 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
 def subquery_apartment_current_surface_area_price(
     calculation_date: Optional[datetime.date] = None,
 ) -> RoundWithPrecision:
-    calculation_month = monthify(timezone.now().date()) if calculation_date is None else monthify(calculation_date)
+    calculation_date = timezone.now().date() if calculation_date is None else calculation_date
+    calculation_month = monthify(calculation_date)
 
     current_value = Subquery(
         SurfaceAreaPriceCeiling.objects.filter(month=calculation_month).values("value"),

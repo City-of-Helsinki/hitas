@@ -437,18 +437,10 @@ class PricesSerializer(serializers.Serializer):
     @staticmethod
     def get_confirmed_max_prices(instance: Apartment) -> Optional[Dict[str, Any]]:
         latest_confirmed_max_price_calculation = (
-            instance.max_price_calculations.only(
-                "uuid",
-                "created_at",
-                "confirmed_at",
-                "calculation_date",
-                "maximum_price",
-                "valid_until",
-                "apartment_id",
-                "json_version",
+            instance.max_price_calculations.filter(
+                confirmed_at__isnull=False,
             )
-            .filter(confirmed_at__isnull=False)
-            .order_by("-confirmed_at", "-maximum_price")  # migrated calculations have the same datestamp
+            .order_by("-confirmed_at", "-calculation_date")
             .first()
         )
 
@@ -843,8 +835,8 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
-        calculation_date: datetime.date = self.kwargs.get("calculation_date") or from_iso_format_or_today_if_none(
-            self.request.query_params.get("calculation_date")
+        calculation_date: datetime.date = from_iso_format_or_today_if_none(
+            self.request.query_params.get("calculation_date") or self.request.data.get("calculation_date")
         )
         completion_date: Optional[datetime.date] = (
             Apartment.objects.filter(uuid=self.kwargs["uuid"]).values_list("completion_date", flat=True).first()
@@ -883,14 +875,15 @@ class ApartmentViewSet(HitasModelViewSet):
 
     @action(detail=True, methods=["GET"], url_path="retrieve-unconfirmed-prices-for-date")
     def retrieve_unconfirmed_prices_for_date(self, request, **kwargs):
-        input_data = UnconfirmedPriceSerializer(data=request.query_params)
-        input_data.is_valid(raise_exception=True)
+        calculation_date: datetime.date = from_iso_format_or_today_if_none(
+            self.request.query_params.get("calculation_date")
+        )
 
-        self.kwargs["calculation_month"] = this_month = monthify(input_data.validated_data["request_date"])
+        calculation_month = monthify(calculation_date)
 
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
-        ump = _validate_apartment_unconfirmed_prices(apartment_data, this_month)
+        ump = _validate_apartment_unconfirmed_prices(apartment_data, calculation_month)
         return Response(ump)
 
     @action(detail=True, methods=["POST"], url_path="reports/download-latest-unconfirmed-prices")
@@ -898,15 +891,14 @@ class ApartmentViewSet(HitasModelViewSet):
         input_data = UnconfirmedPriceSerializer(data=request.data)
         input_data.is_valid(raise_exception=True)
 
-        self.kwargs["calculation_date"] = input_data.validated_data["calculation_date"]
-        this_month = monthify(self.kwargs["calculation_date"])
+        calculation_month = monthify(input_data.validated_data["calculation_date"])
 
         apartment = self.get_object()
         apartment_data = ApartmentDetailSerializer(apartment).data
-        _validate_apartment_unconfirmed_prices(apartment_data, this_month)
+        _validate_apartment_unconfirmed_prices(apartment_data, calculation_month)
 
         surface_area_price_ceiling: Decimal = (
-            SurfaceAreaPriceCeiling.objects.filter(month=this_month).values_list("value", flat=True).first()
+            SurfaceAreaPriceCeiling.objects.filter(month=calculation_month).values_list("value", flat=True).first()
         )
         body_parts: Optional[list[str]] = (
             PDFBody.objects.filter(name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION)
