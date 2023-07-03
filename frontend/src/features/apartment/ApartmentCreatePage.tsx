@@ -49,8 +49,6 @@ const ApartmentDeleteButton = ({apartment}) => {
 
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-    if (!apartment) return null;
-
     const handleConfirmedDeleteAction = () => {
         deleteApartment({
             id: apartment.id,

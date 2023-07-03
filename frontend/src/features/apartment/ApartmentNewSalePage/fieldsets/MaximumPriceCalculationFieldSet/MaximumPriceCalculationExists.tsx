@@ -1,11 +1,11 @@
 import {useContext, useEffect} from "react";
 import {useFormContext} from "react-hook-form";
-import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
-import {QueryStateHandler} from "../../../common/components";
-import {getIndexType} from "../../../common/localisation";
-import {IApartmentMaximumPriceCalculationDetails} from "../../../common/schemas";
-import {formatDate, formatMoney, hdsToast} from "../../../common/utils";
-import {ApartmentSaleContext} from "./index";
+import {useGetApartmentMaximumPriceQuery} from "../../../../../app/services";
+import {QueryStateHandler} from "../../../../../common/components";
+import {getIndexType} from "../../../../../common/localisation";
+import {IApartmentMaximumPriceCalculationDetails} from "../../../../../common/schemas";
+import {formatDate, formatMoney, hdsToast} from "../../../../../common/utils";
+import {ApartmentSaleContext} from "../../utils";
 
 // Element to display when there is a valid maximum price calculation for the apartment
 const LoadedMaximumPriceCalculationExists = ({
@@ -65,8 +65,8 @@ const LoadedMaximumPriceCalculationExists = ({
     );
 };
 
-const MaximumPriceCalculationExists = ({setMaximumPrices}) => {
-    const {apartment} = useContext(ApartmentSaleContext);
+const MaximumPriceCalculationExists = () => {
+    const {apartment, setMaximumPrices} = useContext(ApartmentSaleContext);
     const {setValue} = useFormContext();
 
     const {
@@ -100,7 +100,7 @@ const MaximumPriceCalculationExists = ({setMaximumPrices}) => {
         if (maximumPriceCalculationData && !maximumPriceError) {
             handleSetMaxPrices(maximumPriceCalculationData);
         } else {
-            hdsToast.error("Enimmäishintalaskentan hakeminen epäonnistui.");
+            hdsToast.error("Enimmäishintalaskelman hakeminen epäonnistui.");
         }
         // eslint-disable-next-line
     }, [maximumPriceCalculationData, maximumPriceError, isMaximumPriceLoading]);
