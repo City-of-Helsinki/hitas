@@ -981,7 +981,8 @@ def test__api__apartment__retrieve__pre_2011__indices_set(api_client: HitasAPICl
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2011__old_hitas_ruleset(api_client: HitasAPIClient):
+def test__api__apartment__retrieve__pre_2011__old_hitas_ruleset(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-06-01 00:00:00+00:00")  # Required for depreciation multiplier calculation
     _test_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
@@ -1022,7 +1023,8 @@ def test__api__apartment__retrieve__pre_2011__indices_missing(api_client: HitasA
 
 
 @pytest.mark.django_db
-def test__api__apartment__retrieve__pre_2005__old_hitas_ruleset(api_client: HitasAPIClient):
+def test__api__apartment__retrieve__pre_2005__old_hitas_ruleset(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-06-01 00:00:00+00:00")  # Required for depreciation multiplier calculation
     _test_max_prices(
         api_client,
         completion_date=PRE_2005_DATE,
