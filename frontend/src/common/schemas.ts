@@ -1221,7 +1221,7 @@ export type IIndexCalculationConstructionPriceIndexBefore2011 = z.infer<
     typeof IndexCalculationConstructionPriceIndexBefore2011Schema
 >;
 export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPriceCeilingCalculationSchema>;
-export type IApartmentMaximumPrice = z.infer<typeof ApartmentMaximumPriceSchema>;
+export type IApartmentMaximumPriceCalculationDetails = z.infer<typeof ApartmentMaximumPriceSchema>;
 export type IApartmentMaximumPrice2011Onwards = z.infer<typeof ApartmentMaximumPrice2011OnwardsSchema>;
 export type IApartmentMaximumPricePre2011 = z.infer<typeof ApartmentMaximumPricePre2011Schema>;
 export type IApartmentMaximumPriceWritable = z.infer<typeof ApartmentMaximumPriceWritableSchema>;

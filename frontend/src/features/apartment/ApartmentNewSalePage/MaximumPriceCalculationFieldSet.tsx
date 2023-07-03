@@ -7,7 +7,7 @@ import SimpleErrorMessage from "../../../common/components/SimpleErrorMessage";
 import {
     ApartmentSaleFormSchema,
     IApartmentConfirmedMaximumPrice,
-    IApartmentMaximumPrice,
+    IApartmentMaximumPriceCalculationDetails,
 } from "../../../common/schemas";
 import {formatDate, hdsToast} from "../../../common/utils";
 import MaximumPriceModalContent from "../components/ApartmentMaximumPriceBreakdownModal";
@@ -143,7 +143,7 @@ const MaximumPriceCalculationFieldSet = ({
                     }
                 >
                     <MaximumPriceModalContent
-                        calculation={maximumPriceCalculationCreateData as IApartmentMaximumPrice}
+                        calculation={maximumPriceCalculationCreateData as IApartmentMaximumPriceCalculationDetails}
                         apartment={apartment}
                         setIsModalVisible={setIsCreateModalVisible}
                     />

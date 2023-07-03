@@ -13,7 +13,7 @@ import {
 import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
 import {
     IApartmentDetails,
-    IApartmentMaximumPrice,
+    IApartmentMaximumPriceCalculationDetails,
     IApartmentMaximumPriceWritable,
     IHousingCompanyDetails,
 } from "../../common/schemas";
@@ -178,7 +178,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
                     }
                 >
                     <MaximumPriceModalContent
-                        calculation={data as IApartmentMaximumPrice}
+                        calculation={data as IApartmentMaximumPriceCalculationDetails}
                         apartment={apartment}
                         setIsModalVisible={setIsModalVisible}
                     />

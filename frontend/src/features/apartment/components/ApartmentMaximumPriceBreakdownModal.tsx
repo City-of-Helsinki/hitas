@@ -7,7 +7,7 @@ import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";
 import {
     IApartmentDetails,
-    IApartmentMaximumPrice,
+    IApartmentMaximumPriceCalculationDetails,
     IIndexCalculation2011Onwards,
     IIndexCalculationConstructionPriceIndexBefore2011,
     IIndexCalculationMarketPriceIndexBefore2011,
@@ -439,7 +439,7 @@ const MaximumPriceModalContent = ({
     apartment,
     setIsModalVisible,
 }: {
-    calculation: IApartmentMaximumPrice;
+    calculation: IApartmentMaximumPriceCalculationDetails;
     apartment: IApartmentDetails;
     setIsModalVisible;
 }) => {
