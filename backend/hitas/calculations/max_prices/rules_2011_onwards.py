@@ -23,7 +23,7 @@ class Rules2011Onwards(CalculatorRules):
         if apartment.completion_date_mpi_2005eq100 is None:
             raise IndexMissingException(error_code="mpi2005eq100", date=apartment.completion_date)
         if apartment.surface_area_price_ceiling is None:
-            raise IndexMissingException(error_code="sapc", date=apartment.completion_date)
+            raise IndexMissingException(error_code="sapc", date=calculation_date)
 
     def calculate_construction_price_index_max_price(
         self,

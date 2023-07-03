@@ -100,7 +100,7 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, d
         ("mpi_completion_date", "mpi2005eq100.2014-08"),
         ("cpi_calculation_date", "cpi2005eq100.2022-07"),
         ("mpi_calculation_date", "mpi2005eq100.2022-07"),
-        ("sapc", "sapc.2014-08"),
+        ("sapc", "sapc.2022-07"),
         ("improvement_cpi", "cpi2005eq100.2020-05"),
         ("improvement_mpi", "mpi2005eq100.2020-05"),
     ],
