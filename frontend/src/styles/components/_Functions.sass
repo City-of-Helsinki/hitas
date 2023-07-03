@@ -301,33 +301,33 @@
     width: 20%
   label, .list-headers
     font-weight: 700
-.year-filter
-  width: 200px
-  margin: 0 auto
-.results-list
-  margin-bottom: $spacing-m
-  &__item
-    @include align-items(center)
-    cursor: default
-    &:hover
-      background: $color-white
-.list-headers
-  margin-top: 0
-form
-  @include flexbox()
-  @include justify-content(center)
-  @include align-items(center)
-  > div
-    @include flexbox()
-    @include justify-content(space-between)
-    @include align-items(center)
-  .input-field--dropdown
+  .year-filter
     width: 200px
-    margin: 0 $spacing-xs 0 0
-  legend
-    margin-bottom: $spacing-2-xs
-  > button
-    margin-top: $spacing-2-xs
+    margin: 0 auto
+  .results-list
+    margin-bottom: $spacing-m
+    &__item
+      @include align-items(center)
+      cursor: default
+      &:hover
+        background: $color-white
+  .list-headers
+    margin-top: 0
+  form
+    @include flexbox()
+    @include justify-content(center)
+    @include align-items(center)
+    > div
+      @include flexbox()
+      @include justify-content(space-between)
+      @include align-items(center)
+    .input-field--dropdown
+      width: 200px
+      margin: 0 $spacing-xs 0 0
+    legend
+      margin-bottom: $spacing-2-xs
+    > button
+      margin-top: $spacing-2-xs
 
 #obfuscated-owners-modal
   ul
