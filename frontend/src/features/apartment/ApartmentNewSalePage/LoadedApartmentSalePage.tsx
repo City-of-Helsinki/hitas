@@ -80,10 +80,14 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
 
-    // Re-validate form due to maximum prices changing, only if purchase_price has a value
     useEffect(() => {
+        // Re-validate form due to maximum prices changing to get rid of errors
         if (maximumPrices.maximumPrice !== null && saleForm.getValues("purchase_price")) {
             saleForm.trigger();
+        }
+        // If purchase_price didn't have a value, clear only loan share errors in case there are any
+        else if (saleForm.getValues("apartment_share_of_housing_company_loans") !== null) {
+            saleForm.trigger("apartment_share_of_housing_company_loans");
         }
     }, [maximumPrices]);
 
