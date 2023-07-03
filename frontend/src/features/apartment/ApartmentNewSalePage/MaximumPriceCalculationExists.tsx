@@ -3,12 +3,16 @@ import {useFormContext} from "react-hook-form";
 import {useGetApartmentMaximumPriceQuery} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {getIndexType} from "../../../common/localisation";
-import {IApartmentMaximumPrice} from "../../../common/schemas";
+import {IApartmentMaximumPriceCalculationDetails} from "../../../common/schemas";
 import {formatMoney, hdsToast} from "../../../common/utils";
 import {ApartmentSaleContext} from "./index";
 
 // Element to display when there is a valid maximum price calculation for the apartment
-const LoadedMaximumPriceCalculationExists = ({maximumPriceCalculation}) => {
+const LoadedMaximumPriceCalculationExists = ({
+    maximumPriceCalculation,
+}: {
+    maximumPriceCalculation: IApartmentMaximumPriceCalculationDetails;
+}) => {
     const {formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
     const {getValues} = useFormContext();
 
@@ -73,7 +77,7 @@ const MaximumPriceCalculationExists = ({setMaximumPrices}) => {
         {skip: !apartment?.prices.maximum_prices.confirmed?.id}
     );
 
-    const handleSetMaxPrices = (calculation: IApartmentMaximumPrice) => {
+    const handleSetMaxPrices = (calculation: IApartmentMaximumPriceCalculationDetails) => {
         const indexVariables = calculation.calculations[calculation.index].calculation_variables;
         setMaximumPrices({
             maximumPrice: calculation.maximum_price,
@@ -102,7 +106,9 @@ const MaximumPriceCalculationExists = ({setMaximumPrices}) => {
             error={maximumPriceError}
             isLoading={isMaximumPriceLoading}
         >
-            <LoadedMaximumPriceCalculationExists maximumPriceCalculation={maximumPriceCalculationData} />
+            <LoadedMaximumPriceCalculationExists
+                maximumPriceCalculation={maximumPriceCalculationData as IApartmentMaximumPriceCalculationDetails}
+            />
         </QueryStateHandler>
     );
 };

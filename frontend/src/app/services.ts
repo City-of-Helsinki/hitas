@@ -4,7 +4,7 @@ import {getCookie} from "typescript-cookie";
 import {
     IApartmentDetails,
     IApartmentListResponse,
-    IApartmentMaximumPrice,
+    IApartmentMaximumPriceCalculationDetails,
     IApartmentMaximumPriceWritable,
     IApartmentQuery,
     IApartmentSale,
@@ -388,7 +388,7 @@ const detailApi = hitasApi.injectEndpoints({
             }),
             providesTags: (result, error, arg) => [{type: "ConditionOfSale", id: arg}],
         }),
-        getApartmentMaximumPrice: builder.query<IApartmentMaximumPrice, object>({
+        getApartmentMaximumPrice: builder.query<IApartmentMaximumPriceCalculationDetails, object>({
             query: ({
                 housingCompanyId,
                 apartmentId,
@@ -535,7 +535,7 @@ const mutationApi = hitasApi.injectEndpoints({
             ],
         }),
         saveApartmentMaximumPrice: builder.mutation<
-            IApartmentMaximumPrice,
+            IApartmentMaximumPriceCalculationDetails,
             {
                 data: IApartmentMaximumPriceWritable | {confirm: true};
                 id?: string;
