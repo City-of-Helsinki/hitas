@@ -263,7 +263,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                         successMessage="Isännöitsijän tiedot tallennettu onnistuneesti!"
                         errorMessage="Virhe isännöitsijän tietojen tallentamisessa!"
                         notModifiedMessage="Ei muutoksia isännöitsijän tiedoissa."
-                        defaultFocusFieldName="name"
                         formFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
                         requiredFields={["name"]}
                     />

@@ -20,7 +20,6 @@ interface IResultListProps<
     successMessage?: string;
     errorMessage?: string;
     notModifiedMessage?: string;
-    defaultFocusFieldName?: string;
     formFieldsWithTitles?: TFormFieldsWithTitles;
     requiredFields?: string[];
 }
@@ -45,7 +44,6 @@ function ResultList<
     successMessage,
     errorMessage,
     notModifiedMessage,
-    defaultFocusFieldName,
     formFieldsWithTitles,
     requiredFields,
 }: IResultListProps<TFilterQueryParams, TListFieldsWithTitles, TFormFieldsWithTitles>) {
@@ -74,7 +72,6 @@ function ResultList<
         successMessage,
         errorMessage,
         notModifiedMessage,
-        defaultFocusFieldName,
         formFieldsWithTitles,
         requiredFields,
     };
@@ -161,7 +158,6 @@ interface IMutateSearchListProps<
     successMessage?: string;
     errorMessage?: string;
     notModifiedMessage?: string;
-    defaultFocusFieldName?: string;
     formFieldsWithTitles?: TFormFieldsWithTitles;
     requiredFields?: string[];
 }
@@ -186,7 +182,6 @@ export default function MutateSearchList<
     successMessage,
     errorMessage,
     notModifiedMessage,
-    defaultFocusFieldName,
     formFieldsWithTitles,
     requiredFields,
 }: IMutateSearchListProps<TListFieldsWithTitles, TFilterQueryParams, TFormFieldsWithTitles>) {
@@ -212,7 +207,6 @@ export default function MutateSearchList<
         successMessage,
         errorMessage,
         notModifiedMessage,
-        defaultFocusFieldName,
         formFieldsWithTitles,
         requiredFields,
     };

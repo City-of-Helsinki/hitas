@@ -57,7 +57,6 @@ const Codes = (): JSX.Element => {
                         successMessage="Isännöitsijän tiedot tallennettu onnistuneesti!"
                         errorMessage="Virhe isännöitsijän tietojen tallentamisessa!"
                         notModifiedMessage="Ei muutoksia isännöitsijän tiedoissa."
-                        defaultFocusFieldName="name"
                         formFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
                         requiredFields={["name"]}
                     />
@@ -76,7 +75,6 @@ const Codes = (): JSX.Element => {
                         successMessage="Rakennuttajan tiedot tallennettu onnistuneesti!"
                         errorMessage="Virhe rakennuttajan tietojen tallentamisessa!"
                         notModifiedMessage="Ei muutoksia rakennuttajan tiedoissa."
-                        defaultFocusFieldName="value"
                         formFieldsWithTitles={{value: "Nimi", description: "Kuvaus"}}
                         requiredFields={["value", "description"]}
                     />
