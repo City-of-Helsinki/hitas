@@ -160,7 +160,6 @@ const CodeSchema = object({
     id: APIIdString,
     value: string(),
     description: string().nullable(),
-    code: string(),
 });
 
 const PostalCodeSchema = object({
@@ -259,7 +258,6 @@ const DeveloperSchema = object({
         .min(2, errorMessages.stringLength)
         .max(256, errorMessages.stringMaxIs + "256")
         .nullable(),
-    code: string().nonempty(errorMessages.required),
 });
 
 const HousingCompanyDetailsSchema = object({
