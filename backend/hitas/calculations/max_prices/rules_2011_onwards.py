@@ -119,7 +119,10 @@ class Rules2011Onwards(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
+            raise InvalidCalculationResultException(
+                error_code="max_price_lte_zero",
+                message="Calculated maximum price is less than or equal to zero",
+            )
 
         return IndexCalculation(
             maximum_price=max_price,

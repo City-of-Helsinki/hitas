@@ -12,8 +12,8 @@ class IndexMissingException(ModelConflict):
 
 
 class InvalidCalculationResultException(ModelConflict):
-    def __init__(self, *, error_code: str):
+    def __init__(self, *, error_code: str, message: str = ""):
         super().__init__(
             error_code=error_code,
-            message="Maximum price calculation could not be completed.",
+            message=" ".join(("Maximum price calculation could not be completed.", message)),
         )

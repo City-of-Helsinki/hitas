@@ -466,29 +466,23 @@ class PricesSerializer(serializers.Serializer):
 
     @staticmethod
     def get_unconfirmed_max_prices(instance: Apartment) -> Dict[str, Any]:
-        pre2011 = None
-        onwards2011 = None
-
         def instance_values(keys: list[str]):
             retval = []
-
             for key in keys:
                 value = getattr(instance, key, None)
-
                 retval.append(value)
-
             return retval
 
         def max_with_nones(*values):
-            """
-            Differs from normal max() by allowing None values. Returns None if no max value is found.
-            """
-
+            """Differs from normal max() by allowing None values. Returns None if no max value is found"""
             values = list(filter(None, values))
             return max(values) if values else None
 
         def value_obj(v: float, max_value: float):
             return {"value": v, "maximum": v is not None and v == max_value}
+
+        pre2011 = None
+        onwards2011 = None
 
         if instance.housing_company.hitas_type.old_hitas_ruleset:
             # Handle apartments completed before year 2011

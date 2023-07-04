@@ -273,7 +273,10 @@ def calculate_single_housing_company_improvement_pre_2011_market_price_index(
     # In a few cases the improvement value should be fully accepted without any deductions.
     if improvement.no_deductions:
         if not apartment_shares_count:
-            raise InvalidCalculationResultException(error_code="missing_shares_count")
+            raise InvalidCalculationResultException(
+                error_code="missing_shares_count",
+                message="Apartment shares are required for this calculation.",
+            )
 
         index_adjusted = improvement.value * calculation_date_index / improvement.completion_date_index
         return HousingCompanyImprovementCalculationResult(

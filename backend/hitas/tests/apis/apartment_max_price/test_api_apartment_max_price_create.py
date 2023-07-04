@@ -173,7 +173,8 @@ def test__api__apartment_max_price__too_high_loan(api_client: HitasAPIClient):
 
     assert response.json() == {
         "error": "max_price_lte_zero",
-        "message": "Maximum price calculation could not be completed.",
+        "message": "Maximum price calculation could not be completed. "
+        "Calculated maximum price is less than or equal to zero",
         "reason": "Conflict",
         "status": 409,
     }
