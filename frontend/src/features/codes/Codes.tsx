@@ -77,8 +77,8 @@ const Codes = (): JSX.Element => {
                         errorMessage="Virhe rakennuttajan tietojen tallentamisessa!"
                         notModifiedMessage="Ei muutoksia rakennuttajan tiedoissa."
                         defaultFocusFieldName="value"
-                        formFieldsWithTitles={{value: "Nimi", description: "Kuvaus", code: "Koodi"}}
-                        requiredFields={["value", "description", "code"]}
+                        formFieldsWithTitles={{value: "Nimi", description: "Kuvaus"}}
+                        requiredFields={["value", "description"]}
                     />
                 </Tabs.TabPanel>
             </Tabs>
