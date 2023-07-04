@@ -95,27 +95,48 @@ def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> date
         .first()
     )
     if completion_date is None:
-        raise InvalidCalculationResultException(error_code="missing_housing_company_completion_date")
+        raise InvalidCalculationResultException(
+            error_code="missing_housing_company_completion_date",
+            message="Cannot create max price calculation for a housing company without completion date.",
+        )
 
     return completion_date
 
 
 def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotationsMaxPrice):
     if not apartment.surface_area:
-        raise InvalidCalculationResultException(error_code="missing_surface_area")
+        raise InvalidCalculationResultException(
+            error_code="missing_surface_area",
+            message="Cannot create max price calculation for an apartment without surface area.",
+        )
 
     if apartment.first_sale_purchase_price is None:
-        raise InvalidCalculationResultException(error_code="apartment_first_sale_purchase_price_missing")
+        raise InvalidCalculationResultException(
+            error_code="apartment_first_sale_purchase_price_missing",
+            message="Cannot create max price calculation for an apartment without a first sale purchase price.",
+        )
     if apartment.first_sale_share_of_housing_company_loans is None:
-        raise InvalidCalculationResultException(error_code="apartment_first_sale_share_of_loans_missing")
+        raise InvalidCalculationResultException(
+            error_code="apartment_first_sale_share_of_loans_missing",
+            message="Cannot create max price calculation for an apartment without a first sale loan amount.",
+        )
 
     if apartment.completion_date is None:
-        raise InvalidCalculationResultException(error_code="missing_completion_date")
+        raise InvalidCalculationResultException(
+            error_code="missing_completion_date",
+            message="Cannot create max price calculation for an apartment without completion date.",
+        )
     elif apartment.completion_date > timezone.now().date():
-        raise InvalidCalculationResultException(error_code="completion_date_in_future")
+        raise InvalidCalculationResultException(
+            error_code="completion_date_in_future",
+            message="Cannot create max price calculation for an apartment that has not been completed yet.",
+        )
 
     if apartment.housing_company.release_date:
-        raise InvalidCalculationResultException(error_code="unregulated_housing_company")
+        raise InvalidCalculationResultException(
+            error_code="unregulated_housing_company",
+            message="Cannot create max price calculations for apartments in non-regulated housing companies.",
+        )
 
 
 def calculate_max_price(

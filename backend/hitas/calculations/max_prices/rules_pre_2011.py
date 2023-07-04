@@ -46,13 +46,20 @@ class RulesPre2011(CalculatorRules):
         housing_company_completion_date: datetime.date,
     ) -> IndexCalculation:
         if not apartment.realized_housing_company_acquisition_price:
-            raise InvalidCalculationResultException(error_code="missing_realized_housing_company_acquisition_price")
+            raise InvalidCalculationResultException(
+                error_code="missing_realized_housing_company_acquisition_price",
+                message="Unable to get housing company acquisition price.",
+            )
         if not apartment.completion_date_realized_housing_company_acquisition_price:
             raise InvalidCalculationResultException(
-                error_code="missing_completion_date_realized_housing_company_acquisition_price"
+                error_code="missing_completion_date_realized_housing_company_acquisition_price",
+                message="Unable to get index adjusted housing company acquisition price.",
             )
         if not apartment.first_sale_acquisition_price:
-            raise InvalidCalculationResultException(error_code="missing_first_sale")
+            raise InvalidCalculationResultException(
+                error_code="missing_first_sale",
+                message="Cannot create max price calculation for an apartment without a first sale purchase price.",
+            )
 
         housing_company_index_adjusted_acquisition_price = (
             apartment.completion_date_realized_housing_company_acquisition_price
@@ -128,7 +135,10 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
+            raise InvalidCalculationResultException(
+                error_code="max_price_lte_zero",
+                message="Calculated maximum price is less than or equal to zero",
+            )
 
         return IndexCalculation(
             maximum_price=max_price,
@@ -228,7 +238,10 @@ class RulesPre2011(CalculatorRules):
         max_price = debt_free_shares_price - apartment_share_of_housing_company_loans
 
         if max_price <= 0:
-            raise InvalidCalculationResultException(error_code="max_price_lte_zero")
+            raise InvalidCalculationResultException(
+                error_code="max_price_lte_zero",
+                message="Calculated maximum price is less than or equal to zero",
+            )
 
         return IndexCalculation(
             maximum_price=max_price,

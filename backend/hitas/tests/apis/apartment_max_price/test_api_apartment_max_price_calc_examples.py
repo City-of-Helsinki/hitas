@@ -1371,8 +1371,9 @@ def test__api__apartment_max_price__no_sales_on_apartment__has_catalog_prices__p
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "missing_first_sale",
-        "message": "Maximum price calculation could not be completed.",
+        "error": "apartment_first_sale_purchase_price_missing",
+        "message": "Maximum price calculation could not be completed. "
+        "Cannot create max price calculation for an apartment without a first sale purchase price.",
         "reason": "Conflict",
         "status": 409,
     }
@@ -1410,8 +1411,9 @@ def test__api__apartment_max_price__no_sales_on_apartment__no_catalog_prices__pr
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
-        "error": "missing_realized_housing_company_acquisition_price",
-        "message": "Maximum price calculation could not be completed.",
+        "error": "apartment_first_sale_purchase_price_missing",
+        "message": "Maximum price calculation could not be completed. "
+        "Cannot create max price calculation for an apartment without a first sale purchase price.",
         "reason": "Conflict",
         "status": 409,
     }
