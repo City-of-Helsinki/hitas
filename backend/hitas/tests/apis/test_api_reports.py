@@ -451,6 +451,7 @@ def test__api__regulated_housing_companies_report__single_housing_company(api_cl
     housing_company: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00001",
         postal_code__cost_area=1,
+        hitas_type=HitasType.HITAS_I,
     )
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2020, 1, 1),
@@ -476,6 +477,7 @@ def test__api__regulated_housing_companies_report__single_housing_company(api_cl
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
+            "Puolihitas",
         ),
         (
             housing_company.postal_code.cost_area,
@@ -485,8 +487,9 @@ def test__api__regulated_housing_companies_report__single_housing_company(api_cl
             datetime.datetime.fromisoformat(sale.apartment.completion_date.isoformat()),
             1,
             int(sale.total_price / sale.apartment.surface_area),
+            None,
         ),
-        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 
@@ -495,6 +498,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
     housing_company_1: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00001",
         postal_code__cost_area=1,
+        hitas_type=HitasType.HITAS_I,
     )
     sale_1: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2020, 1, 1),
@@ -508,6 +512,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
     housing_company_2: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00002",
         postal_code__cost_area=1,
+        hitas_type=HitasType.HALF_HITAS,
     )
     sale_2: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2021, 1, 1),
@@ -533,6 +538,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
+            "Puolihitas",
         ),
         (
             housing_company_1.postal_code.cost_area,
@@ -542,6 +548,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat()),
             1,
             int(sale_1.total_price / sale_1.apartment.surface_area),
+            None,
         ),
         (
             housing_company_2.postal_code.cost_area,
@@ -551,8 +558,9 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             datetime.datetime.fromisoformat(sale_2.apartment.completion_date.isoformat()),
             1,
             int(sale_2.total_price / sale_2.apartment.surface_area),
+            "X",
         ),
-        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 
@@ -561,6 +569,7 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
     housing_company_1: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00001",
         postal_code__cost_area=1,
+        hitas_type=HitasType.HITAS_I,
     )
     sale_1: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2020, 1, 1),
@@ -571,11 +580,12 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
         apartment__building__real_estate__housing_company=housing_company_1,
     )
 
-    # Housing company not included in the report since its released from regulation
+    # Housing company not included in the report since it's released from regulation
     housing_company_2: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00002",
         postal_code__cost_area=1,
         regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        hitas_type=HitasType.HITAS_I,
     )
     ApartmentSaleFactory.create(
         purchase_date=datetime.date(2021, 1, 1),
@@ -601,6 +611,7 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
+            "Puolihitas",
         ),
         (
             housing_company_1.postal_code.cost_area,
@@ -610,8 +621,9 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
             datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat()),
             1,
             int(sale_1.total_price / sale_1.apartment.surface_area),
+            None,
         ),
-        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 

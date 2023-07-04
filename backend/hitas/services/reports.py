@@ -47,6 +47,7 @@ class RegulatedHousingCompaniesReportColumns(NamedTuple):
     completion_date: datetime.date | str
     apartment_count: int | str
     average_price_per_square_meter: Decimal | str
+    half_hitas: str
 
 
 class UnregulatedHousingCompaniesReportColumns(NamedTuple):
@@ -318,6 +319,7 @@ def build_regulated_housing_companies_report_excel(
         completion_date="Valmistumispäivä",
         apartment_count="Asuntojen lukumäärä",
         average_price_per_square_meter="Keskineliöhinta",
+        half_hitas="Puolihitas",
     )
     worksheet.append(column_headers)
 
@@ -331,6 +333,7 @@ def build_regulated_housing_companies_report_excel(
                 completion_date=housing_company.completion_date,
                 apartment_count=housing_company.apartment_count,
                 average_price_per_square_meter=housing_company.avg_price_per_square_meter,
+                half_hitas="X" if housing_company.hitas_type.value == HitasType.HALF_HITAS.value else "",
             ),
         )
 
@@ -345,6 +348,7 @@ def build_regulated_housing_companies_report_excel(
         completion_date="",
         apartment_count="",
         average_price_per_square_meter="",
+        half_hitas="",
     )
 
     # There needs to be an empty row for sorting and filtering to work properly
