@@ -6708,6 +6708,7 @@ components:
                   type: integer
                   minimum: 0
                   readOnly: true
+                  nullable: true
                   example: 2382
             rooms:
               description: Number of rooms for this apartment
@@ -6718,6 +6719,7 @@ components:
             type:
               description: Apartment type
               type: string
+              nullable: true
               example: "h+k"
             surface_area:
               description: Apartment's surface area
@@ -6744,6 +6746,7 @@ components:
                 floor:
                   description: Apartment's floor
                   type: string
+                  nullable: true
                   example: "1"
                 stair:
                   description: Apartment's stair
