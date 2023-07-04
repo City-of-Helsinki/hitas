@@ -70,6 +70,7 @@ const ApartmentDeleteButton = ({apartment}) => {
             <RemoveButton
                 onClick={() => setIsDeleteModalVisible(true)}
                 isLoading={isDeleteLoading}
+                buttonText="Poista"
             />
             <ConfirmDialogModal
                 linkText="Palaa asuntoyhtiön sivulle"
