@@ -51,13 +51,11 @@ def test__api__code__list(api_client: HitasAPIClient, url_basename, model, facto
             "id": code2.uuid.hex,
             "value": code2.value,
             "description": code2.description,
-            "code": code2.legacy_code_number,
         },
         {
             "id": code1.uuid.hex,
             "value": code1.value,
             "description": code1.description,
-            "code": code1.legacy_code_number,
         },
     ]
     assert response.json()["page"] == {
@@ -87,7 +85,6 @@ def test__api__code__retrieve(api_client: HitasAPIClient, url_basename, model, f
         "id": code.uuid.hex,
         "value": code.value,
         "description": code.description,
-        "code": code.legacy_code_number,
     }
 
 
@@ -116,7 +113,6 @@ def test__api__code__create(api_client: HitasAPIClient, url_basename, model, fac
     data = {
         "value": "Code Value",
         "description": "Code description",
-        "code": "123",
     }
 
     url = reverse(f"hitas:{url_basename}-list")
@@ -132,7 +128,6 @@ def test__api__code__create(api_client: HitasAPIClient, url_basename, model, fac
 @pytest.mark.parametrize(
     "invalid_data",
     [
-        {"code": None},
         {"description": None},
     ],
 )
@@ -141,7 +136,6 @@ def test__api__code__create__invalid_data(api_client: HitasAPIClient, url_basena
     data = {
         "value": "Code Value",
         "description": "Code description",
-        "code": "123",
     }
     data.update(invalid_data)
 
@@ -160,7 +154,6 @@ def test__api__code__update(api_client: HitasAPIClient, url_basename, model, fac
     data = {
         "value": "Code Value",
         "description": "Code description",
-        "code": "123",
     }
 
     url = reverse(f"hitas:{url_basename}-detail", kwargs={"uuid": code.uuid.hex})
@@ -170,7 +163,6 @@ def test__api__code__update(api_client: HitasAPIClient, url_basename, model, fac
         "id": code.uuid.hex,
         "value": data["value"],
         "description": data["description"],
-        "code": data["code"],
     }
 
     get_response = api_client.get(url)

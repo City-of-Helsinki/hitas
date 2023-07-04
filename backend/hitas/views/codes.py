@@ -8,11 +8,10 @@ from hitas.views.utils.serializers import ReadOnlySerializer
 class AbstractCodeSerializer(HitasModelSerializer):
     value = serializers.CharField()
     description = serializers.CharField()
-    code = serializers.CharField(source="legacy_code_number")
 
     class Meta:
         model = AbstractCode
-        fields = ["id", "value", "description", "code"]
+        fields = ["id", "value", "description"]
         read_only_fields = ["value"]
         abstract = True
 
@@ -37,13 +36,12 @@ def define_read_only_serializer(model_class):
         id = UUIDRelatedField(queryset=model_class.objects)
         value = serializers.CharField(read_only=True)
         description = serializers.CharField(read_only=True)
-        code = serializers.CharField(source="legacy_code_number", read_only=True)
 
         def get_model_class(self):
             return model_class
 
         class Meta:
-            fields = ["id", "value", "description", "code"]
+            fields = ["id", "value", "description"]
 
     return DynamicReadOnlySerializer
 

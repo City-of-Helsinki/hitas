@@ -351,13 +351,11 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
             "id": hc1.building_type.uuid.hex,
             "value": hc1.building_type.value,
             "description": hc1.building_type.description,
-            "code": hc1.building_type.legacy_code_number,
         },
         "developer": {
             "id": hc1.developer.uuid.hex,
             "value": hc1.developer.value,
             "description": hc1.developer.description,
-            "code": hc1.developer.legacy_code_number,
         },
         "property_manager": {
             "id": hc1.property_manager.uuid.hex,
