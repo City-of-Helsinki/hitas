@@ -14,7 +14,6 @@ interface IMutateModalProps<TDefaultObject, TFormFieldsWithTitles extends object
     successMessage?: string;
     errorMessage?: string;
     notModifiedMessage?: string;
-    defaultFocusFieldName?: string;
     formFieldsWithTitles?: TFormFieldsWithTitles;
     requiredFields?: string[];
 }
@@ -32,7 +31,6 @@ export default function MutateModal<TDefaultObject, TFormFieldsWithTitles extend
     successMessage,
     errorMessage,
     notModifiedMessage,
-    defaultFocusFieldName,
     formFieldsWithTitles,
     requiredFields,
 }: IMutateModalProps<TDefaultObject, TFormFieldsWithTitles>): React.ReactElement {
@@ -43,7 +41,6 @@ export default function MutateModal<TDefaultObject, TFormFieldsWithTitles extend
         successMessage,
         errorMessage,
         notModifiedMessage,
-        defaultFocusFieldName,
         formFieldsWithTitles,
         requiredFields,
     };

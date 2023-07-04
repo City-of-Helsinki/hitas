@@ -15,7 +15,6 @@ export interface IMutateForm<TDefaultObject extends object, TFormFieldsWithTitle
     successMessage?: string;
     errorMessage?: string;
     notModifiedMessage?: string;
-    defaultFocusFieldName?: string;
     formFieldsWithTitles?: TFormFieldsWithTitles;
     requiredFields?: string[];
 }
@@ -29,7 +28,6 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
     successMessage,
     errorMessage,
     notModifiedMessage,
-    defaultFocusFieldName,
     formFieldsWithTitles,
     requiredFields,
 }: IMutateForm<TDefaultObject, TFormFieldsWithTitles>) {
@@ -62,11 +60,9 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
 
     useEffect(() => {
         // set initial focus
-        const focusField = (defaultFocusFieldName ??
-            (formFieldsWithTitles && Object.keys(formFieldsWithTitles)[0]) ??
-            "") as never;
+        const focusField = ((formFieldsWithTitles && Object.keys(formFieldsWithTitles)[0]) ?? "") as never;
         setTimeout(() => formObject.setFocus(focusField), 5);
-    }, [defaultFocusFieldName, formFieldsWithTitles]);
+    }, [formFieldsWithTitles]);
 
     const onFormSubmitValid = () => {
         // save the data
