@@ -10,7 +10,6 @@ from django.utils import timezone
 from hitas.calculations.exceptions import InvalidCalculationResultException
 from hitas.calculations.max_prices.rules_2011_onwards import Rules2011Onwards
 from hitas.calculations.max_prices.rules_pre_2011 import RulesPre2011
-from hitas.exceptions import ModelConflict
 from hitas.models import (
     Apartment,
     ApartmentConstructionPriceImprovement,
@@ -53,15 +52,11 @@ def create_max_price_calculation(
         housing_company_completion_month=monthify(housing_company_completion_date),
     )
 
-    if apartment.housing_company.release_date is not None:
-        raise ModelConflict(
-            "Cannot create max price calculations for apartments in non-regulated housing companies.",
-            error_code="invalid",
-        )
+    validate_apartment_for_max_price_calculation(apartment)
 
-    raise_missing_value_errors(apartment)
-
+    #
     # Do the calculation
+    #
     calculation = calculate_max_price(
         apartment,
         calculation_date,
@@ -90,14 +85,6 @@ def create_max_price_calculation(
     return calculation
 
 
-def raise_missing_value_errors(apartment: ApartmentWithAnnotationsMaxPrice):
-    if apartment.completion_date is None:
-        raise InvalidCalculationResultException(error_code="missing_completion_date")
-
-    if not apartment.surface_area:
-        raise InvalidCalculationResultException(error_code="missing_surface_area")
-
-
 def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> datetime.date:
     completion_date: Optional[datetime.date] = (
         HousingCompany.objects.filter(uuid=housing_company_uuid)
@@ -111,6 +98,24 @@ def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> date
         raise InvalidCalculationResultException(error_code="missing_housing_company_completion_date")
 
     return completion_date
+
+
+def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotationsMaxPrice):
+    if not apartment.surface_area:
+        raise InvalidCalculationResultException(error_code="missing_surface_area")
+
+    if apartment.first_sale_purchase_price is None:
+        raise InvalidCalculationResultException(error_code="apartment_first_sale_purchase_price_missing")
+    if apartment.first_sale_share_of_housing_company_loans is None:
+        raise InvalidCalculationResultException(error_code="apartment_first_sale_share_of_loans_missing")
+
+    if apartment.completion_date is None:
+        raise InvalidCalculationResultException(error_code="missing_completion_date")
+    elif apartment.completion_date > timezone.now().date():
+        raise InvalidCalculationResultException(error_code="completion_date_in_future")
+
+    if apartment.housing_company.release_date:
+        raise InvalidCalculationResultException(error_code="unregulated_housing_company")
 
 
 def calculate_max_price(
