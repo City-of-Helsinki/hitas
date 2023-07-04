@@ -7431,7 +7431,6 @@ components:
         - id
         - value
         - description
-        - code
       properties:
         id:
           description: ID of this code
@@ -7448,11 +7447,6 @@ components:
           nullable: true
           readOnly: true
           example: This building type is for luhtitalo
-        code:
-          description: Code number
-          type: string
-          readOnly: true
-          example: 001
 
     NullableReadOnlyCode:
       description: Hitas codebook entry
@@ -7463,7 +7457,6 @@ components:
         - id
         - value
         - description
-        - code
       properties:
         id:
           description: ID of this code
@@ -7481,11 +7474,6 @@ components:
           nullable: true
           readOnly: true
           example: This building type is for luhtitalo
-        code:
-          description: Code number
-          type: string
-          readOnly: true
-          example: 001
 
     Code:
       description: Hitas codebook entry
@@ -7495,7 +7483,6 @@ components:
         - id
         - value
         - description
-        - code
       properties:
         id:
           description: ID of this code
@@ -7511,10 +7498,6 @@ components:
           type: string
           nullable: true
           example: This building type is for luhtitalo
-        code:
-          description: Code number
-          type: string
-          example: 001
 
     HitasTypeItem:
       description: Hitas type

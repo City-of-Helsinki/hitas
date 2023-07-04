@@ -572,7 +572,6 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "id": ap1.apartment_type.uuid.hex,
             "value": ap1.apartment_type.value,
             "description": ap1.apartment_type.description,
-            "code": ap1.apartment_type.legacy_code_number,
         },
         "surface_area": float(ap1.surface_area),
         "rooms": ap1.rooms,
@@ -2101,7 +2100,6 @@ def test__api__apartment__update__overlapping_shares(
     del data["is_sold"]
     del data["type"]["value"]
     del data["type"]["description"]
-    del data["type"]["code"]
     del data["shares"]["total"]
     del data["address"]["postal_code"]
     del data["address"]["city"]
