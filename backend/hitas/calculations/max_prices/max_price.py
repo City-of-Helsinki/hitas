@@ -45,6 +45,13 @@ def create_max_price_calculation(
     additional_info: Optional[str],
 ) -> Dict[str, Any]:
     housing_company_completion_date = get_housing_company_completion_date(housing_company_uuid)
+
+    if housing_company_completion_date is None:
+        raise InvalidCalculationResultException(
+            error_code="missing_housing_company_completion_date",
+            message="Cannot create max price calculation for a housing company without completion date.",
+        )
+
     apartment = fetch_apartment(
         housing_company_uuid=housing_company_uuid,
         apartment_uuid=apartment_uuid,
@@ -85,7 +92,7 @@ def create_max_price_calculation(
     return calculation
 
 
-def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> datetime.date:
+def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> Optional[datetime.date]:
     completion_date: Optional[datetime.date] = (
         HousingCompany.objects.filter(uuid=housing_company_uuid)
         .annotate(
@@ -94,11 +101,6 @@ def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> date
         .values_list("completion_date", flat=True)
         .first()
     )
-    if completion_date is None:
-        raise InvalidCalculationResultException(
-            error_code="missing_housing_company_completion_date",
-            message="Cannot create max price calculation for a housing company without completion date.",
-        )
 
     return completion_date
 
