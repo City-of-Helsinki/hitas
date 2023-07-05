@@ -15,6 +15,7 @@ from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
     EmailTemplate,
+    HousingCompany,
     JobPerformance,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
@@ -38,7 +39,7 @@ from hitas.services.apartment import (
 )
 from hitas.services.condition_of_sale import condition_of_sale_queryset
 from hitas.services.thirty_year_regulation import get_thirty_year_regulation_results_for_housing_company
-from hitas.utils import monthify
+from hitas.utils import max_date_if_all_not_null, monthify
 from hitas.views.apartment import ApartmentDetailSerializer
 from hitas.views.utils.pdf import render_to_pdf
 from users.models import User
@@ -92,8 +93,10 @@ def get_apartment_for_unconfirmed_max_price_calculation(
     apartment_id: UUID,
     calculation_date: datetime.date,
 ) -> ApartmentWithAnnotations:
-    completion_date: Optional[datetime.date] = (
-        Apartment.objects.filter(uuid=apartment_id).first().housing_company.completion_date
+    housing_company = (
+        HousingCompany.objects.filter(real_estates__buildings__apartments__uuid=apartment_id)
+        .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
+        .first()
     )
 
     qs = (
@@ -130,7 +133,7 @@ def get_apartment_for_unconfirmed_max_price_calculation(
     )
     qs = annotate_apartment_unconfirmed_prices(
         queryset=qs,
-        completion_date=completion_date,
+        housing_company=housing_company,
         calculation_date=calculation_date,
     )
     apartment: Optional[ApartmentWithAnnotations] = qs.first()
