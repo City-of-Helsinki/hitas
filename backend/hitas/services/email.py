@@ -28,6 +28,7 @@ from hitas.models.job_performance import JobPerformanceSource
 from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import RegulationResult, ThirtyYearRegulationResultsRowWithAnnotations
 from hitas.services.apartment import (
+    annotate_apartment_unconfirmed_prices,
     get_first_sale_loan_amount,
     get_first_sale_purchase_date,
     get_first_sale_purchase_price,
@@ -36,10 +37,6 @@ from hitas.services.apartment import (
     prefetch_latest_sale,
 )
 from hitas.services.condition_of_sale import condition_of_sale_queryset
-from hitas.services.indices import (
-    subquery_apartment_current_surface_area_price,
-    subquery_apartment_first_sale_acquisition_price_index_adjusted,
-)
 from hitas.services.thirty_year_regulation import get_thirty_year_regulation_results_for_housing_company
 from hitas.utils import monthify
 from hitas.views.apartment import ApartmentDetailSerializer
@@ -99,7 +96,7 @@ def get_apartment_for_unconfirmed_max_price_calculation(
         Apartment.objects.filter(uuid=apartment_id).values_list("completion_date", flat=True).first()
     )
 
-    apartment: Optional[ApartmentWithAnnotations] = (
+    qs = (
         Apartment.objects.filter(uuid=apartment_id)
         .prefetch_related(
             prefetch_latest_sale(include_first_sale=True),
@@ -129,32 +126,15 @@ def get_apartment_for_unconfirmed_max_price_calculation(
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
-            cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-                ConstructionPriceIndex,
-                completion_date=completion_date,
-                calculation_date=calculation_date,
-            ),
-            mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-                MarketPriceIndex,
-                completion_date=completion_date,
-                calculation_date=calculation_date,
-            ),
-            cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-                ConstructionPriceIndex2005Equal100,
-                completion_date=completion_date,
-                calculation_date=calculation_date,
-            ),
-            mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-                MarketPriceIndex2005Equal100,
-                completion_date=completion_date,
-                calculation_date=calculation_date,
-            ),
-            sapc=subquery_apartment_current_surface_area_price(
-                calculation_date=calculation_date,
-            ),
         )
-        .first()
     )
+    qs = annotate_apartment_unconfirmed_prices(
+        queryset=qs,
+        completion_date=completion_date,
+        calculation_date=calculation_date,
+    )
+    apartment: Optional[ApartmentWithAnnotations] = qs.first()
+
     if not apartment:
         raise HitasModelNotFound(Apartment)
 

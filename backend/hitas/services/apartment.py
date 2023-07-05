@@ -5,6 +5,12 @@ from django.db import models
 from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum
 from django.db.models.functions import Coalesce
 
+from hitas.models import (
+    ConstructionPriceIndex,
+    ConstructionPriceIndex2005Equal100,
+    MarketPriceIndex,
+    MarketPriceIndex2005Equal100,
+)
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
 from hitas.models.apartment_sale import ApartmentSale
@@ -206,3 +212,47 @@ def aggregate_catalog_prices_where_no_sales() -> Coalesce:
         0,
         output_field=HitasModelDecimalField(),
     )
+
+
+def annotate_apartment_unconfirmed_prices(
+    queryset: QuerySet[Apartment],
+    completion_date: datetime.date,
+    calculation_date: datetime.date,
+) -> QuerySet[Apartment]:
+    """
+    Annotate apartments with their unconfirmed maximum prices.
+
+    Intended only for a single housing company, as this only takes in a single completion date.
+    """
+
+    from hitas.services.indices import (
+        subquery_apartment_current_surface_area_price,
+        subquery_apartment_first_sale_acquisition_price_index_adjusted,
+    )
+
+    queryset = queryset.annotate(
+        cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+            ConstructionPriceIndex,
+            completion_date=completion_date,
+            calculation_date=calculation_date,
+        ),
+        mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+            MarketPriceIndex,
+            completion_date=completion_date,
+            calculation_date=calculation_date,
+        ),
+        cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+            ConstructionPriceIndex2005Equal100,
+            completion_date=completion_date,
+            calculation_date=calculation_date,
+        ),
+        mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+            MarketPriceIndex2005Equal100,
+            completion_date=completion_date,
+            calculation_date=calculation_date,
+        ),
+        sapc=subquery_apartment_current_surface_area_price(
+            calculation_date=calculation_date,
+        ),
+    )
+    return queryset
