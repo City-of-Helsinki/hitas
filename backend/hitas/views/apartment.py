@@ -21,6 +21,7 @@ from rest_framework.fields import empty
 from rest_framework.response import Response
 
 from hitas.calculations.exceptions import IndexMissingException
+from hitas.calculations.max_prices.max_price import get_housing_company_completion_date
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     Apartment,
@@ -822,11 +823,11 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
+        completion_date: Optional[datetime.date] = get_housing_company_completion_date(
+            self.kwargs["housing_company_uuid"]
+        )
         calculation_date: datetime.date = from_iso_format_or_today_if_none(
             self.request.query_params.get("calculation_date") or self.request.data.get("calculation_date")
-        )
-        completion_date: Optional[datetime.date] = (
-            Apartment.objects.filter(uuid=self.kwargs["uuid"]).values_list("completion_date", flat=True).first()
         )
 
         qs = self.get_list_queryset().annotate(

@@ -760,7 +760,7 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
     }
 
 
-def _test_max_prices(
+def _test_unconfirmed_max_prices(
     api_client: HitasAPIClient,
     completion_date: datetime.date,
     create_completion_indices: bool,
@@ -864,7 +864,7 @@ def _test_max_prices(
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__2011_onwards__indices_set(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=POST_2011_DATE,
         create_completion_indices=True,
@@ -874,7 +874,7 @@ def test__api__apartment__retrieve__2011_onwards__indices_set(api_client: HitasA
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__2011_onwards__completion_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=POST_2011_DATE,
         create_completion_indices=False,
@@ -884,7 +884,7 @@ def test__api__apartment__retrieve__2011_onwards__completion_indices_missing(api
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__2011_onwards__current_month_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=POST_2011_DATE,
         create_completion_indices=True,
@@ -894,7 +894,7 @@ def test__api__apartment__retrieve__2011_onwards__current_month_indices_missing(
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__2011_onwards__indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=POST_2011_DATE,
         create_completion_indices=False,
@@ -904,7 +904,7 @@ def test__api__apartment__retrieve__2011_onwards__indices_missing(api_client: Hi
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__indices_set(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
         create_completion_indices=True,
@@ -915,7 +915,7 @@ def test__api__apartment__retrieve__pre_2011__indices_set(api_client: HitasAPICl
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__old_hitas_ruleset(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-06-01 00:00:00+00:00")  # Required for depreciation multiplier calculation
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
         create_completion_indices=True,
@@ -926,7 +926,7 @@ def test__api__apartment__retrieve__pre_2011__old_hitas_ruleset(api_client: Hita
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__completion_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
         create_completion_indices=False,
@@ -936,7 +936,7 @@ def test__api__apartment__retrieve__pre_2011__completion_indices_missing(api_cli
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__current_month_indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
         create_completion_indices=True,
@@ -946,7 +946,7 @@ def test__api__apartment__retrieve__pre_2011__current_month_indices_missing(api_
 
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2011__indices_missing(api_client: HitasAPIClient):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2011_DATE,
         create_completion_indices=False,
@@ -957,7 +957,7 @@ def test__api__apartment__retrieve__pre_2011__indices_missing(api_client: HitasA
 @pytest.mark.django_db
 def test__api__apartment__retrieve__pre_2005__old_hitas_ruleset(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-06-01 00:00:00+00:00")  # Required for depreciation multiplier calculation
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=PRE_2005_DATE,
         create_completion_indices=True,
@@ -988,13 +988,87 @@ def test__api__apartment__retrieve__indices__null_values(
     create_completion_indices: bool,
     create_current_indices: bool,
 ):
-    _test_max_prices(
+    _test_unconfirmed_max_prices(
         api_client,
         completion_date=completed,
         create_completion_indices=create_completion_indices,
         create_current_indices=create_current_indices,
         null_values=True,
     )
+
+
+@pytest.mark.django_db
+def test__api__apartment__retrieve__unconfirmed_prices_use_housing_company_completion_date(api_client: HitasAPIClient):
+    ap: Apartment = ApartmentFactory.create(
+        completion_date=datetime.date(2020, 1, 1),
+        additional_work_during_construction=0,
+        surface_area=100,
+        interest_during_construction_6=0,
+        interest_during_construction_14=0,
+        building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
+        sales=[],
+    )
+    ap2: Apartment = ApartmentFactory.create(
+        completion_date=None,
+        additional_work_during_construction=0,
+        surface_area=100,
+        interest_during_construction_6=0,
+        interest_during_construction_14=0,
+        sales=[],
+        building__real_estate__housing_company=ap.housing_company,
+    )
+
+    ApartmentSaleFactory.create(apartment=ap, purchase_price=80000, apartment_share_of_housing_company_loans=20000)
+
+    # Create indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200)
+
+    now = datetime.date.today().replace(day=1)
+    ConstructionPriceIndex2005Equal100Factory.create(month=now, value=200)
+    MarketPriceIndex2005Equal100Factory.create(month=now, value=500)
+    SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
+
+    url = reverse("hitas:apartment-detail", args=[ap.housing_company.uuid.hex, ap.uuid.hex])
+
+    # CPI and MPI should not be returned, as housing company is not completed
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["prices"]["maximum_prices"]["unconfirmed"]["onwards_2011"] == {
+        "construction_price_index": {"value": None, "maximum": False},
+        "market_price_index": {"value": None, "maximum": False},
+        "surface_area_price_ceiling": {"value": 300000.0, "maximum": True},
+    }
+
+    # Update second apartment completion date so housing company is now complete
+    ap2.completion_date = datetime.date(2019, 1, 1)
+    ap2.save()
+
+    # CPI and MPI are now returned with using the first apartments completion date index values
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["prices"]["maximum_prices"]["unconfirmed"]["onwards_2011"] == {
+        "construction_price_index": {"value": 200000.0, "maximum": False},
+        "market_price_index": {"value": 250000.0, "maximum": False},
+        "surface_area_price_ceiling": {"value": 300000.0, "maximum": True},
+    }
+
+    # Update second apartment completion date again, so housing company completion date is now later
+    ap2.completion_date = datetime.date(2021, 1, 1)
+    ap2.save()
+    ap2.refresh_from_db()
+
+    ConstructionPriceIndex2005Equal100Factory.create(month=ap2.completion_date, value=125)
+    MarketPriceIndex2005Equal100Factory.create(month=ap2.completion_date, value=250)
+
+    # CPI and MPI are now returned with using the first apartments completion date index values
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["prices"]["maximum_prices"]["unconfirmed"]["onwards_2011"] == {
+        "construction_price_index": {"value": 160000.0, "maximum": False},
+        "market_price_index": {"value": 200000.0, "maximum": False},
+        "surface_area_price_ceiling": {"value": 300000.0, "maximum": True},
+    }
 
 
 @pytest.mark.parametrize("should_be_shown", [False, True])
