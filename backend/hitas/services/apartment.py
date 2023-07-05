@@ -3,11 +3,12 @@ from typing import Collection, Optional, overload
 
 from django.db import models
 from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Cast, Coalesce
 
 from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
+    HousingCompany,
     MarketPriceIndex,
     MarketPriceIndex2005Equal100,
 )
@@ -137,6 +138,7 @@ def get_latest_sale_purchase_price(apartment_id: str | int, *, include_first_sal
                 else subquery_first_id(ApartmentSale, "apartment_id", order_by=["purchase_date", "id"])
             ),
         )
+        # .only("purchase_price", "id")
         .order_by("-purchase_date", "-id")
         .values_list("purchase_price", flat=True)
     )
@@ -216,7 +218,7 @@ def aggregate_catalog_prices_where_no_sales() -> Coalesce:
 
 def annotate_apartment_unconfirmed_prices(
     queryset: QuerySet[Apartment],
-    completion_date: datetime.date,
+    housing_company: HousingCompany,
     calculation_date: datetime.date,
 ) -> QuerySet[Apartment]:
     """
@@ -230,29 +232,44 @@ def annotate_apartment_unconfirmed_prices(
         subquery_apartment_first_sale_acquisition_price_index_adjusted,
     )
 
+    completion_date: Optional[datetime.date] = housing_company.completion_date
+
     queryset = queryset.annotate(
-        cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-            ConstructionPriceIndex,
-            completion_date=completion_date,
-            calculation_date=calculation_date,
-        ),
-        mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-            MarketPriceIndex,
-            completion_date=completion_date,
-            calculation_date=calculation_date,
-        ),
-        cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-            ConstructionPriceIndex2005Equal100,
-            completion_date=completion_date,
-            calculation_date=calculation_date,
-        ),
-        mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
-            MarketPriceIndex2005Equal100,
-            completion_date=completion_date,
-            calculation_date=calculation_date,
-        ),
         sapc=subquery_apartment_current_surface_area_price(
             calculation_date=calculation_date,
-        ),
+        )
     )
+
+    null_decimal_field = Cast(None, output_field=HitasModelDecimalField())
+    if housing_company.hitas_type.new_hitas_ruleset:
+        queryset = queryset.annotate(
+            cpi=null_decimal_field,
+            mpi=null_decimal_field,
+            cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+                ConstructionPriceIndex2005Equal100,
+                completion_date=completion_date,
+                calculation_date=calculation_date,
+            ),
+            mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+                MarketPriceIndex2005Equal100,
+                completion_date=completion_date,
+                calculation_date=calculation_date,
+            ),
+        )
+    else:
+        queryset = queryset.annotate(
+            cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+                ConstructionPriceIndex,
+                completion_date=completion_date,
+                calculation_date=calculation_date,
+            ),
+            mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
+                MarketPriceIndex,
+                completion_date=completion_date,
+                calculation_date=calculation_date,
+            ),
+            cpi_2005_100=null_decimal_field,
+            mpi_2005_100=null_decimal_field,
+        )
+
     return queryset

@@ -56,7 +56,13 @@ from hitas.services.apartment import (
 )
 
 from hitas.services.condition_of_sale import condition_of_sale_queryset
-from hitas.utils import check_for_overlap, valid_uuid, monthify, from_iso_format_or_today_if_none
+from hitas.utils import (
+    check_for_overlap,
+    valid_uuid,
+    monthify,
+    from_iso_format_or_today_if_none,
+    max_date_if_all_not_null,
+)
 from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
@@ -823,9 +829,12 @@ class ApartmentViewSet(HitasModelViewSet):
         return self.get_base_queryset().filter(building__real_estate__housing_company__id=hc_id)
 
     def get_detail_queryset(self):
-        completion_date: Optional[datetime.date] = get_housing_company_completion_date(
-            self.kwargs["housing_company_uuid"]
+        housing_company = (
+            HousingCompany.objects.filter(uuid=self.kwargs["housing_company_uuid"])
+            .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
+            .first()
         )
+
         calculation_date: datetime.date = from_iso_format_or_today_if_none(
             self.request.query_params.get("calculation_date") or self.request.data.get("calculation_date")
         )
@@ -840,7 +849,7 @@ class ApartmentViewSet(HitasModelViewSet):
         )
         return annotate_apartment_unconfirmed_prices(
             queryset=qs,
-            completion_date=completion_date,
+            housing_company=housing_company,
             calculation_date=calculation_date,
         )
 
