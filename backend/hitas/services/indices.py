@@ -318,11 +318,13 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     if completion_date is None:
         return RoundWithPrecision(None, output_field=HitasModelDecimalField())
 
+    completion_month = monthify(completion_date)
+
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
 
     original_value = Subquery(
-        table.objects.filter(month=OuterRef("completion_month")).values("value"),
+        table.objects.filter(month=completion_month).values("value"),
         output_field=HitasModelDecimalField(),
     )
 

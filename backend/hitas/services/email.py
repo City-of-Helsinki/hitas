@@ -93,7 +93,7 @@ def get_apartment_for_unconfirmed_max_price_calculation(
     calculation_date: datetime.date,
 ) -> ApartmentWithAnnotations:
     completion_date: Optional[datetime.date] = (
-        Apartment.objects.filter(uuid=apartment_id).values_list("completion_date", flat=True).first()
+        Apartment.objects.filter(uuid=apartment_id).first().housing_company.completion_date
     )
 
     qs = (
