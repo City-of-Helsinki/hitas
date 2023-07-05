@@ -103,7 +103,7 @@ const App = (): JSX.Element => {
                         <Link to="housing-companies">Yhtiöt</Link>
                         <Link to="apartments">Asunnot</Link>
                         <Link to="reports">Raportit</Link>
-                        <Link to="documents">Dokumentit</Link>
+                        <Link to="documents">Dokumenttipohjat</Link>
                         <Link to="codes">Koodisto</Link>
                         <Link to="functions">Toiminnot</Link>
                     </Navigation.Row>
