@@ -66,6 +66,17 @@ ul, ol
   .query-error-message
     margin-top: 0.5rem
 
+.field-error-list
+  max-height: 800px
+  overflow-y: scroll
+  span
+    display: block
+    &:first-child
+      font-weight: 700
+    &:last-child
+      margin: 0 0 $spacing-s $spacing-m
+
+
 .row
   @include flexbox()
   @include flex-flow(row nowrap)
