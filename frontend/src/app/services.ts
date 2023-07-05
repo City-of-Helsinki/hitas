@@ -365,6 +365,12 @@ const listApi = hitasApi.injectEndpoints({
                 params: arg,
             }),
         }),
+        getPDFBodies: builder.query({
+            query: (arg) => ({
+                url: "/pdf-bodies",
+                params: arg,
+            }),
+        }),
     }),
 });
 
@@ -757,6 +763,14 @@ const mutationApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error) => (!error && result ? [{type: "Index", id: "LIST"}] : []),
         }),
+        editPDFTemplate: builder.mutation({
+            query: (arg) => ({
+                url: `pdf-bodies/${arg.name}`,
+                method: "PUT",
+                headers: mutationApiJsonHeaders(),
+                body: arg.texts,
+            }),
+        }),
     }),
 });
 
@@ -775,6 +789,7 @@ export const {
     useGetApartmentTypesQuery,
     useGetAvailablePostalCodesQuery,
     useGetHousingCompanyStatesQuery,
+    useGetPDFBodiesQuery,
 } = listApi;
 
 export const {
@@ -814,4 +829,5 @@ export const {
     useCreateFromSalesCatalogMutation,
     useBatchCompleteApartmentsMutation,
     useCalculatePriceCeilingMutation,
+    useEditPDFTemplateMutation,
 } = mutationApi;
