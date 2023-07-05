@@ -128,10 +128,10 @@ def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotat
             error_code="missing_completion_date",
             message="Cannot create max price calculation for an apartment without completion date.",
         )
-    elif apartment.completion_date > timezone.now().date():
+    elif apartment.housing_company.completion_date > timezone.now().date():
         raise InvalidCalculationResultException(
             error_code="completion_date_in_future",
-            message="Cannot create max price calculation for an apartment that has not been completed yet.",
+            message="Cannot create max price calculation for a housing company with completion date in the future.",
         )
 
     if apartment.housing_company.release_date:
