@@ -1,0 +1,16 @@
+@use "../imports" as *
+
+.view--documents
+  .current-template
+    li
+      @include flexbox()
+      > div
+        width: 75%
+      .instruction-text
+        width: 25%
+        padding: $spacing-m
+    label
+      font-weight: 700
+    .input-field
+      height: auto
+      margin-bottom: $spacing-m
