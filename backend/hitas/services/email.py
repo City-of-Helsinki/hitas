@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.mail import EmailMessage
 from django.db.models import Prefetch
-from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
 from hitas.exceptions import HitasModelNotFound, get_hitas_object_or_404
@@ -130,7 +129,6 @@ def get_apartment_for_unconfirmed_max_price_calculation(
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
-            completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
             cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
                 completion_date=completion_date,
