@@ -1,15 +1,9 @@
-import {Button, Dialog, IconPlus, StatusLabel, Tabs} from "hds-react";
+import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
 import {useState} from "react";
-import {useForm} from "react-hook-form";
+import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {
-    useCreateFromSalesCatalogMutation,
-    useGetHousingCompanyDetailQuery,
-    useValidateSalesCatalogMutation,
-} from "../../app/services";
-import {
-    CloseButton,
     DetailField,
     EditButton,
     Heading,
@@ -17,87 +11,29 @@ import {
     MutateForm,
     MutateModal,
     QueryStateHandler,
-    SaveButton,
 } from "../../common/components";
-import {FileInput} from "../../common/components/form";
 import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
-import {IHousingCompanyDetails, IPropertyManager, ISalesCatalogApartment} from "../../common/schemas";
-import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
+import {IHousingCompanyDetails, IPropertyManager} from "../../common/schemas";
+import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
+import SalesCatalogImport from "../components/housingCompany/SalesCatalogImport";
 import {BatchCompleteApartmentsModal} from "./";
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): JSX.Element => {
-    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
-    const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
-    const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
-        useValidateSalesCatalogMutation();
-    const [createImportedApartments, {error: createError}] = useCreateFromSalesCatalogMutation();
-    const {handleSubmit} = salesCatalogForm;
-    const handleCreateButton = () => {
-        const importedApartments: object[] = [];
-        validateData.apartments.forEach((apartment: ISalesCatalogApartment) => {
-            importedApartments.push({
-                stair: apartment.stair,
-                floor: apartment.floor,
-                apartment_number: apartment.apartment_number,
-                rooms: apartment.rooms,
-                apartment_type: (apartment.apartment_type as {id: string}).id,
-                surface_area: apartment.surface_area,
-                share_number_start: apartment.share_number_start,
-                share_number_end: apartment.share_number_end,
-                catalog_purchase_price: apartment.catalog_purchase_price,
-                catalog_primary_loan_amount: apartment.catalog_primary_loan_amount,
-            });
-        });
-        createImportedApartments({
-            data: importedApartments,
-            housingCompanyId: params.housingCompanyId,
-        })
-            .then(() => {
-                hdsToast.success("Asuntojen tuonti onnistui.");
-                setIsImportModalOpen(false);
-            })
-            .catch((e) => {
-                hdsToast.error("Asuntojen tuonti epäonnistui: " + e.message);
-                // eslint-disable-next-line no-console
-                console.warn(e, createError);
-            });
-    };
-    const onSubmit = (data) => {
-        validateSalesCatalog({
-            data: data.salesCatalog,
-            housingCompanyId: params.housingCompanyId,
-        })
-            .then(() => {
-                setIsImportModalOpen(true);
-            })
-            // eslint-disable-next-line no-console
-            .catch((e) => console.warn(e));
-    };
-
     return (
         <>
             <Heading>
                 {housingCompany.name.display}
-                <form
-                    className="buttons"
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    <FileInput
-                        name="salesCatalog"
-                        formObject={salesCatalogForm}
-                        accept=".xlsx"
-                        buttonLabel="Lataa myyntihintaluettelo"
-                        onChange={() => onSubmit(salesCatalogForm.getValues())}
-                    />
+                <div className="buttons">
+                    <SalesCatalogImport />
                     <EditButton
                         state={{housingCompany: housingCompany}}
                         disabled={housingCompany.regulation_status !== "regulated"}
                     />
-                </form>
+                </div>
             </Heading>
             <div className="company-status">
                 <StatusLabel>{getHousingCompanyHitasTypeName(housingCompany.hitas_type)}</StatusLabel>
@@ -330,58 +266,6 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     </div>
                 </div>
             </div>
-            <Dialog
-                id="import-sales-catalog-modal"
-                aria-labelledby="Sales catalog import modal"
-                isOpen={isImportModalOpen}
-            >
-                <Dialog.Header
-                    id="import-sales-catalog-modal"
-                    title="Myyntihintaluettelo"
-                />
-                <Dialog.Content>
-                    <p>Luodaanko myyntihintaluettelon pohjalta seuraavat asunnot:</p>
-                    <QueryStateHandler
-                        data={validateData}
-                        error={validateError}
-                        isLoading={isValidating}
-                    >
-                        <div className="sales-catalog-import-list">
-                            <div className="list-headers">
-                                <div>Porras</div>
-                                <div>Huoneisto</div>
-                                <div>Kerros</div>
-                                <div>Tyyppi</div>
-                                <div>Pinta-ala</div>
-                                <div>Osakenumerot</div>
-                            </div>
-                            {validateData && validateData?.apartments.length > 0 && (
-                                <ul>
-                                    {validateData?.apartments.map((apartment: ISalesCatalogApartment) => (
-                                        <li key={apartment.row.toString()}>
-                                            <div>{apartment.stair}</div>
-                                            <div>{apartment.apartment_number}</div>
-                                            <div>{apartment.floor}</div>
-                                            <div>
-                                                {apartment.rooms} {(apartment.apartment_type as {value: string}).value}
-                                            </div>
-                                            <div>{apartment.surface_area}</div>
-                                            <div>{`${apartment.share_number_start} - ${apartment.share_number_end}`}</div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </QueryStateHandler>
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <CloseButton onClick={() => setIsImportModalOpen(false)} />
-                    <SaveButton
-                        onClick={() => handleCreateButton()}
-                        buttonText="Luo asunnot"
-                    />
-                </Dialog.ActionButtons>
-            </Dialog>
         </>
     );
 };
