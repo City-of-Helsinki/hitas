@@ -6,7 +6,6 @@ import {useForm} from "react-hook-form";
 import {
     useCreateFromSalesCatalogMutation,
     useGetHousingCompanyDetailQuery,
-    useSavePropertyManagerMutation,
     useValidateSalesCatalogMutation,
 } from "../../app/services";
 import {
@@ -21,13 +20,9 @@ import {
     SaveButton,
 } from "../../common/components";
 import {FileInput} from "../../common/components/form";
+import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
-import {
-    IHousingCompanyDetails,
-    IPropertyManager,
-    ISalesCatalogApartment,
-    PropertyManagerSchema,
-} from "../../common/schemas";
+import {IHousingCompanyDetails, IPropertyManager, ISalesCatalogApartment} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney, hdsToast} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 import {BatchCompleteApartmentsModal} from "./";
@@ -254,17 +249,11 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     <MutateModal
                         // Modify property manager modal
                         defaultObject={housingCompany?.property_manager as IPropertyManager}
-                        MutateFormComponent={MutateForm}
                         dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
                         isVisible={isModifyPropertyManagerModalVisible}
                         closeModalAction={() => setIsModifyPropertyManagerModalVisible(false)}
-                        formObjectSchema={PropertyManagerSchema}
-                        useSaveMutation={useSavePropertyManagerMutation}
-                        successMessage="Isännöitsijän tiedot tallennettu onnistuneesti!"
-                        errorMessage="Virhe isännöitsijän tietojen tallentamisessa!"
-                        notModifiedMessage="Ei muutoksia isännöitsijän tiedoissa."
-                        formFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
-                        requiredFields={["name"]}
+                        MutateFormComponent={MutateForm}
+                        mutateFormProps={propertyManagerMutateFormProps}
                     />
                 </div>
                 <ImprovementsTable

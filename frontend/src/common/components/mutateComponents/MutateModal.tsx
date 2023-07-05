@@ -1,21 +1,15 @@
 import {Dialog} from "hds-react";
 import React from "react";
-import MutateForm from "./MutateForm";
+import {IMutateFormProps, MutateForm} from "./index";
 
 interface IMutateModalProps<TDefaultObject, TFormFieldsWithTitles extends object> {
     defaultObject?: TDefaultObject;
-    MutateFormComponent;
     dialogTitles?: {modify?: string; new?: string};
     isVisible: boolean;
     closeModalAction: () => void;
     setEmptyFilterParams?: () => void;
-    formObjectSchema?;
-    useSaveMutation?;
-    successMessage?: string;
-    errorMessage?: string;
-    notModifiedMessage?: string;
-    formFieldsWithTitles?: TFormFieldsWithTitles;
-    requiredFields?: string[];
+    MutateFormComponent;
+    mutateFormProps?: IMutateFormProps<TFormFieldsWithTitles>;
 }
 
 // Opens a modal for adding or modifying data defined by the MutateFormComponent prop
@@ -26,27 +20,11 @@ export default function MutateModal<TDefaultObject, TFormFieldsWithTitles extend
     isVisible,
     closeModalAction,
     setEmptyFilterParams,
-    formObjectSchema,
-    useSaveMutation,
-    successMessage,
-    errorMessage,
-    notModifiedMessage,
-    formFieldsWithTitles,
-    requiredFields,
+    mutateFormProps,
 }: IMutateModalProps<TDefaultObject, TFormFieldsWithTitles>): React.ReactElement {
-    // generic MutateForm component -specific props
-    const mutateFormProps = {
-        formObjectSchema,
-        useSaveMutation,
-        successMessage,
-        errorMessage,
-        notModifiedMessage,
-        formFieldsWithTitles,
-        requiredFields,
-    };
-
     // check if the MutateFormComponent is MutateForm
-    const isMutateForm = (<MutateForm />).type === (<MutateFormComponent />).type;
+    const isMutateForm =
+        !!mutateFormProps && (<MutateForm {...mutateFormProps} />).type === (<MutateFormComponent />).type;
 
     return (
         <Dialog

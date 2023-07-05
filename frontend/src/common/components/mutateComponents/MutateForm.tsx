@@ -2,22 +2,26 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Button, IconArrowLeft} from "hds-react";
 import {useEffect} from "react";
 import {useForm} from "react-hook-form";
-import {hdsToast} from "../utils";
-import {TextInput} from "./form";
-import SaveButton from "./SaveButton";
+import {hdsToast} from "../../utils";
+import {TextInput} from "../form";
+import SaveButton from "../SaveButton";
 
-export interface IMutateForm<TDefaultObject extends object, TFormFieldsWithTitles extends object> {
+export interface IMutateFormProps<TFormFieldsWithTitles extends object> {
+    formObjectSchema;
+    useSaveMutation;
+    successMessage: string;
+    errorMessage: string;
+    notModifiedMessage: string;
+    formFieldsWithTitles: TFormFieldsWithTitles;
+    requiredFields: string[];
+}
+
+export type IMutateForm<TDefaultObject extends object, TFormFieldsWithTitles extends object> = {
     defaultObject?: TDefaultObject;
     closeModalAction?: () => void;
     setEmptyFilterParams?: () => void;
-    formObjectSchema?;
-    useSaveMutation?;
-    successMessage?: string;
-    errorMessage?: string;
-    notModifiedMessage?: string;
-    formFieldsWithTitles?: TFormFieldsWithTitles;
-    requiredFields?: string[];
-}
+} & IMutateFormProps<TFormFieldsWithTitles>;
+
 // Generic form for adding or modifying react hook form object data
 export default function MutateForm<TDefaultObject extends object, TFormFieldsWithTitles extends object>({
     defaultObject,
