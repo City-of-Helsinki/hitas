@@ -308,9 +308,16 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
         type[ConstructionPriceIndex],
         type[ConstructionPriceIndex2005Equal100],
     ],
-    completion_date: Optional[datetime.date] = None,
-    calculation_date: Optional[datetime.date] = None,
+    completion_date: Optional[datetime.date],
+    calculation_date: datetime.date,
 ) -> RoundWithPrecision:
+    """
+    If 'completion_date' is missing, calculating index for that month will fail
+    and index price will be null, so we can skip this calculation freely
+    """
+    if completion_date is None:
+        return RoundWithPrecision(None, output_field=HitasModelDecimalField())
+
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
 
@@ -339,13 +346,10 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
             output_field=HitasModelDecimalField(),
         )
     elif issubclass(table, ConstructionPriceIndex):
-        # If 'completion_date' is missing, calculating index for that month will fail
-        # and index price will be null, so we can skip this calculation freely
-        if completion_date is not None:
-            depreciation = Value(
-                depreciation_multiplier(months_between_dates(completion_date, calculation_date)),
-                output_field=HitasModelDecimalField(),
-            )
+        depreciation = Value(
+            depreciation_multiplier(months_between_dates(completion_date, calculation_date)),
+            output_field=HitasModelDecimalField(),
+        )
 
         interest = Case(
             # Check for exceptions where old ruleset is not used
