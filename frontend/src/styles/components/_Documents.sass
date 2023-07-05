@@ -1,14 +1,47 @@
 @use "../imports" as *
 
 .view--documents
+  [class^="Tabs-module_tab__"][aria-selected=true]
+    background-color: $color-black-10
+    border-top-left-radius: $spacing-xs
+    border-top-right-radius: $spacing-xs
+    span
+      font-weight: 700
+  [role="tabpanel"]
+    background-color: $color-black-10
+    padding: $spacing-m
+  [class^="Accordion-module_accordion__"]
+    margin-bottom: $spacing-m
+  [class^="Accordion-module_headingContainer"][aria-expanded=true]
+    font-weight: 700
+    background: $color-engel
+    &:hover
+      background: $color-engel-medium-light
+  [class^="Accordion-module_accordionHeader"]
+    background: $color-engel-medium-light
+    padding: 0
+    &:hover
+      background: $color-engel-light
+      font-weight: 700
+    span
+      padding: $spacing-m
+    svg
+      position: relative
+      right: $spacing-m
+  [class^="Accordion-module_accordionContent"]
+    padding: $spacing-m
+    background: $color-white
+    box-shadow: 0px 5px 5px 0px rgba($color-black, 0.2) inset
+    border-left: 1px solid $color-black-20
+    border-right: 1px solid $color-black-20
   .current-template
+    ul
+      margin: 0
     li
       @include flexbox()
-      > div
-        width: 75%
-      .instruction-text
-        width: 25%
-        padding: $spacing-m
+      @include align-items(center)
+      div
+        flex-grow: 1
     label
       font-weight: 700
     .input-field
