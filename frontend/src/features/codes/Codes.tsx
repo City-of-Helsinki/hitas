@@ -1,13 +1,10 @@
 import {Tabs} from "hds-react";
-import {
-    useGetDevelopersQuery,
-    useGetOwnersQuery,
-    useGetPropertyManagersQuery,
-    useSaveDeveloperMutation,
-    useSavePropertyManagerMutation,
-} from "../../app/services";
+import {useGetDevelopersQuery, useGetOwnersQuery, useGetPropertyManagersQuery} from "../../app/services";
 import {MutateForm, MutateSearchList, OwnerMutateForm} from "../../common/components";
-import {DeveloperSchema, PropertyManagerSchema} from "../../common/schemas";
+import {
+    developerMutateFormProps,
+    propertyManagerMutateFormProps,
+} from "../../common/components/mutateComponents/mutateFormProps";
 import {IndicesList} from "./";
 
 const Codes = (): JSX.Element => {
@@ -35,48 +32,30 @@ const Codes = (): JSX.Element => {
                 <Tabs.TabPanel className="view--codes__tab--owners">
                     <MutateSearchList
                         listFieldsWithTitles={{name: "Nimi", identifier: "Henkilö- tai Y-tunnus"}}
-                        searchStringMinLength={2}
-                        resultListMaxRows={12}
                         useGetQuery={useGetOwnersQuery}
-                        MutateFormComponent={OwnerMutateForm}
                         emptyFilterParams={{name: "", identifier: ""}}
                         dialogTitles={{modify: "Muokkaa henkilötietoja"}}
+                        MutateFormComponent={OwnerMutateForm}
                     />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--property-managers">
                     <MutateSearchList
                         listFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
-                        searchStringMinLength={2}
-                        resultListMaxRows={12}
                         useGetQuery={useGetPropertyManagersQuery}
-                        MutateFormComponent={MutateForm}
                         emptyFilterParams={{name: "", email: ""}}
                         dialogTitles={{modify: "Muokkaa isännöitsijän tietoja", new: "Lisää isännöitsijä"}}
-                        formObjectSchema={PropertyManagerSchema}
-                        useSaveMutation={useSavePropertyManagerMutation}
-                        successMessage="Isännöitsijän tiedot tallennettu onnistuneesti!"
-                        errorMessage="Virhe isännöitsijän tietojen tallentamisessa!"
-                        notModifiedMessage="Ei muutoksia isännöitsijän tiedoissa."
-                        formFieldsWithTitles={{name: "Nimi", email: "Sähköpostiosoite"}}
-                        requiredFields={["name"]}
+                        MutateFormComponent={MutateForm}
+                        mutateFormProps={propertyManagerMutateFormProps}
                     />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--developers">
                     <MutateSearchList
                         listFieldsWithTitles={{value: "Nimi"}}
-                        searchStringMinLength={2}
-                        resultListMaxRows={12}
                         useGetQuery={useGetDevelopersQuery}
-                        MutateFormComponent={MutateForm}
                         emptyFilterParams={{value: ""}}
                         dialogTitles={{modify: "Muokkaa rakennuttajan tietoja", new: "Lisää rakennuttaja"}}
-                        formObjectSchema={DeveloperSchema}
-                        useSaveMutation={useSaveDeveloperMutation}
-                        successMessage="Rakennuttajan tiedot tallennettu onnistuneesti!"
-                        errorMessage="Virhe rakennuttajan tietojen tallentamisessa!"
-                        notModifiedMessage="Ei muutoksia rakennuttajan tiedoissa."
-                        formFieldsWithTitles={{value: "Nimi", description: "Kuvaus"}}
-                        requiredFields={["value", "description"]}
+                        MutateFormComponent={MutateForm}
+                        mutateFormProps={developerMutateFormProps}
                     />
                 </Tabs.TabPanel>
             </Tabs>

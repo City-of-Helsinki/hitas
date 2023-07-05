@@ -3,11 +3,11 @@ import {Button, IconArrowLeft} from "hds-react";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
-import {useSaveOwnerMutation} from "../../app/services";
-import {IOwner, OwnerSchema} from "../schemas";
-import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../utils";
-import {Checkbox, TextInput} from "./form";
-import SaveButton from "./SaveButton";
+import {useSaveOwnerMutation} from "../../../app/services";
+import {IOwner, OwnerSchema} from "../../schemas";
+import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
+import {Checkbox, TextInput} from "../form";
+import SaveButton from "../SaveButton";
 
 interface IOwnerMutateForm {
     defaultObject?: IOwner;
