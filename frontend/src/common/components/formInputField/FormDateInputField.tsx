@@ -1,6 +1,7 @@
 import {format, parse} from "date-fns";
 import {DateInput} from "hds-react";
 
+import React from "react";
 import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormDateInputFieldProps extends CommonFormInputFieldProps {
@@ -13,7 +14,7 @@ export default function FormDateInputField({
     setIsInvalid,
     required,
     ...rest
-}: FormDateInputFieldProps): JSX.Element {
+}: FormDateInputFieldProps): React.JSX.Element {
     // Display the date in 'HDS date format' to the user, but internally keep the date stored in a format which
     // doesn't need to be converted before sending it to the API
 

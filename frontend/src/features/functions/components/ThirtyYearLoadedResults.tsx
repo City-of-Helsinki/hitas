@@ -1,5 +1,5 @@
 import {Button, Dialog} from "hds-react";
-import {useState} from "react";
+import React, {useState} from "react";
 import {CloseButton, Heading} from "../../../common/components";
 import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./";
 
@@ -15,7 +15,7 @@ const ListHeaders = () => (
     </div>
 );
 
-const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): JSX.Element => {
+const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.JSX.Element => {
     const automaticallyReleased = data?.automatically_released ?? [];
     const releasedFromRegulation = data?.released_from_regulation ?? [];
     const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];

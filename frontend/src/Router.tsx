@@ -1,3 +1,4 @@
+import React from "react";
 import {Navigate, Route, Routes} from "react-router-dom";
 import App from "./app/App";
 import {selectIsAuthenticated} from "./app/authSlice";
@@ -30,7 +31,7 @@ export default function Router() {
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
     // Use this function to protect routes that require authentication
-    const protect = (element: JSX.Element) => {
+    const protect = (element: React.JSX.Element) => {
         return isAuthenticated ? element : <Unauthorized />;
     };
 

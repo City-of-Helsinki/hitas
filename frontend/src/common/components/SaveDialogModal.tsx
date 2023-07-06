@@ -3,6 +3,7 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Accordion, Button, Dialog} from "hds-react";
 import {Link} from "react-router-dom";
 
+import React from "react";
 import {
     IApartmentDetails,
     IBuilding,
@@ -111,7 +112,7 @@ export default function SaveDialogModal({
     setIsVisible,
     title,
     className,
-}: SaveStateProps): JSX.Element {
+}: SaveStateProps): React.JSX.Element {
     return (
         <Dialog
             id="save-modal"

@@ -13,7 +13,7 @@ export default function FormPostalCodeInputField({
     setIsInvalid,
     required,
     ...rest
-}: FormPostalCodeInputFieldProps): JSX.Element {
+}: FormPostalCodeInputFieldProps): React.JSX.Element {
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Remove all non-number characters from the value
         setFieldValue(e.target.value.replace(/\D/g, ""));

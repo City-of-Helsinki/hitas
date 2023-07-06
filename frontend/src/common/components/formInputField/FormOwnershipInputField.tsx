@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 import {useImmer} from "use-immer";
@@ -107,7 +107,7 @@ export default function FormOwnershipInputField({
     placeholder,
     required,
     ...rest
-}: FormOwnershipInputFieldProps): JSX.Element {
+}: FormOwnershipInputFieldProps): React.JSX.Element {
     const MIN_LENGTH = 2;
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [isInvalidSSNAllowed, setIsInvalidSSNAllowed] = useState(false);

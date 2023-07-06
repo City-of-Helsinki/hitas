@@ -1,3 +1,4 @@
+import React from "react";
 import {IApartmentDetails, IHousingCompanyDetails} from "../schemas";
 import {formatMoney} from "../utils";
 import {EditButton, Heading} from "./index";
@@ -9,7 +10,12 @@ interface ImprovementsTableProps {
     editPath?: string;
 }
 
-export default function ImprovementsTable({data, title, editableType, editPath}: ImprovementsTableProps): JSX.Element {
+export default function ImprovementsTable({
+    data,
+    title,
+    editableType,
+    editPath,
+}: ImprovementsTableProps): React.JSX.Element {
     // Detect if this is an apartment to know when to show depreciation column
     const isApartment = "links" in data;
 

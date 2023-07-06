@@ -1,4 +1,5 @@
 import {Button, IconCrossCircleFill} from "hds-react";
+import React from "react";
 
 interface RemoveButtonProps {
     onClick: () => void;
@@ -16,7 +17,7 @@ export default function RemoveButton({
     disabled = false,
     buttonText,
     ...rest
-}: RemoveButtonProps): JSX.Element {
+}: RemoveButtonProps): React.JSX.Element {
     return (
         <Button
             iconLeft={<IconCrossCircleFill />}

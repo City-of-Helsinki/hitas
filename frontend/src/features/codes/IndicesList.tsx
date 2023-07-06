@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
@@ -84,7 +84,7 @@ const IndexResultList = ({setFormData, setCreateDialogOpen, indexType, filterPar
     );
 };
 
-const IndicesList = (): JSX.Element => {
+const IndicesList = (): React.JSX.Element => {
     const initialSaveData: IIndex = {
         indexType: indexOptions[0].value,
         month: `${new Date().getFullYear()}-${("0" + (new Date().getMonth() + 1)).slice(-2)}`,

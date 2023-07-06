@@ -1,5 +1,5 @@
 import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
-import {useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {Link, useParams} from "react-router-dom";
 import {
@@ -458,7 +458,7 @@ const LoadedApartmentDetails = ({
 }: {
     apartment: IApartmentDetails;
     housingCompany: IHousingCompanyDetails;
-}): JSX.Element => {
+}): React.JSX.Element => {
     // Handle visibility of the relevant modals
     const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
@@ -758,7 +758,7 @@ const LoadedApartmentDetails = ({
     );
 };
 
-const ApartmentDetailsPage = (): JSX.Element => {
+const ApartmentDetailsPage = (): React.JSX.Element => {
     // Load required data and pass it to the child component
     const params = useParams() as {housingCompanyId: string; apartmentId: string};
 

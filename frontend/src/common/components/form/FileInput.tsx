@@ -1,5 +1,6 @@
 import {FileInput as HDSFileInput} from "hds-react";
 
+import React from "react";
 import {FormInputProps} from "./";
 
 interface FileInputProps extends FormInputProps {
@@ -14,7 +15,7 @@ const FileInput = ({
     formObject,
     onChange,
     ...rest
-}: FileInputProps): JSX.Element => {
+}: FileInputProps): React.JSX.Element => {
     const {
         register,
         formState: {errors},

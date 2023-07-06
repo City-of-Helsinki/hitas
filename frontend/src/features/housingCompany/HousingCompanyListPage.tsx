@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
 import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
@@ -17,7 +17,7 @@ import {getHousingCompanyHitasTypeName} from "../../common/localisation";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
 import {formatDate} from "../../common/utils";
 
-const HousingCompanyListItem = ({housingCompany}): JSX.Element => {
+const HousingCompanyListItem = ({housingCompany}): React.JSX.Element => {
     const getStatusLabelText = () => {
         if (housingCompany.regulation_status.startsWith("released")) {
             return "Vapautunut";
@@ -46,7 +46,7 @@ const HousingCompanyListItem = ({housingCompany}): JSX.Element => {
     );
 };
 
-const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
+const HousingCompanyResultsList = ({filterParams}): React.JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
     const {data, error, isLoading, isFetching} = useGetHousingCompaniesQuery({...filterParams, page: currentPage});
 
@@ -109,7 +109,7 @@ const HousingCompanyResultsList = ({filterParams}): JSX.Element => {
     );
 };
 
-const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => {
+const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Element => {
     return (
         <div className="filters">
             <FilterTextInputField
@@ -164,7 +164,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): JSX.Element => 
     );
 };
 
-const HousingCompanyListPage = (): JSX.Element => {
+const HousingCompanyListPage = (): React.JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (

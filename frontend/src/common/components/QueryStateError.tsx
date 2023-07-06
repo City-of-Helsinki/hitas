@@ -1,5 +1,6 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Accordion, Dialog} from "hds-react";
+import React from "react";
 import {CloseButton} from "./index";
 
 interface QueryStateErrorProps {
@@ -9,7 +10,12 @@ interface QueryStateErrorProps {
     error: object | undefined;
 }
 
-export default function QueryStateError({open, close, attemptedAction, error}: QueryStateErrorProps): JSX.Element {
+export default function QueryStateError({
+    open,
+    close,
+    attemptedAction,
+    error,
+}: QueryStateErrorProps): React.JSX.Element {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
     const errorFields = (error as {fields: []})?.fields || [];
     return (

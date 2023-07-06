@@ -1,5 +1,6 @@
 import toast, {ToastOptions} from "react-hot-toast";
 
+import React from "react";
 import {Config} from "../app/services";
 import {
     hitasQuarters,
@@ -147,7 +148,7 @@ export const today = () => new Date().toISOString().split("T")[0]; // Today's da
 
 // Toast hook with easier Notification typing
 export function hitasToast(
-    message: string | JSX.Element,
+    message: string | React.JSX.Element,
     type?: "success" | "info" | "error" | "alert",
     opts?: ToastOptions
 ) {
@@ -156,10 +157,11 @@ export function hitasToast(
 
 // Toast hook with easier Notification typing
 export const hdsToast = {
-    success: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "success"}),
-    info: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
-    error: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "error"}),
-    alert: (message: string | JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "alert"}),
+    success: (message: string | React.JSX.Element, opts?: ToastOptions) =>
+        toast(message, {...opts, className: "success"}),
+    info: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "info"}),
+    error: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "error"}),
+    alert: (message: string | React.JSX.Element, opts?: ToastOptions) => toast(message, {...opts, className: "alert"}),
 };
 
 // Returns true if obj1 contains the same key/value pairs as obj2. Note that this is non-exclusive, so obj1 doesn't

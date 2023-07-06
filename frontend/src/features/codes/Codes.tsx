@@ -1,4 +1,5 @@
 import {Tabs} from "hds-react";
+import React from "react";
 import {useGetDevelopersQuery, useGetOwnersQuery, useGetPropertyManagersQuery} from "../../app/services";
 import {MutateForm, MutateSearchList, OwnerMutateForm} from "../../common/components";
 import {
@@ -7,7 +8,7 @@ import {
 } from "../../common/components/mutateComponents/mutateFormProps";
 import {IndicesList} from "./";
 
-const Codes = (): JSX.Element => {
+const Codes = (): React.JSX.Element => {
     return (
         <div className="view--codes">
             <h1 className="main-heading">Koodisto</h1>

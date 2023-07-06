@@ -1,6 +1,6 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Container, Footer, IconSignout, Navigation} from "hds-react";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link, Outlet} from "react-router-dom";
 import Notifications from "../common/components/Notifications";
 import Spinner from "../common/components/Spinner";
@@ -11,7 +11,7 @@ import {useAppDispatch, useAppSelector} from "./hooks";
 import {useGetUserInfoQuery} from "./services";
 import useAuthentication from "./useAuthentication";
 
-const App = (): JSX.Element => {
+const App = (): React.JSX.Element => {
     // Authentication
     const token = process.env.REACT_APP_AUTH_TOKEN;
     const {

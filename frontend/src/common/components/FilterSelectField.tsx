@@ -1,4 +1,5 @@
 import {Select} from "hds-react";
+import React from "react";
 
 interface FilterComboboxProps {
     label: string;
@@ -14,7 +15,7 @@ export default function FilterSelectField({
     filterFieldName,
     filterParams,
     setFilterParams,
-}: FilterComboboxProps): JSX.Element {
+}: FilterComboboxProps): React.JSX.Element {
     const onSelectionChange = (value: {label: string; value: string}) => {
         // Update set filter, or remove key if filter is cleared
         const filters = {...filterParams};

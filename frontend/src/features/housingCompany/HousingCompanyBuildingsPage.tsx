@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Fieldset, IconCrossCircle, IconPen} from "hds-react";
 import {useParams} from "react-router-dom";
@@ -24,7 +24,7 @@ const blankForm: IBuildingWritable = {
     building_identifier: "",
 };
 
-const HousingCompanyBuildingsPage = (): JSX.Element => {
+const HousingCompanyBuildingsPage = (): React.JSX.Element => {
     const params = useParams() as {readonly housingCompanyId: string};
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [idsToRemove, setIdsToRemove] = useState<{building?: string | null; realEstate?: string | null}>({

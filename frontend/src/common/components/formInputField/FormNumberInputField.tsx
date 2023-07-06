@@ -1,5 +1,6 @@
 import {NumberInput} from "hds-react";
 
+import React from "react";
 import {CommonFormInputFieldProps} from "./FormInputField";
 
 interface FormNumberInputFieldProps extends Omit<CommonFormInputFieldProps, "value"> {
@@ -15,7 +16,7 @@ export default function FormNumberInputField({
     fractionDigits = 0,
     required,
     ...rest
-}: FormNumberInputFieldProps): JSX.Element {
+}: FormNumberInputFieldProps): React.JSX.Element {
     // Format the passed value depending on fractionDigits without rounding or stripping trailing zeroes
     const re = new RegExp(fractionDigits > 0 ? `(\\d+\\.\\d{${fractionDigits}})(\\d)` : "(\\d+)");
     const toFixedDown = (v: string): string => {

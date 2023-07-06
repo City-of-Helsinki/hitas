@@ -16,7 +16,7 @@ export default function FilterCheckboxField({
     filterParams,
     setFilterParams,
     applyOnlyOnTrue = false,
-}: FilterCheckboxFieldProps): JSX.Element {
+}: FilterCheckboxFieldProps): React.JSX.Element {
     const [isInputChecked, setIsInputChecked] = useState(false);
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
