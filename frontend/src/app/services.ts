@@ -768,7 +768,7 @@ const mutationApi = hitasApi.injectEndpoints({
                 url: `pdf-bodies/${arg.name}`,
                 method: "PUT",
                 headers: mutationApiJsonHeaders(),
-                body: arg.texts,
+                body: arg,
             }),
         }),
     }),

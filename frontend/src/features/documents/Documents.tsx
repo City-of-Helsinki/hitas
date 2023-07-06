@@ -7,13 +7,13 @@ const Documents = () => {
     return (
         <div className="view--documents">
             <Heading type="main">Dokumenttipohjat</Heading>
+            <h2>Ladattavien PDF-tiedostojen leipätekstit ja sähköpostipohjat</h2>
             <Tabs>
                 <TabList>
                     <Tab>PDF-pohjat</Tab>
                     <Tab>Sähköpostipohjat</Tab>
                 </TabList>
                 <TabPanel>
-                    <h2>Ladattavien PDF-tiedostojen leipätekstit</h2>
                     <ManagePDFTemplates />
                 </TabPanel>
                 <TabPanel>
