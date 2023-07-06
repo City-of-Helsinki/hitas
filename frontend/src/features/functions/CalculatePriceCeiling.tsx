@@ -55,7 +55,7 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
                         <span>{data.contents[0].value}</span>
                     </div>
                     <DownloadButton
-                        downloadFn={() => downloadSurfaceAreaPriceCeilingResults(currentMonth + "-01")}
+                        onClick={() => downloadSurfaceAreaPriceCeilingResults(currentMonth + "-01")}
                         buttonText="Lataa laskentaraportti"
                     />
                 </>

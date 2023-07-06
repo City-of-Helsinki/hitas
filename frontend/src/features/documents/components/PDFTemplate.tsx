@@ -3,6 +3,7 @@ import {useEditPDFTemplateMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";
 import {TextAreaInput} from "../../../common/components/form";
 import {hdsToast} from "../../../common/utils";
+
 const instructionTexts = {
     unconfirmed_max_price_calculation: [
         "Teksti velattomasta enimmäishinnasta. Heti asunnon tietoja seuraava kappale. Näytetään lihavoituna.",
@@ -12,9 +13,10 @@ const instructionTexts = {
     confirmed_max_price_calculation: [
         "Heti asunnon tietoja seuraava kappale, eli velaton enimmäishinta. Näytetään lihavoituna.",
     ],
-    stays_regulated: ["Ohjeteksti"],
-    freed_company: ["Ohjeteksti"],
+    stays_regulated: ["Hintasääntelystä vapautuminen", "Tontin maanvuokra", "Hintasääntelyn jatkuminen"],
+    released_from_regulation: ["Hintasääntelystä vapautuminen"],
 };
+
 const PDFTemplate = ({data, type}) => {
     const [saveTemplate] = useEditPDFTemplateMutation();
     // Get the relevant data from the API response and initialize the form (with field array)
@@ -23,7 +25,7 @@ const PDFTemplate = ({data, type}) => {
     });
     const formObject = useForm({
         defaultValues: {
-            paragraphs: currentData[0].texts.map((text) => {
+            paragraphs: currentData[0]?.texts.map((text) => {
                 return {text: text};
             }),
         },
@@ -31,15 +33,12 @@ const PDFTemplate = ({data, type}) => {
     });
     const {control, handleSubmit} = formObject;
     const {fields} = useFieldArray({control, name: "paragraphs"});
+
     const onSubmit = (submitData) => {
-        const data = {
+        saveTemplate({
             name: type,
-            texts: submitData.paragraphs.map((paragraph) => {
-                return paragraph.text;
-            }),
-        };
-        console.log(data);
-        saveTemplate({data})
+            texts: submitData.paragraphs.map((paragraph) => paragraph.text),
+        })
             .unwrap()
             .then(() => hdsToast.success("Päivitys onnistui!"))
             .catch((e) => {
@@ -48,6 +47,7 @@ const PDFTemplate = ({data, type}) => {
                 console.warn(e);
             });
     };
+
     return (
         <form
             className="current-template"

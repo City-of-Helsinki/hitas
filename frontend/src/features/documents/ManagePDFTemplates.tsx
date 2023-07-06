@@ -31,8 +31,30 @@ const ManagePDFTemplates = () => {
                     />
                 </QueryStateHandler>
             </Accordion>
-            <Accordion heading="Vapautuva yhtiö" />
-            <Accordion heading="Valvonnan piiriin jäävä yhtiö" />
+            <Accordion heading="Vapautuva yhtiö">
+                <QueryStateHandler
+                    data={data}
+                    error={error}
+                    isLoading={isLoading}
+                >
+                    <PDFTemplate
+                        data={data}
+                        type="released_from_regulation"
+                    />
+                </QueryStateHandler>
+            </Accordion>
+            <Accordion heading="Valvonnan piiriin jäävä yhtiö">
+                <QueryStateHandler
+                    data={data}
+                    error={error}
+                    isLoading={isLoading}
+                >
+                    <PDFTemplate
+                        data={data}
+                        type="stays_regulated"
+                    />
+                </QueryStateHandler>
+            </Accordion>
         </div>
     );
 };
