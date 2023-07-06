@@ -67,6 +67,40 @@ const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: I
     );
 };
 
+const ApartmentSalesPageLinkButton = ({
+    housingCompany,
+    apartment,
+}: {
+    housingCompany: IHousingCompanyDetails;
+    apartment: IApartmentDetails;
+}) => {
+    // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
+    if (!housingCompany.date && apartment.prices.first_purchase_date) {
+        return (
+            <Button
+                theme="black"
+                iconLeft={<IconGlyphEuro />}
+                onClick={() => hdsToast.error("Valmistumatonta asuntoa ei voida jälleenmyydä.")}
+                disabled={housingCompany.regulation_status !== "regulated"}
+            >
+                Kauppatapahtuma
+            </Button>
+        );
+    } else {
+        return (
+            <Link to="sales">
+                <Button
+                    theme="black"
+                    iconLeft={<IconGlyphEuro />}
+                    disabled={housingCompany.regulation_status !== "regulated" || !apartment.surface_area}
+                >
+                    Kauppatapahtuma
+                </Button>
+            </Link>
+        );
+    }
+};
+
 const ApartmentConditionsOfSaleCard = ({
     apartment,
     housingCompany,
@@ -97,38 +131,13 @@ const ApartmentConditionsOfSaleCard = ({
         return groupedConditionsOfSale[a].length - groupedConditionsOfSale[b].length;
     });
 
-    const ApartmentSalesPageLinkButton = () => {
-        // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
-        if (!housingCompany.date && apartment.prices.first_purchase_date) {
-            return (
-                <Button
-                    theme="black"
-                    iconLeft={<IconGlyphEuro />}
-                    onClick={() => hdsToast.error("Valmistumatonta asuntoa ei voida jälleenmyydä.")}
-                    disabled={housingCompany.regulation_status !== "regulated"}
-                >
-                    Kauppatapahtuma
-                </Button>
-            );
-        } else {
-            return (
-                <Link to="sales">
-                    <Button
-                        theme="black"
-                        iconLeft={<IconGlyphEuro />}
-                        disabled={housingCompany.regulation_status !== "regulated" || !apartment.surface_area}
-                    >
-                        Kauppatapahtuma
-                    </Button>
-                </Link>
-            );
-        }
-    };
-
     return (
         <Card>
             <div className="row row--buttons">
-                <ApartmentSalesPageLinkButton />
+                <ApartmentSalesPageLinkButton
+                    housingCompany={housingCompany}
+                    apartment={apartment}
+                />
                 <Link to="conditions-of-sale">
                     <Button
                         theme="black"
