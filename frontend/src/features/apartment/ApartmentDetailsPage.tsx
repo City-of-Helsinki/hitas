@@ -80,7 +80,7 @@ const ApartmentSalesPageLinkButton = ({
             <Button
                 theme="black"
                 iconLeft={<IconGlyphEuro />}
-                onClick={() => hdsToast.error("Valmistumatonta asuntoa ei voida jälleenmyydä.")}
+                onClick={() => hdsToast.error("Valmistumattoman taloyhtiön asuntoa ei voida jälleenmyydä.")}
                 disabled={housingCompany.regulation_status !== "regulated"}
             >
                 Kauppatapahtuma
