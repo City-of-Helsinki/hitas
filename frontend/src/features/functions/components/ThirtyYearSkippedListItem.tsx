@@ -1,3 +1,4 @@
+import React from "react";
 import {Link} from "react-router-dom";
 import {Select} from "../../../common/components/form";
 
@@ -7,7 +8,7 @@ export default function ThirtyYearSkippedListItem({
     postalCodeOptionSet,
     formObject,
     index,
-}): JSX.Element {
+}): React.JSX.Element {
     const options: {label: string; value: string}[] = [];
     postalCodeOptionSet.forEach((option) => {
         options.push({

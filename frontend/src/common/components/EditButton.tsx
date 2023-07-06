@@ -1,4 +1,5 @@
 import {Button, IconPen} from "hds-react";
+import React from "react";
 import {Link} from "react-router-dom";
 
 interface EditButtonProps {
@@ -13,7 +14,7 @@ export default function EditButton({
     pathname = "edit",
     className,
     disabled = false,
-}: EditButtonProps): JSX.Element {
+}: EditButtonProps): React.JSX.Element {
     return (
         <Link
             to={{pathname: pathname}}

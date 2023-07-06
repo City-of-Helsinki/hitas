@@ -1,7 +1,7 @@
 import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link, useParams} from "react-router-dom";
 
-import {useState} from "react";
+import React, {useState} from "react";
 import {useGetHousingCompanyDetailQuery} from "../../app/services";
 import {
     DetailField,
@@ -20,7 +20,7 @@ import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage
 import SalesCatalogImport from "../components/housingCompany/SalesCatalogImport";
 import {BatchCompleteApartmentsModal} from "./";
 
-const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): JSX.Element => {
+const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): React.JSX.Element => {
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
     const params = useParams() as {readonly housingCompanyId: string};
     return (

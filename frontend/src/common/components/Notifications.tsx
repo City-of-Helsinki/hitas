@@ -14,7 +14,7 @@ const getAnimationStyle = (visible: boolean): React.CSSProperties => {
     };
 };
 
-export default function Notifications(): JSX.Element {
+export default function Notifications(): React.JSX.Element {
     const {toasts, handlers} = useToaster();
     const {calculateOffset, updateHeight} = handlers;
 

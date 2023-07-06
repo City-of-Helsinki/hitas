@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {dotted} from "../../utils";
 import FormDateInputField from "./FormDateInputField";
@@ -85,7 +85,7 @@ export default function FormInputField({
     error,
     className,
     ...rest
-}: FormInputFieldProps): JSX.Element {
+}: FormInputFieldProps): React.JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 

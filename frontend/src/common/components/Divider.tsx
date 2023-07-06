@@ -1,3 +1,5 @@
-export default function Divider({size = "s"}: {size: "s" | "m" | "l"}): JSX.Element {
+import React from "react";
+
+export default function Divider({size = "s"}: {size: "s" | "m" | "l"}): React.JSX.Element {
     return <div className={`divider-horizontal divider-horizontal-${size}`} />;
 }

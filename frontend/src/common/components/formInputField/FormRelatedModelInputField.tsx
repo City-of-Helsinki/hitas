@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
 import {Button, Dialog, IconCrossCircle, IconSearch, Table, TextInput} from "hds-react";
 
@@ -26,7 +26,7 @@ export default function FormRelatedModelInputField({
     placeholder,
     required,
     ...rest
-}: FormRelatedModelInputFieldProps): JSX.Element {
+}: FormRelatedModelInputFieldProps): React.JSX.Element {
     const MIN_LENGTH = 2;
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [internalFilterValue, setInternalFilterValue] = useState("");

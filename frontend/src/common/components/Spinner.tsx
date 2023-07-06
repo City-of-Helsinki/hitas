@@ -1,6 +1,7 @@
 import {LoadingSpinner} from "hds-react";
+import React from "react";
 
-export default function Spinner(): JSX.Element {
+export default function Spinner(): React.JSX.Element {
     return (
         <main>
             <div className="spinner-wrap-color">

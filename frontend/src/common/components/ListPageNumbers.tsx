@@ -15,7 +15,7 @@ export default function ListPageNumbers({
     setCurrentPage,
     pageInfo,
     pageInfo: {total_pages: totalPages},
-}: ListPageNumbersProps): JSX.Element {
+}: ListPageNumbersProps): React.JSX.Element {
     if (pageInfo === undefined || totalPages === 1) return <></>;
     return (
         <Pagination

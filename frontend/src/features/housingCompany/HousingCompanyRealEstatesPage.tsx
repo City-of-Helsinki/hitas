@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
 import {Fieldset, IconCrossCircle} from "hds-react";
 import {useParams} from "react-router-dom";
@@ -19,7 +19,7 @@ import {
 import {IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
 
-const HousingCompanyRealEstatesPage = (): JSX.Element => {
+const HousingCompanyRealEstatesPage = (): React.JSX.Element => {
     const params = useParams();
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);

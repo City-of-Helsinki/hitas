@@ -17,7 +17,7 @@ export default function FormTextInputField({
     required,
     validator,
     ...rest
-}: FormTextInputFieldProps): JSX.Element {
+}: FormTextInputFieldProps): React.JSX.Element {
     function handleOnChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         setFieldValue(e.target.value);
     }

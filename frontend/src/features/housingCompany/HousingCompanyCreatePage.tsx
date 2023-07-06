@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Checkbox, Fieldset} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -29,7 +29,7 @@ interface IHousingCompanyLocationState {
     state: null | {housingCompany: IHousingCompanyDetails};
 }
 
-const HousingCompanyCreatePage = (): JSX.Element => {
+const HousingCompanyCreatePage = (): React.JSX.Element => {
     const navigate = useNavigate();
     const {pathname, state}: IHousingCompanyLocationState = useLocation();
     const isEditPage = pathname.split("/").at(-1) === "edit";

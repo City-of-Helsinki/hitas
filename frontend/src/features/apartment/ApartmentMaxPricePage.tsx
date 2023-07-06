@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
@@ -21,7 +21,7 @@ import {today} from "../../common/utils";
 import ApartmentHeader from "./components/ApartmentHeader";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 
-const MaximumPriceModalError = ({error, setIsModalVisible}) => {
+const MaximumPriceModalError = ({error, setIsModalVisible}): React.JSX.Element => {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
     return (
         <>
@@ -42,7 +42,7 @@ const MaximumPriceModalError = ({error, setIsModalVisible}) => {
     );
 };
 
-const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): JSX.Element => {
+const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): React.JSX.Element => {
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
         apartment_share_of_housing_company_loans: null,
@@ -188,7 +188,7 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): J
     );
 };
 
-const ApartmentMaxPricePage = (): JSX.Element => {
+const ApartmentMaxPricePage = (): React.JSX.Element => {
     const params = useParams();
     const {data, error, isLoading} = useGetApartmentDetailQuery({
         housingCompanyId: params.housingCompanyId as string,

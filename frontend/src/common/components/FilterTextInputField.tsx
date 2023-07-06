@@ -22,7 +22,7 @@ export default function FilterTextInputField({
     minLength = 3,
     maxLength,
     ...rest
-}: FilterTextInputFieldProps): JSX.Element {
+}: FilterTextInputFieldProps): React.JSX.Element {
     const [isInvalid, setIsInvalid] = useState(false);
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Combobox} from "hds-react";
 
@@ -18,7 +18,7 @@ export default function FilterRelatedModelComboboxField({
     filterFieldName,
     filterParams,
     setFilterParams,
-}: FilterRelatedModelComboboxFieldProps): JSX.Element {
+}: FilterRelatedModelComboboxFieldProps): React.JSX.Element {
     const MIN_LENGTH = 2; // Minimum characters before querying more data from the API
     const [queryFilterValue, setQueryFilterValue] = useState("");
     const [options, setOptions] = useState([{label: "Loading...", disabled: true}]);

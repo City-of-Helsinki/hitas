@@ -1,4 +1,5 @@
 import {Button, IconSaveDisketteFill} from "hds-react";
+import React from "react";
 
 interface SaveButtonProps {
     onClick?: (unknown) => unknown;
@@ -16,7 +17,7 @@ export default function SaveButton({
     type,
     buttonText,
     size = "default",
-}: SaveButtonProps): JSX.Element {
+}: SaveButtonProps): React.JSX.Element {
     return (
         <Button
             iconLeft={<IconSaveDisketteFill />}

@@ -1,4 +1,5 @@
 import {Button, IconCross} from "hds-react";
+import React from "react";
 
 interface CloseButtonProps {
     onClick?: (unknown) => unknown;
@@ -6,7 +7,11 @@ interface CloseButtonProps {
     disabled?: boolean;
 }
 
-export default function CloseButton({onClick, isLoading = false, disabled = false}: CloseButtonProps): JSX.Element {
+export default function CloseButton({
+    onClick,
+    isLoading = false,
+    disabled = false,
+}: CloseButtonProps): React.JSX.Element {
     return (
         <Button
             iconLeft={<IconCross />}

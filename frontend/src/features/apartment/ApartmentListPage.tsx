@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 
 import {IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
@@ -17,7 +17,7 @@ import {IApartment, IApartmentListResponse} from "../../common/schemas";
 import {formatDate} from "../../common/utils";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
-const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element => {
+const ApartmentListItem = ({apartment}: {apartment: IApartment}): React.JSX.Element => {
     // Combine ownerships into a single formatted string
     const ownershipsString = apartment.ownerships.length
         ? apartment.ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
@@ -68,7 +68,13 @@ const ApartmentListItem = ({apartment}: {apartment: IApartment}): JSX.Element =>
     );
 };
 
-const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListResponse; isFetching: boolean}) => {
+const LoadedApartmentResultsList = ({
+    data,
+    isFetching,
+}: {
+    data: IApartmentListResponse;
+    isFetching: boolean;
+}): React.JSX.Element => {
     return (
         <>
             <div className="list-headers">
@@ -94,7 +100,7 @@ const LoadedApartmentResultsList = ({data, isFetching}: {data: IApartmentListRes
     );
 };
 
-function result(data, error, isLoading, isFetching, currentPage, setCurrentPage) {
+function result(data, error, isLoading, isFetching, currentPage, setCurrentPage): React.JSX.Element {
     return (
         <div className="results results--apartment">
             <QueryStateHandler
@@ -121,14 +127,14 @@ function result(data, error, isLoading, isFetching, currentPage, setCurrentPage)
     );
 }
 
-export const ApartmentResultsList = ({filterParams}): JSX.Element => {
+export const ApartmentResultsList = ({filterParams}): React.JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
     const {data, error, isLoading, isFetching} = useGetApartmentsQuery({...filterParams, page: currentPage});
 
     return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
-export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Element => {
+export const HousingCompanyApartmentResultsList = ({housingCompanyId}): React.JSX.Element => {
     const [currentPage, setCurrentPage] = useState(1);
     const {data, error, isLoading, isFetching} = useGetHousingCompanyApartmentsQuery({
         housingCompanyId: housingCompanyId,
@@ -138,7 +144,7 @@ export const HousingCompanyApartmentResultsList = ({housingCompanyId}): JSX.Elem
     return result(data, error, isLoading, isFetching, currentPage, setCurrentPage);
 };
 
-const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
+const ApartmentFilters = ({filterParams, setFilterParams}): React.JSX.Element => {
     return (
         <div className="filters">
             <FilterTextInputField
@@ -188,7 +194,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): JSX.Element => {
     );
 };
 
-const ApartmentListPage = (): JSX.Element => {
+const ApartmentListPage = (): React.JSX.Element => {
     const [filterParams, setFilterParams] = useState({});
 
     return (

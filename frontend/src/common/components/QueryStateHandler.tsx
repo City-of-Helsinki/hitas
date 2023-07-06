@@ -2,7 +2,7 @@ import {SerializedError} from "@reduxjs/toolkit";
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {LoadingSpinner} from "hds-react";
 
-import {useState} from "react";
+import React, {useState} from "react";
 import {PageInfo} from "../schemas";
 import {QueryStateError} from "./index";
 
@@ -16,8 +16,8 @@ interface QueryLoadingProps {
         | undefined;
     error: FetchBaseQueryError | SerializedError | object | undefined;
     isLoading: boolean;
-    errorComponent?: JSX.Element;
-    children: JSX.Element | JSX.Element[];
+    errorComponent?: React.JSX.Element;
+    children: React.JSX.Element | React.JSX.Element[];
     attemptedAction?: string;
 }
 
@@ -28,7 +28,7 @@ export default function QueryStateHandler({
     attemptedAction,
     errorComponent,
     children,
-}: QueryLoadingProps): JSX.Element {
+}: QueryLoadingProps): React.JSX.Element {
     // When loading or an error has occurred, show an appropriate message, otherwise return children
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(error !== undefined);
     if (error) {
