@@ -11,7 +11,7 @@ interface ConfirmDialogModalProps {
     modalText?: string | ReactNode;
     modalHeader?: string;
     successText?: string;
-    error?: FetchBaseQueryError | SerializedError | undefined;
+    error?: FetchBaseQueryError | SerializedError;
     linkURL?: string;
     linkText?: string;
     buttonText?: string;
@@ -66,6 +66,31 @@ const ActionSuccess = ({successText, linkURL, linkText}) => {
     );
 };
 
+const DefaultDialogContent = ({modalText, cancelAction, confirmAction, buttonText}) => (
+    <>
+        <Dialog.Content>
+            <p>{modalText}</p>
+            <div className="row row--buttons">
+                <Button
+                    theme="black"
+                    variant="secondary"
+                    onClick={cancelAction}
+                >
+                    Peruuta
+                </Button>
+                <Button
+                    theme="black"
+                    onClick={() => {
+                        confirmAction();
+                    }}
+                >
+                    {buttonText}
+                </Button>
+            </div>
+        </Dialog.Content>
+    </>
+);
+
 const ConfirmDialogModal = ({
     data,
     modalHeader = "Vahvista toiminto",
@@ -83,30 +108,6 @@ const ConfirmDialogModal = ({
     className,
     children,
 }: ConfirmDialogModalProps) => {
-    const DefaultDialogContent = () => (
-        <>
-            <Dialog.Content>
-                <p>{modalText}</p>
-                <div className="row row--buttons">
-                    <Button
-                        theme="black"
-                        variant="secondary"
-                        onClick={cancelAction}
-                    >
-                        Peruuta
-                    </Button>
-                    <Button
-                        theme="black"
-                        onClick={() => {
-                            confirmAction();
-                        }}
-                    >
-                        {buttonText}
-                    </Button>
-                </div>
-            </Dialog.Content>
-        </>
-    );
     return (
         <Dialog
             id="confirmation-modal"
@@ -140,7 +141,14 @@ const ConfirmDialogModal = ({
                     />
                 </QueryStateHandler>
             ) : (
-                children ?? <DefaultDialogContent />
+                children ?? (
+                    <DefaultDialogContent
+                        modalText={modalText}
+                        cancelAction={cancelAction}
+                        confirmAction={confirmAction}
+                        buttonText={buttonText}
+                    />
+                )
             )}
         </Dialog>
     );

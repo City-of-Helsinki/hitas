@@ -18,6 +18,16 @@ export const years = Array.from({length: 34}, (_, index) => {
     };
 });
 
+const CalculateButton = ({handleCalculateButton}) => (
+    <Button
+        className="calculate-button"
+        theme="black"
+        onClick={handleCalculateButton}
+    >
+        <span>Laske rajaneliöhinta</span>
+    </Button>
+);
+
 const PriceCeilingCalculationSection = ({data, currentMonth}) => {
     const [calculatePriceCeiling] = useCalculatePriceCeilingMutation();
     const handleCalculateButton = () => {
@@ -34,15 +44,6 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
                 hdsToast.error("Rajahinnan laskenta epäonnistui");
             });
     };
-    const CalculateButton = () => (
-        <Button
-            className="calculate-button"
-            theme="black"
-            onClick={handleCalculateButton}
-        >
-            <span>Laske rajaneliöhinta</span>
-        </Button>
-    );
 
     return (
         <div className="price-ceiling-calculation">
@@ -62,7 +63,7 @@ const PriceCeilingCalculationSection = ({data, currentMonth}) => {
             ) : (
                 <>
                     <p>Tälle neljännekselle ({getHitasQuarter().label}) ei vielä ole laskettu rajaneliöhintaa</p>
-                    <CalculateButton />
+                    <CalculateButton handleCalculateButton={handleCalculateButton} />
                 </>
             )}
         </div>

@@ -29,19 +29,21 @@ const App = (): React.JSX.Element => {
     const getEnvironment = () => {
         const url = window.location.href;
         const domain = url.split("/")[2];
-        const environment = domain.split(":")[0] === "localhost" ? "local" : domain.split(".")[1];
-        let name = environment;
-        switch (name) {
+        let environmentName = domain.split(":")[0] === "localhost" ? "local" : domain.split(".")[1];
+        switch (environmentName) {
             case "stage":
-                name = "staging";
+                environmentName = "staging";
                 break;
             case "dev":
-                name = "development";
+                environmentName = "development";
                 break;
         }
         const hasDevelopmentBanner =
-            name === "local" || name === "development" || name === "test" || name === "staging";
-        return {name: name, hasDevelopmentBanner: hasDevelopmentBanner};
+            environmentName === "local" ||
+            environmentName === "development" ||
+            environmentName === "test" ||
+            environmentName === "staging";
+        return {name: environmentName, hasDevelopmentBanner: hasDevelopmentBanner};
     };
     const environment = getEnvironment();
 
