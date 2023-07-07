@@ -184,6 +184,7 @@ class HousingCompanyImprovementSerializer(serializers.Serializer):
 class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer):
     name = HousingCompanyNameSerializer(source="*")
     hitas_type = HitasEnumField(enum=HitasType)
+    new_hitas = serializers.SerializerMethodField()
     regulation_status = HitasEnumField(enum=RegulationStatus, default=RegulationStatus.REGULATED)
     over_thirty_years_old = serializers.SerializerMethodField()
     completed = serializers.SerializerMethodField()
@@ -276,6 +277,10 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return value
 
     @staticmethod
+    def get_new_hitas(obj: HousingCompany) -> Optional[bool]:
+        return obj.hitas_type.new_hitas_ruleset if obj.hitas_type is not None else None
+
+    @staticmethod
     def get_area(obj: HousingCompany) -> Dict[str, any]:
         return {"name": obj.postal_code.city, "cost_area": obj.postal_code.cost_area}
 
@@ -329,6 +334,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "business_id",
             "name",
             "hitas_type",
+            "new_hitas",
             "exclude_from_statistics",
             "regulation_status",
             "over_thirty_years_old",

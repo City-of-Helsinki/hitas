@@ -4752,6 +4752,11 @@ components:
           example: 1234567-1
         hitas_type:
           $ref: "#/components/schemas/HitasType"
+        new_hitas:
+          description: Is this housing company using the new Hitas ruleset?
+          type: boolean
+          readOnly: true
+          example: true
         exclude_from_statistics:
           description: Should this housing company's apartments' sales be excluded from statistics?
           type: boolean
@@ -5008,6 +5013,11 @@ components:
           example: 1234567-1
         hitas_type:
           $ref: "#/components/schemas/HitasType"
+        new_hitas:
+          description: Is this housing company using the new Hitas ruleset?
+          type: boolean
+          readOnly: true
+          example: true
         exclude_from_statistics:
           description: Should this housing company's apartments' sales be excluded from statistics?
           type: boolean
