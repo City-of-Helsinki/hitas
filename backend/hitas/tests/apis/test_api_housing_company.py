@@ -276,6 +276,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "business_id": hc1.business_id,
         "name": {"display": hc1.display_name, "official": hc1.official_name},
         "hitas_type": hc1.hitas_type.value,
+        "new_hitas": hc1.hitas_type.new_hitas_ruleset,
         "completed": True,
         "exclude_from_statistics": False,
         "over_thirty_years_old": False,
