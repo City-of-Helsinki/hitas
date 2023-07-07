@@ -17,7 +17,7 @@ import {getHousingCompanyHitasTypeName} from "../../common/localisation";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
 import {formatDate} from "../../common/utils";
 
-const HousingCompanyListItem = ({housingCompany}): React.JSX.Element => {
+const HousingCompanyListItem = ({housingCompany}: {housingCompany: IHousingCompany}): React.JSX.Element => {
     const getStatusLabelText = () => {
         if (housingCompany.regulation_status.startsWith("released")) {
             return "Vapautunut";
@@ -37,7 +37,7 @@ const HousingCompanyListItem = ({housingCompany}): React.JSX.Element => {
                     <br />
                     {housingCompany.address.postal_code}, {housingCompany.address.city}
                 </div>
-                <div className="date">{formatDate(housingCompany.date)}</div>
+                <div className="date">{formatDate(housingCompany.completion_date)}</div>
                 <div className="housing-company-state">
                     <StatusLabel>{getStatusLabelText()}</StatusLabel>
                 </div>

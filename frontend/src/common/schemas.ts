@@ -218,7 +218,7 @@ const HousingCompanySchema = object({
     completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
-    date: string().nullable(),
+    completion_date: string().nullable(),
 });
 
 const BuildingSchema = object({
@@ -271,7 +271,7 @@ const HousingCompanyDetailsSchema = object({
     completed: boolean(),
     address: AddressSchema,
     area: HousingCompanyAreaSchema,
-    date: string().nullable(),
+    completion_date: string().nullable(),
     real_estates: RealEstateSchema.array(),
     building_type: CodeSchema,
     developer: CodeSchema,
