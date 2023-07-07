@@ -3,7 +3,7 @@ import {Heading} from "../../common/components";
 import ManageEmailTemplates from "./ManageEmailTemplates";
 import ManagePDFTemplates from "./ManagePDFTemplates";
 
-const Documents = () => {
+const Templates = () => {
     return (
         <div className="view--documents">
             <Heading type="main">Dokumenttipohjat</Heading>
@@ -25,4 +25,4 @@ const Documents = () => {
     );
 };
 
-export default Documents;
+export default Templates;
