@@ -49,7 +49,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
 
     def retrieve(self, request, *args, **kwargs):
         # Verify housing company and apartment exists (so we can raise an appropriate error)
-        hc_id, apartment_id = self.verify_housing_company_and_apartment(kwargs)
+        _, apartment_id = self.verify_housing_company_and_apartment(kwargs)
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
@@ -77,7 +77,7 @@ class ApartmentMaximumPriceViewSet(CreateModelMixin, RetrieveModelMixin, ViewSet
         confirm = serializer.data["confirm"]
 
         # Verify housing company and apartment exists (so we can raise an appropriate error)
-        hc_id, apartment_id = self.verify_housing_company_and_apartment(kwargs)
+        _, apartment_id = self.verify_housing_company_and_apartment(kwargs)
 
         # Try to fetch the maximum price calculation
         with model_or_404(ApartmentMaximumPriceCalculation):
