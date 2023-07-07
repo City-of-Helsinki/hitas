@@ -141,9 +141,9 @@ export default function FormOwnershipInputField({
     };
 
     const handleCreateOwnerButton = () => {
-        if (validateSocialSecurityNumber(formData.identifier as string) || isInvalidSSNAllowed)
+        if (isInvalidSSNAllowed || validateSocialSecurityNumber(formData.identifier)) {
             createOwner({data: formData});
-        else setIsInvalidSSNAllowed(true);
+        } else setIsInvalidSSNAllowed(true);
     };
 
     const dialogTheme = {

@@ -96,8 +96,10 @@ const handleDownloadPDF = (response) => {
             alink.download = `${filename}`;
             alink.click();
         })
-        // eslint-disable-next-line no-console
-        .catch((error) => console.error(error));
+        .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error);
+        });
 };
 
 const fetchAndDownloadPDF = (url: string, data: object) => {
@@ -269,9 +271,7 @@ const pdfApi = hitasApi.injectEndpoints({
                 return {
                     url: `thirty-year-regulation/reports/download-regulation-letter?housing_company_id=${id}&calculation_date=${calculationDate}`,
                     method: "GET",
-                    responseHandler: async (response) => {
-                        await handleDownloadPDF(response);
-                    },
+                    responseHandler: async (response) => handleDownloadPDF(response),
                     cache: "no-cache",
                 };
             },

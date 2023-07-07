@@ -17,8 +17,8 @@ import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} f
 import {IHousingCompanyDetails, IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
-import SalesCatalogImport from "../components/housingCompany/SalesCatalogImport";
 import {BatchCompleteApartmentsModal} from "./";
+import SalesCatalogImport from "./components/housingCompany/SalesCatalogImport";
 
 const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): React.JSX.Element => {
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);

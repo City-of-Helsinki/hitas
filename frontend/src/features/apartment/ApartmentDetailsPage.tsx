@@ -585,7 +585,7 @@ const LoadedApartmentDetails = ({
                                         <div>
                                             <label className="detail-field-label">Huomioitavaa</label>
                                             <textarea
-                                                value={(apartment.notes as string) || ""}
+                                                value={apartment.notes || ""}
                                                 readOnly
                                             />
                                         </div>

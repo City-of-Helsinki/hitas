@@ -30,7 +30,7 @@ export default function FilterRelatedModelComboboxField({
     );
 
     useEffect(() => {
-        if (data && data?.contents) {
+        if (data && data.contents) {
             const tempOptions = data.contents.map((o) => {
                 return {label: o[labelField]};
             });

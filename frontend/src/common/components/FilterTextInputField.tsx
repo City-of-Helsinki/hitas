@@ -33,7 +33,6 @@ export default function FilterTextInputField({
         if (filters[filterFieldName] && (!value || value.length < minLength)) {
             delete filters[filterFieldName];
             setFilterParams(filters);
-            return;
         } else if (e.target.value.length >= minLength) {
             filters[filterFieldName] = e.target.value;
             setFilterParams(filters);
