@@ -80,7 +80,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                                     />
                                     <DetailField
                                         label="Valmistumispäivä"
-                                        value={formatDate(housingCompany.date)}
+                                        value={formatDate(housingCompany.completion_date)}
                                     />
                                     <DetailField
                                         label="Hankinta-arvo"

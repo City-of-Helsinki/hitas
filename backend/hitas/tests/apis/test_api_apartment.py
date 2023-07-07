@@ -1947,14 +1947,15 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
         data=data,
         format="json",
     )
-    res = response.json()
-
+    response_json = response.json()
     if not minimal_data:
-        assert post_response.json() == res
+        assert post_response.json() == response_json
     else:
         ap = Apartment.objects.first()
-        del res["links"]
-        assert res == {
+        del response_json["links"]
+
+        assert response_json == {
+            "id": ap.uuid.hex,
             "address": {
                 "apartment_number": ap.apartment_number,
                 "city": "Helsinki",
@@ -1964,7 +1965,6 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
                 "street_address": ap.street_address,
             },
             "completion_date": None,
-            "id": ap.uuid.hex,
             "improvements": {
                 "construction_price_index": [],
                 "market_price_index": [],
@@ -1972,21 +1972,8 @@ def test__api__apartment__update(api_client: HitasAPIClient, minimal_data: bool)
             "notes": None,
             "ownerships": [],
             "prices": {
-                "first_sale_purchase_price": None,
-                "first_sale_share_of_housing_company_loans": None,
-                "first_sale_acquisition_price": None,
-                "catalog_purchase_price": None,
-                "catalog_share_of_housing_company_loans": None,
-                "catalog_acquisition_price": None,
-                "first_purchase_date": None,
-                "latest_sale_purchase_price": None,
-                "latest_purchase_date": None,
-                "construction": {
-                    "additional_work": None,
-                    "debt_free_purchase_price": None,
-                    "interest": None,
-                    "loans": None,
-                },
+                **data["prices"],
+                "current_sale_id": None,
                 "maximum_prices": {
                     "confirmed": None,
                     "unconfirmed": {

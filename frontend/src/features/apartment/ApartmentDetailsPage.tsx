@@ -75,7 +75,7 @@ const ApartmentSalesPageLinkButton = ({
     apartment: IApartmentDetails;
 }) => {
     // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
-    if (!housingCompany.date && apartment.prices.first_purchase_date) {
+    if (!housingCompany.completion_date && apartment.prices.first_purchase_date) {
         return (
             <Button
                 theme="black"
@@ -428,7 +428,7 @@ const ApartmentMaximumPricesCard = ({
                         theme="black"
                         size="small"
                         disabled={
-                            !housingCompany.date ||
+                            !housingCompany.completion_date ||
                             housingCompany.regulation_status !== "regulated" ||
                             !apartment.prices.first_purchase_date
                         }

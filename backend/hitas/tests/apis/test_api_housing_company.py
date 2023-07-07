@@ -98,7 +98,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient, freezer):
                 "city": hc2.postal_code.city,
             },
             "area": {"name": hc2.postal_code.city, "cost_area": hc2.postal_code.cost_area},
-            "date": None,
+            "completion_date": None,
         },
         {
             "id": hc1.uuid.hex,
@@ -114,7 +114,7 @@ def test__api__housing_company__list(api_client: HitasAPIClient, freezer):
                 "city": hc1.postal_code.city,
             },
             "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-            "date": str(ap1.completion_date),
+            "completion_date": str(ap1.completion_date),
         },
     ]
     assert response.json()["page"] == {
@@ -282,7 +282,7 @@ def test__api__housing_company__retrieve(api_client: HitasAPIClient, apt_with_nu
         "regulation_status": hc1.regulation_status.value,
         "address": {"city": "Helsinki", "postal_code": hc1.postal_code.value, "street_address": hc1.street_address},
         "area": {"name": hc1.postal_code.city, "cost_area": hc1.postal_code.cost_area},
-        "date": hc1_re1_bu1_ap1.completion_date.isoformat(),
+        "completion_date": hc1_re1_bu1_ap1.completion_date.isoformat(),
         "summary": {
             # (100.5+200+300.5+400+500+600.5) = 2101.5
             "realized_acquisition_price": 2101.5,
@@ -861,7 +861,7 @@ def test__api__housing_company__update(api_client: HitasAPIClient):
     assert hc.street_address == "changed-street-address"
     assert hc.acquisition_price == Decimal("10.01")
     assert hc.notes == ""
-    assert response.json()["date"]
+    assert response.json()["completion_date"]
 
     get_response = api_client.get(reverse("hitas:housing-company-detail", args=[hc.uuid.hex]))
     assert response.json() == get_response.json()

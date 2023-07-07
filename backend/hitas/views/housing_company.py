@@ -190,7 +190,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
     business_id = ValueOrNullField(allow_null=True, required=False)
     address = HitasAddressSerializer(source="*")
     area = serializers.SerializerMethodField()
-    date = serializers.SerializerMethodField()
+    completion_date = serializers.SerializerMethodField()
     real_estates = RealEstateSerializer(many=True, read_only=True)
     building_type = ReadOnlyBuildingTypeSerializer()
     developer = ReadOnlyDeveloperSerializer()
@@ -280,9 +280,8 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
         return {"name": obj.postal_code.city, "cost_area": obj.postal_code.cost_area}
 
     @staticmethod
-    def get_date(obj: HousingCompany) -> Optional[datetime.date]:
-        """SerializerMethodField is used instead of DateField due to date being an annotated value"""
-        return getattr(obj, "date", None)
+    def get_completion_date(obj: HousingCompany) -> Optional[datetime.date]:
+        return obj.completion_date
 
     @staticmethod
     def get_release_date(obj: HousingCompany) -> Optional[datetime.date]:
@@ -312,16 +311,16 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
 
     @staticmethod
     def get_over_thirty_years_old(obj: HousingCompany) -> bool:
-        date: Optional[datetime.date] = getattr(obj, "date", None)
-        if date is None:
+        completion_date: Optional[datetime.date] = getattr(obj, "completion_date", None)
+        if completion_date is None:
             return False
 
-        return relativedelta(timezone.now().date(), date).years >= 30
+        return relativedelta(timezone.now().date(), completion_date).years >= 30
 
     @staticmethod
     def get_completed(obj: HousingCompany) -> bool:
-        date: Optional[datetime.date] = getattr(obj, "date", None)
-        return date is not None
+        completion_date: Optional[datetime.date] = getattr(obj, "completion_date", None)
+        return completion_date is not None
 
     class Meta:
         model = HousingCompany
@@ -336,7 +335,7 @@ class HousingCompanyDetailSerializer(EnumSupportSerializerMixin, HitasModelSeria
             "completed",
             "address",
             "area",
-            "date",
+            "completion_date",
             "real_estates",
             "building_type",
             "developer",
@@ -381,7 +380,7 @@ class HousingCompanyListSerializer(HousingCompanyDetailSerializer):
             "completed",
             "address",
             "area",
-            "date",
+            "completion_date",
         ]
 
 
@@ -403,8 +402,8 @@ class HousingCompanyViewSet(HitasModelViewSet):
     def get_list_queryset(self):
         return (
             HousingCompany.objects.select_related("postal_code")
-            .annotate(date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
-            .order_by(F("date").desc(nulls_last=False))
+            .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
+            .order_by(F("_completion_date").desc(nulls_last=False))
         )
 
     def get_detail_queryset(self):
@@ -441,7 +440,7 @@ class HousingCompanyViewSet(HitasModelViewSet):
                 _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
             )
             .annotate(
-                date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
+                _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
                 sum_surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
                 sum_acquisition_price=Sum("_acquisition_price"),
                 avg_price_per_square_meter=RoundWithPrecision(
