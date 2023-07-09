@@ -21,6 +21,7 @@ import {
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
 import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
+import SendEmailForm from "../../common/components/SendEmailForm";
 import {
     IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,
@@ -207,11 +208,12 @@ const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaxim
 
 interface DownloadModalProps {
     apartment: IApartmentDetails;
+    housingCompany: IHousingCompanyDetails;
     isVisible: boolean;
     setIsVisible;
 }
 
-const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+const UnconfirmedPricesDownloadModal = ({apartment, housingCompany, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
     const downloadForm = useForm({
         defaultValues: {calculation_date: today(), request_date: today(), additional_info: ""},
@@ -271,6 +273,13 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
                         required
                     />
                 </form>
+                <SendEmailForm
+                    email={housingCompany?.property_manager ? (housingCompany.property_manager.email as string) : ""}
+                    options={[
+                        {label: "Oletuspohja", value: "0"}, // should use real template options
+                        {label: "Mukautettu pohja", value: "1"}, // should use real template options
+                    ]}
+                />
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
@@ -294,7 +303,7 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
     );
 };
 
-const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+const MaximumPriceDownloadModal = ({apartment, housingCompany, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
     const downloadForm = useForm({
         defaultValues: {request_date: today(), additional_info: ""},
@@ -335,6 +344,13 @@ const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: Downloa
                         required
                     />
                 </form>
+                <SendEmailForm
+                    email={housingCompany?.property_manager ? (housingCompany.property_manager.email as string) : ""}
+                    options={[
+                        {label: "Oletuspohja", value: "0"}, // should use real template options
+                        {label: "Mukautettu pohja", value: "1"}, // should use real template options
+                    ]}
+                />
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
@@ -440,11 +456,13 @@ const ApartmentMaximumPricesCard = ({
 
             <UnconfirmedPricesDownloadModal
                 apartment={apartment}
+                housingCompany={housingCompany}
                 isVisible={isUnconfirmedMaximumPriceModalVisible}
                 setIsVisible={setIsUnconfirmedMaximumPriceModalVisible}
             />
             <MaximumPriceDownloadModal
                 apartment={apartment}
+                housingCompany={housingCompany}
                 isVisible={isMaximumPriceModalVisible}
                 setIsVisible={setIsMaximumPriceModalVisible}
             />
