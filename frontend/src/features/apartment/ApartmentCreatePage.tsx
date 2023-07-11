@@ -320,7 +320,7 @@ const LoadedApartmentCreatePage = ({
 
     return (
         <>
-            {apartment ? <ApartmentHeader /> : <Heading>Uusi asunto</Heading>}
+            <ApartmentHeader />
             <form
                 ref={formRef}
                 // eslint-disable-next-line no-console

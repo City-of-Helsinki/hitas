@@ -490,7 +490,7 @@ const LoadedApartmentDetails = ({
 
     return (
         <>
-            <ApartmentHeader showEditButton={housingCompany.regulation_status === "regulated"} />
+            <ApartmentHeader />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {apartment.address.stair}

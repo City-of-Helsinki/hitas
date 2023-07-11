@@ -51,8 +51,12 @@ const ApartmentHeaderContent = ({
     );
 };
 
-const ApartmentHeader = ({showEditButton = false}: {showEditButton?: boolean}) => {
+const ApartmentHeader = () => {
     const params = useParams() as {housingCompanyId: string; apartmentId: string};
+
+    if (!params.apartmentId) {
+        return <Heading>Uusi asunto</Heading>;
+    }
 
     const {
         data: housingCompanyData,
@@ -67,6 +71,12 @@ const ApartmentHeader = ({showEditButton = false}: {showEditButton?: boolean}) =
         housingCompanyId: params.housingCompanyId,
         apartmentId: params.apartmentId,
     });
+
+    const {pathname} = useLocation();
+    const isApartmentSubPage = pathname.split("/").pop() !== params.apartmentId;
+
+    // Edit button is visible only if the housing company is regulated and user is on the apartment main page
+    const isEditButtonVisible = housingCompanyData?.regulation_status === "regulated" && !isApartmentSubPage;
 
     return (
         <Heading
@@ -83,7 +93,7 @@ const ApartmentHeader = ({showEditButton = false}: {showEditButton?: boolean}) =
                     housingCompany={housingCompanyData as IHousingCompanyDetails}
                 />
             </QueryStateHandler>
-            {showEditButton ? <EditButton /> : null}
+            {isEditButtonVisible ? <EditButton /> : null}
         </Heading>
     );
 };
