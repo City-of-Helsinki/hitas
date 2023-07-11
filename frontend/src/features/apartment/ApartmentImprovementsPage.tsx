@@ -1,16 +1,27 @@
 import {useEffect, useState} from "react";
 
 import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useSaveApartmentMutation} from "../../app/services";
-import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
+import {
+    useGetApartmentDetailQuery,
+    useGetHousingCompanyDetailQuery,
+    useSaveApartmentMutation,
+} from "../../app/services";
+import {
+    ConfirmDialogModal,
+    FormInputField,
+    NavigateBackButton,
+    QueryStateHandler,
+    SaveButton,
+} from "../../common/components";
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,
     IApartmentWritable,
+    IHousingCompanyDetails,
     IMarketPriceIndexImprovement,
 } from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
@@ -64,15 +75,19 @@ const ImprovementRemoveLineButton = ({onClick}) => {
 
 const depreciationChoices = [{label: "0.0"}, {label: "2.5"}, {label: "10.0"}];
 
-const ApartmentImprovementsPage = () => {
+const LoadedApartmentImprovementsPage = ({
+    housingCompany,
+    apartment,
+}: {
+    housingCompany: IHousingCompanyDetails;
+    apartment: IApartmentDetails;
+}) => {
     const navigate = useNavigate();
-    const {state}: {state: {apartment: IApartmentDetails}} = useLocation();
-    const params = useParams() as {readonly housingCompanyId: string};
     const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
     const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
-    const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(state.apartment);
+    const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(apartment);
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableMarketImprovement[]>(
         apartmentData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
@@ -96,8 +111,8 @@ const ApartmentImprovementsPage = () => {
 
         saveApartment({
             data: formData,
-            id: state?.apartment.id,
-            housingCompanyId: params.housingCompanyId,
+            id: apartment.id,
+            housingCompanyId: housingCompany.id,
         });
     };
 
@@ -174,14 +189,8 @@ const ApartmentImprovementsPage = () => {
         }
     }, [isLoading, error, data, navigate]);
 
-    // Redirect user to detail page if state is missing Apartment data and user is trying to edit the apartment
-    // FIXME: Currently does not work, as the page crashes on load due to accessing properties of null
-    useEffect(() => {
-        if (state === null) navigate("..");
-    }, [navigate, state]);
-
     return (
-        <div className="view--create view--create-improvements">
+        <>
             <ApartmentHeader />
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
@@ -391,8 +400,44 @@ const ApartmentImprovementsPage = () => {
                 }
                 cancelAction={() => setIsConfirmVisible(false)}
             />
-        </div>
+        </>
     );
 };
 
+const ApartmentImprovementsPage = () => {
+    const params = useParams() as {housingCompanyId: string; apartmentId: string};
+
+    const {
+        data: housingCompanyData,
+        error: housingCompanyError,
+        isLoading: isHousingCompanyLoading,
+    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+    const {
+        data: apartmentData,
+        error: apartmentError,
+        isLoading: isApartmentLoading,
+    } = useGetApartmentDetailQuery({
+        housingCompanyId: params.housingCompanyId,
+        apartmentId: params.apartmentId as string,
+    });
+
+    const data = housingCompanyData && apartmentData;
+    const error = housingCompanyError || apartmentError;
+    const isLoading = isHousingCompanyLoading || isApartmentLoading;
+
+    return (
+        <div className="view--create view--create-improvements">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedApartmentImprovementsPage
+                    housingCompany={housingCompanyData as IHousingCompanyDetails}
+                    apartment={apartmentData as IApartmentDetails}
+                />
+            </QueryStateHandler>
+        </div>
+    );
+};
 export default ApartmentImprovementsPage;

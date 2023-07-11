@@ -1,12 +1,19 @@
 import {useEffect, useState} from "react";
 
 import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useSaveHousingCompanyMutation} from "../../app/services";
-import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
+import {useGetHousingCompanyDetailQuery, useSaveHousingCompanyMutation} from "../../app/services";
+import {
+    ConfirmDialogModal,
+    FormInputField,
+    Heading,
+    NavigateBackButton,
+    QueryStateHandler,
+    SaveButton,
+} from "../../common/components";
 import {
     IHousingCompanyDetails,
     IHousingCompanyWritable,
@@ -45,14 +52,13 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     );
 };
 
-const HousingCompanyImprovementsPage = () => {
+const LoadedHousingCompanyImprovementsPage = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const navigate = useNavigate();
-    const {state}: {state: {housingCompany: IHousingCompanyDetails}} = useLocation();
     const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
     const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
-    const housingCompanyData: IHousingCompanyWritable = state.housingCompany;
+    const housingCompanyData: IHousingCompanyWritable = housingCompany;
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableMarketImprovement[]>(
         housingCompanyData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
@@ -72,7 +78,7 @@ const HousingCompanyImprovementsPage = () => {
 
         saveHousingCompany({
             data: formData,
-            id: state?.housingCompany.id,
+            id: housingCompany.id,
         });
     };
 
@@ -148,14 +154,8 @@ const HousingCompanyImprovementsPage = () => {
         }
     }, [isLoading, error, data, navigate]);
 
-    // Redirect user to detail page if state is missing HousingCompany data and user is trying to edit the it
-    // FIXME: Currently does not work, as the page crashes on load due to accessing properties of null
-    useEffect(() => {
-        if (state === null) navigate("..");
-    }, [navigate, state]);
-
     return (
-        <div className="view--create view--create-improvements">
+        <>
             <Heading>{housingCompanyData.name.display} Parannukset</Heading>
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
@@ -336,6 +336,23 @@ const HousingCompanyImprovementsPage = () => {
                 }
                 cancelAction={() => setIsConfirmVisible(false)}
             />
+        </>
+    );
+};
+
+const HousingCompanyImprovementsPage = () => {
+    const params = useParams() as {readonly housingCompanyId: string};
+    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
+
+    return (
+        <div className="view--create view--create-improvements">
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isLoading}
+            >
+                <LoadedHousingCompanyImprovementsPage housingCompany={data as IHousingCompanyDetails} />
+            </QueryStateHandler>
         </div>
     );
 };
