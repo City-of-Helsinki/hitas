@@ -1,4 +1,4 @@
-import BatchCompleteApartmentsModal from "./BatchCompleteApartmentsModal";
+import BatchCompleteApartmentsModal from "./components/BatchCompleteApartmentsModal";
 import HousingCompanyBuildingsPage from "./HousingCompanyBuildingsPage";
 import HousingCompanyCreatePage from "./HousingCompanyCreatePage";
 import HousingCompanyDetailsPage from "./HousingCompanyDetailsPage";

@@ -2,11 +2,11 @@ import {Dialog} from "hds-react";
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useParams} from "react-router-dom";
-import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../../app/services";
-import {CloseButton, QueryStateHandler, SaveButton} from "../../../../common/components";
-import {FileInput} from "../../../../common/components/form";
-import {ErrorResponse, ISalesCatalogApartment} from "../../../../common/schemas";
-import {hdsToast} from "../../../../common/utils";
+import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../app/services";
+import {CloseButton, QueryStateHandler, SaveButton} from "../../../common/components";
+import {FileInput} from "../../../common/components/form";
+import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
+import {hdsToast} from "../../../common/utils";
 
 const SalesCatalogImport = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
