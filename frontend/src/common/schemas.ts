@@ -265,6 +265,7 @@ const HousingCompanyDetailsSchema = object({
     business_id: string().nullable(),
     name: object({official: string(), display: string()}),
     hitas_type: HousingCompanyHitasTypeSchema,
+    new_hitas: boolean(),
     exclude_from_statistics: boolean(),
     regulation_status: HousingCompanyRegulationStatusSchema,
     over_thirty_years_old: boolean(),
