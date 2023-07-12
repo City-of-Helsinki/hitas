@@ -1,20 +1,27 @@
 import {Button, IconSaveDisketteFill} from "hds-react";
 import React from "react";
 
-interface SaveButtonProps {
-    onClick?: (unknown) => unknown;
+type SaveButtonProps = {
     isLoading?: boolean;
     disabled?: boolean;
-    type?: "submit";
     buttonText?: string;
     size?: "small" | "default";
-}
+} & (
+    | {
+          type: "submit";
+          onClick?: undefined;
+      }
+    | {
+          type?: "button";
+          onClick: (unknown) => unknown;
+      }
+);
 
 export default function SaveButton({
     onClick,
     isLoading = false,
     disabled = false,
-    type,
+    type = "button",
     buttonText,
     size = "default",
 }: SaveButtonProps): React.JSX.Element {
@@ -23,7 +30,7 @@ export default function SaveButton({
             iconLeft={<IconSaveDisketteFill />}
             theme="black"
             onClick={
-                type // If the type is set (to "submit"), we don't want another onClick to happen here
+                type === "submit" // If the type is set (to "submit"), we don't want another onClick to happen here
                     ? () => {
                           return;
                       }
@@ -31,7 +38,7 @@ export default function SaveButton({
             }
             isLoading={isLoading}
             disabled={disabled}
-            type={type || "button"}
+            type={type}
             size={size}
         >
             {buttonText ?? "Tallenna"}
