@@ -1,7 +1,7 @@
 import {Fieldset} from "hds-react";
 import {useContext} from "react";
 import {useFormContext} from "react-hook-form";
-import {Checkbox, DateInput, NumberInput} from "../../../../common/components/form";
+import {CheckboxInput, DateInput, NumberInput} from "../../../../common/components/form";
 import {ApartmentSaleContext} from "../utils";
 
 const ApartmentSaleFormFieldSet = ({formRef, onSubmit}) => {
@@ -55,7 +55,7 @@ const ApartmentSaleFormFieldSet = ({formRef, onSubmit}) => {
                     />
                 </div>
                 {!isApartmentFirstSale ? (
-                    <Checkbox
+                    <CheckboxInput
                         name="exclude_from_statistics"
                         label="Ei tilastoihin (esim. sukulaiskauppa)"
                         formObject={saleForm}

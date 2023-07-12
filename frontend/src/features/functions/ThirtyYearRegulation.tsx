@@ -12,7 +12,7 @@ import {
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler} from "../../common/components";
 import DownloadButton from "../../common/components/DownloadButton";
-import {Select, ToggleInput} from "../../common/components/form";
+import {SelectInput, ToggleInput} from "../../common/components/form";
 import {getHitasQuarter, hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
 
@@ -163,7 +163,7 @@ const ThirtyYearRegulation = () => {
                                         haluat suorittaa vertailun mikäli sitä ei ole vielä tehty.
                                     </Tooltip>
                                 </label>
-                                <Select
+                                <SelectInput
                                     label=""
                                     options={years}
                                     name="year"
@@ -173,7 +173,7 @@ const ThirtyYearRegulation = () => {
                                     disabled={hasSkippedCompanies}
                                     required
                                 />
-                                <Select
+                                <SelectInput
                                     label=""
                                     options={hitasQuarterOptions}
                                     name="quarter"

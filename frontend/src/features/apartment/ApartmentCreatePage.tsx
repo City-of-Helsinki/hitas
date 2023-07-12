@@ -17,7 +17,7 @@ import {
     DateInput,
     NumberInput,
     RelatedModelInput,
-    Select,
+    SelectInput,
     TextAreaInput,
     TextInput,
 } from "../../common/components/form";
@@ -314,7 +314,7 @@ const LoadedApartmentCreatePage = () => {
                 <div className="field-sets">
                     <Fieldset heading="">
                         <div className="row">
-                            <Select
+                            <SelectInput
                                 label="Rakennus"
                                 options={buildingOptions || []}
                                 name="building"

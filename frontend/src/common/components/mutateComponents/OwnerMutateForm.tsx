@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useSaveOwnerMutation} from "../../../app/services";
 import {IOwner, OwnerSchema} from "../../schemas";
 import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
-import {Checkbox, TextInput} from "../form";
+import {CheckboxInput, TextInput} from "../form";
 import SaveButton from "../SaveButton";
 
 interface IOwnerMutateForm {
@@ -139,7 +139,7 @@ export default function OwnerMutateForm({
                     label="Sähköpostiosoite"
                     formObject={ownerFormObject}
                 />
-                <Checkbox
+                <CheckboxInput
                     label="Turvakielto"
                     name="non_disclosure"
                     formObject={ownerFormObject}

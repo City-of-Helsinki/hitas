@@ -2,7 +2,7 @@ import {Checkbox as HDSCheckbox} from "hds-react";
 
 import {FormInputProps} from "./";
 
-const Checkbox = ({
+const CheckboxInput = ({
     name,
     id = name,
     label,
@@ -38,4 +38,4 @@ const Checkbox = ({
     );
 };
 
-export default Checkbox;
+export default CheckboxInput;
