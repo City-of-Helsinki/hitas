@@ -193,6 +193,12 @@ const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     })
 );
 
+export const HousingCompanyImprovementsFormSchema = z.object({
+    market_price_index: MarketPriceIndexImprovementSchema.array(),
+    construction_price_index: ImprovementSchema.array(),
+});
+export type IHousingCompanyImprovementsForm = z.infer<typeof HousingCompanyImprovementsFormSchema>;
+
 const UserInfoSchema = object({
     first_name: string(),
     last_name: string(),

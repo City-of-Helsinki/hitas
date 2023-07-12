@@ -479,6 +479,21 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.id},
             ],
         }),
+        patchHousingCompany: builder.mutation<
+            IHousingCompanyDetails,
+            {id: string; data: Partial<IHousingCompanyWritable>}
+        >({
+            query: ({id, data}) => ({
+                url: `housing-companies/${id}`,
+                method: "PATCH",
+                body: data,
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {type: "HousingCompany", id: "LIST"},
+                {type: "HousingCompany", id: arg.id},
+            ],
+        }),
         releaseHousingCompanyFromRegulation: builder.mutation<
             IHousingCompanyDetails,
             {housingCompanyId: string; calculationDate: string}
@@ -806,6 +821,7 @@ export const {
 
 export const {
     useSaveHousingCompanyMutation,
+    usePatchHousingCompanyMutation,
     useReleaseHousingCompanyFromRegulationMutation,
     useCreateRealEstateMutation,
     useDeleteRealEstateMutation,
