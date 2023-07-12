@@ -8,7 +8,7 @@ import {v4 as uuidv4} from "uuid";
 import {useSaveHousingCompanyMutation} from "../../app/services";
 import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
 import {IImprovement, IMarketPriceIndexImprovement} from "../../common/schemas";
-import {dotted, hitasToast} from "../../common/utils";
+import {dotted, hdsToast} from "../../common/utils";
 import HousingCompanyViewContextProvider, {
     HousingCompanyViewContext,
 } from "./components/HousingCompanyViewContextProvider";
@@ -43,6 +43,111 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     );
 };
 
+const ImprovementFieldSet = ({
+    fieldsetHeader,
+    improvements,
+    handleAddImprovementLine,
+    handleSetImprovementLine,
+    setIndexToRemove,
+    error,
+    showNoDeductions,
+}) => {
+    return (
+        <Fieldset heading={fieldsetHeader}>
+            <ul className="improvements-list">
+                {improvements.length ? (
+                    <>
+                        <li className="improvement-headers">
+                            <header>
+                                Nimi <span>*</span>
+                            </header>
+                            <header>
+                                Arvo <span>*</span>
+                            </header>
+                            <header>
+                                Kuukausi <span>*</span>
+                            </header>
+                            <Tooltip
+                                className="header__tooltip"
+                                placement="left-start"
+                            >
+                                Muodossa 'YYYY-MM', esim. '2022-01'
+                            </Tooltip>
+                            {showNoDeductions && (
+                                <>
+                                    <header>
+                                        Ei vähennyksiä <span>*</span>
+                                    </header>
+                                    <Tooltip
+                                        className="header__tooltip2"
+                                        placement="left-start"
+                                    >
+                                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään
+                                        indeksitarkistus. Käytetään ainoastaan vanhoissa Hitas säännöissä.
+                                    </Tooltip>
+                                </>
+                            )}
+                        </li>
+                        {improvements.map(
+                            (improvement: IWritableMarketImprovement | IWritableConsImprovement, index) => (
+                                <li
+                                    className="improvements-list-item"
+                                    key={`improvement-item-${improvement.key}`}
+                                >
+                                    <FormInputField
+                                        inputType="text"
+                                        label=""
+                                        fieldPath="name"
+                                        formData={improvements[index]}
+                                        setterFunction={handleSetImprovementLine(index, "name")}
+                                        error={error}
+                                        required
+                                    />
+                                    <FormInputField
+                                        inputType="number"
+                                        fractionDigits={2}
+                                        label=""
+                                        fieldPath="value"
+                                        formData={improvements[index]}
+                                        setterFunction={handleSetImprovementLine(index, "value")}
+                                        error={error}
+                                        required
+                                    />
+                                    <FormInputField
+                                        inputType="text"
+                                        label=""
+                                        fieldPath="completion_date"
+                                        tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
+                                        formData={improvements[index]}
+                                        setterFunction={handleSetImprovementLine(index, "completion_date")}
+                                        error={error}
+                                        required
+                                    />
+                                    {showNoDeductions && (
+                                        <Checkbox
+                                            id={`input-no_deductions-${index}`}
+                                            checked={improvements[index].no_deductions}
+                                            onChange={(e) =>
+                                                handleSetImprovementLine(index, "no_deductions")(e.target.checked)
+                                            }
+                                        />
+                                    )}
+                                    <ImprovementRemoveLineButton onClick={() => setIndexToRemove(index)} />
+                                </li>
+                            )
+                        )}
+                    </>
+                ) : (
+                    <div>Ei parannuksia</div>
+                )}
+                <li className="row row--buttons">
+                    <ImprovementAddLineButton onClick={handleAddImprovementLine} />
+                </li>
+            </ul>
+        </Fieldset>
+    );
+};
+
 const LoadedHousingCompanyImprovementsPage = () => {
     const navigate = useNavigate();
     const {housingCompany} = useContext(HousingCompanyViewContext);
@@ -59,7 +164,7 @@ const LoadedHousingCompanyImprovementsPage = () => {
         housingCompany.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
 
-    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
+    const [saveHousingCompany, {error, isLoading}] = useSaveHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
         const formData = {
@@ -74,7 +179,15 @@ const LoadedHousingCompanyImprovementsPage = () => {
         saveHousingCompany({
             data: formData,
             id: housingCompany.id,
-        });
+        })
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Parannukset tallennettu onnistuneesti!");
+                navigate(-1); // get the user back to where they opened this view
+            })
+            .catch(() => {
+                hdsToast.error("Virhe tallentaessa parannuksia!");
+            });
     };
 
     // Market
@@ -139,177 +252,30 @@ const LoadedHousingCompanyImprovementsPage = () => {
         }
     }, [marketIndexToRemove, constructionIndexToRemove, setIsConfirmVisible]);
 
-    // Handle saving flow when editing
-    useEffect(() => {
-        if (!isLoading && !error && data && data.id) {
-            hitasToast("Parannukset tallennettu onnistuneesti!");
-            navigate(-1); // get the user back to where they opened this view
-        } else if (error) {
-            hitasToast("Virhe tallentaessa parannuksia!", "error");
-        }
-    }, [isLoading, error, data, navigate]);
-
     return (
         <>
             <Heading>{housingCompany.name.display} Parannukset</Heading>
             <div className="field-sets">
-                <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
-                    <ul className="improvements-list">
-                        {marketIndexImprovements.length ? (
-                            <>
-                                <li className="improvement-headers">
-                                    <header>
-                                        Nimi <span>*</span>
-                                    </header>
-                                    <header>
-                                        Arvo <span>*</span>
-                                    </header>
-                                    <header>
-                                        Kuukausi <span>*</span>
-                                    </header>
-                                    <Tooltip
-                                        className="header__tooltip"
-                                        placement="left-start"
-                                    >
-                                        Muodossa 'YYYY-MM', esim. '2022-01'
-                                    </Tooltip>
-                                    <header>
-                                        Ei vähennyksiä <span>*</span>
-                                    </header>
-                                    <Tooltip
-                                        className="header__tooltip2"
-                                        placement="left-start"
-                                    >
-                                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään
-                                        indeksitarkistus. Käytetään ainoastaan vanhoissa Hitas säännöissä.
-                                    </Tooltip>
-                                </li>
-                                {marketIndexImprovements.map((improvement: IWritableMarketImprovement, index) => (
-                                    <li
-                                        className="improvements-list-item"
-                                        key={`market-improvement-item-${improvement.key}`}
-                                    >
-                                        <FormInputField
-                                            inputType="text"
-                                            label=""
-                                            fieldPath="name"
-                                            formData={marketIndexImprovements[index]}
-                                            setterFunction={handleSetMarketImprovementLine(index, "name")}
-                                            error={error}
-                                            required
-                                        />
-                                        <FormInputField
-                                            inputType="number"
-                                            fractionDigits={2}
-                                            label=""
-                                            fieldPath="value"
-                                            formData={marketIndexImprovements[index]}
-                                            setterFunction={handleSetMarketImprovementLine(index, "value")}
-                                            error={error}
-                                            required
-                                        />
-                                        <FormInputField
-                                            inputType="text"
-                                            label=""
-                                            fieldPath="completion_date"
-                                            tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
-                                            formData={marketIndexImprovements[index]}
-                                            setterFunction={handleSetMarketImprovementLine(index, "completion_date")}
-                                            error={error}
-                                            required
-                                        />
-                                        <Checkbox
-                                            id={`input-no_deductions-${index}`}
-                                            checked={marketIndexImprovements[index].no_deductions}
-                                            onChange={(e) =>
-                                                handleSetMarketImprovementLine(index, "no_deductions")(e.target.checked)
-                                            }
-                                        />
-                                        <ImprovementRemoveLineButton onClick={() => setMarketIndexToRemove(index)} />
-                                    </li>
-                                ))}
-                            </>
-                        ) : (
-                            <div>Ei parannuksia</div>
-                        )}
-                        <li className="row row--buttons">
-                            <ImprovementAddLineButton onClick={handleAddMarketImprovementLine} />
-                        </li>
-                    </ul>
-                </Fieldset>
-                <Fieldset heading="Rakennuskustannusindeksillä laskettavat parannukset">
-                    <ul className="improvements-list">
-                        {constructionIndexImprovements.length ? (
-                            <>
-                                <li className="improvement-headers">
-                                    <header>
-                                        Nimi <span>*</span>
-                                    </header>
-                                    <header>
-                                        Arvo <span>*</span>
-                                    </header>
-                                    <header>
-                                        Kuukausi <span>*</span>
-                                    </header>
-                                    <Tooltip
-                                        className="header__tooltip"
-                                        placement="left-start"
-                                    >
-                                        Muodossa 'YYYY-MM', esim. '2022-01'
-                                    </Tooltip>
-                                </li>
-                                {constructionIndexImprovements.map((improvement: IWritableConsImprovement, index) => (
-                                    <li
-                                        className="improvements-list-item"
-                                        key={improvement.key}
-                                    >
-                                        <FormInputField
-                                            inputType="text"
-                                            label=""
-                                            fieldPath="name"
-                                            formData={constructionIndexImprovements[index]}
-                                            setterFunction={handleSetConstructionImprovementLine(index, "name")}
-                                            error={error}
-                                            required
-                                        />
-                                        <FormInputField
-                                            inputType="number"
-                                            fractionDigits={2}
-                                            label=""
-                                            fieldPath="value"
-                                            formData={constructionIndexImprovements[index]}
-                                            setterFunction={handleSetConstructionImprovementLine(index, "value")}
-                                            error={error}
-                                            required
-                                        />
-                                        <FormInputField
-                                            inputType="text"
-                                            label=""
-                                            fieldPath="completion_date"
-                                            tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
-                                            formData={constructionIndexImprovements[index]}
-                                            setterFunction={handleSetConstructionImprovementLine(
-                                                index,
-                                                "completion_date"
-                                            )}
-                                            error={error}
-                                            required
-                                        />
-                                        <ImprovementRemoveLineButton
-                                            onClick={() => setConstructionIndexToRemove(index)}
-                                        />
-                                    </li>
-                                ))}
-                            </>
-                        ) : (
-                            <div>Ei parannuksia</div>
-                        )}
-                        <li className="row row--buttons">
-                            <ImprovementAddLineButton onClick={handleAddConstructionImprovementLine} />
-                        </li>
-                    </ul>
-                </Fieldset>
+                <ImprovementFieldSet
+                    fieldsetHeader="Markkinakustannusindeksillä laskettavat parannukset"
+                    improvements={marketIndexImprovements}
+                    handleAddImprovementLine={handleAddMarketImprovementLine}
+                    handleSetImprovementLine={handleSetMarketImprovementLine}
+                    setIndexToRemove={setMarketIndexToRemove}
+                    error={error}
+                    showNoDeductions={true}
+                />
+                <ImprovementFieldSet
+                    fieldsetHeader="Rakennuskustannusindeksillä laskettavat parannukset"
+                    improvements={constructionIndexImprovements}
+                    handleAddImprovementLine={handleAddConstructionImprovementLine}
+                    handleSetImprovementLine={handleSetConstructionImprovementLine}
+                    setIndexToRemove={setConstructionIndexToRemove}
+                    error={error}
+                    showNoDeductions={false}
+                />
             </div>
+
             <div className="row row--buttons">
                 <NavigateBackButton />
                 <SaveButton
@@ -317,8 +283,8 @@ const LoadedHousingCompanyImprovementsPage = () => {
                     isLoading={isLoading}
                 />
             </div>
+
             <ConfirmDialogModal
-                isLoading={false}
                 modalText="Haluatko varmasti poistaa parannuksen?"
                 buttonText="Poista"
                 successText="Parannus poistettu"
