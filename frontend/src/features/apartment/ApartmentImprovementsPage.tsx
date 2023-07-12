@@ -1,31 +1,20 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 
 import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {
-    useGetApartmentDetailQuery,
-    useGetHousingCompanyDetailQuery,
-    useSaveApartmentMutation,
-} from "../../app/services";
-import {
-    ConfirmDialogModal,
-    FormInputField,
-    NavigateBackButton,
-    QueryStateHandler,
-    SaveButton,
-} from "../../common/components";
+import {useSaveApartmentMutation} from "../../app/services";
+import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
 import {
     IApartmentConstructionPriceIndexImprovement,
     IApartmentDetails,
     IApartmentWritable,
-    IHousingCompanyDetails,
     IMarketPriceIndexImprovement,
 } from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
+import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 
 type IWritableMarketImprovement = Omit<IMarketPriceIndexImprovement, "value"> & {
     value: number | null;
@@ -75,14 +64,11 @@ const ImprovementRemoveLineButton = ({onClick}) => {
 
 const depreciationChoices = [{label: "0.0"}, {label: "2.5"}, {label: "10.0"}];
 
-const LoadedApartmentImprovementsPage = ({
-    housingCompany,
-    apartment,
-}: {
-    housingCompany: IHousingCompanyDetails;
-    apartment: IApartmentDetails;
-}) => {
+const LoadedApartmentImprovementsPage = () => {
     const navigate = useNavigate();
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
     const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
@@ -191,7 +177,6 @@ const LoadedApartmentImprovementsPage = ({
 
     return (
         <>
-            <ApartmentHeader />
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
                     <ul className="improvements-list">
@@ -405,39 +390,10 @@ const LoadedApartmentImprovementsPage = ({
 };
 
 const ApartmentImprovementsPage = () => {
-    const params = useParams() as {housingCompanyId: string; apartmentId: string};
-
-    const {
-        data: housingCompanyData,
-        error: housingCompanyError,
-        isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-    const {
-        data: apartmentData,
-        error: apartmentError,
-        isLoading: isApartmentLoading,
-    } = useGetApartmentDetailQuery({
-        housingCompanyId: params.housingCompanyId,
-        apartmentId: params.apartmentId as string,
-    });
-
-    const data = housingCompanyData && apartmentData;
-    const error = housingCompanyError || apartmentError;
-    const isLoading = isHousingCompanyLoading || isApartmentLoading;
-
     return (
-        <div className="view--create view--create-improvements">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedApartmentImprovementsPage
-                    housingCompany={housingCompanyData as IHousingCompanyDetails}
-                    apartment={apartmentData as IApartmentDetails}
-                />
-            </QueryStateHandler>
-        </div>
+        <ApartmentViewContextProvider viewClassName="view--create view--create-improvements">
+            <LoadedApartmentImprovementsPage />
+        </ApartmentViewContextProvider>
     );
 };
 export default ApartmentImprovementsPage;

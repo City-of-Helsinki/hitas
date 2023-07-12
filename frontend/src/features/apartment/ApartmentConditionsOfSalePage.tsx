@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useContext, useEffect, useState} from "react";
 
 import {
     Button,
@@ -11,7 +11,7 @@ import {
     IconPlus,
     IconPlusCircleFill,
 } from "hds-react";
-import {Link, useParams} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
@@ -20,7 +20,6 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/dist/query/react";
 import {
     useCreateConditionOfSaleMutation,
     useDeleteConditionOfSaleMutation,
-    useGetApartmentDetailQuery,
     useGetOwnersQuery,
     useLazyGetConditionOfSaleQuery,
     useUpdateConditionOfSaleMutation,
@@ -30,13 +29,12 @@ import {
     FormInputField,
     Heading,
     NavigateBackButton,
-    QueryStateHandler,
     RemoveButton,
     SaveButton,
 } from "../../common/components";
-import {IApartmentConditionOfSale, IApartmentDetails, IConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
+import {IApartmentConditionOfSale, IConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
+import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 
 const OwnersList = ({formOwnerList, setFormOwnerList}) => {
     const handleAddOwnerLine = () => {
@@ -369,11 +367,17 @@ const GracePeriodEntry = ({
     );
 };
 
-const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
+const ConditionsOfSaleList = () => {
+    const {apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
     const [isHoverExtendGracePeriodButton, setIsHoverExtendGracePeriodButton] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [idToRemove, setIdToRemove] = useState<string | null>(null);
+
     const [deleteConditionOfSale, {data, error, isLoading}] = useDeleteConditionOfSaleMutation();
+
     const handleDeleteConditionOfSale = (id: string) => {
         deleteConditionOfSale({id})
             .unwrap()
@@ -388,8 +392,10 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
                 console.warn(e);
             });
     };
+
     return (
         <>
+            <Heading type="main">Myyntiehdot</Heading>
             {apartment.conditions_of_sale.length ? (
                 <ul className="conditions-of-sale-list">
                     <li className="conditions-of-sale-headers">
@@ -443,6 +449,26 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
             ) : (
                 <div>Ei myyntiehtoja</div>
             )}
+
+            <div className="row row--buttons">
+                <NavigateBackButton />
+                <Button
+                    theme="black"
+                    iconLeft={<IconPlus />}
+                    onClick={() => setIsCreateModalOpen(true)}
+                >
+                    Lisää uusi
+                </Button>
+            </div>
+
+            <CreateConditionOfSaleModal
+                apartment={apartment}
+                isModalOpen={isCreateModalOpen}
+                closeModal={() => {
+                    setIsCreateModalOpen(false);
+                }}
+            />
+
             <ConfirmDialogModal
                 data={data}
                 error={error}
@@ -460,42 +486,10 @@ const ConditionsOfSaleList = ({apartment}: {apartment: IApartmentDetails}) => {
 };
 
 const ApartmentConditionsOfSalePage = () => {
-    const params = useParams();
-    const {data, error, isLoading} = useGetApartmentDetailQuery({
-        housingCompanyId: params.housingCompanyId as string,
-        apartmentId: params.apartmentId as string,
-    });
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
     return (
-        <div className="view--create view--apartment-conditions-of-sale">
-            <ApartmentHeader />
-            <Heading type="main">Myyntiehdot</Heading>
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <ConditionsOfSaleList apartment={data as IApartmentDetails} />
-                <div className="row row--buttons">
-                    <NavigateBackButton />
-                    <Button
-                        theme="black"
-                        iconLeft={<IconPlus />}
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        Lisää uusi
-                    </Button>
-                </div>
-                <CreateConditionOfSaleModal
-                    apartment={data as IApartmentDetails}
-                    isModalOpen={isModalOpen}
-                    closeModal={() => {
-                        setIsModalOpen(false);
-                    }}
-                />
-            </QueryStateHandler>
-        </div>
+        <ApartmentViewContextProvider viewClassName="view--create view--apartment-conditions-of-sale">
+            <ConditionsOfSaleList />
+        </ApartmentViewContextProvider>
     );
 };
 

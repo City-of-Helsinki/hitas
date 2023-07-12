@@ -1,13 +1,11 @@
 import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
-import React, {useRef, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
-import {Link, useParams} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {
     downloadApartmentMaximumPricePDF,
     downloadApartmentUnconfirmedMaximumPricePDF,
     useDeleteSaleMutation,
-    useGetApartmentDetailQuery,
-    useGetHousingCompanyDetailQuery,
 } from "../../app/services";
 import {
     DetailField,
@@ -16,7 +14,6 @@ import {
     MutateForm,
     MutateModal,
     OwnerMutateForm,
-    QueryStateHandler,
     RemoveButton,
 } from "../../common/components";
 import {DateInput, TextAreaInput} from "../../common/components/form";
@@ -39,7 +36,7 @@ import {
     hdsToast,
     today,
 } from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
+import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
@@ -452,13 +449,10 @@ const ApartmentMaximumPricesCard = ({
     );
 };
 
-const LoadedApartmentDetails = ({
-    apartment,
-    housingCompany,
-}: {
-    apartment: IApartmentDetails;
-    housingCompany: IHousingCompanyDetails;
-}): React.JSX.Element => {
+const LoadedApartmentDetails = (): React.JSX.Element => {
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
     // Handle visibility of the relevant modals
     const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
@@ -490,7 +484,6 @@ const LoadedApartmentDetails = ({
 
     return (
         <>
-            <ApartmentHeader />
             <h2 className="apartment-stats">
                 <span className="apartment-stats--number">
                     {apartment.address.stair}
@@ -759,40 +752,10 @@ const LoadedApartmentDetails = ({
 };
 
 const ApartmentDetailsPage = (): React.JSX.Element => {
-    // Load required data and pass it to the child component
-    const params = useParams() as {housingCompanyId: string; apartmentId: string};
-
-    const {
-        data: housingCompanyData,
-        error: housingCompanyError,
-        isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-    const {
-        data: apartmentData,
-        error: apartmentError,
-        isLoading: isApartmentLoading,
-    } = useGetApartmentDetailQuery({
-        housingCompanyId: params.housingCompanyId,
-        apartmentId: params.apartmentId,
-    });
-
-    const data = housingCompanyData && apartmentData;
-    const error = housingCompanyError || apartmentError;
-    const isLoading = isHousingCompanyLoading || isApartmentLoading;
-
     return (
-        <div className="view--apartment-details">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedApartmentDetails
-                    housingCompany={housingCompanyData as IHousingCompanyDetails}
-                    apartment={apartmentData as IApartmentDetails}
-                />
-            </QueryStateHandler>
-        </div>
+        <ApartmentViewContextProvider viewClassName="view--apartment-details">
+            <LoadedApartmentDetails />
+        </ApartmentViewContextProvider>
     );
 };
 

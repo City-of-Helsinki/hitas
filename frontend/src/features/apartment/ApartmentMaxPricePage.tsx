@@ -1,25 +1,19 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
-import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {
-    useGetApartmentDetailQuery,
-    useGetHousingCompanyDetailQuery,
-    useSaveApartmentMaximumPriceMutation,
-} from "../../app/services";
+import {useGetHousingCompanyDetailQuery, useSaveApartmentMaximumPriceMutation} from "../../app/services";
 import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
 import {
-    IApartmentDetails,
     IApartmentMaximumPriceCalculationDetails,
     IApartmentMaximumPriceWritable,
     IHousingCompanyDetails,
 } from "../../common/schemas";
 import {today} from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
+import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}): React.JSX.Element => {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";
@@ -42,7 +36,10 @@ const MaximumPriceModalError = ({error, setIsModalVisible}): React.JSX.Element =
     );
 };
 
-const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): React.JSX.Element => {
+const LoadedApartmentMaxPrice = (): React.JSX.Element => {
+    const {apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
         apartment_share_of_housing_company_loans: null,
@@ -83,7 +80,6 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): R
 
     return (
         <div className="view--apartment-max-price">
-            <ApartmentHeader />
             <div className="field-sets">
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
@@ -189,22 +185,10 @@ const LoadedApartmentMaxPrice = ({apartment}: {apartment: IApartmentDetails}): R
 };
 
 const ApartmentMaxPricePage = (): React.JSX.Element => {
-    const params = useParams();
-    const {data, error, isLoading} = useGetApartmentDetailQuery({
-        housingCompanyId: params.housingCompanyId as string,
-        apartmentId: params.apartmentId as string,
-    });
-
     return (
-        <div className="view--apartment view--apartment-details">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedApartmentMaxPrice apartment={data as IApartmentDetails} />
-            </QueryStateHandler>
-        </div>
+        <ApartmentViewContextProvider viewClassName="view--apartment view--apartment-details">
+            <LoadedApartmentMaxPrice />
+        </ApartmentViewContextProvider>
     );
 };
 
