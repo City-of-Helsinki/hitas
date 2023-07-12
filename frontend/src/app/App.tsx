@@ -104,9 +104,9 @@ const App = (): React.JSX.Element => {
                     <Navigation.Row ariaLabel="Main navigation">
                         <Link to="housing-companies">Yhtiöt</Link>
                         <Link to="apartments">Asunnot</Link>
-                        <Link to="reports">Raportit</Link>
-                        <Link to="documents">Dokumenttipohjat</Link>
                         <Link to="codes">Koodisto</Link>
+                        <Link to="documents">Dokumenttipohjat</Link>
+                        <Link to="reports">Raportit</Link>
                         <Link to="functions">Toiminnot</Link>
                     </Navigation.Row>
                 </Navigation>

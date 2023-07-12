@@ -1,5 +1,5 @@
 import CalculatePriceCeiling from "./CalculatePriceCeiling";
-import Functions from "./Functions";
+import FunctionsPage from "./FunctionsPage";
 import ThirtyYearRegulation from "./ThirtyYearRegulation";
 
-export {CalculatePriceCeiling, Functions, ThirtyYearRegulation};
+export {CalculatePriceCeiling, FunctionsPage, ThirtyYearRegulation};

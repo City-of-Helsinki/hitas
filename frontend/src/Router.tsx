@@ -15,7 +15,8 @@ import {
     ApartmentNewSalePage,
 } from "./features/apartment";
 import {Codes} from "./features/codes";
-import {Functions} from "./features/functions";
+import Templates from "./features/documentTemplates/Templates";
+import {FunctionsPage} from "./features/functions";
 import {
     HousingCompanyBuildingsPage,
     HousingCompanyCreatePage,
@@ -24,8 +25,7 @@ import {
     HousingCompanyListPage,
     HousingCompanyRealEstatesPage,
 } from "./features/housingCompany";
-import Reports from "./features/reports/Reports";
-import Templates from "./features/templates/Templates";
+import ReportsPage from "./features/reports/ReportsPage";
 
 export default function Router() {
     const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -120,20 +120,20 @@ export default function Router() {
                     />
                 </Route>
                 <Route
-                    path="reports"
-                    element={protect(<Reports />)}
+                    path="codes"
+                    element={protect(<Codes />)}
                 />
                 <Route
                     path="documents"
                     element={protect(<Templates />)}
                 />
                 <Route
-                    path="codes"
-                    element={protect(<Codes />)}
+                    path="reports"
+                    element={protect(<ReportsPage />)}
                 />
                 <Route
                     path="functions"
-                    element={protect(<Functions />)}
+                    element={protect(<FunctionsPage />)}
                 />
                 <Route
                     path="logout"
