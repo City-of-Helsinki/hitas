@@ -1,5 +1,5 @@
 import HousingCompanyReports from "./HousingCompanyReports";
-import Reports from "./Reports";
+import ReportsPage from "./ReportsPage";
 import SalesReports from "./SalesReports";
 
-export {HousingCompanyReports, Reports, SalesReports};
+export {HousingCompanyReports, ReportsPage, SalesReports};

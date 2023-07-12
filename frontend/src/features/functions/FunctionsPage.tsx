@@ -2,7 +2,7 @@ import {Tabs} from "hds-react";
 import Heading from "../../common/components/Heading";
 import {CalculatePriceCeiling, ThirtyYearRegulation} from "./";
 
-const Functions = () => {
+const FunctionsPage = () => {
     return (
         <div className="view--functions">
             <Heading>Järjestelmän toiminnot</Heading>
@@ -22,4 +22,4 @@ const Functions = () => {
     );
 };
 
-export default Functions;
+export default FunctionsPage;

@@ -5,9 +5,9 @@ import ThirtyYearResultListItem from "./ThirtyYearResultListItem";
 import ThirtyYearResults from "./ThirtyYearResults";
 import ThirtyYearSkippedList from "./ThirtyYearSkippedList";
 import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
-import ThirtyYearErrorSelect from "./ThirtyYearTests/ThirtyYearErrorSelect";
-import ThirtyYearErrorTest from "./ThirtyYearTests/ThirtyYearErrorTest";
-import ThirtyYearErrorTestResult from "./ThirtyYearTests/ThirtyYearErrorTestResult";
+import ThirtyYearErrorSelect from "./ThirtyYearTestComponents/ThirtyYearErrorSelect";
+import ThirtyYearErrorTest from "./ThirtyYearTestComponents/ThirtyYearErrorTest";
+import ThirtyYearErrorTestResult from "./ThirtyYearTestComponents/ThirtyYearErrorTestResult";
 
 export {
     ExternalSalesDataImport,

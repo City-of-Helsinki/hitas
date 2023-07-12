@@ -6,7 +6,7 @@ import HousingCompanyReports from "./HousingCompanyReports";
 import OwnerReports from "./OwnerReports";
 import SalesReports from "./SalesReports";
 
-const Reports = () => {
+const ReportsPage = () => {
     return (
         <div className="view--reports">
             <Heading>Raportit</Heading>
@@ -40,4 +40,4 @@ const Reports = () => {
     );
 };
 
-export default Reports;
+export default ReportsPage;
