@@ -1,6 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {Select} from "../../../common/components/form";
+import {SelectInput} from "../../../common/components/form";
 
 export default function ThirtyYearSkippedListItem({
     postalCode,
@@ -39,7 +39,7 @@ export default function ThirtyYearSkippedListItem({
                 </ul>
             </div>
             <div className="inputs">
-                <Select
+                <SelectInput
                     label="Korvaava postinumero"
                     tooltipText="Puolet keskiarvosta, joka korvaa puuttuvan postinumeroalueen hinnan."
                     options={options}
@@ -48,7 +48,7 @@ export default function ThirtyYearSkippedListItem({
                     setDirectValue={true}
                     required
                 />
-                <Select
+                <SelectInput
                     label="Korvaava postinumero"
                     tooltipText="Toinen korvaava postinumero on valittavissa vasta kun olet valinnut ensimmäisen puolikkaan."
                     options={options.filter(

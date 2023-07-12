@@ -1,4 +1,4 @@
-import {Select} from "../../../../common/components/form";
+import {SelectInput} from "../../../../common/components/form";
 
 const testOptions = [
     {label: "Onnistunut vertailu", value: "result_noProblems"},
@@ -15,7 +15,7 @@ const testOptions = [
 export default function ThirtyYearErrorSelect({formObject}) {
     return (
         <form className="error-test-form">
-            <Select
+            <SelectInput
                 label="Simuloitu virhe"
                 options={testOptions}
                 name="testSelection"

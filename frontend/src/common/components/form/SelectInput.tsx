@@ -13,7 +13,7 @@ interface SelectProps extends FormInputProps {
     setDirectValue?: boolean;
 }
 
-const Select = ({
+const SelectInput = ({
     name,
     label,
     required,
@@ -76,4 +76,4 @@ const Select = ({
     );
 };
 
-export default Select;
+export default SelectInput;
