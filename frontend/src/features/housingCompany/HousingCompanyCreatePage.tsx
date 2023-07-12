@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 
 import {Checkbox, Fieldset} from "hds-react";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 
 import {
@@ -17,86 +17,74 @@ import {
     housingCompanyHitasTypes,
     housingCompanyRegulationStatus,
     ICode,
-    IHousingCompanyDetails,
     IHousingCompanyWritable,
     IPostalCode,
     IPropertyManager,
 } from "../../common/schemas";
-import {hitasToast, validateBusinessId} from "../../common/utils";
+import {hdsToast, validateBusinessId} from "../../common/utils";
+import HousingCompanyViewContextProvider, {
+    HousingCompanyViewContext,
+} from "./components/HousingCompanyViewContextProvider";
 
-interface IHousingCompanyLocationState {
-    pathname: string;
-    state: null | {housingCompany: IHousingCompanyDetails};
-}
+const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
+    return {label: getHousingCompanyRegulationStatusName(state), value: state};
+});
+const hitasTypeOptions = housingCompanyHitasTypes.map((state) => {
+    return {label: getHousingCompanyHitasTypeName(state), value: state};
+});
 
-const HousingCompanyCreatePage = (): React.JSX.Element => {
+const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
     const navigate = useNavigate();
-    const {pathname, state}: IHousingCompanyLocationState = useLocation();
-    const isEditPage = pathname.split("/").at(-1) === "edit";
+    const {housingCompany} = useContext(HousingCompanyViewContext);
 
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
 
-    const initialFormData: IHousingCompanyWritable =
-        state === null || state?.housingCompany === undefined
-            ? {
-                  acquisition_price: 0,
-                  address: {
-                      postal_code: "",
-                      street_address: "",
-                  },
-                  hitas_type: "new_hitas_1",
-                  exclude_from_statistics: false,
-                  regulation_status: "regulated",
-                  building_type: {id: ""},
-                  business_id: "",
-                  developer: {id: ""},
-                  name: {
-                      display: "",
-                      official: "",
-                  },
-                  notes: "",
-                  primary_loan: undefined,
-                  property_manager: null,
-                  sales_price_catalogue_confirmation_date: null,
-                  improvements: {
-                      market_price_index: [],
-                      construction_price_index: [],
-                  },
-              }
-            : state.housingCompany;
+    const initialFormData: IHousingCompanyWritable = housingCompany ?? {
+        acquisition_price: 0,
+        address: {
+            postal_code: "",
+            street_address: "",
+        },
+        hitas_type: "new_hitas_1",
+        exclude_from_statistics: false,
+        regulation_status: "regulated",
+        building_type: {id: ""},
+        business_id: "",
+        developer: {id: ""},
+        name: {
+            display: "",
+            official: "",
+        },
+        notes: "",
+        primary_loan: undefined,
+        property_manager: null,
+        sales_price_catalogue_confirmation_date: null,
+        improvements: {
+            market_price_index: [],
+            construction_price_index: [],
+        },
+    };
+
     const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
     const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
-        saveHousingCompany({data: formData, id: state?.housingCompany.id});
+        saveHousingCompany({data: formData, id: housingCompany?.id})
+            .unwrap()
+            .then((payload) => {
+                hdsToast.success("Asuntoyhtiö tallennettu onnistuneesti!");
+                navigate(`/housing-companies/${payload.id}`);
+            })
+            .catch(() => {
+                hdsToast.error("Virhe tallentaessa taloyhtiötä!");
+                setIsEndModalVisible(true);
+            });
     };
 
-    // Navigate user directly to detail page of the just created Housing Company
-    useEffect(() => {
-        if (!isLoading && !error && data && data.id) {
-            hitasToast("Asuntoyhtiö tallennettu onnistuneesti!");
-            navigate(`/housing-companies/${data.id}`);
-        } else if (error) {
-            setIsEndModalVisible(true);
-        }
-    }, [isLoading, error, data, navigate]);
-
-    // Redirect user to detail page if state is missing HousingCompany data and user is trying to edit the company
-    useEffect(() => {
-        if (isEditPage && state === null) navigate("..");
-    }, [isEditPage, navigate, pathname, state]);
-
-    const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
-        return {label: getHousingCompanyRegulationStatusName(state), value: state};
-    });
-    const hitasTypeOptions = housingCompanyHitasTypes.map((state) => {
-        return {label: getHousingCompanyHitasTypeName(state), value: state};
-    });
-
     return (
-        <div className="view--create view--create-company">
+        <>
             <Heading>
-                <span>{state?.housingCompany ? state?.housingCompany.name.official : "Uusi yhtiö"}</span>
+                <span>{housingCompany ? housingCompany.name.official : "Uusi yhtiö"}</span>
             </Heading>
             <div className="field-sets">
                 <Fieldset heading="">
@@ -237,7 +225,7 @@ const HousingCompanyCreatePage = (): React.JSX.Element => {
                             inputType="relatedModel"
                             label="Talotyyppi"
                             fieldPath="building_type.id"
-                            placeholder={state?.housingCompany.building_type.value}
+                            placeholder={housingCompany?.building_type.value}
                             queryFunction={useGetBuildingTypesQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -252,7 +240,7 @@ const HousingCompanyCreatePage = (): React.JSX.Element => {
                             inputType="relatedModel"
                             label="Rakennuttaja"
                             fieldPath="developer.id"
-                            placeholder={state?.housingCompany.developer.value}
+                            placeholder={housingCompany?.developer.value}
                             queryFunction={useGetDevelopersQuery}
                             relatedModelSearchField="value"
                             getRelatedModelLabel={(obj: ICode) => obj.value}
@@ -265,7 +253,7 @@ const HousingCompanyCreatePage = (): React.JSX.Element => {
                             inputType="relatedModel"
                             label="Isännöitsijä"
                             fieldPath="property_manager.id"
-                            placeholder={state?.housingCompany.property_manager?.name}
+                            placeholder={housingCompany?.property_manager?.name}
                             queryFunction={useGetPropertyManagersQuery}
                             relatedModelSearchField="name"
                             getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
@@ -298,7 +286,15 @@ const HousingCompanyCreatePage = (): React.JSX.Element => {
                 error={error}
                 isLoading={isLoading}
             />
-        </div>
+        </>
+    );
+};
+
+const HousingCompanyCreatePage = (): React.JSX.Element => {
+    return (
+        <HousingCompanyViewContextProvider viewClassName="view--create view--create-company">
+            <LoadedHousingCompanyCreatePage />
+        </HousingCompanyViewContextProvider>
     );
 };
 

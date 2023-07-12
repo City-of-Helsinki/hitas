@@ -1,14 +1,9 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 
 import {Fieldset, IconCrossCircle} from "hds-react";
-import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {
-    useCreateRealEstateMutation,
-    useDeleteRealEstateMutation,
-    useGetHousingCompanyDetailQuery,
-} from "../../app/services";
+import {useCreateRealEstateMutation, useDeleteRealEstateMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
     FormInputField,
@@ -18,68 +13,68 @@ import {
 } from "../../common/components";
 import {IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
+import HousingCompanyViewContextProvider, {
+    HousingCompanyViewContext,
+} from "./components/HousingCompanyViewContextProvider";
 
-const HousingCompanyRealEstatesPage = (): React.JSX.Element => {
-    const params = useParams();
+const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const [realEstateToRemove, setRealEstateToRemove] = useState<string | null>();
-    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
-        params.housingCompanyId as string
-    );
+
     const blankForm = {
-        address: {
-            street_address: "",
-        },
+        address: {street_address: ""},
         property_identifier: "",
     };
-    const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
-    const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
 
+    const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
+
+    const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
     const [deleteRealEstate, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
         useDeleteRealEstateMutation();
+
     const handleSaveButtonClicked = () => {
-        saveRealEstate({data: formData, housingCompanyId: params.housingCompanyId as string});
+        saveRealEstate({data: formData, housingCompanyId: housingCompany.id});
         setIsEndModalVisible(true);
     };
+
     const handleConfirmedRemove = () => {
-        deleteRealEstate({id: realEstateToRemove as string, housingCompanyId: params.housingCompanyId as string}).then(
-            () => {
-                setRealEstateToRemove(null);
-                setIsConfirmModalVisible(false);
-                hitasToast("Kiinteistö poistettu onnistuneesti!", "success");
-            }
-        );
+        deleteRealEstate({id: realEstateToRemove as string, housingCompanyId: housingCompany.id}).then(() => {
+            setRealEstateToRemove(null);
+            setIsConfirmModalVisible(false);
+            hitasToast("Kiinteistö poistettu onnistuneesti!", "success");
+        });
     };
 
     return (
-        <div className="view--create view--real-estates">
+        <>
             <h1 className="main-heading">
                 <span>Kiinteistöt</span>
             </h1>
             <ul className="detail-list__list real-estates-list">
-                {housingCompanyData &&
-                    !isHousingCompanyLoading &&
-                    housingCompanyData.real_estates.map((realEstate) => (
-                        <li
-                            className="detail-list__list-item"
-                            key={realEstate.id}
-                        >
-                            {realEstate.address.street_address} ({realEstate.property_identifier})
-                            <span className="remove-icon">
-                                <IconCrossCircle
-                                    onClick={() => {
-                                        if (realEstate.buildings.length) {
-                                            hitasToast("Kiinteistö ei ole tyhjä!", "error");
-                                        } else {
-                                            setRealEstateToRemove(realEstate.id);
-                                            setIsConfirmModalVisible(true);
-                                        }
-                                    }}
-                                />
-                            </span>
-                        </li>
-                    ))}
+                {housingCompany.real_estates.map((realEstate) => (
+                    <li
+                        key={realEstate.id}
+                        className="detail-list__list-item"
+                    >
+                        {realEstate.address.street_address} ({realEstate.property_identifier})
+                        <span className="remove-icon">
+                            <IconCrossCircle
+                                onClick={() => {
+                                    if (realEstate.buildings.length) {
+                                        hitasToast("Kiinteistö ei ole tyhjä!", "error");
+                                    } else {
+                                        setRealEstateToRemove(realEstate.id);
+                                        setIsConfirmModalVisible(true);
+                                    }
+                                }}
+                            />
+                        </span>
+                    </li>
+                ))}
             </ul>
             <h2>Uusi kiinteistö</h2>
             <div className="field-sets">
@@ -115,7 +110,7 @@ const HousingCompanyRealEstatesPage = (): React.JSX.Element => {
             <SaveDialogModal
                 data={data}
                 error={error}
-                linkURL={"/housing-companies/" + params.housingCompanyId}
+                linkURL={"/housing-companies/" + housingCompany.id}
                 linkText="Takaisin yhtiön sivulle"
                 isLoading={isLoading}
                 isVisible={isEndModalVisible}
@@ -133,7 +128,15 @@ const HousingCompanyRealEstatesPage = (): React.JSX.Element => {
                 cancelAction={() => setIsConfirmModalVisible(false)}
                 buttonText="Poista"
             />
-        </div>
+        </>
+    );
+};
+
+const HousingCompanyRealEstatesPage = (): React.JSX.Element => {
+    return (
+        <HousingCompanyViewContextProvider viewClassName="view--create view--real-estates">
+            <LoadedHousingCompanyRealEstatesPage />
+        </HousingCompanyViewContextProvider>
     );
 };
 
