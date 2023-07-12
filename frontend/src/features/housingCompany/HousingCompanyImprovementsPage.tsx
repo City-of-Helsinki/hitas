@@ -1,26 +1,17 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 
 import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useGetHousingCompanyDetailQuery, useSaveHousingCompanyMutation} from "../../app/services";
-import {
-    ConfirmDialogModal,
-    FormInputField,
-    Heading,
-    NavigateBackButton,
-    QueryStateHandler,
-    SaveButton,
-} from "../../common/components";
-import {
-    IHousingCompanyDetails,
-    IHousingCompanyWritable,
-    IImprovement,
-    IMarketPriceIndexImprovement,
-} from "../../common/schemas";
+import {useSaveHousingCompanyMutation} from "../../app/services";
+import {ConfirmDialogModal, FormInputField, Heading, NavigateBackButton, SaveButton} from "../../common/components";
+import {IImprovement, IMarketPriceIndexImprovement} from "../../common/schemas";
 import {dotted, hitasToast} from "../../common/utils";
+import HousingCompanyViewContextProvider, {
+    HousingCompanyViewContext,
+} from "./components/HousingCompanyViewContextProvider";
 
 type IWritableMarketImprovement = Omit<IMarketPriceIndexImprovement, "value"> & {
     value: number | null;
@@ -52,23 +43,27 @@ const ImprovementRemoveLineButton = ({onClick}) => {
     );
 };
 
-const LoadedHousingCompanyImprovementsPage = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
+const LoadedHousingCompanyImprovementsPage = () => {
     const navigate = useNavigate();
-    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
     const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
     const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
-    const housingCompanyData: IHousingCompanyWritable = housingCompany;
+
     const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableMarketImprovement[]>(
-        housingCompanyData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
+        housingCompany.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
     const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableConsImprovement[]>(
-        housingCompanyData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
+        housingCompany.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
     );
+
+    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
 
     const handleSaveButtonClicked = () => {
         const formData = {
-            ...housingCompanyData,
+            ...housingCompany,
             // Don't send empty improvements to the API
             improvements: {
                 market_price_index: marketIndexImprovements.filter((i) => i.value) as IMarketPriceIndexImprovement[],
@@ -156,7 +151,7 @@ const LoadedHousingCompanyImprovementsPage = ({housingCompany}: {housingCompany:
 
     return (
         <>
-            <Heading>{housingCompanyData.name.display} Parannukset</Heading>
+            <Heading>{housingCompany.name.display} Parannukset</Heading>
             <div className="field-sets">
                 <Fieldset heading="Markkinahintaindeksillä laskettavat parannukset">
                     <ul className="improvements-list">
@@ -341,19 +336,10 @@ const LoadedHousingCompanyImprovementsPage = ({housingCompany}: {housingCompany:
 };
 
 const HousingCompanyImprovementsPage = () => {
-    const params = useParams() as {readonly housingCompanyId: string};
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-
     return (
-        <div className="view--create view--create-improvements">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedHousingCompanyImprovementsPage housingCompany={data as IHousingCompanyDetails} />
-            </QueryStateHandler>
-        </div>
+        <HousingCompanyViewContextProvider viewClassName="view--create view--create-improvements">
+            <LoadedHousingCompanyImprovementsPage />
+        </HousingCompanyViewContextProvider>
     );
 };
 

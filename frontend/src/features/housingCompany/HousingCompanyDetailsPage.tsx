@@ -1,28 +1,25 @@
 import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
-import {Link, useParams} from "react-router-dom";
+import {Link} from "react-router-dom";
 
-import React, {useState} from "react";
-import {useGetHousingCompanyDetailQuery} from "../../app/services";
-import {
-    DetailField,
-    EditButton,
-    Heading,
-    ImprovementsTable,
-    MutateForm,
-    MutateModal,
-    QueryStateHandler,
-} from "../../common/components";
+import React, {useContext, useState} from "react";
+import {DetailField, EditButton, Heading, ImprovementsTable, MutateForm, MutateModal} from "../../common/components";
 import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
-import {IHousingCompanyDetails, IPropertyManager} from "../../common/schemas";
+import {IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 import {BatchCompleteApartmentsModal} from "./";
+import HousingCompanyViewContextProvider, {
+    HousingCompanyViewContext,
+} from "./components/HousingCompanyViewContextProvider";
 import SalesCatalogImport from "./components/SalesCatalogImport";
 
-const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousingCompanyDetails}): React.JSX.Element => {
+const LoadedHousingCompanyDetails = (): React.JSX.Element => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
-    const params = useParams() as {readonly housingCompanyId: string};
+
     return (
         <>
             <Heading>
@@ -248,7 +245,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                     <Heading type="list">
                         <span>Asunnot</span>
                         <div className="buttons">
-                            <BatchCompleteApartmentsModal housingCompanyId={params.housingCompanyId} />
+                            <BatchCompleteApartmentsModal housingCompanyId={housingCompany.id} />
                             <Link to="apartments/create">
                                 <Button
                                     theme="black"
@@ -262,7 +259,7 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
                         </div>
                     </Heading>
                     <div className="listing">
-                        <HousingCompanyApartmentResultsList housingCompanyId={params.housingCompanyId} />
+                        <HousingCompanyApartmentResultsList housingCompanyId={housingCompany.id} />
                     </div>
                 </div>
             </div>
@@ -271,19 +268,10 @@ const LoadedHousingCompanyDetails = ({housingCompany}: {housingCompany: IHousing
 };
 
 const HousingCompanyDetailsPage = () => {
-    const params = useParams() as {readonly housingCompanyId: string};
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-
     return (
-        <div className="view--housing-company-details">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedHousingCompanyDetails housingCompany={data as IHousingCompanyDetails} />
-            </QueryStateHandler>
-        </div>
+        <HousingCompanyViewContextProvider viewClassName="view--housing-company-details">
+            <LoadedHousingCompanyDetails />
+        </HousingCompanyViewContextProvider>
     );
 };
 

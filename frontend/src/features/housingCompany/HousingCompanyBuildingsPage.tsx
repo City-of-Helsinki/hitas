@@ -1,10 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import {Fieldset, IconCrossCircle, IconPen} from "hds-react";
-import {useParams} from "react-router-dom";
 import {useImmer} from "use-immer";
 
-import {useDeleteBuildingMutation, useGetHousingCompanyDetailQuery, useSaveBuildingMutation} from "../../app/services";
+import {useDeleteBuildingMutation, useSaveBuildingMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
     FormInputField,
@@ -15,6 +14,9 @@ import {
 import CancelButton from "../../common/components/CancelButton";
 import {IBuilding, IBuildingWritable, IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
+import HousingCompanyViewContextProvider, {
+    HousingCompanyViewContext,
+} from "./components/HousingCompanyViewContextProvider";
 
 const blankForm: IBuildingWritable = {
     real_estate_id: null,
@@ -24,8 +26,10 @@ const blankForm: IBuildingWritable = {
     building_identifier: "",
 };
 
-const HousingCompanyBuildingsPage = (): React.JSX.Element => {
-    const params = useParams() as {readonly housingCompanyId: string};
+const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [idsToRemove, setIdsToRemove] = useState<{building?: string | null; realEstate?: string | null}>({
         building: null,
@@ -34,27 +38,22 @@ const HousingCompanyBuildingsPage = (): React.JSX.Element => {
     const [isEndModalVisible, setIsEndModalVisible] = useState(false);
     const [editing, setEditing] = useState<{building: IBuilding; realEstate: IRealEstate} | null>(null);
     const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
-    const {data: housingCompanyData, isLoading: isHousingCompanyLoading} = useGetHousingCompanyDetailQuery(
-        params.housingCompanyId
-    );
+
     const [saveBuilding, {data, error, isLoading}] = useSaveBuildingMutation();
     const [deleteBuilding, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
         useDeleteBuildingMutation();
 
-    const realEstateOptions =
-        isHousingCompanyLoading || !housingCompanyData
-            ? []
-            : housingCompanyData.real_estates.map((realEstate) => {
-                  return {
-                      label: `${realEstate.address.street_address} (${realEstate.property_identifier})`,
-                      value: realEstate.id,
-                  };
-              });
+    const realEstateOptions = housingCompany.real_estates.map((realEstate) => {
+        return {
+            label: `${realEstate.address.street_address} (${realEstate.property_identifier})`,
+            value: realEstate.id,
+        };
+    });
 
     const handleSaveBuilding = () => {
         saveBuilding({
             data: formData,
-            housingCompanyId: params.housingCompanyId as string,
+            housingCompanyId: housingCompany.id,
             realEstateId: editing ? (editing.realEstate.id as string) : (formData.real_estate_id as string),
         });
         setIsEndModalVisible(true);
@@ -63,7 +62,7 @@ const HousingCompanyBuildingsPage = (): React.JSX.Element => {
     const handleConfirmedRemove = () => {
         deleteBuilding({
             id: idsToRemove.building as string,
-            housingCompanyId: params.housingCompanyId as string,
+            housingCompanyId: housingCompany.id,
             realEstateId: idsToRemove.realEstate as string,
         }).then(() => {
             hitasToast("Rakennus poistettu onnistuneesti!", "success");
@@ -89,58 +88,57 @@ const HousingCompanyBuildingsPage = (): React.JSX.Element => {
             <h1 className="main-heading">
                 <span>Rakennukset</span>
             </h1>
-            {housingCompanyData &&
-                housingCompanyData.real_estates.map((realEstate, idx) =>
-                    realEstate.buildings.length ? (
-                        <div
-                            className="buildings-list"
-                            key={idx}
-                        >
-                            <h3>
-                                Kiinteistö: {realEstate.address.street_address} ({realEstate.property_identifier})
-                            </h3>
-                            <ul className="detail-list__list">
-                                {realEstate.buildings.map((building) => (
-                                    <li
-                                        key={building.id}
-                                        className="detail-list__list-item"
-                                    >
-                                        {building.address.street_address}
-                                        {building.building_identifier ? ` (${building.building_identifier})` : ""}
-                                        <span>
-                                            <IconPen
-                                                className="edit-icon"
-                                                onClick={() => {
-                                                    setEditing({building, realEstate});
-                                                    setFormData({
-                                                        address: {street_address: building.address.street_address},
-                                                        building_identifier: building.building_identifier,
-                                                        real_estate_id: realEstate.id,
-                                                        id: building.id,
+            {housingCompany.real_estates.map((realEstate, idx) =>
+                realEstate.buildings.length ? (
+                    <div
+                        className="buildings-list"
+                        key={idx}
+                    >
+                        <h3>
+                            Kiinteistö: {realEstate.address.street_address} ({realEstate.property_identifier})
+                        </h3>
+                        <ul className="detail-list__list">
+                            {realEstate.buildings.map((building) => (
+                                <li
+                                    key={building.id}
+                                    className="detail-list__list-item"
+                                >
+                                    {building.address.street_address}
+                                    {building.building_identifier ? ` (${building.building_identifier})` : ""}
+                                    <span>
+                                        <IconPen
+                                            className="edit-icon"
+                                            onClick={() => {
+                                                setEditing({building, realEstate});
+                                                setFormData({
+                                                    address: {street_address: building.address.street_address},
+                                                    building_identifier: building.building_identifier,
+                                                    real_estate_id: realEstate.id,
+                                                    id: building.id,
+                                                });
+                                            }}
+                                        />
+                                        <IconCrossCircle
+                                            className="remove-icon"
+                                            onClick={() => {
+                                                if (building.apartment_count === 0) {
+                                                    setIdsToRemove({
+                                                        building: building.id,
+                                                        realEstate: realEstate.id,
                                                     });
-                                                }}
-                                            />
-                                            <IconCrossCircle
-                                                className="remove-icon"
-                                                onClick={() => {
-                                                    if (building.apartment_count === 0) {
-                                                        setIdsToRemove({
-                                                            building: building.id,
-                                                            realEstate: realEstate.id,
-                                                        });
-                                                        setIsConfirmModalVisible(true);
-                                                    } else hitasToast("Rakennus ei ole tyhjä!", "error");
-                                                }}
-                                            />
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ) : (
-                        ""
-                    )
-                )}
+                                                    setIsConfirmModalVisible(true);
+                                                } else hitasToast("Rakennus ei ole tyhjä!", "error");
+                                            }}
+                                        />
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    ""
+                )
+            )}
             <h2>{editing ? "Muokkaa rakennuksen tietoja" : "Uusi rakennus"}</h2>
             <div className="field-sets">
                 <Fieldset heading="">
@@ -216,7 +214,7 @@ const HousingCompanyBuildingsPage = (): React.JSX.Element => {
                     )}
                     <SaveButton
                         onClick={handleSaveBuilding}
-                        isLoading={isHousingCompanyLoading}
+                        isLoading={isLoading}
                     />
                 </div>
             </div>
@@ -240,6 +238,14 @@ const HousingCompanyBuildingsPage = (): React.JSX.Element => {
                 cancelAction={() => setIsConfirmModalVisible(false)}
             />
         </div>
+    );
+};
+
+const HousingCompanyBuildingsPage = (): React.JSX.Element => {
+    return (
+        <HousingCompanyViewContextProvider viewClassName="view--create view--buildings">
+            <LoadedHousingCompanyBuildingsPage />
+        </HousingCompanyViewContextProvider>
     );
 };
 
