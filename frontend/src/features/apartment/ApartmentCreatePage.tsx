@@ -1,22 +1,14 @@
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Fieldset} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
-import {
-    useDeleteApartmentMutation,
-    useGetApartmentDetailQuery,
-    useGetApartmentTypesQuery,
-    useGetHousingCompanyDetailQuery,
-    useSaveApartmentMutation,
-} from "../../app/services";
+import {useDeleteApartmentMutation, useGetApartmentTypesQuery, useSaveApartmentMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
-    Heading,
     NavigateBackButton,
-    QueryStateHandler,
     RemoveButton,
     SaveButton,
     SaveDialogModal,
@@ -36,10 +28,9 @@ import {
     IApartmentWritable,
     IApartmentWritableForm,
     ICode,
-    IHousingCompanyDetails,
 } from "../../common/schemas";
 import {hdsToast, isEmpty} from "../../common/utils";
-import ApartmentHeader from "./components/ApartmentHeader";
+import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 
 const ApartmentDeleteButton = ({apartment}) => {
     const navigate = useNavigate();
@@ -154,14 +145,9 @@ const formatApartmentFormDataForSubmit = (apartment, data): IApartmentWritable =
     };
 };
 
-const LoadedApartmentCreatePage = ({
-    housingCompany,
-    apartment,
-}: {
-    housingCompany: IHousingCompanyDetails;
-    apartment: IApartmentDetails | undefined;
-}) => {
+const LoadedApartmentCreatePage = () => {
     const navigate = useNavigate();
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
 
     const [saveApartment, {data: saveData, error: saveError, isLoading: isSaveLoading}] = useSaveApartmentMutation();
 
@@ -320,7 +306,6 @@ const LoadedApartmentCreatePage = ({
 
     return (
         <>
-            <ApartmentHeader />
             <form
                 ref={formRef}
                 // eslint-disable-next-line no-console
@@ -481,44 +466,10 @@ const LoadedApartmentCreatePage = ({
 };
 
 const ApartmentCreatePage = () => {
-    // Load required data and pass it to the child component
-    const params = useParams() as {housingCompanyId: string; apartmentId?: string};
-    const isEditPage = !!params.apartmentId;
-
-    const {
-        data: housingCompanyData,
-        error: housingCompanyError,
-        isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(params.housingCompanyId);
-    const {
-        data: apartmentData,
-        error: apartmentError,
-        isLoading: isApartmentLoading,
-    } = useGetApartmentDetailQuery(
-        {
-            housingCompanyId: params.housingCompanyId,
-            apartmentId: params.apartmentId as string,
-        },
-        {skip: !isEditPage}
-    );
-
-    const data = isEditPage ? housingCompanyData && apartmentData : housingCompanyData;
-    const error = housingCompanyError || apartmentError;
-    const isLoading = isHousingCompanyLoading || (isEditPage && isApartmentLoading);
-
     return (
-        <div className="view--create">
-            <QueryStateHandler
-                data={data}
-                error={error}
-                isLoading={isLoading}
-            >
-                <LoadedApartmentCreatePage
-                    housingCompany={housingCompanyData as IHousingCompanyDetails}
-                    apartment={apartmentData as IApartmentDetails}
-                />
-            </QueryStateHandler>
-        </div>
+        <ApartmentViewContextProvider viewClassName="view--create">
+            <LoadedApartmentCreatePage />
+        </ApartmentViewContextProvider>
     );
 };
 

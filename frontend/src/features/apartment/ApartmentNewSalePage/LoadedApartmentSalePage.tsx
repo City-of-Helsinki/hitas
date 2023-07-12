@@ -1,19 +1,22 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Fieldset} from "hds-react";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
 import {z, ZodSchema} from "zod";
 import {useCreateSaleMutation} from "../../../app/services";
-import {ConfirmDialogModal, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
-import {IApartmentDetails, IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
+import {ConfirmDialogModal, Heading, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
+import {IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
+import {ApartmentViewContext} from "../components/ApartmentViewContextProvider";
 import {ApartmentCatalogPricesFieldSet, ApartmentSaleFormFieldSet, MaximumPriceCalculationFieldSet} from "./fieldsets";
 import {ApartmentSaleContext, getRefinedApartmentSaleFormSchema, ISalesPageMaximumPrices} from "./utils";
 
-const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) => {
+const LoadedApartmentSalePage = () => {
     const navigate = useNavigate();
+    const {apartment} = useContext(ApartmentViewContext);
+    if (!apartment) return <></>;
 
     // **********
     // * States *
@@ -184,37 +187,44 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
     }
 
     return (
-        <div className="view--apartment-conditions-of-sale">
-            <div className="fieldsets">
-                <ApartmentSaleContext.Provider value={{apartment, formExtraFieldErrorMessages, setMaximumPrices}}>
-                    <FormProvider {...saleForm}>
-                        <ApartmentSaleFormFieldSet
-                            formRef={formRef}
-                            onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
-                        />
-                        {isApartmentFirstSale ? (
-                            <ApartmentCatalogPricesFieldSet />
-                        ) : (
-                            <MaximumPriceCalculationFieldSet />
-                        )}
-                        <Fieldset
-                            className={`ownerships-fieldset ${
-                                OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success ? "" : "error"
-                            }`}
-                            heading="Omistajuudet"
-                        >
-                            <OwnershipList />
-                        </Fieldset>
-                    </FormProvider>
-                </ApartmentSaleContext.Provider>
-            </div>
+        <>
+            <Heading type="main">
+                {apartment.prices.first_purchase_date ? "Kauppatapahtuma" : "Uudiskohteen kauppa"}
+            </Heading>
+            <div className="view--apartment-sales">
+                <div className="fieldsets">
+                    <ApartmentSaleContext.Provider value={{apartment, formExtraFieldErrorMessages, setMaximumPrices}}>
+                        <FormProvider {...saleForm}>
+                            <ApartmentSaleFormFieldSet
+                                formRef={formRef}
+                                onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
+                            />
+                            {isApartmentFirstSale ? (
+                                <ApartmentCatalogPricesFieldSet />
+                            ) : (
+                                <MaximumPriceCalculationFieldSet />
+                            )}
+                            <Fieldset
+                                className={`ownerships-fieldset ${
+                                    OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success
+                                        ? ""
+                                        : "error"
+                                }`}
+                                heading="Omistajuudet"
+                            >
+                                <OwnershipList />
+                            </Fieldset>
+                        </FormProvider>
+                    </ApartmentSaleContext.Provider>
+                </div>
 
-            <div className="row row--buttons">
-                <NavigateBackButton />
-                <SaveButton
-                    onClick={handleSaveButtonClick}
-                    isLoading={isCreateSaleLoading}
-                />
+                <div className="row row--buttons">
+                    <NavigateBackButton />
+                    <SaveButton
+                        onClick={handleSaveButtonClick}
+                        isLoading={isCreateSaleLoading}
+                    />
+                </div>
             </div>
 
             <ConfirmDialogModal
@@ -228,7 +238,7 @@ const LoadedApartmentSalePage = ({apartment}: {apartment: IApartmentDetails}) =>
                 confirmAction={handleSaveButtonClick}
                 buttonText="Vahvista tallennus"
             />
-        </div>
+        </>
     );
 };
 
