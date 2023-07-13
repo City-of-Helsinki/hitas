@@ -154,24 +154,24 @@ class DepreciationPercentageField(serializers.ChoiceField):
     def to_representation(self, percentage: DepreciationPercentage):
         match percentage:  # noqa: E999
             case DepreciationPercentage.TEN:
-                return 10.0
+                return "10.0"
             case DepreciationPercentage.TWO_AND_HALF:
-                return 2.5
+                return "2.5"
             case DepreciationPercentage.ZERO:
-                return 0.0
+                return "0.0"
             case _:
                 raise NotImplementedError(f"Value '{percentage}' not implemented.")
 
-    def to_internal_value(self, data: float):
+    def to_internal_value(self, data: str):
         if data is None:
             raise serializers.ValidationError(code="blank")
 
         match data:
-            case 10:
+            case "10":
                 return DepreciationPercentage.TEN
-            case 2.5:
+            case "2.5":
                 return DepreciationPercentage.TWO_AND_HALF
-            case 0:
+            case "0":
                 return DepreciationPercentage.ZERO
             case _:
                 supported_values = ["0.0", "2.5", "10.0"]
