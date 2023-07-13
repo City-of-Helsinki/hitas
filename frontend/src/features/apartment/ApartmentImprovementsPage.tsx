@@ -62,14 +62,27 @@ const ImprovementAddEmptyLineButton = ({append}) => {
     );
 };
 
-const ImprovementRemoveLineButton = ({index, remove}) => {
+const ImprovementRemoveLineButton = ({name, index, remove}) => {
+    const formObject = useFormContext();
     const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+
+    const handleRemoveButtonPress = () => {
+        const improvementValues = formObject.getValues(`${name}.${index}`);
+
+        // If all fields are empty, remove the improvement without confirmation
+        if (!improvementValues.name && !improvementValues.value && !improvementValues.completion_date) {
+            remove(index);
+            return;
+        } else {
+            setIsConfirmVisible(true);
+        }
+    };
 
     return (
         <div className="icon--remove">
             <IconCrossCircle
                 size="m"
-                onClick={() => setIsConfirmVisible(true)}
+                onClick={handleRemoveButtonPress}
             />
 
             <ConfirmDialogModal
@@ -168,6 +181,7 @@ const ImprovementsListItems = ({name, showNoDeductions, remove}) => {
                         />
                     )}
                     <ImprovementRemoveLineButton
+                        name={name}
                         index={index}
                         remove={remove}
                     />
