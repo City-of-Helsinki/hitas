@@ -25,7 +25,6 @@ export default function ImprovementsTable({
                 <span>{title}</span>
                 {editableType !== undefined && (
                     <EditButton
-                        state={{[editableType]: data}}
                         pathname={editPath || "improvements"}
                         className="pull-right"
                     />
