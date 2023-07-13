@@ -683,7 +683,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "name": cpi.name,
                     "value": float(cpi.value),
                     "completion_date": cpi.completion_date.strftime("%Y-%m"),
-                    "depreciation_percentage": float(cpi.depreciation_percentage.value),
+                    "depreciation_percentage": str(cpi.depreciation_percentage),
                 },
             ],
             "market_price_index": [
@@ -1217,13 +1217,13 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
                     "value": 1234.5,
                     "name": "test-construction-price-1",
                     "completion_date": "2020-01",
-                    "depreciation_percentage": 10,
+                    "depreciation_percentage": "10",
                 },
                 {
                     "value": 2345.6,
                     "name": "test-construction-price-2",
                     "completion_date": "2023-12",
-                    "depreciation_percentage": 2.5,
+                    "depreciation_percentage": "2.5",
                 },
             ],
             "market_price_index": [

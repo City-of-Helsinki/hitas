@@ -5596,7 +5596,7 @@ components:
                       - 0
                       - 2.5
                       - 10
-                    type: number
+                    type: string
                     example: 10.0
                     x-extensible-enum:
                       - 0

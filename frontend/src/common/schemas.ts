@@ -189,7 +189,7 @@ const MarketPriceIndexImprovementSchema = ImprovementSchema.and(
 );
 const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
     object({
-        depreciation_percentage: number(), // 0.0 | 2.5 | 10.0
+        depreciation_percentage: z.enum(["0.0", "2.5", "10.0"]),
     })
 );
 
