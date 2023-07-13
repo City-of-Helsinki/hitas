@@ -199,6 +199,12 @@ export const HousingCompanyImprovementsFormSchema = z.object({
 });
 export type IHousingCompanyImprovementsForm = z.infer<typeof HousingCompanyImprovementsFormSchema>;
 
+export const ApartmentImprovementsFormSchema = z.object({
+    market_price_index: MarketPriceIndexImprovementSchema.array(),
+    construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
+});
+export type IApartmentImprovementsForm = z.infer<typeof ApartmentImprovementsFormSchema>;
+
 const UserInfoSchema = object({
     first_name: string(),
     last_name: string(),
