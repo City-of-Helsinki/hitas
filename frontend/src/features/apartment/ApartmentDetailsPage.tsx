@@ -608,7 +608,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                             value={formatDate(apartment.prices.first_purchase_date)}
                                         />
                                         <DetailField
-                                            label="Ensimmäinen Kauppahinta"
+                                            label="Ensimmäinen kauppahinta"
                                             value={formatMoney(apartment.prices.first_sale_purchase_price)}
                                         />
                                         <DetailField
@@ -701,11 +701,19 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                     MutateFormComponent={MutateForm}
                     mutateFormProps={propertyManagerMutateFormProps}
                 />
-                <ImprovementsTable
-                    data={apartment}
-                    title="Asuntokohtaiset parannukset"
-                    editableType={housingCompany.regulation_status === "regulated" ? "apartment" : undefined}
-                />
+
+                {
+                    // New Hitas apartments don't have any improvements so the table can be hidden
+                    !housingCompany.new_hitas ||
+                    apartment.improvements.market_price_index.length ||
+                    apartment.improvements.construction_price_index.length ? (
+                        <ImprovementsTable
+                            data={apartment}
+                            title="Asuntokohtaiset parannukset"
+                            editableType={housingCompany.regulation_status === "regulated" ? "apartment" : undefined}
+                        />
+                    ) : null
+                }
                 <ImprovementsTable
                     data={housingCompany}
                     title="Yhtiökohtaiset parannukset"

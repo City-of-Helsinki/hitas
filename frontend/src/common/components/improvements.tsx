@@ -232,6 +232,7 @@ type IGenericImprovementsPage = {
 export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImprovementsPage) => {
     const navigate = useNavigate();
 
+    // Select either apartment or housing company
     let formSchema;
     let patchFunctionHook;
     let patchFunctionArguments;
@@ -254,6 +255,7 @@ export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImp
         rawImprovements = housingCompany.improvements;
     }
 
+    // Form
     const initialFormData = {
         market_price_index: rawImprovements.market_price_index.map((i) => ({
             key: uuidv4(),
@@ -274,9 +276,9 @@ export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImp
         mode: "all",
     });
 
+    // API Handling
     const [patchFunction, {isLoading}] = patchFunctionHook();
 
-    // Format and send data to the API
     const onSubmit: SubmitHandler<IApartmentImprovementsForm | IHousingCompanyImprovementsForm> = (formData) => {
         const formattedData = {
             // Filter empty improvements away (no value entered)
