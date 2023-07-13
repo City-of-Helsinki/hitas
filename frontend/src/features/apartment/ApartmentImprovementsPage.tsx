@@ -1,19 +1,22 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useRef, useState} from "react";
 
-import {Button, Checkbox, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
+import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
 import {useNavigate} from "react-router-dom";
-import {useImmer} from "use-immer";
 import {v4 as uuidv4} from "uuid";
 
-import {useSaveApartmentMutation} from "../../app/services";
-import {ConfirmDialogModal, FormInputField, NavigateBackButton, SaveButton} from "../../common/components";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {FormProvider, SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
+import {usePatchApartmentMutation} from "../../app/services";
+import {ConfirmDialogModal, NavigateBackButton, SaveButton} from "../../common/components";
+import {NumberInput, SelectInput, TextInput} from "../../common/components/form";
+import CheckboxInput from "../../common/components/form/CheckboxInput";
 import {
+    ApartmentImprovementsFormSchema,
     IApartmentConstructionPriceIndexImprovement,
-    IApartmentDetails,
-    IApartmentWritable,
+    IApartmentImprovementsForm,
     IMarketPriceIndexImprovement,
 } from "../../common/schemas";
-import {dotted, hitasToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
 import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
 
 type IWritableMarketImprovement = Omit<IMarketPriceIndexImprovement, "value"> & {
@@ -27,22 +30,30 @@ type IWritableConsImprovement = Omit<IApartmentConstructionPriceIndexImprovement
     saved: boolean;
 };
 
-const convertApartmentDetailToWritable = (ap: IApartmentDetails): IApartmentWritable => {
-    return {
-        ...ap,
-        shares: ap.shares || {start: null, end: null},
-        building: {id: ap.links.building.id},
-        address: {
-            ...ap.address,
-            street_address: ap.links.building.street_address,
-        },
-    };
+const depreciationChoices = [
+    {label: "0%", value: "0.0"},
+    {label: "2.5%", value: "2.5"},
+    {label: "10.0%", value: "10.0"},
+];
+
+const emptyImprovement = {
+    saved: false,
+    name: "",
+    value: null,
+    completion_date: "",
+    no_deductions: false,
+    depreciation_percentage: null,
 };
 
-const ImprovementAddLineButton = ({onClick}) => {
+const ImprovementAddEmptyLineButton = ({append}) => {
     return (
         <Button
-            onClick={onClick}
+            onClick={() =>
+                append({
+                    key: uuidv4(),
+                    ...emptyImprovement,
+                })
+            }
             iconLeft={<IconPlus />}
             theme="black"
         >
@@ -51,134 +62,146 @@ const ImprovementAddLineButton = ({onClick}) => {
     );
 };
 
-const ImprovementRemoveLineButton = ({onClick}) => {
+const ImprovementRemoveLineButton = ({index, remove}) => {
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+
     return (
         <div className="icon--remove">
             <IconCrossCircle
                 size="m"
-                onClick={(index) => onClick(index)}
+                onClick={() => setIsConfirmVisible(true)}
+            />
+
+            <ConfirmDialogModal
+                modalText="Haluatko varmasti poistaa parannuksen?"
+                buttonText="Poista"
+                successText="Parannus poistettu"
+                isVisible={isConfirmVisible}
+                setIsVisible={setIsConfirmVisible}
+                confirmAction={() => remove(index)}
+                cancelAction={() => setIsConfirmVisible(false)}
             />
         </div>
     );
 };
 
-const depreciationChoices = [{label: "0.0"}, {label: "2.5"}, {label: "10.0"}];
+const ImprovementsListHeaders = ({showNoDeductions}) => {
+    return (
+        <li className="improvement-headers">
+            <header>
+                Nimi <span>*</span>
+            </header>
+            <header>
+                Arvo <span>*</span>
+            </header>
+            <header>
+                Kuukausi <span>*</span>
+            </header>
+            <Tooltip
+                className="header__tooltip"
+                placement="left-start"
+            >
+                Muodossa 'YYYY-MM', esim. '2022-01'
+            </Tooltip>
+            {showNoDeductions ? (
+                <>
+                    <header>
+                        Ei vähennyksiä <span>*</span>
+                    </header>
+                    <Tooltip
+                        className="header__tooltip2"
+                        placement="left-start"
+                    >
+                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään indeksitarkistus. Käytetään
+                        ainoastaan vanhoissa Hitas säännöissä.
+                    </Tooltip>
+                </>
+            ) : (
+                <header>
+                    Poistoprosentti <span>*</span>
+                </header>
+            )}
+        </li>
+    );
+};
 
-const ImprovementFieldSet = ({
-    fieldsetHeader,
-    improvements,
-    handleAddImprovementLine,
-    handleSetImprovementLine,
-    setIndexToRemove,
-    error,
-    showNoDeductions,
-}) => {
+const ImprovementsListItems = ({name, showNoDeductions, remove}) => {
+    const formObject = useFormContext();
+    const improvements = formObject.watch(name);
+    return (
+        <>
+            {improvements.map((improvement: IWritableMarketImprovement | IWritableConsImprovement, index) => (
+                <li
+                    className="improvements-list-item"
+                    key={`improvement-item-${improvement.key}`}
+                >
+                    <TextInput
+                        name={`${name}.${index}.name`}
+                        formObject={formObject}
+                        required
+                    />
+                    <NumberInput
+                        name={`${name}.${index}.value`}
+                        allowDecimals
+                        formObject={formObject}
+                        required
+                    />
+                    <TextInput
+                        name={`${name}.${index}.completion_date`}
+                        formObject={formObject}
+                        required
+                    />
+                    {showNoDeductions ? (
+                        <CheckboxInput
+                            name={`${name}.${index}.no_deductions`}
+                            label=""
+                            formObject={formObject}
+                        />
+                    ) : (
+                        <SelectInput
+                            name={`${name}.${index}.depreciation_percentage`}
+                            label=""
+                            formObject={formObject}
+                            options={depreciationChoices}
+                            setDirectValue
+                            required
+                        />
+                    )}
+                    <ImprovementRemoveLineButton
+                        index={index}
+                        remove={remove}
+                    />
+                </li>
+            ))}
+        </>
+    );
+};
+
+const ImprovementFieldSet = ({fieldsetHeader, name, showNoDeductions}) => {
+    const formObject = useFormContext();
+    const {fields, append, remove} = useFieldArray({
+        name: name,
+        control: formObject.control,
+    });
+    formObject.register(name);
+
     return (
         <Fieldset heading={fieldsetHeader}>
             <ul className="improvements-list">
-                {improvements.length ? (
+                {fields.length ? (
                     <>
-                        <li className="improvement-headers">
-                            <header>
-                                Nimi <span>*</span>
-                            </header>
-                            <header>
-                                Arvo <span>*</span>
-                            </header>
-                            <header>
-                                Kuukausi <span>*</span>
-                            </header>
-                            <Tooltip
-                                className="header__tooltip"
-                                placement="left-start"
-                            >
-                                Muodossa 'YYYY-MM', esim. '2022-01'
-                            </Tooltip>
-                            {showNoDeductions ? (
-                                <>
-                                    <header>
-                                        Ei vähennyksiä <span>*</span>
-                                    </header>
-                                    <Tooltip
-                                        className="header__tooltip2"
-                                        placement="left-start"
-                                    >
-                                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään
-                                        indeksitarkistus. Käytetään ainoastaan vanhoissa Hitas säännöissä.
-                                    </Tooltip>
-                                </>
-                            ) : (
-                                <header>
-                                    Poistoprosentti <span>*</span>
-                                </header>
-                            )}
-                        </li>
-                        {improvements.map(
-                            (improvement: IWritableMarketImprovement | IWritableConsImprovement, index) => (
-                                <li
-                                    className="improvements-list-item"
-                                    key={`improvement-item-${improvement.key}`}
-                                >
-                                    <FormInputField
-                                        inputType="text"
-                                        label=""
-                                        fieldPath="name"
-                                        formData={improvements[index]}
-                                        setterFunction={handleSetImprovementLine(index, "name")}
-                                        error={error}
-                                        required
-                                    />
-                                    <FormInputField
-                                        inputType="number"
-                                        fractionDigits={2}
-                                        label=""
-                                        fieldPath="value"
-                                        formData={improvements[index]}
-                                        setterFunction={handleSetImprovementLine(index, "value")}
-                                        error={error}
-                                        required
-                                    />
-                                    <FormInputField
-                                        inputType="text"
-                                        label=""
-                                        fieldPath="completion_date"
-                                        tooltipText={"Muodossa 'YYYY-MM', esim. '2022-01'"}
-                                        formData={improvements[index]}
-                                        setterFunction={handleSetImprovementLine(index, "completion_date")}
-                                        error={error}
-                                        required
-                                    />
-                                    {showNoDeductions ? (
-                                        <Checkbox
-                                            id={`input-no_deductions-${index}`}
-                                            checked={improvements[index].no_deductions}
-                                            onChange={(e) =>
-                                                handleSetImprovementLine(index, "no_deductions")(e.target.checked)
-                                            }
-                                        />
-                                    ) : (
-                                        <FormInputField
-                                            inputType="select"
-                                            label=""
-                                            fieldPath="depreciation_percentage"
-                                            options={depreciationChoices}
-                                            placeholder={improvements[index].depreciation_percentage.toString()}
-                                            formData={improvement[index]}
-                                            setterFunction={handleSetImprovementLine(index, "depreciation_percentage")}
-                                            error={error}
-                                            required
-                                        />
-                                    )}
-                                    <ImprovementRemoveLineButton onClick={() => setIndexToRemove(index)} />
-                                </li>
-                            )
-                        )}
+                        <ImprovementsListHeaders showNoDeductions={showNoDeductions} />
+                        <ImprovementsListItems
+                            name={name}
+                            showNoDeductions={showNoDeductions}
+                            remove={remove}
+                        />
                     </>
                 ) : (
                     <div>Ei parannuksia</div>
                 )}
                 <li className="row row--buttons">
-                    <ImprovementAddLineButton onClick={handleAddImprovementLine} />
+                    <ImprovementAddEmptyLineButton append={append} />
                 </li>
             </ul>
         </Fieldset>
@@ -190,155 +213,81 @@ const LoadedApartmentImprovementsPage = () => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
-    const [saveApartment, {data, error, isLoading}] = useSaveApartmentMutation();
-    const [isConfirmVisible, setIsConfirmVisible] = useState(false);
-    const [marketIndexToRemove, setMarketIndexToRemove] = useState<number | null>(null);
-    const [constructionIndexToRemove, setConstructionIndexToRemove] = useState<number | null>(null);
-    const apartmentData: IApartmentWritable = convertApartmentDetailToWritable(apartment);
-    const [marketIndexImprovements, setMarketIndexImprovements] = useImmer<IWritableMarketImprovement[]>(
-        apartmentData.improvements.market_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
-    );
-    const [constructionIndexImprovements, setConstructionIndexImprovements] = useImmer<IWritableConsImprovement[]>(
-        apartmentData.improvements.construction_price_index.map((i) => ({key: uuidv4(), saved: true, ...i})) || []
-    );
+    const [patchApartment, {isLoading}] = usePatchApartmentMutation();
 
-    const handleSaveButtonClicked = () => {
-        const formData = {
-            ...apartmentData,
-            // Don't send empty improvements to the API
+    const initialFormData = {
+        market_price_index: apartment.improvements.market_price_index.map((i) => ({
+            key: uuidv4(),
+            saved: true,
+            ...i,
+        })),
+        construction_price_index: apartment.improvements.construction_price_index.map((i) => ({
+            key: uuidv4(),
+            saved: true,
+            ...i,
+        })),
+    };
+
+    const formRef = useRef<HTMLFormElement | null>(null);
+    const formObject = useForm({
+        resolver: zodResolver(ApartmentImprovementsFormSchema),
+        defaultValues: initialFormData,
+        mode: "all",
+    });
+
+    // Format and send data to the API
+    const onSubmit: SubmitHandler<IApartmentImprovementsForm> = (formData) => {
+        const formattedData = {
+            // Filter empty improvements away (no value entered)
             improvements: {
-                market_price_index: marketIndexImprovements.filter((i) => i.value) as IMarketPriceIndexImprovement[],
-                construction_price_index: constructionIndexImprovements
-                    .filter((i) => i.value)
-                    .map((i) => {
-                        return {...i, depreciation_percentage: parseFloat(`${i.depreciation_percentage}`)};
-                    }) as IApartmentConstructionPriceIndexImprovement[],
+                market_price_index: formData.market_price_index.filter((i) => i.name || i.value),
+                construction_price_index: formData.construction_price_index.filter((i) => i.name || i.value),
             },
         };
 
-        saveApartment({
-            data: formData,
-            id: apartment.id,
+        patchApartment({
             housingCompanyId: housingCompany.id,
-        });
+            id: apartment.id,
+            data: formattedData,
+        })
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Parannukset tallennettu onnistuneesti!");
+                navigate(-1); // get the user back to where they opened this view
+            })
+            .catch(() => hdsToast.error("Virhe tallentaessa parannuksia!"));
     };
-
-    // Market
-    const handleAddMarketImprovementLine = () => {
-        setMarketIndexImprovements((draft) => {
-            draft.push({
-                key: uuidv4(),
-                saved: false,
-                name: "",
-                value: null,
-                completion_date: "",
-                no_deductions: false,
-            });
-        });
-    };
-    const handleSetMarketImprovementLine = (index, fieldPath) => (value) => {
-        setMarketIndexImprovements((draft) => {
-            dotted(draft[index], fieldPath, value);
-        });
-    };
-    const handleConfirmedRemoveMarketImprovementLine = () => {
-        if (marketIndexToRemove !== null) {
-            setMarketIndexImprovements((draft) => {
-                draft.splice(marketIndexToRemove, 1);
-            });
-            setIsConfirmVisible(false);
-            setMarketIndexToRemove(null);
-        }
-    };
-
-    // Construction
-    const handleAddConstructionImprovementLine = () => {
-        setConstructionIndexImprovements((draft) => {
-            draft.push({
-                key: uuidv4(),
-                saved: false,
-                name: "",
-                value: null,
-                completion_date: "",
-                depreciation_percentage: 2.5,
-            });
-        });
-    };
-    const handleSetConstructionImprovementLine = (index, fieldPath) => (value) => {
-        setConstructionIndexImprovements((draft) => {
-            dotted(draft[index], fieldPath, value);
-        });
-    };
-    const handleConfirmedRemoveConstructionImprovementLine = () => {
-        if (constructionIndexToRemove !== null) {
-            setConstructionIndexImprovements((draft) => {
-                draft.splice(constructionIndexToRemove, 1);
-            });
-            setIsConfirmVisible(false);
-            setConstructionIndexToRemove(null);
-        }
-    };
-
-    // Handle confirm remove modal
-    useEffect(() => {
-        if (marketIndexToRemove !== null || constructionIndexToRemove !== null) {
-            setIsConfirmVisible(true);
-        }
-    }, [marketIndexToRemove, constructionIndexToRemove, setIsConfirmVisible]);
-
-    // Handle saving flow when editing
-    useEffect(() => {
-        if (!isLoading && !error && data && data.id) {
-            hitasToast("Parannukset tallennettu onnistuneesti!");
-            navigate(`/housing-companies/${data.links.housing_company.id}/apartments/${data.id}`);
-        } else if (error) {
-            hitasToast("Virhe tallentaessa parannuksia!", "error");
-        }
-    }, [isLoading, error, data, navigate]);
 
     return (
         <>
-            <div className="field-sets">
-                <ImprovementFieldSet
-                    fieldsetHeader="Markkinakustannusindeksillä laskettavat parannukset"
-                    improvements={marketIndexImprovements}
-                    handleAddImprovementLine={handleAddMarketImprovementLine}
-                    handleSetImprovementLine={handleSetMarketImprovementLine}
-                    setIndexToRemove={setMarketIndexToRemove}
-                    error={error}
-                    showNoDeductions={true}
-                />
-                <ImprovementFieldSet
-                    fieldsetHeader="Rakennuskustannusindeksillä laskettavat parannukset"
-                    improvements={constructionIndexImprovements}
-                    handleAddImprovementLine={handleAddConstructionImprovementLine}
-                    handleSetImprovementLine={handleSetConstructionImprovementLine}
-                    setIndexToRemove={setConstructionIndexToRemove}
-                    error={error}
-                    showNoDeductions={false}
-                />
-            </div>
-            <div className="row row--buttons">
-                <NavigateBackButton />
-                <SaveButton
-                    onClick={handleSaveButtonClicked}
-                    isLoading={isLoading}
-                />
-            </div>
-            <ConfirmDialogModal
-                isLoading={false}
-                modalText="Haluatko varmasti poistaa parannuksen?"
-                buttonText="Poista"
-                successText="Parannus poistettu"
-                isVisible={isConfirmVisible}
-                setIsVisible={setIsConfirmVisible}
-                confirmAction={
-                    marketIndexToRemove === null
-                        ? handleConfirmedRemoveConstructionImprovementLine
-                        : handleConfirmedRemoveMarketImprovementLine
-                }
-                cancelAction={() => setIsConfirmVisible(false)}
-            />
+            <form
+                ref={formRef}
+                // eslint-disable-next-line no-console
+                onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject.getValues(), errors))}
+            >
+                <FormProvider {...formObject}>
+                    <div className="field-sets">
+                        <ImprovementFieldSet
+                            fieldsetHeader="Markkinakustannusindeksillä laskettavat parannukset"
+                            name="market_price_index"
+                            showNoDeductions={true}
+                        />
+                        <ImprovementFieldSet
+                            fieldsetHeader="Rakennuskustannusindeksillä laskettavat parannukset"
+                            name="construction_price_index"
+                            showNoDeductions={false}
+                        />
+                    </div>
+
+                    <div className="row row--buttons">
+                        <NavigateBackButton />
+                        <SaveButton
+                            type="submit"
+                            isLoading={isLoading}
+                        />
+                    </div>
+                </FormProvider>
+            </form>
         </>
     );
 };

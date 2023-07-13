@@ -570,6 +570,22 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "HousingCompany", id: arg.housingCompanyId},
             ],
         }),
+        patchApartment: builder.mutation<
+            IApartmentDetails,
+            {housingCompanyId: string; id: string; data: Partial<IApartmentWritable>}
+        >({
+            query: ({data, id, housingCompanyId}) => ({
+                url: `housing-companies/${housingCompanyId}/apartments/${id}`,
+                method: "PATCH",
+                body: data,
+                headers: mutationApiJsonHeaders(),
+            }),
+            invalidatesTags: (result, error, arg) => [
+                {type: "Apartment", id: "LIST"},
+                {type: "Apartment", id: arg.id},
+                {type: "HousingCompany", id: arg.housingCompanyId},
+            ],
+        }),
         saveApartmentMaximumPrice: builder.mutation<
             IApartmentMaximumPriceCalculationDetails,
             {
@@ -828,6 +844,7 @@ export const {
     useSaveBuildingMutation,
     useDeleteBuildingMutation,
     useSaveApartmentMutation,
+    usePatchApartmentMutation,
     useDeleteApartmentMutation,
     useSaveOwnerMutation,
     useSavePropertyManagerMutation,
