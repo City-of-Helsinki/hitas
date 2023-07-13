@@ -26,10 +26,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 {housingCompany.name.display}
                 <div className="buttons">
                     <SalesCatalogImport />
-                    <EditButton
-                        state={{housingCompany: housingCompany}}
-                        disabled={housingCompany.regulation_status !== "regulated"}
-                    />
+                    <EditButton disabled={housingCompany.regulation_status !== "regulated"} />
                 </div>
             </Heading>
             <div className="company-status">
@@ -200,7 +197,6 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                             <span>Kiinteistöt</span>
                             <EditButton
                                 pathname="real-estates"
-                                state={{housingCompany: housingCompany}}
                                 disabled={housingCompany.regulation_status !== "regulated"}
                             />
                         </Heading>
@@ -222,7 +218,6 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                             <span>Rakennukset</span>
                             <EditButton
                                 pathname="buildings"
-                                state={{housingCompany: housingCompany}}
                                 disabled={housingCompany.regulation_status !== "regulated"}
                             />
                         </Heading>

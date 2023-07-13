@@ -3,14 +3,12 @@ import React from "react";
 import {Link} from "react-router-dom";
 
 interface EditButtonProps {
-    state?: object;
     pathname?: string;
     className?: string;
     disabled?: boolean;
 }
 
 export default function EditButton({
-    state,
     pathname = "edit",
     className,
     disabled = false,
@@ -18,7 +16,6 @@ export default function EditButton({
     return (
         <Link
             to={{pathname: pathname}}
-            state={state}
             className={className}
         >
             <Button
