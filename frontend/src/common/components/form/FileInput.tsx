@@ -7,15 +7,7 @@ interface FileInputProps extends FormInputProps {
     buttonLabel?: string;
     accept?: string;
 }
-const FileInput = ({
-    name,
-    id = name,
-    label = "",
-    required,
-    formObject,
-    onChange,
-    ...rest
-}: FileInputProps): React.JSX.Element => {
+const FileInput = ({name, label = "", required, formObject, onChange, ...rest}: FileInputProps): React.JSX.Element => {
     const {
         register,
         formState: {errors},
@@ -30,7 +22,7 @@ const FileInput = ({
     return (
         <div className="input-field--file">
             <HDSFileInput
-                id={id}
+                id={name}
                 label={label}
                 onChange={handleChange}
                 errorText={errors[name] && errors[name].message}

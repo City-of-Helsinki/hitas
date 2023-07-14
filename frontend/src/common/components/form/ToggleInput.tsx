@@ -2,7 +2,7 @@ import {ToggleButton} from "hds-react";
 
 import {FormInputProps} from "./";
 
-const ToggleInput = ({id, name, label, required, formObject, ...rest}: FormInputProps) => {
+const ToggleInput = ({name, label, required, formObject, ...rest}: FormInputProps) => {
     const {register} = formObject;
     const formToggle = register(name);
     const value = formObject.getValues(formToggle.name);
@@ -10,7 +10,7 @@ const ToggleInput = ({id, name, label, required, formObject, ...rest}: FormInput
     return (
         <div className={required ? "force-bold" : undefined}>
             <ToggleButton
-                id={id || name}
+                id={name}
                 label={`${label}${required ? " *" : ""}`}
                 checked={value}
                 ref={formToggle.ref}

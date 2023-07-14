@@ -10,7 +10,6 @@ import ToggleInput from "./ToggleInput";
 
 export type FormInputProps = {
     name: string;
-    id?: string;
     formObject?;
     label?: string;
     required?: boolean;

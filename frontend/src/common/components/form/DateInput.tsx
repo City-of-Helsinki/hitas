@@ -10,7 +10,7 @@ interface DateInputProps extends FormInputProps {
     minDate?: Date;
 }
 
-const DateInput = ({id, name, label, formObject, required, ...rest}: DateInputProps) => {
+const DateInput = ({name, label, formObject, required, ...rest}: DateInputProps) => {
     const hdsFormat = "d.M.yyyy";
     const apiFormat = "yyyy-MM-dd";
 
@@ -57,9 +57,9 @@ const DateInput = ({id, name, label, formObject, required, ...rest}: DateInputPr
     return (
         <div className={`input-field input-field--date${required ? " input-field--required" : ""}`}>
             <HDSDateInput
+                id={name}
                 language="fi"
                 disableConfirmation
-                id={id || name}
                 name={formDate.name}
                 label={label || ""}
                 onChange={handleOnChange}
