@@ -4,8 +4,9 @@ import {v4 as uuidv4} from "uuid";
 import {useGetOwnersQuery} from "../../app/services";
 import {IOwner, OwnershipsListSchema} from "../schemas";
 import {formatOwner} from "../utils";
-import {OwnerMutateForm, SimpleErrorMessage} from "./";
+import {SimpleErrorMessage} from "./";
 import {NumberInput, RelatedModelInput} from "./form";
+import {OwnerMutateForm} from "./mutateComponents";
 
 const OwnershipList = () => {
     const formObject = useFormContext();

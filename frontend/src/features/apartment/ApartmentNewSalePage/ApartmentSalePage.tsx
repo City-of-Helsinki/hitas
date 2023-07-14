@@ -9,7 +9,7 @@ import {useCreateSaleMutation} from "../../../app/services";
 import {ConfirmDialogModal, Heading, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
 import {IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "../components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/ApartmentViewContextProvider";
 import {ApartmentCatalogPricesFieldSet, ApartmentSaleFormFieldSet, MaximumPriceCalculationFieldSet} from "./fieldsets";
 import {ApartmentSaleContext, getRefinedApartmentSaleFormSchema, ISalesPageMaximumPrices} from "./utils";
 

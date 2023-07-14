@@ -14,7 +14,7 @@ export const ApartmentViewContext = createContext<{
     apartment: undefined as unknown as IApartmentDetails | undefined,
 });
 
-const ApartmentViewContextProvider = ({
+export const ApartmentViewContextProvider = ({
     viewClassName,
     children,
 }: {
@@ -65,5 +65,3 @@ const ApartmentViewContextProvider = ({
         </div>
     );
 };
-
-export default ApartmentViewContextProvider;

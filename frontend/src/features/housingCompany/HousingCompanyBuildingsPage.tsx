@@ -14,8 +14,9 @@ import {
 import CancelButton from "../../common/components/CancelButton";
 import {IBuilding, IBuildingWritable, IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
-import HousingCompanyViewContextProvider, {
+import {
     HousingCompanyViewContext,
+    HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
 const blankForm: IBuildingWritable = {

@@ -2,15 +2,16 @@ import {Button, IconPlus, StatusLabel, Tabs} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
-import {DetailField, EditButton, Heading, ImprovementsTable, MutateForm, MutateModal} from "../../common/components";
-import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents";
+import {DetailField, EditButton, Heading, ImprovementsTable} from "../../common/components";
+import {MutateForm, MutateModal, propertyManagerMutateFormProps} from "../../common/components/mutateComponents";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
 import {HousingCompanyApartmentResultsList} from "../apartment/ApartmentListPage";
 import {BatchCompleteApartmentsModal} from "./";
-import HousingCompanyViewContextProvider, {
+import {
     HousingCompanyViewContext,
+    HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 import SalesCatalogImport from "./components/SalesCatalogImport";
 

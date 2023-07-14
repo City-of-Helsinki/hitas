@@ -13,8 +13,9 @@ import {
 } from "../../common/components";
 import {IRealEstate} from "../../common/schemas";
 import {hitasToast} from "../../common/utils";
-import HousingCompanyViewContextProvider, {
+import {
     HousingCompanyViewContext,
+    HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
 const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {

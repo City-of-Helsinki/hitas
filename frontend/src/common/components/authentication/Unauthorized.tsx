@@ -1,6 +1,6 @@
 import {Link} from "hds-react";
 import React from "react";
-import useAuthentication from "../../app/useAuthentication";
+import useAuthentication from "../../../app/useAuthentication";
 
 export default function Unauthorized(): React.JSX.Element {
     const {signIn} = useAuthentication();

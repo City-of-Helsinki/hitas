@@ -49,7 +49,6 @@ export default function ExternalSalesDataImport({formDate}) {
         >
             <FileInput
                 name="file"
-                id="file-input"
                 buttonLabel="Valitse tiedosto"
                 formObject={formObject}
                 label="Postinumeroalueiden keskineliöhinnat *"

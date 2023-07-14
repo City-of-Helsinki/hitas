@@ -3,8 +3,7 @@ import {Navigate, Route, Routes} from "react-router-dom";
 import App from "./app/App";
 import {selectIsAuthenticated} from "./app/authSlice";
 import {useAppSelector} from "./app/hooks";
-import Logout from "./common/components/Logout";
-import Unauthorized from "./common/components/Unauthorized";
+import {Logout, Unauthorized} from "./common/components/authentication";
 import {
     ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
@@ -15,7 +14,7 @@ import {
     ApartmentNewSalePage,
 } from "./features/apartment";
 import {Codes} from "./features/codes";
-import Templates from "./features/documentTemplates/Templates";
+import {Templates} from "./features/documentTemplates";
 import {FunctionsPage} from "./features/functions";
 import {
     HousingCompanyBuildingsPage,
@@ -25,7 +24,7 @@ import {
     HousingCompanyListPage,
     HousingCompanyRealEstatesPage,
 } from "./features/housingCompany";
-import ReportsPage from "./features/reports/ReportsPage";
+import {ReportsPage} from "./features/reports";
 
 export default function Router() {
     const isAuthenticated = useAppSelector(selectIsAuthenticated);

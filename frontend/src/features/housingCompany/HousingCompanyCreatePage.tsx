@@ -22,8 +22,9 @@ import {
     IPropertyManager,
 } from "../../common/schemas";
 import {hdsToast, validateBusinessId} from "../../common/utils";
-import HousingCompanyViewContextProvider, {
+import {
     HousingCompanyViewContext,
+    HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
 const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
