@@ -4,11 +4,10 @@ import {FormInputProps} from "./";
 
 const CheckboxInput = ({
     name,
-    id = name,
     label,
     required,
     formObject,
-    triggerField,
+    triggerField, // Used to trigger validation of another field, in case validation is related to this checkbox
     ...rest
 }: FormInputProps & {triggerField?: string}) => {
     const {register} = formObject;
@@ -23,7 +22,7 @@ const CheckboxInput = ({
 
     return (
         <HDSCheckbox
-            id={id}
+            id={name}
             name={name}
             label={`${label}${required ? " *" : ""}`}
             checked={formObject.getValues(formCheckbox.name)}

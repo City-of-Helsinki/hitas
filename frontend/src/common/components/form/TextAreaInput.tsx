@@ -3,7 +3,7 @@ import {TextArea as HDSTextArea} from "hds-react";
 import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
-const TextAreaInput = ({name, id = name, label = "", required, invalid, formObject, ...rest}: FormInputProps) => {
+const TextAreaInput = ({name, label = "", required, invalid, formObject, ...rest}: FormInputProps) => {
     const {
         register,
         formState: {errors},
@@ -14,7 +14,7 @@ const TextAreaInput = ({name, id = name, label = "", required, invalid, formObje
     return (
         <div className={`input-field input-field--text ${required ? "input-field--required" : ""}`}>
             <HDSTextArea
-                id={id}
+                id={name}
                 name={formText.name}
                 label={label}
                 onChange={formText.onChange}
