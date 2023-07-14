@@ -121,8 +121,7 @@ const ImprovementsListHeaders = ({showNoDeductions, showDeprecationPercentage}) 
                         className="header__tooltip2"
                         placement="left-start"
                     >
-                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään indeksitarkistus. Käytetään
-                        ainoastaan vanhoissa Hitas säännöissä.
+                        Parannuksesta ei vähennetä omavastuu osuutta tai poistoja ja tehdään indeksitarkistus.
                     </Tooltip>
                 </>
             )}
