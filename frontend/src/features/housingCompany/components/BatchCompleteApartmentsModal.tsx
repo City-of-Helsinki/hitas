@@ -10,7 +10,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [batchComplete, {data, error, isLoading}] = useBatchCompleteApartmentsMutation();
-    const groupCompleteForm = useForm({
+    const batchCompleteForm = useForm({
         defaultValues: {
             start: null,
             end: null,
@@ -18,9 +18,9 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
         },
         mode: "all",
     });
-    const {handleSubmit} = groupCompleteForm;
-    const formStart = groupCompleteForm.watch("start");
-    const formEnd = groupCompleteForm.watch("end");
+    const {handleSubmit} = batchCompleteForm;
+    const formStart = batchCompleteForm.watch("start");
+    const formEnd = batchCompleteForm.watch("end");
 
     const onSubmit = (data: {start: number | null; end: number | null; completion_date: string}) => {
         const submitData = {
@@ -72,31 +72,35 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                         <p>Määritä asunnot, jotka haluat merkitä valmiiksi.</p>
                         <>
                             <p>
-                                Jos et halua rajata pelkkää alku- tai loppupäätä jätä kenttä tyhjäksi. Jos kumpikin
-                                kenttä on tyhjä valitaan kaikki yhtiön asunnot. Valinta koskee kaikkia rappuja.
+                                Rajaa asuntojen valmiiksi merkitsemistä asunnon numeron perusteella. Voit myös jättää
+                                kentän tyhjäksi, mikäli et halua rajata asuntoja alku- tai loppunumeron perusteella. Jos
+                                molemmat kentät jätetään tyhjäksi, kaikki yhtiön asunnot valitaan valmiiksi
+                                merkittäväksi. Asuntoja ei rajata asunnon rapun perusteella.
                             </p>
                             <div className="apartment-numbers">
                                 <div className={formStart ? "toggled" : undefined}>
                                     <NumberInput
                                         name="start"
-                                        label="Asuntonumero alku"
-                                        formObject={groupCompleteForm}
-                                        tooltipText="Jätä kenttä tyhjäksi, jos haluat merkitä valmiiksi kaikki asunnot ennen viimeistä huoneistonumeroa"
+                                        label="Ensimmäinen asuntonumero"
+                                        formObject={batchCompleteForm}
+                                        tooltipText="Rajaa pienimmän asunnon numeron joka valitaan valmiiksi merkittäväksi.
+                                        Mikäli kenttä jätetään tyhjäksi valitaan kaikki asunnot, joiden asuntonumero on pienempi tai yhtäsuuri kuin viimeinen valittu asuntonumero."
                                     />
                                 </div>
                                 <div className={formEnd ? "toggled" : undefined}>
                                     <NumberInput
                                         name="end"
-                                        label="Asuntonumero loppu"
-                                        formObject={groupCompleteForm}
-                                        tooltipText="Jätä kenttä tyhjäksi, jos haluat merkitä kaikki ensimmäisen valitun jälkeiset asunnot valmiiksi"
+                                        label="Viimeinen asuntonumero"
+                                        formObject={batchCompleteForm}
+                                        tooltipText="Rajaa suurimman asunnon numeron joka valitaan valmiiksi merkittäväksi.
+                                        Mikäli kenttä jätetään tyhjäksi valitaan kaikki asunnot, joiden asuntonumero on yhtäsuuri tai suurempi kuin ensimmäinen valittu asuntonumero."
                                     />
                                 </div>
                             </div>
                             <DateInput
                                 name="completion_date"
                                 label="Valmistumispäivä"
-                                formObject={groupCompleteForm}
+                                formObject={batchCompleteForm}
                                 maxDate={new Date()}
                                 defaultValue={new Date()}
                             />
