@@ -1,4 +1,4 @@
-import {Dialog} from "hds-react";
+import {Dialog, Table} from "hds-react";
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {useParams} from "react-router-dom";
@@ -8,31 +8,31 @@ import {FileInput} from "../../../common/components/form";
 import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
 import {hdsToast} from "../../../common/utils";
 
+const tableTheme = {
+    "--header-background-color": "var(--color-black-80)",
+};
+
 const SalesCatalogImport = () => {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-    const [fileValidationError, setFileValidationError] = useState<ErrorResponse>();
-    const [isFileValid, setisFileValid] = useState(false);
+    const [fileValidationError, setFileValidationError] = useState<ErrorResponse | undefined>();
+
     const params = useParams() as {readonly housingCompanyId: string};
+
     const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
         useValidateSalesCatalogMutation();
+
     const [createImportedApartments, {error: createError}] = useCreateFromSalesCatalogMutation();
+
     const handleCreateButton = () => {
         const importedApartments: object[] = [];
         validateData.apartments.forEach((apartment: ISalesCatalogApartment) => {
             importedApartments.push({
-                stair: apartment.stair,
-                floor: apartment.floor,
-                apartment_number: apartment.apartment_number,
-                rooms: apartment.rooms,
+                ...apartment,
                 apartment_type: (apartment.apartment_type as {id: string}).id,
-                surface_area: apartment.surface_area,
-                share_number_start: apartment.share_number_start,
-                share_number_end: apartment.share_number_end,
-                catalog_purchase_price: apartment.catalog_purchase_price,
-                catalog_primary_loan_amount: apartment.catalog_primary_loan_amount,
             });
         });
+
         createImportedApartments({
             data: importedApartments,
             housingCompanyId: params.housingCompanyId,
@@ -48,27 +48,27 @@ const SalesCatalogImport = () => {
                 console.warn(e, createError);
             });
     };
+
     const validateFile = (data) => {
-        setFileValidationError(undefined);
         validateSalesCatalog({
             data: data.salesCatalog,
             housingCompanyId: params.housingCompanyId,
         })
             .unwrap()
             .then(() => {
-                setisFileValid(true);
+                setFileValidationError(undefined);
             })
             // eslint-disable-next-line no-console
             .catch((e) => {
-                setisFileValid(false);
                 setFileValidationError(e.data);
             })
             .finally(() => {
                 setIsImportModalOpen(true);
             });
     };
+
     return (
-        <div>
+        <>
             <FileInput
                 buttonLabel="Lataa myyntihintaluettelo"
                 name="salesCatalog"
@@ -96,31 +96,31 @@ const SalesCatalogImport = () => {
                                 isLoading={isValidating}
                             >
                                 <div className="sales-catalog-import-list">
-                                    <div className="list-headers">
-                                        <div>Porras</div>
-                                        <div>Huoneisto</div>
-                                        <div>Kerros</div>
-                                        <div>Tyyppi</div>
-                                        <div>Pinta-ala</div>
-                                        <div>Osakenumerot</div>
-                                    </div>
-                                    {validateData && validateData?.apartments.length > 0 && (
-                                        <ul>
-                                            {validateData?.apartments.map((apartment: ISalesCatalogApartment) => (
-                                                <li key={apartment.row.toString()}>
-                                                    <div>{apartment.stair}</div>
-                                                    <div>{apartment.apartment_number}</div>
-                                                    <div>{apartment.floor}</div>
-                                                    <div>
-                                                        {apartment.rooms}{" "}
-                                                        {(apartment.apartment_type as {value: string}).value}
-                                                    </div>
-                                                    <div>{apartment.surface_area}</div>
-                                                    <div>{`${apartment.share_number_start} - ${apartment.share_number_end}`}</div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
+                                    <Table
+                                        id="sales-catalog-import-table"
+                                        cols={[
+                                            {key: "stair", headerName: "Porras"},
+                                            {key: "apartment_number", headerName: "Huoneisto"},
+                                            {key: "floor", headerName: "Kerros"},
+                                            {
+                                                key: "rooms",
+                                                headerName: "Tyyppi",
+                                                transform: (obj) => `${obj.rooms} ${obj.apartment_type.value}`,
+                                            },
+                                            {key: "surface_area", headerName: "Pinta-ala"},
+                                            {
+                                                key: "share_number_start",
+                                                headerName: "Osakenumerot",
+                                                transform: (obj) =>
+                                                    `${obj.share_number_start} - ${obj.share_number_end}`,
+                                            },
+                                        ]}
+                                        rows={validateData?.apartments}
+                                        indexKey="apartment_number"
+                                        dense
+                                        zebra
+                                        theme={tableTheme}
+                                    />
                                 </div>
                             </QueryStateHandler>
                         </>
@@ -150,7 +150,7 @@ const SalesCatalogImport = () => {
                 </Dialog.Content>
                 <Dialog.ActionButtons>
                     <CloseButton onClick={() => setIsImportModalOpen(false)} />
-                    {isFileValid && (
+                    {!fileValidationError && (
                         <SaveButton
                             onClick={() => handleCreateButton()}
                             buttonText="Luo asunnot"
@@ -158,7 +158,7 @@ const SalesCatalogImport = () => {
                     )}
                 </Dialog.ActionButtons>
             </Dialog>
-        </div>
+        </>
     );
 };
 
