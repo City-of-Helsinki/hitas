@@ -30,7 +30,7 @@ import {
     ICode,
 } from "../../common/schemas";
 import {hdsToast, isEmpty} from "../../common/utils";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const ApartmentDeleteButton = ({apartment}) => {
     const navigate = useNavigate();

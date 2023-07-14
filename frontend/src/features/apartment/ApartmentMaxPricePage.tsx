@@ -13,7 +13,7 @@ import {
 } from "../../common/schemas";
 import {today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const MaximumPriceModalError = ({error, setIsModalVisible}): React.JSX.Element => {
     const nonFieldError = ((error as FetchBaseQueryError)?.data as {message?: string})?.message || "";

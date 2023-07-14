@@ -2,7 +2,7 @@ import {useContext} from "react";
 
 import {NavigateBackButton} from "../../common/components";
 import {GenericImprovementsPage} from "../../common/components/improvements";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const LoadedApartmentImprovementsPage = () => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);

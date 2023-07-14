@@ -5,7 +5,8 @@ import {useImmer} from "use-immer";
 
 import {useForm} from "react-hook-form";
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {FilterTextInputField, QueryStateHandler, SaveButton} from "../../common/components";
+import {QueryStateHandler, SaveButton} from "../../common/components";
+import {FilterTextInputField} from "../../common/components/filters";
 import {NumberInput, TextInput} from "../../common/components/form";
 import {IIndex} from "../../common/schemas";
 import {hdsToast} from "../../common/utils";

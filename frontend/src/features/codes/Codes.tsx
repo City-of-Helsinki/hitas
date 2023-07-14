@@ -1,11 +1,13 @@
 import {Tabs} from "hds-react";
 import React from "react";
 import {useGetDevelopersQuery, useGetOwnersQuery, useGetPropertyManagersQuery} from "../../app/services";
-import {MutateForm, MutateSearchList, OwnerMutateForm} from "../../common/components";
 import {
     developerMutateFormProps,
+    MutateForm,
+    MutateSearchList,
+    OwnerMutateForm,
     propertyManagerMutateFormProps,
-} from "../../common/components/mutateComponents/mutateFormProps";
+} from "../../common/components/mutateComponents";
 import {IndicesList} from "./";
 
 const Codes = (): React.JSX.Element => {

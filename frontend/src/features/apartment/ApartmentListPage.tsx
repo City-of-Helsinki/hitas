@@ -3,15 +3,13 @@ import React, {useState} from "react";
 import {IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 import {useGetApartmentsQuery, useGetHousingCompanyApartmentsQuery} from "../../app/services";
+import {Heading, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {
+    FilterCheckboxField,
     FilterIntegerField,
     FilterSelectField,
     FilterTextInputField,
-    Heading,
-    ListPageNumbers,
-    QueryStateHandler,
-} from "../../common/components";
-import FilterCheckboxField from "../../common/components/FilterCheckboxField";
+} from "../../common/components/filters";
 import {getApartmentSoldStatusLabel} from "../../common/localisation";
 import {IApartment, IApartmentListResponse} from "../../common/schemas";
 import {formatDate} from "../../common/utils";

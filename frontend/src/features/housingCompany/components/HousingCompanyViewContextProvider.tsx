@@ -11,7 +11,7 @@ export const HousingCompanyViewContext = createContext<{
     housingCompany: undefined as unknown as IHousingCompanyDetails | undefined,
 });
 
-const HousingCompanyViewContextProvider = ({
+export const HousingCompanyViewContextProvider = ({
     viewClassName,
     children,
 }: {
@@ -42,5 +42,3 @@ const HousingCompanyViewContextProvider = ({
         </div>
     );
 };
-
-export default HousingCompanyViewContextProvider;

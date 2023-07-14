@@ -34,7 +34,7 @@ import {
 } from "../../common/components";
 import {IApartmentConditionOfSale, IConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const OwnersList = ({formOwnerList, setFormOwnerList}) => {
     const handleAddOwnerLine = () => {

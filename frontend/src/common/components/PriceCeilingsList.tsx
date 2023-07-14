@@ -2,7 +2,8 @@ import {useState} from "react";
 import {useGetIndicesQuery} from "../../app/services";
 import {getHitasQuarter} from "../utils";
 import DownloadButton from "./DownloadButton";
-import {Divider, FilterTextInputField, QueryStateHandler} from "./index";
+import {FilterTextInputField} from "./filters";
+import {Divider, QueryStateHandler} from "./index";
 
 const LoadedPriceCeilingPerSquareResultsList = ({data, callbackFn}) => {
     return (

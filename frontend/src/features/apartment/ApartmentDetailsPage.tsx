@@ -7,17 +7,14 @@ import {
     downloadApartmentUnconfirmedMaximumPricePDF,
     useDeleteSaleMutation,
 } from "../../app/services";
+import {DetailField, Divider, ImprovementsTable, RemoveButton} from "../../common/components";
+import {DateInput, TextAreaInput} from "../../common/components/form";
 import {
-    DetailField,
-    Divider,
-    ImprovementsTable,
     MutateForm,
     MutateModal,
     OwnerMutateForm,
-    RemoveButton,
-} from "../../common/components";
-import {DateInput, TextAreaInput} from "../../common/components/form";
-import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
+    propertyManagerMutateFormProps,
+} from "../../common/components/mutateComponents";
 import {
     IApartmentConditionOfSale,
     IApartmentConfirmedMaximumPrice,
@@ -36,7 +33,7 @@ import {
     hdsToast,
     today,
 } from "../../common/utils";
-import ApartmentViewContextProvider, {ApartmentViewContext} from "./components/ApartmentViewContextProvider";
+import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {

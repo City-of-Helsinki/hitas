@@ -1,8 +1,9 @@
 import {useContext} from "react";
 
 import {GenericImprovementsPage} from "../../common/components/improvements";
-import HousingCompanyViewContextProvider, {
+import {
     HousingCompanyViewContext,
+    HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
 const LoadedHousingCompanyImprovementsPage = () => {
