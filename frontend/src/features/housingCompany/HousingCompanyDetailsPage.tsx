@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
 import {DetailField, EditButton, Heading, ImprovementsTable, MutateForm, MutateModal} from "../../common/components";
-import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents/mutateFormProps";
+import {propertyManagerMutateFormProps} from "../../common/components/mutateComponents";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
