@@ -6,15 +6,15 @@ import {EditButton, Heading} from "./index";
 interface ImprovementsTableProps {
     data: IApartmentDetails | IHousingCompanyDetails;
     title: string;
-    editableType?: "apartment" | "housingCompany";
+    isEditable?: boolean;
     editPath?: string;
 }
 
 export default function ImprovementsTable({
     data,
     title,
-    editableType,
-    editPath,
+    isEditable = false,
+    editPath = "improvements",
 }: ImprovementsTableProps): React.JSX.Element {
     // Detect if this is an apartment to know when to show depreciation column
     const isApartment = "links" in data;
@@ -23,13 +23,14 @@ export default function ImprovementsTable({
         <div className="list__wrapper list-wrapper--improvements">
             <Heading type="list">
                 <span>{title}</span>
-                {editableType !== undefined && (
+                {isEditable ? (
                     <EditButton
-                        pathname={editPath || "improvements"}
+                        pathname={editPath}
                         className="pull-right"
                     />
-                )}
+                ) : null}
             </Heading>
+
             <ul className="detail-list__list detail-list__list--improvements">
                 {data.improvements.market_price_index.length || data.improvements.construction_price_index.length ? (
                     <>
