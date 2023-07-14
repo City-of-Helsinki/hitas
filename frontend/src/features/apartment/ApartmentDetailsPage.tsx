@@ -710,14 +710,14 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                         <ImprovementsTable
                             data={apartment}
                             title="Asuntokohtaiset parannukset"
-                            editableType={housingCompany.regulation_status === "regulated" ? "apartment" : undefined}
+                            isEditable={housingCompany.regulation_status === "regulated"}
                         />
                     ) : null
                 }
                 <ImprovementsTable
                     data={housingCompany}
                     title="Yhtiökohtaiset parannukset"
-                    editableType={housingCompany.regulation_status === "regulated" ? "housingCompany" : undefined}
+                    isEditable={housingCompany.regulation_status === "regulated"}
                     editPath={`/housing-companies/${housingCompany.id}/improvements`}
                 />
             </div>

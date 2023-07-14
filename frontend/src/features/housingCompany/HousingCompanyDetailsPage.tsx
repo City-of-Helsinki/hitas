@@ -189,7 +189,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 <ImprovementsTable
                     data={housingCompany}
                     title="Yhtiökohtaiset parannukset"
-                    editableType={housingCompany.regulation_status === "regulated" ? "housingCompany" : undefined}
+                    isEditable={housingCompany.regulation_status === "regulated"}
                 />
                 <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                     <div className="list-wrapper list-wrapper--real-estates">

@@ -45,7 +45,7 @@ const BreakdownValue = ({label, value, unit = "€"}: {label: string; value: num
     </div>
 );
 
-const ImprovementsTable = ({heading, cols, improvements}) => {
+const MaximumPriceCalculationImprovementsTable = ({heading, cols, improvements}) => {
     if (!improvements.items.length) return null;
 
     const getImprovements = (improvements): object[] => {
@@ -172,7 +172,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 size="s"
                 heading="Huoneistokohtaiset parannukset"
             >
-                <ImprovementsTable
+                <MaximumPriceCalculationImprovementsTable
                     heading=""
                     cols={[
                         {key: "name", headerName: "name"},
@@ -200,7 +200,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
                 size="s"
                 heading="Huoneiston osuus yhtiön parannuksista"
             >
-                <ImprovementsTable
+                <MaximumPriceCalculationImprovementsTable
                     heading=""
                     cols={[
                         {key: "name", headerName: "name"},
@@ -291,7 +291,7 @@ const ConstructionPricePre2011Breakdown = ({
                 size="s"
                 heading="Huoneistokohtaiset parannukset"
             >
-                <ImprovementsTable
+                <MaximumPriceCalculationImprovementsTable
                     heading=""
                     cols={[
                         {key: "name", headerName: "name"},
@@ -323,7 +323,7 @@ const ConstructionPricePre2011Breakdown = ({
                 size="s"
                 heading="Huoneiston osuus yhtiön parannuksista"
             >
-                <ImprovementsTable
+                <MaximumPriceCalculationImprovementsTable
                     heading=""
                     cols={[
                         {key: "name", headerName: "name"},
