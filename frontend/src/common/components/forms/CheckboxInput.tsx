@@ -1,15 +1,16 @@
 import {Checkbox as HDSCheckbox} from "hds-react";
 
+import {useFormContext} from "react-hook-form";
 import {FormInputProps} from "./";
 
 const CheckboxInput = ({
     name,
     label,
     required,
-    formObject,
     triggerField, // Used to trigger validation of another field, in case validation is related to this checkbox
     ...rest
 }: FormInputProps & {triggerField?: string}) => {
+    const formObject = useFormContext();
     const {register} = formObject;
     const formCheckbox = register(name);
 

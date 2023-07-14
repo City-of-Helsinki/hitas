@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 
 import {Button, Dialog, IconPlus, Select} from "hds-react";
 import {useImmer} from "use-immer";
@@ -7,7 +7,7 @@ import {useForm} from "react-hook-form";
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
 import {QueryStateHandler, SaveButton} from "../../common/components";
 import {FilterTextInputField} from "../../common/components/filters";
-import {NumberInput, TextInput} from "../../common/components/form";
+import {FormProviderForm, NumberInput, TextInput} from "../../common/components/forms";
 import {IIndex} from "../../common/schemas";
 import {hdsToast} from "../../common/utils";
 
@@ -148,11 +148,17 @@ const IndicesList = (): React.JSX.Element => {
 
 const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
     const [saveIndex, {data, error, isLoading}] = useSaveIndexMutation();
-    const editIndexForm = useForm({
+
+    const formRef = useRef<HTMLFormElement>(null);
+    const formObject = useForm({
         defaultValues: formData,
         mode: "all",
     });
-    const {handleSubmit} = editIndexForm;
+
+    const handleConfirmButtonClick = () => {
+        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
+    };
+
     const handleSaveIndex = () => {
         saveIndex({
             data: formData,
@@ -165,7 +171,7 @@ const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
         if (isLoading || !data) return;
         if (data && !error) {
             hdsToast.success("Indeksi tallennettu onnistuneesti");
-            editIndexForm.reset();
+            formObject.reset();
             closeModal();
         } else {
             hdsToast.error("Indeksin tallennus epäonnistui");
@@ -186,12 +192,15 @@ const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
                 id="index-creation-header"
                 title={`Tallenna ${indexType.label}`}
             />
-            <form onSubmit={handleSubmit(handleSaveIndex)}>
-                <Dialog.Content>
+            <Dialog.Content>
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={handleSaveIndex}
+                >
                     <TextInput
                         label="Kuukausi (VVVV-KK)"
                         name="month"
-                        formObject={editIndexForm}
                         tooltipText="Esim 2022-12"
                         required
                     />
@@ -199,24 +208,23 @@ const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
                         label="Arvo"
                         allowDecimals={true}
                         name="value"
-                        formObject={editIndexForm}
                         required
                     />
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <Button
-                        onClick={() => closeModal()}
-                        theme="black"
-                        variant="secondary"
-                    >
-                        Peruuta
-                    </Button>
-                    <SaveButton
-                        type="submit"
-                        isLoading={isLoading}
-                    />
-                </Dialog.ActionButtons>
-            </form>
+                </FormProviderForm>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={() => closeModal()}
+                    theme="black"
+                    variant="secondary"
+                >
+                    Peruuta
+                </Button>
+                <SaveButton
+                    onClick={handleConfirmButtonClick}
+                    isLoading={isLoading}
+                />
+            </Dialog.ActionButtons>
         </Dialog>
     );
 };

@@ -3,7 +3,7 @@ import {Button, IconArrowLeft} from "hds-react";
 import {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {hdsToast} from "../../utils";
-import {TextInput} from "../form";
+import {FormProviderForm, TextInput} from "../forms";
 import SaveButton from "../SaveButton";
 
 export interface IMutateFormProps<TFormFieldsWithTitles extends object> {
@@ -86,40 +86,34 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
     };
 
     return (
-        <>
-            <form
-                onSubmit={
-                    formObject.formState.isDirty
-                        ? formObject.handleSubmit(onFormSubmitValid)
-                        : formObject.handleSubmit(onFormSubmitUnchanged)
-                }
-            >
-                {formFieldsWithTitles &&
-                    Object.entries(formFieldsWithTitles).map(([field, title]) => (
-                        <TextInput
-                            key={field}
-                            name={field}
-                            label={title}
-                            formObject={formObject}
-                            required={requiredFields?.includes(field)}
-                        />
-                    ))}
-                <div className="row row--buttons">
-                    <Button
-                        theme="black"
-                        iconLeft={<IconArrowLeft />}
-                        onClick={close}
-                    >
-                        Peruuta
-                    </Button>
-                    <SaveButton
-                        isLoading={isLoading}
-                        type="submit"
-                        buttonText="Tallenna"
-                        disabled={!formObject.formState.isValid}
+        <FormProviderForm
+            formObject={formObject}
+            onSubmit={formObject.formState.isDirty ? onFormSubmitValid : onFormSubmitUnchanged}
+        >
+            {formFieldsWithTitles &&
+                Object.entries(formFieldsWithTitles).map(([field, title]) => (
+                    <TextInput
+                        key={field}
+                        name={field}
+                        label={title}
+                        required={requiredFields?.includes(field)}
                     />
-                </div>
-            </form>
-        </>
+                ))}
+            <div className="row row--buttons">
+                <Button
+                    theme="black"
+                    iconLeft={<IconArrowLeft />}
+                    onClick={close}
+                >
+                    Peruuta
+                </Button>
+                <SaveButton
+                    isLoading={isLoading}
+                    type="submit"
+                    buttonText="Tallenna"
+                    disabled={!formObject.formState.isValid}
+                />
+            </div>
+        </FormProviderForm>
     );
 }

@@ -5,7 +5,7 @@ import {useGetOwnersQuery} from "../../app/services";
 import {IOwner, OwnershipsListSchema} from "../schemas";
 import {formatOwner} from "../utils";
 import {SimpleErrorMessage} from "./";
-import {NumberInput, RelatedModelInput} from "./form";
+import {NumberInput, RelatedModelInput} from "./forms";
 import {OwnerMutateForm} from "./mutateComponents";
 
 const OwnershipList = () => {
@@ -45,7 +45,6 @@ const OwnershipList = () => {
                                     required
                                     queryFunction={useGetOwnersQuery}
                                     relatedModelSearchField="name"
-                                    formObject={formObject}
                                     formObjectFieldPath={`ownerships.${index}.owner`}
                                     formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
                                     RelatedModelMutateComponent={OwnerMutateForm}
@@ -55,7 +54,6 @@ const OwnershipList = () => {
                                 <NumberInput
                                     name={`ownerships.${index}.percentage`}
                                     allowDecimals
-                                    formObject={formObject}
                                     required
                                 />
                                 <span>%</span>

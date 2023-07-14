@@ -20,7 +20,8 @@ import {
     SelectInput,
     TextAreaInput,
     TextInput,
-} from "../../common/components/form";
+} from "../../common/components/forms";
+import FormProviderForm from "../../common/components/forms/FormProviderForm";
 import {
     ApartmentWritableFormSchema,
     errorMessages,
@@ -164,7 +165,7 @@ const LoadedApartmentCreatePage = () => {
 
     // Form
     const initialFormData: IApartmentWritableForm = getInitialFormData(apartment, buildingOptions);
-    const formRef = useRef<HTMLFormElement | null>(null);
+    const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm<IApartmentWritableForm>({
         defaultValues: initialFormData,
         mode: "onBlur",
@@ -306,10 +307,10 @@ const LoadedApartmentCreatePage = () => {
 
     return (
         <>
-            <form
-                ref={formRef}
-                // eslint-disable-next-line no-console
-                onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject, errors))}
+            <FormProviderForm
+                formObject={formObject}
+                formRef={formRef}
+                onSubmit={onSubmit}
             >
                 <div className="field-sets">
                     <Fieldset heading="">
@@ -322,7 +323,6 @@ const LoadedApartmentCreatePage = () => {
                                     label: initialFormData.building.label || "",
                                     value: initialFormData.building.value || "",
                                 }}
-                                formObject={formObject}
                                 required
                             />
                         </div>
@@ -330,13 +330,11 @@ const LoadedApartmentCreatePage = () => {
                             <TextInput
                                 name="address.stair"
                                 label="Rappu"
-                                formObject={formObject}
                                 required
                             />
                             <NumberInput
                                 name="address.apartment_number"
                                 label="Asunnon numero"
-                                formObject={formObject}
                                 required
                             />
                         </div>
@@ -344,12 +342,10 @@ const LoadedApartmentCreatePage = () => {
                             <NumberInput
                                 name="address.floor"
                                 label="Kerros"
-                                formObject={formObject}
                             />
                             <NumberInput
                                 name="surface_area"
                                 label="Pinta-ala"
-                                formObject={formObject}
                                 allowDecimals
                                 unit="m²"
                             />
@@ -358,13 +354,11 @@ const LoadedApartmentCreatePage = () => {
                             <NumberInput
                                 name="rooms"
                                 label="Huoneiden määrä"
-                                formObject={formObject}
                             />
                             <RelatedModelInput
                                 label="Asuntotyyppi"
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
-                                formObject={formObject}
                                 formObjectFieldPath="type"
                                 formatFormObjectValue={(obj: ICode) => (obj?.id ? obj.value : "")}
                             />
@@ -373,7 +367,6 @@ const LoadedApartmentCreatePage = () => {
                             <DateInput
                                 label="Valmistumispäivä"
                                 name="completion_date"
-                                formObject={formObject}
                             />
                             <div />
                         </div>
@@ -383,12 +376,10 @@ const LoadedApartmentCreatePage = () => {
                             <NumberInput
                                 name="shares.start"
                                 label="Osakkeet, alku"
-                                formObject={formObject}
                             />
                             <NumberInput
                                 name="shares.end"
                                 label="Osakkeet, loppu"
-                                formObject={formObject}
                             />
                         </div>
                         <div className="row">
@@ -397,21 +388,18 @@ const LoadedApartmentCreatePage = () => {
                                 label="Rakennusaikaiset lainat"
                                 unit="€"
                                 allowDecimals
-                                formObject={formObject}
                             />
                             <NumberInput
                                 name="prices.construction.interest.rate_6"
                                 label="Rak.aik. korko (6%)"
                                 unit="€"
                                 allowDecimals
-                                formObject={formObject}
                             />
                             <NumberInput
                                 name="prices.construction.interest.rate_14"
                                 label="Rak.aik. korko (14%)"
                                 unit="€"
                                 allowDecimals
-                                formObject={formObject}
                             />
                         </div>
                         <div className="row">
@@ -420,7 +408,6 @@ const LoadedApartmentCreatePage = () => {
                                 label="Rakennusaikaiset lisätyöt"
                                 unit="€"
                                 allowDecimals
-                                formObject={formObject}
                             />
                             {apartment?.prices?.construction.debt_free_purchase_price ? (
                                 <NumberInput
@@ -428,7 +415,6 @@ const LoadedApartmentCreatePage = () => {
                                     label="Luovutushinta (RA)"
                                     unit="€"
                                     allowDecimals
-                                    formObject={formObject}
                                 />
                             ) : (
                                 <div />
@@ -438,12 +424,11 @@ const LoadedApartmentCreatePage = () => {
                             <TextAreaInput
                                 name="notes"
                                 label="Muistiinpanot"
-                                formObject={formObject}
                             />
                         </div>
                     </Fieldset>
                 </div>
-            </form>
+            </FormProviderForm>
             <div className="row row--buttons">
                 <NavigateBackButton />
                 {isEditPage && <ApartmentDeleteButton apartment={apartment} />}

@@ -2,25 +2,19 @@ import React, {useState} from "react";
 
 import {Button, Dialog, IconCrossCircle, IconPlus, IconSearch, Table, TextInput} from "hds-react";
 
+import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
 import {QueryStateHandler} from "../index";
 
 type IRelatedModelMutateComponent = React.FC<{
-    formObject;
     formObjectFieldPath: string;
     cancelButtonAction: () => void;
     closeModalAction: () => void;
 }>;
 
-const RelatedModelTextInput = ({
-    label,
-    required,
-    disabled,
-    formObject,
-    formObjectFieldPath,
-    formatFormObjectValue,
-    openModal,
-}) => {
+const RelatedModelTextInput = ({label, required, disabled, formObjectFieldPath, formatFormObjectValue, openModal}) => {
+    const formObject = useFormContext();
+
     const fieldValue = formObject.getValues(formObjectFieldPath);
     const isFieldClearable = !required && fieldValue;
     const errors = formObject.formState.errors;
@@ -57,11 +51,10 @@ const RelatedModelTextInput = ({
     );
 };
 
-interface IRelatedModelInputProps {
+interface RelatedModelModalProps {
     label?: string;
     queryFunction;
     relatedModelSearchField: string;
-    formObject;
     formObjectFieldPath: string;
     formatFormObjectValue: (unknown) => string;
     isModalOpen: boolean;
@@ -74,13 +67,14 @@ const RelatedModelModal = ({
     label,
     queryFunction,
     relatedModelSearchField,
-    formObject,
     formObjectFieldPath,
     formatFormObjectValue,
     isModalOpen,
     closeModal,
     RelatedModelMutateComponent,
-}: IRelatedModelInputProps) => {
+}: RelatedModelModalProps) => {
+    const formObject = useFormContext();
+
     const MIN_LENGTH = 2; // Minimum length before applying filter
     const [internalFilterValue, setInternalFilterValue] = useState("");
     const [isRelatedModelMutateVisible, setIsRelatedModelMutateVisible] = useState(false);
@@ -135,7 +129,6 @@ const RelatedModelModal = ({
                 <div className="input-field--related-model--modal--content">
                     {isRelatedModelMutateVisible && RelatedModelMutateComponent ? (
                         <RelatedModelMutateComponent
-                            formObject={formObject}
                             formObjectFieldPath={formObjectFieldPath}
                             cancelButtonAction={() => setIsRelatedModelMutateVisible(false)}
                             closeModalAction={() => closeModal()}
@@ -198,7 +191,6 @@ interface RelatedModelInputProps {
     queryFunction;
     relatedModelSearchField: string;
 
-    formObject?;
     formObjectFieldPath: string;
     formatFormObjectValue: (unknown) => string;
 
@@ -217,12 +209,12 @@ const RelatedModelInput = ({
     queryFunction,
     relatedModelSearchField,
 
-    formObject,
     formObjectFieldPath,
     formatFormObjectValue,
 
     RelatedModelMutateComponent,
 }: RelatedModelInputProps) => {
+    const formObject = useFormContext();
     formObject.register(formObjectFieldPath);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -235,14 +227,12 @@ const RelatedModelInput = ({
                 label={label}
                 required={required}
                 disabled={disabled}
-                formObject={formObject}
                 formObjectFieldPath={formObjectFieldPath}
                 formatFormObjectValue={formatFormObjectValue}
                 openModal={openModal}
             />
             <RelatedModelModal
                 label={label}
-                formObject={formObject}
                 formObjectFieldPath={formObjectFieldPath}
                 queryFunction={queryFunction}
                 relatedModelSearchField={relatedModelSearchField}

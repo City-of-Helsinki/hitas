@@ -8,7 +8,7 @@ import {
     useDeleteSaleMutation,
 } from "../../app/services";
 import {DetailField, Divider, ImprovementsTable, RemoveButton} from "../../common/components";
-import {DateInput, TextAreaInput} from "../../common/components/form";
+import {DateInput, FormProviderForm, TextAreaInput} from "../../common/components/forms";
 import {
     MutateForm,
     MutateModal,
@@ -207,19 +207,20 @@ interface DownloadModalProps {
 
 const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const downloadForm = useForm({
+    const formObject = useForm({
         defaultValues: {calculation_date: today(), request_date: today(), additional_info: ""},
     });
-    const {handleSubmit} = downloadForm;
+
     const handleDownloadButtonClick = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
+
     const onSubmit = () => {
         downloadApartmentUnconfirmedMaximumPricePDF(
             apartment,
-            downloadForm.getValues("request_date"),
-            downloadForm.getValues("additional_info"),
-            downloadForm.getValues("calculation_date")
+            formObject.getValues("request_date"),
+            formObject.getValues("additional_info"),
+            formObject.getValues("calculation_date")
         );
         setIsVisible(false);
     };
@@ -238,14 +239,14 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
                 title="Lataa enimmäishinta-arvio"
             />
             <Dialog.Content>
-                <form
-                    ref={formRef}
-                    onSubmit={handleSubmit(onSubmit)}
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={onSubmit}
                 >
                     <DateInput
                         name="calculation_date"
                         label="Hinta-arvion päivämäärä"
-                        formObject={downloadForm}
                         maxDate={new Date()}
                         tooltipText="Päivämäärä jolle hinta-arvio lasketaan."
                         required
@@ -253,18 +254,16 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
                     <TextAreaInput
                         name="additional_info"
                         label="Lisätietoja"
-                        formObject={downloadForm}
                         tooltipText="Lisätietokenttään kirjoitetaan jos laskelmassa on jotain erityistä mitä osakkaan on syytä tietää. Kentän teksti lisätään hinta-arviotulosteeseen."
                     />
                     <DateInput
                         name="request_date"
                         label="Pyynnön vastaanottamispäivä"
-                        formObject={downloadForm}
                         maxDate={new Date()}
                         tooltipText="Päivämäärä jolloin hinta-arvio pyyntö on vastaanotettu."
                         required
                     />
-                </form>
+                </FormProviderForm>
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
@@ -290,15 +289,14 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
 
 const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
     const formRef = useRef<HTMLFormElement>(null);
-    const downloadForm = useForm({
+    const formObject = useForm({
         defaultValues: {request_date: today(), additional_info: ""},
     });
-    const {handleSubmit} = downloadForm;
     const handleDownloadButtonClick = () => {
         formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
     };
     const onSubmit = () => {
-        downloadApartmentMaximumPricePDF(apartment, downloadForm.getValues("request_date"));
+        downloadApartmentMaximumPricePDF(apartment, formObject.getValues("request_date"));
         setIsVisible(false);
     };
 
@@ -316,19 +314,19 @@ const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: Downloa
                 title="Lataa enimmäishintalaskelma"
             />
             <Dialog.Content>
-                <form
-                    ref={formRef}
-                    onSubmit={handleSubmit(onSubmit)}
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={onSubmit}
                 >
                     <DateInput
                         name="request_date"
                         label="Pyynnön vastaanottamispäivä"
-                        formObject={downloadForm}
                         maxDate={new Date()}
                         tooltipText="Päivämäärä, jolloin enimmäishintalaskelma pyyntö on vastaanotettu."
                         required
                     />
-                </form>
+                </FormProviderForm>
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button

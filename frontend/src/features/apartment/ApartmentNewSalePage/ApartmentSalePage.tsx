@@ -1,12 +1,13 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Fieldset} from "hds-react";
 import {useContext, useEffect, useRef, useState} from "react";
-import {FormProvider, useForm} from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
 import {z, ZodSchema} from "zod";
 import {useCreateSaleMutation} from "../../../app/services";
 import {ConfirmDialogModal, Heading, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
+import {FormProviderForm} from "../../../common/components/forms";
 import {IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
 import {hdsToast, today} from "../../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/ApartmentViewContextProvider";
@@ -69,14 +70,14 @@ const LoadedApartmentSalePage = () => {
         return zodResolver(RefinedApartmentSaleSchema)(data, context, {...options, mode: "sync"});
     };
 
-    const saleForm = useForm({
+    const formObject = useForm({
         resolver: resolver,
         defaultValues: initialFormData,
         mode: "all",
     });
 
     // We need a reference to the form-element to be able to dispatch a submit event dynamically
-    const formRef = useRef<HTMLFormElement | null>(null);
+    const formRef = useRef<HTMLFormElement>(null);
 
     const handleSaveButtonClick = () => {
         // Dispatch submit event, as the "Tallenna"-button isn't inside the sale form element
@@ -85,12 +86,12 @@ const LoadedApartmentSalePage = () => {
 
     useEffect(() => {
         // Re-validate form due to maximum prices changing to get rid of errors
-        if (maximumPrices.maximumPrice !== null && saleForm.getValues("purchase_price")) {
-            saleForm.trigger();
+        if (maximumPrices.maximumPrice !== null && formObject.getValues("purchase_price")) {
+            formObject.trigger();
         }
         // If purchase_price didn't have a value, clear only loan share errors in case there are any
-        else if (saleForm.getValues("apartment_share_of_housing_company_loans") !== null) {
-            saleForm.trigger("apartment_share_of_housing_company_loans");
+        else if (formObject.getValues("apartment_share_of_housing_company_loans") !== null) {
+            formObject.trigger("apartment_share_of_housing_company_loans");
         }
     }, [maximumPrices]);
 
@@ -142,7 +143,7 @@ const LoadedApartmentSalePage = () => {
     // Sale form was submitted without any errors
     const onSaleFormSubmitValid = () => {
         // Proceed to creating the sale.
-        createApartmentSale(saleForm.getValues(), apartment);
+        createApartmentSale(formObject.getValues(), apartment);
     };
 
     // ***********************
@@ -170,7 +171,7 @@ const LoadedApartmentSalePage = () => {
             .catch((error) => {
                 hdsToast.error("Kaupan tallentaminen epäonnistui!");
                 error.data.fields.forEach((field) =>
-                    saleForm.setError(field.field, {type: "custom", message: field.message})
+                    formObject.setError(field.field, {type: "custom", message: field.message})
                 );
             });
     };
@@ -179,8 +180,8 @@ const LoadedApartmentSalePage = () => {
     // * Extra form validation *
     // *************************
 
-    // saleForm can not be trusted to always validate everything and have the errors, so force a parse on every render
-    const extraValidationResult = RefinedApartmentSaleSchema.safeParse(saleForm.getValues());
+    // formObject can not be trusted to always validate everything and have the errors, so force a parse on every render
+    const extraValidationResult = RefinedApartmentSaleSchema.safeParse(formObject.getValues());
     let formExtraFieldErrorMessages;
     if (!extraValidationResult.success) {
         formExtraFieldErrorMessages = extraValidationResult.error.flatten().fieldErrors;
@@ -194,11 +195,13 @@ const LoadedApartmentSalePage = () => {
             <div className="view--apartment-sales">
                 <div className="fieldsets">
                     <ApartmentSaleContext.Provider value={{apartment, formExtraFieldErrorMessages, setMaximumPrices}}>
-                        <FormProvider {...saleForm}>
-                            <ApartmentSaleFormFieldSet
-                                formRef={formRef}
-                                onSubmit={saleForm.handleSubmit(onSaleFormSubmitValid, onSaleFormSubmitInvalid)}
-                            />
+                        <FormProviderForm
+                            formObject={formObject}
+                            formRef={formRef}
+                            onSubmit={onSaleFormSubmitValid}
+                            onSubmitError={onSaleFormSubmitInvalid}
+                        >
+                            <ApartmentSaleFormFieldSet />
                             {isApartmentFirstSale ? (
                                 <ApartmentCatalogPricesFieldSet />
                             ) : (
@@ -206,7 +209,7 @@ const LoadedApartmentSalePage = () => {
                             )}
                             <Fieldset
                                 className={`ownerships-fieldset ${
-                                    OwnershipsListSchema.safeParse(saleForm.getValues("ownerships")).success
+                                    OwnershipsListSchema.safeParse(formObject.getValues("ownerships")).success
                                         ? ""
                                         : "error"
                                 }`}
@@ -214,7 +217,7 @@ const LoadedApartmentSalePage = () => {
                             >
                                 <OwnershipList />
                             </Fieldset>
-                        </FormProvider>
+                        </FormProviderForm>
                     </ApartmentSaleContext.Provider>
                 </div>
 

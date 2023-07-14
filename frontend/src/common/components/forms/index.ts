@@ -1,6 +1,7 @@
 import CheckboxInput from "./CheckboxInput";
 import DateInput from "./DateInput";
 import FileInput from "./FileInput";
+import FormProviderForm from "./FormProviderForm";
 import NumberInput from "./NumberInput";
 import RelatedModelInput from "./RelatedModelInput";
 import SelectInput from "./SelectInput";
@@ -10,7 +11,6 @@ import ToggleInput from "./ToggleInput";
 
 export type FormInputProps = {
     name: string;
-    formObject?;
     label?: string;
     required?: boolean;
     invalid?: boolean;
@@ -18,7 +18,6 @@ export type FormInputProps = {
     key?: string;
     tooltipText?: string;
     className?: string;
-    placeholder?;
     value?;
     disabled?;
     defaultValue?;
@@ -30,6 +29,7 @@ export {
     CheckboxInput,
     DateInput,
     FileInput,
+    FormProviderForm,
     NumberInput,
     RelatedModelInput,
     SelectInput,

@@ -165,7 +165,7 @@ export const downloadSurfaceAreaPriceCeilingResults = (calculationDate?: string)
         .catch((error) => console.error(error));
 };
 
-export const downloadSalesReportPDF = (startDate: string, endDate: string) => {
+export const downloadSalesReportPDF = ({startDate, endDate}: {startDate: string; endDate: string}) => {
     const params = `start_date=${startDate}&end_date=${endDate}`;
     const url = `${Config.api_v1_url}/reports/download-sales-report?${params}`;
     const init = {
@@ -178,7 +178,13 @@ export const downloadSalesReportPDF = (startDate: string, endDate: string) => {
         .catch((error) => console.error(error));
 };
 
-export const downloadSalesByPostalCodeAndAreaReportPDF = (startDate: string, endDate: string) => {
+export const downloadSalesByPostalCodeAndAreaReportPDF = ({
+    startDate,
+    endDate,
+}: {
+    startDate: string;
+    endDate: string;
+}) => {
     const params = `start_date=${startDate}&end_date=${endDate}`;
     const url = `${Config.api_v1_url}/reports/download-sales-by-postal-code-and-area-report?${params}`;
     const init = {

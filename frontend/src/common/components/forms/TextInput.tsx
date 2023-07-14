@@ -1,9 +1,12 @@
 import {TextInput as HDSTextInput} from "hds-react";
 
+import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
-const TextInput = ({name, label = "", required, invalid, formObject, ...rest}: FormInputProps) => {
+const TextInput = ({name, label = "", required, invalid, ...rest}: FormInputProps) => {
+    const formObject = useFormContext();
+
     const {
         register,
         formState: {errors},

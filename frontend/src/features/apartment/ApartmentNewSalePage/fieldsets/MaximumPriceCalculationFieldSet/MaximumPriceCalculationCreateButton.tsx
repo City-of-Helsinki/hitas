@@ -12,7 +12,7 @@ import MaximumPriceModalError from "./MaximumPriceModalError";
 const MaximumPriceCalculationFieldSet = ({hasLoanValueChanged}) => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
     const {apartment} = useContext(ApartmentSaleContext);
-    const saleForm = useFormContext();
+    const formObject = useFormContext();
 
     const [
         saveMaximumPriceCalculation,
@@ -20,13 +20,13 @@ const MaximumPriceCalculationFieldSet = ({hasLoanValueChanged}) => {
     ] = useSaveApartmentMaximumPriceMutation();
 
     const isCalculationFormValid = ApartmentSaleFormSchema.partial().safeParse({
-        purchase_date: saleForm.getValues("purchase_date"),
-        apartment_share_of_housing_company_loans: saleForm.getValues("apartment_share_of_housing_company_loans"),
+        purchase_date: formObject.getValues("purchase_date"),
+        apartment_share_of_housing_company_loans: formObject.getValues("apartment_share_of_housing_company_loans"),
     }).success;
 
     const handleCreateNewCalculationButton = () => {
         if (isCalculationFormValid) {
-            const date = saleForm.watch("purchase_date") ?? null;
+            const date = formObject.watch("purchase_date") ?? null;
 
             saveMaximumPriceCalculation({
                 housingCompanyId: apartment.links.housing_company.id,
@@ -35,7 +35,7 @@ const MaximumPriceCalculationFieldSet = ({hasLoanValueChanged}) => {
                     calculation_date: date,
                     apartment_share_of_housing_company_loans_date: date,
                     apartment_share_of_housing_company_loans:
-                        saleForm.watch("apartment_share_of_housing_company_loans") ?? 0,
+                        formObject.watch("apartment_share_of_housing_company_loans") ?? 0,
                     additional_info: "",
                 },
             })

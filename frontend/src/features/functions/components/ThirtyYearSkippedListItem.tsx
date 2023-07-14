@@ -1,14 +1,16 @@
 import React from "react";
+import {useFormContext} from "react-hook-form";
 import {Link} from "react-router-dom";
-import {SelectInput} from "../../../common/components/form";
+import {SelectInput} from "../../../common/components/forms";
 
 export default function ThirtyYearSkippedListItem({
     postalCode,
     companies,
     postalCodeOptionSet,
-    formObject,
     index,
 }): React.JSX.Element {
+    const formObject = useFormContext();
+
     const options: {label: string; value: string}[] = [];
     postalCodeOptionSet.forEach((option) => {
         options.push({
@@ -16,6 +18,7 @@ export default function ThirtyYearSkippedListItem({
             value: option.postal_code,
         });
     });
+
     return (
         <li
             className="results-list__item"
@@ -41,23 +44,21 @@ export default function ThirtyYearSkippedListItem({
             <div className="inputs">
                 <SelectInput
                     label="Korvaava postinumero"
-                    tooltipText="Puolet keskiarvosta, joka korvaa puuttuvan postinumeroalueen hinnan."
-                    options={options}
                     name={`skipped.${index}.replacementCode1`}
-                    formObject={formObject}
-                    setDirectValue={true}
+                    options={options}
+                    tooltipText="Puolet keskiarvosta, joka korvaa puuttuvan postinumeroalueen hinnan."
+                    setDirectValue
                     required
                 />
                 <SelectInput
                     label="Korvaava postinumero"
-                    tooltipText="Toinen korvaava postinumero on valittavissa vasta kun olet valinnut ensimmäisen puolikkaan."
+                    name={`skipped.${index}.replacementCode2`}
                     options={options.filter(
                         (option) => option.value !== formObject.getValues(`skipped.${index}.replacementCode1`)
                     )}
-                    name={`skipped.${index}.replacementCode2`}
-                    formObject={formObject}
-                    setDirectValue={true}
+                    tooltipText="Toinen korvaava postinumero on valittavissa vasta kun olet valinnut ensimmäisen puolikkaan."
                     disabled={formObject.getValues(`skipped.${index}.replacementCode1`) === null}
+                    setDirectValue
                     required
                 />
             </div>

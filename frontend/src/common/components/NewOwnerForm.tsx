@@ -6,7 +6,8 @@ import {SubmitHandler, useForm} from "react-hook-form";
 
 import {IOwner, OwnerSchema} from "../schemas";
 import {validateSocialSecurityNumber} from "../utils";
-import {CheckboxInput, TextInput} from "./form";
+import {CheckboxInput, TextInput} from "./forms";
+import FormProviderForm from "./forms/FormProviderForm";
 import {SaveButton} from "./index";
 
 type NewOwnerFormProps = {
@@ -39,33 +40,29 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
     };
 
     return (
-        <form
+        <FormProviderForm
+            formObject={formObject}
             className="hitas-form hitas-form--owner"
-            // eslint-disable-next-line no-console
-            onSubmit={formObject.handleSubmit(onValidSubmit, (errors) => console.log(errors))}
+            onSubmit={onValidSubmit}
         >
             <TextInput
                 name="name"
                 label="Nimi"
                 required
-                formObject={formObject}
             />
             <TextInput
                 name="identifier"
                 label="Henkilö- tai Y-tunnus"
                 tooltipText="Esimerkiksi: 123456-123A"
-                formObject={formObject}
                 required
             />
             <TextInput
                 name="email"
                 label="Sähköpostiosoite"
-                formObject={formObject}
             />
             <CheckboxInput
                 name="non_disclosure"
                 label="Turvakielto"
-                formObject={formObject}
             />
             {
                 // If valid identifier values are required and the identifier
@@ -93,7 +90,7 @@ const NewOwnerForm = ({confirmAction, cancelAction, isInvalidSSNAllowed, isLoadi
                     disabled={!isDirty || !isValid}
                 />
             </div>
-        </form>
+        </FormProviderForm>
     );
 };
 
