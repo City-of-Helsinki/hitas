@@ -54,7 +54,7 @@ class Rules2011Onwards(CalculatorRules):
             housing_company_improvements,
             calculation_date,
             housing_company_completion_date,
-            "mpi2005eq100",
+            "cpi2005eq100",
         )
 
     def calculate_market_price_index_max_price(
@@ -110,6 +110,7 @@ class Rules2011Onwards(CalculatorRules):
                     value=i.value,
                     completion_date=i.completion_date,
                     completion_date_index=i.completion_date_index_2005eq100,
+                    no_deductions=i.no_deductions,
                 )
                 for i in housing_company_improvements
             ],

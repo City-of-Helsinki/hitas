@@ -89,7 +89,7 @@ def calculate_single_housing_company_improvement_2011_onwards(
 
     # Calculate value addition by calculating the excess ('omavastuu') first and then reducing that from the
     # improvement's value. Value addition must be always >= 0.
-    excess_amount = Excess.AFTER_2010_HOUSING_COMPANY.value * total_surface_area
+    excess_amount = Excess.AFTER_2010_HOUSING_COMPANY.value * total_surface_area if not improvement.no_deductions else 0
     value_addition = max(improvement.value - excess_amount, Decimal(0))
 
     #

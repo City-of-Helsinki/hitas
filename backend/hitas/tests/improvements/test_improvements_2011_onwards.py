@@ -36,6 +36,34 @@ def test_calculate__single_improvement__housing_company__2011_onwards():
     assert roundup(result.value_for_housing_company) == Decimal("22_707.86")
 
 
+def test_calculate__single_improvement__housing_company__2011_onwards__no_deductions():
+    improvement = ImprovementData(
+        name="Test improvement",
+        value=Decimal(150_000),
+        completion_date=datetime.date(2020, 5, 1),
+        completion_date_index=Decimal(129.2),
+        no_deductions=True,
+    )
+
+    result = calculate_single_housing_company_improvement_2011_onwards(
+        improvement,
+        calculation_date_index=Decimal(146.4),
+        total_surface_area=Decimal(4332),
+        apartment_surface_area=Decimal(30),
+        calculation_date=datetime.date(2023, 1, 1),
+        index_name="foo",
+    )
+    assert result is not None
+
+    # Verify item
+    assert result.name == improvement.name
+    assert result.value == improvement.value
+    assert result.completion_date == improvement.completion_date
+    assert result.value_added == improvement.value
+    assert roundup(result.value_for_apartment) == Decimal("1177.07")
+    assert roundup(result.value_for_housing_company) == Decimal("169969.04")
+
+
 def test_calculate__multiple_improvements__housing_company__2011_onwards():
     improvement = ImprovementData(
         name="Test improvement",

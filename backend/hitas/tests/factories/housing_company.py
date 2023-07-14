@@ -59,6 +59,7 @@ class HousingCompanyMarketPriceImprovementFactory(AbstractImprovementFactory):
         model = HousingCompanyMarketPriceImprovement
 
     housing_company = factory.SubFactory("hitas.tests.factories.HousingCompanyFactory")
+    no_deductions = False
 
 
 class HousingCompanyConstructionPriceImprovementFactory(AbstractImprovementFactory):
