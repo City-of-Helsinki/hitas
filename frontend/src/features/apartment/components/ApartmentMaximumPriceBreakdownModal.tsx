@@ -46,7 +46,7 @@ const BreakdownValue = ({label, value, unit = "€"}: {label: string; value: num
 );
 
 const MaximumPriceCalculationImprovementsTable = ({heading, cols, improvements}) => {
-    if (!improvements.items.length) return null;
+    if (!improvements.items.length) return <p>Ei parannuksia.</p>;
 
     const getImprovements = (improvements): object[] => {
         if (improvements.items.length === 1) return improvements.items;
@@ -171,6 +171,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
             <Accordion
                 size="s"
                 heading="Huoneistokohtaiset parannukset"
+                initiallyOpen={!calculation.calculation_variables.apartment_improvements.items.length}
             >
                 <MaximumPriceCalculationImprovementsTable
                     heading=""
@@ -199,6 +200,7 @@ const MarketPricePre2011Breakdown = ({calculation}: {calculation: IIndexCalculat
             <Accordion
                 size="s"
                 heading="Huoneiston osuus yhtiön parannuksista"
+                initiallyOpen={!calculation.calculation_variables.housing_company_improvements.items.length}
             >
                 <MaximumPriceCalculationImprovementsTable
                     heading=""
