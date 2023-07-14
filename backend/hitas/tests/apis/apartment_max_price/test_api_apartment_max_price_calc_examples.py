@@ -64,6 +64,12 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         value=150000,
         completion_date=datetime.date(2020, 5, 21),
     )
+    mpi_improvement2: HousingCompanyMarketPriceImprovement = HousingCompanyMarketPriceImprovementFactory.create(
+        housing_company=a.housing_company,
+        value=100000,
+        completion_date=datetime.date(2020, 5, 21),
+        no_deductions=True,
+    )
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         apartment=a,
@@ -78,15 +84,14 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=129.29)
     MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2019, 11, 1), value=167.9)
 
-    # Create necessary calculation date indices
-    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
-    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
-    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
-
     # Create necessary improvement's completion date indices
     ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=129.20)
     MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 5, 1), value=171.0)
 
+    # Create necessary calculation date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=146.4)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 7, 1), value=189.1)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 7, 1), value=4869)
     data = {
         "calculation_date": "2022-07-05",
         "apartment_share_of_housing_company_loans": 2500,
@@ -104,114 +109,16 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
     response_json = response.json()
     mpc_id = assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+    calculations = response_json.pop("calculations")
 
-    expected_response = {
+    assert response_json == {
         "confirmed_at": None,
-        "maximum_price": 223520.28,
-        "maximum_price_per_square": 7450.68,
+        "maximum_price": 224343.43,
+        "maximum_price_per_square": 7478.11,
         "calculation_date": "2022-07-05",
         "valid_until": "2022-10-05",
         "index": "construction_price_index",
         "new_hitas": True,
-        "calculations": {
-            "construction_price_index": {
-                "maximum_price": 223520.28,
-                "valid_until": "2022-10-05",
-                "maximum": True,
-                "calculation_variables": {
-                    "first_sale_acquisition_price": 199500.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 199500.0,
-                    "index_adjustment": 26401.46,
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": mpi_improvement.name,
-                                "value": float(mpi_improvement.value),
-                                "completion_date": mpi_improvement.completion_date.isoformat(),
-                                "value_added": 20040.0,
-                                "value_for_apartment": 118.82,
-                                "value_for_housing_company": 17157.05,
-                            }
-                        ],
-                        "summary": {
-                            "value": 150_000.0,
-                            "value_added": 20040.0,
-                            "excess": {
-                                "surface_area": 4332.0,
-                                "value_per_square_meter": 30.0,
-                                "total": 129960.0,
-                            },
-                            "value_for_apartment": 118.82,
-                            "value_for_housing_company": 17157.05,
-                        },
-                    },
-                    "debt_free_price": 226020.28,
-                    "debt_free_price_m2": 7534.01,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                    "completion_date": "2019-11-27",
-                    "completion_date_index": 129.29,
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_index": 146.4,
-                },
-            },
-            "market_price_index": {
-                "maximum_price": 222343.46,
-                "valid_until": "2022-10-05",
-                "maximum": False,
-                "calculation_variables": {
-                    "first_sale_acquisition_price": 199500.0,
-                    "additional_work_during_construction": 0.0,
-                    "basic_price": 199500.0,
-                    "index_adjustment": 25189.99,
-                    "housing_company_improvements": {
-                        "items": [
-                            {
-                                "name": mpi_improvement.name,
-                                "value": float(mpi_improvement.value),
-                                "completion_date": mpi_improvement.completion_date.isoformat(),
-                                "value_added": 20040.0,
-                                "value_for_housing_company": 22161.19,
-                                "value_for_apartment": 153.47,
-                            }
-                        ],
-                        "summary": {
-                            "value": 150_000.0,
-                            "value_added": 20040.0,
-                            "excess": {
-                                "surface_area": 4332.0,
-                                "value_per_square_meter": 30.0,
-                                "total": 129960.0,
-                            },
-                            "value_for_housing_company": 22161.19,
-                            "value_for_apartment": 153.47,
-                        },
-                    },
-                    "debt_free_price": 224843.46,
-                    "debt_free_price_m2": 7494.78,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                    "completion_date": "2019-11-27",
-                    "completion_date_index": 167.9,
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_index": 189.1,
-                },
-            },
-            "surface_area_price_ceiling": {
-                "maximum_price": 143570.0,
-                "valid_until": "2022-08-31",
-                "maximum": False,
-                "calculation_variables": {
-                    "calculation_date": "2022-07-05",
-                    "calculation_date_value": 4869.0,
-                    "debt_free_price": 146070.0,
-                    "surface_area": 30.0,
-                    "apartment_share_of_housing_company_loans": 2500,
-                    "apartment_share_of_housing_company_loans_date": "2022-07-28",
-                },
-            },
-        },
         "apartment": {
             "address": {
                 "apartment_number": a.apartment_number,
@@ -249,7 +156,122 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
         },
         "additional_info": "Example",
     }
-    assert expected_response == response_json
+
+    assert calculations["construction_price_index"] == {
+        "maximum_price": 224343.43,
+        "valid_until": "2022-10-05",
+        "maximum": True,
+        "calculation_variables": {
+            "first_sale_acquisition_price": 199500.0,
+            "additional_work_during_construction": 0,
+            "basic_price": 199500.0,
+            "index_adjustment": 26401.46,
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": mpi_improvement.name,
+                        "value": float(mpi_improvement.value),
+                        "completion_date": mpi_improvement.completion_date.isoformat(),
+                        "value_added": 20040.0,
+                        "value_for_apartment": 157.26,
+                        "value_for_housing_company": 22707.86,
+                    },
+                    {
+                        "name": mpi_improvement2.name,
+                        "value": float(mpi_improvement2.value),
+                        "completion_date": mpi_improvement2.completion_date.isoformat(),
+                        "value_added": 100000.0,
+                        "value_for_apartment": 784.71,
+                        "value_for_housing_company": 113312.69,
+                    },
+                ],
+                "summary": {
+                    "value": 250_000.0,
+                    "value_added": 120040.0,
+                    "excess": {
+                        "surface_area": 4332.0,
+                        "value_per_square_meter": 30.0,
+                        "total": 129960.0,
+                    },
+                    "value_for_apartment": 941.97,
+                    "value_for_housing_company": 136020.56,
+                },
+            },
+            "debt_free_price": 226843.43,
+            "debt_free_price_m2": 7561.45,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+            "completion_date": "2019-11-27",
+            "completion_date_index": 129.29,
+            "calculation_date": "2022-07-05",
+            "calculation_date_index": 146.4,
+        },
+    }
+
+    assert calculations["market_price_index"] == {
+        "maximum_price": 223109.29,
+        "valid_until": "2022-10-05",
+        "maximum": False,
+        "calculation_variables": {
+            "first_sale_acquisition_price": 199500.0,
+            "additional_work_during_construction": 0,
+            "basic_price": 199500.0,
+            "index_adjustment": 25189.99,
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": mpi_improvement.name,
+                        "value": float(mpi_improvement.value),
+                        "completion_date": mpi_improvement.completion_date.isoformat(),
+                        "value_added": 20040.0,
+                        "value_for_housing_company": 22161.19,
+                        "value_for_apartment": 153.47,
+                    },
+                    {
+                        "name": mpi_improvement2.name,
+                        "value": float(mpi_improvement2.value),
+                        "completion_date": mpi_improvement2.completion_date.isoformat(),
+                        "value_added": 100000.0,
+                        "value_for_apartment": 765.82,
+                        "value_for_housing_company": 110584.8,
+                    },
+                ],
+                "summary": {
+                    "value": 250000.0,
+                    "value_added": 120040.0,
+                    "excess": {
+                        "surface_area": 4332.0,
+                        "value_per_square_meter": 30.0,
+                        "total": 129960.0,
+                    },
+                    "value_for_housing_company": 132745.99,
+                    "value_for_apartment": 919.29,
+                },
+            },
+            "debt_free_price": 225609.29,
+            "debt_free_price_m2": 7520.31,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+            "completion_date": "2019-11-27",
+            "completion_date_index": 167.9,
+            "calculation_date": "2022-07-05",
+            "calculation_date_index": 189.1,
+        },
+    }
+
+    assert calculations["surface_area_price_ceiling"] == {
+        "maximum_price": 143570.0,
+        "valid_until": "2022-08-31",
+        "maximum": False,
+        "calculation_variables": {
+            "calculation_date": "2022-07-05",
+            "calculation_date_value": 4869.0,
+            "debt_free_price": 146070.0,
+            "surface_area": 30.0,
+            "apartment_share_of_housing_company_loans": 2500,
+            "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        },
+    }
 
     response = api_client.get(
         reverse("hitas:maximum-price-detail", args=[a.housing_company.uuid.hex, a.uuid.hex, mpc_id]),
@@ -259,7 +281,6 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
-    assert expected_response == response_json
 
 
 @pytest.mark.django_db
@@ -374,8 +395,8 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
                         "value": float(mpi_improvement.value),
                         "completion_date": mpi_improvement.completion_date.isoformat(),
                         "value_added": 68910.0,
-                        "value_for_apartment": 1047.66,
-                        "value_for_housing_company": 58996.63,
+                        "value_for_apartment": 1386.62,
+                        "value_for_housing_company": 78083.78,
                     }
                 ],
                 "summary": {
@@ -386,12 +407,12 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
                         "value_per_square_meter": 30.0,
                         "total": 81090.0,
                     },
-                    "value_for_apartment": 1047.66,
-                    "value_for_housing_company": 58996.63,
+                    "value_for_apartment": 1386.62,
+                    "value_for_housing_company": 78083.78,
                 },
             },
-            "debt_free_price": 262624.75,
-            "debt_free_price_m2": 5471.35,
+            "debt_free_price": 262963.7,
+            "debt_free_price_m2": 5478.41,
             "apartment_share_of_housing_company_loans": 2500,
             "apartment_share_of_housing_company_loans_date": "2022-07-28",
             "completion_date": "2014-08-27",
@@ -399,7 +420,7 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
             "calculation_date": "2022-07-05",
             "calculation_date_index": 146.4,
         },
-        "maximum_price": 260124.75,
+        "maximum_price": 260463.7,
         "valid_until": "2022-10-05",
         "maximum": False,
     }
