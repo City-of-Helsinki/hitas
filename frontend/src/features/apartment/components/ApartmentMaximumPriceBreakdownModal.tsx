@@ -473,8 +473,10 @@ const MaximumPriceModalContent = ({
                 <MaximumPriceBreakdownTabs calculation={calculation} />
                 <div className="valid-until">
                     <div className="confirmation-modal__breakdown-row">
-                        <label>Vahvistettavan laskelman voimassaoloaika</label>
-                        <p>{formatDate(calculation.valid_until)}</p>
+                        <label>Vahvistettavan laskelman voimassaoloaika:</label>
+                        <p>
+                            {formatDate(calculation.calculation_date)} - {formatDate(calculation.valid_until)}
+                        </p>
                     </div>
                 </div>
             </Dialog.Content>
