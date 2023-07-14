@@ -101,6 +101,7 @@ def test__api__apartment_max_price__invalid_params(api_client: HitasAPIClient, d
         ("mpi_calculation_date", "mpi2005eq100.2022-07"),
         ("sapc", "sapc.2022-07"),
         ("improvement_mpi", "mpi2005eq100.2020-05"),
+        ("improvement_cpi", "cpi2005eq100.2020-05"),
     ],
 )
 @pytest.mark.django_db
@@ -113,7 +114,7 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
         completion_date=apartment_completion_date,
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
-    # Construction price improvement is not used since this is a new hitas apartment
+    # Construction price improvement is not used since this is a new hitas apartment (copied from MPI-improvements)
     HousingCompanyMarketPriceImprovementFactory.create(
         housing_company=apartment.housing_company,
         value=150000,
@@ -133,6 +134,8 @@ def test__api__apartment_max_price__missing_index(api_client: HitasAPIClient, mi
         SurfaceAreaPriceCeilingFactory.create(month=monthify(calculation_date), value=4869)
     if missing_index != "improvement_mpi":
         MarketPriceIndex2005Equal100Factory.create(month=monthify(improvement_completion_date), value=171.0)
+    if missing_index != "improvement_cpi":
+        ConstructionPriceIndex2005Equal100Factory.create(month=monthify(improvement_completion_date), value=171.0)
 
     data = {
         "calculation_date": calculation_date.isoformat(),

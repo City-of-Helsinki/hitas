@@ -177,12 +177,7 @@ def calculate_max_price(
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
         apartment.construction_price_improvements.all(),
-        (
-            # For hitas apartments using the new rules, market price improvements are used for both indices
-            apartment.housing_company.market_price_improvements.all()
-            if new_hitas_ruleset
-            else apartment.housing_company.construction_price_improvements.all()
-        ),
+        apartment.housing_company.construction_price_improvements.all(),
         calculation_date,
         housing_company_completion_date,
     )
@@ -287,7 +282,9 @@ def fetch_apartment(
     calculation_month: datetime.date,
     housing_company_completion_month: datetime.date,
 ) -> ApartmentWithAnnotationsMaxPrice:
-    return (
+    is_new_hitas = HousingCompany.objects.only("hitas_type").get(uuid=housing_company_uuid).hitas_type.new_hitas_ruleset
+
+    qs = (
         Apartment.objects.select_related(
             "apartment_type",
             "building",
@@ -302,150 +299,10 @@ def fetch_apartment(
                 "sales__ownerships",
                 Ownership.objects.select_related("owner"),
             ),
-            Prefetch(
-                "construction_price_improvements",
-                ApartmentConstructionPriceImprovement.objects.annotate(
-                    completion_month=TruncMonth("completion_date"),
-                    completion_date_index=Subquery(
-                        queryset=(
-                            ConstructionPriceIndex.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                    # New hitas apartment improvements are not counted,
-                    # so we don't fetch index for it here
-                ),
-            ),
-            Prefetch(
-                "market_price_improvements",
-                ApartmentMarketPriceImprovement.objects.annotate(
-                    completion_month=TruncMonth("completion_date"),
-                    completion_date_index=Subquery(
-                        queryset=(
-                            MarketPriceIndex.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                    # New hitas apartment improvements are not counted,
-                    # so we don't fetch index for it here
-                ),
-            ),
-            Prefetch(
-                "building__real_estate__housing_company__construction_price_improvements",
-                HousingCompanyConstructionPriceImprovement.objects.annotate(
-                    completion_month=TruncMonth("completion_date"),
-                    completion_date_index=Subquery(
-                        queryset=(
-                            ConstructionPriceIndex.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                    completion_date_index_2005eq100=Subquery(
-                        queryset=(
-                            ConstructionPriceIndex2005Equal100.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                ),
-            ),
-            Prefetch(
-                "building__real_estate__housing_company__market_price_improvements",
-                HousingCompanyMarketPriceImprovement.objects.annotate(
-                    completion_month=TruncMonth("completion_date"),
-                    completion_date_index=Subquery(
-                        queryset=(
-                            MarketPriceIndex.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                    completion_date_index_2005eq100=Subquery(
-                        queryset=(
-                            MarketPriceIndex2005Equal100.objects.filter(
-                                month=OuterRef("completion_month"),
-                            ).values("value")
-                        ),
-                        output_field=HitasModelDecimalField(null=True),
-                    ),
-                ),
-            ),
         )
         .annotate(
             _first_sale_purchase_price=get_first_sale_purchase_price("id"),
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
-            calculation_date_cpi=Subquery(
-                queryset=(
-                    ConstructionPriceIndex.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            calculation_date_cpi_2005eq100=Subquery(
-                queryset=(
-                    ConstructionPriceIndex2005Equal100.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            completion_date_cpi=Subquery(
-                queryset=(
-                    ConstructionPriceIndex.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            completion_date_cpi_2005eq100=Subquery(
-                queryset=(
-                    ConstructionPriceIndex2005Equal100.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            calculation_date_mpi=Subquery(
-                queryset=(
-                    MarketPriceIndex.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            calculation_date_mpi_2005eq100=Subquery(
-                queryset=(
-                    MarketPriceIndex2005Equal100.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            completion_date_mpi=Subquery(
-                queryset=(
-                    MarketPriceIndex.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
-            completion_date_mpi_2005eq100=Subquery(
-                queryset=(
-                    MarketPriceIndex2005Equal100.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
-                output_field=HitasModelDecimalField(null=True),
-            ),
             surface_area_price_ceiling_m2=Subquery(
                 queryset=(
                     SurfaceAreaPriceCeiling.objects.filter(
@@ -507,5 +364,157 @@ def fetch_apartment(
                 )
             ),
         )
-        .get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
     )
+
+    # New Hitas
+    if is_new_hitas:
+        qs = qs.prefetch_related(
+            # New hitas apartment improvements are not counted, so we don't need to fetch them here
+            Prefetch(
+                "building__real_estate__housing_company__construction_price_improvements",
+                # Intentionally use MarketPriceImprovements, as new hitas housing companies only use them,
+                # but we still need to use the Construction Price Index for calculating max price
+                HousingCompanyMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index_2005eq100=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex2005Equal100.objects.filter(
+                                month=OuterRef("completion_month")
+                            ).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+            Prefetch(
+                "building__real_estate__housing_company__market_price_improvements",
+                HousingCompanyMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index_2005eq100=Subquery(
+                        queryset=(
+                            MarketPriceIndex2005Equal100.objects.filter(month=OuterRef("completion_month")).values(
+                                "value"
+                            )
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+        ).annotate(
+            calculation_date_cpi_2005eq100=Subquery(
+                queryset=(
+                    ConstructionPriceIndex2005Equal100.objects.filter(
+                        month=calculation_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_cpi_2005eq100=Subquery(
+                queryset=(
+                    ConstructionPriceIndex2005Equal100.objects.filter(
+                        month=housing_company_completion_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            calculation_date_mpi_2005eq100=Subquery(
+                queryset=(
+                    MarketPriceIndex2005Equal100.objects.filter(
+                        month=calculation_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_mpi_2005eq100=Subquery(
+                queryset=(
+                    MarketPriceIndex2005Equal100.objects.filter(
+                        month=housing_company_completion_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+        )
+
+    # Old Hitas
+    else:
+        qs = qs.prefetch_related(
+            Prefetch(
+                "construction_price_improvements",
+                ApartmentConstructionPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+            Prefetch(
+                "market_price_improvements",
+                ApartmentMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(MarketPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+            Prefetch(
+                "building__real_estate__housing_company__construction_price_improvements",
+                HousingCompanyConstructionPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(
+                            ConstructionPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")
+                        ),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+            Prefetch(
+                "building__real_estate__housing_company__market_price_improvements",
+                HousingCompanyMarketPriceImprovement.objects.annotate(
+                    completion_month=TruncMonth("completion_date"),
+                    completion_date_index=Subquery(
+                        queryset=(MarketPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")),
+                        output_field=HitasModelDecimalField(null=True),
+                    ),
+                ),
+            ),
+        ).annotate(
+            calculation_date_cpi=Subquery(
+                queryset=(
+                    ConstructionPriceIndex.objects.filter(
+                        month=calculation_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_cpi=Subquery(
+                queryset=(
+                    ConstructionPriceIndex.objects.filter(
+                        month=housing_company_completion_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            calculation_date_mpi=Subquery(
+                queryset=(
+                    MarketPriceIndex.objects.filter(
+                        month=calculation_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+            completion_date_mpi=Subquery(
+                queryset=(
+                    MarketPriceIndex.objects.filter(
+                        month=housing_company_completion_month,
+                    ).values("value")
+                ),
+                output_field=HitasModelDecimalField(null=True),
+            ),
+        )
+
+    return qs.get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
