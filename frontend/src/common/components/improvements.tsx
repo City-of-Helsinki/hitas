@@ -223,6 +223,40 @@ export const ImprovementFieldSet = ({fieldsetHeader, name, showNoDeductions, sho
     );
 };
 
+export const ImprovementFieldSets = ({housingCompany, apartment}) => {
+    // New Hitas Housing Company
+    if (apartment === undefined && housingCompany.new_hitas) {
+        return (
+            <div className="field-sets">
+                <ImprovementFieldSet
+                    fieldsetHeader="Taloyhtiön parannukset"
+                    name="market_price_index" // New Hitas uses only MPI-improvements
+                    showNoDeductions={true}
+                    showDeprecationPercentage={false}
+                />
+            </div>
+        );
+    }
+
+    // Old Hitas Housing Company and Apartment
+    return (
+        <div className="field-sets">
+            <ImprovementFieldSet
+                fieldsetHeader="Markkinakustannusindeksillä laskettavat parannukset"
+                name="market_price_index"
+                showNoDeductions={true} // Always enabled for MPI-improvements
+                showDeprecationPercentage={false}
+            />
+            <ImprovementFieldSet
+                fieldsetHeader="Rakennuskustannusindeksillä laskettavat parannukset"
+                name="construction_price_index"
+                showNoDeductions={false}
+                showDeprecationPercentage={apartment !== undefined} // Only enabled for Apartment CPI-improvements
+            />
+        </div>
+    );
+};
+
 type IGenericImprovementsPage = {
     housingCompany: IHousingCompanyDetails;
     apartment?: IApartmentDetails;
@@ -306,22 +340,12 @@ export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImp
                 // eslint-disable-next-line no-console
                 onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject.getValues(), errors))}
             >
-                <div className="field-sets">
-                    <FormProvider {...formObject}>
-                        <ImprovementFieldSet
-                            fieldsetHeader="Markkinakustannusindeksillä laskettavat parannukset"
-                            name="market_price_index"
-                            showNoDeductions={true} // Always enabled for MPI-improvements
-                            showDeprecationPercentage={false}
-                        />
-                        <ImprovementFieldSet
-                            fieldsetHeader="Rakennuskustannusindeksillä laskettavat parannukset"
-                            name="construction_price_index"
-                            showNoDeductions={false}
-                            showDeprecationPercentage={apartment !== undefined} // Only enabled for Apartment CPI-improvements
-                        />
-                    </FormProvider>
-                </div>
+                <FormProvider {...formObject}>
+                    <ImprovementFieldSets
+                        housingCompany={housingCompany}
+                        apartment={apartment}
+                    />
+                </FormProvider>
 
                 <div className="row row--buttons">
                     <NavigateBackButton />
