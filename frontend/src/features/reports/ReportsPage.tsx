@@ -1,10 +1,14 @@
 import {Accordion} from "hds-react";
 import {downloadSurfaceAreaPriceCeilingResults} from "../../app/services";
-import {Heading} from "../../common/components";
+import {Divider, Heading} from "../../common/components";
 import PriceCeilingsList from "../../common/components/PriceCeilingsList";
-import HousingCompanyReports from "./HousingCompanyReports";
-import OwnerReports from "./OwnerReports";
-import SalesReports from "./SalesReports";
+import {
+    HousingCompanyReportRegulated,
+    HousingCompanyReportReleased,
+    HousingCompanyStatusTable,
+} from "./components/HousingCompanyReports";
+import OwnerReports from "./components/OwnerReports";
+import {SalesReportAll, SalesReportByAreas} from "./components/SalesReports";
 
 const ReportsPage = () => {
     return (
@@ -15,24 +19,36 @@ const ReportsPage = () => {
                     heading="Kaupat"
                     closeButton={false}
                 >
-                    <SalesReports />
+                    <Divider size="s" />
+                    <SalesReportAll />
+                    <Divider size="s" />
+                    <SalesReportByAreas />
                 </Accordion>
+
                 <Accordion
                     heading="Taloyhtiöt"
                     closeButton={false}
                 >
-                    <HousingCompanyReports />
+                    <Divider size="s" />
+                    <HousingCompanyStatusTable />
+                    <Divider size="s" />
+                    <HousingCompanyReportRegulated />
+                    <Divider size="s" />
+                    <HousingCompanyReportReleased />
                 </Accordion>
+
                 <Accordion
                     heading="Rajahintalaskelmat"
                     closeButton={false}
                 >
                     <PriceCeilingsList callbackFn={downloadSurfaceAreaPriceCeilingResults} />
                 </Accordion>
+
                 <Accordion
                     heading="Omistajien raportit"
                     closeButton={false}
                 >
+                    <Divider size="s" />
                     <OwnerReports />
                 </Accordion>
             </div>

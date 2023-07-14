@@ -1,6 +1,6 @@
 import {Button, Fieldset, IconCrossCircle, IconPlus, Tooltip} from "hds-react";
-import {useRef, useState} from "react";
-import {FormProvider, SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
+import {useState} from "react";
+import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {
     ApartmentImprovementsFormSchema,
     HousingCompanyImprovementsFormSchema,
@@ -10,8 +10,7 @@ import {
     IHousingCompanyDetails,
     IHousingCompanyImprovementsForm,
 } from "../schemas";
-import {NumberInput, SelectInput, TextInput} from "./form";
-import CheckboxInput from "./form/CheckboxInput";
+import {CheckboxInput, FormProviderForm, NumberInput, SelectInput, TextInput} from "./forms";
 import {ConfirmDialogModal, NavigateBackButton, SaveButton} from "./index";
 
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -146,32 +145,27 @@ const ImprovementsListItems = ({name, showNoDeductions, showDeprecationPercentag
                 >
                     <TextInput
                         name={`${name}.${index}.name`}
-                        formObject={formObject}
                         required
                     />
                     <NumberInput
                         name={`${name}.${index}.value`}
                         allowDecimals
-                        formObject={formObject}
                         required
                     />
                     <TextInput
                         name={`${name}.${index}.completion_date`}
-                        formObject={formObject}
                         required
                     />
                     {showNoDeductions && (
                         <CheckboxInput
                             name={`${name}.${index}.no_deductions`}
                             label=""
-                            formObject={formObject}
                         />
                     )}
                     {showDeprecationPercentage && (
                         <SelectInput
                             name={`${name}.${index}.depreciation_percentage`}
                             label=""
-                            formObject={formObject}
                             options={depreciationChoices}
                             setDirectValue
                             required
@@ -223,7 +217,7 @@ export const ImprovementFieldSet = ({fieldsetHeader, name, showNoDeductions, sho
     );
 };
 
-export const ImprovementFieldSets = ({housingCompany, apartment}) => {
+const ImprovementFieldSets = ({housingCompany, apartment}) => {
     // New Hitas Housing Company
     if (apartment === undefined && housingCompany.new_hitas) {
         return (
@@ -262,7 +256,7 @@ type IGenericImprovementsPage = {
     apartment?: IApartmentDetails;
 };
 
-export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImprovementsPage) => {
+const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImprovementsPage) => {
     const navigate = useNavigate();
 
     // Select either apartment or housing company
@@ -302,7 +296,6 @@ export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImp
         })),
     };
 
-    const formRef = useRef<HTMLFormElement | null>(null);
     const formObject = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: initialFormData,
@@ -334,27 +327,24 @@ export const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImp
     };
 
     return (
-        <>
-            <form
-                ref={formRef}
-                // eslint-disable-next-line no-console
-                onSubmit={formObject.handleSubmit(onSubmit, (errors) => console.warn(formObject.getValues(), errors))}
-            >
-                <FormProvider {...formObject}>
-                    <ImprovementFieldSets
-                        housingCompany={housingCompany}
-                        apartment={apartment}
-                    />
-                </FormProvider>
+        <FormProviderForm
+            formObject={formObject}
+            onSubmit={onSubmit}
+        >
+            <ImprovementFieldSets
+                housingCompany={housingCompany}
+                apartment={apartment}
+            />
 
-                <div className="row row--buttons">
-                    <NavigateBackButton />
-                    <SaveButton
-                        type="submit"
-                        isLoading={isLoading}
-                    />
-                </div>
-            </form>
-        </>
+            <div className="row row--buttons">
+                <NavigateBackButton />
+                <SaveButton
+                    type="submit"
+                    isLoading={isLoading}
+                />
+            </div>
+        </FormProviderForm>
     );
 };
+
+export default GenericImprovementsPage;

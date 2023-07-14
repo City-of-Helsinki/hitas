@@ -2,6 +2,7 @@ import {Button} from "hds-react";
 import {useFieldArray, useForm} from "react-hook-form";
 import {useGetAvailablePostalCodesQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
+import {FormProviderForm} from "../../../common/components/forms";
 import {today} from "../../../common/utils";
 import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
 
@@ -16,6 +17,7 @@ type NewPostalCodes = {
 const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     // If in Test mode, use today's date as the calculation date
     const validCalculationDate = isNaN(Number(calculationDate.substring(0, 4))) ? today() : calculationDate;
+
     const {
         data: codes,
         error,
@@ -34,17 +36,17 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                         ? [...skippedPostalCodes[company.address.postal_code], company]
                         : [company])
         );
-        // console.log("skipped:", skippedPostalCodes);
     }
+
     const initialValues: object[] = [];
     Object.entries(skippedPostalCodes).forEach((code) =>
         initialValues.push({missingCode: code[0], replacementCode1: null, replacementCode2: null})
     );
-    const skippedForm = useForm<NewPostalCodes>({
+    const formObject = useForm<NewPostalCodes>({
         defaultValues: {skipped: initialValues},
         mode: "onBlur",
     });
-    const {control, watch} = skippedForm;
+    const {control, watch} = formObject;
     useFieldArray({name: "skipped", control});
 
     let skippedCheck = 0;
@@ -53,10 +55,7 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     });
 
     return (
-        <form
-            className="companies companies--skipped"
-            onSubmit={skippedForm.handleSubmit(reCalculateFn)}
-        >
+        <>
             <Heading type="body">Vertailu ei onnistunut</Heading>
             <p>
                 Vertailua ei voitu suorittaa, koska seuraavilta postinumeroalueilta puuttuu keskineliöhinnat.
@@ -69,31 +68,36 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                 error={error}
                 isLoading={isLoading}
             >
-                <div className="list">
-                    <ul className="results-list">
-                        {Object.entries(skippedPostalCodes).map(([key, value], index) => (
-                            <ThirtyYearSkippedListItem
-                                key={key}
-                                postalCode={key}
-                                companies={value}
-                                postalCodeOptionSet={codes}
-                                formObject={skippedForm}
-                                index={index}
-                            />
-                        ))}
-                    </ul>
-                </div>
-            </QueryStateHandler>
-            <div className="row row--buttons">
-                <Button
-                    theme="black"
-                    type="submit"
-                    disabled={skippedCheck !== 0}
+                <FormProviderForm
+                    formObject={formObject}
+                    onSubmit={reCalculateFn}
+                    className="companies companies--skipped"
                 >
-                    Suorita vertailu korvaavin postinumeroin
-                </Button>
-            </div>
-        </form>
+                    <div className="list">
+                        <ul className="results-list">
+                            {Object.entries(skippedPostalCodes).map(([key, value], index) => (
+                                <ThirtyYearSkippedListItem
+                                    key={key}
+                                    postalCode={key}
+                                    companies={value}
+                                    postalCodeOptionSet={codes}
+                                    index={index}
+                                />
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="row row--buttons">
+                        <Button
+                            theme="black"
+                            type="submit"
+                            disabled={skippedCheck !== 0}
+                        >
+                            Suorita vertailu korvaavin postinumeroin
+                        </Button>
+                    </div>
+                </FormProviderForm>
+            </QueryStateHandler>
+        </>
     );
 };
 

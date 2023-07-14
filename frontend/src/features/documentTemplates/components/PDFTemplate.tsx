@@ -1,7 +1,7 @@
 import {useFieldArray, useForm} from "react-hook-form";
 import {useEditPDFTemplateMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";
-import {TextAreaInput} from "../../../common/components/form";
+import {FormProviderForm, TextAreaInput} from "../../../common/components/forms";
 import {hdsToast} from "../../../common/utils";
 
 const instructionTexts = {
@@ -31,7 +31,7 @@ const PDFTemplate = ({data, type}) => {
         },
         mode: "all",
     });
-    const {control, handleSubmit} = formObject;
+    const {control} = formObject;
     const {fields} = useFieldArray({control, name: "paragraphs"});
 
     const onSubmit = (submitData) => {
@@ -49,16 +49,16 @@ const PDFTemplate = ({data, type}) => {
     };
 
     return (
-        <form
+        <FormProviderForm
+            formObject={formObject}
             className="current-template"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={onSubmit}
         >
             <ul>
                 {fields.map((field, index) => (
                     <li key={field.id}>
                         <TextAreaInput
                             name={`paragraphs[${index}].text`}
-                            formObject={formObject}
                             label={instructionTexts[data.contents[0].name][index]}
                         />
                     </li>
@@ -70,7 +70,7 @@ const PDFTemplate = ({data, type}) => {
                     disabled={false}
                 />
             </div>
-        </form>
+        </FormProviderForm>
     );
 };
 

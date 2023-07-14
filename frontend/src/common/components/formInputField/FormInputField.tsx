@@ -4,7 +4,6 @@ import {dotted} from "../../utils";
 import FormDateInputField from "./FormDateInputField";
 import FormDropdownInputField from "./FormDropdownInputField";
 import FormNumberInputField from "./FormNumberInputField";
-import FormOwnershipInputField from "./FormOwnershipInputField";
 import FormPostalCodeInputField from "./FormPostalCodeInputField";
 import FormRelatedModelInputField from "./FormRelatedModelInputField";
 import FormTextInputField from "./FormTextInputField";
@@ -58,13 +57,6 @@ type FormInputFieldProps = {
       }
     | {
           inputType: "relatedModel";
-          queryFunction;
-          requestedField?: string;
-          relatedModelSearchField: string;
-          getRelatedModelLabel: (unknown) => string;
-      }
-    | {
-          inputType: "ownership";
           queryFunction;
           requestedField?: string;
           relatedModelSearchField: string;
@@ -213,19 +205,6 @@ export default function FormInputField({
 
         return (
             <FormRelatedModelInputField
-                {...commonProps}
-                fieldPath={fieldPath}
-                {...rest}
-            />
-        );
-    }
-    if (inputType === "ownership") {
-        if (!("getRelatedModelLabel" in rest) || rest.getRelatedModelLabel === undefined)
-            throw new Error("`relatedModelLabel` is required.");
-        if (!("queryFunction" in rest) || rest.queryFunction === undefined)
-            throw new Error("`queryFunction` is required.");
-        return (
-            <FormOwnershipInputField
                 {...commonProps}
                 fieldPath={fieldPath}
                 {...rest}

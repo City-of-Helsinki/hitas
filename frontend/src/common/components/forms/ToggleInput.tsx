@@ -1,10 +1,11 @@
 import {ToggleButton} from "hds-react";
 
+import {useFormContext} from "react-hook-form";
 import {FormInputProps} from "./";
 
-const ToggleInput = ({name, label, required, formObject, ...rest}: FormInputProps) => {
-    const {register} = formObject;
-    const formToggle = register(name);
+const ToggleInput = ({name, label, required, ...rest}: FormInputProps) => {
+    const formObject = useFormContext();
+    const formToggle = formObject.register(name);
     const value = formObject.getValues(formToggle.name);
 
     return (
@@ -13,9 +14,9 @@ const ToggleInput = ({name, label, required, formObject, ...rest}: FormInputProp
                 id={name}
                 label={`${label}${required ? " *" : ""}`}
                 checked={value}
-                ref={formToggle.ref}
+                ref={formToggle.ref} // TODO is this needed?
                 onChange={() => {
-                    formObject.setValue(formToggle.name, !value, {shouldValidate: true});
+                    formObject.setValue(name, !value, {shouldValidate: true});
                 }}
                 variant="inline"
                 {...rest}

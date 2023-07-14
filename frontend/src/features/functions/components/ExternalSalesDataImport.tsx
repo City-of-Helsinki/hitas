@@ -1,13 +1,15 @@
 import {useState} from "react";
-import {useForm} from "react-hook-form";
+import {FormProvider, useForm} from "react-hook-form";
 import {useSaveExternalSalesDataMutation} from "../../../app/services";
 import {SaveDialogModal} from "../../../common/components";
-import {FileInput} from "../../../common/components/form";
+import {FileInput, FormProviderForm} from "../../../common/components/forms";
 import {hdsToast} from "../../../common/utils";
 
 export default function ExternalSalesDataImport({formDate}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const [saveExternalSalesData, {data, isLoading, error}] = useSaveExternalSalesDataMutation();
+
     const formObject = useForm({
         defaultValues: {
             calculationDate: formDate,
@@ -15,8 +17,9 @@ export default function ExternalSalesDataImport({formDate}) {
         },
         mode: "all",
     });
-    const {watch, handleSubmit} = formObject;
-    const formFile: File | undefined = watch("file");
+
+    const formFile: File | undefined = formObject.watch("file");
+
     // Submit = upload file
     const onSubmit = (data) => {
         const fileWithDate = {
@@ -42,20 +45,23 @@ export default function ExternalSalesDataImport({formDate}) {
                 setIsModalOpen(true);
             });
     };
+
     return (
-        <form
+        <FormProviderForm
+            formObject={formObject}
+            onSubmit={onSubmit}
             className={`file${formFile === undefined ? "" : " file--selected"}`}
-            onSubmit={handleSubmit(onSubmit)}
         >
-            <FileInput
-                name="file"
-                buttonLabel="Valitse tiedosto"
-                formObject={formObject}
-                label="Postinumeroalueiden keskineliöhinnat *"
-                tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
-                accept=".xlsx"
-                onChange={() => onSubmit(formObject.getValues())}
-            />
+            <FormProvider {...formObject}>
+                <FileInput
+                    name="file"
+                    buttonLabel="Valitse tiedosto"
+                    label="Postinumeroalueiden keskineliöhinnat *"
+                    tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
+                    accept=".xlsx"
+                    onChange={() => onSubmit(formObject.getValues())}
+                />
+            </FormProvider>
             <SaveDialogModal
                 title="Tallennetaan excel-tiedostoa"
                 data={data}
@@ -64,6 +70,6 @@ export default function ExternalSalesDataImport({formDate}) {
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
             />
-        </form>
+        </FormProviderForm>
     );
 }

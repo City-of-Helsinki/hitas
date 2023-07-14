@@ -1,6 +1,6 @@
 import {useContext} from "react";
 
-import {GenericImprovementsPage} from "../../common/components/improvements";
+import {GenericImprovementsPage} from "../../common/components";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,

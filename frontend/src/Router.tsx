@@ -24,7 +24,7 @@ import {
     HousingCompanyListPage,
     HousingCompanyRealEstatesPage,
 } from "./features/housingCompany";
-import {ReportsPage} from "./features/reports";
+import ReportsPage from "./features/reports";
 
 export default function Router() {
     const isAuthenticated = useAppSelector(selectIsAuthenticated);

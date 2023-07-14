@@ -1,5 +1,5 @@
 import {Tooltip} from "hds-react";
-import {useForm} from "react-hook-form";
+import {FormProvider, useForm} from "react-hook-form";
 import {hitasQuarters} from "../../common/schemas";
 
 import {useState} from "react";
@@ -12,7 +12,7 @@ import {
 } from "../../app/services";
 import {Divider, Heading, QueryStateHandler} from "../../common/components";
 import DownloadButton from "../../common/components/DownloadButton";
-import {SelectInput, ToggleInput} from "../../common/components/form";
+import {SelectInput, ToggleInput} from "../../common/components/forms";
 import {getHitasQuarter, hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
 
@@ -43,6 +43,7 @@ const ThirtyYearRegulation = () => {
         },
         mode: "all",
     });
+
     const {watch: testWatch} = testForm;
     const {watch} = formObject;
     const formTimePeriod: {label: string; value: string} = watch("quarter");
@@ -72,6 +73,7 @@ const ThirtyYearRegulation = () => {
     } = useGetExternalSalesDataQuery({
         calculation_date: formDate,
     });
+
     const {
         currentData: getRegulationData,
         isFetching: isGetRegulationLoading,
@@ -82,8 +84,10 @@ const ThirtyYearRegulation = () => {
         },
         {skip: !externalSalesData || !!isExternalSalesDataLoading || !!externalSalesDataLoadError}
     );
+
     const [makeRegulation, {data: makeRegulationData, isLoading: isMakeRegulationLoading, error: makeRegulationError}] =
         useCreateThirtyYearRegulationMutation();
+
     const {
         currentData: priceCeilingData,
         isFetching: isPriceCeilingLoading,
@@ -141,11 +145,12 @@ const ThirtyYearRegulation = () => {
                 >
                     <span>Vapautumisen tarkistus</span>
                     <div className="test-toggle">
-                        <ToggleInput
-                            name="testMode"
-                            label="Virhetila -testi"
-                            formObject={testForm}
-                        />
+                        <FormProvider {...testForm}>
+                            <ToggleInput
+                                name="testMode"
+                                label="Virhetila -testi"
+                            />
+                        </FormProvider>
                     </div>
                 </Heading>
                 {isTestMode ? (
@@ -163,26 +168,25 @@ const ThirtyYearRegulation = () => {
                                         haluat suorittaa vertailun mikäli sitä ei ole vielä tehty.
                                     </Tooltip>
                                 </label>
-                                <SelectInput
-                                    label=""
-                                    options={years}
-                                    name="year"
-                                    formObject={formObject}
-                                    defaultValue={years[0]}
-                                    setDirectValue={true}
-                                    disabled={hasSkippedCompanies}
-                                    required
-                                />
-                                <SelectInput
-                                    label=""
-                                    options={hitasQuarterOptions}
-                                    name="quarter"
-                                    formObject={formObject}
-                                    defaultValue={hitasQuarterOptions[hitasQuarterOptions.length - 1]}
-                                    value={formTimePeriod}
-                                    disabled={hasSkippedCompanies}
-                                    required
-                                />
+                                <FormProvider {...formObject}>
+                                    <SelectInput
+                                        label=""
+                                        name="year"
+                                        options={years}
+                                        defaultValue={years[0].value}
+                                        disabled={hasSkippedCompanies}
+                                        setDirectValue
+                                        required
+                                    />
+                                    <SelectInput
+                                        label=""
+                                        name="quarter"
+                                        options={hitasQuarterOptions}
+                                        defaultValue={hitasQuarterOptions[hitasQuarterOptions.length - 1].value}
+                                        disabled={hasSkippedCompanies}
+                                        required
+                                    />
+                                </FormProvider>
                             </div>
                             <div className="price-ceiling">
                                 <label>

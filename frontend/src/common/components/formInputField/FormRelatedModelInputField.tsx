@@ -128,15 +128,6 @@ export default function FormRelatedModelInputField({
                     </QueryStateHandler>
                 </Dialog.Content>
                 <Dialog.ActionButtons>
-                    {/* TODO: Adding to the related data is handled by the Django dashboard for now. This feature is to be shown here later
-                     <Button
-                     onClick={closeModal}
-                     disabled
-                     theme={"black"}
-                     >
-                     Lisää uusi
-                     </Button>
-                     */}
                     <Button
                         onClick={closeModal}
                         variant="secondary"

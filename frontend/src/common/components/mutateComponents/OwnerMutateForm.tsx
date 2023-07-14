@@ -6,7 +6,8 @@ import {z} from "zod";
 import {useSaveOwnerMutation} from "../../../app/services";
 import {IOwner, OwnerSchema} from "../../schemas";
 import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
-import {CheckboxInput, TextInput} from "../form";
+import {CheckboxInput, TextInput} from "../forms";
+import FormProviderForm from "../forms/FormProviderForm";
 import SaveButton from "../SaveButton";
 
 interface IOwnerMutateForm {
@@ -21,6 +22,7 @@ export default function OwnerMutateForm({
 }: IOwnerMutateForm) {
     const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
+
     const runSaveOwner = (data: IOwner) => {
         // submit the form values
         saveOwner({data})
@@ -33,7 +35,7 @@ export default function OwnerMutateForm({
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
                 error.data.fields.forEach((field) =>
-                    ownerFormObject.setError(field.field, {type: "backend", message: field.message})
+                    formObject.setError(field.field, {type: "backend", message: field.message})
                 );
             });
     };
@@ -53,19 +55,19 @@ export default function OwnerMutateForm({
         )(data, context, {...options, mode: "sync"});
     };
 
-    const ownerFormObject = useForm({
+    const formObject = useForm({
         defaultValues: owner,
         mode: "all",
         resolver: resolver,
     });
-    const identifierValue = ownerFormObject.watch("identifier");
+    const identifierValue = formObject.watch("identifier");
 
     // helper booleans for special saving controls with invalid data
-    const hasFormChanged = ownerFormObject.formState.isDirty;
-    const isMalformedIdentifier = !!ownerFormObject.formState.errors.identifier;
+    const hasFormChanged = formObject.formState.isDirty;
+    const isMalformedIdentifier = !!formObject.formState.errors.identifier;
     const isIdentifierEmpty = identifierValue === "";
-    const isBackendErrorInIdentifier = ownerFormObject.formState.errors.identifier?.type === "backend";
-    const isOtherErrorsThanIdentifier = Object.keys(ownerFormObject.formState.errors).some(
+    const isBackendErrorInIdentifier = formObject.formState.errors.identifier?.type === "backend";
+    const isOtherErrorsThanIdentifier = Object.keys(formObject.formState.errors).some(
         (field) => field !== "identifier"
     );
 
@@ -81,24 +83,24 @@ export default function OwnerMutateForm({
 
     useEffect(() => {
         // validate the initial form values
-        ownerFormObject.trigger().then(() => {
+        formObject.trigger().then(() => {
             // set the initial identifier validity
-            setIsInitialIdentifierValid(!ownerFormObject.formState.errors.identifier);
+            setIsInitialIdentifierValid(!formObject.formState.errors.identifier);
             // set initial focus
-            setTimeout(() => ownerFormObject.setFocus("name"), 5);
+            setTimeout(() => formObject.setFocus("name"), 5);
         });
         // eslint-disable-next-line
     }, []);
 
     const onFormSubmitValid = () => {
         // save the data
-        runSaveOwner(ownerFormObject.getValues());
+        runSaveOwner(formObject.getValues());
     };
 
     const onFormSubmitInvalid = () => {
         if (isSaveWithWarning) {
             // save with warning
-            runSaveOwner(ownerFormObject.getValues());
+            runSaveOwner(formObject.getValues());
         }
     };
 
@@ -114,61 +116,53 @@ export default function OwnerMutateForm({
     };
 
     return (
-        <>
-            <form
-                onSubmit={
-                    hasFormChanged
-                        ? ownerFormObject.handleSubmit(onFormSubmitValid, onFormSubmitInvalid)
-                        : ownerFormObject.handleSubmit(onFormSubmitUnchanged, onFormSubmitUnchanged)
-                }
-            >
-                <TextInput
-                    name="name"
-                    label="Nimi"
-                    formObject={ownerFormObject}
-                    required
-                />
-                <TextInput
-                    name="identifier"
-                    label="Henkilö- tai Y-tunnus"
-                    formObject={ownerFormObject}
-                    required
-                />
-                <TextInput
-                    name="email"
-                    label="Sähköpostiosoite"
-                    formObject={ownerFormObject}
-                />
-                <CheckboxInput
-                    label="Turvakielto"
-                    name="non_disclosure"
-                    formObject={ownerFormObject}
-                />
-                {
-                    // show warning when saving malformed identifier is enabled
-                    isSaveWithWarning && !isSaveDisabled && (
-                        <p className="error-message">
-                            "{identifierValue}" on virheellinen henkilö- tai Y-tunnus. Tallennetaanko silti?
-                        </p>
-                    )
-                }
-                <div className="row row--buttons">
-                    <Button
-                        theme="black"
-                        iconLeft={<IconArrowLeft />}
-                        onClick={close}
-                    >
-                        Peruuta
-                    </Button>
+        <FormProviderForm
+            formObject={formObject}
+            onSubmit={hasFormChanged ? onFormSubmitValid : onFormSubmitUnchanged}
+            onSubmitError={hasFormChanged ? onFormSubmitInvalid : onFormSubmitUnchanged}
+        >
+            <TextInput
+                name="name"
+                label="Nimi"
+                required
+            />
+            <TextInput
+                name="identifier"
+                label="Henkilö- tai Y-tunnus"
+                required
+            />
+            <TextInput
+                name="email"
+                label="Sähköpostiosoite"
+            />
+            <CheckboxInput
+                label="Turvakielto"
+                name="non_disclosure"
+            />
+            {
+                // show warning when saving malformed identifier is enabled
+                isSaveWithWarning && !isSaveDisabled && (
+                    <p className="error-message">
+                        "{identifierValue}" on virheellinen henkilö- tai Y-tunnus. Tallennetaanko silti?
+                    </p>
+                )
+            }
+            <div className="row row--buttons">
+                <Button
+                    theme="black"
+                    iconLeft={<IconArrowLeft />}
+                    onClick={close}
+                >
+                    Peruuta
+                </Button>
 
-                    <SaveButton
-                        isLoading={isSaveOwnerLoading}
-                        type="submit"
-                        buttonText={isSaveWithWarning ? "Tallenna silti" : "Tallenna"}
-                        disabled={isSaveDisabled}
-                    />
-                </div>
-            </form>
-        </>
+                <SaveButton
+                    isLoading={isSaveOwnerLoading}
+                    type="submit"
+                    buttonText={isSaveWithWarning ? "Tallenna silti" : "Tallenna"}
+                    disabled={isSaveDisabled}
+                />
+            </div>
+        </FormProviderForm>
     );
 }

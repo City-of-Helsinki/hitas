@@ -2,6 +2,7 @@ import {format, parse} from "date-fns";
 import {DateInput as HDSDateInput} from "hds-react";
 
 import {useEffect} from "react";
+import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
@@ -10,7 +11,9 @@ interface DateInputProps extends FormInputProps {
     minDate?: Date;
 }
 
-const DateInput = ({name, label, formObject, required, ...rest}: DateInputProps) => {
+const DateInput = ({name, label, required, ...rest}: DateInputProps) => {
+    const formObject = useFormContext();
+
     const hdsFormat = "d.M.yyyy";
     const apiFormat = "yyyy-MM-dd";
 
@@ -36,17 +39,17 @@ const DateInput = ({name, label, formObject, required, ...rest}: DateInputProps)
     const handleOnChange = (newValue: string, valueAsDate: Date) => {
         // Do not format the date if the year is obviously incomplete
         if (valueAsDate.getFullYear().toString().length < 4) {
-            formObject.setValue(formDate.name, newValue, true);
+            formObject.setValue(formDate.name, newValue);
             return;
         }
 
         // Try to convert HDS date to Hitas API date
         try {
             const convertedValue = format(valueAsDate, apiFormat);
-            formObject.setValue(formDate.name, convertedValue, true);
+            formObject.setValue(formDate.name, convertedValue);
             formObject.clearErrors(name);
         } catch {
-            formObject.setValue(formDate.name, newValue, true);
+            formObject.setValue(formDate.name, newValue);
         }
     };
 

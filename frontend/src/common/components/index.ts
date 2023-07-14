@@ -4,6 +4,7 @@ import DetailField from "./DetailField";
 import Divider from "./Divider";
 import EditButton from "./EditButton";
 import FormInputField from "./formInputField/FormInputField";
+import GenericImprovementsPage from "./GenericImprovementsPage";
 import Heading from "./Heading";
 import ImprovementsTable from "./ImprovementsTable";
 import ListPageNumbers from "./ListPageNumbers";
@@ -26,6 +27,7 @@ export {
     EditButton,
     FormInputField,
     Heading,
+    GenericImprovementsPage,
     ImprovementsTable,
     ListPageNumbers,
     NavigateBackButton,

@@ -9,13 +9,13 @@ import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 
 const MaximumPriceCalculationFieldSet = () => {
     const {apartment, formExtraFieldErrorMessages} = useContext(ApartmentSaleContext);
-    const saleForm = useFormContext();
+    const formObject = useFormContext();
 
-    const isCalculationValid = isApartmentMaxPriceCalculationValid(apartment, saleForm.watch("purchase_date"));
+    const isCalculationValid = isApartmentMaxPriceCalculationValid(apartment, formObject.watch("purchase_date"));
 
     const hasLoanValueChanged =
         formExtraFieldErrorMessages?.apartment_share_of_housing_company_loans &&
-        saleForm.watch("apartment_share_of_housing_company_loans") !== null;
+        formObject.watch("apartment_share_of_housing_company_loans") !== null;
 
     const maximumPriceCalculationErrorMessage =
         formExtraFieldErrorMessages?.maximum_price_calculation &&

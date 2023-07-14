@@ -1,7 +1,6 @@
 import {useContext} from "react";
 
-import {NavigateBackButton} from "../../common/components";
-import {GenericImprovementsPage} from "../../common/components/improvements";
+import {GenericImprovementsPage, NavigateBackButton} from "../../common/components";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const LoadedApartmentImprovementsPage = () => {

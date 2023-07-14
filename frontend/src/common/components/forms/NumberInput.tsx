@@ -1,5 +1,6 @@
 import {NumberInput as HDSNumberInput} from "hds-react";
 
+import {useFormContext} from "react-hook-form";
 import {dotted} from "../../utils";
 import {FormInputProps} from "./";
 
@@ -9,16 +10,9 @@ interface FormNumberInputProps extends FormInputProps {
     allowDecimals?: boolean;
 }
 
-const NumberInput = ({
-    name,
-    label = "",
-    unit,
-    required,
-    invalid,
-    formObject,
-    allowDecimals,
-    ...rest
-}: FormNumberInputProps) => {
+const NumberInput = ({name, label = "", unit, required, invalid, allowDecimals, ...rest}: FormNumberInputProps) => {
+    const formObject = useFormContext();
+
     const {
         register,
         watch,

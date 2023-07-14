@@ -1,10 +1,10 @@
 import {Dialog, Table} from "hds-react";
 import {useState} from "react";
-import {useForm} from "react-hook-form";
+import {FormProvider, useForm} from "react-hook-form";
 import {useParams} from "react-router-dom";
 import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../app/services";
 import {CloseButton, QueryStateHandler, SaveButton} from "../../../common/components";
-import {FileInput} from "../../../common/components/form";
+import {FileInput} from "../../../common/components/forms";
 import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
 import {hdsToast} from "../../../common/utils";
 
@@ -18,7 +18,7 @@ const SalesCatalogImport = () => {
 
     const params = useParams() as {readonly housingCompanyId: string};
 
-    const salesCatalogForm = useForm({defaultValues: {salesCatalog: null}});
+    const formObject = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
         useValidateSalesCatalogMutation();
 
@@ -69,13 +69,14 @@ const SalesCatalogImport = () => {
 
     return (
         <>
-            <FileInput
-                buttonLabel="Lataa myyntihintaluettelo"
-                name="salesCatalog"
-                formObject={salesCatalogForm}
-                accept=".xlsx"
-                onChange={() => validateFile(salesCatalogForm.getValues())}
-            />
+            <FormProvider {...formObject}>
+                <FileInput
+                    buttonLabel="Lataa myyntihintaluettelo"
+                    name="salesCatalog"
+                    accept=".xlsx"
+                    onChange={() => validateFile(formObject.getValues())}
+                />
+            </FormProvider>
             <Dialog
                 id="import-sales-catalog-modal"
                 aria-labelledby="Sales catalog import modal"
