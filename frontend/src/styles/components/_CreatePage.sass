@@ -107,6 +107,7 @@
 
   > button
     margin: $spacing-layout-s auto
+
 .view--create-improvements
   .field-sets
     @include flex-direction(column)
@@ -195,102 +196,3 @@
       height: 24px
       &:hover
         color: $color-error
-
-.view--apartment-conditions-of-sale
-  .conditions-of-sale-headers
-    position: relative
-    display: grid
-    grid-template-columns: auto 400px 120px 150px 100px 120px
-    gap: $spacing-layout-2-xs
-    grid-row: 1
-    height: $spacing-layout-s
-    font-size: $fontsize-body-s
-    font-weight: 700
-    padding-left: $spacing-2-xs
-    span
-      font-size: $fontsize-body-l
-      line-height: 0
-
-  .conditions-of-sale-list
-    padding: $spacing-layout-s
-    padding-left: $spacing-layout-m
-    background: $color-engel-medium-light
-    display: grid
-    grid-template-rows: $spacing-layout-2-xs auto
-    grid-template-columns: 100%
-    row-gap: 0.3em
-    &-item
-      background: white
-      display: grid
-      grid-template-columns: auto 400px 120px 150px 100px 120px
-      gap: 1em
-      height: $spacing-layout-l
-      @include align-items(center)
-      .grace-period
-        padding-left: 18px
-        .text-button
-          margin-left: $spacing-xs
-          &:hover
-            cursor: pointer
-          .icon
-            width: $spacing-m
-            height: $spacing-m
-            &:hover
-              width: $spacing-l
-              height: $spacing-l
-
-      .fulfillment-date
-        align-items: center
-        margin: 0 auto
-        text-decoration: none
-      .input-wrap
-        @include flexbox()
-        @include align-items(center)
-      .icon-wrap
-        margin: 0 20px 0 -40px
-        svg
-          background: $color-error
-          color: $color-white
-        &.fulfilled svg
-          background: $color-black-5
-          color: $color-black-50
-          //opacity: 0.5
-      button
-        margin: $spacing-xs
-        margin-left: 0
-        svg
-          height: 22px
-    svg
-      height: 32px
-      width: auto
-      vertical-align: text-bottom
-    .unresolved
-      color: $color-black-60
-    .resolved
-      .name, .address, .grace-period
-        text-decoration: line-through
-        color: $color-black-30
-      button
-        display: none
-    .unresolved a:hover
-      color: $color-black
-    .resolved a:hover
-      color: $color-black-50
-
-  // Add person/owner/entity at the condition of sale dialog
-#conditions-of-sale-creation-dialog
-  .ownership-item
-    @include flexbox()
-    @include align-items(center)
-    height: 56px
-    margin-bottom: 1em
-    .input-field
-      height: 56px
-      @include flex-grow(1)
-      margin-bottom: 0
-    .icon--remove
-      @include flexbox()
-      @include flex-flow(row)
-      @include align-items(center)
-      height: 100%
-      margin-left: $spacing-s

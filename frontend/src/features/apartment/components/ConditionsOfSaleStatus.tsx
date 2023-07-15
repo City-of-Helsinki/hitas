@@ -3,7 +3,7 @@ import {IconLock, IconLockOpen, StatusLabel} from "hds-react";
 import {IApartment, IApartmentConditionOfSale, IApartmentDetails} from "../../../common/schemas";
 import {formatDate} from "../../../common/utils";
 
-type IConditionsOfSaleStatus =
+type IConditionsOfSaleStatus = (
     | {
           apartment: IApartment | IApartmentDetails;
           conditionOfSale?: never;
@@ -11,9 +11,22 @@ type IConditionsOfSaleStatus =
     | {
           apartment?: never;
           conditionOfSale: IApartmentConditionOfSale;
-      };
+      }
+) & {
+    withSellByDate?: boolean;
+};
 
-const ConditionsOfSaleStatus = ({apartment, conditionOfSale}: IConditionsOfSaleStatus) => {
+const ConditionsOfSaleStatusText = ({hasGracePeriod, sellByDate}) => {
+    return (
+        <>
+            {hasGracePeriod ? "+" : null}
+            <span className="sell-by-date">&nbsp;{formatDate(sellByDate)}</span>
+        </>
+    );
+};
+
+// Only either apartment or conditionOfSale should be passed as props
+const ConditionsOfSaleStatus = ({apartment, conditionOfSale, withSellByDate = true}: IConditionsOfSaleStatus) => {
     let sellByDate;
     let hasGracePeriod;
     let fulfilled;
@@ -40,7 +53,7 @@ const ConditionsOfSaleStatus = ({apartment, conditionOfSale}: IConditionsOfSaleS
     }
 
     const getConditionsOfSaleStatusLabelType = () => {
-        if (sellByDate === null) return "neutral";
+        if (!!fulfilled || sellByDate === null) return "neutral";
         const sbd = new Date(sellByDate);
         const today = new Date();
         if (today >= sbd) return "error";
@@ -51,12 +64,16 @@ const ConditionsOfSaleStatus = ({apartment, conditionOfSale}: IConditionsOfSaleS
 
     return (
         <StatusLabel
-            className="conditions-of-sale-status"
+            className={`conditions-of-sale-status${withSellByDate ? " conditions-of-sale-status--with-date" : ""}`}
             type={getConditionsOfSaleStatusLabelType()}
             iconLeft={fulfilled ? <IconLockOpen size="s" /> : <IconLock size="s" />}
         >
-            {hasGracePeriod ? "+" : null}
-            <span className="sell-by-date">&nbsp;{formatDate(sellByDate)}</span>
+            {withSellByDate ? (
+                <ConditionsOfSaleStatusText
+                    hasGracePeriod={hasGracePeriod}
+                    sellByDate={sellByDate}
+                />
+            ) : null}
         </StatusLabel>
     );
 };

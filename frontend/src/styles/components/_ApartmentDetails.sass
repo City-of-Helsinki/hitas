@@ -47,8 +47,6 @@
         color: $color-black-50
       h3
         margin: $spacing-2-xs 0
-      [class*="hds-status-label-icon"]
-        margin-right: -4px
       svg
         position: relative
         margin: 0 10px 0 0
@@ -271,35 +269,44 @@
         width: auto
         opacity: 1
 
-.conditions-of-sale-status
+span.conditions-of-sale-status
   @include flexbox()
-  flex-direction: row
+  @include flex-flow(row nowrap)
   @include justify-content(center)
   @include align-items(center)
+
+  padding-left: 4px
+  padding-right: 4px
+
   margin-right: 0.5em
   span
+    //height: 32px
     margin: 0
     svg
       margin: 0 !important
+
   [class*="hds-status-label-icon"]
     width: 24px
-    opacity: 1
-    transition: width 200ms 100ms, opacity 100ms
-  .sell-by-date
-    overflow: hidden
-    width: 0
-    opacity: 0
-    text-align: center
-    transition: width 200ms 100ms, opacity 200ms
-  &:hover
+
+  &--with-date
     [class*="hds-status-label-icon"]
+      opacity: 1
+      transition: width 200ms 100ms, opacity 100ms
+    .sell-by-date
+      overflow: hidden
       width: 0
       opacity: 0
-      transition: width 100ms, opacity 100ms
-    .sell-by-date
-      width: 74px
-      opacity: 1
-      transition: width 200ms, opacity 200ms 100ms
-    display: none
-  &:hover > .sell-by-date
-    display: inline-block
+      text-align: center
+      transition: width 200ms 100ms, opacity 200ms
+    &:hover
+      [class*="hds-status-label-icon"]
+        width: 0
+        opacity: 0
+        transition: width 100ms, opacity 100ms
+      .sell-by-date
+        width: 74px
+        opacity: 1
+        transition: width 200ms, opacity 200ms 100ms
+      display: none
+    &:hover > .sell-by-date
+      display: inline-block

@@ -15,6 +15,7 @@ export default function CloseButton({
     return (
         <Button
             iconLeft={<IconCross />}
+            variant="secondary"
             theme="black"
             onClick={onClick}
             isLoading={isLoading}
