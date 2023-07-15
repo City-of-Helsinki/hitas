@@ -1,0 +1,37 @@
+@use "../imports" as *
+
+.view--apartment-conditions-of-sale
+  .conditions-of-sale-table
+    background: $color-engel-medium-light
+    padding: $spacing-layout-s
+
+    table tbody tr td
+      .row
+        gap: $spacing-3-xs
+        align-items: center
+
+      // Make links/buttons lighter on hover
+      .text-button:hover, a:hover
+        color: $color-black-60
+
+      .fulfilled
+        text-decoration: line-through
+        color: $color-black-30
+
+// Select household owners modal
+#conditions-of-sale-creation-dialog
+  .ownership-item
+    @include flexbox()
+    @include align-items(center)
+    height: 56px
+    margin-bottom: 1em
+    .input-field
+      height: 56px
+      @include flex-grow(1)
+      margin-bottom: 0
+    .icon--remove
+      @include flexbox()
+      @include flex-flow(row)
+      @include align-items(center)
+      height: 100%
+      margin-left: $spacing-s

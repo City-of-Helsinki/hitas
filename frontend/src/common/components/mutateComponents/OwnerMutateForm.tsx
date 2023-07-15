@@ -43,7 +43,7 @@ export default function OwnerMutateForm({
     const resolver = async (data, context, options) => {
         // validate the form
         return zodResolver(
-            OwnerSchema.superRefine((data, ctx) => {
+            OwnerSchema.omit({id: true}).superRefine((data, ctx) => {
                 if (!validateSocialSecurityNumber(data.identifier) && !validateBusinessId(data.identifier)) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,

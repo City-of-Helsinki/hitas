@@ -367,7 +367,7 @@ const ApartmentLinkedModelsSchema = object({
 });
 
 const OwnerSchema = object({
-    id: APIIdString.optional(),
+    id: APIIdString,
     name: string({required_error: errorMessages.required})
         .min(2, errorMessages.stringLength)
         .max(256, errorMessages.stringMaxIs + "256"),

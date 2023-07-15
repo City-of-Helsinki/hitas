@@ -1,4 +1,4 @@
-import {IApartment, IApartmentDetails} from "./schemas";
+import {IApartment, IApartmentConditionOfSale, IApartmentDetails} from "./schemas";
 
 export const getHousingCompanyHitasTypeName = (state) => {
     switch (state) {
@@ -58,4 +58,15 @@ export const getApartmentSoldStatusLabel = (apartment: IApartment | IApartmentDe
         return "Myyty";
     }
     return "Vapaa";
+};
+
+export const getConditionOfSaleGracePeriodLabel = (conditionOfSale: IApartmentConditionOfSale) => {
+    switch (conditionOfSale.grace_period) {
+        case "three_months":
+            return "3kk";
+        case "six_months":
+            return "6kk";
+        default:
+            return "Ei lisäaikaa";
+    }
 };

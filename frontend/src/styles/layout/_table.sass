@@ -1,0 +1,14 @@
+@use '../imports' as *
+
+// Disable blue outline on HDS tables when they are clicked
+[class^="Table-module_container"]
+  &:focus
+    outline: none !important
+
+  // Restyle HDS zebra tables
+  table[class*="Table-module_zebra"]
+    tbody[class^="Table-module_content"]
+      tr:nth-child(2n) td
+        background-color: $color-black-5
+      tr td
+        border-bottom: 1px solid $color-black-20
