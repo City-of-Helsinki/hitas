@@ -167,11 +167,11 @@ class DepreciationPercentageField(serializers.ChoiceField):
             raise serializers.ValidationError(code="blank")
 
         match data:
-            case "10":
+            case "10" | "10.0":
                 return DepreciationPercentage.TEN
             case "2.5":
                 return DepreciationPercentage.TWO_AND_HALF
-            case "0":
+            case "0" | "0.0":
                 return DepreciationPercentage.ZERO
             case _:
                 supported_values = ["0.0", "2.5", "10.0"]
