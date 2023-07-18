@@ -9,7 +9,7 @@ import {useCreateSaleMutation} from "../../../app/services";
 import {ConfirmDialogModal, Heading, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
 import {FormProviderForm} from "../../../common/components/forms";
 import {IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
-import {hdsToast, today} from "../../../common/utils";
+import {hdsToast, setAPIErrorsForFormFields, today} from "../../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/ApartmentViewContextProvider";
 import {ApartmentCatalogPricesFieldSet, ApartmentSaleFormFieldSet, MaximumPriceCalculationFieldSet} from "./fieldsets";
 import {ApartmentSaleContext, getRefinedApartmentSaleFormSchema, ISalesPageMaximumPrices} from "./utils";
@@ -170,9 +170,7 @@ const LoadedApartmentSalePage = () => {
             })
             .catch((error) => {
                 hdsToast.error("Kaupan tallentaminen epäonnistui!");
-                error.data.fields.forEach((field) =>
-                    formObject.setError(field.field, {type: "custom", message: field.message})
-                );
+                setAPIErrorsForFormFields(formObject, error);
             });
     };
 

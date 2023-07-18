@@ -30,7 +30,7 @@ import {
     IApartmentWritableForm,
     ICode,
 } from "../../common/schemas";
-import {hdsToast, isEmpty} from "../../common/utils";
+import {hdsToast, isEmpty, setAPIErrorsForFormFields} from "../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
 const ApartmentDeleteButton = ({apartment}) => {
@@ -172,15 +172,6 @@ const LoadedApartmentCreatePage = () => {
         resolver: zodResolver(ApartmentWritableFormSchema),
     });
 
-    // Set errors returned from the API for form fields
-    const setAPIErrorsForFormFields = (error) => {
-        if (error?.data?.fields) {
-            for (const fieldError of error.data.fields) {
-                formObject.setError(fieldError.field, {type: "custom", message: fieldError.message});
-            }
-        }
-    };
-
     const onSubmit: SubmitHandler<IApartmentWritableForm> = (data) => {
         const formattedFormData = formatApartmentFormDataForSubmit(apartment, data);
 
@@ -201,7 +192,7 @@ const LoadedApartmentCreatePage = () => {
             .catch((error) => {
                 hdsToast.error("Asunnon tallentaminen epäonnistui!");
                 setIsEndModalVisible(true);
-                setAPIErrorsForFormFields(error);
+                setAPIErrorsForFormFields(formObject, error);
             });
     };
 

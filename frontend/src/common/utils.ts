@@ -244,3 +244,13 @@ export const getHitasQuarter = (date?) => {
     }
     return hitasQuarters[quarter.number];
 };
+
+// Set errors returned from an API request for form fields
+// Does not work well with useFieldArray fields, as the API does not return the index of the field, only the field name
+export const setAPIErrorsForFormFields = (formObject, error) => {
+    if (error?.data?.fields) {
+        for (const fieldError of error.data.fields) {
+            formObject.setError(fieldError.field, {type: "custom", message: fieldError.message});
+        }
+    }
+};
