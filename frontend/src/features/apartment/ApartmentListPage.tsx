@@ -178,6 +178,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): React.JSX.Element =>
                     {value: "true", label: "Säännelty"},
                     {value: "false", label: "Ei säännelty"},
                 ]}
+                defaultOption={{value: "true", label: "Säännelty"}}
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
@@ -193,7 +194,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): React.JSX.Element =>
 };
 
 const ApartmentListPage = (): React.JSX.Element => {
-    const [filterParams, setFilterParams] = useState({});
+    const [filterParams, setFilterParams] = useState({is_regulated: "true"});
 
     return (
         <div className="view--apartments-listing">
