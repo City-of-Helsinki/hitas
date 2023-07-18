@@ -26,7 +26,7 @@ const MaximumPriceCalculationFieldSet = ({hasLoanValueChanged}) => {
 
     const handleCreateNewCalculationButton = () => {
         if (isCalculationFormValid) {
-            const date = formObject.watch("purchase_date") ?? null;
+            const date = formObject.getValues("purchase_date") ?? null;
 
             saveMaximumPriceCalculation({
                 housingCompanyId: apartment.links.housing_company.id,
