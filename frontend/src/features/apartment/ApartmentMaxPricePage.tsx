@@ -4,13 +4,9 @@ import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
 import {useImmer} from "use-immer";
 
-import {useGetHousingCompanyDetailQuery, useSaveApartmentMaximumPriceMutation} from "../../app/services";
+import {useSaveApartmentMaximumPriceMutation} from "../../app/services";
 import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
-import {
-    IApartmentMaximumPriceCalculationDetails,
-    IApartmentMaximumPriceWritable,
-    IHousingCompanyDetails,
-} from "../../common/schemas";
+import {IApartmentMaximumPriceCalculationDetails, IApartmentMaximumPriceWritable} from "../../common/schemas";
 import {today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
@@ -36,8 +32,8 @@ const MaximumPriceModalError = ({error, setIsModalVisible}): React.JSX.Element =
     );
 };
 
-const LoadedApartmentMaxPrice = (): React.JSX.Element => {
-    const {apartment} = useContext(ApartmentViewContext);
+const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -47,11 +43,7 @@ const LoadedApartmentMaxPrice = (): React.JSX.Element => {
         calculation_date: today(),
         additional_info: "",
     });
-    const {
-        data: housingCompanyData,
-        error: housingCompanyError,
-        isLoading: isHousingCompanyLoading,
-    } = useGetHousingCompanyDetailQuery(apartment.links.housing_company.id);
+
     const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
     useEffect(() => {
@@ -79,7 +71,7 @@ const LoadedApartmentMaxPrice = (): React.JSX.Element => {
     };
 
     return (
-        <div className="view--apartment-max-price">
+        <>
             <div className="field-sets">
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
@@ -128,16 +120,10 @@ const LoadedApartmentMaxPrice = (): React.JSX.Element => {
                         data={apartment}
                         title="Laskentaan vaikuttavat asunnon parannukset"
                     />
-                    <QueryStateHandler
-                        data={housingCompanyData}
-                        error={housingCompanyError}
-                        isLoading={isHousingCompanyLoading}
-                    >
-                        <ImprovementsTable
-                            data={housingCompanyData as IHousingCompanyDetails}
-                            title="Yhtiökohtaiset parannukset"
-                        />
-                    </QueryStateHandler>
+                    <ImprovementsTable
+                        data={housingCompany}
+                        title="Yhtiökohtaiset parannukset"
+                    />
                     <div className="row row--buttons">
                         <NavigateBackButton />
                         <Button
@@ -180,14 +166,14 @@ const LoadedApartmentMaxPrice = (): React.JSX.Element => {
                     />
                 </QueryStateHandler>
             </Dialog>
-        </div>
+        </>
     );
 };
 
 const ApartmentMaxPricePage = (): React.JSX.Element => {
     return (
-        <ApartmentViewContextProvider viewClassName="view--apartment view--apartment-details">
-            <LoadedApartmentMaxPrice />
+        <ApartmentViewContextProvider viewClassName="view--apartment-max-price">
+            <LoadedApartmentMaxPricePage />
         </ApartmentViewContextProvider>
     );
 };
