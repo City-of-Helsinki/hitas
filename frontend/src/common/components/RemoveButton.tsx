@@ -9,6 +9,7 @@ interface RemoveButtonProps {
     variant?: "primary" | "secondary" | "success" | "danger";
     className?: string;
     size?: "small" | "default";
+    iconLeft?: React.ReactNode;
 }
 
 export default function RemoveButton({
@@ -16,11 +17,12 @@ export default function RemoveButton({
     isLoading,
     disabled = false,
     buttonText,
+    iconLeft,
     ...rest
 }: RemoveButtonProps): React.JSX.Element {
     return (
         <Button
-            iconLeft={<IconCrossCircleFill />}
+            iconLeft={iconLeft ?? <IconCrossCircleFill />}
             theme="black"
             onClick={onClick}
             isLoading={isLoading}

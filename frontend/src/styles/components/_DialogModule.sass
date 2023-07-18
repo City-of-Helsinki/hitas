@@ -1,5 +1,14 @@
 @use '../imports' as *
 
+// Disable blue outline for the dialog title when it's selected
+[class^="DialogHeader-module_dialogTitle"]:after
+  content: none !important
+
+// More red colors for danger dialogs
+[class*="Dialog-module_danger"]
+  background: $color-error-light !important
+  border-color: $color-error !important
+
 [class^="Dialog-module_"]
   [class^="Table-module_headerRow"]
     text-transform: capitalize

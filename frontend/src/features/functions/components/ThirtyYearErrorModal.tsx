@@ -1,6 +1,6 @@
-import {Dialog} from "hds-react";
+import {IconAlertCircleFill} from "hds-react";
 import {Dispatch, SetStateAction} from "react";
-import {CloseButton} from "../../../common/components";
+import {GenericActionModal} from "../../../common/components";
 import {ErrorResponse} from "../../../common/schemas";
 
 interface ComparisonResultModalProps {
@@ -13,20 +13,15 @@ export default function ThirtyYearErrorModal({isOpen, setIsOpen, response}: Comp
     if (!response) return <></>;
     const error = response as ErrorResponse;
     return (
-        <Dialog
-            id="comparison-result-modal"
-            aria-labelledby="comparison-result-modal"
-            isOpen={isOpen}
-            className="error-modal"
+        <GenericActionModal
+            title={`Virhe ${error?.status ? error.status + ": " : ""}${error?.reason ? error?.reason : ""}!`}
+            modalIcon={<IconAlertCircleFill />}
+            isModalOpen={isOpen}
+            closeModal={() => setIsOpen(false)}
+            confirmButton={null}
+            danger
         >
-            <Dialog.Header
-                id="error-notification-modal-header"
-                title={`Virhe ${error?.status ? error.status + ": " : ""}${error?.reason ? error?.reason : ""}!`}
-            />
-            <Dialog.Content>{error?.message}</Dialog.Content>
-            <Dialog.ActionButtons>
-                <CloseButton onClick={() => setIsOpen(false)} />
-            </Dialog.ActionButtons>
-        </Dialog>
+            {error?.message}
+        </GenericActionModal>
     );
 }
