@@ -59,7 +59,7 @@ const HouseholdOwnersList = () => {
                             label="Omistaja"
                             queryFunction={useGetOwnersQuery}
                             relatedModelSearchField="name"
-                            formObjectFieldPath={`household.${index}.owner`}
+                            name={`household.${index}.owner`}
                             formatFormObjectValue={(obj) => (obj.id ? formatOwner(obj) : "")}
                             required
                         />
