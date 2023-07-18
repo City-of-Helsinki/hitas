@@ -13,7 +13,7 @@ import {
     IApartmentMaximumPriceCalculationDetails,
     IApartmentMaximumPriceWritable,
 } from "../../common/schemas";
-import {today} from "../../common/utils";
+import {hdsToast, setAPIErrorsForFormFields, today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 
@@ -73,9 +73,15 @@ const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
             data: parsedFormData,
-        });
-
-        setIsModalVisible(true);
+        })
+            .unwrap()
+            .then(() => {
+                setIsModalVisible(true);
+            })
+            .catch((error) => {
+                hdsToast.error("Asunnon enimmäishintalaskelman luominen epäonnistui!");
+                setAPIErrorsForFormFields(formObject, error);
+            });
     };
 
     return (
