@@ -4,6 +4,7 @@ import React from "react";
 interface FilterComboboxProps {
     label: string;
     options: {label: string; value: string}[];
+    defaultOption?: {label: string; value: string};
     filterFieldName: string;
     filterParams: object;
     setFilterParams: (object) => void;
@@ -12,6 +13,7 @@ interface FilterComboboxProps {
 export default function FilterSelectField({
     label,
     options,
+    defaultOption,
     filterFieldName,
     filterParams,
     setFilterParams,
@@ -33,6 +35,7 @@ export default function FilterSelectField({
             id={`filter__${filterFieldName}`}
             label={label}
             options={options}
+            defaultValue={defaultOption}
             onChange={onSelectionChange}
             clearable
         />

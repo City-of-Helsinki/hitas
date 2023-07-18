@@ -155,6 +155,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
                     {value: "true", label: "Säännelty"},
                     {value: "false", label: "Ei säännelty"},
                 ]}
+                defaultOption={{value: "true", label: "Säännelty"}}
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
@@ -163,7 +164,7 @@ const HousingCompanyFilters = ({filterParams, setFilterParams}): React.JSX.Eleme
 };
 
 const HousingCompanyListPage = (): React.JSX.Element => {
-    const [filterParams, setFilterParams] = useState({});
+    const [filterParams, setFilterParams] = useState({is_regulated: "true"});
 
     return (
         <div className="view--housing-company-list">
