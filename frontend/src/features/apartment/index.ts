@@ -7,11 +7,11 @@ import ApartmentMaxPricePage from "./ApartmentMaxPricePage";
 import ApartmentNewSalePage from "./ApartmentNewSalePage";
 
 export {
-    ApartmentDetailsPage,
-    ApartmentListPage,
+    ApartmentConditionsOfSalePage,
     ApartmentCreatePage,
+    ApartmentDetailsPage,
+    ApartmentImprovementsPage,
+    ApartmentListPage,
     ApartmentMaxPricePage,
     ApartmentNewSalePage,
-    ApartmentImprovementsPage,
-    ApartmentConditionsOfSalePage,
 };
