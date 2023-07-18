@@ -4,6 +4,7 @@ import FileInput from "./FileInput";
 import FormProviderForm from "./FormProviderForm";
 import NumberInput from "./NumberInput";
 import RelatedModelInput from "./RelatedModelInput";
+import SaveFormButton from "./SaveFormButton";
 import SelectInput from "./SelectInput";
 import TextAreaInput from "./TextAreaInput";
 import TextInput from "./TextInput";
@@ -32,6 +33,7 @@ export {
     FormProviderForm,
     NumberInput,
     RelatedModelInput,
+    SaveFormButton,
     SelectInput,
     TextAreaInput,
     TextInput,

@@ -1,4 +1,4 @@
-import {Button, Card, Dialog, IconDownload, IconGlyphEuro, IconLock, Tabs} from "hds-react";
+import {Button, Card, IconDownload, IconGlyphEuro, IconLock, IconTrash, Tabs} from "hds-react";
 import React, {useContext, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {Link} from "react-router-dom";
@@ -7,8 +7,9 @@ import {
     downloadApartmentUnconfirmedMaximumPricePDF,
     useDeleteSaleMutation,
 } from "../../app/services";
-import {DetailField, Divider, ImprovementsTable, RemoveButton} from "../../common/components";
-import {DateInput, FormProviderForm, TextAreaInput} from "../../common/components/forms";
+import {DetailField, Divider, GenericActionModal, ImprovementsTable, RemoveButton} from "../../common/components";
+import DownloadButton from "../../common/components/DownloadButton";
+import {DateInput, FormProviderForm, SaveFormButton, TextAreaInput} from "../../common/components/forms";
 import {
     MutateForm,
     MutateModal,
@@ -199,21 +200,17 @@ const ConfirmedPriceDetails = ({confirmed}: {confirmed: IApartmentConfirmedMaxim
     );
 };
 
-interface DownloadModalProps {
-    apartment: IApartmentDetails;
-    isVisible: boolean;
-    setIsVisible;
-}
+const UnconfirmedPricesDownloadModalButton = () => {
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
 
-const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
     const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm({
         defaultValues: {calculation_date: today(), request_date: today(), additional_info: ""},
     });
-
-    const handleDownloadButtonClick = () => {
-        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
 
     const onSubmit = () => {
         downloadApartmentUnconfirmedMaximumPricePDF(
@@ -222,23 +219,39 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
             formObject.getValues("additional_info"),
             formObject.getValues("calculation_date")
         );
-        setIsVisible(false);
+        closeModal();
     };
 
+    const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
+
     return (
-        <Dialog
-            id="unconfirmed-prices-download-modal"
-            closeButtonLabelText=""
-            aria-labelledby=""
-            isOpen={isVisible}
-            close={() => setIsVisible(false)}
-            boxShadow
-        >
-            <Dialog.Header
-                id="unconfirmed-prices-download-modal__header"
-                title="Lataa enimmäishinta-arvio"
+        <>
+            <DownloadButton
+                buttonText="Lataa Hinta-arvio"
+                onClick={() => setIsModalOpen(true)}
+                size="small"
+                disabled={
+                    // Button should be disabled if any of the price calculations are missing
+                    !(
+                        unconfirmedPrices.market_price_index.value &&
+                        unconfirmedPrices.construction_price_index.value &&
+                        unconfirmedPrices.surface_area_price_ceiling.value
+                    ) || housingCompany.regulation_status !== "regulated"
+                }
             />
-            <Dialog.Content>
+            <GenericActionModal
+                id="unconfirmed-prices-download-modal"
+                title="Lataa enimmäishinta-arvio"
+                modalIcon={<IconDownload />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <SaveFormButton
+                        formRef={formRef}
+                        buttonText="Lataa enimmäishinta-arvio"
+                    />
+                }
+            >
                 <FormProviderForm
                     formObject={formObject}
                     formRef={formRef}
@@ -264,56 +277,52 @@ const UnconfirmedPricesDownloadModal = ({apartment, isVisible, setIsVisible}: Do
                         required
                     />
                 </FormProviderForm>
-            </Dialog.Content>
-            <Dialog.ActionButtons>
-                <Button
-                    onClick={() => setIsVisible(false)}
-                    variant="secondary"
-                    theme="black"
-                    size="small"
-                >
-                    Sulje
-                </Button>
-                <Button
-                    theme="black"
-                    size="small"
-                    iconLeft={<IconDownload />}
-                    onClick={() => handleDownloadButtonClick()}
-                >
-                    Lataa Hinta-arvio
-                </Button>
-            </Dialog.ActionButtons>
-        </Dialog>
+            </GenericActionModal>
+        </>
     );
 };
 
-const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: DownloadModalProps) => {
+const MaximumPriceDownloadModalButton = () => {
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
     const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm({
         defaultValues: {request_date: today(), additional_info: ""},
     });
-    const handleDownloadButtonClick = () => {
-        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
+
     const onSubmit = () => {
         downloadApartmentMaximumPricePDF(apartment, formObject.getValues("request_date"));
-        setIsVisible(false);
+        setIsModalOpen(false);
     };
 
     return (
-        <Dialog
-            id="maximum-prices-download-modal"
-            closeButtonLabelText=""
-            aria-labelledby=""
-            isOpen={isVisible}
-            close={() => setIsVisible(false)}
-            boxShadow
-        >
-            <Dialog.Header
-                id="unconfirmed-prices-download-modal__header"
-                title="Lataa enimmäishintalaskelma"
+        <>
+            <DownloadButton
+                buttonText="Lataa enimmäishintalaskelma"
+                onClick={() => setIsModalOpen(true)}
+                size="small"
+                disabled={
+                    !apartment.prices.maximum_prices.confirmed ||
+                    !apartment.prices.maximum_prices.confirmed.id ||
+                    housingCompany.regulation_status !== "regulated"
+                }
             />
-            <Dialog.Content>
+            <GenericActionModal
+                title="Lataa enimmäishintalaskelma"
+                modalIcon={<IconDownload />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <SaveFormButton
+                        formRef={formRef}
+                        buttonText="Lataa enimmäishintalaskelma"
+                    />
+                }
+            >
                 <FormProviderForm
                     formObject={formObject}
                     formRef={formRef}
@@ -327,26 +336,8 @@ const MaximumPriceDownloadModal = ({apartment, isVisible, setIsVisible}: Downloa
                         required
                     />
                 </FormProviderForm>
-            </Dialog.Content>
-            <Dialog.ActionButtons>
-                <Button
-                    onClick={() => setIsVisible(false)}
-                    variant="secondary"
-                    theme="black"
-                    size="small"
-                >
-                    Sulje
-                </Button>
-                <Button
-                    theme="black"
-                    size="small"
-                    iconLeft={<IconDownload />}
-                    onClick={() => handleDownloadButtonClick()}
-                >
-                    Lataa enimmäishintalaskelma
-                </Button>
-            </Dialog.ActionButtons>
-        </Dialog>
+            </GenericActionModal>
+        </>
     );
 };
 
@@ -358,8 +349,6 @@ const ApartmentMaximumPricesCard = ({
     housingCompany: IHousingCompanyDetails;
 }) => {
     const unconfirmedPrices = getApartmentUnconfirmedPrices(apartment);
-    const [isUnconfirmedMaximumPriceModalVisible, setIsUnconfirmedMaximumPriceModalVisible] = useState(false);
-    const [isMaximumPriceModalVisible, setIsMaximumPriceModalVisible] = useState(false);
 
     return (
         <Card>
@@ -378,43 +367,15 @@ const ApartmentMaximumPricesCard = ({
                     unconfirmedPrice={unconfirmedPrices.surface_area_price_ceiling}
                 />
                 <div className="align-content-right">
-                    <Button
-                        theme="black"
-                        size="small"
-                        variant="secondary"
-                        iconLeft={<IconDownload />}
-                        onClick={() => setIsUnconfirmedMaximumPriceModalVisible(true)}
-                        disabled={
-                            // Button should be disabled if any of the price calculations are missing
-                            !(
-                                unconfirmedPrices.market_price_index.value &&
-                                unconfirmedPrices.construction_price_index.value &&
-                                unconfirmedPrices.surface_area_price_ceiling.value
-                            ) || housingCompany.regulation_status !== "regulated"
-                        }
-                    >
-                        Lataa Hinta-arvio
-                    </Button>
+                    <UnconfirmedPricesDownloadModalButton />
                 </div>
             </div>
 
             <label className="card-heading">Vahvistettu enimmäishinta</label>
             <ConfirmedPriceDetails confirmed={apartment.prices.maximum_prices.confirmed} />
+
             <div className="align-content-right">
-                <Button
-                    theme="black"
-                    size="small"
-                    variant="secondary"
-                    iconLeft={<IconDownload />}
-                    onClick={() => setIsMaximumPriceModalVisible(true)}
-                    disabled={
-                        !apartment.prices.maximum_prices.confirmed ||
-                        !apartment.prices.maximum_prices.confirmed.id ||
-                        housingCompany.regulation_status !== "regulated"
-                    }
-                >
-                    Lataa enimmäishintalaskelma
-                </Button>
+                <MaximumPriceDownloadModalButton />
                 <Link to="max-price">
                     <Button
                         theme="black"
@@ -429,36 +390,21 @@ const ApartmentMaximumPricesCard = ({
                     </Button>
                 </Link>
             </div>
-
-            <UnconfirmedPricesDownloadModal
-                apartment={apartment}
-                isVisible={isUnconfirmedMaximumPriceModalVisible}
-                setIsVisible={setIsUnconfirmedMaximumPriceModalVisible}
-            />
-            <MaximumPriceDownloadModal
-                apartment={apartment}
-                isVisible={isMaximumPriceModalVisible}
-                setIsVisible={setIsMaximumPriceModalVisible}
-            />
         </Card>
     );
 };
 
-const LoadedApartmentDetails = (): React.JSX.Element => {
+const RemoveApartmentLatestSaleModalButton = () => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
-    // Handle visibility of the relevant modals
-    const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
-    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
-    const [isRemoveSaleModalVisible, setIsRemoveSaleModalVisible] = useState(false);
+    if (!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date) return null;
 
-    const [owner, setOwner] = useState<IOwner | undefined>(undefined);
-    const modifyOwnerHandler = (selectedOwner: IOwner) => {
-        setIsModifyOwnerModalVisible(true);
-        setOwner(selectedOwner);
-    };
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
     const [removeSale, {isLoading}] = useDeleteSaleMutation();
+
     const handleRemoveSaleButtonClick = () => {
         removeSale({
             housingCompanyId: housingCompany.id,
@@ -474,7 +420,63 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                 // eslint-disable-next-line no-console
                 console.warn(e);
             });
-        setIsRemoveSaleModalVisible(false);
+        setIsModalOpen(false);
+    };
+
+    const getLatestSaleDescription = () => {
+        const price = apartment.prices.latest_sale_purchase_price ?? apartment.prices.first_sale_purchase_price;
+        return `(${formatDate(apartment.prices.latest_purchase_date)}, ${formatMoney(price)})`;
+    };
+
+    return (
+        <>
+            <RemoveButton
+                onClick={() => setIsModalOpen(true)}
+                isLoading={isLoading}
+                buttonText="Peru kauppa"
+                variant="secondary"
+                size="small"
+                className="delete-sale-button"
+                disabled={!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date}
+            />
+
+            <GenericActionModal
+                title="Asunnon viimeisimmän kaupan peruminen"
+                modalIcon={<IconTrash />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <RemoveButton
+                        onClick={handleRemoveSaleButtonClick}
+                        isLoading={isLoading}
+                        buttonText="Vahvista kaupan peruminen"
+                        iconLeft={<IconTrash />}
+                    />
+                }
+                danger
+            >
+                <p>
+                    Haluatko varmasti perua viimeisimmän kaupan
+                    <br />
+                    {getLatestSaleDescription()}?
+                </p>
+            </GenericActionModal>
+        </>
+    );
+};
+
+const LoadedApartmentDetails = (): React.JSX.Element => {
+    const {housingCompany, apartment} = useContext(ApartmentViewContext);
+    if (!apartment) throw new Error("Apartment not found");
+
+    // Handle visibility of the relevant modals
+    const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
+    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
+
+    const [owner, setOwner] = useState<IOwner | undefined>(undefined);
+    const modifyOwnerHandler = (selectedOwner: IOwner) => {
+        setIsModifyOwnerModalVisible(true);
+        setOwner(selectedOwner);
     };
 
     return (
@@ -584,17 +586,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                                 label="Viimeisin kauppapäivä"
                                                 value={formatDate(apartment.prices.latest_purchase_date)}
                                             />
-                                            <RemoveButton
-                                                onClick={() => setIsRemoveSaleModalVisible(true)}
-                                                isLoading={isLoading}
-                                                buttonText="Peru kauppa"
-                                                variant="secondary"
-                                                className="delete-sale-button"
-                                                disabled={
-                                                    !apartment.prices.current_sale_id ||
-                                                    !apartment.prices.latest_purchase_date
-                                                }
-                                            />
+                                            <RemoveApartmentLatestSaleModalButton />
                                         </div>
                                         <Divider size="s" />
 
@@ -716,40 +708,6 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                     editPath={`/housing-companies/${housingCompany.id}/improvements`}
                 />
             </div>
-            <Dialog
-                id="remove-sale-modal"
-                aria-labelledby="remove-sale-modal"
-                isOpen={isRemoveSaleModalVisible}
-            >
-                <Dialog.Header
-                    title="Viimeisimmän kaupan peruminen"
-                    id="remove-sale-modal-header"
-                />
-                <Dialog.Content>
-                    <p>
-                        Haluatko varmasti perua viimeisimmän kaupan?
-                        <br />({formatDate(apartment.prices.latest_purchase_date) + ", "}
-                        {formatMoney(
-                            apartment.prices.latest_sale_purchase_price ?? apartment.prices.first_sale_purchase_price
-                        )}
-                        )
-                    </p>
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <Button
-                        theme="black"
-                        variant="secondary"
-                        onClick={() => setIsRemoveSaleModalVisible(false)}
-                    >
-                        Peruuta
-                    </Button>
-                    <RemoveButton
-                        onClick={handleRemoveSaleButtonClick}
-                        isLoading={isLoading}
-                        buttonText="Vahvista kaupan peruminen"
-                    />
-                </Dialog.ActionButtons>
-            </Dialog>
         </>
     );
 };

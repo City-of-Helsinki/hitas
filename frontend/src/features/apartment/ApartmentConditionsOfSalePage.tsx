@@ -1,6 +1,6 @@
 import {useContext, useRef, useState} from "react";
 
-import {Button, Dialog, IconCrossCircle, IconPlus, IconPlusCircleFill, Table} from "hds-react";
+import {Button, IconCrossCircle, IconLock, IconPlus, IconPlusCircleFill, Table} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
@@ -10,9 +10,15 @@ import {
     useGetOwnersQuery,
     usePatchConditionOfSaleMutation,
 } from "../../app/services";
-import {ConfirmDialogModal, Heading, NavigateBackButton, RemoveButton, SaveButton} from "../../common/components";
-import CloseButton from "../../common/components/CloseButton";
-import {FormProviderForm, RelatedModelInput} from "../../common/components/forms";
+import {
+    ConfirmDialogModal,
+    GenericActionModal,
+    Heading,
+    NavigateBackButton,
+    RemoveButton,
+    SaveButton,
+} from "../../common/components";
+import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
 import {getConditionOfSaleGracePeriodLabel} from "../../common/localisation";
 import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
@@ -85,6 +91,7 @@ const CreateConditionOfSaleButton = () => {
     if (!apartment) throw new Error("Apartment not found");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
 
     const initialFormOwnerList: {owner: IOwner}[] = apartment.ownerships.map((o: IOwnership) => {
         return {owner: o.owner};
@@ -95,10 +102,6 @@ const CreateConditionOfSaleButton = () => {
         defaultValues: {household: initialFormOwnerList},
         mode: "all",
     });
-
-    const handleSaveButtonClick = () => {
-        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
 
     const [createConditionOfSale, {isLoading}] = useCreateConditionOfSaleMutation();
 
@@ -119,7 +122,7 @@ const CreateConditionOfSaleButton = () => {
                     } else {
                         hdsToast.info("Yhtään myyntiehtoa ei voitu luoda.");
                     }
-                    setIsModalOpen(false);
+                    closeModal();
                 })
                 .catch(() => {
                     hdsToast.error("Myyntiehtojen luonti epäonnistui!");
@@ -139,46 +142,36 @@ const CreateConditionOfSaleButton = () => {
                 Lisää uusi
             </Button>
 
-            <Dialog
+            <GenericActionModal
                 id="conditions-of-sale-creation-dialog"
-                aria-labelledby="create-modal"
-                isOpen={isModalOpen}
-                close={() => setIsModalOpen(false)}
-                closeButtonLabelText="Sulje"
-                boxShadow
-            >
-                <Dialog.Header
-                    id="conditions-of-sale-creation-header"
-                    title="Luo myyntiehto taloudelle"
-                />
-                <Dialog.Content>
-                    <FormProviderForm
-                        formObject={formObject}
+                title="Luo myyntiehto taloudelle"
+                modalIcon={<IconLock />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <SaveFormButton
                         formRef={formRef}
-                        onSubmit={handleCreateConditionOfSale}
-                    >
-                        <HouseholdOwnersList />
-                    </FormProviderForm>
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <CloseButton onClick={() => setIsModalOpen(false)} />
-                    <SaveButton
-                        onClick={handleSaveButtonClick}
                         isLoading={isLoading}
                         disabled={!formObject.getValues("household").length}
                     />
-                </Dialog.ActionButtons>
-            </Dialog>
+                }
+            >
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={handleCreateConditionOfSale}
+                >
+                    <HouseholdOwnersList />
+                </FormProviderForm>
+            </GenericActionModal>
         </>
     );
 };
 
 const ConditionOfSaleGracePeriodButton = ({conditionOfSale}: {conditionOfSale: IApartmentConditionOfSale}) => {
-    const [isExtendGracePeriodModalOpen, setIsExtendGracePeriodModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const closeModal = () => {
-        setIsExtendGracePeriodModalOpen(false);
-    };
+    const closeModal = () => setIsModalOpen(false);
 
     const [patchConditionOfSale, {error, isLoading}] = usePatchConditionOfSaleMutation();
 
@@ -203,7 +196,7 @@ const ConditionOfSaleGracePeriodButton = ({conditionOfSale}: {conditionOfSale: I
         <>
             <button
                 className="text-button"
-                onClick={() => setIsExtendGracePeriodModalOpen(true)}
+                onClick={() => setIsModalOpen(true)}
             >
                 <IconPlusCircleFill
                     className="icon"
@@ -211,62 +204,52 @@ const ConditionOfSaleGracePeriodButton = ({conditionOfSale}: {conditionOfSale: I
                 />
             </button>
 
-            <Dialog
-                id="extend-grace-period-dialog"
-                closeButtonLabelText=""
-                aria-labelledby="extend-grace-period-dialog__header"
-                isOpen={isExtendGracePeriodModalOpen}
-                close={closeModal}
-                boxShadow
-            >
-                <Dialog.Header
-                    id="extend-grace-period-dialog__header"
-                    title="Myönnä lisäaikaa"
-                />
-                <Dialog.Content id="extend-grace-period-dialog__content">
-                    {error && "status" in error && "data" in error && (
-                        <p className="error-message">
-                            Lisäajan tallentamisessa tapahtui virhe: {error.status} {JSON.stringify(error.data)}
-                        </p>
-                    )}
-                    <ul className="info-text">
-                        <li>
-                            <span className="title">Omistaja:</span> {formatOwner(conditionOfSale.owner)}
-                        </li>
-                        <li>
-                            <span className="title">Asunto:</span> {formatAddress(conditionOfSale.apartment.address)}
-                        </li>
-                        <li>
-                            <span className="title">Myytävä viimeistään: </span>{" "}
-                            {formatDate(conditionOfSale.sell_by_date)}
-                        </li>
-                    </ul>
-                    {conditionOfSale.grace_period === "not_given" && (
-                        <p>
-                            Asunnolle '{formatAddress(conditionOfSale.apartment.address)}' ei ole vielä myönnetty
-                            lisäaikaa. Myönnetäänkö 3kk lisäaikaa asunnon myymiseen?
-                        </p>
-                    )}
-                    {conditionOfSale.grace_period === "three_months" && (
-                        <p>
-                            Asunnolle '{formatAddress(conditionOfSale.apartment.address)}' on jo myönnetty 3kk
-                            lisäaikaa. Myönnetäänkö vielä 3kk lisäaikaa asunnon myymiseen?
-                        </p>
-                    )}
-                    {conditionOfSale.grace_period === "six_months" && (
-                        <p>Lisäaikaa asunnon myymiseen on jo myönnetty 6kk, enempää ei voi myöntää.</p>
-                    )}
-                </Dialog.Content>
-                <Dialog.ActionButtons>
-                    <CloseButton onClick={closeModal} />
+            <GenericActionModal
+                title="Myönnä lisäaikaa"
+                modalIcon={<IconLock />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
                     <SaveButton
                         onClick={handleExtendGracePeriod}
                         buttonText="Hyväksy"
                         isLoading={isLoading}
-                        disabled={isLoading || !!error}
+                        disabled={!!error}
                     />
-                </Dialog.ActionButtons>{" "}
-            </Dialog>
+                }
+            >
+                {error && "status" in error && "data" in error && (
+                    <p className="error-message">
+                        Lisäajan tallentamisessa tapahtui virhe: {error.status} {JSON.stringify(error.data)}
+                    </p>
+                )}
+                <ul className="info-text">
+                    <li>
+                        <span className="title">Omistaja:</span> {formatOwner(conditionOfSale.owner)}
+                    </li>
+                    <li>
+                        <span className="title">Asunto:</span> {formatAddress(conditionOfSale.apartment.address)}
+                    </li>
+                    <li>
+                        <span className="title">Myytävä viimeistään: </span> {formatDate(conditionOfSale.sell_by_date)}
+                    </li>
+                </ul>
+                {conditionOfSale.grace_period === "not_given" && (
+                    <p>
+                        Asunnolle '{formatAddress(conditionOfSale.apartment.address)}' ei ole vielä myönnetty lisäaikaa.
+                        Myönnetäänkö 3kk lisäaikaa asunnon myymiseen?
+                    </p>
+                )}
+                {conditionOfSale.grace_period === "three_months" && (
+                    <p>
+                        Asunnolle '{formatAddress(conditionOfSale.apartment.address)}' on jo myönnetty 3kk lisäaikaa.
+                        Myönnetäänkö vielä 3kk lisäaikaa asunnon myymiseen?
+                    </p>
+                )}
+                {conditionOfSale.grace_period === "six_months" && (
+                    <p>Lisäaikaa asunnon myymiseen on jo myönnetty 6kk, enempää ei voi myöntää.</p>
+                )}
+            </GenericActionModal>
         </>
     );
 };

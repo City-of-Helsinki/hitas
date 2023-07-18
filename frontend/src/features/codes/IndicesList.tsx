@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
 
-import {Button, Dialog, IconPlus, Select} from "hds-react";
+import {Button, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useForm} from "react-hook-form";
 import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
-import {QueryStateHandler, SaveButton} from "../../common/components";
+import {GenericActionModal, QueryStateHandler, SaveButton} from "../../common/components";
 import {FilterTextInputField} from "../../common/components/filters";
 import {FormProviderForm, NumberInput, TextInput} from "../../common/components/forms";
 import {IIndex} from "../../common/schemas";
@@ -20,12 +20,12 @@ const indexOptions: {label: string; value: string}[] = [
     {label: "Luovutushintaindeksi", value: "maximum-price-index"},
 ];
 
-const IndexListItem = ({month, value, editFn}: {month: string; value: number; editFn}) => (
+const IndexListItem = ({month, value, setFormData}: {month: string; value: number; setFormData}) => (
     <div
         className="results-list__item results-list__item--code"
         onClick={(e) => {
             e.preventDefault();
-            editFn({month: month, value: value});
+            setFormData({month: month, value: value});
         }}
     >
         <span className="month">{month}</span>
@@ -33,7 +33,7 @@ const IndexListItem = ({month, value, editFn}: {month: string; value: number; ed
     </div>
 );
 
-const LoadedIndexResultsList = ({data, editFn}) => {
+const LoadedIndexResultsList = ({data, setFormData}) => {
     return (
         <div className="results">
             <div className="list-headers">
@@ -46,7 +46,7 @@ const LoadedIndexResultsList = ({data, editFn}) => {
                         key={item.month}
                         month={item.month}
                         value={item.value as number}
-                        editFn={editFn}
+                        setFormData={setFormData}
                     />
                 ))}
             </ul>
@@ -71,7 +71,7 @@ const IndexResultList = ({setFormData, setCreateDialogOpen, indexType, filterPar
             >
                 <LoadedIndexResultsList
                     data={data}
-                    editFn={({month, value}) => {
+                    setFormData={({month, value}) => {
                         setFormData({
                             indexType: indexType,
                             month: month,
@@ -180,52 +180,37 @@ const EditIndexModal = ({indexType, formData, isModalOpen, closeModal}) => {
     }, [isLoading, error, data]);
 
     return (
-        <Dialog
-            id="index-creation-dialog"
-            aria-labelledby="create-modal"
-            isOpen={isModalOpen}
-            close={() => closeModal()}
-            closeButtonLabelText="Sulje"
-            boxShadow
-        >
-            <Dialog.Header
-                id="index-creation-header"
-                title={`Tallenna ${indexType.label}`}
-            />
-            <Dialog.Content>
-                <FormProviderForm
-                    formObject={formObject}
-                    formRef={formRef}
-                    onSubmit={handleSaveIndex}
-                >
-                    <TextInput
-                        label="Kuukausi (VVVV-KK)"
-                        name="month"
-                        tooltipText="Esim 2022-12"
-                        required
-                    />
-                    <NumberInput
-                        label="Arvo"
-                        allowDecimals={true}
-                        name="value"
-                        required
-                    />
-                </FormProviderForm>
-            </Dialog.Content>
-            <Dialog.ActionButtons>
-                <Button
-                    onClick={() => closeModal()}
-                    theme="black"
-                    variant="secondary"
-                >
-                    Peruuta
-                </Button>
+        <GenericActionModal
+            title={`Tallenna ${indexType.label}`}
+            modalIcon={<IconSaveDisketteFill />}
+            isModalOpen={isModalOpen}
+            closeModal={closeModal}
+            confirmButton={
                 <SaveButton
                     onClick={handleConfirmButtonClick}
                     isLoading={isLoading}
                 />
-            </Dialog.ActionButtons>
-        </Dialog>
+            }
+        >
+            <FormProviderForm
+                formObject={formObject}
+                formRef={formRef}
+                onSubmit={handleSaveIndex}
+            >
+                <TextInput
+                    label="Kuukausi (VVVV-KK)"
+                    name="month"
+                    tooltipText="Esim 2022-12"
+                    required
+                />
+                <NumberInput
+                    label="Arvo"
+                    allowDecimals={true}
+                    name="value"
+                    required
+                />
+            </FormProviderForm>
+        </GenericActionModal>
     );
 };
 
