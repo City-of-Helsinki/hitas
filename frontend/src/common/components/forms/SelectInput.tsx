@@ -10,6 +10,7 @@ interface SelectProps extends FormInputProps {
         label: string;
         value: string;
     }[];
+    defaultValue?: string;
     searchable?: boolean;
     setDirectValue?: boolean;
 }
@@ -38,17 +39,22 @@ const SelectInput = ({
 
     // If form has an initial value defined for this field, use it
     if (!defaultValue && formState.defaultValues) {
-        defaultValue = dotted(formState.defaultValues as object, name);
+        defaultValue = dotted(formState.defaultValues as object, name) as string | undefined;
     }
-    // Find the defaultValue option from the options
-    defaultValue = options.find((option) => option.value === defaultValue);
+    // Find the option with value corresponding to defaultValue from the options
+    const defaultOption = options.find((option) => option.value === defaultValue);
+
+    if (defaultValue && !defaultOption) {
+        // eslint-disable-next-line no-console
+        console.warn(`SelectInput: No default option found for value ${defaultValue}!`);
+    }
 
     const inputProps = {
         label: label,
         required: required,
         clearable: !required,
         options: options,
-        defaultValue: defaultValue,
+        defaultValue: defaultOption,
         ariaLabelledBy: "",
         clearButtonAriaLabel: "Tyhjennä",
         selectedItemRemoveButtonAriaLabel: "Poista",
