@@ -37,15 +37,16 @@ const ApartmentHeaderContent = ({
 
             <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
 
+            {housingCompany.regulation_status !== "regulated" && (
+                <StatusLabel>{getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}</StatusLabel>
+            )}
+            {!housingCompany.completed && <StatusLabel>Taloyhtiö ei valmis</StatusLabel>}
+
             {apartment.sell_by_date && (
                 <StatusLabel
                     className="conditions-of-sale-status"
                     iconLeft={<IconLock />}
                 />
-            )}
-
-            {housingCompany.regulation_status !== "regulated" && (
-                <StatusLabel>{getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}</StatusLabel>
             )}
         </div>
     );
