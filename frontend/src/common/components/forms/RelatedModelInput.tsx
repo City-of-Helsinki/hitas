@@ -7,18 +7,18 @@ import {dotted} from "../../utils";
 import {QueryStateHandler} from "../index";
 
 type IRelatedModelMutateComponent = React.FC<{
-    formObjectFieldPath: string;
+    name: string;
     cancelButtonAction: () => void;
     closeModalAction: () => void;
 }>;
 
-const RelatedModelTextInput = ({label, required, disabled, formObjectFieldPath, formatFormObjectValue, openModal}) => {
+const RelatedModelTextInput = ({label, required, disabled, name, formatFormObjectValue, openModal}) => {
     const formObject = useFormContext();
 
-    const fieldValue = formObject.getValues(formObjectFieldPath);
+    const fieldValue = formObject.getValues(name);
     const isFieldClearable = !required && fieldValue;
     const errors = formObject.formState.errors;
-    const fieldError = dotted(errors, formObjectFieldPath);
+    const fieldError = dotted(errors, name);
 
     const handleKeyDown = (e) => {
         // Make other key presses than Tab (and Shift+Tab) open the modal
@@ -29,14 +29,14 @@ const RelatedModelTextInput = ({label, required, disabled, formObjectFieldPath, 
     };
 
     const clearFieldValue = () => {
-        formObject.watch(formObjectFieldPath);
-        formObject.setValue(formObjectFieldPath, null);
+        formObject.watch(name);
+        formObject.setValue(name, null);
     };
 
     return (
         <TextInput
-            id={formObjectFieldPath}
-            name={formObjectFieldPath}
+            id={name}
+            name={name}
             label={label}
             required={required}
             disabled={disabled}
@@ -55,7 +55,7 @@ interface RelatedModelModalProps {
     label?: string;
     queryFunction;
     relatedModelSearchField: string;
-    formObjectFieldPath: string;
+    name: string;
     formatFormObjectValue: (unknown) => string;
     isModalOpen: boolean;
     closeModal: () => void;
@@ -65,9 +65,9 @@ interface RelatedModelModalProps {
 
 const RelatedModelModal = ({
     label,
+    name,
     queryFunction,
     relatedModelSearchField,
-    formObjectFieldPath,
     formatFormObjectValue,
     isModalOpen,
     closeModal,
@@ -94,7 +94,7 @@ const RelatedModelModal = ({
     ];
 
     const setFieldValue = (value) => {
-        formObject.setValue(formObjectFieldPath, value, {shouldValidate: true});
+        formObject.setValue(name, value, {shouldValidate: true});
     };
 
     // Triggered when a table checkbox is clicked
@@ -109,8 +109,8 @@ const RelatedModelModal = ({
 
     return (
         <Dialog
-            id={`input-modal-${formObjectFieldPath}`}
-            aria-labelledby={label || formObjectFieldPath}
+            id={`input-modal-${name}`}
+            aria-labelledby={label || name}
             closeButtonLabelText="args.closeButtonLabelText"
             isOpen={isModalOpen}
             close={() => {
@@ -122,21 +122,21 @@ const RelatedModelModal = ({
             }}
         >
             <Dialog.Header
-                id={`input-modal-${formObjectFieldPath}__title`}
+                id={`input-modal-${name}__title`}
                 title={isRelatedModelMutateVisible ? `Luo uusi ${label}` : `Valitse ${label}`}
             />
             <Dialog.Content>
                 <div className="input-field--related-model--modal--content">
                     {isRelatedModelMutateVisible && RelatedModelMutateComponent ? (
                         <RelatedModelMutateComponent
-                            formObjectFieldPath={formObjectFieldPath}
+                            name={name}
                             cancelButtonAction={() => setIsRelatedModelMutateVisible(false)}
                             closeModalAction={() => closeModal()}
                         />
                     ) : (
                         <>
                             <TextInput
-                                id={`modal-search-${formObjectFieldPath}`}
+                                id={`modal-search-${name}`}
                                 className="text-input-search"
                                 label="Hae"
                                 value={internalFilterValue}
@@ -191,7 +191,7 @@ interface RelatedModelInputProps {
     queryFunction;
     relatedModelSearchField: string;
 
-    formObjectFieldPath: string;
+    name: string;
     formatFormObjectValue: (unknown) => string;
 
     invalid?: boolean;
@@ -209,13 +209,13 @@ const RelatedModelInput = ({
     queryFunction,
     relatedModelSearchField,
 
-    formObjectFieldPath,
+    name,
     formatFormObjectValue,
 
     RelatedModelMutateComponent,
 }: RelatedModelInputProps) => {
     const formObject = useFormContext();
-    formObject.register(formObjectFieldPath);
+    formObject.register(name);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -227,13 +227,13 @@ const RelatedModelInput = ({
                 label={label}
                 required={required}
                 disabled={disabled}
-                formObjectFieldPath={formObjectFieldPath}
+                name={name}
                 formatFormObjectValue={formatFormObjectValue}
                 openModal={openModal}
             />
             <RelatedModelModal
                 label={label}
-                formObjectFieldPath={formObjectFieldPath}
+                name={name}
                 queryFunction={queryFunction}
                 relatedModelSearchField={relatedModelSearchField}
                 formatFormObjectValue={formatFormObjectValue}
