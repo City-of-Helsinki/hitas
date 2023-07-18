@@ -65,7 +65,7 @@ const ApartmentDeleteButton = ({apartment}) => {
                 buttonText="Poista"
             />
             <ConfirmDialogModal
-                linkText="Palaa asuntoyhtiön sivulle"
+                linkText="Palaa taloyhtiön sivulle"
                 linkURL={`/housing-companies/${apartment.links.housing_company.id}`}
                 modalText="Haluatko varmasti poistaa asunnon?"
                 successText="Asunto poistettu"
@@ -251,7 +251,7 @@ const LoadedApartmentCreatePage = () => {
     };
 
     // Event handlers
-    const handleFormSubmit = () => {
+    const handleFormPreSubmitValidationSubmit = () => {
         // Recursively find the first error in the form (The error may be nested, e.g. shares.start)
         const getFirstError = (errors, _fullPath = "") => {
             if (isEmpty(errors)) return null;
@@ -310,10 +310,7 @@ const LoadedApartmentCreatePage = () => {
                                 label="Rakennus"
                                 options={buildingOptions || []}
                                 name="building"
-                                defaultValue={{
-                                    label: initialFormData.building.label || "",
-                                    value: initialFormData.building.value || "",
-                                }}
+                                defaultValue={initialFormData.building.value}
                                 required
                             />
                         </div>
@@ -424,7 +421,7 @@ const LoadedApartmentCreatePage = () => {
                 <NavigateBackButton />
                 {isEditPage && <ApartmentDeleteButton apartment={apartment} />}
                 <SaveButton
-                    onClick={handleFormSubmit}
+                    onClick={handleFormPreSubmitValidationSubmit}
                     isLoading={isSaveLoading}
                 />
             </div>
