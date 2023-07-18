@@ -1,12 +1,18 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
-import {useImmer} from "use-immer";
 
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
 import {useSaveApartmentMaximumPriceMutation} from "../../app/services";
-import {FormInputField, ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
-import {IApartmentMaximumPriceCalculationDetails, IApartmentMaximumPriceWritable} from "../../common/schemas";
+import {ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
+import {DateInput, FormProviderForm, NumberInput, TextAreaInput} from "../../common/components/forms";
+import {
+    ApartmentMaximumPriceWritableSchema,
+    IApartmentMaximumPriceCalculationDetails,
+    IApartmentMaximumPriceWritable,
+} from "../../common/schemas";
 import {today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
@@ -37,34 +43,36 @@ const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
     if (!apartment) throw new Error("Apartment not found");
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [formData, setFormData] = useImmer<IApartmentMaximumPriceWritable>({
+
+    const initialFormData: IApartmentMaximumPriceWritable = {
         apartment_share_of_housing_company_loans: null,
         apartment_share_of_housing_company_loans_date: today(),
         calculation_date: today(),
         additional_info: "",
+    };
+
+    const formRef = useRef<HTMLFormElement>(null);
+    const formObject = useForm({
+        resolver: zodResolver(ApartmentMaximumPriceWritableSchema),
+        defaultValues: initialFormData,
+        mode: "all",
     });
 
     const [saveMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
 
-    useEffect(() => {
-        // Field errors, don't show modal as they are displayed on the fields instead
-        if ((error as {data?: {fields: []}})?.data?.fields?.length) {
-            setIsModalVisible(false);
-        }
-    }, [error]);
-
-    const handleCalculateButton = () => {
+    const onSubmit = () => {
         // Replace apartment_share_of_housing_company_loans `null` value with a zero (API expects an integer)
         const parsedFormData = {
-            ...formData,
-            apartment_share_of_housing_company_loans: formData.apartment_share_of_housing_company_loans || 0,
+            ...formObject.getValues(),
+            apartment_share_of_housing_company_loans:
+                formObject.getValues("apartment_share_of_housing_company_loans") ?? 0,
         };
 
         saveMaximumPrice({
-            data: parsedFormData,
             id: undefined,
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
+            data: parsedFormData,
         });
 
         setIsModalVisible(true);
@@ -75,47 +83,38 @@ const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
             <div className="field-sets">
                 <Fieldset heading="">
                     <h2 className="detail-list__heading">Laskentaan vaikuttavat asunnon tiedot</h2>
-                    <div className="row">
-                        <div>
-                            <FormInputField
-                                inputType="number"
-                                unit="€"
-                                label="Yhtiölainaosuus"
-                                fieldPath="apartment_share_of_housing_company_loans"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                            />
-                            <FormInputField
-                                inputType="date"
-                                label="Yhtiölainaosuuden päivämäärä"
-                                fieldPath="apartment_share_of_housing_company_loans_date"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                                maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
-                                tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
-                            />
-                            <FormInputField
-                                inputType="date"
-                                label="Laskentapäivämäärä"
-                                fieldPath="calculation_date"
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                                maxDate={new Date()}
-                                tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
+                    <FormProviderForm
+                        formObject={formObject}
+                        formRef={formRef}
+                        onSubmit={onSubmit}
+                    >
+                        <div className="row">
+                            <div>
+                                <NumberInput
+                                    label="Yhtiölainaosuus"
+                                    name="apartment_share_of_housing_company_loans"
+                                    unit="€"
+                                />
+                                <DateInput
+                                    label="Yhtiölainaosuuden päivämäärä"
+                                    name="apartment_share_of_housing_company_loans_date"
+                                    maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
+                                    tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
+                                />
+                                <DateInput
+                                    label="Laskentapäivämäärä"
+                                    name="calculation_date"
+                                    maxDate={new Date()}
+                                    tooltipText="Jos jätetään tyhjäksi, käytetään tämänhetkistä päivää."
+                                />
+                            </div>
+                            <TextAreaInput
+                                label="Lisätieto"
+                                name="additional_info"
                             />
                         </div>
-                        <FormInputField
-                            inputType="textArea"
-                            label="Lisätieto"
-                            fieldPath="additional_info"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
+                    </FormProviderForm>
+
                     <ImprovementsTable
                         data={apartment}
                         title="Laskentaan vaikuttavat asunnon parannukset"
@@ -124,11 +123,12 @@ const LoadedApartmentMaxPricePage = (): React.JSX.Element => {
                         data={housingCompany}
                         title="Yhtiökohtaiset parannukset"
                     />
+
                     <div className="row row--buttons">
                         <NavigateBackButton />
                         <Button
                             theme="black"
-                            onClick={handleCalculateButton}
+                            onClick={onSubmit}
                             iconLeft={<IconCheck />}
                         >
                             Laske
