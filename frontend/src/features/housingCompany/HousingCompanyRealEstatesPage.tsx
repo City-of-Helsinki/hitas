@@ -12,7 +12,7 @@ import {
     SaveDialogModal,
 } from "../../common/components";
 import {IRealEstate} from "../../common/schemas";
-import {hitasToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
@@ -46,7 +46,7 @@ const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
         deleteRealEstate({id: realEstateToRemove as string, housingCompanyId: housingCompany.id}).then(() => {
             setRealEstateToRemove(null);
             setIsConfirmModalVisible(false);
-            hitasToast("Kiinteistö poistettu onnistuneesti!", "success");
+            hdsToast.success("Kiinteistö poistettu onnistuneesti!");
         });
     };
 
@@ -66,7 +66,7 @@ const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
                             <IconCrossCircle
                                 onClick={() => {
                                     if (realEstate.buildings.length) {
-                                        hitasToast("Kiinteistö ei ole tyhjä!", "error");
+                                        hdsToast.error("Kiinteistö ei ole tyhjä!");
                                     } else {
                                         setRealEstateToRemove(realEstate.id);
                                         setIsConfirmModalVisible(true);
