@@ -150,7 +150,8 @@ const LoadedApartmentCreatePage = () => {
     const navigate = useNavigate();
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
 
-    const [saveApartment, {data: saveData, error: saveError, isLoading: isSaveLoading}] = useSaveApartmentMutation();
+    const [saveApartment, {data: apartmentSaveData, error: apartmentSaveError, isLoading: isApartmentSaveLoading}] =
+        useSaveApartmentMutation();
 
     // Flags
     const isEditPage = !!apartment;
@@ -348,7 +349,7 @@ const LoadedApartmentCreatePage = () => {
                                 name="type"
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
-                                formatFormObjectValue={(obj: ICode) => obj.value}
+                                transform={(obj: ICode) => obj.value}
                             />
                         </div>
                         <div className="row">
@@ -422,7 +423,7 @@ const LoadedApartmentCreatePage = () => {
                 {isEditPage && <ApartmentDeleteButton apartment={apartment} />}
                 <SaveButton
                     onClick={handleFormPreSubmitValidationSubmit}
-                    isLoading={isSaveLoading}
+                    isLoading={isApartmentSaveLoading}
                 />
             </div>
             <SaveDialogModal
@@ -430,9 +431,9 @@ const LoadedApartmentCreatePage = () => {
                 baseURL={`/housing-companies/${housingCompany.id}/apartments/`}
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
-                data={saveData}
-                error={saveError}
-                isLoading={isSaveLoading}
+                data={apartmentSaveData}
+                error={apartmentSaveError}
+                isLoading={isApartmentSaveLoading}
             />
         </>
     );

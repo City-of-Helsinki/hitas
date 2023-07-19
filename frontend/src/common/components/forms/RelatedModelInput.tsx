@@ -12,7 +12,7 @@ type IRelatedModelMutateComponent = React.FC<{
     closeModalAction: () => void;
 }>;
 
-const RelatedModelTextInput = ({label, required, disabled, name, formatFormObjectValue, openModal}) => {
+const RelatedModelTextInput = ({label, required, disabled, name, transform, openModal}) => {
     const formObject = useFormContext();
 
     const fieldValue = formObject.getValues(name);
@@ -36,17 +36,17 @@ const RelatedModelTextInput = ({label, required, disabled, name, formatFormObjec
     return (
         <TextInput
             id={name}
-            name={name}
             label={label}
-            required={required}
-            disabled={disabled}
-            value={fieldValue ? formatFormObjectValue(fieldValue) : ""}
+            name={name}
+            value={fieldValue ? transform(fieldValue) : ""}
             onClick={openModal}
             onKeyDown={(e) => handleKeyDown(e)}
             buttonIcon={isFieldClearable ? <IconCrossCircle /> : <IconSearch />}
             onButtonClick={isFieldClearable ? clearFieldValue : openModal}
             errorText={fieldError ? (fieldError as {message: string}).message : ""}
             invalid={!!fieldError}
+            required={required}
+            disabled={disabled}
         />
     );
 };
@@ -57,6 +57,7 @@ interface RelatedModelModalProps {
     relatedModelSearchField: string;
     name: string;
     formatFormObjectValue: (unknown) => string;
+    transform?: (unknown) => string;
     isModalOpen: boolean;
     closeModal: () => void;
     // If component is passed, creating new objects is enabled
@@ -69,6 +70,7 @@ const RelatedModelModal = ({
     queryFunction,
     relatedModelSearchField,
     formatFormObjectValue,
+    transform,
     isModalOpen,
     closeModal,
     RelatedModelMutateComponent,
@@ -88,8 +90,8 @@ const RelatedModelModal = ({
         {key: "id", headerName: "Not rendered"},
         {
             key: "value",
-            transform: formatFormObjectValue,
             headerName: label,
+            transform: transform ?? formatFormObjectValue,
         },
     ];
 
@@ -102,7 +104,12 @@ const RelatedModelModal = ({
         if (rows.length === 1) {
             const objId = rows[0];
             const obj = data.contents[data.contents.findIndex((obj) => obj.id === objId)];
-            setFieldValue(obj);
+            if (transform !== undefined) {
+                setFieldValue(transform(obj));
+            } else {
+                setFieldValue(obj);
+            }
+
             closeModal();
         }
     };
@@ -185,34 +192,41 @@ const RelatedModelModal = ({
 
 interface RelatedModelInputProps {
     label: string;
-    required?: boolean;
-    disabled?: boolean;
+    // Place in form where the whole object is stored and set
+    name: string;
 
     queryFunction;
     relatedModelSearchField: string;
 
-    name: string;
-    formatFormObjectValue: (unknown) => string;
+    // Format form value to a string. Displayed on the input field (and modal list)
+    transform: (unknown) => string;
+    // Used when the form expects a string, not an object.
+    // Format the relatedModel object before setting it to the form. If defined, used in the modal list instead of transform.
+    formatObjectForForm?: (unknown) => string;
 
     invalid?: boolean;
     errorText?: string;
     tooltipText?: string;
 
     RelatedModelMutateComponent?: IRelatedModelMutateComponent;
+    required?: boolean;
+    disabled?: boolean;
 }
 
 const RelatedModelInput = ({
     label,
-    required,
-    disabled,
+    name,
 
     queryFunction,
     relatedModelSearchField,
 
-    name,
-    formatFormObjectValue,
+    transform,
+    formatObjectForForm,
 
     RelatedModelMutateComponent,
+
+    required,
+    disabled,
 }: RelatedModelInputProps) => {
     const formObject = useFormContext();
     formObject.register(name);
@@ -225,18 +239,19 @@ const RelatedModelInput = ({
         <div className={`input-field input-field--related-model${required ? " input-field--required" : ""}`}>
             <RelatedModelTextInput
                 label={label}
+                name={name}
+                transform={transform}
+                openModal={openModal}
                 required={required}
                 disabled={disabled}
-                name={name}
-                formatFormObjectValue={formatFormObjectValue}
-                openModal={openModal}
             />
             <RelatedModelModal
                 label={label}
                 name={name}
                 queryFunction={queryFunction}
                 relatedModelSearchField={relatedModelSearchField}
-                formatFormObjectValue={formatFormObjectValue}
+                formatFormObjectValue={transform}
+                transform={formatObjectForForm}
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
                 RelatedModelMutateComponent={RelatedModelMutateComponent}
