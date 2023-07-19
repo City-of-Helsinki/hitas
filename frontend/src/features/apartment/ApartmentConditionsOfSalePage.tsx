@@ -12,10 +12,10 @@ import {
 } from "../../app/services";
 import {
     ConfirmDialogModal,
+    DeleteButton,
     GenericActionModal,
     Heading,
     NavigateBackButton,
-    RemoveButton,
     SaveButton,
 } from "../../common/components";
 import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
@@ -265,7 +265,7 @@ const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApart
         deleteConditionOfSale({id: conditionOfSale.id})
             .unwrap()
             .then(() => {
-                hdsToast.success("Myyntiehto poistettu onnistuneesti.");
+                hdsToast.info("Myyntiehto poistettu onnistuneesti.");
                 setIsModalOpen(false);
             })
             .catch((e) => {
@@ -277,11 +277,10 @@ const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApart
 
     return (
         <>
-            <RemoveButton
+            <DeleteButton
                 onClick={() => setIsModalOpen(true)}
                 isLoading={isLoading}
                 size="small"
-                buttonText="Poista"
             />
             <ConfirmDialogModal
                 data={data}

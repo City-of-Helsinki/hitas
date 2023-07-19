@@ -8,8 +8,8 @@ import {useNavigate} from "react-router-dom";
 import {useDeleteApartmentMutation, useGetApartmentTypesQuery, useSaveApartmentMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
+    DeleteButton,
     NavigateBackButton,
-    RemoveButton,
     SaveButton,
     SaveDialogModal,
 } from "../../common/components";
@@ -48,7 +48,7 @@ const ApartmentDeleteButton = ({apartment}) => {
         })
             .unwrap()
             .then(() => {
-                hdsToast.success("Asunto poistettu onnistuneesti!");
+                hdsToast.info("Asunto poistettu onnistuneesti!");
                 navigate(`/housing-companies/${apartment.links.housing_company.id}`);
             })
             .catch(() => {
@@ -59,10 +59,9 @@ const ApartmentDeleteButton = ({apartment}) => {
 
     return (
         <>
-            <RemoveButton
+            <DeleteButton
                 onClick={() => setIsDeleteModalVisible(true)}
                 isLoading={isDeleteLoading}
-                buttonText="Poista"
             />
             <ConfirmDialogModal
                 linkText="Palaa taloyhtiön sivulle"

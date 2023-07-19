@@ -66,7 +66,7 @@ const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
             housingCompanyId: housingCompany.id,
             realEstateId: idsToRemove.realEstate as string,
         }).then(() => {
-            hdsToast.success("Rakennus poistettu onnistuneesti!");
+            hdsToast.info("Rakennus poistettu onnistuneesti!");
             setIdsToRemove({building: null, realEstate: null});
             setIsConfirmModalVisible(false);
         });
