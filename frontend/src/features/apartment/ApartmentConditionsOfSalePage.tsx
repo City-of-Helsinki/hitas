@@ -1,6 +1,6 @@
 import {useContext, useRef, useState} from "react";
 
-import {Button, IconCrossCircle, IconLock, IconPlus, IconPlusCircleFill, Table} from "hds-react";
+import {Button, IconCrossCircle, IconLock, IconPlus, IconPlusCircleFill, IconTrash, Table} from "hds-react";
 import {Link} from "react-router-dom";
 
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
@@ -10,14 +10,7 @@ import {
     useGetOwnersQuery,
     usePatchConditionOfSaleMutation,
 } from "../../app/services";
-import {
-    ConfirmDialogModal,
-    DeleteButton,
-    GenericActionModal,
-    Heading,
-    NavigateBackButton,
-    SaveButton,
-} from "../../common/components";
+import {DeleteButton, GenericActionModal, Heading, NavigateBackButton, SaveButton} from "../../common/components";
 import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
 import {getConditionOfSaleGracePeriodLabel} from "../../common/localisation";
 import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
@@ -258,8 +251,9 @@ const ConditionOfSaleGracePeriodButton = ({conditionOfSale}: {conditionOfSale: I
 
 const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApartmentConditionOfSale}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
 
-    const [deleteConditionOfSale, {data, error, isLoading}] = useDeleteConditionOfSaleMutation();
+    const [deleteConditionOfSale, {isLoading}] = useDeleteConditionOfSaleMutation();
 
     const handleDeleteConditionOfSale = () => {
         deleteConditionOfSale({id: conditionOfSale.id})
@@ -282,20 +276,23 @@ const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApart
                 isLoading={isLoading}
                 size="small"
             />
-            <ConfirmDialogModal
-                data={data}
-                error={error}
-                isLoading={isLoading}
-                isVisible={isModalOpen}
-                setIsVisible={setIsModalOpen}
-                modalHeader="Poista myyntiehto"
-                modalText={`Oletko varma, että haluat poistaa henkilön '${formatOwner(
-                    conditionOfSale.owner
-                )}' myyntiehdon asuntoon '${formatAddress(conditionOfSale.apartment.address)}'?`}
-                buttonText="Poista"
-                confirmAction={handleDeleteConditionOfSale}
-                cancelAction={() => setIsModalOpen(false)}
-            />
+            <GenericActionModal
+                title="Poista myyntiehto"
+                modalIcon={<IconTrash />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <DeleteButton
+                        onClick={handleDeleteConditionOfSale}
+                        isLoading={isLoading}
+                    />
+                }
+            >
+                <p>
+                    Oletko varma, että haluat poistaa henkilön '{formatOwner(conditionOfSale.owner)}' myyntiehdon
+                    asuntoon '{formatAddress(conditionOfSale.apartment.address)}'?
+                </p>
+            </GenericActionModal>
         </>
     );
 };
