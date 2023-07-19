@@ -39,8 +39,9 @@ const HouseholdOwnersList = () => {
     formObject.register("household");
     const household = formObject.watch("household");
 
-    // Blank Ownership. This is appended to the list when user clicks "New ownership"
-    const emptyOwner = {owner: {id: ""} as IOwner};
+    const addEmptyLine = () => {
+        append(null as unknown as IOwner);
+    };
 
     return (
         <div>
@@ -77,7 +78,7 @@ const HouseholdOwnersList = () => {
                     iconLeft={<IconPlus />}
                     variant={household.length > 0 ? "secondary" : "primary"}
                     theme="black"
-                    onClick={() => append(emptyOwner)}
+                    onClick={addEmptyLine}
                 >
                     Lisää omistaja
                 </Button>
@@ -123,6 +124,7 @@ const CreateConditionOfSaleButton = () => {
                         hdsToast.info("Yhtään myyntiehtoa ei voitu luoda.");
                     }
                     closeModal();
+                    formObject.reset();
                 })
                 .catch(() => {
                     hdsToast.error("Myyntiehtojen luonti epäonnistui!");
