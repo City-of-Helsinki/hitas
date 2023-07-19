@@ -60,7 +60,7 @@ const HouseholdOwnersList = () => {
                             queryFunction={useGetOwnersQuery}
                             relatedModelSearchField="name"
                             name={`household.${index}.owner`}
-                            formatFormObjectValue={(obj) => formatOwner(obj)}
+                            transform={(obj) => formatOwner(obj)}
                             required
                         />
                         <div className="icon--remove">

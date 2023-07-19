@@ -1,9 +1,11 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 
-import {Checkbox, Fieldset} from "hds-react";
+import {Fieldset} from "hds-react";
 import {useNavigate} from "react-router-dom";
-import {useImmer} from "use-immer";
 
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
 import {
     useGetBuildingTypesQuery,
     useGetDevelopersQuery,
@@ -11,17 +13,28 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
-import {FormInputField, Heading, SaveButton, SaveDialogModal} from "../../common/components";
+import {Heading, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import {
+    CheckboxInput,
+    DateInput,
+    FormProviderForm,
+    NumberInput,
+    RelatedModelInput,
+    SelectInput,
+    TextAreaInput,
+    TextInput,
+} from "../../common/components/forms";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {
     housingCompanyHitasTypes,
     housingCompanyRegulationStatus,
+    HousingCompanyWritableSchema,
     ICode,
     IHousingCompanyWritable,
     IPostalCode,
     IPropertyManager,
 } from "../../common/schemas";
-import {hdsToast, validateBusinessId} from "../../common/utils";
+import {hdsToast, setAPIErrorsForFormFields, validateBusinessId} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
@@ -30,17 +43,15 @@ import {
 const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
     return {label: getHousingCompanyRegulationStatusName(state), value: state};
 });
+
 const hitasTypeOptions = housingCompanyHitasTypes.map((state) => {
     return {label: getHousingCompanyHitasTypeName(state), value: state};
 });
 
-const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
-    const navigate = useNavigate();
-    const {housingCompany} = useContext(HousingCompanyViewContext);
+const getInitialFormData = (housingCompany): IHousingCompanyWritable => {
+    if (housingCompany) return housingCompany;
 
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-
-    const initialFormData: IHousingCompanyWritable = housingCompany ?? {
+    return {
         acquisition_price: 0,
         address: {
             postal_code: "",
@@ -65,20 +76,50 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
             construction_price_index: [],
         },
     };
+};
 
-    const [formData, setFormData] = useImmer<IHousingCompanyWritable>(initialFormData);
-    const [saveHousingCompany, {data, error, isLoading}] = useSaveHousingCompanyMutation();
+const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
+    const navigate = useNavigate();
+    const {housingCompany} = useContext(HousingCompanyViewContext);
 
-    const handleSaveButtonClicked = () => {
-        saveHousingCompany({data: formData, id: housingCompany?.id})
+    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+
+    const initialFormData: IHousingCompanyWritable = getInitialFormData(housingCompany);
+    const formRef = useRef<HTMLFormElement>(null);
+    const formObject = useForm<IHousingCompanyWritable>({
+        defaultValues: initialFormData,
+        mode: "onBlur",
+        resolver: zodResolver(
+            HousingCompanyWritableSchema.superRefine((data, ctx) => {
+                // Price can be zero only if sale is excluded from statistics.
+                if (!data.business_id) return;
+                if (!validateBusinessId(data.business_id)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["business_id"],
+                        message: "Y-Tunnuksen muoto on virheellinen",
+                    });
+                }
+            })
+        ),
+    });
+
+    const [
+        saveHousingCompany,
+        {data: housingCompanySaveData, error: housingCompanySaveError, isLoading: isHousingCompanySaveLoading},
+    ] = useSaveHousingCompanyMutation();
+
+    const onSubmit = (data) => {
+        saveHousingCompany({id: housingCompany?.id, data: data})
             .unwrap()
             .then((payload) => {
-                hdsToast.success("Asuntoyhtiö tallennettu onnistuneesti!");
+                hdsToast.success("Taloyhtiö tallennettu onnistuneesti!");
                 navigate(`/housing-companies/${payload.id}`);
             })
-            .catch(() => {
+            .catch((error) => {
                 hdsToast.error("Virhe tallentaessa taloyhtiötä!");
                 setIsEndModalVisible(true);
+                setAPIErrorsForFormFields(formObject, error);
             });
     };
 
@@ -87,205 +128,145 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
             <Heading>
                 <span>{housingCompany ? housingCompany.name.official : "Uusi yhtiö"}</span>
             </Heading>
-            <div className="field-sets">
-                <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            label="Yhtiön virallinen nimi"
-                            fieldPath="name.official"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
+            <FormProviderForm
+                formObject={formObject}
+                formRef={formRef}
+                onSubmit={onSubmit}
+            >
+                <div className="field-sets">
+                    <Fieldset heading="">
+                        <div className="row">
+                            <TextInput
+                                label="Yhtiön virallinen nimi"
+                                name="name.official"
+                                required
+                            />
+                            <TextInput
+                                label="Yhtiön hakunimi"
+                                name="name.display"
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <TextInput
+                                label="Katuosoite"
+                                name="address.street_address"
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <RelatedModelInput
+                                label="Postinumero"
+                                name="address.postal_code"
+                                queryFunction={useGetPostalCodesQuery}
+                                relatedModelSearchField="value"
+                                transform={(obj: string) => obj}
+                                formatObjectForForm={(obj: IPostalCode) => obj.value}
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <NumberInput
+                                label="Hankinta-arvo"
+                                name="acquisition_price"
+                                unit="€"
+                                required
+                            />
+                            <NumberInput
+                                label="Ensisijainen laina"
+                                name="primary_loan"
+                                unit="€"
+                            />
+                        </div>
+                        <div className="row">
+                            <SelectInput
+                                label="Sääntelyn tila"
+                                name="regulation_status"
+                                options={regulationStatusOptions}
+                                defaultValue={initialFormData.regulation_status}
+                                setDirectValue
+                                required
+                            />
+                            <SelectInput
+                                label="Hitas-tyyppi"
+                                name="hitas_type"
+                                options={hitasTypeOptions}
+                                defaultValue={initialFormData.hitas_type}
+                                setDirectValue
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <CheckboxInput
+                                label="Ei-tilastoihin"
+                                name="exclude_from_statistics"
+                                tooltipText="Yhtiötä ei huomioida '30v vertailussa', 'rajaneliöhinnan laskennassa' tai 'Toteutuneet kauppahinnat' tilastoissa."
+                            />
+                            <div />
+                        </div>
+                    </Fieldset>
+                    <Fieldset heading="">
+                        <div className="row">
+                            <TextInput
+                                label="Y-Tunnus"
+                                name="business_id"
+                                tooltipText="Esimerkki arvo: '1234567-8'"
+                            />
+                            <DateInput
+                                label="Myyntihintaluettelon vahvistamispäivä"
+                                name="sales_price_catalogue_confirmation_date"
+                            />
+                        </div>
+                        <div className="row">
+                            <RelatedModelInput
+                                label="Talotyyppi"
+                                name="building_type"
+                                queryFunction={useGetBuildingTypesQuery}
+                                relatedModelSearchField="value"
+                                transform={(obj: ICode) => obj.value}
+                                required
+                            />
+                        </div>
+                        <div className="row">
+                            <RelatedModelInput
+                                label="Rakennuttaja"
+                                name="developer"
+                                queryFunction={useGetDevelopersQuery}
+                                relatedModelSearchField="value"
+                                transform={(obj: ICode) => obj.value}
+                                required
+                            />
+                            <RelatedModelInput
+                                label="Isännöitsijä"
+                                name="property_manager"
+                                queryFunction={useGetPropertyManagersQuery}
+                                relatedModelSearchField="name"
+                                transform={(obj: IPropertyManager) => obj.name}
+                            />
+                        </div>
+                        <TextAreaInput
+                            label="Huomioitavaa"
+                            name="notes"
                         />
-                        <FormInputField
-                            label="Yhtiön hakunimi"
-                            fieldPath="name.display"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            label="Katuosoite"
-                            fieldPath="address.street_address"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Postinumero"
-                            requestedField="value"
-                            fieldPath="address.postal_code"
-                            queryFunction={useGetPostalCodesQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: IPostalCode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            fractionDigits={2}
-                            label="Hankinta-arvo"
-                            fieldPath="acquisition_price"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="number"
-                            unit="€"
-                            fractionDigits={2}
-                            label="Ensisijainen laina"
-                            fieldPath="primary_loan"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="select"
-                            label="Sääntelyn tila"
-                            fieldPath="regulation_status"
-                            options={regulationStatusOptions}
-                            defaultValue={{
-                                label: getHousingCompanyRegulationStatusName(initialFormData.regulation_status),
-                                value: initialFormData.regulation_status,
-                            }}
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            required
-                        />
-                        <FormInputField
-                            inputType="select"
-                            label="Hitas-tyyppi"
-                            fieldPath="hitas_type"
-                            options={hitasTypeOptions}
-                            defaultValue={{
-                                label: getHousingCompanyHitasTypeName(initialFormData.hitas_type),
-                                value: initialFormData.hitas_type,
-                            }}
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            required
-                        />
-                    </div>
-                    <div className="row">
-                        <Checkbox
-                            id="exclude_from_statistics-checkbox"
-                            label="Ei-tilastoihin"
-                            checked={formData.exclude_from_statistics}
-                            onChange={(e) =>
-                                setFormData((draft) => {
-                                    draft.exclude_from_statistics = e.target.checked;
-                                })
-                            }
-                            // tooltipText="Mikäli yhtiötä ei haluta mukaan '30v vertailuun',
-                            // 'rajaneliöhinnan laskentaan' tai 'Toteutuneet kauppahinnat' tilastoihin."
-                        />
-                        <div />
-                    </div>
-                </Fieldset>
-                <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            label="Y-Tunnus"
-                            fieldPath="business_id"
-                            validator={validateBusinessId}
-                            tooltipText="Esimerkki arvo: '1234567-1'"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="date"
-                            label="Myyntihintaluettelon vahvistamispäivä"
-                            fieldPath="sales_price_catalogue_confirmation_date"
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Talotyyppi"
-                            fieldPath="building_type.id"
-                            placeholder={housingCompany?.building_type.value}
-                            queryFunction={useGetBuildingTypesQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <div className="row">
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Rakennuttaja"
-                            fieldPath="developer.id"
-                            placeholder={housingCompany?.developer.value}
-                            queryFunction={useGetDevelopersQuery}
-                            relatedModelSearchField="value"
-                            getRelatedModelLabel={(obj: ICode) => obj.value}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            inputType="relatedModel"
-                            label="Isännöitsijä"
-                            fieldPath="property_manager.id"
-                            placeholder={housingCompany?.property_manager?.name}
-                            queryFunction={useGetPropertyManagersQuery}
-                            relatedModelSearchField="name"
-                            getRelatedModelLabel={(obj: IPropertyManager) => obj.name}
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                    <FormInputField
-                        inputType="textArea"
-                        label="Huomioitavaa"
-                        fieldPath="notes"
-                        formData={formData}
-                        setFormData={setFormData}
-                        error={error}
-                    />
-                </Fieldset>
-            </div>
+                    </Fieldset>
+                </div>
 
-            <SaveButton
-                onClick={handleSaveButtonClicked}
-                isLoading={isLoading}
-            />
+                <div className="row row--buttons">
+                    <NavigateBackButton />
+                    <SaveButton
+                        type="submit"
+                        isLoading={isHousingCompanySaveLoading}
+                    />
+                </div>
+            </FormProviderForm>
             <SaveDialogModal
                 linkText="Yhtiön sivulle"
                 baseURL="/housing-companies/"
                 isVisible={isEndModalVisible}
                 setIsVisible={setIsEndModalVisible}
-                data={data}
-                error={error}
-                isLoading={isLoading}
+                data={housingCompanySaveData}
+                error={housingCompanySaveError}
+                isLoading={isHousingCompanySaveLoading}
             />
         </>
     );
