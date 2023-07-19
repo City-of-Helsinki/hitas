@@ -13,7 +13,7 @@ import {
     IIndexCalculationMarketPriceIndexBefore2011,
     SurfaceAreaPriceCeilingCalculation,
 } from "../../../common/schemas";
-import {formatDate, formatMoney, hitasToast} from "../../../common/utils";
+import {formatDate, formatMoney, hdsToast} from "../../../common/utils";
 
 const tableTheme = {
     "--header-background-color": "var(--color-black-80)",
@@ -461,7 +461,7 @@ const MaximumPriceModalContent = ({
 
     useEffect(() => {
         if (!isLoading && !error && data && data.confirmed_at) {
-            hitasToast("Enimmäishinta vahvistettu!");
+            hdsToast.success("Enimmäishinta vahvistettu!");
             if (location.pathname.endsWith("sales")) setIsModalVisible(false);
             else navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
         }

@@ -13,7 +13,7 @@ import {
 } from "../../common/components";
 import CancelButton from "../../common/components/CancelButton";
 import {IBuilding, IBuildingWritable, IRealEstate} from "../../common/schemas";
-import {hitasToast} from "../../common/utils";
+import {hdsToast} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
@@ -66,7 +66,7 @@ const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
             housingCompanyId: housingCompany.id,
             realEstateId: idsToRemove.realEstate as string,
         }).then(() => {
-            hitasToast("Rakennus poistettu onnistuneesti!", "success");
+            hdsToast.success("Rakennus poistettu onnistuneesti!");
             setIdsToRemove({building: null, realEstate: null});
             setIsConfirmModalVisible(false);
         });
@@ -128,7 +128,7 @@ const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
                                                         realEstate: realEstate.id,
                                                     });
                                                     setIsConfirmModalVisible(true);
-                                                } else hitasToast("Rakennus ei ole tyhjä!", "error");
+                                                } else hdsToast.error("Rakennus ei ole tyhjä!");
                                             }}
                                         />
                                     </span>

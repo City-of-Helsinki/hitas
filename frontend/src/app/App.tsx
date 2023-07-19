@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {Link, Outlet} from "react-router-dom";
 import Notifications from "../common/components/Notifications";
 import Spinner from "../common/components/Spinner";
-import {hitasToast} from "../common/utils";
+import {hdsToast} from "../common/utils";
 import "../styles/index.sass";
 import {selectIsAuthenticated, selectIsAuthenticating, setIsAuthenticated} from "./authSlice";
 import {useAppDispatch, useAppSelector} from "./hooks";
@@ -66,7 +66,7 @@ const App = (): React.JSX.Element => {
             // Error 401 is returned when the user is not authenticated
             // Error 403 is returned when the user is authenticated but does not have access
             if ((userInfoError as FetchBaseQueryError | undefined)?.status === 403) {
-                hitasToast("Kirjautuminen onnistui, mutta sinulla on puutteelliset oikeudet!", "error");
+                hdsToast.error("Kirjautuminen onnistui, mutta sinulla on puutteelliset oikeudet!");
             }
         }
     }, [userInfoData, userInfoError, dispatch, token]);
