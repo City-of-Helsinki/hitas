@@ -348,7 +348,7 @@ const LoadedApartmentCreatePage = () => {
                                 name="type"
                                 queryFunction={useGetApartmentTypesQuery}
                                 relatedModelSearchField="value"
-                                formatFormObjectValue={(obj: ICode) => (obj?.id ? obj.value : "")}
+                                formatFormObjectValue={(obj: ICode) => obj.value}
                             />
                         </div>
                         <div className="row">

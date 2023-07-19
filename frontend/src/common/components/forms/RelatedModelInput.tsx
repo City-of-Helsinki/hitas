@@ -40,7 +40,7 @@ const RelatedModelTextInput = ({label, required, disabled, name, formatFormObjec
             label={label}
             required={required}
             disabled={disabled}
-            value={formatFormObjectValue(fieldValue)}
+            value={fieldValue ? formatFormObjectValue(fieldValue) : ""}
             onClick={openModal}
             onKeyDown={(e) => handleKeyDown(e)}
             buttonIcon={isFieldClearable ? <IconCrossCircle /> : <IconSearch />}
@@ -52,7 +52,7 @@ const RelatedModelTextInput = ({label, required, disabled, name, formatFormObjec
 };
 
 interface RelatedModelModalProps {
-    label?: string;
+    label: string;
     queryFunction;
     relatedModelSearchField: string;
     name: string;
@@ -88,8 +88,8 @@ const RelatedModelModal = ({
         {key: "id", headerName: "Not rendered"},
         {
             key: "value",
-            headerName: label || "Arvo",
             transform: formatFormObjectValue,
+            headerName: label,
         },
     ];
 
@@ -184,7 +184,7 @@ const RelatedModelModal = ({
 };
 
 interface RelatedModelInputProps {
-    label?: string;
+    label: string;
     required?: boolean;
     disabled?: boolean;
 
