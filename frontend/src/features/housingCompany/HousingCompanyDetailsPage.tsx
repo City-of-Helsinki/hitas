@@ -55,7 +55,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                             <Tabs.Tab>Dokumentit</Tabs.Tab>
                         </Tabs.TabList>
                         <Tabs.TabPanel>
-                            <div className="company-details__tab basic-details">
+                            <div className="company-details__tab">
                                 <div className="column">
                                     <DetailField
                                         label="Yhtiön hakunimi"

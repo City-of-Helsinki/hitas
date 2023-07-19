@@ -62,7 +62,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                             <Tabs.Tab>Dokumentit</Tabs.Tab>
                         </Tabs.TabList>
                         <Tabs.TabPanel>
-                            <div className="apartment-details__tab basic-details">
+                            <div className="apartment-details__tab">
                                 <div className="row top-row">
                                     <DetailField
                                         label="Viimeisin kauppahinta"

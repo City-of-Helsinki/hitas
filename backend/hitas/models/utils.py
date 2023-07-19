@@ -22,7 +22,7 @@ def validate_property_id(value: Optional[str]) -> None:
 
     if match is None:
         raise ValidationError(
-            _("%(value)s is not an valid property id"),
+            _("'%(value)s' is not a valid property identifier"),
             params={"value": value},
         )
 
