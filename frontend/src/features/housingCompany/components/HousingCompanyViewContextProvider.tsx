@@ -20,6 +20,9 @@ export const HousingCompanyViewContextProvider = ({
 }) => {
     const {housingCompanyId}: {housingCompanyId?: string} = useParams();
 
+    // If no housingCompanyId is given, just render the children
+    if (!housingCompanyId) return <div className={viewClassName}>{children}</div>;
+
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(housingCompanyId as string, {
         skip: !housingCompanyId,
     });
