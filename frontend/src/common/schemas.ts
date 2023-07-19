@@ -256,6 +256,10 @@ const RealEstateSchema = object({
     buildings: BuildingSchema.array(),
 });
 
+const WritableRealEstateSchema = object({
+    property_identifier: string(),
+});
+
 const PropertyManagerSchema = object({
     id: APIIdString.optional(),
     name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
@@ -1194,6 +1198,7 @@ export {
     ownershipsSchema,
     ApartmentSaleSchema,
     OwnershipsListSchema,
+    WritableRealEstateSchema,
 };
 
 // Types (i.e. models)

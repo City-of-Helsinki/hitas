@@ -1,134 +1,195 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 
-import {Fieldset, IconCrossCircle} from "hds-react";
-import {useImmer} from "use-immer";
+import {Button, IconPlus, IconTrash, Table} from "hds-react";
 
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
 import {useCreateRealEstateMutation, useDeleteRealEstateMutation} from "../../app/services";
-import {
-    ConfirmDialogModal,
-    FormInputField,
-    NavigateBackButton,
-    SaveButton,
-    SaveDialogModal,
-} from "../../common/components";
-import {IRealEstate} from "../../common/schemas";
-import {hdsToast} from "../../common/utils";
+import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../../common/components";
+import {FormProviderForm, SaveFormButton, TextInput} from "../../common/components/forms";
+import {IRealEstate, WritableRealEstateSchema} from "../../common/schemas";
+import {hdsToast, setAPIErrorsForFormFields} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
-const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
+const tableTheme = {
+    "--header-background-color": "var(--color-engel-medium-light)",
+};
+
+const CreateRealEstateButton = () => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
     if (!housingCompany) throw new Error("Housing company not found");
 
-    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [realEstateToRemove, setRealEstateToRemove] = useState<string | null>();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
 
-    const blankForm = {
-        address: {street_address: ""},
-        property_identifier: "",
+    const initialFormValues = {
+        property_identifier: null,
     };
+    const formRef = useRef<HTMLFormElement>(null);
+    const formObject = useForm({
+        defaultValues: initialFormValues,
+        mode: "all",
+        resolver: zodResolver(WritableRealEstateSchema),
+    });
 
-    const [formData, setFormData] = useImmer<IRealEstate>(blankForm as IRealEstate);
+    const [saveRealEstate, {isLoading}] = useCreateRealEstateMutation();
 
-    const [saveRealEstate, {data, error, isLoading}] = useCreateRealEstateMutation();
-    const [deleteRealEstate, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
-        useDeleteRealEstateMutation();
-
-    const handleSaveButtonClicked = () => {
-        saveRealEstate({data: formData, housingCompanyId: housingCompany.id});
-        setIsEndModalVisible(true);
-    };
-
-    const handleConfirmedRemove = () => {
-        deleteRealEstate({id: realEstateToRemove as string, housingCompanyId: housingCompany.id}).then(() => {
-            setRealEstateToRemove(null);
-            setIsConfirmModalVisible(false);
-            hdsToast.success("Kiinteistö poistettu onnistuneesti!");
-        });
+    const onSubmit = (data) => {
+        saveRealEstate({housingCompanyId: housingCompany.id, data: data})
+            .unwrap()
+            .then(() => {
+                hdsToast.info("Kiinteistö luotu onnistuneesti.");
+                closeModal();
+                formObject.reset();
+            })
+            .catch((error) => {
+                hdsToast.error("Kiinteistön luonti epäonnistui!");
+                setAPIErrorsForFormFields(formObject, error);
+            });
     };
 
     return (
         <>
-            <h1 className="main-heading">
-                <span>Kiinteistöt</span>
-            </h1>
-            <ul className="detail-list__list real-estates-list">
-                {housingCompany.real_estates.map((realEstate) => (
-                    <li
-                        key={realEstate.id}
-                        className="detail-list__list-item"
-                    >
-                        {realEstate.address.street_address} ({realEstate.property_identifier})
-                        <span className="remove-icon">
-                            <IconCrossCircle
-                                onClick={() => {
-                                    if (realEstate.buildings.length) {
-                                        hdsToast.error("Kiinteistö ei ole tyhjä!");
-                                    } else {
-                                        setRealEstateToRemove(realEstate.id);
-                                        setIsConfirmModalVisible(true);
-                                    }
-                                }}
-                            />
-                        </span>
-                    </li>
-                ))}
-            </ul>
-            <h2>Uusi kiinteistö</h2>
-            <div className="field-sets">
-                <Fieldset heading="">
-                    <div className="row">
-                        <FormInputField
-                            label="Katuosoite"
-                            fieldPath="address.street_address"
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            label="Kiinteistötunnus"
-                            fieldPath="property_identifier"
-                            tooltipText={'Esimerkkiarvo: "1234-5678-9012-3456"'}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                    </div>
-                </Fieldset>
+            <Button
+                theme="black"
+                iconLeft={<IconPlus />}
+                onClick={() => setIsModalOpen(true)}
+            >
+                Lisää uusi
+            </Button>
+
+            <GenericActionModal
+                title="Uusi kiinteistö"
+                modalIcon={<IconPlus />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <SaveFormButton
+                        formRef={formRef}
+                        isLoading={isLoading}
+                    />
+                }
+            >
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={onSubmit}
+                >
+                    <TextInput
+                        label="Kiinteistötunnus"
+                        name="property_identifier"
+                        tooltipText="Esimerkkiarvo: '1234-5678-9012-3456'"
+                        required
+                    />
+                </FormProviderForm>
+            </GenericActionModal>
+        </>
+    );
+};
+
+const DeleteRealEstateButton = ({realEstate}: {realEstate: IRealEstate}) => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
+    const [deleteRealEstate, {isLoading}] = useDeleteRealEstateMutation();
+
+    const handleDeleteRealEstate = () => {
+        deleteRealEstate({housingCompanyId: housingCompany.id, id: realEstate.id})
+            .unwrap()
+            .then(() => {
+                hdsToast.info("Kiinteistö poistettu onnistuneesti!");
+                setIsModalOpen(false);
+            })
+            .catch((e) => {
+                hdsToast.error("Myyntiehdon poistaminen epäonnistui!");
+                // eslint-disable-next-line no-console
+                console.warn(e);
+            });
+    };
+
+    return (
+        <>
+            <DeleteButton
+                onClick={() => setIsModalOpen(true)}
+                isLoading={isLoading}
+                size="small"
+            />
+            <GenericActionModal
+                title="Poista kiinteistö"
+                modalIcon={<IconTrash />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <DeleteButton
+                        onClick={handleDeleteRealEstate}
+                        isLoading={isLoading}
+                    />
+                }
+            >
+                <p>Haluatko varmasti poistaa kiinteistön '{realEstate.property_identifier}'?</p>
+            </GenericActionModal>
+        </>
+    );
+};
+
+const realEstateTableColumns = [
+    {key: "id", headerName: "Not rendered"},
+    {
+        key: "address",
+        headerName: "Osoite",
+        transform: (obj: IRealEstate) => obj.address.street_address,
+    },
+    {
+        key: "property_identifier",
+        headerName: "Kiinteistötunnus",
+    },
+    {
+        key: "buildings",
+        headerName: "Rakennuksia",
+        transform: (obj: IRealEstate) => <div className="text-right">{obj.buildings.length} kpl</div>,
+    },
+    {
+        key: "delete",
+        headerName: "",
+        transform: (obj: IRealEstate) => (
+            <div className="text-right">{!obj.buildings.length ? <DeleteRealEstateButton realEstate={obj} /> : ""}</div>
+        ),
+    },
+];
+
+const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
+    return (
+        <>
+            <Heading type="list">Kiinteistöt</Heading>
+
+            <div className="real-estates-table">
+                {housingCompany.real_estates.length ? (
+                    <Table
+                        cols={realEstateTableColumns}
+                        rows={housingCompany.real_estates}
+                        indexKey="id"
+                        variant="light"
+                        theme={tableTheme}
+                        renderIndexCol={false}
+                        zebra
+                    />
+                ) : (
+                    <div>Ei kiinteistöjä</div>
+                )}
             </div>
             <div className="row row--buttons">
                 <NavigateBackButton />
-                <SaveButton
-                    onClick={handleSaveButtonClicked}
-                    isLoading={isLoading}
-                />
+                <CreateRealEstateButton />
             </div>
-            <SaveDialogModal
-                data={data}
-                error={error}
-                linkURL={"/housing-companies/" + housingCompany.id}
-                linkText="Takaisin yhtiön sivulle"
-                isLoading={isLoading}
-                isVisible={isEndModalVisible}
-                setIsVisible={setIsEndModalVisible}
-            />
-            <ConfirmDialogModal
-                data={deleteData}
-                modalText="Haluatko varmasti poistaa kiinteistön?"
-                successText="Kiinteistö poistettu"
-                error={deleteError}
-                isLoading={isDeleteLoading}
-                isVisible={isConfirmModalVisible}
-                setIsVisible={setIsConfirmModalVisible}
-                confirmAction={handleConfirmedRemove}
-                cancelAction={() => setIsConfirmModalVisible(false)}
-                buttonText="Poista"
-            />
         </>
     );
 };
