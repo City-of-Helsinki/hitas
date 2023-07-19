@@ -1,9 +1,9 @@
-import {Button, IconCrossCircleFill} from "hds-react";
+import {Button, IconTrash} from "hds-react";
 import React from "react";
 
-interface RemoveButtonProps {
+interface DeleteButtonProps {
     onClick: () => void;
-    isLoading: boolean;
+    isLoading?: boolean;
     buttonText?: string;
     disabled?: boolean;
     variant?: "primary" | "secondary" | "success" | "danger";
@@ -12,21 +12,23 @@ interface RemoveButtonProps {
     iconLeft?: React.ReactNode;
 }
 
-export default function RemoveButton({
+export default function DeleteButton({
     onClick,
     isLoading,
     disabled = false,
-    buttonText,
+    buttonText = "Poista",
     iconLeft,
+    className = "",
     ...rest
-}: RemoveButtonProps): React.JSX.Element {
+}: DeleteButtonProps): React.JSX.Element {
     return (
         <Button
-            iconLeft={iconLeft ?? <IconCrossCircleFill />}
+            iconLeft={iconLeft ?? <IconTrash />}
             theme="black"
             onClick={onClick}
             isLoading={isLoading}
             disabled={disabled}
+            className={`delete-button ${className}`}
             {...rest}
         >
             {buttonText}

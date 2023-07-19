@@ -1,7 +1,7 @@
 import {IconTrash} from "hds-react";
 import {useContext, useState} from "react";
 import {useDeleteSaleMutation} from "../../../../app/services";
-import {GenericActionModal, RemoveButton} from "../../../../common/components";
+import {DeleteButton, GenericActionModal} from "../../../../common/components";
 import {formatDate, formatMoney, hdsToast} from "../../../../common/utils";
 import {ApartmentViewContext} from "../../components/ApartmentViewContextProvider";
 
@@ -41,7 +41,7 @@ const RemoveApartmentLatestSaleModalButton = () => {
 
     return (
         <>
-            <RemoveButton
+            <DeleteButton
                 onClick={() => setIsModalOpen(true)}
                 isLoading={isLoading}
                 buttonText="Peru kauppa"
@@ -57,11 +57,10 @@ const RemoveApartmentLatestSaleModalButton = () => {
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
                 confirmButton={
-                    <RemoveButton
+                    <DeleteButton
                         onClick={handleRemoveSaleButtonClick}
                         isLoading={isLoading}
                         buttonText="Vahvista kaupan peruminen"
-                        iconLeft={<IconTrash />}
                     />
                 }
                 danger

@@ -1,5 +1,6 @@
 import CloseButton from "./CloseButton";
 import ConfirmDialogModal from "./ConfirmDialogModal";
+import DeleteButton from "./DeleteButton";
 import DetailField from "./DetailField";
 import Divider from "./Divider";
 import EditButton from "./EditButton";
@@ -15,7 +16,6 @@ import Notifications from "./Notifications";
 import OwnershipList from "./OwnershipList";
 import QueryStateError from "./QueryStateError";
 import QueryStateHandler from "./QueryStateHandler";
-import RemoveButton from "./RemoveButton";
 import SaveButton from "./SaveButton";
 import SaveDialogModal from "./SaveDialogModal";
 import SimpleErrorMessage from "./SimpleErrorMessage";
@@ -23,6 +23,7 @@ import SimpleErrorMessage from "./SimpleErrorMessage";
 export {
     CloseButton,
     ConfirmDialogModal,
+    DeleteButton,
     DetailField,
     Divider,
     EditButton,
@@ -38,7 +39,6 @@ export {
     OwnershipList,
     QueryStateError,
     QueryStateHandler,
-    RemoveButton,
     SaveButton,
     SaveDialogModal,
     SimpleErrorMessage,
