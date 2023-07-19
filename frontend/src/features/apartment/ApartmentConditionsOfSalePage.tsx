@@ -373,24 +373,24 @@ const LoadedConditionsOfSalePage = () => {
     const {apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
-    if (!apartment.conditions_of_sale.length) {
-        return <div>Ei myyntiehtoja</div>;
-    }
-
     return (
         <>
             <Heading type="main">Myyntiehdot</Heading>
             <div className="conditions-of-sale-table">
-                <Table
-                    id="conditions-of-sale-table"
-                    cols={getConditionsOfSaleTableColumns(apartment)}
-                    rows={apartment.conditions_of_sale}
-                    indexKey="id"
-                    variant="light"
-                    theme={tableTheme}
-                    dense
-                    zebra
-                />
+                {apartment.conditions_of_sale.length ? (
+                    <Table
+                        id="conditions-of-sale-table"
+                        cols={getConditionsOfSaleTableColumns(apartment)}
+                        rows={apartment.conditions_of_sale}
+                        indexKey="id"
+                        variant="light"
+                        theme={tableTheme}
+                        dense
+                        zebra
+                    />
+                ) : (
+                    <div>Ei myyntiehtoja</div>
+                )}
             </div>
             <div className="row row--buttons">
                 <NavigateBackButton />
