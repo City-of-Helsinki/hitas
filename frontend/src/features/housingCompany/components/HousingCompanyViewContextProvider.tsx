@@ -4,6 +4,7 @@ import {createContext} from "react";
 import {useGetHousingCompanyDetailQuery} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {IHousingCompanyDetails} from "../../../common/schemas";
+import HousingCompanyHeader from "./HousingCompanyHeader";
 
 export const HousingCompanyViewContext = createContext<{
     housingCompany?: IHousingCompanyDetails;
@@ -21,7 +22,13 @@ export const HousingCompanyViewContextProvider = ({
     const {housingCompanyId}: {housingCompanyId?: string} = useParams();
 
     // If no housingCompanyId is given, just render the children
-    if (!housingCompanyId) return <div className={viewClassName}>{children}</div>;
+    if (!housingCompanyId)
+        return (
+            <div className={viewClassName}>
+                <HousingCompanyHeader />
+                {children}
+            </div>
+        );
 
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(housingCompanyId as string, {
         skip: !housingCompanyId,
@@ -29,6 +36,7 @@ export const HousingCompanyViewContextProvider = ({
 
     return (
         <div className={viewClassName}>
+            <HousingCompanyHeader />
             <QueryStateHandler
                 data={data}
                 error={error}

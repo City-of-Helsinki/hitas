@@ -13,7 +13,7 @@ import {
     useGetPropertyManagersQuery,
     useSaveHousingCompanyMutation,
 } from "../../app/services";
-import {Heading, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import {NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     CheckboxInput,
     DateInput,
@@ -125,9 +125,6 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
 
     return (
         <>
-            <Heading>
-                <span>{housingCompany ? housingCompany.name.official : "Uusi yhtiö"}</span>
-            </Heading>
             <FormProviderForm
                 formObject={formObject}
                 formRef={formRef}

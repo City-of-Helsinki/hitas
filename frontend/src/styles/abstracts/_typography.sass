@@ -12,7 +12,8 @@ body
   font-size: $fontsize-heading-xl
   line-height: $lineheight-l
   border-bottom: 1px solid #ccc
-  margin: 0 0 32px
+  margin: 0
+  margin-bottom: $spacing-layout-s
 
   a, span
     display: flex
@@ -25,12 +26,15 @@ body
 
 [class^="heading--list"]
   font-size: $fontsize-heading-l
+  margin-bottom: $spacing-layout-xs
 
 [class^="heading--body"]
   font-size: $fontsize-heading-m
+  margin-bottom: $spacing-layout-xs
 
 [class^="heading--sub"]
   font-size: $fontsize-heading-s
+  margin-bottom: $spacing-layout-xs
 
 .query-handler-error
   font-size: 2rem
