@@ -159,12 +159,14 @@ export const CodeSchema = object({
     value: string(),
     description: string().nullable(),
 });
+export type ICode = z.infer<typeof CodeSchema>;
 
 export const PostalCodeSchema = object({
     value: string(),
     city: string(),
     cost_area: z.enum(CostAreas),
 });
+export type IPostalCode = z.infer<typeof PostalCodeSchema>;
 
 export const AddressSchema = object({
     street_address: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
@@ -174,6 +176,7 @@ export const AddressSchema = object({
         .or(string().length(5)),
     city: string().min(2, errorMessages.stringLength).optional(),
 });
+export type IAddress = z.infer<typeof AddressSchema>;
 
 const ImprovementSchema = object({
     name: string(),
@@ -190,7 +193,9 @@ const ApartmentConstructionPriceIndexImprovementSchema = ImprovementSchema.and(
         depreciation_percentage: z.enum(["0.0", "2.5", "10.0"]),
     })
 );
-
+export type IApartmentConstructionPriceIndexImprovement = z.infer<
+    typeof ApartmentConstructionPriceIndexImprovementSchema
+>;
 export const HousingCompanyImprovementsFormSchema = z.object({
     market_price_index: MarketPriceIndexImprovementSchema.array(),
     construction_price_index: ImprovementSchema.array(),
@@ -208,6 +213,7 @@ export const UserInfoSchema = object({
     last_name: string(),
     email: string(),
 });
+export type IUserInfoResponse = z.infer<typeof UserInfoSchema>;
 
 // ********************************
 // * Housing company schemas
@@ -230,6 +236,7 @@ export const HousingCompanySchema = object({
     area: HousingCompanyAreaSchema,
     completion_date: string().nullable(),
 });
+export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
 
 const BuildingSchema = object({
     id: APIIdString,
@@ -237,6 +244,7 @@ const BuildingSchema = object({
     building_identifier: string().nullable(),
     apartment_count: number(),
 });
+export type IBuilding = z.infer<typeof BuildingSchema>;
 
 export const WritableBuildingSchema = object({
     id: APIIdString.optional(),
@@ -244,6 +252,7 @@ export const WritableBuildingSchema = object({
     building_identifier: string().nullable(),
     real_estate_id: APIIdString.nullable(),
 });
+export type IBuildingWritable = z.infer<typeof WritableBuildingSchema>;
 
 const RealEstateSchema = object({
     id: APIIdString,
@@ -251,6 +260,7 @@ const RealEstateSchema = object({
     address: AddressSchema,
     buildings: BuildingSchema.array(),
 });
+export type IRealEstate = z.infer<typeof RealEstateSchema>;
 
 export const WritableRealEstateSchema = object({
     id: APIIdString.optional(),
@@ -262,6 +272,7 @@ export const PropertyManagerSchema = object({
     name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
     email: string().email(errorMessages.emailInvalid).or(z.literal("")),
 });
+export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
 
 export const DeveloperSchema = object({
     id: APIIdString.optional(),
@@ -272,6 +283,7 @@ export const DeveloperSchema = object({
         .max(256, errorMessages.stringMaxIs + "256")
         .nullable(),
 });
+export type IDeveloper = z.infer<typeof DeveloperSchema>;
 
 const HousingCompanyDetailsSchema = object({
     id: APIIdString,
@@ -315,6 +327,7 @@ const HousingCompanyDetailsSchema = object({
         construction_price_index: ImprovementSchema.array(),
     }),
 });
+export type IHousingCompanyDetails = z.infer<typeof HousingCompanyDetailsSchema>;
 
 export const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     name: true,
@@ -336,12 +349,14 @@ export const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
         property_manager: object({id: string().optional()}).nullable(),
     })
 );
+export type IHousingCompanyWritable = z.infer<typeof HousingCompanyWritableSchema>;
 
 const HousingCompanyStateSchema = object({
     status: string(),
     housing_company_count: number(),
     apartment_count: number(),
 });
+export type IHousingCompanyState = z.infer<typeof HousingCompanyStateSchema>;
 
 // ********************************
 // * Apartment Schemas
@@ -355,6 +370,7 @@ const ApartmentAddressSchema = object({
     floor: nullishNumber,
     stair: string().min(1, "Pakollinen kenttä!"),
 });
+export type IApartmentAddress = z.infer<typeof ApartmentAddressSchema>;
 
 const ApartmentLinkedModelSchema = object({id: string(), link: string()});
 
@@ -378,6 +394,7 @@ export const OwnerSchema = object({
     email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
     non_disclosure: boolean().optional(),
 });
+export type IOwner = z.infer<typeof OwnerSchema>;
 
 const ownershipSchema = object({
     owner: OwnerSchema,
@@ -388,6 +405,7 @@ const ownershipSchema = object({
     key: z.any(),
     starting_date: string().optional(),
 });
+export type IOwnership = z.infer<typeof ownershipSchema>;
 
 export const ownershipsSchema = ownershipSchema.array();
 
@@ -395,6 +413,7 @@ export const ownershipsSchema = ownershipSchema.array();
 const CreateConditionOfSaleSchema = object({
     household: string().array(), // List of owner IDs
 });
+export type ICreateConditionOfSale = z.infer<typeof CreateConditionOfSaleSchema>;
 
 const ApartmentConditionOfSaleSchema = object({
     id: string(),
@@ -408,6 +427,7 @@ const ApartmentConditionOfSaleSchema = object({
     fulfilled: string().nullable(),
     sell_by_date: string().nullable(), // Read only
 });
+export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
 
 const ConditionOfSaleSchema = object({
     id: string().optional(),
@@ -432,13 +452,17 @@ const ConditionOfSaleSchema = object({
     grace_period: z.enum(["not_given", "three_months", "six_months"]),
     fulfilled: string().nullable().optional(),
 });
+export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
+
 const ApartmentUnconfirmedMaximumPriceSchema = object({maximum: boolean(), value: number()});
+export type IApartmentUnconfirmedMaximumPrice = z.infer<typeof ApartmentUnconfirmedMaximumPriceSchema>;
 
 const ApartmentUnconfirmedMaximumPriceIndicesSchema = object({
     construction_price_index: ApartmentUnconfirmedMaximumPriceSchema,
     market_price_index: ApartmentUnconfirmedMaximumPriceSchema,
     surface_area_price_ceiling: ApartmentUnconfirmedMaximumPriceSchema,
 });
+export type IApartmentUnconfirmedMaximumPriceIndices = z.infer<typeof ApartmentUnconfirmedMaximumPriceIndicesSchema>;
 
 const ApartmentConfirmedMaximumPriceSchema = object({
     id: string().optional(),
@@ -448,6 +472,7 @@ const ApartmentConfirmedMaximumPriceSchema = object({
     maximum_price: number(),
     valid: object({is_valid: boolean(), valid_until: string()}),
 });
+export type IApartmentConfirmedMaximumPrice = z.infer<typeof ApartmentConfirmedMaximumPriceSchema>;
 
 export const ApartmentPricesSchema = object({
     first_sale_purchase_price: number().nullable(), // Read only
@@ -514,6 +539,7 @@ export const ApartmentSchema = object({
     has_grace_period: boolean(),
     sell_by_date: string().nullable(),
 });
+export type IApartment = z.infer<typeof ApartmentSchema>;
 
 export const ApartmentDetailsSchema = object({
     id: APIIdString,
@@ -535,6 +561,7 @@ export const ApartmentDetailsSchema = object({
     conditions_of_sale: ApartmentConditionOfSaleSchema.array(),
     sell_by_date: string().nullable(),
 });
+export type IApartmentDetails = z.infer<typeof ApartmentDetailsSchema>;
 
 export const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
@@ -552,6 +579,7 @@ export const ApartmentWritableSchema = object({
         construction_price_index: ApartmentConstructionPriceIndexImprovementSchema.array(),
     }),
 });
+export type IApartmentWritable = z.infer<typeof ApartmentWritableSchema>;
 
 export const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
     building: true,
@@ -562,6 +590,7 @@ export const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
         address: ApartmentAddressSchema.omit({street_address: true, city: true}),
     })
 );
+export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>;
 
 // Writable list of ownerships
 export const OwnershipsListSchema = object({
@@ -636,6 +665,7 @@ export const ApartmentSaleFormSchema = object({
     exclude_from_statistics: boolean(),
     ownerships: OwnershipsListSchema.optional(),
 });
+export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
 
 // Apartment Sale Form that can be submitted.
 // Other validations still need to be done, but those are out of scope for this schema.
@@ -657,6 +687,7 @@ export const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
         ownerships: OwnershipsListSchema,
     })
 );
+export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
 
 const ApartmentSaleCreatedSchema = object({
     id: string(),
@@ -668,6 +699,7 @@ const ApartmentSaleCreatedSchema = object({
     exclude_from_statistics: boolean(),
     conditions_of_sale_created: boolean(),
 });
+export type IApartmentSaleCreated = z.infer<typeof ApartmentSaleCreatedSchema>;
 
 // ********************************
 // * Maximum price schemas
@@ -727,6 +759,7 @@ const IndexCalculation2011OnwardsSchema = IndexCalculationSchema.and(
         calculation_variables: CommonCalculationVarsSchema.and(CalculationVars2011OnwardsSchema),
     })
 );
+export type IIndexCalculation2011Onwards = z.infer<typeof IndexCalculation2011OnwardsSchema>;
 
 const IndexCalculationMarketPriceIndexBefore2011Schema = IndexCalculationSchema.and(
     object({
@@ -799,6 +832,9 @@ const IndexCalculationMarketPriceIndexBefore2011Schema = IndexCalculationSchema.
     })
 );
 
+export type IIndexCalculationMarketPriceIndexBefore2011 = z.infer<
+    typeof IndexCalculationMarketPriceIndexBefore2011Schema
+>;
 const IndexCalculationConstructionPriceIndexBefore2011Schema = IndexCalculationSchema.and(
     object({
         calculation_variables: CommonCalculationVarsSchema.and(
@@ -850,6 +886,9 @@ const IndexCalculationConstructionPriceIndexBefore2011Schema = IndexCalculationS
         ),
     })
 );
+export type IIndexCalculationConstructionPriceIndexBefore2011 = z.infer<
+    typeof IndexCalculationConstructionPriceIndexBefore2011Schema
+>;
 
 const SurfaceAreaPriceCeilingCalculationSchema = IndexCalculationSchema.and(
     object({
@@ -863,6 +902,7 @@ const SurfaceAreaPriceCeilingCalculationSchema = IndexCalculationSchema.and(
         }),
     })
 );
+export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPriceCeilingCalculationSchema>;
 
 // Maximum Price Schemas
 
@@ -916,6 +956,7 @@ export const ApartmentMaximumPriceSchema = object({
         }),
     }),
 }).and(Split2011Schema);
+export type IApartmentMaximumPriceCalculationDetails = z.infer<typeof ApartmentMaximumPriceSchema>;
 
 export const ApartmentMaximumPriceWritableSchema = object({
     calculation_date: string().nullable(),
@@ -923,10 +964,13 @@ export const ApartmentMaximumPriceWritableSchema = object({
     apartment_share_of_housing_company_loans_date: string().nullable(),
     additional_info: string(),
 });
+export type IApartmentMaximumPriceWritable = z.infer<typeof ApartmentMaximumPriceWritableSchema>;
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
+export type IIndex = z.infer<typeof IndexSchema>;
 
 export const IndexResponseSchema = object({indexType: string(), value: number(), valid_until: string()});
+export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
 
 const ThirtyYearRegulationCompanySchema = object({
     id: string(),
@@ -947,6 +991,7 @@ const ThirtyYearRegulationResponseSchema = object({
     skipped: ThirtyYearRegulationCompanySchema.array(),
     obfuscated_owners: OwnerSchema.array(),
 });
+export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
 
 const ThirtyYearAvailablePostalCodeSchema = object({
     postal_code: string(),
@@ -955,6 +1000,7 @@ const ThirtyYearAvailablePostalCodeSchema = object({
 });
 
 const ThirtyYearAvailablePostalCodesResponseSchema = ThirtyYearAvailablePostalCodeSchema.array();
+export type IThirtyYearAvailablePostalCodesResponse = z.infer<typeof ThirtyYearAvailablePostalCodesResponseSchema>;
 
 const QuarterSchema = string().regex(/\d{4}Q\d/);
 const ExternalSalesQuarterSchema = object({
@@ -972,6 +1018,7 @@ const ExternalSalesDataResponseSchema = object({
     quarter_3: ExternalSalesQuarterSchema,
     quarter_4: ExternalSalesQuarterSchema,
 });
+export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 
 // ********************************
 // * Request / Response schemas
@@ -989,6 +1036,7 @@ const PageInfoSchema = object({
         previous: string().nullable(),
     }),
 });
+export type PageInfo = z.infer<typeof PageInfoSchema>;
 
 const ErrorResponseSchema = object({
     error: string(),
@@ -1011,6 +1059,7 @@ const ErrorResponseSchema = object({
         }),
     }).optional(),
 });
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
 
 // List responses
 
@@ -1018,31 +1067,37 @@ export const HousingCompanyListResponseSchema = object({
     page: PageInfoSchema,
     contents: HousingCompanySchema.array(),
 });
+export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
 
 export const ApartmentListResponseSchema = object({
     page: PageInfoSchema,
     contents: ApartmentSchema.array(),
 });
+export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
 
 export const CodeResponseSchema = object({
     page: PageInfoSchema,
     contents: CodeSchema.array(),
 });
+export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
 
 export const PostalCodeResponseSchema = object({
     page: PageInfoSchema,
     contents: PostalCodeSchema.array(),
 });
+export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
 
 export const IndexListResponseSchema = object({
     page: PageInfoSchema,
     contents: IndexSchema.array(),
 });
+export type IIndexListResponse = z.infer<typeof IndexListResponseSchema>;
 
 export const OwnersResponseSchema = object({
     page: PageInfoSchema,
     contents: OwnerSchema.array(),
 });
+export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
 
 const SalesCatalogApartmentSchema = object({
     row: number(),
@@ -1063,11 +1118,13 @@ const SalesCatalogApartmentSchema = object({
     catalog_primary_loan_amount: number(),
     acquisition_price: number(),
 });
+export type ISalesCatalogApartment = z.infer<typeof SalesCatalogApartmentSchema>;
 
 export const PropertyManagersResponseSchema = object({
     page: PageInfoSchema,
     contents: array(PropertyManagerSchema.extend({id: string()})),
 });
+export type IPropertyManagersResponse = z.infer<typeof PropertyManagersResponseSchema>;
 
 // Query Parameters
 
@@ -1077,11 +1134,13 @@ export const HousingCompanyApartmentQuerySchema = object({
         page: number(),
     }),
 });
+export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
 
 export const ApartmentQuerySchema = object({
     housingCompanyId: string(),
     apartmentId: string(),
 });
+export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 
 export const IndexListQuerySchema = object({
     indexType: string(),
@@ -1091,11 +1150,13 @@ export const IndexListQuerySchema = object({
         year: string(),
     }),
 });
+export type IIndexListQuery = z.infer<typeof IndexListQuerySchema>;
 
 const IndexQuerySchema = object({
     indexType: string(),
     month: string(),
 });
+export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
 
 const ThirtyYearRegulationQuerySchema = object({
     calculationDate: string(),
@@ -1106,6 +1167,7 @@ const ThirtyYearRegulationQuerySchema = object({
         .array()
         .optional(),
 });
+export type IThirtyYearRegulationQuery = z.infer<typeof ThirtyYearRegulationQuerySchema>;
 
 export const FilterOwnersQuerySchema = object({
     name: string().optional(),
@@ -1114,6 +1176,7 @@ export const FilterOwnersQuerySchema = object({
     limit: number().int().optional(),
     page: number().int().optional(),
 });
+export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
 
 export const FilterPropertyManagersQuerySchema = object({
     name: string().optional(),
@@ -1121,84 +1184,11 @@ export const FilterPropertyManagersQuerySchema = object({
     limit: number().int().optional(),
     page: number().int().optional(),
 });
+export type IFilterPropertyManagersQuery = z.infer<typeof FilterPropertyManagersQuerySchema>;
 
 export const FilterDevelopersQuerySchema = object({
     value: string().optional(),
     limit: number().int().optional(),
     page: number().int().optional(),
 });
-
-// ********************************
-// * Exports
-// ********************************
-
-// Types (i.e. models)
-export type IAddress = z.infer<typeof AddressSchema>;
-export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
-export type IHousingCompanyDetails = z.infer<typeof HousingCompanyDetailsSchema>;
-export type IHousingCompanyWritable = z.infer<typeof HousingCompanyWritableSchema>;
-export type IHousingCompanyState = z.infer<typeof HousingCompanyStateSchema>;
-export type IRealEstate = z.infer<typeof RealEstateSchema>;
-export type IBuilding = z.infer<typeof BuildingSchema>;
-export type IBuildingWritable = z.infer<typeof WritableBuildingSchema>;
-export type IApartmentAddress = z.infer<typeof ApartmentAddressSchema>;
-export type IApartmentUnconfirmedMaximumPrice = z.infer<typeof ApartmentUnconfirmedMaximumPriceSchema>;
-export type IApartmentUnconfirmedMaximumPriceIndices = z.infer<typeof ApartmentUnconfirmedMaximumPriceIndicesSchema>;
-export type IApartmentConfirmedMaximumPrice = z.infer<typeof ApartmentConfirmedMaximumPriceSchema>;
-export type IApartmentConstructionPriceIndexImprovement = z.infer<
-    typeof ApartmentConstructionPriceIndexImprovementSchema
->;
-export type IApartment = z.infer<typeof ApartmentSchema>;
-export type IApartmentDetails = z.infer<typeof ApartmentDetailsSchema>;
-export type IApartmentWritable = z.infer<typeof ApartmentWritableSchema>;
-export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>;
-export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
-export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
-export type IApartmentSaleCreated = z.infer<typeof ApartmentSaleCreatedSchema>;
-export type IIndexCalculation2011Onwards = z.infer<typeof IndexCalculation2011OnwardsSchema>;
-export type IIndexCalculationMarketPriceIndexBefore2011 = z.infer<
-    typeof IndexCalculationMarketPriceIndexBefore2011Schema
->;
-export type IIndexCalculationConstructionPriceIndexBefore2011 = z.infer<
-    typeof IndexCalculationConstructionPriceIndexBefore2011Schema
->;
-export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPriceCeilingCalculationSchema>;
-export type IApartmentMaximumPriceCalculationDetails = z.infer<typeof ApartmentMaximumPriceSchema>;
-export type IApartmentMaximumPriceWritable = z.infer<typeof ApartmentMaximumPriceWritableSchema>;
-export type IIndex = z.infer<typeof IndexSchema>;
-export type ICode = z.infer<typeof CodeSchema>;
-export type IPostalCode = z.infer<typeof PostalCodeSchema>;
-export type IPropertyManager = z.infer<typeof PropertyManagerSchema>;
-export type IOwner = z.infer<typeof OwnerSchema>;
-export type IDeveloper = z.infer<typeof DeveloperSchema>;
-export type IOwnership = z.infer<typeof ownershipSchema>;
-
-// Query/list responses & paging
-export type PageInfo = z.infer<typeof PageInfoSchema>;
-export type IUserInfoResponse = z.infer<typeof UserInfoSchema>;
-export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
-export type IHousingCompanyListResponse = z.infer<typeof HousingCompanyListResponseSchema>;
-export type IApartmentListResponse = z.infer<typeof ApartmentListResponseSchema>;
-export type ICodeResponse = z.infer<typeof CodeResponseSchema>;
-export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
-export type IPropertyManagersResponse = z.infer<typeof PropertyManagersResponseSchema>;
-export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
-export type ISalesCatalogApartment = z.infer<typeof SalesCatalogApartmentSchema>;
-export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
-export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
-export type IIndexListQuery = z.infer<typeof IndexListQuerySchema>;
-export type IIndexListResponse = z.infer<typeof IndexListResponseSchema>;
-export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
-export type IIndexResponse = z.infer<typeof IndexResponseSchema>;
-export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
-export type IFilterPropertyManagersQuery = z.infer<typeof FilterPropertyManagersQuerySchema>;
 export type IFilterDevelopersQuery = z.infer<typeof FilterDevelopersQuerySchema>;
-
-export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
-export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
-export type IThirtyYearAvailablePostalCodesResponse = z.infer<typeof ThirtyYearAvailablePostalCodesResponseSchema>;
-export type IThirtyYearRegulationQuery = z.infer<typeof ThirtyYearRegulationQuerySchema>;
-
-export type IApartmentConditionOfSale = z.infer<typeof ApartmentConditionOfSaleSchema>;
-export type IConditionOfSale = z.infer<typeof ConditionOfSaleSchema>;
-export type ICreateConditionOfSale = z.infer<typeof CreateConditionOfSaleSchema>;
