@@ -1,23 +1,22 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 
-import {Fieldset, IconCrossCircle, IconPen} from "hds-react";
-import {useImmer} from "use-immer";
+import {Button, IconPlus, IconTrash, Table} from "hds-react";
 
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
 import {useDeleteBuildingMutation, useSaveBuildingMutation} from "../../app/services";
-import {
-    ConfirmDialogModal,
-    FormInputField,
-    NavigateBackButton,
-    SaveButton,
-    SaveDialogModal,
-} from "../../common/components";
-import CancelButton from "../../common/components/CancelButton";
-import {IBuilding, IBuildingWritable, IRealEstate} from "../../common/schemas";
-import {hdsToast} from "../../common/utils";
+import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../../common/components";
+import {FormProviderForm, SaveFormButton, SelectInput, TextInput} from "../../common/components/forms";
+import {IBuilding, IBuildingWritable, IRealEstate, WritableBuildingSchema} from "../../common/schemas";
+import {hdsToast, setAPIErrorsForFormFields} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
+
+const tableTheme = {
+    "--header-background-color": "var(--color-engel-medium-light)",
+};
 
 const blankForm: IBuildingWritable = {
     real_estate_id: null,
@@ -27,22 +26,44 @@ const blankForm: IBuildingWritable = {
     building_identifier: "",
 };
 
-const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
+interface IAnnotatedBuilding extends IBuilding {
+    real_estate: Omit<IRealEstate, "buildings">;
+}
+
+const ModifyBuildingButton = ({building}: {building?: IAnnotatedBuilding}) => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
     if (!housingCompany) throw new Error("Housing company not found");
 
-    const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
-    const [idsToRemove, setIdsToRemove] = useState<{building?: string | null; realEstate?: string | null}>({
-        building: null,
-        realEstate: null,
-    });
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
-    const [editing, setEditing] = useState<{building: IBuilding; realEstate: IRealEstate} | null>(null);
-    const [formData, setFormData] = useImmer<IBuildingWritable>(blankForm);
+    const isEditing = building !== undefined;
 
-    const [saveBuilding, {data, error, isLoading}] = useSaveBuildingMutation();
-    const [deleteBuilding, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
-        useDeleteBuildingMutation();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
+    const formRef = useRef<HTMLFormElement>(null);
+    const formObject = useForm({
+        defaultValues: isEditing ? {...building, real_estate_id: building.real_estate.id} : blankForm,
+        mode: "all",
+        resolver: zodResolver(WritableBuildingSchema),
+    });
+
+    const [saveBuilding, {isLoading}] = useSaveBuildingMutation();
+
+    const onSubmit = (data) => {
+        const realEstateId = isEditing ? building.real_estate.id : data.real_estate_id;
+        saveBuilding({housingCompanyId: housingCompany.id, realEstateId: realEstateId, data: data})
+            .unwrap()
+            .then(() => {
+                hdsToast.info("Rakennus luotu onnistuneesti.");
+                closeModal();
+                if (!isEditing) {
+                    formObject.reset();
+                }
+            })
+            .catch((error) => {
+                hdsToast.error("Rakennuksen luominen epäonnistui!");
+                setAPIErrorsForFormFields(formObject, error);
+            });
+    };
 
     const realEstateOptions = housingCompany.real_estates.map((realEstate) => {
         return {
@@ -51,194 +72,188 @@ const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
         };
     });
 
-    const handleSaveBuilding = () => {
-        saveBuilding({
-            data: formData,
-            housingCompanyId: housingCompany.id,
-            realEstateId: editing ? (editing.realEstate.id as string) : (formData.real_estate_id as string),
-        });
-        setIsEndModalVisible(true);
-    };
+    return (
+        <>
+            <Button
+                theme="black"
+                iconLeft={<IconPlus />}
+                onClick={() => setIsModalOpen(true)}
+                size={isEditing ? "small" : "default"}
+            >
+                {isEditing ? "Muokkaa" : "Lisää uusi"}
+            </Button>
 
-    const handleConfirmedRemove = () => {
-        deleteBuilding({
-            id: idsToRemove.building as string,
-            housingCompanyId: housingCompany.id,
-            realEstateId: idsToRemove.realEstate as string,
-        }).then(() => {
-            hdsToast.info("Rakennus poistettu onnistuneesti!");
-            setIdsToRemove({building: null, realEstate: null});
-            setIsConfirmModalVisible(false);
-        });
-    };
+            <GenericActionModal
+                title={isEditing ? "Muokkaa rakennuksen tietoja" : "Uusi rakennus"}
+                modalIcon={<IconPlus />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <SaveFormButton
+                        formRef={formRef}
+                        isLoading={isLoading}
+                    />
+                }
+            >
+                <FormProviderForm
+                    formObject={formObject}
+                    formRef={formRef}
+                    onSubmit={onSubmit}
+                >
+                    <SelectInput
+                        label="Kiinteistö"
+                        name="real_estate_id"
+                        options={realEstateOptions}
+                        setDirectValue
+                        required
+                    />
+                    <TextInput
+                        label="Katuosoite"
+                        name="address.street_address"
+                        required
+                    />
+                    <TextInput
+                        label="Rakennustunnus"
+                        name="building_identifier"
+                        tooltipText='Esimerkkiarvo: "123456789A"'
+                    />
+                </FormProviderForm>
+            </GenericActionModal>
+        </>
+    );
+};
 
-    const cancelEditing = () => {
-        setFormData(blankForm);
-        setEditing(null);
-    };
+const DeleteBuildingButton = ({building}: {building: IAnnotatedBuilding}) => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
 
-    useEffect(() => {
-        if (!isEndModalVisible && !error) {
-            setFormData(blankForm);
-            setEditing(null);
-        }
-    }, [isEndModalVisible, error, setFormData]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => setIsModalOpen(false);
+
+    const [deleteBuilding, {isLoading}] = useDeleteBuildingMutation();
+
+    const handleDeleteRealEstate = () => {
+        deleteBuilding({housingCompanyId: housingCompany.id, realEstateId: building.real_estate.id, id: building.id})
+            .unwrap()
+            .then(() => {
+                hdsToast.info("Rakennus poistettu onnistuneesti!");
+                setIsModalOpen(false);
+            })
+            .catch((e) => {
+                hdsToast.error("Myyntiehdon poistaminen epäonnistui!");
+                // eslint-disable-next-line no-console
+                console.warn(e);
+            });
+    };
 
     return (
-        <div className="view--create view--buildings">
-            <h1 className="main-heading">
-                <span>Rakennukset</span>
-            </h1>
-            {housingCompany.real_estates.map((realEstate, idx) =>
-                realEstate.buildings.length ? (
-                    <div
-                        className="buildings-list"
-                        key={idx}
-                    >
-                        <h3>
-                            Kiinteistö: {realEstate.address.street_address} ({realEstate.property_identifier})
-                        </h3>
-                        <ul className="detail-list__list">
-                            {realEstate.buildings.map((building) => (
-                                <li
-                                    key={building.id}
-                                    className="detail-list__list-item"
-                                >
-                                    {building.address.street_address}
-                                    {building.building_identifier ? ` (${building.building_identifier})` : ""}
-                                    <span>
-                                        <IconPen
-                                            className="edit-icon"
-                                            onClick={() => {
-                                                setEditing({building, realEstate});
-                                                setFormData({
-                                                    address: {street_address: building.address.street_address},
-                                                    building_identifier: building.building_identifier,
-                                                    real_estate_id: realEstate.id,
-                                                    id: building.id,
-                                                });
-                                            }}
-                                        />
-                                        <IconCrossCircle
-                                            className="remove-icon"
-                                            onClick={() => {
-                                                if (building.apartment_count === 0) {
-                                                    setIdsToRemove({
-                                                        building: building.id,
-                                                        realEstate: realEstate.id,
-                                                    });
-                                                    setIsConfirmModalVisible(true);
-                                                } else hdsToast.error("Rakennus ei ole tyhjä!");
-                                            }}
-                                        />
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+        <>
+            <DeleteButton
+                onClick={() => setIsModalOpen(true)}
+                isLoading={isLoading}
+                size="small"
+            />
+            <GenericActionModal
+                title="Poista rakennus"
+                modalIcon={<IconTrash />}
+                isModalOpen={isModalOpen}
+                closeModal={closeModal}
+                confirmButton={
+                    <DeleteButton
+                        onClick={handleDeleteRealEstate}
+                        isLoading={isLoading}
+                    />
+                }
+            >
+                <p>
+                    Haluatko varmasti poistaa rakennuksen '{building.address.street_address}{" "}
+                    {building.building_identifier ? `(${building.building_identifier})` : ""}'?
+                </p>
+            </GenericActionModal>
+        </>
+    );
+};
+
+const buildingTableColumns = [
+    {key: "id", headerName: "Not rendered"},
+    {
+        key: "real_estate",
+        headerName: "Kiinteistö",
+        transform: (obj: IAnnotatedBuilding) => obj.real_estate.property_identifier,
+    },
+    {
+        key: "address",
+        headerName: "Osoite",
+        transform: (obj: IAnnotatedBuilding) => obj.address.street_address,
+    },
+    {
+        key: "building_identifier",
+        headerName: "Rakennustunnus",
+    },
+    {
+        key: "buildings",
+        headerName: "Asuntoja",
+        transform: (obj: IAnnotatedBuilding) => <div className="text-right">{obj.apartment_count} kpl</div>,
+    },
+    {
+        key: "edit",
+        headerName: "",
+        transform: (obj: IAnnotatedBuilding) => (
+            <div className="text-right">
+                <ModifyBuildingButton building={obj} />
+            </div>
+        ),
+    },
+    {
+        key: "delete",
+        headerName: "",
+        transform: (obj: IAnnotatedBuilding) => (
+            <div className="text-right">
+                <DeleteBuildingButton building={obj} />
+            </div>
+        ),
+    },
+];
+
+const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
+
+    // const buildingsList = housingCompany.real_estates.flatMap((obj) => obj.buildings);
+    const buildingsList = housingCompany.real_estates.flatMap((realEstate) =>
+        realEstate.buildings.map((building) => {
+            return {
+                ...building,
+                real_estate: {...realEstate, buildings: undefined},
+            };
+        })
+    );
+
+    return (
+        <>
+            <Heading type="list">Rakennukset</Heading>
+
+            <div className="buildings-table">
+                {buildingsList.length ? (
+                    <Table
+                        cols={buildingTableColumns}
+                        rows={buildingsList}
+                        indexKey="id"
+                        variant="light"
+                        theme={tableTheme}
+                        renderIndexCol={false}
+                        zebra
+                    />
                 ) : (
-                    ""
-                )
-            )}
-            <h2>{editing ? "Muokkaa rakennuksen tietoja" : "Uusi rakennus"}</h2>
-            <div className="field-sets">
-                <Fieldset heading="">
-                    {editing && (
-                        <h3>
-                            Rakennus: {editing.building.address.street_address}
-                            {editing.building.building_identifier ? ` (${editing.building.building_identifier})` : ""}
-                        </h3>
-                    )}
-                    {!editing && (
-                        <div className="row">
-                            <FormInputField
-                                inputType="select"
-                                label="Kiinteistö"
-                                fieldPath="real_estate_id"
-                                options={realEstateOptions}
-                                required
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                            />
-                        </div>
-                    )}
-                    {editing && (
-                        <div className="row">
-                            <FormInputField
-                                inputType="select"
-                                label="Kiinteistö"
-                                fieldPath="real_estate_id"
-                                options={realEstateOptions}
-                                defaultValue={{
-                                    label: `${editing.realEstate.address.street_address} (${editing.realEstate.property_identifier})`,
-                                    value: editing.realEstate.id,
-                                }}
-                                required
-                                formData={formData}
-                                setFormData={setFormData}
-                                error={error}
-                            />
-                        </div>
-                    )}
-                    <div className="row">
-                        <FormInputField
-                            label="Katuosoite"
-                            fieldPath="address.street_address"
-                            options={realEstateOptions}
-                            required
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                        />
-                        <FormInputField
-                            label="Rakennustunnus"
-                            fieldPath="building_identifier"
-                            tooltipText='Esimerkkiarvo: "123456789A"'
-                            formData={formData}
-                            setFormData={setFormData}
-                            error={error}
-                            className="building-identifier-field"
-                        />
-                    </div>
-                </Fieldset>
+                    <div>Ei rakennuksia</div>
+                )}
             </div>
 
             <div className="row row--buttons">
                 <NavigateBackButton />
-                <div>
-                    {editing && (
-                        <CancelButton
-                            onClick={cancelEditing}
-                            isLoading={isLoading}
-                        />
-                    )}
-                    <SaveButton
-                        onClick={handleSaveBuilding}
-                        isLoading={isLoading}
-                    />
-                </div>
+                <ModifyBuildingButton />
             </div>
-            <SaveDialogModal
-                data={data}
-                error={error}
-                isLoading={isLoading}
-                isVisible={isEndModalVisible}
-                setIsVisible={setIsEndModalVisible}
-            />
-            <ConfirmDialogModal
-                data={deleteData}
-                buttonText="Poista"
-                modalText="Haluatko varmasti poistaa rakennuksen?"
-                successText="Rakennus poistettu"
-                error={deleteError}
-                isLoading={isDeleteLoading}
-                isVisible={isConfirmModalVisible}
-                setIsVisible={setIsConfirmModalVisible}
-                confirmAction={handleConfirmedRemove}
-                cancelAction={() => setIsConfirmModalVisible(false)}
-            />
-        </div>
+        </>
     );
 };
 

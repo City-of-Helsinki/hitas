@@ -88,10 +88,6 @@
     @include flex-flow(row nowrap)
     @include justify-content(space-between)
 
-  .building-identifier-field
-    @include flex-grow(0)
-    width: 200px
-
   .ownership-headings
     @include flexbox()
     @include justify-content(space-between)
@@ -168,22 +164,9 @@
             color: $color-error
 
 .view--buildings
-  .building-identifier-field
-    width: auto
-  .buildings-list
+  .buildings-table
     background: $color-engel-medium-light
-    h3
-      padding: $spacing-s 0 0 $spacing-l
-    .remove-icon
-      cursor: pointer
-      height: 24px
-      margin-left: $spacing-xs
-      &:hover
-        color: $color-error
-    .edit-icon
-      @extend .remove-icon
-      &:hover
-        color: $color-info
+    padding: $spacing-layout-s
 
 .view--real-estates
   .real-estates-table

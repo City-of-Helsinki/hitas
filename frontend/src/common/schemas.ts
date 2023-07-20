@@ -236,18 +236,16 @@ const HousingCompanySchema = object({
 const BuildingSchema = object({
     id: APIIdString,
     address: AddressSchema,
-    completion_date: string().nullable(),
     building_identifier: string().nullable(),
     apartment_count: number(),
 });
 
-const BuildingWritableSchema = BuildingSchema.pick({building_identifier: true}).and(
-    object({
-        id: APIIdString.optional(),
-        address: object({street_address: string()}),
-        real_estate_id: string().nullable(),
-    })
-);
+const WritableBuildingSchema = object({
+    id: APIIdString.optional(),
+    address: object({street_address: string()}),
+    building_identifier: string().nullable(),
+    real_estate_id: APIIdString.nullable(),
+});
 
 const RealEstateSchema = object({
     id: APIIdString,
@@ -1161,7 +1159,7 @@ export {
     PostalCodeSchema,
     UserInfoSchema,
     HousingCompanySchema,
-    BuildingWritableSchema,
+    WritableBuildingSchema,
     HousingCompanyWritableSchema,
     ApartmentPricesSchema,
     ApartmentSharesSchema,
@@ -1211,7 +1209,7 @@ export type IHousingCompanyWritable = z.infer<typeof HousingCompanyWritableSchem
 export type IHousingCompanyState = z.infer<typeof HousingCompanyStateSchema>;
 export type IRealEstate = z.infer<typeof RealEstateSchema>;
 export type IBuilding = z.infer<typeof BuildingSchema>;
-export type IBuildingWritable = z.infer<typeof BuildingWritableSchema>;
+export type IBuildingWritable = z.infer<typeof WritableBuildingSchema>;
 export type IApartmentAddress = z.infer<typeof ApartmentAddressSchema>;
 export type IApartmentLinkedModel = z.infer<typeof ApartmentLinkedModelSchema>;
 export type IApartmentLinkedModels = z.infer<typeof ApartmentLinkedModelsSchema>;
