@@ -255,6 +255,7 @@ const RealEstateSchema = object({
 });
 
 const WritableRealEstateSchema = object({
+    id: APIIdString.optional(),
     property_identifier: string(),
 });
 

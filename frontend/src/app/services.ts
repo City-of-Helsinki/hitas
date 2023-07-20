@@ -516,10 +516,10 @@ const mutationApi = hitasApi.injectEndpoints({
                 {type: "ThirtyYearRegulation", id: arg.calculationDate},
             ],
         }),
-        createRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
+        saveRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
             query: ({data, housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}/real-estates`,
-                method: "POST",
+                url: `housing-companies/${housingCompanyId}/real-estates${idOrBlank(data.id)}`,
+                method: data.id === undefined ? "POST" : "PUT",
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
@@ -855,7 +855,7 @@ export const {
     useSaveHousingCompanyMutation,
     usePatchHousingCompanyMutation,
     useReleaseHousingCompanyFromRegulationMutation,
-    useCreateRealEstateMutation,
+    useSaveRealEstateMutation,
     useDeleteRealEstateMutation,
     useSaveBuildingMutation,
     useDeleteBuildingMutation,

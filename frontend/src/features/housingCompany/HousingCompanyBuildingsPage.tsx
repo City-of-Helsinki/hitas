@@ -36,15 +36,18 @@ const ModifyBuildingButton = ({building}: {building?: IAnnotatedBuilding}) => {
 
     const isEditing = building !== undefined;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const closeModal = () => setIsModalOpen(false);
-
     const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm({
         defaultValues: isEditing ? {...building, real_estate_id: building.real_estate.id} : blankForm,
         mode: "all",
         resolver: zodResolver(WritableBuildingSchema),
     });
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => {
+        setIsModalOpen(false);
+        formObject.reset();
+    };
 
     const [saveBuilding, {isLoading}] = useSaveBuildingMutation();
 
@@ -54,10 +57,8 @@ const ModifyBuildingButton = ({building}: {building?: IAnnotatedBuilding}) => {
             .unwrap()
             .then(() => {
                 hdsToast.info("Rakennus luotu onnistuneesti.");
-                closeModal();
-                if (!isEditing) {
-                    formObject.reset();
-                }
+                setIsModalOpen(false);
+                if (!isEditing) formObject.reset();
             })
             .catch((error) => {
                 hdsToast.error("Rakennuksen luominen epäonnistui!");

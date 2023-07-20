@@ -4,11 +4,12 @@ import {Button, IconPlus, IconTrash, Table} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {useCreateRealEstateMutation, useDeleteRealEstateMutation} from "../../app/services";
+import {z} from "zod";
+import {useDeleteRealEstateMutation, useSaveRealEstateMutation} from "../../app/services";
 import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../../common/components";
 import {FormProviderForm, SaveFormButton, TextInput} from "../../common/components/forms";
 import {IRealEstate, WritableRealEstateSchema} from "../../common/schemas";
-import {hdsToast, setAPIErrorsForFormFields} from "../../common/utils";
+import {hdsToast, setAPIErrorsForFormFields, validatePropertyId} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
@@ -18,35 +19,51 @@ const tableTheme = {
     "--header-background-color": "var(--color-engel-medium-light)",
 };
 
-const CreateRealEstateButton = () => {
+const ModifyRealEstateButton = ({realEstate}: {realEstate?: IRealEstate}) => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
     if (!housingCompany) throw new Error("Housing company not found");
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const closeModal = () => setIsModalOpen(false);
+    const isEditing = realEstate !== undefined;
 
     const initialFormValues = {
-        property_identifier: null,
+        id: realEstate?.id,
+        property_identifier: realEstate?.property_identifier ?? null,
     };
     const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm({
         defaultValues: initialFormValues,
         mode: "all",
-        resolver: zodResolver(WritableRealEstateSchema),
+        resolver: zodResolver(
+            WritableRealEstateSchema.superRefine((data, ctx) => {
+                if (!validatePropertyId(data.property_identifier)) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["property_identifier"],
+                        message: "Kiinteistötunnuksen muoto on virheellinen",
+                    });
+                }
+            })
+        ),
     });
 
-    const [saveRealEstate, {isLoading}] = useCreateRealEstateMutation();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const closeModal = () => {
+        setIsModalOpen(false);
+        formObject.reset();
+    };
+
+    const [saveRealEstate, {isLoading}] = useSaveRealEstateMutation();
 
     const onSubmit = (data) => {
         saveRealEstate({housingCompanyId: housingCompany.id, data: data})
             .unwrap()
             .then(() => {
                 hdsToast.info("Kiinteistö luotu onnistuneesti.");
-                closeModal();
-                formObject.reset();
+                setIsModalOpen(false);
+                if (!isEditing) formObject.reset();
             })
             .catch((error) => {
-                hdsToast.error("Kiinteistön luonti epäonnistui!");
+                hdsToast.error("Kiinteistön luominen epäonnistui!");
                 setAPIErrorsForFormFields(formObject, error);
             });
     };
@@ -57,12 +74,13 @@ const CreateRealEstateButton = () => {
                 theme="black"
                 iconLeft={<IconPlus />}
                 onClick={() => setIsModalOpen(true)}
+                size={isEditing ? "small" : "default"}
             >
-                Lisää uusi
+                {isEditing ? "Muokkaa" : "Lisää uusi"}
             </Button>
 
             <GenericActionModal
-                title="Uusi kiinteistö"
+                title={isEditing ? "Muokkaa kiinteistön tietoja" : "Uusi kiinteistö"}
                 modalIcon={<IconPlus />}
                 isModalOpen={isModalOpen}
                 closeModal={closeModal}
@@ -155,6 +173,15 @@ const realEstateTableColumns = [
         transform: (obj: IRealEstate) => <div className="text-right">{obj.buildings.length} kpl</div>,
     },
     {
+        key: "edit",
+        headerName: "",
+        transform: (obj: IRealEstate) => (
+            <div className="text-right">
+                <ModifyRealEstateButton realEstate={obj} />
+            </div>
+        ),
+    },
+    {
         key: "delete",
         headerName: "",
         transform: (obj: IRealEstate) => (
@@ -188,7 +215,7 @@ const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
             </div>
             <div className="row row--buttons">
                 <NavigateBackButton />
-                <CreateRealEstateButton />
+                <ModifyRealEstateButton />
             </div>
         </>
     );

@@ -70,6 +70,12 @@ export function validateBusinessId(value: string): boolean {
     return !!value.match(/^(\d{7})-(\d)$/);
 }
 
+export function validatePropertyId(value: string): boolean {
+    // e.g. '1-1234-321-56'
+    // Returns true if the format is valid
+    return !!value.match(/^\d{1,4}-\d{1,4}-\d{1,4}-\d{1,4}$/);
+}
+
 export function validateSocialSecurityNumber(value: string): boolean {
     if (value === null) return false;
     if (!value.match(/^(\d{6})([A-FYXWVU+-])(\d{3})([\dA-Z])$/)) {
