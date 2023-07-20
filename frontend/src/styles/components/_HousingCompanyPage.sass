@@ -1,21 +1,6 @@
 @use '../imports' as *
 
 .view--housing-company-details
-  [class^="heading--main"]
-    .input-field--file
-      height: 44px
-      [class*="TextInput-module_root"] div:not(:first-child), #salesCatalog-list
-        display: none
-    [class*="FileInput-module_fileInputWrapper"], a, button
-      height: 44px
-      margin: 0
-      padding: 0
-  .company-status
-    display: flex
-    flex-direction: row
-    gap: 1rem
-    margin-bottom: 1rem
-
   .company-details
     > *
       margin-bottom: 75px
@@ -68,6 +53,12 @@
             cursor: pointer
             color: $color-black-70
 
+      // Hide 'Import sales catalog' help texts
+      .input-field--file
+        [class*="TextInput-module_root"] div:not(:first-child), #salesCatalog-list
+          display: none
+
+
   .list-wrapper--real-estates, .list-wrapper--buildings
     width: 50%
 
@@ -97,3 +88,24 @@
     @include flex-flow(column nowrap)
     border: 1px solid $color-black-40
     overflow: auto
+
+.housing-company-header
+  @include flex-flow(column nowrap)
+  padding: $spacing-layout-2-xs $spacing-layout-xs $spacing-layout-2-xs $spacing-layout-xs
+  background: var(--color-engel)
+  font-size: $fontsize-heading-s
+  white-space: nowrap
+  border: 0
+  margin-bottom: $spacing-layout-s
+
+  h1
+    margin: 0
+    margin-bottom: $spacing-layout-2-xs
+
+  div
+    @include flexbox()
+    @include flex-flow(row nowrap)
+    gap: 1rem
+
+  [class^="StatusLabel"]
+    background-color: var(--color-engel-light)

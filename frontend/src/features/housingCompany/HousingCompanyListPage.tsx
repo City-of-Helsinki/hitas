@@ -175,7 +175,7 @@ const HousingCompanyListPage = (): React.JSX.Element => {
                         theme="black"
                         iconLeft={<IconPlus />}
                     >
-                        Lisää uusi yhtiö
+                        Lisää uusi taloyhtiö
                     </Button>
                 </Link>
             </Heading>
