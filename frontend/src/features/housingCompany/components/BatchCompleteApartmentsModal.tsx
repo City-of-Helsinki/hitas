@@ -3,8 +3,7 @@ import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useBatchCompleteApartmentsMutation} from "../../../app/services";
 import {CloseButton, SaveDialogModal} from "../../../common/components";
-import {DateInput, NumberInput} from "../../../common/components/forms";
-import FormProviderForm from "../../../common/components/forms/FormProviderForm";
+import {DateInput, FormProviderForm, NumberInput} from "../../../common/components/forms";
 import {hdsToast, today} from "../../../common/utils";
 
 const BatchCompleteApartmentsModal = ({housingCompanyId}) => {

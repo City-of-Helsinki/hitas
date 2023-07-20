@@ -1,3 +1,1 @@
-import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
-
-export default MaximumPriceCalculationFieldSet;
+export {default} from "./MaximumPriceCalculationFieldSet";

@@ -1,5 +1,5 @@
 import {Tabs} from "hds-react";
-import Heading from "../../common/components/Heading";
+import {Heading} from "../../common/components";
 import {CalculatePriceCeiling, ThirtyYearRegulation} from "./";
 
 const FunctionsPage = () => {

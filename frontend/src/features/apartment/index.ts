@@ -1,17 +1,7 @@
-import ApartmentConditionsOfSalePage from "./ApartmentConditionsOfSalePage";
-import ApartmentCreatePage from "./ApartmentCreatePage";
-import ApartmentDetailsPage from "./ApartmentDetailsPage";
-import ApartmentImprovementsPage from "./ApartmentImprovementsPage";
-import ApartmentListPage from "./ApartmentListPage";
-import ApartmentMaxPricePage from "./ApartmentMaxPricePage";
-import ApartmentNewSalePage from "./ApartmentNewSalePage";
-
-export {
-    ApartmentConditionsOfSalePage,
-    ApartmentCreatePage,
-    ApartmentDetailsPage,
-    ApartmentImprovementsPage,
-    ApartmentListPage,
-    ApartmentMaxPricePage,
-    ApartmentNewSalePage,
-};
+export {default as ApartmentConditionsOfSalePage} from "./ApartmentConditionsOfSalePage";
+export {default as ApartmentCreatePage} from "./ApartmentCreatePage";
+export {default as ApartmentDetailsPage} from "./ApartmentDetailsPage";
+export {default as ApartmentImprovementsPage} from "./ApartmentImprovementsPage";
+export {default as ApartmentListPage} from "./ApartmentListPage";
+export {default as ApartmentMaxPricePage} from "./ApartmentMaxPricePage";
+export {default as ApartmentNewSalePage} from "./ApartmentNewSalePage";

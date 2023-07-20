@@ -1,3 +1,1 @@
-import ApartmentDetailsPage from "./ApartmentDetailsPage";
-
-export default ApartmentDetailsPage;
+export {default} from "./ApartmentDetailsPage";

@@ -13,7 +13,7 @@ import {
     ApartmentMaxPricePage,
     ApartmentNewSalePage,
 } from "./features/apartment";
-import {Codes} from "./features/codes";
+import CodesPage from "./features/codes";
 import {Templates} from "./features/documentTemplates";
 import {FunctionsPage} from "./features/functions";
 import {
@@ -120,7 +120,7 @@ export default function Router() {
                 </Route>
                 <Route
                     path="codes"
-                    element={protect(<Codes />)}
+                    element={protect(<CodesPage />)}
                 />
                 <Route
                     path="documents"

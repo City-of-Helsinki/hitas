@@ -1,6 +1,6 @@
 import {useForm} from "react-hook-form";
 import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../app/services";
-import DownloadButton from "../../../common/components/DownloadButton";
+import {DownloadButton} from "../../../common/components";
 import {DateInput, FormProviderForm} from "../../../common/components/forms";
 import {today} from "../../../common/utils";
 

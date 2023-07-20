@@ -1,4 +1,4 @@
-const regulationAPIResponses = {
+export const regulationAPIResponses = {
     result_noProblems: {
         automatically_released: [
             {
@@ -272,7 +272,7 @@ const regulationAPIResponses = {
     },
 };
 
-const fileImportResponses = {
+export const fileImportResponses = {
     success: {
         calculation_quarter: "2022Q4",
         quarter_1: {
@@ -357,5 +357,3 @@ const fileImportResponses = {
         },
     },
 };
-
-export {regulationAPIResponses, fileImportResponses};

@@ -1,14 +1,14 @@
-import CheckboxInput from "./CheckboxInput";
-import DateInput from "./DateInput";
-import FileInput from "./FileInput";
-import FormProviderForm from "./FormProviderForm";
-import NumberInput from "./NumberInput";
-import RelatedModelInput from "./RelatedModelInput";
-import SaveFormButton from "./SaveFormButton";
-import SelectInput from "./SelectInput";
-import TextAreaInput from "./TextAreaInput";
-import TextInput from "./TextInput";
-import ToggleInput from "./ToggleInput";
+export {default as CheckboxInput} from "./CheckboxInput";
+export {default as DateInput} from "./DateInput";
+export {default as FileInput} from "./FileInput";
+export {default as FormProviderForm} from "./FormProviderForm";
+export {default as NumberInput} from "./NumberInput";
+export {default as RelatedModelInput} from "./RelatedModelInput";
+export {default as SaveFormButton} from "./SaveFormButton";
+export {default as SelectInput} from "./SelectInput";
+export {default as TextAreaInput} from "./TextAreaInput";
+export {default as TextInput} from "./TextInput";
+export {default as ToggleInput} from "./ToggleInput";
 
 export type FormInputProps = {
     name: string;
@@ -24,18 +24,4 @@ export type FormInputProps = {
     defaultValue?;
     onChange?;
     onBlur?;
-};
-
-export {
-    CheckboxInput,
-    DateInput,
-    FileInput,
-    FormProviderForm,
-    NumberInput,
-    RelatedModelInput,
-    SaveFormButton,
-    SelectInput,
-    TextAreaInput,
-    TextInput,
-    ToggleInput,
 };
