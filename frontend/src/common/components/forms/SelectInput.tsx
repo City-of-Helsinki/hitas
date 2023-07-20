@@ -85,12 +85,8 @@ const SelectInput = ({
                         label={label}
                         onChange={handleChange}
                         invalid={invalid ?? !!errors[name]}
+                        error={fieldError ? (fieldError as {message: string}).message : ""}
                     />
-                    {!!fieldError && (
-                        <p className="text-input_hds-text-input__error-text">
-                            {(fieldError as {message: string}).message}
-                        </p>
-                    )}
                 </>
             )}
         </div>
