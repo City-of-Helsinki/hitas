@@ -126,8 +126,6 @@ z.setErrorMap(customErrorMap);
 
 const APIIdString = string().min(32, errorMessages.APIIdMin).max(32, errorMessages.APIIdMax);
 
-const addAPIId = (zodObject) => zodObject.merge(APIIdString);
-
 const nullishNumber = number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
     .nonnegative(errorMessages.numberPositive)
     .nullish();
@@ -151,24 +149,24 @@ const writableRequiredNumber = number({
     .nonnegative(errorMessages.numberPositive)
     .optional(); // allow undefined but no null
 
-const APIDateSchema = string({required_error: errorMessages.required}).regex(
+export const APIDateSchema = string({required_error: errorMessages.required}).regex(
     /^\d{4}-\d{2}-\d{2}$/,
     errorMessages.dateFormat
 );
 
-const CodeSchema = object({
+export const CodeSchema = object({
     id: APIIdString,
     value: string(),
     description: string().nullable(),
 });
 
-const PostalCodeSchema = object({
+export const PostalCodeSchema = object({
     value: string(),
     city: string(),
     cost_area: z.enum(CostAreas),
 });
 
-const AddressSchema = object({
+export const AddressSchema = object({
     street_address: string({required_error: errorMessages.required}).min(2, errorMessages.stringLength),
     postal_code: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
@@ -205,7 +203,7 @@ export const ApartmentImprovementsFormSchema = z.object({
 });
 export type IApartmentImprovementsForm = z.infer<typeof ApartmentImprovementsFormSchema>;
 
-const UserInfoSchema = object({
+export const UserInfoSchema = object({
     first_name: string(),
     last_name: string(),
     email: string(),
@@ -220,7 +218,7 @@ const HousingCompanyAreaSchema = object({name: string(), cost_area: number()});
 const HousingCompanyHitasTypeSchema = z.enum(housingCompanyHitasTypes);
 const HousingCompanyRegulationStatusSchema = z.enum(housingCompanyRegulationStatus);
 
-const HousingCompanySchema = object({
+export const HousingCompanySchema = object({
     id: APIIdString,
     name: string(),
     hitas_type: HousingCompanyHitasTypeSchema,
@@ -240,7 +238,7 @@ const BuildingSchema = object({
     apartment_count: number(),
 });
 
-const WritableBuildingSchema = object({
+export const WritableBuildingSchema = object({
     id: APIIdString.optional(),
     address: object({street_address: string()}),
     building_identifier: string().nullable(),
@@ -254,18 +252,18 @@ const RealEstateSchema = object({
     buildings: BuildingSchema.array(),
 });
 
-const WritableRealEstateSchema = object({
+export const WritableRealEstateSchema = object({
     id: APIIdString.optional(),
     property_identifier: string(),
 });
 
-const PropertyManagerSchema = object({
+export const PropertyManagerSchema = object({
     id: APIIdString.optional(),
     name: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
     email: string().email(errorMessages.emailInvalid).or(z.literal("")),
 });
 
-const DeveloperSchema = object({
+export const DeveloperSchema = object({
     id: APIIdString.optional(),
     value: string().nonempty(errorMessages.required).min(2, errorMessages.stringLength),
     description: string()
@@ -318,7 +316,7 @@ const HousingCompanyDetailsSchema = object({
     }),
 });
 
-const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
+export const HousingCompanyWritableSchema = HousingCompanyDetailsSchema.pick({
     name: true,
     business_id: true,
     hitas_type: true,
@@ -369,7 +367,7 @@ const ApartmentLinkedModelsSchema = object({
     apartment: ApartmentLinkedModelSchema,
 });
 
-const OwnerSchema = object({
+export const OwnerSchema = object({
     id: APIIdString,
     name: string({required_error: errorMessages.required})
         .min(2, errorMessages.stringLength)
@@ -391,14 +389,7 @@ const ownershipSchema = object({
     starting_date: string().optional(),
 });
 
-const ownershipsSchema = ownershipSchema.array();
-
-const OwnershipFormSchema = ownershipSchema
-    .omit({owner: true})
-    .and(object({owner: object({id: string()})}))
-    .array();
-
-const ownerAPISchema = addAPIId(OwnerSchema);
+export const ownershipsSchema = ownershipSchema.array();
 
 // Condition of Sale
 const CreateConditionOfSaleSchema = object({
@@ -458,7 +449,7 @@ const ApartmentConfirmedMaximumPriceSchema = object({
     valid: object({is_valid: boolean(), valid_until: string()}),
 });
 
-const ApartmentPricesSchema = object({
+export const ApartmentPricesSchema = object({
     first_sale_purchase_price: number().nullable(), // Read only
     first_sale_share_of_housing_company_loans: number().nullable(), // Read only
     first_sale_acquisition_price: number().optional(), // Read only. (purchase_price + share_of_housing_company_loans)
@@ -502,13 +493,13 @@ const ApartmentWritablePricesSchema = ApartmentPricesSchema.omit({
     catalog_acquisition_price: true,
 });
 
-const ApartmentSharesSchema = object({
+export const ApartmentSharesSchema = object({
     start: nullishPositiveNumber,
     end: nullishPositiveNumber,
     total: number(),
 });
 
-const ApartmentSchema = object({
+export const ApartmentSchema = object({
     id: string().nullable(),
     is_sold: boolean(),
     type: string(),
@@ -524,7 +515,7 @@ const ApartmentSchema = object({
     sell_by_date: string().nullable(),
 });
 
-const ApartmentDetailsSchema = object({
+export const ApartmentDetailsSchema = object({
     id: APIIdString,
     is_sold: boolean(),
     type: CodeSchema,
@@ -545,7 +536,7 @@ const ApartmentDetailsSchema = object({
     sell_by_date: string().nullable(),
 });
 
-const ApartmentWritableSchema = object({
+export const ApartmentWritableSchema = object({
     id: APIIdString.optional(),
     type: object({id: string()}).nullable(),
     surface_area: nullishDecimal,
@@ -562,7 +553,7 @@ const ApartmentWritableSchema = object({
     }),
 });
 
-const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
+export const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
     building: true,
     address: true,
 }).and(
@@ -573,7 +564,7 @@ const ApartmentWritableFormSchema = ApartmentWritableSchema.omit({
 );
 
 // Writable list of ownerships
-const OwnershipsListSchema = object({
+export const OwnershipsListSchema = object({
     owner: object({id: APIIdString.optional().or(z.literal(""))}),
     percentage: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
@@ -627,14 +618,10 @@ const OwnershipsListSchema = object({
     });
 
 // Writable Apartment Sale Form
-const ApartmentSaleFormSchema = object({
+export const ApartmentSaleFormSchema = object({
     key: string().optional(),
-    notification_date: z
-        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
-    purchase_date: z
-        .string({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-        .regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat),
+    notification_date: APIDateSchema,
+    purchase_date: APIDateSchema,
     purchase_price: z
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)
@@ -653,7 +640,7 @@ const ApartmentSaleFormSchema = object({
 // Apartment Sale Form that can be submitted.
 // Other validations still need to be done, but those are out of scope for this schema.
 
-const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
+export const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
     purchase_price: true,
     apartment_share_of_housing_company_loans: true,
     ownerships: true,
@@ -879,7 +866,7 @@ const SurfaceAreaPriceCeilingCalculationSchema = IndexCalculationSchema.and(
 
 // Maximum Price Schemas
 
-const ApartmentMaximumPrice2011OnwardsSchema = object({
+export const ApartmentMaximumPrice2011OnwardsSchema = object({
     new_hitas: literal(true),
     calculations: object({
         construction_price_index: IndexCalculation2011OnwardsSchema,
@@ -888,7 +875,7 @@ const ApartmentMaximumPrice2011OnwardsSchema = object({
     }),
 });
 
-const ApartmentMaximumPricePre2011Schema = object({
+export const ApartmentMaximumPricePre2011Schema = object({
     new_hitas: literal(false),
     calculations: object({
         construction_price_index: IndexCalculationConstructionPriceIndexBefore2011Schema,
@@ -899,7 +886,7 @@ const ApartmentMaximumPricePre2011Schema = object({
 
 const Split2011Schema = ApartmentMaximumPrice2011OnwardsSchema.or(ApartmentMaximumPrice2011OnwardsSchema);
 
-const ApartmentMaximumPriceSchema = object({
+export const ApartmentMaximumPriceSchema = object({
     id: string(),
     index: z.enum(indexNames),
     maximum_price: number(),
@@ -930,7 +917,7 @@ const ApartmentMaximumPriceSchema = object({
     }),
 }).and(Split2011Schema);
 
-const ApartmentMaximumPriceWritableSchema = object({
+export const ApartmentMaximumPriceWritableSchema = object({
     calculation_date: string().nullable(),
     apartment_share_of_housing_company_loans: number().nullable(),
     apartment_share_of_housing_company_loans_date: string().nullable(),
@@ -939,7 +926,7 @@ const ApartmentMaximumPriceWritableSchema = object({
 
 const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
 
-const IndexResponseSchema = object({indexType: string(), value: number(), valid_until: string()});
+export const IndexResponseSchema = object({indexType: string(), value: number(), valid_until: string()});
 
 const ThirtyYearRegulationCompanySchema = object({
     id: string(),
@@ -1027,32 +1014,32 @@ const ErrorResponseSchema = object({
 
 // List responses
 
-const HousingCompanyListResponseSchema = object({
+export const HousingCompanyListResponseSchema = object({
     page: PageInfoSchema,
     contents: HousingCompanySchema.array(),
 });
 
-const ApartmentListResponseSchema = object({
+export const ApartmentListResponseSchema = object({
     page: PageInfoSchema,
     contents: ApartmentSchema.array(),
 });
 
-const CodeResponseSchema = object({
+export const CodeResponseSchema = object({
     page: PageInfoSchema,
     contents: CodeSchema.array(),
 });
 
-const PostalCodeResponseSchema = object({
+export const PostalCodeResponseSchema = object({
     page: PageInfoSchema,
     contents: PostalCodeSchema.array(),
 });
 
-const IndexListResponseSchema = object({
+export const IndexListResponseSchema = object({
     page: PageInfoSchema,
     contents: IndexSchema.array(),
 });
 
-const OwnersResponseSchema = object({
+export const OwnersResponseSchema = object({
     page: PageInfoSchema,
     contents: OwnerSchema.array(),
 });
@@ -1077,34 +1064,26 @@ const SalesCatalogApartmentSchema = object({
     acquisition_price: number(),
 });
 
-const SalesCatalogValidationResponseSchema = object({
-    apartments: SalesCatalogApartmentSchema.array(),
-    confirmation_date: string(),
-    total_surface_area: number(),
-    total_acquisition_price: number(),
-    acquisition_price_limit: number(),
-});
-
-const PropertyManagersResponseSchema = object({
+export const PropertyManagersResponseSchema = object({
     page: PageInfoSchema,
     contents: array(PropertyManagerSchema.extend({id: string()})),
 });
 
 // Query Parameters
 
-const HousingCompanyApartmentQuerySchema = object({
+export const HousingCompanyApartmentQuerySchema = object({
     housingCompanyId: string(),
     params: object({
         page: number(),
     }),
 });
 
-const ApartmentQuerySchema = object({
+export const ApartmentQuerySchema = object({
     housingCompanyId: string(),
     apartmentId: string(),
 });
 
-const IndexListQuerySchema = object({
+export const IndexListQuerySchema = object({
     indexType: string(),
     params: object({
         page: number(),
@@ -1128,7 +1107,7 @@ const ThirtyYearRegulationQuerySchema = object({
         .optional(),
 });
 
-const FilterOwnersQuerySchema = object({
+export const FilterOwnersQuerySchema = object({
     name: string().optional(),
     identifier: string().optional(),
     email: string().optional(),
@@ -1136,14 +1115,14 @@ const FilterOwnersQuerySchema = object({
     page: number().int().optional(),
 });
 
-const FilterPropertyManagersQuerySchema = object({
+export const FilterPropertyManagersQuerySchema = object({
     name: string().optional(),
     email: string().optional(),
     limit: number().int().optional(),
     page: number().int().optional(),
 });
 
-const FilterDevelopersQuerySchema = object({
+export const FilterDevelopersQuerySchema = object({
     value: string().optional(),
     limit: number().int().optional(),
     page: number().int().optional(),
@@ -1153,57 +1132,8 @@ const FilterDevelopersQuerySchema = object({
 // * Exports
 // ********************************
 
-// Schemas
-export {
-    APIDateSchema,
-    AddressSchema,
-    PostalCodeSchema,
-    UserInfoSchema,
-    HousingCompanySchema,
-    WritableBuildingSchema,
-    HousingCompanyWritableSchema,
-    ApartmentPricesSchema,
-    ApartmentSharesSchema,
-    ApartmentSchema,
-    ApartmentDetailsSchema,
-    ApartmentWritableSchema,
-    ApartmentWritableFormSchema,
-    ApartmentMaximumPriceSchema,
-    ApartmentMaximumPrice2011OnwardsSchema,
-    ApartmentMaximumPricePre2011Schema,
-    ApartmentMaximumPriceWritableSchema,
-    HousingCompanyListResponseSchema,
-    ApartmentListResponseSchema,
-    CodeResponseSchema,
-    OwnersResponseSchema,
-    PropertyManagersResponseSchema,
-    PostalCodeResponseSchema,
-    IndexListResponseSchema,
-    IndexResponseSchema,
-    SalesCatalogValidationResponseSchema,
-    HousingCompanyApartmentQuerySchema,
-    ApartmentQuerySchema,
-    IndexListQuerySchema,
-    FilterOwnersQuerySchema,
-    FilterPropertyManagersQuerySchema,
-    FilterDevelopersQuerySchema,
-    ApartmentSaleFormSchema,
-    OwnerSchema,
-    PropertyManagerSchema,
-    CodeSchema,
-    DeveloperSchema,
-    OwnershipFormSchema,
-    ownerAPISchema,
-    ownershipsSchema,
-    ApartmentSaleSchema,
-    OwnershipsListSchema,
-    WritableRealEstateSchema,
-};
-
 // Types (i.e. models)
-export type IAPIDate = z.infer<typeof APIDateSchema>;
 export type IAddress = z.infer<typeof AddressSchema>;
-export type IImprovement = z.infer<typeof ImprovementSchema>;
 export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
 export type IHousingCompanyDetails = z.infer<typeof HousingCompanyDetailsSchema>;
 export type IHousingCompanyWritable = z.infer<typeof HousingCompanyWritableSchema>;
@@ -1212,13 +1142,9 @@ export type IRealEstate = z.infer<typeof RealEstateSchema>;
 export type IBuilding = z.infer<typeof BuildingSchema>;
 export type IBuildingWritable = z.infer<typeof WritableBuildingSchema>;
 export type IApartmentAddress = z.infer<typeof ApartmentAddressSchema>;
-export type IApartmentLinkedModel = z.infer<typeof ApartmentLinkedModelSchema>;
-export type IApartmentLinkedModels = z.infer<typeof ApartmentLinkedModelsSchema>;
 export type IApartmentUnconfirmedMaximumPrice = z.infer<typeof ApartmentUnconfirmedMaximumPriceSchema>;
 export type IApartmentUnconfirmedMaximumPriceIndices = z.infer<typeof ApartmentUnconfirmedMaximumPriceIndicesSchema>;
 export type IApartmentConfirmedMaximumPrice = z.infer<typeof ApartmentConfirmedMaximumPriceSchema>;
-export type IApartmentPrices = z.infer<typeof ApartmentPricesSchema>;
-export type IMarketPriceIndexImprovement = z.infer<typeof MarketPriceIndexImprovementSchema>;
 export type IApartmentConstructionPriceIndexImprovement = z.infer<
     typeof ApartmentConstructionPriceIndexImprovementSchema
 >;
@@ -1229,9 +1155,6 @@ export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>
 export type IApartmentSale = z.infer<typeof ApartmentSaleSchema>;
 export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
 export type IApartmentSaleCreated = z.infer<typeof ApartmentSaleCreatedSchema>;
-export type IIndexCalculation = z.infer<typeof IndexCalculationSchema>;
-export type ICommonCalculationVars = z.infer<typeof CommonCalculationVarsSchema>;
-export type ICalculationVars2011Onwards = z.infer<typeof CalculationVars2011OnwardsSchema>;
 export type IIndexCalculation2011Onwards = z.infer<typeof IndexCalculation2011OnwardsSchema>;
 export type IIndexCalculationMarketPriceIndexBefore2011 = z.infer<
     typeof IndexCalculationMarketPriceIndexBefore2011Schema
@@ -1241,8 +1164,6 @@ export type IIndexCalculationConstructionPriceIndexBefore2011 = z.infer<
 >;
 export type SurfaceAreaPriceCeilingCalculation = z.infer<typeof SurfaceAreaPriceCeilingCalculationSchema>;
 export type IApartmentMaximumPriceCalculationDetails = z.infer<typeof ApartmentMaximumPriceSchema>;
-export type IApartmentMaximumPrice2011Onwards = z.infer<typeof ApartmentMaximumPrice2011OnwardsSchema>;
-export type IApartmentMaximumPricePre2011 = z.infer<typeof ApartmentMaximumPricePre2011Schema>;
 export type IApartmentMaximumPriceWritable = z.infer<typeof ApartmentMaximumPriceWritableSchema>;
 export type IIndex = z.infer<typeof IndexSchema>;
 export type ICode = z.infer<typeof CodeSchema>;
@@ -1263,7 +1184,6 @@ export type IOwnersResponse = z.infer<typeof OwnersResponseSchema>;
 export type IPropertyManagersResponse = z.infer<typeof PropertyManagersResponseSchema>;
 export type IPostalCodeResponse = z.infer<typeof PostalCodeResponseSchema>;
 export type ISalesCatalogApartment = z.infer<typeof SalesCatalogApartmentSchema>;
-export type ISalesCatalogValidationResponse = z.infer<typeof SalesCatalogValidationResponseSchema>;
 export type IHousingCompanyApartmentQuery = z.infer<typeof HousingCompanyApartmentQuerySchema>;
 export type IApartmentQuery = z.infer<typeof ApartmentQuerySchema>;
 export type IIndexListQuery = z.infer<typeof IndexListQuerySchema>;
@@ -1276,7 +1196,6 @@ export type IFilterDevelopersQuery = z.infer<typeof FilterDevelopersQuerySchema>
 
 export type IExternalSalesDataResponse = z.infer<typeof ExternalSalesDataResponseSchema>;
 export type IThirtyYearRegulationResponse = z.infer<typeof ThirtyYearRegulationResponseSchema>;
-export type IThirtyYearAvailablePostalCode = z.infer<typeof ThirtyYearAvailablePostalCodeSchema>;
 export type IThirtyYearAvailablePostalCodesResponse = z.infer<typeof ThirtyYearAvailablePostalCodesResponseSchema>;
 export type IThirtyYearRegulationQuery = z.infer<typeof ThirtyYearRegulationQuerySchema>;
 
