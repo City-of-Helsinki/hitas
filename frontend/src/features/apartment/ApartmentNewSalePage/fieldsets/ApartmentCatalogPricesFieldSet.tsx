@@ -1,6 +1,6 @@
 import {Fieldset} from "hds-react";
 import {useContext, useEffect} from "react";
-import SimpleErrorMessage from "../../../../common/components/SimpleErrorMessage";
+import {SimpleErrorMessage} from "../../../../common/components";
 import {formatMoney} from "../../../../common/utils";
 import {ApartmentSaleContext} from "../utils";
 

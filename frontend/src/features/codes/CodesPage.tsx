@@ -8,9 +8,9 @@ import {
     OwnerMutateForm,
     propertyManagerMutateFormProps,
 } from "../../common/components/mutateComponents";
-import {IndicesList} from "./";
+import IndicesList from "./IndicesList";
 
-const Codes = (): React.JSX.Element => {
+const CodesPage = (): React.JSX.Element => {
     return (
         <div className="view--codes">
             <h1 className="main-heading">Koodisto</h1>
@@ -66,4 +66,4 @@ const Codes = (): React.JSX.Element => {
     );
 };
 
-export default Codes;
+export default CodesPage;

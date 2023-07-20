@@ -10,8 +10,7 @@ import {
     useGetIndexQuery,
     useGetThirtyYearRegulationQuery,
 } from "../../app/services";
-import {Divider, Heading, QueryStateHandler} from "../../common/components";
-import DownloadButton from "../../common/components/DownloadButton";
+import {Divider, DownloadButton, Heading, QueryStateHandler} from "../../common/components";
 import {SelectInput, ToggleInput} from "../../common/components/forms";
 import {getHitasQuarter, hdsToast} from "../../common/utils";
 import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";

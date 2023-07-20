@@ -1,10 +1,11 @@
 import {Button} from "hds-react";
-import {useFieldArray, useForm} from "react-hook-form";
+import React from "react";
+import {useFieldArray, useForm, useFormContext} from "react-hook-form";
+import {Link} from "react-router-dom";
 import {useGetAvailablePostalCodesQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
-import {FormProviderForm} from "../../../common/components/forms";
+import {FormProviderForm, SelectInput} from "../../../common/components/forms";
 import {today} from "../../../common/utils";
-import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
 
 type NewPostalCodes = {
     skipped: {
@@ -13,6 +14,64 @@ type NewPostalCodes = {
         replacementCode2: string | null;
     }[];
 };
+
+function ThirtyYearSkippedListItem({postalCode, companies, postalCodeOptionSet, index}): React.JSX.Element {
+    const formObject = useFormContext();
+
+    const options: {label: string; value: string}[] = [];
+    postalCodeOptionSet.forEach((option) => {
+        options.push({
+            label: `${option.postal_code} (${option.price_by_area} €/m², alue: ${option.cost_area})`,
+            value: option.postal_code,
+        });
+    });
+
+    return (
+        <li
+            className="results-list__item"
+            key={postalCode}
+        >
+            <div>
+                <h2>{postalCode}</h2>
+                <ul>
+                    <li>{companies.length > 1 ? "Yhtiöt:" : "Yhtiö:"} </li>
+                    {companies.map((company) => (
+                        <li key={company.display_name}>
+                            <Link
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                to={`/housing-companies/${company.id}`}
+                            >
+                                {company.display_name}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div className="inputs">
+                <SelectInput
+                    label="Korvaava postinumero"
+                    name={`skipped.${index}.replacementCode1`}
+                    options={options}
+                    tooltipText="Puolet keskiarvosta, joka korvaa puuttuvan postinumeroalueen hinnan."
+                    setDirectValue
+                    required
+                />
+                <SelectInput
+                    label="Korvaava postinumero"
+                    name={`skipped.${index}.replacementCode2`}
+                    options={options.filter(
+                        (option) => option.value !== formObject.getValues(`skipped.${index}.replacementCode1`)
+                    )}
+                    tooltipText="Toinen korvaava postinumero on valittavissa vasta kun olet valinnut ensimmäisen puolikkaan."
+                    disabled={formObject.getValues(`skipped.${index}.replacementCode1`) === null}
+                    setDirectValue
+                    required
+                />
+            </div>
+        </li>
+    );
+}
 
 const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     // If in Test mode, use today's date as the calculation date

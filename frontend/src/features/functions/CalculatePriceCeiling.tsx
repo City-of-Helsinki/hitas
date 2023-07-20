@@ -5,9 +5,7 @@ import {
     useCalculatePriceCeilingMutation,
     useGetIndicesQuery,
 } from "../../app/services";
-import {Heading, QueryStateHandler} from "../../common/components";
-import DownloadButton from "../../common/components/DownloadButton";
-import PriceCeilingsList from "../../common/components/PriceCeilingsList";
+import {DownloadButton, Heading, PriceCeilingsList, QueryStateHandler} from "../../common/components";
 import {getHitasQuarter, hdsToast, today} from "../../common/utils";
 
 export const years = Array.from({length: 34}, (_, index) => {

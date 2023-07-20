@@ -15,13 +15,13 @@ import {
 } from "../../common/components";
 import {
     DateInput,
+    FormProviderForm,
     NumberInput,
     RelatedModelInput,
     SelectInput,
     TextAreaInput,
     TextInput,
 } from "../../common/components/forms";
-import FormProviderForm from "../../common/components/forms/FormProviderForm";
 import {
     ApartmentWritableFormSchema,
     errorMessages,

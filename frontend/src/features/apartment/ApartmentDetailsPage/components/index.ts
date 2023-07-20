@@ -1,11 +1,3 @@
-import ApartmentConditionsOfSaleCard from "./ApartmentConditionsOfSaleCard";
-import ApartmentMaximumPricesCard from "./ApartmentMaximumPricesCard";
-import ApartmentSalesPageLinkButton from "./ApartmentSalesPageLinkButton";
-import RemoveApartmentLatestSaleModalButton from "./RemoveApartmentLatestSaleModalButton";
-
-export {
-    ApartmentConditionsOfSaleCard,
-    ApartmentMaximumPricesCard,
-    ApartmentSalesPageLinkButton,
-    RemoveApartmentLatestSaleModalButton,
-};
+export {default as ApartmentConditionsOfSaleCard} from "./ApartmentConditionsOfSaleCard";
+export {default as ApartmentMaximumPricesCard} from "./ApartmentMaximumPricesCard";
+export {default as RemoveApartmentLatestSaleModalButton} from "./RemoveApartmentLatestSaleModalButton";

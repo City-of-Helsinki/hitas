@@ -1,9 +1,42 @@
-import {Button, Card, IconLock} from "hds-react";
+import {Button, Card, IconGlyphEuro, IconLock} from "hds-react";
 import {Link} from "react-router-dom";
 import {IApartmentConditionOfSale, IApartmentDetails, IHousingCompanyDetails} from "../../../../common/schemas";
-import {formatAddress} from "../../../../common/utils";
+import {formatAddress, hdsToast} from "../../../../common/utils";
 import ConditionsOfSaleStatus from "../../components/ConditionsOfSaleStatus";
-import ApartmentSalesPageLinkButton from "./ApartmentSalesPageLinkButton";
+
+const ApartmentSalesPageLinkButton = ({
+    housingCompany,
+    apartment,
+}: {
+    housingCompany: IHousingCompanyDetails;
+    apartment: IApartmentDetails;
+}) => {
+    // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
+    if (!housingCompany.completion_date && apartment.prices.first_purchase_date) {
+        return (
+            <Button
+                theme="black"
+                iconLeft={<IconGlyphEuro />}
+                onClick={() => hdsToast.error("Valmistumattoman taloyhtiön asuntoa ei voida jälleenmyydä.")}
+                disabled={housingCompany.regulation_status !== "regulated"}
+            >
+                Kauppatapahtuma
+            </Button>
+        );
+    } else {
+        return (
+            <Link to="sales">
+                <Button
+                    theme="black"
+                    iconLeft={<IconGlyphEuro />}
+                    disabled={housingCompany.regulation_status !== "regulated" || !apartment.surface_area}
+                >
+                    Kauppatapahtuma
+                </Button>
+            </Link>
+        );
+    }
+};
 
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (

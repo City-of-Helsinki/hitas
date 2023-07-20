@@ -1,21 +1,8 @@
-import ExternalSalesDataImport from "./ExternalSalesDataImport";
-import ThirtyYearErrorModal from "./ThirtyYearErrorModal";
-import ThirtyYearLoadedResults from "./ThirtyYearLoadedResults";
-import ThirtyYearResultListItem from "./ThirtyYearResultListItem";
-import ThirtyYearResults from "./ThirtyYearResults";
-import ThirtyYearSkippedList from "./ThirtyYearSkippedList";
-import ThirtyYearSkippedListItem from "./ThirtyYearSkippedListItem";
-import ThirtyYearErrorTest from "./ThirtyYearTestComponents/ThirtyYearErrorTest";
-import ThirtyYearErrorTestResult from "./ThirtyYearTestComponents/ThirtyYearErrorTestResult";
-
-export {
-    ExternalSalesDataImport,
-    ThirtyYearResults,
-    ThirtyYearResultListItem,
-    ThirtyYearErrorTest,
-    ThirtyYearErrorModal,
-    ThirtyYearErrorTestResult,
-    ThirtyYearSkippedList,
-    ThirtyYearSkippedListItem,
-    ThirtyYearLoadedResults,
-};
+export {default as ExternalSalesDataImport} from "./ExternalSalesDataImport";
+export {default as ThirtyYearErrorModal} from "./ThirtyYearErrorModal";
+export {default as ThirtyYearLoadedResults} from "./ThirtyYearLoadedResults";
+export {default as ThirtyYearResultListItem} from "./ThirtyYearResultListItem";
+export {default as ThirtyYearResults} from "./ThirtyYearResults";
+export {default as ThirtyYearSkippedList} from "./ThirtyYearSkippedList";
+export {default as ThirtyYearErrorTest} from "./ThirtyYearTestComponents/ThirtyYearErrorTest";
+export {default as ThirtyYearErrorTestResult} from "./ThirtyYearTestComponents/ThirtyYearErrorTestResult";

@@ -3,8 +3,7 @@ import {useContext, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {Link} from "react-router-dom";
 import {downloadApartmentMaximumPricePDF, downloadApartmentUnconfirmedMaximumPricePDF} from "../../../../app/services";
-import {GenericActionModal} from "../../../../common/components";
-import DownloadButton from "../../../../common/components/DownloadButton";
+import {DownloadButton, GenericActionModal} from "../../../../common/components";
 import {DateInput, FormProviderForm, SaveFormButton, TextAreaInput} from "../../../../common/components/forms";
 import {
     IApartmentConfirmedMaximumPrice,

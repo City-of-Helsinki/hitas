@@ -1,5 +1,3 @@
-import ApartmentCatalogPricesFieldSet from "./ApartmentCatalogPricesFieldSet";
-import ApartmentSaleFormFieldSet from "./ApartmentSaleFormFieldSet";
-import MaximumPriceCalculationFieldSet from "./MaximumPriceCalculationFieldSet";
-
-export {ApartmentCatalogPricesFieldSet, ApartmentSaleFormFieldSet, MaximumPriceCalculationFieldSet};
+export {default as ApartmentCatalogPricesFieldSet} from "./ApartmentCatalogPricesFieldSet";
+export {default as ApartmentSaleFormFieldSet} from "./ApartmentSaleFormFieldSet";
+export {default as MaximumPriceCalculationFieldSet} from "./MaximumPriceCalculationFieldSet";

@@ -1,3 +1,1 @@
-import ReportsPage from "./ReportsPage";
-
-export default ReportsPage;
+export {default} from "./ReportsPage";

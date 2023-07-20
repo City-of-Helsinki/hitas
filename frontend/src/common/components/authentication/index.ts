@@ -1,4 +1,2 @@
-import Logout from "./Logout";
-import Unauthorized from "./Unauthorized";
-
-export {Logout, Unauthorized};
+export {default as Logout} from "./Logout";
+export {default as Unauthorized} from "./Unauthorized";

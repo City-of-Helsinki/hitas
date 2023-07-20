@@ -1,17 +1,7 @@
-import BatchCompleteApartmentsModal from "./components/BatchCompleteApartmentsModal";
-import HousingCompanyBuildingsPage from "./HousingCompanyBuildingsPage";
-import HousingCompanyCreatePage from "./HousingCompanyCreatePage";
-import HousingCompanyDetailsPage from "./HousingCompanyDetailsPage";
-import HousingCompanyImprovementsPage from "./HousingCompanyImprovementsPage";
-import HousingCompanyListPage from "./HousingCompanyListPage";
-import HousingCompanyRealEstatesPage from "./HousingCompanyRealEstatesPage";
-
-export {
-    BatchCompleteApartmentsModal,
-    HousingCompanyCreatePage,
-    HousingCompanyDetailsPage,
-    HousingCompanyListPage,
-    HousingCompanyBuildingsPage,
-    HousingCompanyRealEstatesPage,
-    HousingCompanyImprovementsPage,
-};
+export {default as BatchCompleteApartmentsModal} from "./components/BatchCompleteApartmentsModal";
+export {default as HousingCompanyBuildingsPage} from "./HousingCompanyBuildingsPage";
+export {default as HousingCompanyCreatePage} from "./HousingCompanyCreatePage";
+export {default as HousingCompanyDetailsPage} from "./HousingCompanyDetailsPage";
+export {default as HousingCompanyImprovementsPage} from "./HousingCompanyImprovementsPage";
+export {default as HousingCompanyListPage} from "./HousingCompanyListPage";
+export {default as HousingCompanyRealEstatesPage} from "./HousingCompanyRealEstatesPage";

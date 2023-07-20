@@ -1,5 +1,3 @@
-import CalculatePriceCeiling from "./CalculatePriceCeiling";
-import FunctionsPage from "./FunctionsPage";
-import ThirtyYearRegulation from "./ThirtyYearRegulation";
-
-export {CalculatePriceCeiling, FunctionsPage, ThirtyYearRegulation};
+export {default as CalculatePriceCeiling} from "./CalculatePriceCeiling";
+export {default as FunctionsPage} from "./FunctionsPage";
+export {default as ThirtyYearRegulation} from "./ThirtyYearRegulation";

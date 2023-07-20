@@ -1,15 +1,6 @@
-import MutateForm, {IMutateForm, IMutateFormProps} from "./MutateForm";
-import {developerMutateFormProps, propertyManagerMutateFormProps} from "./mutateFormProps";
-import MutateModal from "./MutateModal";
-import MutateSearchList from "./MutateSearchList";
-import OwnerMutateForm from "./OwnerMutateForm";
-
-export type {IMutateForm, IMutateFormProps};
-export {
-    MutateForm,
-    MutateModal,
-    MutateSearchList,
-    OwnerMutateForm,
-    developerMutateFormProps,
-    propertyManagerMutateFormProps,
-};
+export {default as MutateForm} from "./MutateForm";
+export type {IMutateForm, IMutateFormProps} from "./MutateForm";
+export {developerMutateFormProps, propertyManagerMutateFormProps} from "./mutateFormProps";
+export {default as MutateModal} from "./MutateModal";
+export {default as MutateSearchList} from "./MutateSearchList";
+export {default as OwnerMutateForm} from "./OwnerMutateForm";

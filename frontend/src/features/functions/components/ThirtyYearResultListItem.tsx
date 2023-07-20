@@ -5,8 +5,8 @@ import {
     useDownloadThirtyYearRegulationLetterMutation,
     useReleaseHousingCompanyFromRegulationMutation,
 } from "../../../app/services";
-import ConfirmDialogModal from "../../../common/components/ConfirmDialogModal";
-import DownloadButton from "../../../common/components/DownloadButton";
+import {ConfirmDialogModal, DownloadButton} from "../../../common/components";
+
 import {formatDate, hdsToast} from "../../../common/utils";
 
 const ThirtyYearResultListItem = ({company, calculationDate, category}) => {

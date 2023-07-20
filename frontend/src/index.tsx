@@ -3,7 +3,7 @@ import {BrowserRouter} from "react-router-dom";
 
 import {Provider} from "react-redux";
 import {store} from "./app/store";
-import ScrollToTop from "./common/components/ScrollToTop";
+import {ScrollToTop} from "./common/components";
 import Router from "./Router";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
