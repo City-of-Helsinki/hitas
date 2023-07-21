@@ -17,18 +17,30 @@ const instructionTexts = {
     released_from_regulation: ["Hintasääntelystä vapautuminen"],
 };
 
-const PDFTemplate = ({data, type}) => {
+interface IPDFListResponseData {
+    contents: {
+        name: string;
+        texts: string[];
+    }[];
+}
+
+const PDFTemplate = ({data, type}: {data: IPDFListResponseData; type: string}) => {
     const [saveTemplate] = useEditPDFTemplateMutation();
     // Get the relevant data from the API response and initialize the form (with field array)
-    const currentData = data?.contents.filter((item) => {
+    const currentData = data.contents.filter((item) => {
         return item.name === type;
     });
+
+    const initialFormParagraphs =
+        currentData[0]?.texts.map((text) => {
+            return {text: text};
+        }) ??
+        instructionTexts[type].map(() => {
+            return {text: ""};
+        });
+
     const formObject = useForm({
-        defaultValues: {
-            paragraphs: currentData[0]?.texts.map((text) => {
-                return {text: text};
-            }),
-        },
+        defaultValues: {paragraphs: initialFormParagraphs},
         mode: "all",
     });
     const {control} = formObject;
