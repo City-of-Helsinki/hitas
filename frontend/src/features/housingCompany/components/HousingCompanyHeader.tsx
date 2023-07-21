@@ -49,13 +49,13 @@ const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousing
 const HousingCompanyHeader = () => {
     const {housingCompanyId}: {housingCompanyId?: string} = useParams();
 
-    if (!housingCompanyId) {
-        return <Heading>Uusi taloyhtiö</Heading>;
-    }
-
     const {data, error, isLoading} = useGetHousingCompanyDetailQuery(housingCompanyId as string, {
         skip: !housingCompanyId,
     });
+
+    if (!housingCompanyId) {
+        return <Heading>Uusi taloyhtiö</Heading>;
+    }
 
     return (
         <div className="housing-company-header">
