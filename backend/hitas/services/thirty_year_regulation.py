@@ -820,7 +820,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     )
 
     summary_start = worksheet.max_row + 1
-    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
+    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE"}
     for title, formula in summary_rows.items():
         worksheet.append(
             ReportColumns(

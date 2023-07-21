@@ -20,7 +20,7 @@ def get_unconfirmed_prices():
     "maximum_index", ["construction_price_index", "market_price_index", "surface_area_price_ceiling"]
 )
 @pytest.mark.django_db
-def test__render_unconfirmed_max_price__surface_are_price_ceiling(maximum_index):
+def test__render_unconfirmed_max_price__surface_area_price_ceiling(maximum_index):
     api_user = UserFactory.create()
     ap: Apartment = ApartmentFactory.create(completion_date=datetime.date(2011, 1, 1))
     apartment_data = ApartmentDetailSerializer(ap).data

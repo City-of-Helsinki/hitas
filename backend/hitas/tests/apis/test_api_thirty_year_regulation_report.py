@@ -849,20 +849,6 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
             None,
             None,
         ),
-        (
-            "Mediaani",
-            "=MEDIAN(B2:B2)",
-            "=MEDIAN(C2:C2)",
-            None,
-            "=MEDIAN(E2:E2)",
-            "=MEDIAN(F2:F2)",
-            "=MEDIAN(G2:G2)",
-            "=MEDIAN(H2:H2)",
-            "=MEDIAN(I2:I2)",
-            None,
-            None,
-            None,
-        ),
     ]
 
 
