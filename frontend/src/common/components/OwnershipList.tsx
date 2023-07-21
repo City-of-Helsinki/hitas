@@ -1,8 +1,8 @@
 import {Button, IconCrossCircle, IconPlus} from "hds-react";
 import {useFieldArray, useFormContext} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
-import {useGetOwnersQuery} from "../../app/services";
 import {IOwner, OwnershipsListSchema} from "../schemas";
+import {useGetOwnersQuery} from "../services";
 import {formatOwner} from "../utils";
 import {SimpleErrorMessage} from "./";
 import {NumberInput, RelatedModelInput} from "./forms";

@@ -1,10 +1,10 @@
 import {IconLock, StatusLabel} from "hds-react";
 import {Link, useLocation, useParams} from "react-router-dom";
 
-import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../../app/services";
 import {EditButton, Heading, QueryStateHandler} from "../../../common/components";
 import {getApartmentSoldStatusLabel, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
 import {IApartmentDetails, IHousingCompanyDetails} from "../../../common/schemas";
+import {useGetApartmentDetailQuery, useGetHousingCompanyDetailQuery} from "../../../common/services";
 import {formatAddress} from "../../../common/utils";
 
 const ApartmentHeaderContent = ({

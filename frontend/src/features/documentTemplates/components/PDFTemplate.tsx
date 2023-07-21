@@ -1,7 +1,7 @@
 import {useFieldArray, useForm} from "react-hook-form";
-import {useEditPDFTemplateMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";
 import {FormProviderForm, TextAreaInput} from "../../../common/components/forms";
+import {useEditPDFTemplateMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
 const instructionTexts = {

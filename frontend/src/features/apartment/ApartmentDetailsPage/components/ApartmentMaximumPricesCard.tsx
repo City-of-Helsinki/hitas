@@ -2,7 +2,6 @@ import {Button, Card, IconDownload} from "hds-react";
 import {useContext, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {Link} from "react-router-dom";
-import {downloadApartmentMaximumPricePDF, downloadApartmentUnconfirmedMaximumPricePDF} from "../../../../app/services";
 import {DownloadButton, GenericActionModal} from "../../../../common/components";
 import {DateInput, FormProviderForm, SaveFormButton, TextAreaInput} from "../../../../common/components/forms";
 import {
@@ -11,6 +10,10 @@ import {
     IApartmentUnconfirmedMaximumPrice,
     IHousingCompanyDetails,
 } from "../../../../common/schemas";
+import {
+    downloadApartmentMaximumPricePDF,
+    downloadApartmentUnconfirmedMaximumPricePDF,
+} from "../../../../common/services";
 import {formatDate, formatMoney, getApartmentUnconfirmedPrices, today} from "../../../../common/utils";
 import {ApartmentViewContext} from "../../components/ApartmentViewContextProvider";
 

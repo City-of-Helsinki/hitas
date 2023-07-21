@@ -1,7 +1,7 @@
 import {IconTrash} from "hds-react";
 import {useContext, useState} from "react";
-import {useDeleteSaleMutation} from "../../../../app/services";
 import {DeleteButton, GenericActionModal} from "../../../../common/components";
+import {useDeleteSaleMutation} from "../../../../common/services";
 import {formatDate, formatMoney, hdsToast} from "../../../../common/utils";
 import {ApartmentViewContext} from "../../components/ApartmentViewContextProvider";
 

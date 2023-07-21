@@ -1,10 +1,10 @@
 import {StatusLabel} from "hds-react";
 import {Link, useLocation, useParams} from "react-router-dom";
 
-import {useGetHousingCompanyDetailQuery} from "../../../app/services";
 import {EditButton, Heading, QueryStateHandler} from "../../../common/components";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
 import {IHousingCompanyDetails} from "../../../common/schemas";
+import {useGetHousingCompanyDetailQuery} from "../../../common/services";
 
 const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const {pathname} = useLocation();

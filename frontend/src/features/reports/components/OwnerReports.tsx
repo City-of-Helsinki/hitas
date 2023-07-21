@@ -1,5 +1,5 @@
-import {downloadMultipleOwnershipsReportPDF} from "../../../app/services";
 import {DownloadButton} from "../../../common/components";
+import {downloadMultipleOwnershipsReportPDF} from "../../../common/services";
 
 const OwnerReports = () => {
     return (

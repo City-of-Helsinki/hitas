@@ -1,9 +1,9 @@
 import {Button, Dialog} from "hds-react";
 import {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
-import {useBatchCompleteApartmentsMutation} from "../../../app/services";
 import {CloseButton, SaveDialogModal} from "../../../common/components";
 import {DateInput, FormProviderForm, NumberInput} from "../../../common/components/forms";
+import {useBatchCompleteApartmentsMutation} from "../../../common/services";
 import {hdsToast, today} from "../../../common/utils";
 
 const BatchCompleteApartmentsModal = ({housingCompanyId}) => {

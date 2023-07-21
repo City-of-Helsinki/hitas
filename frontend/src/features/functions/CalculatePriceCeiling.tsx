@@ -1,11 +1,11 @@
 import {Button} from "hds-react";
 
+import {DownloadButton, Heading, PriceCeilingsList, QueryStateHandler} from "../../common/components";
 import {
     downloadSurfaceAreaPriceCeilingResults,
     useCalculatePriceCeilingMutation,
     useGetIndicesQuery,
-} from "../../app/services";
-import {DownloadButton, Heading, PriceCeilingsList, QueryStateHandler} from "../../common/components";
+} from "../../common/services";
 import {getHitasQuarter, hdsToast, today} from "../../common/utils";
 
 export const years = Array.from({length: 34}, (_, index) => {

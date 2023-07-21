@@ -1,11 +1,11 @@
+import {DownloadButton, QueryStateHandler} from "../../../common/components";
+import {IHousingCompanyState} from "../../../common/schemas";
 import {
     downloadHousingCompanyStatesReportPDF,
     downloadRegulatedHousingCompaniesPDF,
     downloadUnregulatedHousingCompaniesPDF,
     useGetHousingCompanyStatesQuery,
-} from "../../../app/services";
-import {DownloadButton, QueryStateHandler} from "../../../common/components";
-import {IHousingCompanyState} from "../../../common/schemas";
+} from "../../../common/services";
 
 const LoadedHousingCompanyStatusTable = ({housingCompanyStates}) => {
     return (

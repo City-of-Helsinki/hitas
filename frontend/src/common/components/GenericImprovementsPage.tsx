@@ -16,7 +16,7 @@ import {ConfirmDialogModal, NavigateBackButton, SaveButton} from "./index";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useNavigate} from "react-router-dom";
 import {v4 as uuidv4} from "uuid";
-import {usePatchApartmentMutation, usePatchHousingCompanyMutation} from "../../app/services";
+import {usePatchApartmentMutation, usePatchHousingCompanyMutation} from "../services";
 import {hdsToast} from "../utils";
 
 type IWritableImprovement = Omit<IApartmentConstructionPriceIndexImprovement, "value"> & {

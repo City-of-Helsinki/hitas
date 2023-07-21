@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useGetIndicesQuery} from "../../app/services";
+import {useGetIndicesQuery} from "../services";
 import {getHitasQuarter} from "../utils";
 import DownloadButton from "./DownloadButton";
 import {FilterTextInputField} from "./filters";

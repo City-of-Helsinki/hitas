@@ -3,12 +3,12 @@ import {Container, Footer, IconSignout, Navigation} from "hds-react";
 import React, {useEffect, useState} from "react";
 import {Link, Outlet} from "react-router-dom";
 import {Notifications} from "../common/components";
+import {useGetUserInfoQuery} from "../common/services";
 import {hdsToast} from "../common/utils";
 import "../styles/index.sass";
 import {selectIsAuthenticated, selectIsAuthenticating, setIsAuthenticated} from "./authSlice";
 import {Spinner} from "./components/Spinner";
 import {useAppDispatch, useAppSelector} from "./hooks";
-import {useGetUserInfoQuery} from "./services";
 import useAuthentication from "./useAuthentication";
 
 const App = (): React.JSX.Element => {

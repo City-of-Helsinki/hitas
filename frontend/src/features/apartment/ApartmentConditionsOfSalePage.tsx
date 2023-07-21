@@ -4,16 +4,16 @@ import {Button, IconCrossCircle, IconLock, IconPlus, IconPlusCircleFill, IconTra
 import {Link} from "react-router-dom";
 
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
+import {DeleteButton, GenericActionModal, Heading, NavigateBackButton, SaveButton} from "../../common/components";
+import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
+import {getConditionOfSaleGracePeriodLabel} from "../../common/localisation";
+import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
 import {
     useCreateConditionOfSaleMutation,
     useDeleteConditionOfSaleMutation,
     useGetOwnersQuery,
     usePatchConditionOfSaleMutation,
-} from "../../app/services";
-import {DeleteButton, GenericActionModal, Heading, NavigateBackButton, SaveButton} from "../../common/components";
-import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
-import {getConditionOfSaleGracePeriodLabel} from "../../common/localisation";
-import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
+} from "../../common/services";
 import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";

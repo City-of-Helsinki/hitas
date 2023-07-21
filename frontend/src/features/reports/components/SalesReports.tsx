@@ -1,7 +1,7 @@
 import {useForm} from "react-hook-form";
-import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../app/services";
 import {DownloadButton} from "../../../common/components";
 import {DateInput, FormProviderForm} from "../../../common/components/forms";
+import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../common/services";
 import {today} from "../../../common/utils";
 
 const BaseSalesReport = ({header, downloadReportFunction}) => {

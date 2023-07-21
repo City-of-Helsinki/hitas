@@ -5,7 +5,6 @@ import {Fieldset} from "hds-react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
 
-import {useDeleteApartmentMutation, useGetApartmentTypesQuery, useSaveApartmentMutation} from "../../app/services";
 import {
     ConfirmDialogModal,
     DeleteButton,
@@ -30,6 +29,7 @@ import {
     IApartmentWritableForm,
     ICode,
 } from "../../common/schemas";
+import {useDeleteApartmentMutation, useGetApartmentTypesQuery, useSaveApartmentMutation} from "../../common/services";
 import {hdsToast, isEmpty, setAPIErrorsForFormFields} from "../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 

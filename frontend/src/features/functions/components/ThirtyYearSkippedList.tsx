@@ -2,9 +2,9 @@ import {Button} from "hds-react";
 import React from "react";
 import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {Link} from "react-router-dom";
-import {useGetAvailablePostalCodesQuery} from "../../../app/services";
 import {Heading, QueryStateHandler} from "../../../common/components";
 import {FormProviderForm, SelectInput} from "../../../common/components/forms";
+import {useGetAvailablePostalCodesQuery} from "../../../common/services";
 import {today} from "../../../common/utils";
 
 type NewPostalCodes = {

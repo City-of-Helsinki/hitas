@@ -3,7 +3,6 @@ import {useEffect} from "react";
 import {Accordion, Button, Dialog, Table, Tabs} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 
-import {useSaveApartmentMaximumPriceMutation} from "../../../app/services";
 import {SaveButton} from "../../../common/components";
 import {
     IApartmentDetails,
@@ -13,6 +12,7 @@ import {
     IIndexCalculationMarketPriceIndexBefore2011,
     SurfaceAreaPriceCeilingCalculation,
 } from "../../../common/schemas";
+import {useSaveApartmentMaximumPriceMutation} from "../../../common/services";
 import {formatDate, formatMoney, hdsToast} from "../../../common/utils";
 
 const tableTheme = {

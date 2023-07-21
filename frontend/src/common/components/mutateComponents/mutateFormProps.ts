@@ -1,5 +1,5 @@
-import {useSaveDeveloperMutation, useSavePropertyManagerMutation} from "../../../app/services";
 import {DeveloperSchema, PropertyManagerSchema} from "../../schemas";
+import {useSaveDeveloperMutation, useSavePropertyManagerMutation} from "../../services";
 
 export const propertyManagerMutateFormProps = {
     formObjectSchema: PropertyManagerSchema,
