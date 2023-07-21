@@ -34,7 +34,7 @@ export type IOwnership = z.infer<typeof OwnershipSchema>;
 
 // Writable list of ownerships
 export const OwnershipsListSchema = object({
-    owner: object({id: APIIdString.optional().or(z.literal(""))}),
+    owner: object({id: APIIdString.optional().or(z.literal(""))}, {required_error: errorMessages.ownerIsRequired}),
     percentage: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
         .positive(errorMessages.numberPositive),
@@ -63,7 +63,7 @@ export const OwnershipsListSchema = object({
         if (elements.filter((e) => !e.owner.id).length) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: `"Omistaja"-kenttä ei voi olla tyhjä`,
+                message: errorMessages.ownerIsRequired,
             });
             return;
         }
