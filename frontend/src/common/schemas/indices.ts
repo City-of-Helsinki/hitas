@@ -1,11 +1,13 @@
 import {number, object, string, z} from "zod";
 import {PageInfoSchema} from "./common";
 
+const IndexMonth = string().regex(/\d{4}-\d{2}/, "Kuukauden täytyy olla muotoa VVVV-KK, esim. 2021-01");
+
 // ********************************
 // * Index
 // ********************************
 
-const IndexSchema = object({indexType: string(), month: string(), value: number().nullable()});
+export const IndexSchema = object({month: IndexMonth, value: number().nullable()});
 export type IIndex = z.infer<typeof IndexSchema>;
 
 // ********************************
@@ -33,6 +35,6 @@ export type IIndexListQuery = z.infer<typeof IndexListQuerySchema>;
 
 const IndexQuerySchema = object({
     indexType: string(),
-    month: string(),
+    month: IndexMonth,
 });
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;

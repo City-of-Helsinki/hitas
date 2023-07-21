@@ -8,21 +8,14 @@
     [class*="tablistBar"]
       background-color: white
 
-    [class*="active"]
+    [class*="Tabs-module_active"]
       background-color: $codes-background-color
-
       span
         font-weight: 700
-
         &:before
           display: none
 
-  [class^="Tabs-module_tabs"]
-    @include flexbox()
-    @include flex-flow(column nowrap)
-    @include flex-grow(1)
-
-
+  // General styles
   .filters
     @include flexbox()
     padding: 0
@@ -32,15 +25,16 @@
     > div
       @include flex-grow(1)
 
+    [class*="Select-module_"]
+      text-transform: capitalize
+
   .listing
     @include flexbox()
     @include flex-flow(column nowrap)
     background-color: $codes-background-color
     padding-right: $spacing-layout-2-xl
 
-
   .results
-
     &-list
       border: 1px solid #888
 
@@ -80,34 +74,6 @@
         &:nth-child(odd)
           background-color: $color-engel-light
 
-  &__tab--indices
-    @include flexbox()
-    @include flex-flow(column nowrap)
-    @include flex-grow(1)
-    [class*="Select-module_"]
-      text-transform: capitalize
-    .listing
-      @include flex-grow(1)
-      @include justify-content(flex-start)
-      grid-template-rows: auto
-      grid-template-columns: 50% 50%
-
-    .list-headers, .results-list__item, .results-list__no-mod-item
-      @include flexbox()
-      @include justify-content(space-between)
-      .index
-        width: 70%
-      .month
-        width: 20%
-      .value
-        @include justify-content(flex-end)
-        width: 10%
-        text-align: right
-
-  .index-actions
-    @include flexbox()
-    @include justify-content(center)
-    padding-top: $spacing-layout-m
 
   .list-footer
     @include flexbox()
@@ -117,3 +83,21 @@
 
   .list-footer-item
     margin-top: $spacing-layout-xs
+
+  // Tab specific styles
+  &__tab
+    &--indices
+      .listing
+        @include flex-grow(1)
+        @include justify-content(flex-start)
+        grid-template-rows: auto
+        grid-template-columns: 50% 50%
+
+        .list-headers, .results-list__item
+          @include flexbox()
+          @include justify-content(space-between)
+
+      .index-actions
+        @include flexbox()
+        @include justify-content(center)
+        padding-top: $spacing-layout-m
