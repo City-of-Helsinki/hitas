@@ -1,12 +1,15 @@
 @use "../imports" as *
 
 .view--documents
-  [class^="Tabs-module_tab__"][aria-selected=true]
-    background-color: $color-black-10
-    border-top-left-radius: $spacing-xs
-    border-top-right-radius: $spacing-xs
-    span
-      font-weight: 700
+  [class^="Tabs-module"]
+    [class*="tablistBar"]
+      background-color: white
+    [class*="Tabs-module_active"]
+      background-color: $codes-background-color
+      span
+        font-weight: 700
+        &:before
+          display: none
   [role="tabpanel"]
     background-color: $color-black-10
     padding: $spacing-m
@@ -34,7 +37,7 @@
   [class^="Accordion-module_accordionContent"]
     padding: $spacing-m
     background: $color-white
-    box-shadow: 0px 5px 5px 0px rgba($color-black, 0.2) inset
+    box-shadow: 0 5px 5px 0 rgba($color-black, 0.2) inset
     border-left: 1px solid $color-black-20
     border-right: 1px solid $color-black-20
   .current-template
