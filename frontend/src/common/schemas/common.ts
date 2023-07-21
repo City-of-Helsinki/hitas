@@ -43,6 +43,7 @@ export const errorMessages = {
     constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
     maxTwoDecimalPlaces: "Anna arvo enintän kahden desimaalin tarkkuudella",
     noDecimalPlaces: "Anna arvo kokonaislukuna",
+    ownerIsRequired: `"Omistaja"-kenttä ei voi olla tyhjä`,
 };
 
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {

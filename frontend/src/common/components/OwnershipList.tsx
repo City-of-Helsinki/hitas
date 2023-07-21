@@ -1,7 +1,7 @@
 import {Button, IconCrossCircle, IconPlus} from "hds-react";
 import {useFieldArray, useFormContext} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
-import {IOwner, OwnershipsListSchema} from "../schemas";
+import {OwnershipsListSchema} from "../schemas";
 import {useGetOwnersQuery} from "../services";
 import {formatOwner} from "../utils";
 import {SimpleErrorMessage} from "./";
@@ -19,7 +19,7 @@ const OwnershipList = () => {
     formObject.register("ownerships");
 
     // Blank Ownership. This is appended to the list when user clicks "New ownership"
-    const emptyOwnership = {key: uuidv4(), owner: {id: ""} as IOwner, percentage: 100};
+    const emptyOwnership = {key: uuidv4(), owner: undefined, percentage: 100};
 
     const formErrors = OwnershipsListSchema.safeParse(formObject.getValues("ownerships"));
 
@@ -72,9 +72,9 @@ const OwnershipList = () => {
             <>
                 {!formErrors.success &&
                     formErrors.error &&
-                    formErrors.error.issues.map((e) => (
+                    formErrors.error.issues.map((e, index) => (
                         <SimpleErrorMessage
-                            key={`${e.code}-${e.message}`}
+                            key={`${index}-${e.code}-${e.message}`}
                             errorMessage={e.message}
                         />
                     ))}
