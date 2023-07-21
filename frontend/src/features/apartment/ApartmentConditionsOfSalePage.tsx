@@ -14,7 +14,7 @@ import {
     useGetOwnersQuery,
     usePatchConditionOfSaleMutation,
 } from "../../common/services";
-import {formatAddress, formatDate, formatOwner, hdsToast} from "../../common/utils";
+import {formatAddress, formatApartmentAddressShort, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 
@@ -310,7 +310,15 @@ const getConditionsOfSaleTableColumns = (apartment: IApartmentDetails) => {
                             withSellByDate={false}
                         />
                     </div>
-                    {formatOwner(obj.owner)}
+                    <div>
+                        <b>{obj.owner.name}</b>
+                        {obj.owner.identifier ? (
+                            <>
+                                <br />
+                                {obj.owner.identifier}
+                            </>
+                        ) : null}
+                    </div>
                 </div>
             ),
         },
@@ -322,7 +330,7 @@ const getConditionsOfSaleTableColumns = (apartment: IApartmentDetails) => {
                     <b>{obj.apartment.housing_company.display_name}</b>
                     <Link to={`/housing-companies/${obj.apartment.housing_company.id}/apartments/${obj.apartment.id}`}>
                         <br />
-                        {formatAddress(obj.apartment.address)}
+                        {formatApartmentAddressShort(obj.apartment.address)}
                     </Link>
                 </div>
             ),
