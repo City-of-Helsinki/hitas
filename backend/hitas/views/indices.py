@@ -1,6 +1,7 @@
 import datetime
 from typing import ClassVar
 
+from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from django.http import HttpResponse
 from rest_framework import mixins, serializers, status
@@ -157,7 +158,10 @@ class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
 
         results = get_surface_area_price_ceiling_results(calculation_date)
         workbook = build_surface_area_price_ceiling_report_excel(results)
-        filename = f"Rajaneliöhinnan laskentaraportti ({results.calculation_month.isoformat()}).xlsx"
+        filename = (
+            f"Rajaneliöhinnan laskentaraportti ({results.calculation_month.strftime('%Y-%m')} - "
+            f"{(results.calculation_month + relativedelta(months=2)).strftime('%Y-%m')}).xlsx"
+        )
         return get_excel_response(filename=filename, excel=workbook)
 
 
