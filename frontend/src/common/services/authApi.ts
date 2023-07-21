@@ -1,7 +1,7 @@
 import {IUserInfoResponse} from "../schemas";
-import {hitasApi} from "./apis";
+import {authApi} from "./apis";
 
-const userApi = hitasApi.injectEndpoints({
+const userApi = authApi.injectEndpoints({
     endpoints: (builder) => ({
         getUserInfo: builder.query<IUserInfoResponse, null>({
             query: () => ({
