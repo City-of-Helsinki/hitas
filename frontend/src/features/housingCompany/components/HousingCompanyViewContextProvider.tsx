@@ -21,6 +21,10 @@ export const HousingCompanyViewContextProvider = ({
 }) => {
     const {housingCompanyId}: {housingCompanyId?: string} = useParams();
 
+    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(housingCompanyId as string, {
+        skip: !housingCompanyId,
+    });
+
     // If no housingCompanyId is given, just render the children
     if (!housingCompanyId)
         return (
@@ -29,10 +33,6 @@ export const HousingCompanyViewContextProvider = ({
                 {children}
             </div>
         );
-
-    const {data, error, isLoading} = useGetHousingCompanyDetailQuery(housingCompanyId as string, {
-        skip: !housingCompanyId,
-    });
 
     return (
         <div className={viewClassName}>

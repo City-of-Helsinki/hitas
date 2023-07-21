@@ -9,12 +9,12 @@ const RemoveApartmentLatestSaleModalButton = () => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
-    if (!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date) return null;
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const closeModal = () => setIsModalOpen(false);
 
     const [removeSale, {isLoading}] = useDeleteSaleMutation();
+
+    if (!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date) return null;
 
     const handleRemoveSaleButtonClick = () => {
         removeSale({
