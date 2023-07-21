@@ -209,10 +209,6 @@ def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
             func=lambda x: len(unwrap_range(x)),
         ),
         SalesReportSummaryDefinition(
-            subtitle="Summa",
-            func=lambda x: sum(unwrap_range(x)),
-        ),
-        SalesReportSummaryDefinition(
             subtitle="Keskiarvo",
             func=lambda x: mean(unwrap_range(x) or [0]),
         ),
@@ -233,10 +229,6 @@ def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
                 title=f"Kalleusalue {cost_area}",
                 subtitle="Lukumäärä",
                 func=lambda x, y=cost_area: len(conditional_range(x, **{f"A2:A{last_row}": y})),
-            ),
-            SalesReportSummaryDefinition(
-                subtitle="Summa",
-                func=lambda x, y=cost_area: sum(conditional_range(x, **{f"A2:A{last_row}": y})),
             ),
             SalesReportSummaryDefinition(
                 subtitle="Keskiarvo",
