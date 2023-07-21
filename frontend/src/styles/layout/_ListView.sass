@@ -56,13 +56,17 @@
     -o-filter: blur(3px)
     -ms-filter: blur(3px)
     filter: blur(3px) brightness(90%) opacity(90%)
+    pointer-events: none
+    user-select: none
+
 
   &-list-overlay-spinner
-    position: relative
+    position: fixed
     height: 0
     width: 0
     top: 50%
     left: 50%
+    z-index: 10
     [class*="LoadingSpinner-module_loadingSpinner"]
       transform: translate(-50%, -50%)
       --spinner-size: 12rem

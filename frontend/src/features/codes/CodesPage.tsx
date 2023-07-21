@@ -1,5 +1,6 @@
 import {Tabs} from "hds-react";
 import React from "react";
+import {Heading} from "../../common/components";
 import {
     developerMutateFormProps,
     MutateForm,
@@ -8,12 +9,12 @@ import {
     propertyManagerMutateFormProps,
 } from "../../common/components/mutateComponents";
 import {useGetDevelopersQuery, useGetOwnersQuery, useGetPropertyManagersQuery} from "../../common/services";
-import IndicesList from "./IndicesList";
+import IndicesTab from "./IndicesTab";
 
 const CodesPage = (): React.JSX.Element => {
     return (
         <div className="view--codes">
-            <h1 className="main-heading">Koodisto</h1>
+            <Heading type="main">Koodisto</Heading>
             <Tabs>
                 <Tabs.TabList>
                     <Tabs.Tab>Indeksit</Tabs.Tab>
@@ -24,7 +25,7 @@ const CodesPage = (): React.JSX.Element => {
                     <Tabs.Tab>Rakennuttajat</Tabs.Tab>
                 </Tabs.TabList>
                 <Tabs.TabPanel className="view--codes__tab--indices">
-                    <IndicesList />
+                    <IndicesTab />
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--postalcodes">
                     <h1>Postinumerot</h1>
