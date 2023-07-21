@@ -221,7 +221,7 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
     )
 
     summary_start = worksheet.max_row + 1
-    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE", "Mediaani": "MEDIAN"}
+    summary_rows = {"Summa": "SUM", "Keskiarvo": "AVERAGE"}
     for title, formula in summary_rows.items():
         worksheet.append(
             ReportColumns(

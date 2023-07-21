@@ -714,15 +714,6 @@ def test__api__indices__surface_area_price_ceiling__report(api_client: HitasAPIC
             "=AVERAGE(G2:G3)",
         ),
         (
-            "Mediaani",
-            "=MEDIAN(B2:B3)",
-            None,
-            "=MEDIAN(D2:D3)",
-            "=MEDIAN(E2:E3)",
-            "=MEDIAN(F2:F3)",
-            "=MEDIAN(G2:G3)",
-        ),
-        (
             "Rajaneliöhinta",
             7600,
             None,
