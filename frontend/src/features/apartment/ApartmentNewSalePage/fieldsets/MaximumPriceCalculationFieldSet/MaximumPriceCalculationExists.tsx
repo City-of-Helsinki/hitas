@@ -1,9 +1,9 @@
 import {useContext, useEffect} from "react";
 import {useFormContext} from "react-hook-form";
-import {useGetApartmentMaximumPriceQuery} from "../../../../../app/services";
 import {QueryStateHandler} from "../../../../../common/components";
 import {getIndexType} from "../../../../../common/localisation";
 import {IApartmentMaximumPriceCalculationDetails} from "../../../../../common/schemas";
+import {useGetApartmentMaximumPriceQuery} from "../../../../../common/services";
 import {formatDate, formatMoney, hdsToast} from "../../../../../common/utils";
 import {ApartmentSaleContext} from "../../utils";
 

@@ -6,13 +6,6 @@ import {useNavigate} from "react-router-dom";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
-import {
-    useGetBuildingTypesQuery,
-    useGetDevelopersQuery,
-    useGetPostalCodesQuery,
-    useGetPropertyManagersQuery,
-    useSaveHousingCompanyMutation,
-} from "../../app/services";
 import {NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     CheckboxInput,
@@ -34,6 +27,13 @@ import {
     IPostalCode,
     IPropertyManager,
 } from "../../common/schemas";
+import {
+    useGetBuildingTypesQuery,
+    useGetDevelopersQuery,
+    useGetPostalCodesQuery,
+    useGetPropertyManagersQuery,
+    useSaveHousingCompanyMutation,
+} from "../../common/services";
 import {hdsToast, setAPIErrorsForFormFields, validateBusinessId} from "../../common/utils";
 import {
     HousingCompanyViewContext,

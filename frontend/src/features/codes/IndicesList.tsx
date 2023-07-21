@@ -4,11 +4,11 @@ import {Button, IconPlus, IconSaveDisketteFill, Select} from "hds-react";
 import {useImmer} from "use-immer";
 
 import {useForm} from "react-hook-form";
-import {useGetIndicesQuery, useSaveIndexMutation} from "../../app/services";
 import {GenericActionModal, QueryStateHandler, SaveButton} from "../../common/components";
 import {FilterTextInputField} from "../../common/components/filters";
 import {FormProviderForm, NumberInput, TextInput} from "../../common/components/forms";
 import {IIndex} from "../../common/schemas";
+import {useGetIndicesQuery, useSaveIndexMutation} from "../../common/services";
 import {hdsToast} from "../../common/utils";
 
 const indexOptions: {label: string; value: string}[] = [

@@ -1,11 +1,11 @@
 import {Button, IconLockOpen} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
+import {ConfirmDialogModal, DownloadButton} from "../../../common/components";
 import {
     useDownloadThirtyYearRegulationLetterMutation,
     useReleaseHousingCompanyFromRegulationMutation,
-} from "../../../app/services";
-import {ConfirmDialogModal, DownloadButton} from "../../../common/components";
+} from "../../../common/services";
 
 import {formatDate, hdsToast} from "../../../common/utils";
 

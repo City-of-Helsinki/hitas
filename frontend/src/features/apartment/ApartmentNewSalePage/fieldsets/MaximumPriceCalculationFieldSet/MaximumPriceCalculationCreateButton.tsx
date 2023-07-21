@@ -1,9 +1,9 @@
 import {Button, Dialog} from "hds-react";
 import {useContext, useState} from "react";
 import {useFormContext} from "react-hook-form";
-import {useSaveApartmentMaximumPriceMutation} from "../../../../../app/services";
 import {QueryStateHandler} from "../../../../../common/components";
 import {ApartmentSaleFormSchema, IApartmentMaximumPriceCalculationDetails} from "../../../../../common/schemas";
+import {useSaveApartmentMaximumPriceMutation} from "../../../../../common/services";
 import {hdsToast} from "../../../../../common/utils";
 import MaximumPriceModalContent from "../../../components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentSaleContext} from "../../utils";

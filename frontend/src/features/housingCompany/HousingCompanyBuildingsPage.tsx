@@ -4,10 +4,10 @@ import {Button, IconPlus, IconTrash, Table} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {useDeleteBuildingMutation, useSaveBuildingMutation} from "../../app/services";
 import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../../common/components";
 import {FormProviderForm, SaveFormButton, SelectInput, TextInput} from "../../common/components/forms";
 import {IBuilding, IBuildingWritable, IRealEstate, WritableBuildingSchema} from "../../common/schemas";
+import {useDeleteBuildingMutation, useSaveBuildingMutation} from "../../common/services";
 import {hdsToast, setAPIErrorsForFormFields} from "../../common/utils";
 import {
     HousingCompanyViewContext,

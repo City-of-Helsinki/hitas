@@ -1,8 +1,8 @@
 import {useContext, useEffect} from "react";
 import {useFormContext} from "react-hook-form";
-import {useGetApartmentUnconfirmedMaximumPriceForDateQuery} from "../../../../../app/services";
 import {QueryStateHandler} from "../../../../../common/components";
 import {ApartmentSaleFormSchema} from "../../../../../common/schemas";
+import {useGetApartmentUnconfirmedMaximumPriceForDateQuery} from "../../../../../common/services";
 import {formatMoney, hdsToast, today} from "../../../../../common/utils";
 import {ApartmentSaleContext} from "../../utils";
 

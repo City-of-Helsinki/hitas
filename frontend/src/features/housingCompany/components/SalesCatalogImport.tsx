@@ -2,10 +2,10 @@ import {IconUploadCloud, Table} from "hds-react";
 import {useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
 import {useParams} from "react-router-dom";
-import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../app/services";
 import {GenericActionModal, QueryStateHandler, SaveButton} from "../../../common/components";
 import {FileInput} from "../../../common/components/forms";
 import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
+import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
 const tableTheme = {

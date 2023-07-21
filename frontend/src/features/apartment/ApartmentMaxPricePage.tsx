@@ -5,7 +5,6 @@ import {Button, Dialog, Fieldset, IconCheck} from "hds-react";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {useSaveApartmentMaximumPriceMutation} from "../../app/services";
 import {ImprovementsTable, NavigateBackButton, QueryStateHandler} from "../../common/components";
 import {DateInput, FormProviderForm, NumberInput, TextAreaInput} from "../../common/components/forms";
 import {
@@ -13,6 +12,7 @@ import {
     IApartmentMaximumPriceCalculationDetails,
     IApartmentMaximumPriceWritable,
 } from "../../common/schemas";
+import {useSaveApartmentMaximumPriceMutation} from "../../common/services";
 import {hdsToast, setAPIErrorsForFormFields, today} from "../../common/utils";
 import MaximumPriceModalContent from "./components/ApartmentMaximumPriceBreakdownModal";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";

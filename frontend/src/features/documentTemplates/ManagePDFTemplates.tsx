@@ -1,6 +1,6 @@
 import {Accordion} from "hds-react";
-import {useGetPDFBodiesQuery} from "../../app/services";
 import {QueryStateHandler} from "../../common/components";
+import {useGetPDFBodiesQuery} from "../../common/services";
 import PDFTemplate from "./components/PDFTemplate";
 
 const ManagePDFTemplates = () => {

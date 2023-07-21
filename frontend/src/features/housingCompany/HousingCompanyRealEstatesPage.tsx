@@ -5,10 +5,10 @@ import {Button, IconPlus, IconTrash, Table} from "hds-react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
-import {useDeleteRealEstateMutation, useSaveRealEstateMutation} from "../../app/services";
 import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../../common/components";
 import {FormProviderForm, SaveFormButton, TextInput} from "../../common/components/forms";
 import {IRealEstate, WritableRealEstateSchema} from "../../common/schemas";
+import {useDeleteRealEstateMutation, useSaveRealEstateMutation} from "../../common/services";
 import {hdsToast, setAPIErrorsForFormFields, validatePropertyId} from "../../common/utils";
 import {
     HousingCompanyViewContext,

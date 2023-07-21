@@ -1,9 +1,9 @@
 import {useParams} from "react-router-dom";
 
 import {createContext} from "react";
-import {useGetHousingCompanyDetailQuery} from "../../../app/services";
 import {QueryStateHandler} from "../../../common/components";
 import {IHousingCompanyDetails} from "../../../common/schemas";
+import {useGetHousingCompanyDetailQuery} from "../../../common/services";
 import HousingCompanyHeader from "./HousingCompanyHeader";
 
 export const HousingCompanyViewContext = createContext<{

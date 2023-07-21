@@ -1,6 +1,6 @@
 import {Accordion} from "hds-react";
-import {downloadSurfaceAreaPriceCeilingResults} from "../../app/services";
 import {Divider, Heading, PriceCeilingsList} from "../../common/components";
+import {downloadSurfaceAreaPriceCeilingResults} from "../../common/services";
 import {
     HousingCompanyReportRegulated,
     HousingCompanyReportReleased,

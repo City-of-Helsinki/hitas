@@ -40,8 +40,8 @@ import {
     IThirtyYearRegulationQuery,
     IThirtyYearRegulationResponse,
     IUserInfoResponse,
-} from "../common/schemas";
-import {hdsToast} from "../common/utils";
+} from "../schemas";
+import {hdsToast} from "../utils";
 
 // /////////
 // Config //

@@ -3,7 +3,6 @@ import React, {useState} from "react";
 import {Button, IconPlus, IconSearch, LoadingSpinner, StatusLabel} from "hds-react";
 import {Link} from "react-router-dom";
 
-import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../app/services";
 import {Heading, ListPageNumbers, QueryStateHandler} from "../../common/components";
 import {
     FilterIntegerField,
@@ -13,6 +12,7 @@ import {
 } from "../../common/components/filters";
 import {getHousingCompanyHitasTypeName} from "../../common/localisation";
 import {IHousingCompany, IHousingCompanyListResponse} from "../../common/schemas";
+import {useGetDevelopersQuery, useGetHousingCompaniesQuery, useGetPropertyManagersQuery} from "../../common/services";
 import {formatDate} from "../../common/utils";
 
 const HousingCompanyListItem = ({housingCompany}: {housingCompany: IHousingCompany}): React.JSX.Element => {

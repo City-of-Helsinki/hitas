@@ -1,7 +1,6 @@
 import toast, {ToastOptions} from "react-hot-toast";
 
 import React from "react";
-import {Config} from "../app/services";
 import {
     hitasQuarters,
     IAddress,
@@ -10,6 +9,7 @@ import {
     IApartmentUnconfirmedMaximumPriceIndices,
     IOwner,
 } from "./schemas";
+import {Config} from "./services";
 
 export function dotted(obj: object, path: string | string[], value?: number | string | null | object): unknown {
     /*
