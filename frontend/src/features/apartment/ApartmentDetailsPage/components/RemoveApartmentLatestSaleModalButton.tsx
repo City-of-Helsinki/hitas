@@ -5,6 +5,32 @@ import {useDeleteSaleMutation} from "../../../../common/services";
 import {formatDate, formatMoney, hdsToast} from "../../../../common/utils";
 import {ApartmentViewContext} from "../../components/ApartmentViewContextProvider";
 
+const canApartmentSaleBeDeleted = (apartment) => {
+    // No sale to remove
+    if (!apartment.prices.current_sale_id) return false;
+
+    // Sale can always be removed if apartment is not complete
+    if (!apartment.completion_date) return true;
+
+    const today = new Date();
+    const completionDate = new Date(apartment.completion_date);
+
+    // First sale can be removed before apartment is completed
+    if (today < completionDate) return true;
+
+    // First sale can be removed within 3 months after completion date
+    if (!apartment.prices.latest_purchase_date && apartment.prices.first_purchase_date) {
+        return completionDate < new Date(today.setMonth(today.getMonth() - 3));
+    }
+
+    // Latest sale can be removed within 3 months of sale date
+    if (apartment.prices.latest_purchase_date) {
+        return new Date(apartment.prices.latest_purchase_date) < new Date(today.setMonth(today.getMonth() - 3));
+    }
+
+    return false;
+};
+
 const RemoveApartmentLatestSaleModalButton = () => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
@@ -14,7 +40,8 @@ const RemoveApartmentLatestSaleModalButton = () => {
 
     const [removeSale, {isLoading}] = useDeleteSaleMutation();
 
-    if (!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date) return null;
+    const canSaleBeDeleted = canApartmentSaleBeDeleted(apartment);
+    if (!canSaleBeDeleted) return null;
 
     const handleRemoveSaleButtonClick = () => {
         removeSale({
@@ -35,8 +62,9 @@ const RemoveApartmentLatestSaleModalButton = () => {
     };
 
     const getLatestSaleDescription = () => {
+        const date = apartment.prices.latest_purchase_date ?? apartment.prices.first_purchase_date;
         const price = apartment.prices.latest_sale_purchase_price ?? apartment.prices.first_sale_purchase_price;
-        return `(${formatDate(apartment.prices.latest_purchase_date)}, ${formatMoney(price)})`;
+        return `(${formatDate(date)}, ${formatMoney(price)})`;
     };
 
     return (
@@ -48,7 +76,7 @@ const RemoveApartmentLatestSaleModalButton = () => {
                 variant="secondary"
                 size="small"
                 className="delete-sale-button"
-                disabled={!apartment.prices.current_sale_id || !apartment.prices.latest_purchase_date}
+                disabled={!apartment.prices.current_sale_id}
             />
 
             <GenericActionModal

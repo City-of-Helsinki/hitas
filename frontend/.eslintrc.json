@@ -41,7 +41,7 @@
                 "selector": "variable",
                 "types": ["boolean"],
                 "format": ["PascalCase"],
-                "prefix": ["is", "has"]
+                "prefix": ["is", "has", "can"]
             }
         ]
     },
