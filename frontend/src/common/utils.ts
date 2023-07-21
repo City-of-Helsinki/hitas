@@ -40,6 +40,10 @@ export function formatAddress(address: IAddress | IApartmentAddress): string {
     return `${address.street_address}, ${address.postal_code}, ${address.city}`;
 }
 
+export function formatApartmentAddressShort(address: IApartmentAddress): string {
+    return `${address.street_address} ${address.stair} ${address.apartment_number}`;
+}
+
 export function formatOwner(owner: IOwner): string {
     return `${owner.name} (${owner.identifier})`;
 }
