@@ -86,7 +86,6 @@ const EditIndexModal = ({
                     label="Arvo"
                     allowDecimals={true}
                     name="value"
-                    required
                 />
             </FormProviderForm>
         </GenericActionModal>

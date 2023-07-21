@@ -1,5 +1,5 @@
 import {number, object, string, z} from "zod";
-import {PageInfoSchema} from "./common";
+import {errorMessages, PageInfoSchema} from "./common";
 
 const IndexMonth = string().regex(/\d{4}-\d{2}/, "Kuukauden täytyy olla muotoa VVVV-KK, esim. 2021-01");
 
@@ -7,7 +7,7 @@ const IndexMonth = string().regex(/\d{4}-\d{2}/, "Kuukauden täytyy olla muotoa 
 // * Index
 // ********************************
 
-export const IndexSchema = object({month: IndexMonth, value: number().nullable()});
+export const IndexSchema = object({month: IndexMonth, value: number().min(1, errorMessages.numberMin).nullable()});
 export type IIndex = z.infer<typeof IndexSchema>;
 
 // ********************************
