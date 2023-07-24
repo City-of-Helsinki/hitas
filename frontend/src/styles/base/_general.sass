@@ -83,6 +83,12 @@ ul, ol
   &--buttons
     margin-top: $spacing-layout-m
     margin-bottom: $spacing-layout-s
+
+.column
+  @include flexbox()
+  @include flex-flow(column)
+
+
 .row--buttons, [class*="DialogActionButtons"]
     @include align-items(center)
     @include justify-content(space-between)

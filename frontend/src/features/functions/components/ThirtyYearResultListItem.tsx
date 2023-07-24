@@ -70,7 +70,6 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
                         buttonText="Lataa tiedote"
                         downloadFn={handleClickDownloadPDFButton}
                         variant={company.letter_fetched ? "secondary" : "primary"}
-                        className="download-button"
                     />
                 )}
             </div>

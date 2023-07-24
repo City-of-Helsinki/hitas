@@ -1,4 +1,5 @@
-import {DownloadButton, QueryStateHandler} from "../../../common/components";
+import {Table} from "hds-react";
+import {DownloadButton, Heading, QueryStateHandler} from "../../../common/components";
 import {IHousingCompanyState} from "../../../common/schemas";
 import {
     downloadHousingCompanyStatesReportPDF,
@@ -6,49 +7,47 @@ import {
     downloadUnregulatedHousingCompaniesPDF,
     useGetHousingCompanyStatesQuery,
 } from "../../../common/services";
+import {tableThemeBlack} from "../../../common/themes";
 
-const LoadedHousingCompanyStatusTable = ({housingCompanyStates}) => {
-    return (
-        <>
-            <ul className="state-list">
-                <li className="state-list-headers">
-                    <span>Tila</span>
-                    <div className="state-values">
-                        <span>Yhtiöitä</span>
-                        <span>Asuntoja</span>
-                    </div>
-                </li>
-                {housingCompanyStates.map((state: IHousingCompanyState) => (
-                    <li key={state.status}>
-                        <span>{state.status}</span>
-                        <div className="state-values">
-                            <span>{state.housing_company_count}</span>
-                            <span>{state.apartment_count}</span>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-            <div className="row row--buttons">
-                <DownloadButton
-                    buttonText="Lataa lukumäärät tiloittain"
-                    onClick={downloadHousingCompanyStatesReportPDF}
-                />
-            </div>
-        </>
-    );
-};
+const statusTableColumns = [
+    {
+        key: "status",
+        headerName: "Tila",
+    },
+    {
+        key: "housing_company_count",
+        headerName: "Yhtiöitä",
+        transform: (obj) => <div className="text-right">{obj.housing_company_count} kpl</div>,
+    },
+    {
+        key: "apartment_count",
+        headerName: "Asuntoja",
+        transform: (obj) => <div className="text-right">{obj.apartment_count} kpl</div>,
+    },
+];
 
 export const HousingCompanyStatusTable = () => {
     const {data, error, isLoading} = useGetHousingCompanyStatesQuery({});
 
     return (
         <div className="report-container">
+            <Heading type="sub">Taloyhtiöiden tilat</Heading>
             <QueryStateHandler
                 data={data}
                 error={error}
                 isLoading={isLoading}
             >
-                <LoadedHousingCompanyStatusTable housingCompanyStates={data as IHousingCompanyState[]} />
+                <Table
+                    cols={statusTableColumns}
+                    rows={data as IHousingCompanyState[]}
+                    indexKey="status"
+                    theme={tableThemeBlack}
+                    zebra
+                />
+                <DownloadButton
+                    buttonText="Lataa raportti"
+                    onClick={downloadHousingCompanyStatesReportPDF}
+                />
             </QueryStateHandler>
         </div>
     );
@@ -57,11 +56,16 @@ export const HousingCompanyStatusTable = () => {
 export const HousingCompanyReportRegulated = () => {
     return (
         <div className="report-container">
-            <p>Listaus säännellyistä taloyhtiöistä.</p>
-            <DownloadButton
-                buttonText="Lataa säännellyt yhtiöt"
-                onClick={downloadRegulatedHousingCompaniesPDF}
-            />
+            <div className="column">
+                <Heading type="sub">Säännellyt yhtiöt</Heading>
+                <span>Listaus sääntelyn piirissä olevista taloyhtiöistä</span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadRegulatedHousingCompaniesPDF}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
@@ -69,11 +73,16 @@ export const HousingCompanyReportRegulated = () => {
 export const HousingCompanyReportReleased = () => {
     return (
         <div className="report-container">
-            <p>Listaus sääntelystä vapautuneista taloyhtiöistä.</p>
-            <DownloadButton
-                buttonText="Lataa vapautuneet yhtiöt"
-                onClick={downloadUnregulatedHousingCompaniesPDF}
-            />
+            <div className="column">
+                <Heading type="sub">Vapautuneet yhtiöt</Heading>
+                <span>Listaus sääntelystä piiristä vapautuneista taloyhtiöistä</span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadUnregulatedHousingCompaniesPDF}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

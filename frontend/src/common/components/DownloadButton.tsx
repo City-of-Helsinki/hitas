@@ -5,6 +5,7 @@ const DownloadButton = ({buttonText, ...rest}) => {
         <Button
             theme="black"
             iconLeft={<IconDownload />}
+            className="download-button"
             {...rest}
         >
             {buttonText}
