@@ -28,15 +28,3 @@
         @include align-items(center)
       &:not(:last-child)
         border-bottom: 1px solid #ccc
-
-.column
-  @include flexbox()
-  @include flex-flow(column)
-  gap: $spacing-layout-xs
-  width: 50%
-
-  textarea
-    font-size: $fontsize-body-m
-    width: 100%
-    height: 200px
-    resize: none

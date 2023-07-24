@@ -44,6 +44,10 @@
       width: 100%
       margin-top: 0
 
+    .download-button
+      margin-top: 1rem
+      margin-bottom: 0.5rem
+
   .date-input-wrap
     @include flexbox()
     @include flex-flow(row wrap)
@@ -59,31 +63,5 @@
     .results-list
       margin-bottom: 0
 
-  .state-list
-    @include flexbox()
-    @include flex-flow(column nowrap)
-    @include justify-content(space-between)
-    @include align-items(center)
+  [class^="Table-module_container"]
     width: 100%
-    border: 1px solid $color-black-50
-    &-headers
-      background: $color-black
-      color: $color-white
-      padding: $spacing-2-xs 0 $spacing-2-xs $spacing-m
-    li
-      @include flexbox()
-      @include flex-flow(row wrap)
-      @include justify-content(space-between)
-      @include align-items(center)
-      width: 100%
-      padding: $spacing-2-xs 0 $spacing-2-xs $spacing-m
-      border-bottom: 1px solid $color-black-50
-
-  .row--buttons
-    margin: 0
-
-  .state-values
-    @include flexbox()
-    @include flex-flow(row nowrap)
-    @include justify-content(space-evenly)
-    width: 250px
