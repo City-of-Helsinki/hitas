@@ -4,9 +4,7 @@
   @include flexbox()
   @include flex-flow(column nowrap)
   @include flex-grow(1)
-  .reports-card
-    // background: $color-engel
-    // padding: $spacing-m
+
   [id^="accordion-"]
     border-bottom: 0px !important
     .divider-horizontal-s:first-child
@@ -33,6 +31,7 @@
     &:hover
       background: $color-engel
       font-weight: 700
+
   div.report-container
     @include flexbox()
     @include flex-flow(row wrap)
@@ -44,19 +43,22 @@
     h3
       width: 100%
       margin-top: 0
+
   .date-input-wrap
     @include flexbox()
     @include flex-flow(row wrap)
     @include justify-content(space-between)
     gap: 40px
+
   .input-field
     height: auto
-    // width: 200px
+
   .price-ceiling-per-square-list
     width: 100%
     padding: 0
     .results-list
       margin-bottom: 0
+
   .state-list
     @include flexbox()
     @include flex-flow(column nowrap)
@@ -76,8 +78,10 @@
       width: 100%
       padding: $spacing-2-xs 0 $spacing-2-xs $spacing-m
       border-bottom: 1px solid $color-black-50
+
   .row--buttons
     margin: 0
+
   .state-values
     @include flexbox()
     @include flex-flow(row nowrap)

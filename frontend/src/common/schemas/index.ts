@@ -8,3 +8,4 @@ export * from "./improvements";
 export * from "./indices";
 export * from "./owner";
 export * from "./propertyManager";
+export * from "./reports";
