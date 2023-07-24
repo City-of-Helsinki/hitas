@@ -1,14 +1,21 @@
-import {DownloadButton} from "../../../common/components";
+import {DownloadButton, Heading} from "../../../common/components";
 import {downloadMultipleOwnershipsReportPDF} from "../../../common/services";
 
 const OwnerReports = () => {
     return (
         <div className="report-container">
-            <p>Listaus henkilöistä jotka omistavat useampia kuin yhden hitas-asunnon sekä heidän omistuksistaan.</p>
-            <DownloadButton
-                buttonText="Lataa listaus"
-                onClick={() => downloadMultipleOwnershipsReportPDF()}
-            />
+            <div className="column">
+                <Heading type="sub">Usean Hitas-asunnon omistajat</Heading>
+                <span>
+                    Listaus henkilöistä, jotka omistavat useamman kuin yhden Hitas-asunnon, sekä heidän omistuksistaan.
+                </span>
+                <div>
+                    <DownloadButton
+                        buttonText="Lataa raportti"
+                        onClick={downloadMultipleOwnershipsReportPDF}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
