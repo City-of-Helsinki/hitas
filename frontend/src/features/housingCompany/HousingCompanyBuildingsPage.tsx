@@ -8,15 +8,12 @@ import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../
 import {FormProviderForm, SaveFormButton, SelectInput, TextInput} from "../../common/components/forms";
 import {IBuilding, IBuildingWritable, IRealEstate, WritableBuildingSchema} from "../../common/schemas";
 import {useDeleteBuildingMutation, useSaveBuildingMutation} from "../../common/services";
+import {tableThemeEngel} from "../../common/themes";
 import {hdsToast, setAPIErrorsForFormFields} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
-
-const tableTheme = {
-    "--header-background-color": "var(--color-engel-medium-light)",
-};
 
 const blankForm: IBuildingWritable = {
     real_estate_id: null,
@@ -192,7 +189,7 @@ const buildingTableColumns = [
         headerName: "Rakennustunnus",
     },
     {
-        key: "buildings",
+        key: "apartments_count",
         headerName: "Asuntoja",
         transform: (obj: IAnnotatedBuilding) => <div className="text-right">{obj.apartment_count} kpl</div>,
     },
@@ -241,7 +238,7 @@ const LoadedHousingCompanyBuildingsPage = (): React.JSX.Element => {
                         rows={buildingsList}
                         indexKey="id"
                         variant="light"
-                        theme={tableTheme}
+                        theme={tableThemeEngel}
                         renderIndexCol={false}
                         zebra
                     />
