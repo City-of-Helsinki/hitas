@@ -1,6 +1,7 @@
 import {useForm} from "react-hook-form";
-import {DownloadButton} from "../../../common/components";
+import {DownloadButton, Heading} from "../../../common/components";
 import {DateInput, FormProviderForm} from "../../../common/components/forms";
+import {SalesReportFormSchema} from "../../../common/schemas";
 import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../common/services";
 import {today} from "../../../common/utils";
 
@@ -13,7 +14,7 @@ const BaseSalesReport = ({header, downloadReportFunction}) => {
         mode: "all",
     });
 
-    const values = formObject.watch();
+    const formParse = SalesReportFormSchema.safeParse(formObject.watch());
 
     return (
         <div className="report-container">
@@ -21,7 +22,7 @@ const BaseSalesReport = ({header, downloadReportFunction}) => {
                 formObject={formObject}
                 onSubmit={downloadReportFunction}
             >
-                <h3>{header}</h3>
+                <Heading type="sub">{header}</Heading>
                 <div className="date-input-wrap">
                     <DateInput
                         name="startDate"
@@ -38,12 +39,12 @@ const BaseSalesReport = ({header, downloadReportFunction}) => {
                         required
                     />
                 </div>
+                <DownloadButton
+                    buttonText="Lataa raportti"
+                    disabled={!formParse.success}
+                    type="submit"
+                />
             </FormProviderForm>
-            <DownloadButton
-                buttonText="Lataa raportti"
-                onClick={() => downloadReportFunction(values)}
-                disabled={!values.startDate || !values.endDate}
-            />
         </div>
     );
 };
@@ -51,7 +52,7 @@ const BaseSalesReport = ({header, downloadReportFunction}) => {
 export const SalesReportAll = () => {
     return (
         <BaseSalesReport
-            header="Raportti kaikista kaupoista aikavälillä"
+            header="Raportti kaikista kaupoista"
             downloadReportFunction={downloadSalesReportPDF}
         />
     );
