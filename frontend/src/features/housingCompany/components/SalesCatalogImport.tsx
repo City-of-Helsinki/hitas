@@ -6,11 +6,8 @@ import {GenericActionModal, QueryStateHandler, SaveButton} from "../../../common
 import {FileInput} from "../../../common/components/forms";
 import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
 import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../common/services";
+import {tableThemeBlack} from "../../../common/themes";
 import {hdsToast} from "../../../common/utils";
-
-const tableTheme = {
-    "--header-background-color": "var(--color-black-80)",
-};
 
 const salesCatalogTableCols = [
     {key: "stair", headerName: "Porras"},
@@ -137,9 +134,9 @@ const SalesCatalogImport = () => {
                                     cols={salesCatalogTableCols}
                                     rows={validateData?.apartments}
                                     indexKey="apartment_number"
+                                    theme={tableThemeBlack}
                                     dense
                                     zebra
-                                    theme={tableTheme}
                                 />
                             </div>
                         </QueryStateHandler>

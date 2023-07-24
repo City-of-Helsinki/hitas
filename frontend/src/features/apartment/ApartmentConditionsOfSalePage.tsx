@@ -14,13 +14,10 @@ import {
     useGetOwnersQuery,
     usePatchConditionOfSaleMutation,
 } from "../../common/services";
+import {tableThemeEngel} from "../../common/themes";
 import {formatAddress, formatApartmentAddressShort, formatDate, formatOwner, hdsToast} from "../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "./components/ApartmentViewContextProvider";
 import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
-
-const tableTheme = {
-    "--header-background-color": "var(--color-engel-medium-light)",
-};
 
 const HouseholdOwnersList = () => {
     const formObject = useFormContext();
@@ -389,7 +386,7 @@ const LoadedConditionsOfSalePage = () => {
                         rows={apartment.conditions_of_sale}
                         indexKey="id"
                         variant="light"
-                        theme={tableTheme}
+                        theme={tableThemeEngel}
                         dense
                         zebra
                     />

@@ -13,11 +13,8 @@ import {
     SurfaceAreaPriceCeilingCalculation,
 } from "../../../common/schemas";
 import {useSaveApartmentMaximumPriceMutation} from "../../../common/services";
+import {tableThemeBlack} from "../../../common/themes";
 import {formatDate, formatMoney, hdsToast} from "../../../common/utils";
-
-const tableTheme = {
-    "--header-background-color": "var(--color-black-80)",
-};
 
 const getDepreciation = (depreciation) => {
     if (depreciation === null) return 0;
@@ -61,7 +58,7 @@ const MaximumPriceCalculationImprovementsTable = ({heading, cols, improvements})
                 rows={getImprovements(improvements)}
                 indexKey="name"
                 renderIndexCol={true}
-                theme={tableTheme}
+                theme={tableThemeBlack}
                 zebra
                 dense
                 verticalLines

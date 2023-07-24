@@ -9,15 +9,12 @@ import {DeleteButton, GenericActionModal, Heading, NavigateBackButton} from "../
 import {FormProviderForm, SaveFormButton, TextInput} from "../../common/components/forms";
 import {IRealEstate, WritableRealEstateSchema} from "../../common/schemas";
 import {useDeleteRealEstateMutation, useSaveRealEstateMutation} from "../../common/services";
+import {tableThemeEngel} from "../../common/themes";
 import {hdsToast, setAPIErrorsForFormFields, validatePropertyId} from "../../common/utils";
 import {
     HousingCompanyViewContext,
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
-
-const tableTheme = {
-    "--header-background-color": "var(--color-engel-medium-light)",
-};
 
 const ModifyRealEstateButton = ({realEstate}: {realEstate?: IRealEstate}) => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
@@ -205,7 +202,7 @@ const LoadedHousingCompanyRealEstatesPage = (): React.JSX.Element => {
                         rows={housingCompany.real_estates}
                         indexKey="id"
                         variant="light"
-                        theme={tableTheme}
+                        theme={tableThemeEngel}
                         renderIndexCol={false}
                         zebra
                     />
