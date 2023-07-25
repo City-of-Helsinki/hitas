@@ -1,6 +1,5 @@
 import {Accordion} from "hds-react";
-import {Divider, Heading, PriceCeilingsList} from "../../common/components";
-import {downloadSurfaceAreaPriceCeilingResults} from "../../common/services";
+import {Divider, Heading} from "../../common/components";
 import {
     HousingCompanyReportRegulated,
     HousingCompanyReportReleased,
@@ -8,6 +7,7 @@ import {
 } from "./components/HousingCompanyReports";
 import OwnerReports from "./components/OwnerReports";
 import {SalesReportAll, SalesReportByAreas} from "./components/SalesReports";
+import {SurfaceAreaPriceCalculationReport} from "./components/SurfaceAreaPriceCalculationReports";
 
 const ReportsPage = () => {
     return (
@@ -40,7 +40,7 @@ const ReportsPage = () => {
                     heading="Rajahintalaskelmat"
                     closeButton={false}
                 >
-                    <PriceCeilingsList callbackFn={downloadSurfaceAreaPriceCeilingResults} />
+                    <SurfaceAreaPriceCalculationReport />
                 </Accordion>
 
                 <Accordion

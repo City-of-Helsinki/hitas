@@ -12,3 +12,8 @@
         background-color: $color-black-5
       tr td
         border-bottom: 1px solid $color-black-20
+
+// Disable blue outline on Accordions when they are clicked
+[class^="Accordion-module_headingContainer"]
+  &:focus
+    outline: none !important
