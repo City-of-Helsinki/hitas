@@ -231,31 +231,47 @@ export const getHitasQuarter = (date?) => {
     return hitasQuarters[quarter.number];
 };
 
-export const getHitasQuarterFullLabel = (month: string) => {
+export const getHitasQuarterFullLabel = (
+    month: string,
+    onlyCalculationMonths = false // Do not return a value for the months which are not the start of a new quarter/year
+) => {
     const [yearString, monthString] = month.split("-");
-
     const hitasQuarter = getHitasQuarter(month).label;
+
+    // For the months which start and end the same year, simply add the year to the end of the quarter
+    const formatQuarter = (quarter) => `${hitasQuarter}${yearString} (Q${quarter})`;
+
+    // Add last year for the start date, as January's quarter begins in the previous year
+    const formatJan = () =>
+        `${hitasQuarter.split(" ")[0]}${Number(yearString) - 1} - ${hitasQuarter.split("-")[1]}${yearString} (Q4)`;
+
+    // Add the next year in the end date for the last quarter, as the quarter ends in the next year
+    const formatNovDec = () =>
+        `${hitasQuarter.split(" ")[0]}${yearString} - ${hitasQuarter.split("-")[1]}${Number(yearString) + 1} (Q4)`;
 
     switch (monthString) {
         case "01":
-            // add the previous year in the start date for january, as its quarter begins in the previous year
-            return `${hitasQuarter.split(" ")[0]}${Number(yearString) - 1} - ${
-                hitasQuarter.split("-")[1]
-            }${yearString} (Q4)`;
-        // for the months which start a new quarter, simply add the year to the end of the quarter label
+            return formatJan();
         case "02":
-            return `${hitasQuarter}${yearString} (Q1)`;
+            return formatQuarter(1);
+        case "03":
+        case "04":
+            return onlyCalculationMonths ? undefined : formatQuarter(1);
         case "05":
-            return `${hitasQuarter}${yearString} (Q2)`;
+            return formatQuarter(2);
+        case "06":
+        case "07":
+            return onlyCalculationMonths ? undefined : formatQuarter(2);
         case "08":
-            return `${hitasQuarter}${yearString} (Q3)`;
+            return formatQuarter(3);
+        case "09":
+        case "10":
+            return onlyCalculationMonths ? undefined : formatQuarter(3);
         case "11":
-            // add the next year in the end date for the last quarter, as the quarter ends in the next year
-            return `${hitasQuarter.split(" ")[0]}${yearString} - ${hitasQuarter.split("-")[1]}${
-                Number(yearString) + 1
-            } (Q4)`;
+            return formatNovDec();
+        case "12":
+            return onlyCalculationMonths ? undefined : formatNovDec();
         default:
-            // for the months which are not the start of a new quarter (or year), do not display the value
             break;
     }
 };

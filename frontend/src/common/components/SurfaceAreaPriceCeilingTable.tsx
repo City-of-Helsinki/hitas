@@ -11,7 +11,7 @@ const LoadedSurfaceAreaPriceCeilingResultsList = ({data, tableColumns}: {data: I
     // Parse the indices data into quarters
     const tableData = data
         .map((item) => {
-            const timePeriodString = getHitasQuarterFullLabel(item.month);
+            const timePeriodString = getHitasQuarterFullLabel(item.month, true);
             if (timePeriodString === undefined) return;
 
             return {
