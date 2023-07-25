@@ -150,7 +150,7 @@ const IndexResultTable = ({indexType, filterParams}) => {
 };
 
 const IndicesTab = (): React.JSX.Element => {
-    const [filterParams, setFilterParams] = useState({});
+    const [filterParams, setFilterParams] = useState({year: new Date().getFullYear().toString()});
     const [currentIndexType, setCurrentIndexType] = useState(indexOptions[0]);
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -170,6 +170,7 @@ const IndicesTab = (): React.JSX.Element => {
                     filterFieldName="year"
                     filterParams={filterParams}
                     setFilterParams={setFilterParams}
+                    defaultValue={filterParams.year}
                     minLength={4}
                     maxLength={4}
                 />
