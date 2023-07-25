@@ -27,10 +27,32 @@
   label
     font-weight: 700
 
-  &__price-ceiling-per-square
+  // Surface Area Price Ceiling styles
+  &__surface-area-price-ceiling
     background: $color-black-10
     padding: $spacing-m
 
+    .price-ceiling-calculation
+      @include flexbox()
+      @include flex-flow(row nowrap)
+      @include justify-content(space-between)
+      margin-bottom: $spacing-layout-m
+      .price-ceiling-value
+        @include flexbox()
+        @include flex-flow(column nowrap)
+        @include justify-content(space-between)
+        span
+          font-size: $fontsize-heading-l
+          font-weight: 700
+          margin-top: $spacing-xs
+          text-align: right
+          &::after
+            content: "€/m²"
+            font-size: $fontsize-heading-s
+            font-weight: 400
+            margin-left: $spacing-xs
+
+  // Thirty Year Regulation styles
   &__thirty-year-regulation
     flex-grow: 1
     .regulation, .companies
@@ -268,65 +290,6 @@
     .error-test-form
       padding: $spacing-m
       background: $color-black-10
-
-.price-ceiling-calculation
-  @include flexbox()
-  @include flex-flow(row nowrap)
-  @include justify-content(space-between)
-  margin-bottom: $spacing-layout-m
-.price-ceiling-value
-  @include flexbox()
-  @include flex-flow(column nowrap)
-  @include justify-content(space-between)
-  span
-    font-size: $fontsize-heading-l
-    font-weight: 700
-    margin-top: $spacing-xs
-    &::after
-      content: "€/m²"
-      font-size: $fontsize-heading-s
-      font-weight: 400
-      margin-left: $spacing-xs
-.calculate-button
-  height: 56px
-  width: 250px
-.price-ceiling-results
-  @include flexbox()
-  @include flex-flow(row nowrap)
-  gap: $spacing-m
-  > :last-child
-    width: 80%
-  > :only-child
-    width: 20%
-  label, .list-headers
-    font-weight: 700
-  .year-filter
-    width: 200px
-    margin: 0 auto
-  .results-list
-    margin-bottom: $spacing-m
-    &__item
-      @include align-items(center)
-      cursor: default
-      &:hover
-        background: $color-white
-  .list-headers
-    margin-top: 0
-  form
-    @include flexbox()
-    @include justify-content(center)
-    @include align-items(center)
-    > div
-      @include flexbox()
-      @include justify-content(space-between)
-      @include align-items(center)
-    .input-field--dropdown
-      width: 200px
-      margin: 0 $spacing-xs 0 0
-    legend
-      margin-bottom: $spacing-2-xs
-    > button
-      margin-top: $spacing-2-xs
 
 #obfuscated-owners-modal
   ul

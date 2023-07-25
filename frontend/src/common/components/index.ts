@@ -13,7 +13,6 @@ export {default as ListPageNumbers} from "./ListPageNumbers";
 export {default as NavigateBackButton} from "./NavigateBackButton";
 export {default as Notifications} from "./Notifications";
 export {default as OwnershipList} from "./OwnershipList";
-export {default as PriceCeilingsList} from "./PriceCeilingsList";
 export {default as QueryStateError} from "./QueryStateError";
 export {default as QueryStateHandler} from "./QueryStateHandler";
 export {default as SaveButton} from "./SaveButton";
