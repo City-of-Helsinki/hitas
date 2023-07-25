@@ -20,3 +20,4 @@ export {default as SaveButton} from "./SaveButton";
 export {default as SaveDialogModal} from "./SaveDialogModal";
 export {default as ScrollToTop} from "./ScrollToTop";
 export {default as SimpleErrorMessage} from "./SimpleErrorMessage";
+export {default as SurfaceAreaPriceCeilingTable} from "./SurfaceAreaPriceCeilingTable";

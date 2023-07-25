@@ -231,6 +231,35 @@ export const getHitasQuarter = (date?) => {
     return hitasQuarters[quarter.number];
 };
 
+export const getHitasQuarterFullLabel = (month: string) => {
+    const [yearString, monthString] = month.split("-");
+
+    const hitasQuarter = getHitasQuarter(month).label;
+
+    switch (monthString) {
+        case "01":
+            // add the previous year in the start date for january, as its quarter begins in the previous year
+            return `${hitasQuarter.split(" ")[0]}${Number(yearString) - 1} - ${
+                hitasQuarter.split("-")[1]
+            }${yearString} (Q4)`;
+        // for the months which start a new quarter, simply add the year to the end of the quarter label
+        case "02":
+            return `${hitasQuarter}${yearString} (Q1)`;
+        case "05":
+            return `${hitasQuarter}${yearString} (Q2)`;
+        case "08":
+            return `${hitasQuarter}${yearString} (Q3)`;
+        case "11":
+            // add the next year in the end date for the last quarter, as the quarter ends in the next year
+            return `${hitasQuarter.split(" ")[0]}${yearString} - ${hitasQuarter.split("-")[1]}${
+                Number(yearString) + 1
+            } (Q4)`;
+        default:
+            // for the months which are not the start of a new quarter (or year), do not display the value
+            break;
+    }
+};
+
 // Set errors returned from an API request for form fields
 // Does not work well with useFieldArray fields, as the API does not return the index of the field, only the field name
 export const setAPIErrorsForFormFields = (formObject, error) => {

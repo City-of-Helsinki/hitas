@@ -7,7 +7,7 @@ import {
 } from "./components/HousingCompanyReports";
 import OwnerReports from "./components/OwnerReports";
 import {SalesReportAll, SalesReportByAreas} from "./components/SalesReports";
-import {SurfaceAreaPriceCalculationReport} from "./components/SurfaceAreaPriceCalculationReports";
+import {SurfaceAreaPriceCeilingCalculationReport} from "./components/SurfaceAreaPriceCalculationReports";
 
 const ReportsPage = () => {
     return (
@@ -40,7 +40,7 @@ const ReportsPage = () => {
                     heading="Rajahintalaskelmat"
                     closeButton={false}
                 >
-                    <SurfaceAreaPriceCalculationReport />
+                    <SurfaceAreaPriceCeilingCalculationReport />
                 </Accordion>
 
                 <Accordion
