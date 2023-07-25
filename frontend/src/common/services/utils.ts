@@ -54,7 +54,15 @@ export const fetchAndDownloadPDF = (url: string, method: "GET" | "POST" = "GET",
 
     url = Config.api_v1_url + url;
     fetch(url, init)
-        .then(handleDownloadPDF)
+        .then((response) => {
+            if (response.ok) {
+                handleDownloadPDF(response);
+            } else {
+                // eslint-disable-next-line no-console
+                console.error(response);
+                hdsToast.error(`Virhe ladattaessa tiedostoa. (${response.status} ${response.statusText})`);
+            }
+        })
         // eslint-disable-next-line no-console
         .catch((error) => console.error(error));
 };
