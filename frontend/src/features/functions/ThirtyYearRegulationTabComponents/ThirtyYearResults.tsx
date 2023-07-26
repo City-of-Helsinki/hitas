@@ -3,7 +3,7 @@ import {useState} from "react";
 import {QueryStateHandler} from "../../../common/components";
 import {ThirtyYearLoadedResults} from "./index";
 
-export default function ThirtyYearResults({
+const ThirtyYearResults = ({
     hasResults,
     hasExternalSalesData,
     data,
@@ -12,7 +12,7 @@ export default function ThirtyYearResults({
     date,
     priceCeilingValue,
     compareFn,
-}) {
+}) => {
     // Because the compareFn doesn't play ball with isLoading, we need to keep track of whether the button has been
     // clicked. Clicking it again while the comparison is running results in errors.
     const [isButtonClicked, setIsButtonClicked] = useState(false);
@@ -59,4 +59,6 @@ export default function ThirtyYearResults({
             )}
         </>
     );
-}
+};
+
+export default ThirtyYearResults;

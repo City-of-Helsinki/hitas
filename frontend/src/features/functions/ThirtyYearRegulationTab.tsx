@@ -13,9 +13,14 @@ import {
     useGetThirtyYearRegulationQuery,
 } from "../../common/services";
 import {getHitasQuarter, hdsToast} from "../../common/utils";
-import {ExternalSalesDataImport, ThirtyYearErrorModal, ThirtyYearErrorTest, ThirtyYearResults} from "./components";
+import {
+    ExternalSalesDataImport,
+    ThirtyYearErrorModal,
+    ThirtyYearErrorTest,
+    ThirtyYearResults,
+} from "./ThirtyYearRegulationTabComponents";
 
-const ThirtyYearRegulation = () => {
+const ThirtyYearRegulationTab = () => {
     const currentTime = new Date();
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     // TODO: populate the years options with years starting from 2023, when testing is done
@@ -240,4 +245,4 @@ const ThirtyYearRegulation = () => {
     );
 };
 
-export default ThirtyYearRegulation;
+export default ThirtyYearRegulationTab;

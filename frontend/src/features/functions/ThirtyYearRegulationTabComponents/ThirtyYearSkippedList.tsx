@@ -15,7 +15,7 @@ type NewPostalCodes = {
     }[];
 };
 
-function ThirtyYearSkippedListItem({postalCode, companies, postalCodeOptionSet, index}): React.JSX.Element {
+const ThirtyYearSkippedListItem = ({postalCode, companies, postalCodeOptionSet, index}): React.JSX.Element => {
     const formObject = useFormContext();
 
     const options: {label: string; value: string}[] = [];
@@ -71,7 +71,7 @@ function ThirtyYearSkippedListItem({postalCode, companies, postalCodeOptionSet, 
             </div>
         </li>
     );
-}
+};
 
 const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
     // If in Test mode, use today's date as the calculation date
