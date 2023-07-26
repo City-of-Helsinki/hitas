@@ -37,6 +37,8 @@ from hitas.views.utils import (
 from hitas.views.utils.excel import get_excel_response
 from hitas.views.utils.serializers import YearMonthSerializer
 
+# Indices
+
 
 class IndicesFilterSet(HitasFilterSet):
     year = HitasIntegerFilter(method="year_filter", min_value=1970, max_value=2099)
@@ -165,6 +167,23 @@ class SurfaceAreaPriceCeilingViewSet(_AbstractIndicesViewSet):
         return get_excel_response(filename=filename, excel=workbook)
 
 
+# SAPC Calculation
+
+
+class SurfaceAreaPriceCeilingCalculationDataFilterSet(HitasFilterSet):
+    year = HitasIntegerFilter(method="year_filter", min_value=1970, max_value=2099)
+
+    def year_filter(self, queryset, name, value):
+        return queryset.filter(
+            Q(calculation_month__gte=datetime.date(value, month=1, day=1))
+            & Q(calculation_month__lt=datetime.date(value + 1, month=1, day=1))
+        )
+
+    class Meta:
+        model = SurfaceAreaPriceCeilingCalculationData
+        fields = ["year"]
+
+
 class CreatedSAPCSerializer(serializers.Serializer):
     month = serializers.DateField()
     value = HitasDecimalField()
@@ -206,6 +225,10 @@ class SurfaceAreaPriceCeilingCalculationDataViewSet(
 ):
     serializer_class = SurfaceAreaPriceCeilingCalculationDataSerializer
     lookup_field = "calculation_month"
+
+    @staticmethod
+    def get_filterset_class():
+        return SurfaceAreaPriceCeilingCalculationDataFilterSet
 
     def get_default_queryset(self):
         return SurfaceAreaPriceCeilingCalculationData.objects.order_by("-calculation_month")
