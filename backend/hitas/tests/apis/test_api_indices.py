@@ -181,7 +181,7 @@ def test__api__indices__create(api_client: HitasAPIClient, index):
 
 @pytest.mark.django_db
 def test__api__indices__create__surface_area_price_ceiling__empty(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
+    day = datetime.datetime(2023, 2, 10)
     freezer.move_to(day)
 
     url = reverse("hitas:surface-area-price-ceiling-list")
