@@ -81,9 +81,7 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
     const [calculatePriceCeiling, {data: calculationData, isLoading}] = useCalculatePriceCeilingMutation();
 
     const handleCalculateButtonOnClick = () => {
-        calculatePriceCeiling({
-            data: {calculation_month: currentMonth},
-        })
+        calculatePriceCeiling({calculation_date: currentMonth + "-01"})
             .unwrap()
             .then(() => {
                 hdsToast.success("Rajahinnan laskenta onnistui");
