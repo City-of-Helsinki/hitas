@@ -60,17 +60,12 @@ const functionsApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "ExternalSaleData", id: arg.calculation_date}, {type: "Index"}]),
         }),
-        getPriceCeilingCalculationData: builder.query<{calculationMonth: string}, object>({
-            query: (params: {calculationMonth: string}) => ({
-                url: `indices/surface-area-price-ceiling-calculation-data/${params.calculationMonth}-01`,
-            }),
-        }),
         calculatePriceCeiling: builder.mutation({
-            query: ({data}) => ({
+            query: (params: {calculation_date: string}) => ({
                 url: "indices/surface-area-price-ceiling",
                 method: "POST",
                 headers: mutationApiJsonHeaders(),
-                body: data,
+                params: params,
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Index"}]),
         }),
