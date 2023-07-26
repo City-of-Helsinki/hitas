@@ -4,7 +4,7 @@ import {
     IThirtyYearRegulationQuery,
     IThirtyYearRegulationResponse,
 } from "../../schemas";
-import {mutationApiExcelHeaders, mutationApiJsonHeaders} from "../utils";
+import {mutationApiExcelHeaders, mutationApiJsonHeaders, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -39,7 +39,7 @@ const functionsApi = hitasApi.injectEndpoints({
                     headers: {"Content-type": "application/json; charset=UTF-8"},
                 }),
                 invalidatesTags: (result, error, arg) =>
-                    !error && result ? [{type: "ThirtyYearRegulation", id: arg.data.calculationDate}] : [],
+                    safeInvalidate(error, [{type: "ThirtyYearRegulation", id: arg.data.calculationDate}]),
             }
         ),
         getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({
@@ -58,7 +58,7 @@ const functionsApi = hitasApi.injectEndpoints({
                 headers: mutationApiExcelHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
-                !error && result ? [{type: "ExternalSaleData", id: arg.calculation_date}] : [],
+                safeInvalidate(error, [{type: "ExternalSaleData", id: arg.calculation_date}, {type: "Index"}]),
         }),
         getPriceCeilingCalculationData: builder.query<{calculationMonth: string}, object>({
             query: (params: {calculationMonth: string}) => ({
@@ -72,7 +72,7 @@ const functionsApi = hitasApi.injectEndpoints({
                 headers: mutationApiJsonHeaders(),
                 body: data,
             }),
-            invalidatesTags: (result, error) => (!error && result ? [{type: "Index", id: "LIST"}] : []),
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Index"}]),
         }),
     }),
 });

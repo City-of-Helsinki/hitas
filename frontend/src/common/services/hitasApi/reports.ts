@@ -1,6 +1,6 @@
 import {IApartmentDetails} from "../../schemas";
 import {hdsToast} from "../../utils";
-import {fetchAndDownloadPDF, handleDownloadPDF, mutationApiJsonHeaders} from "../utils";
+import {fetchAndDownloadPDF, handleDownloadPDF, mutationApiJsonHeaders, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -79,7 +79,8 @@ export const reportsApi = hitasApi.injectEndpoints({
                     cache: "no-cache",
                 };
             },
-            invalidatesTags: (result, error, arg) => [{type: "ThirtyYearRegulation", id: arg.calculationDate}],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "ThirtyYearRegulation", id: arg.calculationDate}]),
         }),
         getPDFBodies: builder.query({
             query: (arg) => ({

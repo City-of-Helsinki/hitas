@@ -66,3 +66,5 @@ export const fetchAndDownloadPDF = (url: string, method: "GET" | "POST" = "GET",
         // eslint-disable-next-line no-console
         .catch((error) => console.error(error));
 };
+
+export const safeInvalidate = (error, tags) => (!error ? tags : []);

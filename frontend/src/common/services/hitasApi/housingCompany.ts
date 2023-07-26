@@ -9,7 +9,7 @@ import {
     IHousingCompanyWritable,
     IRealEstate,
 } from "../../schemas";
-import {idOrBlank, mutationApiExcelHeaders, mutationApiJsonHeaders} from "../utils";
+import {idOrBlank, mutationApiExcelHeaders, mutationApiJsonHeaders, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -28,6 +28,7 @@ const housingCompanyApi = hitasApi.injectEndpoints({
             providesTags: (result, error, arg) => [
                 {type: "HousingCompany", id: arg},
                 {type: "PropertyManager", id: result?.property_manager?.id},
+                {type: "Developer", id: result?.developer?.id},
             ],
         }),
         // MODIFY
@@ -38,10 +39,12 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [
-                {type: "HousingCompany", id: "LIST"},
-                {type: "HousingCompany", id: arg.id},
-            ],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [
+                    {type: "HousingCompany", id: "LIST"},
+                    {type: "HousingCompany", id: arg.id},
+                    {type: "Apartment"},
+                ]),
         }),
         patchHousingCompany: builder.mutation<
             IHousingCompanyDetails,
@@ -53,10 +56,12 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [
-                {type: "HousingCompany", id: "LIST"},
-                {type: "HousingCompany", id: arg.id},
-            ],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [
+                    {type: "HousingCompany", id: "LIST"},
+                    {type: "HousingCompany", id: arg.id},
+                    {type: "Apartment"},
+                ]),
         }),
         releaseHousingCompanyFromRegulation: builder.mutation<
             IHousingCompanyDetails,
@@ -68,11 +73,7 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: {regulation_status: "released_by_plot_department"},
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [
-                {type: "HousingCompany", id: "LIST"},
-                {type: "HousingCompany", id: arg.housingCompanyId},
-                {type: "ThirtyYearRegulation", id: arg.calculationDate},
-            ],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "HousingCompany"}, {type: "Apartment"}]),
         }),
         // Real Estate
         saveRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
@@ -82,12 +83,8 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [
-                {
-                    type: "HousingCompany",
-                    id: arg.housingCompanyId,
-                },
-            ],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}]),
         }),
         deleteRealEstate: builder.mutation<IRealEstate, {id: string; housingCompanyId: string}>({
             query: ({id, housingCompanyId}) => ({
@@ -95,7 +92,8 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 method: "DELETE",
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}]),
         }),
         // Building
         saveBuilding: builder.mutation<
@@ -110,7 +108,8 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}, {type: "Apartment"}]),
         }),
         deleteBuilding: builder.mutation<IBuilding, {id: string; housingCompanyId: string; realEstateId: string}>({
             query: ({id, housingCompanyId, realEstateId}) => ({
@@ -118,7 +117,8 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 method: "DELETE",
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) => [{type: "HousingCompany", id: arg.housingCompanyId}],
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [{type: "HousingCompany", id: arg.housingCompanyId}]),
         }),
         // Sales Catalog
         validateSalesCatalog: builder.mutation({
@@ -136,8 +136,7 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (result, error, arg) =>
-                !error ? [{type: "HousingCompany", id: arg.housingCompanyId}, {type: "Apartment"}] : [],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "HousingCompany"}, {type: "Apartment"}]),
         }),
         // Apartment
         getHousingCompanyApartments: builder.query<IApartmentListResponse, IHousingCompanyApartmentQuery>({
@@ -146,8 +145,8 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 params: params.params,
             }),
             providesTags: (result, error, arg) => [
-                {type: "Apartment", id: "LIST"},
                 {type: "HousingCompany", id: arg.housingCompanyId},
+                {type: "Apartment", id: "LIST"},
             ],
         }),
         batchCompleteApartments: builder.mutation({
@@ -157,7 +156,7 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 headers: mutationApiJsonHeaders(),
                 body: arg.data,
             }),
-            invalidatesTags: (result, error) => (!error && result ? [{type: "Apartment"}] : []),
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Apartment"}]),
         }),
 
         getBuildingTypes: builder.query<ICodeResponse, object>({

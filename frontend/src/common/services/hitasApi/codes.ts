@@ -15,7 +15,7 @@ import {
     IPropertyManager,
     IPropertyManagersResponse,
 } from "../../schemas";
-import {idOrBlank, mutationApiJsonHeaders} from "../utils";
+import {idOrBlank, mutationApiJsonHeaders, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -53,7 +53,7 @@ const indexApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: () => [{type: "Apartment"}, {type: "Index", id: "LIST"}],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Apartment"}, {type: "Index"}]),
         }),
     }),
 });
@@ -76,10 +76,7 @@ const developerApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (response) => [
-                {type: "Developer", id: response?.id},
-                {type: "Developer", id: "LIST"},
-            ],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Developer"}]),
         }),
     }),
 });
@@ -102,10 +99,7 @@ const propertyManagerApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: (response) => [
-                {type: "PropertyManager", id: response?.id},
-                {type: "PropertyManager", id: "LIST"},
-            ],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "PropertyManager"}]),
         }),
     }),
 });
@@ -128,7 +122,7 @@ const ownerApi = hitasApi.injectEndpoints({
                 body: data,
                 headers: mutationApiJsonHeaders(),
             }),
-            invalidatesTags: () => [{type: "Owner"}],
+            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Owner"}, {type: "Apartment"}]),
         }),
     }),
 });
