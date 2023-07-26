@@ -44,6 +44,7 @@ export const hitasApi = createApi({
         "Developer",
         "ExternalSaleData",
         "ThirtyYearRegulation",
+        "SurfaceAreaPriceCeilingCalculation",
     ],
     endpoints: () => ({}),
 });

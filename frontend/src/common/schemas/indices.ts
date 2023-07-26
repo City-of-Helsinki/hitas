@@ -38,3 +38,30 @@ const IndexQuerySchema = object({
     month: IndexMonth,
 });
 export type IIndexQuery = z.infer<typeof IndexQuerySchema>;
+
+const IndexCalculationDataSchema = object({
+    calculation_month: string(),
+    data: object({
+        housing_company_data: object({
+            name: string(),
+            completion_date: string(),
+            surface_area: number(),
+            realized_acquisition_price: number(),
+            unadjusted_average_price_per_square_meter: number(),
+            adjusted_average_price_per_square_meter: number(),
+            completion_month_index: number(),
+            calculation_month_index: number(),
+        }).array(),
+        created_surface_area_price_ceilings: object({
+            month: string(),
+            value: number(),
+        }).array(),
+    }),
+});
+export type IIndexCalculationData = z.infer<typeof IndexCalculationDataSchema>;
+
+export const IIndexCalculationDataResponseSchema = object({
+    page: PageInfoSchema,
+    contents: IndexCalculationDataSchema.array(),
+});
+export type IIndexCalculationDataResponse = z.infer<typeof IIndexCalculationDataResponseSchema>;
