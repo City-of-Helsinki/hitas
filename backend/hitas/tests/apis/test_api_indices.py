@@ -236,10 +236,10 @@ def test__api__indices__create__surface_area_price_ceiling__wrong_status(api_cli
 
 @pytest.mark.parametrize(
     "hitas_type",
-    [HitasType.RENTAL_HITAS_I, HitasType.RENTAL_HITAS_II],
+    [HitasType.RENTAL_HITAS_I, HitasType.RENTAL_HITAS_II, HitasType.HALF_HITAS],
 )
 @pytest.mark.django_db
-def test__api__indices__create__surface_area_price_ceiling__dont_include_rental_hitas(
+def test__api__indices__create__surface_area_price_ceiling__dont_include_rental_or_half_hitas(
     api_client: HitasAPIClient,
     freezer,
     hitas_type,
