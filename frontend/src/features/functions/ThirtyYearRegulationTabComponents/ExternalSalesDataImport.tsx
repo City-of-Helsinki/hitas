@@ -5,7 +5,7 @@ import {FileInput, FormProviderForm} from "../../../common/components/forms";
 import {useSaveExternalSalesDataMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
-export default function ExternalSalesDataImport({formDate}) {
+const ExternalSalesDataImport = ({formDate}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [saveExternalSalesData, {data, isLoading, error}] = useSaveExternalSalesDataMutation();
@@ -72,4 +72,6 @@ export default function ExternalSalesDataImport({formDate}) {
             />
         </FormProviderForm>
     );
-}
+};
+
+export default ExternalSalesDataImport;

@@ -1,7 +1,7 @@
 import {Button, Dialog} from "hds-react";
 import React, {useState} from "react";
 import {CloseButton, Heading} from "../../../common/components";
-import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./";
+import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./index";
 
 const ListHeaders = () => (
     <div className="list-headers">
