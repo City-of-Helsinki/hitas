@@ -59,7 +59,7 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
 
     if not housing_companies:
         raise ModelConflict(
-            f"No regulated housing companies completed before {calculation_date.isoformat()!r}.",
+            f"No regulated housing companies completed before {calculation_month.isoformat()!r}.",
             error_code="missing",
         )
 
