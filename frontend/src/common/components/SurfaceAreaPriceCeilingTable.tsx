@@ -1,28 +1,47 @@
 import {Table} from "hds-react";
 import {useState} from "react";
-import {IIndex} from "../schemas";
-import {useGetIndicesQuery} from "../services";
+import {IIndexCalculationData} from "../schemas";
+import {downloadSurfaceAreaPriceCeilingResults, useGetSurfaceAreaPriceCeilingCalculationDataQuery} from "../services";
 import {tableThemeBlack} from "../themes";
 import {getHitasQuarterFullLabel} from "../utils";
+import DownloadButton from "./DownloadButton";
 import {FilterTextInputField} from "./filters";
 import {QueryStateHandler} from "./index";
 
-const LoadedSurfaceAreaPriceCeilingResultsList = ({data, tableColumns}: {data: IIndex[]; tableColumns}) => {
+const DownloadSurfaceAreaPriceCeilingReportButton = ({calculation}) => {
+    return (
+        <div className="text-right">
+            <DownloadButton
+                onClick={() => downloadSurfaceAreaPriceCeilingResults(calculation.calculation_month)}
+                buttonText="Lataa raportti"
+                size="small"
+            />
+        </div>
+    );
+};
+
+const LoadedSurfaceAreaPriceCeilingResultsList = ({
+    data,
+    tableColumns,
+}: {
+    data: IIndexCalculationData[];
+    tableColumns;
+}) => {
     // Parse the indices data into quarters
     const tableData = data
         .map((item) => {
-            const timePeriodString = getHitasQuarterFullLabel(item.month, true);
+            const timePeriodString = getHitasQuarterFullLabel(item.calculation_month, true);
             if (timePeriodString === undefined) return;
 
             return {
                 period: timePeriodString,
-                month: item.month,
-                value: item.value,
+                calculation_month: item.calculation_month,
+                value: item.data.created_surface_area_price_ceilings[0].value,
             };
         })
-        .filter((item) => item !== undefined) as {period: string; value: number; month: string}[];
+        .filter((item) => item !== undefined) as {period: string; value: number; calculation_month: string}[];
     // Sort table data by month in ascending order
-    tableData.sort((a, b) => (a.month > b.month ? 1 : -1));
+    tableData.sort((a, b) => (a.calculation_month > b.calculation_month ? 1 : -1));
 
     return (
         <>
@@ -37,16 +56,33 @@ const LoadedSurfaceAreaPriceCeilingResultsList = ({data, tableColumns}: {data: I
     );
 };
 
-const SurfaceAreaPriceCeilingTable = ({tableColumns, helpText}: {tableColumns; helpText?: string}) => {
+const sapcTableColumns = [
+    {
+        key: "period",
+        headerName: "Hitas-vuosineljännes",
+        transform: (obj) => <div className="text-right">{obj.period}</div>,
+    },
+    {
+        key: "value",
+        headerName: "Rajaneliöhinta (€/m²)",
+        transform: (obj) => <div className="text-right">{obj.value}</div>,
+    },
+    {
+        key: "report",
+        headerName: "Raportti",
+        transform: (obj) => <DownloadSurfaceAreaPriceCeilingReportButton calculation={obj} />,
+    },
+];
+
+const SurfaceAreaPriceCeilingTable = () => {
     const [filterParams, setFilterParams] = useState({year: new Date().getFullYear().toString()});
 
     const {
         currentData: sapcIndices,
         error: sapcIndicesError,
         isFetching: isSapcIndicesLoading,
-    } = useGetIndicesQuery(
+    } = useGetSurfaceAreaPriceCeilingCalculationDataQuery(
         {
-            indexType: "surface-area-price-ceiling",
             params: {...filterParams, limit: 12, page: 1},
         },
         {skip: !filterParams.year}
@@ -66,7 +102,10 @@ const SurfaceAreaPriceCeilingTable = ({tableColumns, helpText}: {tableColumns; h
                     tooltipText="Syötä vuosiluku nähdäksesi sille lasketut rajaneliöhintaraportit"
                     required
                 />
-                {helpText && <p className="help-text">{helpText}</p>}
+                <p className="help-text">
+                    Rajaneliöhinnan raportti on saatavilla ainoastaan neljänneksille, joiden indeksin arvo on laskettu
+                    tässä Hitas-järjestelmässä.
+                </p>
             </div>
             <QueryStateHandler
                 data={{contents: [true]}} // Always render the table, even if there is no data
@@ -74,8 +113,8 @@ const SurfaceAreaPriceCeilingTable = ({tableColumns, helpText}: {tableColumns; h
                 isLoading={isSapcIndicesLoading}
             >
                 <LoadedSurfaceAreaPriceCeilingResultsList
-                    data={(filterParams.year ? sapcIndices?.contents : []) as unknown as IIndex[]}
-                    tableColumns={tableColumns}
+                    data={(filterParams.year ? sapcIndices?.contents : []) as unknown as IIndexCalculationData[]}
+                    tableColumns={sapcTableColumns}
                 />
             </QueryStateHandler>
         </div>

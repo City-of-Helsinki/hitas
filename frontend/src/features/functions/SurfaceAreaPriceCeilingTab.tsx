@@ -129,19 +129,6 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
     );
 };
 
-const sapcTableColumns = [
-    {
-        key: "period",
-        headerName: "Hitas-vuosineljännes",
-        transform: (obj) => <div className="text-right">{obj.period}</div>,
-    },
-    {
-        key: "value",
-        headerName: "Rajaneliöhinta (€/m²)",
-        transform: (obj) => <div className="text-right">{obj.value}</div>,
-    },
-];
-
 const SurfaceAreaPriceCeilingTab = () => {
     // Get latest 12 SAPC values
     const {
@@ -168,10 +155,7 @@ const SurfaceAreaPriceCeilingTab = () => {
             <Divider size="xl" />
 
             <Heading type="sub">Vanhat rajaneliöhintalaskelmat</Heading>
-            <SurfaceAreaPriceCeilingTable
-                tableColumns={sapcTableColumns}
-                helpText=""
-            />
+            <SurfaceAreaPriceCeilingTable />
         </div>
     );
 };

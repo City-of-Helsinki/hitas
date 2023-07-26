@@ -1,5 +1,6 @@
 import {
     IExternalSalesDataResponse,
+    IIndexCalculationDataResponse,
     IThirtyYearAvailablePostalCodesResponse,
     IThirtyYearRegulationQuery,
     IThirtyYearRegulationResponse,
@@ -10,6 +11,7 @@ import {hitasApi} from "../apis";
 
 const functionsApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
+        // Thirty year regulation
         getAvailablePostalCodes: builder.query<IThirtyYearAvailablePostalCodesResponse, object>({
             query: (params: object) => ({
                 url: "thirty-year-regulation/postal-codes",
@@ -60,6 +62,7 @@ const functionsApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "ExternalSaleData", id: arg.calculation_date}, {type: "Index"}]),
         }),
+        // Surface area price ceiling
         calculatePriceCeiling: builder.mutation({
             query: (params: {calculation_date: string}) => ({
                 url: "indices/surface-area-price-ceiling",
@@ -67,7 +70,18 @@ const functionsApi = hitasApi.injectEndpoints({
                 headers: mutationApiJsonHeaders(),
                 params: params,
             }),
-            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Index"}]),
+            invalidatesTags: (result, error) =>
+                safeInvalidate(error, [{type: "Index"}, {type: "SurfaceAreaPriceCeilingCalculation"}]),
+        }),
+        getSurfaceAreaPriceCeilingCalculationData: builder.query<
+            IIndexCalculationDataResponse,
+            {params: {year?: string; limit?: number; page?: number}}
+        >({
+            query: ({params}) => ({
+                url: "indices/surface-area-price-ceiling-calculation-data",
+                params: params,
+            }),
+            providesTags: () => [{type: "SurfaceAreaPriceCeilingCalculation"}],
         }),
     }),
 });
@@ -79,4 +93,5 @@ export const {
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
     useSaveExternalSalesDataMutation,
+    useGetSurfaceAreaPriceCeilingCalculationDataQuery,
 } = functionsApi;
