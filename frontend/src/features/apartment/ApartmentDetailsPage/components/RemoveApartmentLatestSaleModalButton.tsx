@@ -15,20 +15,22 @@ const canApartmentSaleBeDeleted = (apartment) => {
     const today = new Date();
     const completionDate = new Date(apartment.completion_date);
 
-    // First sale can be removed before apartment is completed
+    // First sale can be removed before apartment is completed (Completion date is in the future)
     if (today < completionDate) return true;
 
-    // First sale can be removed within 3 months after completion date
-    if (!apartment.prices.latest_purchase_date && apartment.prices.first_purchase_date) {
-        return completionDate < new Date(today.setMonth(today.getMonth() - 3));
-    }
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
 
-    // Latest sale can be removed within 3 months of sale date
-    if (apartment.prices.latest_purchase_date) {
-        return new Date(apartment.prices.latest_purchase_date) < new Date(today.setMonth(today.getMonth() - 3));
-    }
+    const comparisonDate = [
+        completionDate,
+        new Date(apartment.prices.first_purchase_date),
+        new Date(apartment.prices.latest_purchase_date),
+    ]
+        .sort((a, b) => a.getTime() - b.getTime())
+        .reverse()[0];
 
-    return false;
+    // Apartment sale can be removed within 3 months of the sale or completion date
+    return comparisonDate > threeMonthsAgo;
 };
 
 const RemoveApartmentLatestSaleModalButton = () => {
