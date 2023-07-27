@@ -45,7 +45,7 @@ export function formatApartmentAddressShort(address: IApartmentAddress): string 
 }
 
 export function formatOwner(owner: IOwner): string {
-    return `${owner.name} (${owner.identifier})`;
+    return `${owner.name}${owner.identifier ? ` (${owner.identifier})` : ""}`;
 }
 
 export function formatMoney(value: number | undefined | null, forceDecimals = false): string {
