@@ -1349,6 +1349,56 @@ def test__api__apartment_sale__create__half_hitas__cant_resell(api_client: Hitas
     }
 
 
+@pytest.mark.django_db
+def test__api__apartment_sale__create__unfinished_company__cant_resell(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01 00:00:00+00:00")
+
+    apartment: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
+        sales__purchase_date=datetime.date(2022, 1, 1),
+        completion_date=datetime.date(2022, 1, 1),
+    )
+    # Create another unfinished apartment in the same housing company
+    ApartmentFactory.create(
+        building__real_estate__housing_company=apartment.housing_company,
+        completion_date=None,
+    )
+    owner: Owner = OwnerFactory.create()
+
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2023-01-01",
+        "purchase_date": "2023-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+
+    url_1 = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.post(url_1, data=data, format="json")
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "invalid",
+        "message": "Cannot re-sell an apartment from uncompleted housing company.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
 # Update tests
 
 

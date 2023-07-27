@@ -93,6 +93,9 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
         if apartment.housing_company.hitas_type == HitasType.HALF_HITAS and apartment.latest_purchase_date is not None:
             raise ModelConflict("Cannot re-sell a half-hitas housing company apartment.", error_code="invalid")
 
+        if apartment.housing_company.completion_date is None and apartment.latest_purchase_date is not None:
+            raise ModelConflict("Cannot re-sell an apartment from uncompleted housing company.", error_code="invalid")
+
         validated_data["apartment"] = apartment
 
         with transaction.atomic():
