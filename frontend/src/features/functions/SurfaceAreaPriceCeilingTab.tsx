@@ -48,7 +48,7 @@ const CurrentMonthCalculationExists = ({sapcIndexData}) => {
 
     return (
         <>
-            <div className="price-ceiling-value">
+            <div className="surface-area-price-ceiling-value">
                 <label>Rajaneliöhinta {getHitasQuarterFullLabel(currentMonth)}</label>
                 <span>{sapcIndexData.contents[0].value}</span>
             </div>

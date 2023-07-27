@@ -1,10 +1,10 @@
-import {FileInput as HDSFileInput} from "hds-react";
+import {FileInput as HDSFileInput, LoadingSpinner} from "hds-react";
 import {useState} from "react";
 import {SaveDialogModal} from "../../../common/components";
 import {useSaveExternalSalesDataMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
-const ExternalSalesDataImport = ({calculationMonth}) => {
+const ExternalSalesDataImport = ({calculationMonth, hasExternalSalesData, isExternalSalesDataLoading}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [saveExternalSalesData, {data, isLoading, error}] = useSaveExternalSalesDataMutation();
@@ -12,7 +12,7 @@ const ExternalSalesDataImport = ({calculationMonth}) => {
     // Upload file to backend
     const handleFileSelected = (externalSalesDataFile) => {
         saveExternalSalesData({
-            calculation_date: formDate,
+            calculation_date: calculationMonth,
             data: externalSalesDataFile,
         })
             .unwrap()
@@ -28,6 +28,26 @@ const ExternalSalesDataImport = ({calculationMonth}) => {
                 setIsModalOpen(true);
             });
     };
+
+    if (isExternalSalesDataLoading) {
+        return (
+            <div className="external-sales-data-import">
+                <div className="spinner-wrap-color">
+                    <LoadingSpinner />
+                </div>
+            </div>
+        );
+    }
+    if (hasExternalSalesData) {
+        return (
+            <div className="external-sales-data-import">
+                <p>
+                    Tilastokeskuksen postinumeroalueiden keskineliöhinnat on jo tallennettu tälle
+                    Hitas-vuosineljännekselle.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="external-sales-data-import">
