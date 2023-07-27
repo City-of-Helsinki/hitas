@@ -1,10 +1,10 @@
-import {Tooltip} from "hds-react";
+import {ToggleButton, Tooltip} from "hds-react";
 import {FormProvider, useForm} from "react-hook-form";
-import {hitasQuarters} from "../../common/schemas";
 
 import {useState} from "react";
 import {Divider, DownloadButton, Heading, QueryStateHandler} from "../../common/components";
-import {SelectInput, ToggleInput} from "../../common/components/forms";
+import {SelectInput} from "../../common/components/forms";
+import {hitasQuarters} from "../../common/schemas";
 import {
     downloadRegulationResults,
     useCreateThirtyYearRegulationMutation,
@@ -20,8 +20,7 @@ import {
     ThirtyYearResults,
 } from "./ThirtyYearRegulationTabComponents";
 
-const ThirtyYearRegulationTab = () => {
-    const currentTime = new Date();
+const ThirtyYearRegulationContainer = () => {
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     // TODO: populate the years options with years starting from 2023, when testing is done
     const years = [
@@ -40,33 +39,25 @@ const ThirtyYearRegulationTab = () => {
         },
         mode: "all",
     });
-    const testForm = useForm({
-        defaultValues: {
-            testMode: false,
-            selection: "result_noProblems",
-        },
-        mode: "all",
-    });
 
-    const {watch: testWatch} = testForm;
     const {watch} = formObject;
     const formTimePeriod: {label: string; value: string} = watch("quarter");
     const formYear: string = watch("year");
     const formDate = `${formYear}-${formTimePeriod.value}`;
-    const isTestMode: boolean = testWatch("testMode");
 
+    const currentTime = new Date();
     // Populate the time quarter select with options, if current year is selected in the year selector
-    const hitasQuarterOptions: {label: string; value: string}[] = [];
+    let hitasQuarterOptions: {label: string; value: string}[] = [];
     // If the current year is not selected, add all quarters to the time period select options...
     if (currentTime.getFullYear().toString() !== formYear) {
-        hitasQuarters.forEach((quarter) => hitasQuarterOptions.push({value: quarter.value, label: quarter.label}));
+        hitasQuarterOptions = hitasQuarters;
     } else {
         // ...otherwise add only the quarters that have passed
-        for (let i = 0; i < 4; i++) {
-            if (currentTime.getMonth() + 1 >= (i + 1) * 3 - 1) {
-                hitasQuarterOptions.push(hitasQuarters[i]);
-            }
-        }
+        const month = currentTime.getMonth();
+        if (month > 1) hitasQuarterOptions.push(hitasQuarters[0]);
+        if (month > 4) hitasQuarterOptions.push(hitasQuarters[1]);
+        if (month > 7) hitasQuarterOptions.push(hitasQuarters[2]);
+        if (month > 10) hitasQuarterOptions.push(hitasQuarters[3]);
     }
 
     // Queries and mutations
@@ -141,106 +132,104 @@ const ThirtyYearRegulationTab = () => {
     };
 
     return (
-        <div className="view--functions__thirty-year-regulation">
-            <div className="regulation">
-                <Heading
-                    type="body"
-                    className="page-heading"
-                >
-                    <span>Vapautumisen tarkistus</span>
-                    <div className="test-toggle">
-                        <FormProvider {...testForm}>
-                            <ToggleInput
-                                name="testMode"
-                                label="Virhetila -testi"
-                            />
-                        </FormProvider>
-                    </div>
-                </Heading>
-                {isTestMode ? (
-                    <>
-                        <ThirtyYearErrorTest />
-                    </>
-                ) : (
-                    <>
-                        <div className="actions">
-                            <div className="time-period">
-                                <label>
-                                    Vuosineljännes
-                                    <Tooltip placement="bottom-start">
-                                        Valitse vuosi ja neljännes jonka vapautumisia haluat tarkastella, tai jolle
-                                        haluat suorittaa vertailun mikäli sitä ei ole vielä tehty.
-                                    </Tooltip>
-                                </label>
-                                <FormProvider {...formObject}>
-                                    <SelectInput
-                                        label=""
-                                        name="year"
-                                        options={years}
-                                        defaultValue={years[0].value}
-                                        disabled={hasSkippedCompanies}
-                                        setDirectValue
-                                        required
-                                    />
-                                    <SelectInput
-                                        label=""
-                                        name="quarter"
-                                        options={hitasQuarterOptions}
-                                        defaultValue={hitasQuarterOptions[hitasQuarterOptions.length - 1].value}
-                                        disabled={hasSkippedCompanies}
-                                        required
-                                    />
-                                </FormProvider>
-                            </div>
-                            <div className="price-ceiling">
-                                <label>
-                                    Rajaneliöhinta
-                                    {` (${formObject.getValues("quarter").label}${formYear})`}
-                                </label>
-                                <QueryStateHandler
-                                    data={priceCeilingData}
-                                    error={priceCeilingError}
-                                    isLoading={isPriceCeilingLoading}
-                                >
-                                    <div className="value">
-                                        <>{(priceCeilingData?.value ?? "---") + " "}</>
-                                        €/m²
-                                    </div>
-                                </QueryStateHandler>
-                                {hasRegulationResults && (
-                                    <DownloadButton
-                                        downloadFn={() => downloadRegulationResults(formDate)}
-                                        buttonText="Lataa kokonaisraportti"
-                                    />
-                                )}
-                            </div>
+        <>
+            <div className="actions">
+                <div className="time-period">
+                    <label>
+                        Vuosineljännes
+                        <Tooltip placement="bottom-start">
+                            Valitse vuosi ja neljännes jonka vapautumisia haluat tarkastella, tai jolle haluat suorittaa
+                            vertailun mikäli sitä ei ole vielä tehty.
+                        </Tooltip>
+                    </label>
+                    <FormProvider {...formObject}>
+                        <SelectInput
+                            label=""
+                            name="year"
+                            options={years}
+                            defaultValue={years[0].value}
+                            disabled={hasSkippedCompanies}
+                            setDirectValue
+                            required
+                        />
+                        <SelectInput
+                            label=""
+                            name="quarter"
+                            options={hitasQuarterOptions}
+                            defaultValue={hitasQuarterOptions[hitasQuarterOptions.length - 1].value}
+                            disabled={hasSkippedCompanies}
+                            required
+                        />
+                    </FormProvider>
+                </div>
+                <div className="price-ceiling">
+                    <label>
+                        Rajaneliöhinta
+                        {` (${formObject.getValues("quarter").label}${formYear})`}
+                    </label>
+                    <QueryStateHandler
+                        data={priceCeilingData}
+                        error={priceCeilingError}
+                        isLoading={isPriceCeilingLoading}
+                    >
+                        <div className="value">
+                            <>{(priceCeilingData?.value ?? "---") + " "}</>
+                            €/m²
                         </div>
-                        {!hasExternalSalesData && (
-                            <>
-                                <Divider size="l" />
-                                <div className="external-sales-data-import">
-                                    <ExternalSalesDataImport formDate={formDate} />
-                                </div>
-                            </>
-                        )}
-                        <ThirtyYearResults
-                            hasResults={hasRegulationResults}
-                            hasExternalSalesData={hasExternalSalesData}
-                            data={regulationData}
-                            error={regulationError}
-                            isLoading={isRegulationLoading}
-                            date={formDate}
-                            priceCeilingValue={priceCeilingData?.value}
-                            compareFn={onCompareButtonClick}
+                    </QueryStateHandler>
+                    {hasRegulationResults && (
+                        <DownloadButton
+                            downloadFn={() => downloadRegulationResults(formDate)}
+                            buttonText="Lataa kokonaisraportti"
                         />
-                        <ThirtyYearErrorModal
-                            isOpen={isErrorModalOpen}
-                            setIsOpen={setIsErrorModalOpen}
-                            response={regulationError}
-                        />
-                    </>
-                )}
+                    )}
+                </div>
             </div>
+            {!hasExternalSalesData && (
+                <>
+                    <Divider size="l" />
+                    <ExternalSalesDataImport formDate={formDate} />
+                </>
+            )}
+            <ThirtyYearResults
+                hasResults={hasRegulationResults}
+                hasExternalSalesData={hasExternalSalesData}
+                data={regulationData}
+                error={regulationError}
+                isLoading={isRegulationLoading}
+                date={formDate}
+                priceCeilingValue={priceCeilingData?.value}
+                compareFn={onCompareButtonClick}
+            />
+            <ThirtyYearErrorModal
+                isOpen={isErrorModalOpen}
+                setIsOpen={setIsErrorModalOpen}
+                response={regulationError}
+            />
+        </>
+    );
+};
+
+const ThirtyYearRegulationTab = () => {
+    const [isTestModeEnabled, setIsTestModeEnabled] = useState(false);
+
+    return (
+        <div className="view--functions__thirty-year-regulation">
+            <Heading type="body">
+                <span>Vapautumisen tarkistus</span>
+                <div className="test-toggle">
+                    <ToggleButton
+                        id="testMode-Toggle"
+                        label="Virhetila -testi"
+                        checked={isTestModeEnabled}
+                        onChange={() => {
+                            setIsTestModeEnabled((prevState) => !prevState);
+                        }}
+                        variant="inline"
+                    />
+                </div>
+            </Heading>
+            {isTestModeEnabled ? <ThirtyYearErrorTest /> : <ThirtyYearRegulationContainer />}
         </div>
     );
 };
