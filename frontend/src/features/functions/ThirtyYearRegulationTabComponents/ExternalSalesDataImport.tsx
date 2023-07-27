@@ -1,43 +1,26 @@
+import {FileInput as HDSFileInput} from "hds-react";
 import {useState} from "react";
-import {FormProvider, useForm} from "react-hook-form";
 import {SaveDialogModal} from "../../../common/components";
-import {FileInput, FormProviderForm} from "../../../common/components/forms";
 import {useSaveExternalSalesDataMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
-const ExternalSalesDataImport = ({formDate}) => {
+const ExternalSalesDataImport = ({calculationMonth}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [saveExternalSalesData, {data, isLoading, error}] = useSaveExternalSalesDataMutation();
 
-    const formObject = useForm({
-        defaultValues: {
-            calculationDate: formDate,
-            file: undefined,
-        },
-        mode: "all",
-    });
-
-    const formFile: File | undefined = formObject.watch("file");
-
-    // Submit = upload file
-    const onSubmit = (data) => {
-        const fileWithDate = {
-            data: data.file,
+    // Upload file to backend
+    const handleFileSelected = (externalSalesDataFile) => {
+        saveExternalSalesData({
             calculation_date: formDate,
-        };
-        saveExternalSalesData(fileWithDate)
+            data: externalSalesDataFile,
+        })
             .unwrap()
             .then((data) => {
-                if ("error" in (data as object)) {
-                    // eslint-disable-next-line no-console
-                    console.warn("Uncaught error:", data.error);
-                    setIsModalOpen(true);
-                } else {
-                    // Successful upload
-                    hdsToast.success("Postinumeroalueiden keskinumerohinnat ladattu onnistuneesti");
-                    formObject.setValue("file", undefined, {shouldValidate: true});
-                }
+                // Successful upload
+                hdsToast.success(
+                    `Postinumeroalueiden keskineliöhinnat ladattu onnistuneesti Hitas-vuosineljännekselle ${data.calculation_quarter}`
+                );
             })
             .catch((error) => {
                 // eslint-disable-next-line no-console
@@ -47,21 +30,21 @@ const ExternalSalesDataImport = ({formDate}) => {
     };
 
     return (
-        <FormProviderForm
-            formObject={formObject}
-            onSubmit={onSubmit}
-            className={`file${formFile === undefined ? "" : " file--selected"}`}
-        >
-            <FormProvider {...formObject}>
-                <FileInput
-                    name="file"
-                    buttonLabel="Valitse tiedosto"
-                    label="Postinumeroalueiden keskineliöhinnat *"
-                    tooltipText="Tilastokeskukselta saatu excel-tiedosto (.xslx)"
-                    accept=".xlsx"
-                    onChange={() => onSubmit(formObject.getValues())}
-                />
-            </FormProvider>
+        <div className="external-sales-data-import">
+            <HDSFileInput
+                id="externalSalesDataFile"
+                label="Tilastokeskuksen postinumeroalueiden keskineliöhinnat"
+                tooltipText="Syötä valitun Hitas-vuosinejänneksen tilastokeskukselta saatu excel-tiedosto, joka sisältää Helsingin postinumeroalueiden keskineliöhinnat"
+                buttonLabel="Valitse tiedosto"
+                onChange={(files) => {
+                    if (files.length !== 0) {
+                        handleFileSelected(files[0]);
+                    }
+                }}
+                accept=".xlsx"
+                multiple={false}
+                required
+            />
             <SaveDialogModal
                 title="Tallennetaan excel-tiedostoa"
                 data={data}
@@ -70,7 +53,7 @@ const ExternalSalesDataImport = ({formDate}) => {
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
             />
-        </FormProviderForm>
+        </div>
     );
 };
 

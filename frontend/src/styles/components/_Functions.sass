@@ -54,121 +54,74 @@
 
   // Thirty Year Regulation styles
   &__thirty-year-regulation
-    flex-grow: 1
-    .regulation, .companies
-      padding: $spacing-m
+    background: $color-black-10
+    padding: $spacing-m
 
-    .regulation
-      padding: 0
-      .page-heading
-        background: $color-black-10
-        padding: $spacing-m
+    .actions
+      padding: $spacing-m
+      position: relative
+      display: grid
+      grid-template-columns: 1fr 1fr
+      gap: $spacing-l
+      label
+        @include flexbox()
+        @include justify-content(space-between)
+        width: 100%
+      .input-field
         margin: 0
-      .actions
-        background: $color-black-10
-        padding: $spacing-m
-        position: relative
-        display: grid
-        grid-template-columns: 1fr 1fr
-        gap: $spacing-l
+        height: auto
+      .time-period
+        @include flexbox()
+        @include flex-flow(row wrap)
+        @include justify-content(space-between)
+        @include align-content(flex-start)
+        column-gap: $spacing-m
+        row-gap: $spacing-xs
+        grid-column: 1
+        grid-row: 1
         label
-          @include flexbox()
-          @include justify-content(space-between)
-          width: 100%
-        .input-field
-          margin: 0
-          height: auto
-        .time-period
-          @include flexbox()
-          @include flex-flow(row wrap)
-          @include justify-content(space-between)
-          @include align-content(flex-start)
-          column-gap: $spacing-m
-          row-gap: $spacing-xs
-          grid-column: 1
-          grid-row: 1
-          label
-            margin-bottom: -8px
-          > *
-            flex-grow: 1
-        .price-ceiling
-          @include flexbox()
-          @include flex-flow(row wrap)
-          @include justify-content(space-between)
-          grid-row: 1
-          grid-column: 2
-          .value
-            @include flexbox()
-            @include align-items(center)
-            height: 56px
-            margin-top: $spacing-xs
-            font-size: $fontsize-heading-l
-          button
-            margin: $spacing-xs
-        .test-toggle
-          @include flexbox()
-          position: absolute
-          top: -80px
-          right: 0
-          [class^="Select-module_root"]
-            width: 450px
-            margin-right: 20px
-            margin-top: -15px
-          label
-            margin-right: 20px
-      .divider-horizontal-l
-        background: $color-black-10
-        margin: 0
-        padding: $spacing-m 0
-      .external-sales-data-import
-        background: $color-black-10
-        padding: $spacing-m
-        padding-top: 0
-        h3
-          margin: 0
-          padding: 0
-      .file
-        position: relative
-        grid-row: 2
-        grid-column: 1 / span 2
-        display: flex
-        flex-flow: column nowrap
-        .input-field--file
-          position: relative
-          @include flexbox()
-          @include flex-flow(column nowrap)
-          gap: $spacing-l
-          button:not([class*="tooltip"])
-            width: 200px
-            height: 56px
-          section
-            transform: translate(40px) !important
-        label
-          width: calc(50% - 25px)
-        [class^="Tooltip-module_root"]
-          width: 80%
-          position: relative
-          top: -35px
-        [class^="TextInput-module_root"]
+          margin-bottom: -8px
+        > *
+          flex-grow: 1
+      .price-ceiling
+        @include flexbox()
+        @include flex-flow(row wrap)
+        @include justify-content(space-between)
+        grid-row: 1
+        grid-column: 2
+        .value
           @include flexbox()
           @include align-items(center)
-          @include justify-content(space-between)
-        [class^="FileInput-module_fileInputWrapper"]
-          width: 100%
-          margin-top: 0
-        [class*="FieldLabel-module_tooltipButton"]
-          right: auto
-        #file-info,
-        #file-success,
-        #file-helper,
-        #file-list
-          display: none
-      .external-sales-data-exists
-        grid-row: 2
-        background: $color-black-10
-        color: $color-black-50
-        font-size: $fontsize-body-m
+          height: 56px
+          margin-top: $spacing-xs
+          font-size: $fontsize-heading-l
+        button
+          margin: $spacing-xs
+      .test-toggle
+        @include flexbox()
+        position: absolute
+        top: -80px
+        right: 0
+        [class^="Select-module_root"]
+          width: 450px
+          margin-right: 20px
+          margin-top: -15px
+        label
+          margin-right: 20px
+
+    .external-sales-data-import
+      padding: $spacing-m
+      padding-top: 0
+      width: 50%
+
+      // Hide the input help texts and file list as we can't manually clear selected files
+      [class^="TextInput-module_infoText"],
+      [class^="TextInput-module_successText"],
+      [class^="FileInput-module_fileList"]
+        display: none
+
     .companies
+      padding: $spacing-m
       margin-top: $spacing-m
       background-color: $color-engel-medium-light
       .obfuscated-owners-button
@@ -279,14 +232,18 @@
         --spinner-thickness: 1rem
         --spinner-color: $color-engel
         color: $color-engel
+
+    // Test component styles
     .test-toggle
       height: auto
       label
         margin-right: 20px
       .input-field
         height: auto
+
     .test-select
       width: 500px
+
     .error-test-form
       padding: $spacing-m
       background: $color-black-10
