@@ -137,14 +137,20 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                                 label="Viimeisin kauppapäivä"
                                                 value={formatDate(apartment.prices.latest_purchase_date)}
                                             />
-                                            <RemoveApartmentLatestSaleModalButton />
+                                            {apartment.prices.latest_purchase_date && (
+                                                <RemoveApartmentLatestSaleModalButton />
+                                            )}
                                         </div>
                                         <Divider size="s" />
-
-                                        <DetailField
-                                            label="Ensimmäinen kauppapäivä"
-                                            value={formatDate(apartment.prices.first_purchase_date)}
-                                        />
+                                        <div className="row">
+                                            <DetailField
+                                                label="Ensimmäinen kauppapäivä"
+                                                value={formatDate(apartment.prices.first_purchase_date)}
+                                            />
+                                            {!apartment.prices.latest_purchase_date && (
+                                                <RemoveApartmentLatestSaleModalButton />
+                                            )}
+                                        </div>
                                         <DetailField
                                             label="Ensimmäinen kauppahinta"
                                             value={formatMoney(apartment.prices.first_sale_purchase_price)}
