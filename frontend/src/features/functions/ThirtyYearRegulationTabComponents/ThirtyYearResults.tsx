@@ -1,6 +1,7 @@
 import {Button} from "hds-react";
 import {useState} from "react";
 import {QueryStateHandler} from "../../../common/components";
+import {hdsToast} from "../../../common/utils";
 import {ThirtyYearLoadedResults} from "./index";
 
 const ThirtyYearResults = ({
@@ -25,6 +26,7 @@ const ThirtyYearResults = ({
                 // eslint-disable-next-line no-console
                 console.warn(e);
                 setIsButtonClicked(false); // in the event of an error, re-enable the button
+                hdsToast.error("Virhe!");
             });
     };
     return (
@@ -45,7 +47,7 @@ const ThirtyYearResults = ({
                     </QueryStateHandler>
                 ))}
             {!hasResults && !(data as unknown as {skipped: object[]})?.skipped && (
-                <div className="row row--buttons ">
+                <div className="row row--buttons">
                     <Button
                         theme="black"
                         onClick={handleCompareButton}

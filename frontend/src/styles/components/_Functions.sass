@@ -1,6 +1,7 @@
 @use "../imports" as *
 
 .view--functions
+  // Base styles
   @include flexbox()
   @include flex-flow(column nowrap)
   @include flex-grow(1)
@@ -24,8 +25,23 @@
       > div
         @include flex-grow(1)
 
+  // Common styles
   label
     font-weight: 700
+
+  .surface-area-price-ceiling-value
+    @include flexbox()
+    @include flex-flow(column nowrap)
+    span
+      font-size: $fontsize-heading-l
+      font-weight: 700
+      margin-top: $spacing-xs
+      text-align: right
+      &::after
+        content: "€/m²"
+        font-size: $fontsize-heading-s
+        font-weight: 400
+        margin-left: $spacing-xs
 
   // Surface Area Price Ceiling styles
   &__surface-area-price-ceiling
@@ -36,78 +52,37 @@
       @include flexbox()
       @include flex-flow(row nowrap)
       @include justify-content(space-between)
-      margin-bottom: $spacing-layout-m
-      .price-ceiling-value
-        @include flexbox()
-        @include flex-flow(column nowrap)
-        @include justify-content(space-between)
-        span
-          font-size: $fontsize-heading-l
-          font-weight: 700
-          margin-top: $spacing-xs
-          text-align: right
-          &::after
-            content: "€/m²"
-            font-size: $fontsize-heading-s
-            font-weight: 400
-            margin-left: $spacing-xs
 
   // Thirty Year Regulation styles
   &__thirty-year-regulation
     background: $color-black-10
     padding: $spacing-m
 
-    .actions
-      padding: $spacing-m
-      position: relative
+    .actions-row
       display: grid
-      grid-template-columns: 1fr 1fr
+      grid-template-columns: 2fr 1fr 1fr
       gap: $spacing-l
+
       label
         @include flexbox()
         @include justify-content(space-between)
         width: 100%
-      .input-field
-        margin: 0
-        height: auto
-      .time-period
+
+      .hitas-quarter-selection-container
         @include flexbox()
         @include flex-flow(row wrap)
-        @include justify-content(space-between)
-        @include align-content(flex-start)
         column-gap: $spacing-m
-        row-gap: $spacing-xs
-        grid-column: 1
-        grid-row: 1
-        label
-          margin-bottom: -8px
-        > *
+
+        .input-field
           flex-grow: 1
-      .price-ceiling
+          margin: 0
+          height: auto
+
+      .surface-area-price-ceiling-value-container
         @include flexbox()
-        @include flex-flow(row wrap)
-        @include justify-content(space-between)
-        grid-row: 1
-        grid-column: 2
-        .value
-          @include flexbox()
-          @include align-items(center)
-          height: 56px
-          margin-top: $spacing-xs
-          font-size: $fontsize-heading-l
-        button
-          margin: $spacing-xs
-      .test-toggle
-        @include flexbox()
-        position: absolute
-        top: -80px
-        right: 0
-        [class^="Select-module_root"]
-          width: 450px
-          margin-right: 20px
-          margin-top: -15px
-        label
-          margin-right: 20px
+
+      .download-button-container
+        margin-left: auto
 
     .external-sales-data-import
       padding: $spacing-m
@@ -240,9 +215,6 @@
         margin-right: 20px
       .input-field
         height: auto
-
-    .test-select
-      width: 500px
 
     .error-test-form
       padding: $spacing-m

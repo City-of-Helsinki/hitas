@@ -16,8 +16,9 @@ interface QueryLoadingProps {
         | undefined;
     error: FetchBaseQueryError | SerializedError | object | undefined;
     isLoading: boolean;
-    errorComponent?: React.JSX.Element;
     children: React.JSX.Element | React.JSX.Element[];
+    errorComponent?: React.JSX.Element;
+    spinnerWrapClassName?: string;
     attemptedAction?: string;
 }
 
@@ -27,6 +28,7 @@ export default function QueryStateHandler({
     isLoading,
     attemptedAction,
     errorComponent,
+    spinnerWrapClassName = "spinner-wrap",
     children,
 }: QueryLoadingProps): React.JSX.Element {
     // When loading or an error has occurred, show an appropriate message, otherwise return children
@@ -44,7 +46,7 @@ export default function QueryStateHandler({
         );
     } else if (isLoading) {
         return (
-            <div className="spinner-wrap">
+            <div className={spinnerWrapClassName}>
                 <LoadingSpinner />
             </div>
         );
