@@ -1,7 +1,7 @@
 import {Button, Card, IconGlyphEuro, IconLock} from "hds-react";
 import {Link} from "react-router-dom";
 import {IApartmentConditionOfSale, IApartmentDetails, IHousingCompanyDetails} from "../../../../common/schemas";
-import {formatAddress, hdsToast} from "../../../../common/utils";
+import {formatAddress, formatOwner, hdsToast} from "../../../../common/utils";
 import ConditionsOfSaleStatus from "../../components/ConditionsOfSaleStatus";
 
 const ApartmentSalesPageLinkButton = ({
@@ -41,9 +41,7 @@ const ApartmentSalesPageLinkButton = ({
 const SingleApartmentConditionOfSale = ({conditionsOfSale}: {conditionsOfSale: IApartmentConditionOfSale[]}) => {
     return (
         <li>
-            <h3>
-                {conditionsOfSale[0].owner.name} ({conditionsOfSale[0].owner.identifier})
-            </h3>
+            <h3>{formatOwner(conditionsOfSale[0].owner)}</h3>
             <ul>
                 {conditionsOfSale.map((cos) => (
                     <li
