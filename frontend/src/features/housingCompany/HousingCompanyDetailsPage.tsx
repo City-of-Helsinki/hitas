@@ -89,9 +89,10 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                                                 className="text-button"
                                                 onClick={() => setIsModifyPropertyManagerModalVisible(true)}
                                             >
-                                                {`${housingCompany.property_manager.name} (${
-                                                    housingCompany.property_manager.email ?? ""
-                                                })`}
+                                                {housingCompany.property_manager.name}
+                                                {housingCompany.property_manager.email
+                                                    ? ` (${housingCompany.property_manager.email})`
+                                                    : ""}
                                             </button>
                                         ) : (
                                             "-"
