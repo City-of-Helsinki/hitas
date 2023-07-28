@@ -164,11 +164,13 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                     mutateFormProps={propertyManagerMutateFormProps}
                 />
             </div>
-            <ImprovementsTable
-                data={housingCompany}
-                title="Yhtiökohtaiset parannukset"
-                isEditable={housingCompany.regulation_status === "regulated"}
-            />
+            {housingCompany.hitas_type !== "half_hitas" ? (
+                <ImprovementsTable
+                    data={housingCompany}
+                    title="Yhtiökohtaiset parannukset"
+                    isEditable={housingCompany.regulation_status === "regulated"}
+                />
+            ) : null}
             <div style={{display: "flex", flexFlow: "row nowrap", gap: "var(--spacing-layout-s)"}}>
                 <div className="list-wrapper list-wrapper--real-estates">
                     <Heading type="list">
