@@ -229,8 +229,8 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                     </Tabs>
                 </div>
                 {
-                    // New Hitas apartments don't have any improvements so the table can be hidden
-                    !housingCompany.new_hitas ||
+                    // Half-Hitas and New Hitas apartments don't have any improvements so the table can be hidden
+                    (housingCompany.hitas_type !== "half_hitas" && !housingCompany.new_hitas) ||
                     apartment.improvements.market_price_index.length ||
                     apartment.improvements.construction_price_index.length ? (
                         <ImprovementsTable
@@ -240,12 +240,14 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                         />
                     ) : null
                 }
-                <ImprovementsTable
-                    data={housingCompany}
-                    title="Yhtiökohtaiset parannukset"
-                    isEditable={housingCompany.regulation_status === "regulated"}
-                    editPath={`/housing-companies/${housingCompany.id}/improvements`}
-                />
+                {housingCompany.hitas_type !== "half_hitas" ? (
+                    <ImprovementsTable
+                        data={housingCompany}
+                        title="Yhtiökohtaiset parannukset"
+                        isEditable={housingCompany.regulation_status === "regulated"}
+                        editPath={`/housing-companies/${housingCompany.id}/improvements`}
+                    />
+                ) : null}
             </div>
             <MutateModal
                 // Modify owner modal
