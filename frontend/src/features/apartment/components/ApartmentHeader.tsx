@@ -35,12 +35,15 @@ const ApartmentHeaderContent = ({
                 <span className="address">{apartment && formatAddress(apartment.address)}</span>
             )}
 
-            <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
-
             {housingCompany.regulation_status !== "regulated" && (
                 <StatusLabel>{getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}</StatusLabel>
             )}
+
             {!housingCompany.completed && <StatusLabel>Taloyhtiö ei valmis</StatusLabel>}
+
+            {housingCompany.hitas_type === "half_hitas" && <StatusLabel>Puolihitas</StatusLabel>}
+
+            <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
 
             {apartment.sell_by_date && (
                 <StatusLabel
