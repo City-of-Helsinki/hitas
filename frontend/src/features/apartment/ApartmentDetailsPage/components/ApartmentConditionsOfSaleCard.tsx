@@ -122,7 +122,11 @@ const ApartmentConditionsOfSaleCard = ({
                     <Button
                         theme="black"
                         iconLeft={<IconLock />}
-                        disabled={!apartment.ownerships.length || housingCompany.regulation_status !== "regulated"}
+                        disabled={
+                            !apartment.ownerships.length ||
+                            housingCompany.regulation_status !== "regulated" ||
+                            housingCompany.hitas_type === "half_hitas"
+                        }
                     >
                         Muokkaa myyntiehtoja
                     </Button>
