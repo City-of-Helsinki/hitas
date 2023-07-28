@@ -4,6 +4,19 @@ import {IApartmentConditionOfSale, IApartmentDetails, IHousingCompanyDetails} fr
 import {formatAddress, formatOwner, hdsToast} from "../../../../common/utils";
 import ConditionsOfSaleStatus from "../../components/ConditionsOfSaleStatus";
 
+const ApartmentSaleButton = ({onClick, disabled}) => {
+    return (
+        <Button
+            theme="black"
+            iconLeft={<IconGlyphEuro />}
+            onClick={onClick}
+            disabled={disabled}
+        >
+            Kauppatapahtuma
+        </Button>
+    );
+};
+
 const ApartmentSalesPageLinkButton = ({
     housingCompany,
     apartment,
@@ -11,28 +24,33 @@ const ApartmentSalesPageLinkButton = ({
     housingCompany: IHousingCompanyDetails;
     apartment: IApartmentDetails;
 }) => {
-    // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
-    if (!housingCompany.completion_date && apartment.prices.first_purchase_date) {
+    let apartmentCantBeSoldErrorMessage;
+
+    if (!apartment.surface_area) {
+        apartmentCantBeSoldErrorMessage = "Asunnolta puuttuu pinta-ala";
+    } else if (apartment.prices.first_purchase_date && !housingCompany.completion_date) {
+        // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
+        apartmentCantBeSoldErrorMessage = "Valmistumattoman taloyhtiön asuntoa ei voida jälleenmyydä";
+    } else if (apartment.prices.first_purchase_date && housingCompany.hitas_type === "half_hitas") {
+        apartmentCantBeSoldErrorMessage = "Puolihitas-taloyhtiön asuntoa ei voida jälleenmyydä";
+    } else if (housingCompany.regulation_status !== "regulated") {
+        apartmentCantBeSoldErrorMessage = "Vapautetun taloyhtiön asuntoa ei voida jälleenmyydä";
+    }
+
+    if (apartmentCantBeSoldErrorMessage) {
         return (
-            <Button
-                theme="black"
-                iconLeft={<IconGlyphEuro />}
-                onClick={() => hdsToast.error("Valmistumattoman taloyhtiön asuntoa ei voida jälleenmyydä.")}
+            <ApartmentSaleButton
+                onClick={() => hdsToast.error(apartmentCantBeSoldErrorMessage)}
                 disabled={housingCompany.regulation_status !== "regulated"}
-            >
-                Kauppatapahtuma
-            </Button>
+            />
         );
     } else {
         return (
             <Link to="sales">
-                <Button
-                    theme="black"
-                    iconLeft={<IconGlyphEuro />}
-                    disabled={housingCompany.regulation_status !== "regulated" || !apartment.surface_area}
-                >
-                    Kauppatapahtuma
-                </Button>
+                <ApartmentSaleButton
+                    onClick={undefined}
+                    disabled={housingCompany.regulation_status !== "regulated"}
+                />
             </Link>
         );
     }
