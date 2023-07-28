@@ -233,6 +233,7 @@ const ApartmentMaximumPricesCard = ({
                         disabled={
                             !housingCompany.completion_date ||
                             housingCompany.regulation_status !== "regulated" ||
+                            housingCompany.hitas_type === "half_hitas" ||
                             !apartment.prices.first_purchase_date
                         }
                     >
