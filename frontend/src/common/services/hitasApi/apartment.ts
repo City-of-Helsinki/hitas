@@ -132,7 +132,14 @@ export const {
 
 const apartmentMaximumPriceApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
-        getApartmentMaximumPrice: builder.query<IApartmentMaximumPriceCalculationDetails, object>({
+        getApartmentMaximumPrice: builder.query<
+            IApartmentMaximumPriceCalculationDetails,
+            {
+                housingCompanyId: string;
+                apartmentId: string;
+                priceId: string;
+            }
+        >({
             query: ({
                 housingCompanyId,
                 apartmentId,
@@ -144,8 +151,16 @@ const apartmentMaximumPriceApi = hitasApi.injectEndpoints({
             }) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices/${priceId}`,
             }),
+            providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}],
         }),
-        getApartmentUnconfirmedMaximumPriceForDate: builder.query<IApartmentUnconfirmedMaximumPriceIndices, object>({
+        getApartmentUnconfirmedMaximumPriceForDate: builder.query<
+            IApartmentUnconfirmedMaximumPriceIndices,
+            {
+                housingCompanyId: string;
+                apartmentId: string;
+                date?: string;
+            }
+        >({
             query: ({
                 housingCompanyId,
                 apartmentId,

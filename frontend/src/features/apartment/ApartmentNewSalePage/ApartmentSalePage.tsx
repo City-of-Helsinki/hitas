@@ -52,7 +52,7 @@ const LoadedApartmentSalePage = () => {
     const isApartmentFirstSale = !apartment.prices.first_purchase_date;
     const initialFormData: IApartmentSaleForm = {
         notification_date: today(),
-        purchase_date: null,
+        purchase_date: "",
         purchase_price: isApartmentFirstSale ? apartment.prices.catalog_purchase_price : null,
         apartment_share_of_housing_company_loans: isApartmentFirstSale
             ? apartment.prices.catalog_share_of_housing_company_loans

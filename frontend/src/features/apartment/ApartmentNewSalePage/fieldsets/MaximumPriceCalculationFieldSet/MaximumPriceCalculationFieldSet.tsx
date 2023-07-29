@@ -2,8 +2,8 @@ import {Fieldset} from "hds-react";
 import {useContext} from "react";
 import {useFormContext} from "react-hook-form";
 import {SimpleErrorMessage} from "../../../../../common/components";
+import CreateMaximumPriceCalculationButton from "../../../components/MaximumPriceCalculationCreateButton";
 import {ApartmentSaleContext, isApartmentMaxPriceCalculationValid} from "../../utils";
-import MaximumPriceCalculationCreateButton from "./MaximumPriceCalculationCreateButton";
 import MaximumPriceCalculationExists from "./MaximumPriceCalculationExists";
 import MaximumPriceCalculationMissing from "./MaximumPriceCalculationMissing";
 
@@ -20,6 +20,17 @@ const MaximumPriceCalculationFieldSet = () => {
     const maximumPriceCalculationErrorMessage =
         formExtraFieldErrorMessages?.maximum_price_calculation &&
         formExtraFieldErrorMessages.maximum_price_calculation[0];
+
+    const getParsedFormData = () => {
+        const date = formObject.getValues("purchase_date") ?? null;
+        return {
+            calculation_date: date,
+            apartment_share_of_housing_company_loans_date: date,
+            apartment_share_of_housing_company_loans:
+                formObject.getValues("apartment_share_of_housing_company_loans") ?? 0,
+            additional_info: "",
+        };
+    };
 
     return (
         <Fieldset
@@ -40,7 +51,10 @@ const MaximumPriceCalculationFieldSet = () => {
                 }
             />
 
-            <MaximumPriceCalculationCreateButton hasLoanValueChanged={hasLoanValueChanged} />
+            <CreateMaximumPriceCalculationButton
+                buttonVariant={hasLoanValueChanged ? "primary" : "secondary"}
+                getParsedFormData={getParsedFormData}
+            />
         </Fieldset>
     );
 };
