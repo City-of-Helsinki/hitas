@@ -37,8 +37,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
         return (
             <div className={`companies companies--${category}`}>
                 <Heading type="body">
-                    {category === "freed" ? "Valvonnasta vapautetut " : "Valvonnan piiriin jäävät "}
-                    yhtiöt
+                    {category === "freed" ? "Valvonnasta vapautetut " : "Valvonnan piiriin jäävät"} yhtiöt
                     {category === "freed" && obfuscatedOwners.length > 0 && (
                         <Button
                             theme="black"

@@ -68,7 +68,7 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
                 {company.current_regulation_status !== "released_by_plot_department" && (
                     <DownloadButton
                         buttonText="Lataa tiedote"
-                        downloadFn={handleClickDownloadPDFButton}
+                        onClick={handleClickDownloadPDFButton}
                         variant={company.letter_fetched ? "secondary" : "primary"}
                     />
                 )}
