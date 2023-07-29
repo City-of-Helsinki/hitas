@@ -1,4 +1,7 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
+import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
+import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
+import {getCookie} from "typescript-cookie";
+import {getSignInUrl, hdsToast} from "../utils";
 
 declare global {
     interface Window {
@@ -24,16 +27,35 @@ export const authApi = createApi({
     endpoints: () => ({}),
 });
 
+const baseQuery = fetchBaseQuery({
+    baseUrl: Config.api_v1_url,
+    prepareHeaders: (headers, api) => {
+        Config.token && headers.set("Authorization", "Bearer " + Config.token);
+        return headers;
+    },
+    ...(!Config.token && {credentials: "include"}),
+});
+const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+    args,
+    api,
+    extraOptions
+) => {
+    const result = await baseQuery(args, api, extraOptions);
+
+    // Handle CSRF errors by redirecting to login page
+    if (result.error && result.error.status === 403) {
+        const errorMessage = (result.error?.data as {detail: string})?.detail;
+        if (errorMessage?.startsWith("CSRF Failed:")) {
+            hdsToast.error("CSRF Virhe. Uudelleenohjataan kirjautumissivulle.");
+            window.location.href = getSignInUrl(window.location.href);
+        }
+    }
+    return result;
+};
+
 export const hitasApi = createApi({
     reducerPath: "hitasApi",
-    baseQuery: fetchBaseQuery({
-        baseUrl: Config.api_v1_url,
-        prepareHeaders: (headers) => {
-            Config.token && headers.set("Authorization", "Bearer " + Config.token);
-            return headers;
-        },
-        ...(!Config.token && {credentials: "include"}),
-    }),
+    baseQuery: baseQueryWithReAuth,
     tagTypes: [
         "HousingCompany",
         "ConditionOfSale",
