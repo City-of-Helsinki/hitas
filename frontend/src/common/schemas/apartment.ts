@@ -438,8 +438,8 @@ export type IApartmentWritableForm = z.infer<typeof ApartmentWritableFormSchema>
 
 export const ApartmentSaleFormSchema = object({
     key: string().optional(),
-    notification_date: APIDateSchema.nullish(),
-    purchase_date: APIDateSchema.nullish(),
+    notification_date: APIDateSchema,
+    purchase_date: APIDateSchema,
     purchase_price: z
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)

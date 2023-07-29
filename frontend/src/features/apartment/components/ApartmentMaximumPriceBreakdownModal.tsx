@@ -1,5 +1,3 @@
-import {useEffect} from "react";
-
 import {Accordion, Button, Dialog, Table, Tabs} from "hds-react";
 import {useLocation, useNavigate} from "react-router-dom";
 
@@ -444,25 +442,21 @@ const MaximumPriceModalContent = ({
 }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [confirmMaximumPrice, {data, error, isLoading}] = useSaveApartmentMaximumPriceMutation();
+    const [confirmMaximumPrice, {isLoading}] = useSaveApartmentMaximumPriceMutation();
 
     const handleConfirmButton = () => {
+        if (!location.pathname.endsWith("sales")) setIsModalVisible(true);
         confirmMaximumPrice({
             data: {confirm: true},
             id: calculation.id,
             apartmentId: apartment.id,
             housingCompanyId: apartment.links.housing_company.id,
-        });
-        if (!location.pathname.endsWith("sales")) setIsModalVisible(true);
-    };
-
-    useEffect(() => {
-        if (!isLoading && !error && data && data.confirmed_at) {
+        }).then(() => {
             hdsToast.success("Enimmäishinta vahvistettu!");
             if (location.pathname.endsWith("sales")) setIsModalVisible(false);
             else navigate(`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`);
-        }
-    }, [apartment, data, error, isLoading, navigate, location.pathname, setIsModalVisible]);
+        });
+    };
 
     return (
         <>
