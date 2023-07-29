@@ -194,7 +194,7 @@ const ThirtyYearRegulationContainer = () => {
                 {hasRegulationResults && (
                     <div className="download-button-container">
                         <DownloadButton
-                            downloadFn={() => downloadRegulationResults(calculationMonth)}
+                            onClick={() => downloadRegulationResults(calculationMonth)}
                             buttonText="Lataa kokonaisraportti"
                         />
                     </div>
