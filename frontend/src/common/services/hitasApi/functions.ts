@@ -9,9 +9,36 @@ import {mutationApiExcelHeaders, mutationApiJsonHeaders, safeInvalidate} from ".
 
 import {hitasApi} from "../apis";
 
-const functionsApi = hitasApi.injectEndpoints({
+const surfaceAreaPriceCeilingApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
-        // Thirty year regulation
+        getSurfaceAreaPriceCeilingCalculationData: builder.query<
+            IIndexCalculationDataResponse,
+            {params: {year?: string; limit?: number; page?: number}}
+        >({
+            query: ({params}) => ({
+                url: "indices/surface-area-price-ceiling-calculation-data",
+                params: params,
+            }),
+            providesTags: () => [{type: "SurfaceAreaPriceCeilingCalculation"}],
+        }),
+        calculatePriceCeiling: builder.mutation({
+            query: (params: {calculation_date: string}) => ({
+                url: "indices/surface-area-price-ceiling",
+                method: "POST",
+                headers: mutationApiJsonHeaders(),
+                params: params,
+            }),
+            invalidatesTags: (result, error) =>
+                safeInvalidate(error, [{type: "Index"}, {type: "SurfaceAreaPriceCeilingCalculation"}]),
+        }),
+    }),
+});
+
+export const {useCalculatePriceCeilingMutation, useGetSurfaceAreaPriceCeilingCalculationDataQuery} =
+    surfaceAreaPriceCeilingApi;
+
+const thirtyYearRegulationApi = hitasApi.injectEndpoints({
+    endpoints: (builder) => ({
         getAvailablePostalCodes: builder.query<IThirtyYearAvailablePostalCodesResponse, object>({
             query: (params: object) => ({
                 url: "thirty-year-regulation/postal-codes",
@@ -26,6 +53,13 @@ const functionsApi = hitasApi.injectEndpoints({
                 },
             }),
             providesTags: (result, error, arg) => [{type: "ThirtyYearRegulation", id: arg.calculationDate}],
+        }),
+        getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({
+            query: (params: {calculation_date: string}) => ({
+                url: "external-sales-data",
+                params: params,
+            }),
+            providesTags: (result, error, arg) => [{type: "ExternalSaleData", id: arg.calculation_date}],
         }),
         createThirtyYearRegulation: builder.mutation<IThirtyYearRegulationResponse, {data: IThirtyYearRegulationQuery}>(
             {
@@ -44,13 +78,6 @@ const functionsApi = hitasApi.injectEndpoints({
                     safeInvalidate(error, [{type: "ThirtyYearRegulation", id: arg.data.calculationDate}]),
             }
         ),
-        getExternalSalesData: builder.query<IExternalSalesDataResponse, {calculation_date: string}>({
-            query: (params: {calculation_date: string}) => ({
-                url: "external-sales-data",
-                params: params,
-            }),
-            providesTags: (result, error, arg) => [{type: "ExternalSaleData", id: arg.calculation_date}],
-        }),
         saveExternalSalesData: builder.mutation({
             query: (arg) => ({
                 url: "external-sales-data",
@@ -62,36 +89,13 @@ const functionsApi = hitasApi.injectEndpoints({
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "ExternalSaleData", id: arg.calculation_date}, {type: "Index"}]),
         }),
-        // Surface area price ceiling
-        calculatePriceCeiling: builder.mutation({
-            query: (params: {calculation_date: string}) => ({
-                url: "indices/surface-area-price-ceiling",
-                method: "POST",
-                headers: mutationApiJsonHeaders(),
-                params: params,
-            }),
-            invalidatesTags: (result, error) =>
-                safeInvalidate(error, [{type: "Index"}, {type: "SurfaceAreaPriceCeilingCalculation"}]),
-        }),
-        getSurfaceAreaPriceCeilingCalculationData: builder.query<
-            IIndexCalculationDataResponse,
-            {params: {year?: string; limit?: number; page?: number}}
-        >({
-            query: ({params}) => ({
-                url: "indices/surface-area-price-ceiling-calculation-data",
-                params: params,
-            }),
-            providesTags: () => [{type: "SurfaceAreaPriceCeilingCalculation"}],
-        }),
     }),
 });
 
 export const {
-    useCalculatePriceCeilingMutation,
     useCreateThirtyYearRegulationMutation,
     useGetAvailablePostalCodesQuery,
     useGetExternalSalesDataQuery,
     useGetThirtyYearRegulationQuery,
     useSaveExternalSalesDataMutation,
-    useGetSurfaceAreaPriceCeilingCalculationDataQuery,
-} = functionsApi;
+} = thirtyYearRegulationApi;
