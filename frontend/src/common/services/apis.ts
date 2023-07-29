@@ -31,6 +31,12 @@ const baseQuery = fetchBaseQuery({
     baseUrl: Config.api_v1_url,
     prepareHeaders: (headers, api) => {
         Config.token && headers.set("Authorization", "Bearer " + Config.token);
+        if (api.type === "mutation") {
+            headers.set("Content-type", "application/json; charset=UTF-8");
+            const csrfToken = getCookie("csrftoken");
+            csrfToken && headers.set("X-CSRFToken", csrfToken);
+        }
+
         return headers;
     },
     ...(!Config.token && {credentials: "include"}),

@@ -15,7 +15,7 @@ import {
     IPropertyManager,
     IPropertyManagersResponse,
 } from "../../schemas";
-import {idOrBlank, mutationApiJsonHeaders, safeInvalidate} from "../utils";
+import {idOrBlank, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -52,7 +52,6 @@ const indexApi = hitasApi.injectEndpoints({
                 url: `indices/${index}/${month}`,
                 method: "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Apartment"}, {type: "Index"}]),
         }),
@@ -75,7 +74,6 @@ const developerApi = hitasApi.injectEndpoints({
                 url: `developers${idOrBlank(data.id)}`,
                 method: data.id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Developer"}]),
         }),
@@ -98,7 +96,6 @@ const propertyManagerApi = hitasApi.injectEndpoints({
                 url: `property-managers${idOrBlank(data.id)}`,
                 method: data.id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "PropertyManager"}]),
         }),
@@ -121,7 +118,6 @@ const ownerApi = hitasApi.injectEndpoints({
                 url: `owners${idOrBlank(data.id)}`,
                 method: data.id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Owner"}, {type: "Apartment"}]),
         }),
