@@ -12,7 +12,7 @@ import {
     IConditionOfSale,
     ICreateConditionOfSale,
 } from "../../schemas";
-import {idOrBlank, mutationApiJsonHeaders, safeInvalidate} from "../utils";
+import {idOrBlank, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -45,7 +45,6 @@ const apartmentApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [
@@ -62,7 +61,6 @@ const apartmentApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${id}`,
                 method: "PATCH",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [
@@ -81,7 +79,6 @@ const apartmentApi = hitasApi.injectEndpoints({
             query: ({id, housingCompanyId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${id}`,
                 method: "DELETE",
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [
@@ -102,7 +99,6 @@ const apartmentApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales`,
                 method: "POST",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "Apartment"}, {type: "HousingCompany", id: arg.housingCompanyId}]),
@@ -111,7 +107,6 @@ const apartmentApi = hitasApi.injectEndpoints({
             query: ({housingCompanyId, apartmentId, saleId}) => ({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/sales/${saleId}`,
                 method: "DELETE",
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "Apartment"}, {type: "HousingCompany", id: arg.housingCompanyId}]),
@@ -187,7 +182,6 @@ const apartmentMaximumPriceApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${housingCompanyId}/apartments/${apartmentId}/maximum-prices${idOrBlank(id)}`,
                 method: id === undefined ? "POST" : "PUT",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             // Invalidate Apartment Details only when confirming a maximum price, don't invalidate if confirmed_at
             // is not set (e.g. when creating a new maximum price)
@@ -213,7 +207,6 @@ const apartmentConditionsOfSaleApi = hitasApi.injectEndpoints({
                 url: `conditions-of-sale`,
                 method: "POST",
                 body: data,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) =>
                 safeInvalidate(error || (result && !result.conditions_of_sale.length), [{type: "Apartment"}]),
@@ -223,7 +216,6 @@ const apartmentConditionsOfSaleApi = hitasApi.injectEndpoints({
                 url: `conditions-of-sale/${conditionOfSale.id}`,
                 method: "PATCH",
                 body: conditionOfSale,
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [{type: "Apartment"}, {type: "ConditionOfSale", id: arg.id}]),
@@ -232,7 +224,6 @@ const apartmentConditionsOfSaleApi = hitasApi.injectEndpoints({
             query: ({id}) => ({
                 url: `conditions-of-sale/${id}`,
                 method: "DELETE",
-                headers: mutationApiJsonHeaders(),
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Apartment"}]),
         }),

@@ -5,7 +5,7 @@ import {
     IThirtyYearRegulationQuery,
     IThirtyYearRegulationResponse,
 } from "../../schemas";
-import {mutationApiExcelHeaders, mutationApiJsonHeaders, safeInvalidate} from "../utils";
+import {mutationApiExcelHeaders, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -25,7 +25,6 @@ const surfaceAreaPriceCeilingApi = hitasApi.injectEndpoints({
             query: (params: {calculation_date: string}) => ({
                 url: "indices/surface-area-price-ceiling",
                 method: "POST",
-                headers: mutationApiJsonHeaders(),
                 params: params,
             }),
             invalidatesTags: (result, error) =>
@@ -72,7 +71,6 @@ const thirtyYearRegulationApi = hitasApi.injectEndpoints({
                             return {postal_code: p.postalCode, replacements: p.replacements};
                         }),
                     },
-                    headers: {"Content-type": "application/json; charset=UTF-8"},
                 }),
                 invalidatesTags: (result, error, arg) =>
                     safeInvalidate(error, [{type: "ThirtyYearRegulation", id: arg.data.calculationDate}]),

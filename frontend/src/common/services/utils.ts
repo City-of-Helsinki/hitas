@@ -5,18 +5,8 @@ import {Config} from "./apis";
 
 export const idOrBlank = (id: string | undefined) => (id ? `/${id}` : "");
 
-export const mutationApiJsonHeaders = () => {
-    return new Headers({
-        "Content-type": "application/json; charset=UTF-8",
-        ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
-    });
-};
-
 export const mutationApiExcelHeaders = () => {
-    return new Headers({
-        "Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        ...(getCookie("csrftoken") && {"X-CSRFToken": getCookie("csrftoken")}),
-    });
+    return new Headers({"Content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
 };
 
 // PDF Helpers

@@ -1,6 +1,6 @@
 import {IApartmentDetails} from "../../schemas";
 import {hdsToast} from "../../utils";
-import {fetchAndDownloadPDF, handleDownloadPDF, mutationApiJsonHeaders, safeInvalidate} from "../utils";
+import {fetchAndDownloadPDF, handleDownloadPDF, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
 
@@ -98,7 +98,6 @@ export const reportsApi = hitasApi.injectEndpoints({
             query: (arg) => ({
                 url: `pdf-bodies/${arg.name}`,
                 method: "PUT",
-                headers: mutationApiJsonHeaders(),
                 body: arg,
             }),
         }),
