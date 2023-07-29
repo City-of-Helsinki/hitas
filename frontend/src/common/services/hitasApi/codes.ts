@@ -39,12 +39,13 @@ const indexApi = hitasApi.injectEndpoints({
                 url: `indices/${params.indexType}`,
                 params: params.params,
             }),
-            providesTags: [{type: "Index", id: "LIST"}],
+            providesTags: [{type: "Index"}],
         }),
         getIndex: builder.query<IIndexResponse, IIndexQuery>({
             query: (params: IIndexQuery) => ({
                 url: `indices/${params.indexType}/${params.month}`,
             }),
+            providesTags: [{type: "Index"}],
         }),
         saveIndex: builder.mutation<IIndex, {data: IIndex; index: string; month: string}>({
             query: ({data, index, month}) => ({
