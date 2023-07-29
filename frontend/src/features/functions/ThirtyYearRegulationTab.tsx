@@ -201,13 +201,17 @@ const ThirtyYearRegulationContainer = () => {
                 )}
             </div>
 
-            <Divider size="l" />
+            {!hasRegulationResults ? (
+                <>
+                    <Divider size="l" />
 
-            <ExternalSalesDataImport
-                calculationMonth={calculationMonth}
-                hasExternalSalesData={hasExternalSalesData}
-                isExternalSalesDataLoading={isExternalSalesDataLoading}
-            />
+                    <ExternalSalesDataImport
+                        calculationMonth={calculationMonth}
+                        hasExternalSalesData={hasExternalSalesData}
+                        isExternalSalesDataLoading={isExternalSalesDataLoading}
+                    />
+                </>
+            ) : null}
 
             <Divider size="l" />
 
