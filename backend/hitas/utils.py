@@ -125,7 +125,7 @@ def safe_attrgetter(obj: Any, dotted_path: str, default: Optional[Any]) -> Any:
 
 
 def this_month() -> datetime.date:
-    return monthify(timezone.now().today().date())
+    return monthify(timezone.now().date())
 
 
 def monthify(date: datetime.date) -> datetime.date:

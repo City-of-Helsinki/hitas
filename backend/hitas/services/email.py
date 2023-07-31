@@ -83,7 +83,7 @@ def render_confirmed_max_price_calculation_pdf(
         "user": user,
         "body_parts": pdf_body.texts,
         "title": filename,
-        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
+        "date_today": datetime.date.strftime(timezone.now().date(), "%d.%m.%Y"),
     }
     pdf = render_to_pdf(template="confirmed_maximum_price.jinja", context=context)
     return filename, pdf
@@ -209,7 +209,7 @@ def render_unconfirmed_max_price_calculation_pdf(
         "old_hitas_ruleset": apartment.old_hitas_ruleset,
         "user": user,
         "body_parts": pdf_body.texts,
-        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
+        "date_today": datetime.date.strftime(timezone.now().date(), "%d.%m.%Y"),
     }
 
     pdf = render_to_pdf(template="unconfirmed_maximum_price.jinja", context=context)
@@ -258,7 +258,7 @@ def render_regulation_letter_pdf(
         "user": user,
         "title": filename,
         "body_parts": pdf_body.texts,
-        "date_today": datetime.date.strftime(timezone.now().today(), "%d.%m.%Y"),
+        "date_today": datetime.date.strftime(timezone.now().date(), "%d.%m.%Y"),
     }
     pdf = render_to_pdf(template="regulation_letter.jinja", context=context)
     return filename, pdf
