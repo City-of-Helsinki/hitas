@@ -27,14 +27,17 @@ interface IPDFListResponseData {
 const PDFTemplate = ({data, type}: {data: IPDFListResponseData; type: string}) => {
     const [saveTemplate] = useEditPDFTemplateMutation();
     // Get the relevant data from the API response and initialize the form (with field array)
-    const currentData = data.contents.filter((item) => {
-        return item.name === type;
-    });
+    const currentData =
+        data.contents &&
+        data.contents.filter((item) => {
+            return item.name === type;
+        });
 
     const initialFormParagraphs =
-        currentData[0]?.texts.map((text) => {
-            return {text: text};
-        }) ??
+        (currentData &&
+            currentData[0]?.texts.map((text) => {
+                return {text: text};
+            })) ??
         instructionTexts[type].map(() => {
             return {text: ""};
         });
@@ -71,7 +74,7 @@ const PDFTemplate = ({data, type}: {data: IPDFListResponseData; type: string}) =
                     <li key={field.id}>
                         <TextAreaInput
                             name={`paragraphs[${index}].text`}
-                            label={instructionTexts[data.contents[0].name][index]}
+                            label={instructionTexts[type][index]}
                         />
                     </li>
                 ))}
