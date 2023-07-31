@@ -8,7 +8,7 @@ import {
     propertyManagerMutateFormProps,
 } from "../../../common/components/mutateComponents";
 import {IOwner, IOwnership, IPropertyManager} from "../../../common/schemas";
-import {formatDate, formatMoney} from "../../../common/utils";
+import {formatDate, formatMoney, formatOwner} from "../../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/ApartmentViewContextProvider";
 import {
     ApartmentConditionsOfSaleCard,
@@ -16,19 +16,54 @@ import {
     RemoveApartmentLatestSaleModalButton,
 } from "./components";
 
+const OwnerEditModalButton = ({owner}: {owner: IOwner}): React.JSX.Element => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    return (
+        <>
+            <button
+                className="text-button"
+                onClick={() => setIsModalVisible(true)}
+            >
+                {formatOwner(owner)}
+            </button>
+            <MutateModal
+                defaultObject={owner}
+                dialogTitles={{modify: "Muokkaa henkilötietoja"}}
+                isVisible={isModalVisible}
+                closeModalAction={() => setIsModalVisible(false)}
+                MutateFormComponent={OwnerMutateForm}
+            />
+        </>
+    );
+};
+
+const PropertyManagerEditModalButton = ({propertyManager}: {propertyManager: IPropertyManager}): React.JSX.Element => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    return (
+        <>
+            <button
+                className="text-button"
+                onClick={() => setIsModalVisible(true)}
+            >
+                {propertyManager.name}
+            </button>
+            <MutateModal
+                defaultObject={propertyManager}
+                dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
+                isVisible={isModalVisible}
+                closeModalAction={() => setIsModalVisible(false)}
+                MutateFormComponent={MutateForm}
+                mutateFormProps={propertyManagerMutateFormProps}
+            />
+        </>
+    );
+};
+
 const LoadedApartmentDetails = (): React.JSX.Element => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
-
-    // Handle visibility of the relevant modals
-    const [isModifyOwnerModalVisible, setIsModifyOwnerModalVisible] = useState(false);
-    const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
-
-    const [owner, setOwner] = useState<IOwner | undefined>(undefined);
-    const modifyOwnerHandler = (selectedOwner: IOwner) => {
-        setIsModifyOwnerModalVisible(true);
-        setOwner(selectedOwner);
-    };
 
     return (
         <>
@@ -90,12 +125,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                                     key={ownership.owner.id}
                                                     className="detail-field-value"
                                                 >
-                                                    <button
-                                                        className="text-button"
-                                                        onClick={() => modifyOwnerHandler(ownership.owner)}
-                                                    >
-                                                        {ownership.owner.name} ({ownership.owner.identifier})
-                                                    </button>
+                                                    <OwnerEditModalButton owner={ownership.owner} />
                                                     <span> {ownership.percentage}%</span>
                                                 </div>
                                             ))}
@@ -104,12 +134,9 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                             <label className="detail-field-label">Isännöitsijä</label>
                                             <div className="detail-field-value">
                                                 {housingCompany?.property_manager ? (
-                                                    <button
-                                                        className="text-button"
-                                                        onClick={() => setIsModifyPropertyManagerModalVisible(true)}
-                                                    >
-                                                        {housingCompany?.property_manager?.name || " "}
-                                                    </button>
+                                                    <PropertyManagerEditModalButton
+                                                        propertyManager={housingCompany.property_manager}
+                                                    />
                                                 ) : (
                                                     "-"
                                                 )}
@@ -249,23 +276,6 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                     />
                 ) : null}
             </div>
-            <MutateModal
-                // Modify owner modal
-                defaultObject={owner as IOwner}
-                dialogTitles={{modify: "Muokkaa henkilötietoja"}}
-                isVisible={isModifyOwnerModalVisible}
-                closeModalAction={() => setIsModifyOwnerModalVisible(false)}
-                MutateFormComponent={OwnerMutateForm}
-            />
-            <MutateModal
-                // Modify property manager modal
-                defaultObject={housingCompany?.property_manager as IPropertyManager}
-                dialogTitles={{modify: "Muokkaa isännöitsijän tietoja"}}
-                isVisible={isModifyPropertyManagerModalVisible}
-                closeModalAction={() => setIsModifyPropertyManagerModalVisible(false)}
-                MutateFormComponent={MutateForm}
-                mutateFormProps={propertyManagerMutateFormProps}
-            />
         </>
     );
 };
