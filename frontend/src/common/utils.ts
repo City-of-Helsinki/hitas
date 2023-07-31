@@ -112,11 +112,11 @@ export function validateSocialSecurityNumber(value: string): boolean {
     }
     const dateValue = value.substring(0, 4);
     const yearString = century + value.substring(4, 6);
-    const dateString = `${yearString}-${dateValue.substring(3, 4)}-${dateValue.substring(0, 2)}`;
+    const dateString = `${yearString}-${dateValue.substring(2, 4)}-${dateValue.substring(0, 2)}`;
     if (isNaN(Date.parse(dateString))) return false;
     // validate individual number
-    const idNumber = Number(value.substring(7, 10));
-    if (idNumber < 2 || idNumber > 899) return false;
+    const idNumber = value.substring(7, 10);
+    if (Number(idNumber) < 2 || Number(idNumber) > 899) return false;
     // validate checkDigit
     const checkDigit = value.substring(10, 11);
     const checkDigits = [
