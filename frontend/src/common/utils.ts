@@ -45,6 +45,8 @@ export function formatApartmentAddressShort(address: IApartmentAddress): string 
 }
 
 export function formatOwner(owner: IOwner): string {
+    if (owner.name === "" && owner.non_disclosure === true) return "TURVAKIELTO";
+
     return `${owner.name}${owner.identifier ? ` (${owner.identifier})` : ""}`;
 }
 

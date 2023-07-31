@@ -14,8 +14,8 @@ const CheckboxInput = ({
     const {register} = formObject;
     const formCheckbox = register(name);
 
-    const handleChange = () => {
-        formObject.setValue(formCheckbox.name, !formObject.getValues(formCheckbox.name), {shouldValidate: true});
+    const handleChange = (e) => {
+        formCheckbox.onChange(e);
         if (triggerField) {
             formObject.trigger(triggerField);
         }

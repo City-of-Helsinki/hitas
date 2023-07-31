@@ -11,10 +11,10 @@ export const OwnerSchema = object({
         .min(2, errorMessages.stringLength)
         .max(256, errorMessages.stringMaxIs + "256"),
     identifier: string({required_error: errorMessages.required})
-        .min(1, errorMessages.stringLength)
+        .min(1, errorMessages.required)
         .max(11, errorMessages.stringMaxIs + "11"),
-    email: string().email(errorMessages.emailInvalid).optional().or(z.literal("")),
-    non_disclosure: boolean().optional(),
+    email: string().email(errorMessages.emailInvalid).nullish().or(z.literal("")),
+    non_disclosure: boolean(),
 });
 export type IOwner = z.infer<typeof OwnerSchema>;
 
