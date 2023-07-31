@@ -531,7 +531,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
     ConstructionPriceIndex2005Equal100Factory.create(month=ap1.completion_date, value=100.5)
     MarketPriceIndex2005Equal100Factory.create(month=ap1.completion_date, value=200.5)
 
-    now = datetime.date.today().replace(day=1)
+    now = timezone.now().date().replace(day=1)
     ConstructionPriceIndex2005Equal100Factory.create(month=now, value=150.5)
     MarketPriceIndex2005Equal100Factory.create(month=now, value=250.5)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000.5)
@@ -618,7 +618,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
                     "maximum_price": float(ampc.maximum_price),
                     "valid": {
                         "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
-                        "is_valid": ampc.valid_until >= datetime.date.today(),
+                        "is_valid": ampc.valid_until >= timezone.now().date(),
                     },
                 },
                 "unconfirmed": {
@@ -755,7 +755,7 @@ def test__api__apartment__retrieve__confirmed_old_json_version(api_client: Hitas
         "maximum_price": float(ampc.maximum_price),
         "valid": {
             "valid_until": ampc.valid_until.strftime("%Y-%m-%d"),
-            "is_valid": ampc.valid_until >= datetime.date.today(),
+            "is_valid": ampc.valid_until >= timezone.now().date(),
         },
     }
 
@@ -796,7 +796,7 @@ def _test_unconfirmed_max_prices(
         mpi_factory.create(month=ap.completion_date, value=200)
 
     if create_current_indices:
-        now = datetime.date.today().replace(day=1)
+        now = timezone.now().date().replace(day=1)
         cpi_factory.create(month=now, value=150)
         mpi_factory.create(month=now, value=250)
         SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)
@@ -1024,7 +1024,7 @@ def test__api__apartment__retrieve__unconfirmed_prices_use_housing_company_compl
     ConstructionPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=100)
     MarketPriceIndex2005Equal100Factory.create(month=ap.completion_date, value=200)
 
-    now = datetime.date.today().replace(day=1)
+    now = timezone.now().date().replace(day=1)
     ConstructionPriceIndex2005Equal100Factory.create(month=now, value=200)
     MarketPriceIndex2005Equal100Factory.create(month=now, value=500)
     SurfaceAreaPriceCeilingFactory.create(month=now, value=3000)

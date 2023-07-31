@@ -21,7 +21,7 @@ def render_to_pdf(template: str, context: dict[str, Any]) -> bytes:
 
 def get_pdf_response(filename: str, template: str, context: dict[str, Any]) -> HttpResponse:
     context.setdefault("title", filename)
-    pdf = render_to_pdf(template, {**context, "date_today": datetime.strftime(timezone.now().today(), "%d.%m.%Y")})
+    pdf = render_to_pdf(template, {**context, "date_today": datetime.strftime(timezone.now().date(), "%d.%m.%Y")})
     response = HttpResponse(pdf, content_type="application/pdf")
     response.headers["Content-Disposition"] = f"attachment; filename={filename}"
     return response

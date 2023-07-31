@@ -3,6 +3,7 @@ import datetime
 import pytest
 from dateutil import relativedelta
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 
 from hitas.models import Apartment
@@ -43,7 +44,7 @@ from hitas.utils import monthify, this_month
             ],
         ),
         (
-            {"calculation_date": datetime.date.today() + relativedelta.relativedelta(days=1)},
+            {"calculation_date": timezone.now().date() + relativedelta.relativedelta(days=1)},
             [{"field": "calculation_date", "message": "Field has to be less than or equal to current date."}],
         ),
         (
