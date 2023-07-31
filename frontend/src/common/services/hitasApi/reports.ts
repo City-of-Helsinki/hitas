@@ -94,11 +94,11 @@ export const reportsApi = hitasApi.injectEndpoints({
                 params: arg,
             }),
         }),
-        editPDFTemplate: builder.mutation({
+        savePDFTemplate: builder.mutation({
             query: (arg) => ({
-                url: `pdf-bodies/${arg.name}`,
-                method: "PUT",
-                body: arg,
+                url: `pdf-bodies${arg.createTemplate ? "" : `/${arg.name}`}`,
+                method: arg.createTemplate ? "POST" : "PUT",
+                body: {name: arg.name, texts: arg.texts},
             }),
         }),
     }),
@@ -106,7 +106,7 @@ export const reportsApi = hitasApi.injectEndpoints({
 
 export const {
     useDownloadThirtyYearRegulationLetterMutation,
-    useEditPDFTemplateMutation,
+    useSavePDFTemplateMutation,
     useGetHousingCompanyStatesQuery,
     useGetPDFBodiesQuery,
 } = reportsApi;

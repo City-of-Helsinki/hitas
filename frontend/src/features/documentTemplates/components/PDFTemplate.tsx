@@ -1,7 +1,7 @@
 import {useFieldArray, useForm} from "react-hook-form";
 import {SaveButton} from "../../../common/components";
 import {FormProviderForm, TextAreaInput} from "../../../common/components/forms";
-import {useEditPDFTemplateMutation} from "../../../common/services";
+import {useSavePDFTemplateMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
 const instructionTexts = {
@@ -25,7 +25,8 @@ interface IPDFListResponseData {
 }
 
 const PDFTemplate = ({data, type}: {data: IPDFListResponseData; type: string}) => {
-    const [saveTemplate] = useEditPDFTemplateMutation();
+    const [saveTemplate] = useSavePDFTemplateMutation();
+
     // Get the relevant data from the API response and initialize the form (with field array)
     const currentData =
         data.contents &&
@@ -51,6 +52,7 @@ const PDFTemplate = ({data, type}: {data: IPDFListResponseData; type: string}) =
 
     const onSubmit = (submitData) => {
         saveTemplate({
+            createTemplate: currentData.length === 0,
             name: type,
             texts: submitData.paragraphs.map((paragraph) => paragraph.text),
         })
