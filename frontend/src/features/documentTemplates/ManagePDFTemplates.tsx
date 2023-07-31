@@ -9,7 +9,7 @@ const ManagePDFTemplates = () => {
         <div>
             <Accordion heading="Enimmäishintalaskelma">
                 <QueryStateHandler
-                    data={data}
+                    data={{}} // Always render, regardless of if returned data is empty
                     error={error}
                     isLoading={isLoading}
                 >
@@ -21,7 +21,7 @@ const ManagePDFTemplates = () => {
             </Accordion>
             <Accordion heading="Vahvistettu enimmäishintalaskelma">
                 <QueryStateHandler
-                    data={data}
+                    data={{}}
                     error={error}
                     isLoading={isLoading}
                 >
@@ -33,7 +33,7 @@ const ManagePDFTemplates = () => {
             </Accordion>
             <Accordion heading="Vapautuva yhtiö">
                 <QueryStateHandler
-                    data={data}
+                    data={{}}
                     error={error}
                     isLoading={isLoading}
                 >
@@ -45,7 +45,7 @@ const ManagePDFTemplates = () => {
             </Accordion>
             <Accordion heading="Valvonnan piiriin jäävä yhtiö">
                 <QueryStateHandler
-                    data={data}
+                    data={{}}
                     error={error}
                     isLoading={isLoading}
                 >
