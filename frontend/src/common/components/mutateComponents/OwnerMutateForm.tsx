@@ -1,11 +1,11 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, IconArrowLeft} from "hds-react";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {IOwner, OwnerSchema} from "../../schemas";
 import {useSaveOwnerMutation} from "../../services";
-import {hdsToast, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
+import {hdsToast, setAPIErrorsForFormFields, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
 import {CheckboxInput, TextInput} from "../forms";
 import FormProviderForm from "../forms/FormProviderForm";
 import SaveButton from "../SaveButton";
@@ -20,28 +20,15 @@ export default function OwnerMutateForm({
     closeModalAction,
     setEmptyFilterParams,
 }: IOwnerMutateForm) {
-    const [isInitialIdentifierValid, setIsInitialIdentifierValid] = useState<boolean>(false);
+    const isInitialIdentifierValid = owner !== undefined && validateSocialSecurityNumber(owner.identifier);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
 
-    const runSaveOwner = (data: IOwner) => {
-        // submit the form values
-        saveOwner({data})
-            .unwrap()
-            .then(() => {
-                hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
-                closeModalAction();
-                setEmptyFilterParams?.();
-            })
-            .catch((error) => {
-                hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
-                error.data.fields.forEach((field) =>
-                    formObject.setError(field.field, {type: "backend", message: field.message})
-                );
-            });
+    const closeModal = () => {
+        closeModalAction();
+        !owner && setEmptyFilterParams?.();
     };
 
-    const resolver = async (data, context, options) => {
-        // validate the form
+    const resolver = (data, context, options) => {
         return zodResolver(
             OwnerSchema.omit({id: true}).superRefine((data, ctx) => {
                 if (!validateSocialSecurityNumber(data.identifier) && !validateBusinessId(data.identifier)) {
@@ -60,66 +47,65 @@ export default function OwnerMutateForm({
         mode: "all",
         resolver: resolver,
     });
-    const identifierValue = formObject.watch("identifier");
 
-    // helper booleans for special saving controls with invalid data
-    const hasFormChanged = formObject.formState.isDirty;
-    const isMalformedIdentifier = !!formObject.formState.errors.identifier;
-    const isIdentifierEmpty = identifierValue === "";
-    const isBackendErrorInIdentifier = formObject.formState.errors.identifier?.type === "backend";
-    const isOtherErrorsThanIdentifier = Object.keys(formObject.formState.errors).some(
-        (field) => field !== "identifier"
-    );
+    // formState needs to be read before a render in order to enable the state update
+    const {
+        formState: {isDirty: isFormDirty, errors: formErrors},
+    } = formObject;
 
-    // enable submitting malformed non-empty identifier if it wasn't valid initially and other fields are valid
-    const isSaveWithWarning =
-        isMalformedIdentifier && !isInitialIdentifierValid && !isOtherErrorsThanIdentifier && !isIdentifierEmpty;
-    // disable submitting in the following cases:
+    // If the initial identifier is invalid, show a warning when saving
+    const isInvalidIdentifierSaveWarningShown =
+        !isInitialIdentifierValid && !!formErrors.identifier && formErrors.identifier.type === "custom";
+    // Disable saving if form has any errors
+    // With the exception, that if the initial identifier is invalid, it can stay invalid
     const isSaveDisabled =
-        isOtherErrorsThanIdentifier ||
-        isIdentifierEmpty ||
-        (isMalformedIdentifier && isInitialIdentifierValid) ||
-        isBackendErrorInIdentifier;
+        !!Object.keys(formErrors).length &&
+        (isInitialIdentifierValid ||
+            (!isInitialIdentifierValid &&
+                ((!!formErrors.identifier && formErrors.identifier.type !== "custom") ||
+                    Object.keys(formErrors).some((field) => field !== "identifier"))));
 
-    useEffect(() => {
-        // validate the initial form values
-        formObject.trigger().then(() => {
-            // set the initial identifier validity
-            setIsInitialIdentifierValid(!formObject.formState.errors.identifier);
-            // set initial focus
-            setTimeout(() => formObject.setFocus("name"), 5);
-        });
-        // eslint-disable-next-line
-    }, []);
+    const runSaveOwner = () => {
+        if (!isFormDirty) {
+            hdsToast.info("Ei muutoksia omistajan tiedoissa.");
+            closeModalAction();
+            return;
+        }
+
+        saveOwner({data: formObject.getValues()})
+            .unwrap()
+            .then(() => {
+                hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
+                closeModalAction();
+                setEmptyFilterParams?.();
+            })
+            .catch((error) => {
+                hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
+                setAPIErrorsForFormFields(error, formObject.setError);
+            });
+    };
 
     const onFormSubmitValid = () => {
-        // save the data
-        runSaveOwner(formObject.getValues());
+        runSaveOwner();
     };
 
     const onFormSubmitInvalid = () => {
-        if (isSaveWithWarning) {
-            // save with warning
-            runSaveOwner(formObject.getValues());
+        if (isInvalidIdentifierSaveWarningShown) {
+            runSaveOwner();
         }
     };
 
-    const onFormSubmitUnchanged = () => {
-        // close without saving if the data has not changed
-        hdsToast.success("Ei muutoksia omistajan tiedoissa.");
-        close();
-    };
-
-    const close = () => {
-        closeModalAction();
-        !owner && setEmptyFilterParams?.();
-    };
+    useEffect(() => {
+        // Set initial focus to the "name" field
+        formObject.trigger().then(() => setTimeout(() => formObject.setFocus("name"), 5));
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <FormProviderForm
             formObject={formObject}
-            onSubmit={hasFormChanged ? onFormSubmitValid : onFormSubmitUnchanged}
-            onSubmitError={hasFormChanged ? onFormSubmitInvalid : onFormSubmitUnchanged}
+            onSubmit={onFormSubmitValid}
+            onSubmitError={onFormSubmitInvalid}
         >
             <TextInput
                 name="name"
@@ -141,9 +127,11 @@ export default function OwnerMutateForm({
             />
             {
                 // show warning when saving malformed identifier is enabled
-                isSaveWithWarning && !isSaveDisabled && (
+                isInvalidIdentifierSaveWarningShown && !isSaveDisabled && (
                     <p className="error-message">
-                        "{identifierValue}" on virheellinen henkilö- tai Y-tunnus. Tallennetaanko silti?
+                        '{formObject.watch("identifier")}' on virheellinen henkilö- tai Y-tunnus.
+                        <br />
+                        Tallennetaanko silti?
                     </p>
                 )
             }
@@ -151,7 +139,7 @@ export default function OwnerMutateForm({
                 <Button
                     theme="black"
                     iconLeft={<IconArrowLeft />}
-                    onClick={close}
+                    onClick={closeModal}
                 >
                     Peruuta
                 </Button>
@@ -159,7 +147,7 @@ export default function OwnerMutateForm({
                 <SaveButton
                     isLoading={isSaveOwnerLoading}
                     type="submit"
-                    buttonText={isSaveWithWarning ? "Tallenna silti" : "Tallenna"}
+                    buttonText={isInvalidIdentifierSaveWarningShown ? "Tallenna silti" : "Tallenna"}
                     disabled={isSaveDisabled}
                 />
             </div>
