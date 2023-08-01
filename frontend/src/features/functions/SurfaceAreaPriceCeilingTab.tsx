@@ -1,4 +1,4 @@
-import {Button, IconCogwheels} from "hds-react";
+import {Button, ErrorSummary, IconCogwheels} from "hds-react";
 
 import {useState} from "react";
 import {
@@ -78,7 +78,7 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const closeModal = () => setIsModalOpen(false);
 
-    const [calculatePriceCeiling, {data: calculationData, isLoading}] = useCalculatePriceCeilingMutation();
+    const [calculatePriceCeiling, {data: calculationData, isLoading, error}] = useCalculatePriceCeilingMutation();
 
     const handleCalculateButtonOnClick = () => {
         calculatePriceCeiling({calculation_date: currentMonth + "-01"})
@@ -87,10 +87,10 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
                 hdsToast.success("Rajahinnan laskenta onnistui");
                 setIsModalOpen(true);
             })
-            .catch((e) => {
+            .catch((error) => {
                 hdsToast.error("Rajahinnan laskenta epäonnistui");
                 // eslint-disable-next-line no-console
-                console.error(e);
+                console.error(error);
             });
     };
 
@@ -100,32 +100,46 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
     const isCurrentQuarterCalculated = sapcIndexData.contents.some((item) => item.month === currentMonth);
 
     return (
-        <div className="price-ceiling-calculation">
-            {isCurrentQuarterCalculated ? (
-                <CurrentMonthCalculationExists sapcIndexData={sapcIndexData} />
-            ) : (
-                <CurrentMonthCalculationMissing
-                    handleCalculateButtonOnClick={handleCalculateButtonOnClick}
-                    isLoading={isLoading}
-                />
+        <>
+            {error && (
+                <ErrorSummary label={(error as {data: {message: string}})?.data?.message}>
+                    {(error as {data: {fields: [{field: string; message: string}]}})?.data?.fields.map(
+                        (field, index) => (
+                            <p key={`error-${field.field}-${index}`}>
+                                <b>Virhe {index + 1}:</b> {field.message}
+                            </p>
+                        )
+                    )}
+                </ErrorSummary>
             )}
-            <GenericActionModal
-                title="Rajaneliöhinnan laskenta"
-                modalIcon={<IconCogwheels />}
-                isModalOpen={isModalOpen}
-                closeModal={closeModal}
-                confirmButton={<DownloadSurfaceAreaPriceCeilingResultsButton extraOnClickAction={closeModal} />}
-            >
-                <>
-                    <p>Rajaneliöhinnan laskenta on suoritettu onnistuneesti.</p>
-                    <p>
-                        Rajaneliöhinnan laskennan tulos Hitas-vuosineljännelle {getHitasQuarterFullLabel(currentMonth)}{" "}
-                        on <b>{calculationData !== undefined ? calculationData[0].value : "VIRHE"}</b>
-                    </p>
-                    <p>Haluatko ladata laskentaraportin?</p>
-                </>
-            </GenericActionModal>
-        </div>
+            <div className="price-ceiling-calculation">
+                {isCurrentQuarterCalculated ? (
+                    <CurrentMonthCalculationExists sapcIndexData={sapcIndexData} />
+                ) : (
+                    <CurrentMonthCalculationMissing
+                        handleCalculateButtonOnClick={handleCalculateButtonOnClick}
+                        isLoading={isLoading}
+                    />
+                )}
+                <GenericActionModal
+                    title="Rajaneliöhinnan laskenta"
+                    modalIcon={<IconCogwheels />}
+                    isModalOpen={isModalOpen}
+                    closeModal={closeModal}
+                    confirmButton={<DownloadSurfaceAreaPriceCeilingResultsButton extraOnClickAction={closeModal} />}
+                >
+                    <>
+                        <p>Rajaneliöhinnan laskenta on suoritettu onnistuneesti.</p>
+                        <p>
+                            Rajaneliöhinnan laskennan tulos Hitas-vuosineljännelle{" "}
+                            {getHitasQuarterFullLabel(currentMonth)} on{" "}
+                            <b>{calculationData !== undefined ? calculationData[0].value : "VIRHE"}</b>
+                        </p>
+                        <p>Haluatko ladata laskentaraportin?</p>
+                    </>
+                </GenericActionModal>
+            </div>
+        </>
     );
 };
 
