@@ -51,7 +51,7 @@ class RulesPre2011(CalculatorRules):
         apartment_improvements: Iterable[ApartmentConstructionPriceImprovementWithIndex],
         housing_company_improvements: Iterable[HousingCompanyConstructionPriceImprovementWithIndex],
         calculation_date: datetime.date,
-        housing_company_completion_date: datetime.date,
+        housing_company_completion_date: datetime.date,  # unused in old-hitas rules
     ) -> IndexCalculation:
         if not apartment.realized_housing_company_acquisition_price:
             raise InvalidCalculationResultException(
@@ -165,7 +165,7 @@ class RulesPre2011(CalculatorRules):
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
-                completion_date=housing_company_completion_date,
+                completion_date=apartment.completion_date,
                 completion_date_index=apartment.completion_date_cpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_cpi,
@@ -181,7 +181,7 @@ class RulesPre2011(CalculatorRules):
         apartment_improvements: Iterable[ApartmentMarketPriceImprovementWithIndex],
         housing_company_improvements: Iterable[HousingCompanyMarketPriceImprovementWithIndex],
         calculation_date: datetime.date,
-        housing_company_completion_date: datetime.date,
+        housing_company_completion_date: datetime.date,  # unused in old-hitas rules
     ) -> IndexCalculation:
         # Start calculations
 
@@ -267,7 +267,7 @@ class RulesPre2011(CalculatorRules):
                 debt_free_price_m2=debt_free_shares_price / apartment.surface_area,
                 apartment_share_of_housing_company_loans=apartment_share_of_housing_company_loans,
                 apartment_share_of_housing_company_loans_date=apartment_share_of_housing_company_loans_date,
-                completion_date=housing_company_completion_date,
+                completion_date=apartment.completion_date,
                 completion_date_index=apartment.completion_date_mpi,
                 calculation_date=calculation_date,
                 calculation_date_index=apartment.calculation_date_mpi,

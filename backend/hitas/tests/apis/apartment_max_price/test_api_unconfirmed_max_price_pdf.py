@@ -6,6 +6,7 @@ from typing import Literal, NamedTuple
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from pypdf import PdfReader
 from rest_framework import status
 
@@ -142,6 +143,14 @@ def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPI
         sales__apartment_share_of_housing_company_loans=15000,
     )
 
+    # Create another apartment with a later completion date.
+    # As Old-Hitas rules use the apartment completion date for the maximum price calculation,
+    # this apartment should not affect the calculation.
+    ApartmentFactory.create(
+        completion_date=datetime.date(2011, 1, 1),
+        building__real_estate__housing_company=apartment.housing_company,
+    )
+
     ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
 
     body = PDFBodyFactory.create(
@@ -149,7 +158,7 @@ def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPI
         texts=["||foo||", "||bar||", "||baz||"],
     )
 
-    this_month = datetime.date.today().replace(day=1)
+    this_month = timezone.now().date().replace(day=1)
     completion_month = apartment.completion_date.replace(day=1)
 
     # Completion month indices
@@ -300,7 +309,7 @@ def test__api__unconfirmed_max_price_pdf__indices_missing(
         texts=["||foo||", "||bar||", "||baz||"],
     )
 
-    this_month = datetime.date.today().replace(day=1)
+    this_month = timezone.now().date().replace(day=1)
     completion_month = apartment.completion_date.replace(day=1)
 
     # Completion month indices
@@ -361,7 +370,7 @@ def test__api__unconfirmed_max_price_pdf__past_date(api_client: HitasAPIClient, 
         texts=["||foo||", "||bar||", "||baz||"],
     )
 
-    this_month = datetime.date.today().replace(day=1)
+    this_month = timezone.now().date().replace(day=1)
     past_month = datetime.date(2021, 5, 1)
     completion_month = apartment.completion_date.replace(day=1)
 
@@ -552,7 +561,7 @@ def test__api__unconfirmed_max_price_pdf__missing_template(api_client: HitasAPIC
         sales__apartment_share_of_housing_company_loans=15000,
     )
 
-    this_month = datetime.date.today().replace(day=1)
+    this_month = timezone.now().date().replace(day=1)
     completion_month = apartment.completion_date.replace(day=1)
 
     # Completion month indices

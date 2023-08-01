@@ -351,14 +351,11 @@ def fetch_apartment(
                     output_field=HitasModelDecimalField(),
                 )
             ),
-            completion_month=Value(
-                housing_company.completion_date and monthify(housing_company.completion_date or None),
-                output_field=models.DateField(),
-            ),
         )
     )
 
     # New Hitas
+    # Index date is selected by housing company completion date
     if is_new_hitas:
         qs = qs.prefetch_related(
             # New hitas apartment improvements are not counted, so we don't need to fetch them here
@@ -393,6 +390,10 @@ def fetch_apartment(
                 ),
             ),
         ).annotate(
+            completion_month=Value(
+                housing_company.completion_date and monthify(housing_company.completion_date or None),
+                output_field=models.DateField(),
+            ),
             calculation_date_cpi_2005eq100=Subquery(
                 queryset=(ConstructionPriceIndex2005Equal100.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
@@ -420,6 +421,7 @@ def fetch_apartment(
         )
 
     # Old Hitas
+    # Index date is selected by the apartment completion date
     else:
         qs = qs.prefetch_related(
             Prefetch(
@@ -467,6 +469,7 @@ def fetch_apartment(
                 ),
             ),
         ).annotate(
+            completion_month=TruncMonth("completion_date"),
             calculation_date_cpi=Subquery(
                 queryset=(ConstructionPriceIndex.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
