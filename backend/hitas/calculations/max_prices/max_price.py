@@ -1,9 +1,11 @@
 import dataclasses
 import datetime
 import uuid
+from decimal import Decimal
 from typing import Any, Dict, Optional
 
-from django.db.models import Case, F, OuterRef, Prefetch, Q, Subquery, Sum, When
+from django.db import models
+from django.db.models import Case, F, OuterRef, Prefetch, Q, Subquery, Sum, Value, When
 from django.db.models.functions import Coalesce, Round, TruncMonth
 from django.utils import timezone
 
@@ -36,6 +38,14 @@ from hitas.services.apartment import (
 from hitas.utils import SQSum, max_date_if_all_not_null, monthify, safe_attrgetter
 
 
+class HousingCompanyWithAnnotationsMaxPrice(HousingCompany):
+    _completion_date: Optional[datetime.date]
+    sum_surface_area: Optional[Decimal]
+
+    class Meta:
+        abstract = True
+
+
 def create_max_price_calculation(
     housing_company_uuid: uuid.UUID,
     apartment_uuid: uuid.UUID,
@@ -44,19 +54,21 @@ def create_max_price_calculation(
     apartment_share_of_housing_company_loans_date: datetime.date,
     additional_info: Optional[str],
 ) -> Dict[str, Any]:
-    housing_company_completion_date = get_housing_company_completion_date(housing_company_uuid)
+    housing_company = HousingCompany.objects.annotate(
+        _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
+        sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
+    ).get(uuid=housing_company_uuid)
 
-    if housing_company_completion_date is None:
+    if housing_company.completion_date is None:
         raise InvalidCalculationResultException(
             error_code="missing_housing_company_completion_date",
             message="Cannot create max price calculation for a housing company without completion date.",
         )
 
     apartment = fetch_apartment(
-        housing_company_uuid=housing_company_uuid,
+        housing_company=housing_company,
         apartment_uuid=apartment_uuid,
         calculation_month=monthify(calculation_date),
-        housing_company_completion_month=monthify(housing_company_completion_date),
     )
 
     validate_apartment_for_max_price_calculation(apartment)
@@ -65,9 +77,9 @@ def create_max_price_calculation(
     # Do the calculation
     #
     calculation = calculate_max_price(
+        housing_company,
         apartment,
         calculation_date,
-        housing_company_completion_date,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
         additional_info,
@@ -90,19 +102,6 @@ def create_max_price_calculation(
     calculation["confirmed_at"] = None
 
     return calculation
-
-
-def get_housing_company_completion_date(housing_company_uuid: uuid.UUID) -> Optional[datetime.date]:
-    completion_date: Optional[datetime.date] = (
-        HousingCompany.objects.filter(uuid=housing_company_uuid)
-        .annotate(
-            completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
-        )
-        .values_list("completion_date", flat=True)
-        .first()
-    )
-
-    return completion_date
 
 
 def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotationsMaxPrice):
@@ -142,25 +141,15 @@ def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotat
 
 
 def calculate_max_price(
+    housing_company: HousingCompanyWithAnnotationsMaxPrice,
     apartment: ApartmentWithAnnotationsMaxPrice,
     calculation_date: datetime.date,
-    housing_company_completion_date: datetime.date,
     apartment_share_of_housing_company_loans: int,
     apartment_share_of_housing_company_loans_date: datetime.date,
     additional_info: str = "",
 ) -> Dict[str, Any]:
-    #
-    # Fetch housing company's total surface area
-    #
-    total_surface_area = (
-        HousingCompany.objects.annotate(sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"))
-        .only("id")
-        .get(id=apartment.housing_company.id)
-        .sum_surface_area
-    )
-
     # Select calculator
-    new_hitas_ruleset = apartment.housing_company.hitas_type.new_hitas_ruleset
+    new_hitas_ruleset = housing_company.hitas_type.new_hitas_ruleset
     max_price_calculator = Rules2011Onwards() if new_hitas_ruleset else RulesPre2011()
 
     #
@@ -173,23 +162,23 @@ def calculate_max_price(
     #
     construction_price_index = max_price_calculator.calculate_construction_price_index_max_price(
         apartment,
-        total_surface_area,
+        housing_company.sum_surface_area,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
         apartment.construction_price_improvements.all(),
         apartment.housing_company.construction_price_improvements.all(),
         calculation_date,
-        housing_company_completion_date,
+        housing_company.completion_date,
     )
     market_price_index = max_price_calculator.calculate_market_price_index_max_price(
         apartment,
-        total_surface_area,
+        housing_company.sum_surface_area,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
         apartment.market_price_improvements.all(),
         apartment.housing_company.market_price_improvements.all(),
         calculation_date,
-        housing_company_completion_date,
+        housing_company.completion_date,
     )
     surface_area_price_ceiling = max_price_calculator.calculate_surface_area_price_ceiling(
         apartment,
@@ -277,12 +266,11 @@ def calculate_max_price(
 
 
 def fetch_apartment(
-    housing_company_uuid: uuid.UUID,
+    housing_company: HousingCompany,
     apartment_uuid: uuid.UUID,
     calculation_month: datetime.date,
-    housing_company_completion_month: datetime.date,
 ) -> ApartmentWithAnnotationsMaxPrice:
-    is_new_hitas = HousingCompany.objects.only("hitas_type").get(uuid=housing_company_uuid).hitas_type.new_hitas_ruleset
+    is_new_hitas = housing_company.hitas_type.new_hitas_ruleset
 
     qs = (
         Apartment.objects.select_related(
@@ -317,7 +305,7 @@ def fetch_apartment(
                     SQSum(
                         queryset=(
                             Apartment.objects.filter(
-                                building__real_estate__housing_company__uuid=housing_company_uuid,
+                                building__real_estate__housing_company=housing_company,
                             )
                             .annotate(
                                 _price=Case(
@@ -342,7 +330,7 @@ def fetch_apartment(
                     SQSum(
                         queryset=(
                             Apartment.objects.filter(
-                                building__real_estate__housing_company__uuid=housing_company_uuid,
+                                building__real_estate__housing_company=housing_company,
                                 completion_date=OuterRef("completion_date"),
                             )
                             .annotate(
@@ -363,6 +351,10 @@ def fetch_apartment(
                     output_field=HitasModelDecimalField(),
                 )
             ),
+            completion_month=Value(
+                housing_company.completion_date and monthify(housing_company.completion_date or None),
+                output_field=models.DateField(),
+            ),
         )
     )
 
@@ -379,7 +371,7 @@ def fetch_apartment(
                     completion_date_index_2005eq100=Subquery(
                         queryset=(
                             ConstructionPriceIndex2005Equal100.objects.filter(
-                                month=OuterRef("completion_month")
+                                month=OuterRef("completion_month"),
                             ).values("value")
                         ),
                         output_field=HitasModelDecimalField(null=True),
@@ -392,9 +384,9 @@ def fetch_apartment(
                     completion_month=TruncMonth("completion_date"),
                     completion_date_index_2005eq100=Subquery(
                         queryset=(
-                            MarketPriceIndex2005Equal100.objects.filter(month=OuterRef("completion_month")).values(
-                                "value"
-                            )
+                            MarketPriceIndex2005Equal100.objects.filter(
+                                month=OuterRef("completion_month"),
+                            ).values("value")
                         ),
                         output_field=HitasModelDecimalField(null=True),
                     ),
@@ -402,33 +394,25 @@ def fetch_apartment(
             ),
         ).annotate(
             calculation_date_cpi_2005eq100=Subquery(
-                queryset=(
-                    ConstructionPriceIndex2005Equal100.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
+                queryset=(ConstructionPriceIndex2005Equal100.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             completion_date_cpi_2005eq100=Subquery(
                 queryset=(
                     ConstructionPriceIndex2005Equal100.objects.filter(
-                        month=housing_company_completion_month,
+                        month=OuterRef("completion_month"),
                     ).values("value")
                 ),
                 output_field=HitasModelDecimalField(null=True),
             ),
             calculation_date_mpi_2005eq100=Subquery(
-                queryset=(
-                    MarketPriceIndex2005Equal100.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
+                queryset=(MarketPriceIndex2005Equal100.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             completion_date_mpi_2005eq100=Subquery(
                 queryset=(
                     MarketPriceIndex2005Equal100.objects.filter(
-                        month=housing_company_completion_month,
+                        month=OuterRef("completion_month"),
                     ).values("value")
                 ),
                 output_field=HitasModelDecimalField(null=True),
@@ -484,37 +468,21 @@ def fetch_apartment(
             ),
         ).annotate(
             calculation_date_cpi=Subquery(
-                queryset=(
-                    ConstructionPriceIndex.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
+                queryset=(ConstructionPriceIndex.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             completion_date_cpi=Subquery(
-                queryset=(
-                    ConstructionPriceIndex.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
+                queryset=(ConstructionPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             calculation_date_mpi=Subquery(
-                queryset=(
-                    MarketPriceIndex.objects.filter(
-                        month=calculation_month,
-                    ).values("value")
-                ),
+                queryset=(MarketPriceIndex.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             completion_date_mpi=Subquery(
-                queryset=(
-                    MarketPriceIndex.objects.filter(
-                        month=housing_company_completion_month,
-                    ).values("value")
-                ),
+                queryset=(MarketPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
         )
 
-    return qs.get(uuid=apartment_uuid, building__real_estate__housing_company__uuid=housing_company_uuid)
+    return qs.get(uuid=apartment_uuid, building__real_estate__housing_company=housing_company)

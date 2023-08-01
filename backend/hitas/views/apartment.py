@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q
 from django.db.models.expressions import Case, F, Subquery, When
-from django.db.models.functions import TruncMonth
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -22,7 +21,6 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
 from hitas.calculations.exceptions import IndexMissingException
-from hitas.calculations.max_prices.max_price import get_housing_company_completion_date
 from hitas.exceptions import HitasModelNotFound, ModelConflict
 from hitas.models import (
     Apartment,
@@ -864,7 +862,6 @@ class ApartmentViewSet(HitasModelViewSet):
             _first_purchase_date=get_first_sale_purchase_date("id"),
             _latest_sale_purchase_price=get_latest_sale_purchase_price("id"),
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
-            completion_month=TruncMonth("completion_date"),  # Used for calculating indexes
         )
         return annotate_apartment_unconfirmed_prices(
             queryset=qs,
