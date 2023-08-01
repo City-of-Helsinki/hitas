@@ -9,6 +9,8 @@ import {FilterTextInputField} from "./filters";
 import {QueryStateHandler} from "./index";
 
 const DownloadSurfaceAreaPriceCeilingReportButton = ({calculation}) => {
+    if (calculation.value === undefined) return null;
+
     return (
         <div className="text-right">
             <DownloadButton
