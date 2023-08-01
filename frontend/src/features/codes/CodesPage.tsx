@@ -29,9 +29,11 @@ const CodesPage = (): React.JSX.Element => {
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--postalcodes">
                     <h1>Postinumerot</h1>
+                    <p>Tämä sivu on vielä työn alla.</p>
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--financing-methods">
                     <h1>Rahoitusmuodot</h1>
+                    <p>Tämä sivu on vielä työn alla.</p>
                 </Tabs.TabPanel>
                 <Tabs.TabPanel className="view--codes__tab--owners">
                     <MutateSearchList
