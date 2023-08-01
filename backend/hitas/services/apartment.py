@@ -1,9 +1,10 @@
 import datetime
 from typing import Collection, Optional, overload
+from uuid import UUID
 
 from django.db import models
-from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum
-from django.db.models.functions import Cast, Coalesce
+from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum, Value
+from django.db.models.functions import Cast, Coalesce, TruncMonth
 
 from hitas.models import (
     ConstructionPriceIndex,
@@ -15,7 +16,7 @@ from hitas.models import (
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
 from hitas.models.apartment_sale import ApartmentSale
-from hitas.utils import SQSum, subquery_first_id
+from hitas.utils import SQSum, monthify, subquery_first_id
 
 
 def prefetch_first_sale(lookup_prefix: str = "", ignore: Collection = ()) -> Prefetch:
@@ -217,14 +218,14 @@ def aggregate_catalog_prices_where_no_sales() -> Coalesce:
 
 
 def annotate_apartment_unconfirmed_prices(
+    apartment_uuid: UUID,
     queryset: QuerySet[Apartment],
     housing_company: HousingCompany,
     calculation_date: datetime.date,
 ) -> QuerySet[Apartment]:
     """
     Annotate apartments with their unconfirmed maximum prices.
-
-    Intended only for a single housing company, as this only takes in a single completion date.
+    Intended only for a single apartment at a time.
     """
 
     from hitas.services.indices import (
@@ -232,32 +233,32 @@ def annotate_apartment_unconfirmed_prices(
         subquery_apartment_first_sale_acquisition_price_index_adjusted,
     )
 
-    completion_date: Optional[datetime.date] = housing_company.completion_date
-
-    queryset = queryset.annotate(
-        sapc=subquery_apartment_current_surface_area_price(
-            calculation_date=calculation_date,
-        )
-    )
-
     null_decimal_field = Cast(None, output_field=HitasModelDecimalField())
+
     if housing_company.hitas_type.new_hitas_ruleset:
         queryset = queryset.annotate(
+            completion_month=Value(
+                housing_company.completion_date and monthify(housing_company.completion_date or None),
+                output_field=models.DateField(),
+            ),
             cpi=null_decimal_field,
             mpi=null_decimal_field,
             cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex2005Equal100,
-                completion_date=completion_date,
+                completion_date=housing_company.completion_date,
                 calculation_date=calculation_date,
             ),
             mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex2005Equal100,
-                completion_date=completion_date,
+                completion_date=housing_company.completion_date,
                 calculation_date=calculation_date,
             ),
         )
     else:
+        # Actual completion date value is required for deprecation calculations, and we can't use `OuterRef` for it here
+        completion_date = Apartment.objects.only("completion_date").get(uuid=apartment_uuid).completion_date
         queryset = queryset.annotate(
+            completion_month=TruncMonth("completion_date"),
             cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
                 completion_date=completion_date,
@@ -271,5 +272,9 @@ def annotate_apartment_unconfirmed_prices(
             cpi_2005_100=null_decimal_field,
             mpi_2005_100=null_decimal_field,
         )
+
+    queryset = queryset.annotate(
+        sapc=subquery_apartment_current_surface_area_price(calculation_date=calculation_date),
+    )
 
     return queryset

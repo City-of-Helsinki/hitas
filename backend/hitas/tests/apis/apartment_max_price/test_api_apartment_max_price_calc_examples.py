@@ -494,9 +494,11 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
         sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
     )
-    # Create another apartment with rest of the surface area
+    # Create another apartment with a later completion date and rest of the surface area.
+    # As Old-Hitas rules use the apartment completion date for the maximum price calculation,
+    # this apartment should not affect the calculation.
     ApartmentFactory.create(
-        completion_date=datetime.date(2003, 5, 9),
+        completion_date=datetime.date(2003, 6, 9),
         building__real_estate__housing_company=a.housing_company,
         surface_area=3336,
         share_number_start=3,
@@ -627,7 +629,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "debt_free_price_m2": 3326.51,
             "apartment_share_of_housing_company_loans": 0,
             "apartment_share_of_housing_company_loans_date": "2022-09-05",
-            "completion_date": "2003-05-09",
+            "completion_date": str(a.completion_date),
             "completion_date_index": 244.9,
             "calculation_date": "2022-09-07",
             "calculation_date_index": 364.4,
@@ -743,7 +745,7 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
             "debt_free_price_m2": 5759.04,
             "apartment_share_of_housing_company_loans": 0,
             "apartment_share_of_housing_company_loans_date": "2022-09-05",
-            "completion_date": "2003-05-09",
+            "completion_date": str(a.completion_date),
             "completion_date_index": 263.6,
             "calculation_date": "2022-09-07",
             "calculation_date_index": 583.3,
@@ -797,9 +799,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
         sales__apartment_share_of_housing_company_loans=0.5,
     )
     # Create another apartment with a later completion date and rest of the acquisition price.
-    # Now the completion date used in the calculation should be this apartments completion date, since
-    # it becomes the latest apartment in the housing company, and thus its completion date is used for the
-    # housing company's completion date.
+    # As Old-Hitas rules use the apartment completion date for the maximum price calculation,
+    # this apartment should not affect the calculation.
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         completion_date=datetime.date(2012, 7, 28),
@@ -829,8 +830,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
     o1: Ownership = OwnershipFactory.create(percentage=100.0, sale=sale)
 
     # Create necessary housing company's completion date indices
-    ConstructionPriceIndexFactory.create(month=datetime.date(2012, 7, 1), value=296.10)
-    MarketPriceIndexFactory.create(month=datetime.date(2012, 7, 1), value=263.60)
+    ConstructionPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=296.10)
+    MarketPriceIndexFactory.create(month=datetime.date(2012, 6, 1), value=263.60)
 
     # Create necessary calculation date indices
     ConstructionPriceIndexFactory.create(month=datetime.date(2022, 11, 1), value=364.60)
@@ -950,7 +951,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "debt_free_price_m2": 5228.62,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
-            "completion_date": "2012-07-28",
+            "completion_date": str(a.completion_date),
             "completion_date_index": 296.10,
             "calculation_date": "2022-11-21",
             "calculation_date_index": 364.6,
@@ -1002,7 +1003,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "debt_free_price_m2": 8564.47,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
-            "completion_date": "2012-07-28",
+            "completion_date": str(a.completion_date),
             "completion_date_index": 263.6,
             "calculation_date": "2022-11-21",
             "calculation_date_index": 567.1,

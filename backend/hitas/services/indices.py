@@ -315,17 +315,17 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     """
     If 'completion_date' is missing, calculating index for that month will fail
     and index price will be null, so we can skip this calculation freely
+
+    Requires `completion_month` to be annotated to the queryset
     """
     if completion_date is None:
         return RoundWithPrecision(None, output_field=HitasModelDecimalField())
-
-    completion_month = monthify(completion_date)
 
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
 
     original_value = Subquery(
-        table.objects.filter(month=completion_month).values("value"),
+        table.objects.filter(month=OuterRef("completion_month")).values("value"),
         output_field=HitasModelDecimalField(),
     )
     current_value = Subquery(

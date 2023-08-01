@@ -864,6 +864,7 @@ class ApartmentViewSet(HitasModelViewSet):
             _latest_purchase_date=get_latest_sale_purchase_date("id"),
         )
         return annotate_apartment_unconfirmed_prices(
+            apartment_uuid=self.kwargs["uuid"],
             queryset=qs,
             housing_company=housing_company,
             calculation_date=calculation_date,

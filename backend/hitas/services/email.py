@@ -132,6 +132,7 @@ def get_apartment_for_unconfirmed_max_price_calculation(
         )
     )
     qs = annotate_apartment_unconfirmed_prices(
+        apartment_uuid=apartment_id,
         queryset=qs,
         housing_company=housing_company,
         calculation_date=calculation_date,
