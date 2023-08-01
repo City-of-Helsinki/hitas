@@ -328,40 +328,24 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
         table.objects.filter(month=completion_month).values("value"),
         output_field=HitasModelDecimalField(),
     )
-
     current_value = Subquery(
         table.objects.filter(month=calculation_month).values("value"),
         output_field=HitasModelDecimalField(),
     )
 
+    # Initialize default values
     depreciation: Value = Value(1, output_field=HitasModelDecimalField())
-    interest: Union[Case, Value] = Value(0, output_field=HitasModelDecimalField())
+    interest: Union[Case, Value, Coalesce] = Value(0, output_field=HitasModelDecimalField())
 
+    # Override values based on table type for Old Hitas ruleset
     if issubclass(table, MarketPriceIndex):
-        interest = Case(
-            When(
-                condition=~Q(
-                    building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
-                ),
-                then=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
-            ),
-            default=0,
-            output_field=HitasModelDecimalField(),
-        )
+        interest = Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField())
     elif issubclass(table, ConstructionPriceIndex):
         depreciation = Value(
             depreciation_multiplier(months_between_dates(completion_date, calculation_date)),
             output_field=HitasModelDecimalField(),
         )
-
         interest = Case(
-            # Check for exceptions where old ruleset is not used
-            When(
-                condition=Q(
-                    building__real_estate__housing_company__hitas_type__in=HitasType.with_new_hitas_ruleset(),
-                ),
-                then=0,
-            ),
             When(
                 condition=Q(completion_date__lt=datetime.date(2005, 1, 1)),
                 then=Coalesce(F("interest_during_construction_14"), 0, output_field=HitasModelDecimalField()),
