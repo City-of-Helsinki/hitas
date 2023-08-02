@@ -30,16 +30,20 @@ const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousing
             <div>
                 <StatusLabel>{getHousingCompanyHitasTypeName(housingCompany.hitas_type)}</StatusLabel>
                 <StatusLabel>{housingCompany.completed ? "Valmis" : "Ei valmis"}</StatusLabel>
+
                 {housingCompany.completed ? (
                     <>
-                        <StatusLabel>
-                            {housingCompany.over_thirty_years_old ? "Yli 30 vuotta" : "Alle 30 vuotta"}
-                        </StatusLabel>
+                        {housingCompany.hitas_type !== "half_hitas" ? (
+                            <StatusLabel>
+                                {housingCompany.over_thirty_years_old ? "Yli 30 vuotta" : "Alle 30 vuotta"}
+                            </StatusLabel>
+                        ) : null}
                         <StatusLabel>
                             {getHousingCompanyRegulationStatusName(housingCompany.regulation_status)}
                         </StatusLabel>
                     </>
                 ) : null}
+
                 {housingCompany.exclude_from_statistics ? <StatusLabel>Ei tilastoihin</StatusLabel> : null}
             </div>
         </>
