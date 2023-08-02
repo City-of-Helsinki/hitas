@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import F, OuterRef, Prefetch, QuerySet, Subquery, Sum, Value
 from django.db.models.functions import Cast, Coalesce, TruncMonth
 
+from hitas.exceptions import HitasModelNotFound
 from hitas.models import (
     ConstructionPriceIndex,
     ConstructionPriceIndex2005Equal100,
@@ -255,18 +256,32 @@ def annotate_apartment_unconfirmed_prices(
             ),
         )
     else:
-        # Actual completion date value is required for deprecation calculations, and we can't use `OuterRef` for it here
-        completion_date = Apartment.objects.only("completion_date").get(uuid=apartment_uuid).completion_date
+        # Completion date is required to calculate depreciation
+        # For old hitas CPI max price, we use completion date or first sale purchase date, whichever is later
+        apartment = (
+            Apartment.objects.filter(uuid=apartment_uuid)
+            .annotate(_first_sale_purchase_date=get_first_sale_purchase_date("id"))
+            .only("completion_date")
+            .first()
+        )
+        if apartment is None:
+            raise HitasModelNotFound(model=Apartment)
+
+        if apartment.completion_date and apartment._first_sale_purchase_date:
+            cpi_completion_date = max(apartment.completion_date, apartment._first_sale_purchase_date)
+        else:
+            cpi_completion_date = apartment.completion_date or apartment._first_sale_purchase_date
+
         queryset = queryset.annotate(
             completion_month=TruncMonth("completion_date"),
             cpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex,
-                completion_date=completion_date,
+                completion_date=cpi_completion_date,
                 calculation_date=calculation_date,
             ),
             mpi=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex,
-                completion_date=completion_date,
+                completion_date=apartment.completion_date,
                 calculation_date=calculation_date,
             ),
             cpi_2005_100=null_decimal_field,

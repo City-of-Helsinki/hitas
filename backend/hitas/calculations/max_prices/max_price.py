@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 
 from django.db import models
 from django.db.models import Case, F, OuterRef, Prefetch, Q, Subquery, Sum, Value, When
-from django.db.models.functions import Coalesce, Round, TruncMonth
+from django.db.models.functions import Coalesce, Greatest, Round, TruncMonth
 from django.utils import timezone
 
 from hitas.calculations.exceptions import InvalidCalculationResultException
@@ -32,6 +32,7 @@ from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
 from hitas.services.apartment import (
     get_first_sale_acquisition_price,
     get_first_sale_loan_amount,
+    get_first_sale_purchase_date,
     get_first_sale_purchase_price,
     prefetch_latest_sale,
 )
@@ -289,6 +290,7 @@ def fetch_apartment(
             ),
         )
         .annotate(
+            _first_sale_purchase_date=get_first_sale_purchase_date("id"),
             _first_sale_purchase_price=get_first_sale_purchase_price("id"),
             _first_sale_share_of_housing_company_loans=get_first_sale_loan_amount("id"),
             surface_area_price_ceiling_m2=Subquery(
@@ -470,12 +472,19 @@ def fetch_apartment(
             ),
         ).annotate(
             completion_month=TruncMonth("completion_date"),
+            cpi_completion_month=TruncMonth(Greatest("completion_month", "_first_sale_purchase_date")),
             calculation_date_cpi=Subquery(
                 queryset=(ConstructionPriceIndex.objects.filter(month=calculation_month).values("value")),
                 output_field=HitasModelDecimalField(null=True),
             ),
             completion_date_cpi=Subquery(
-                queryset=(ConstructionPriceIndex.objects.filter(month=OuterRef("completion_month")).values("value")),
+                queryset=(
+                    ConstructionPriceIndex.objects.filter(
+                        # Special rule for Old Hitas CPI:
+                        # Index date is chosen by apartment completion date or the first sale date, whichever is latest
+                        month=OuterRef("cpi_completion_month"),
+                    ).values("value")
+                ),
                 output_field=HitasModelDecimalField(null=True),
             ),
             calculation_date_mpi=Subquery(
