@@ -39,14 +39,15 @@ from hitas.tests.factories.indices import (
 def test__api__apartment_max_price__construction_price_index__2011_onwards(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
         additional_work_during_construction=0,
-        completion_date=datetime.date(2019, 11, 27),
+        completion_date=datetime.date(2018, 11, 27),
         surface_area=30.0,
         share_number_start=18402,
         share_number_end=20784,
         sales=[],
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
     )
-    # Create another apartment with rest of the surface area
+    # Create another apartment with rest of the surface area and later completion date
+    # The latest completed apartment in the company determines which indices are used for the calculation for New Hitas
     ApartmentFactory.create(
         building__real_estate__housing_company=a.housing_company,
         completion_date=datetime.date(2019, 11, 27),
@@ -281,6 +282,18 @@ def test__api__apartment_max_price__construction_price_index__2011_onwards(api_c
     response_json = response.json()
     assert_id(response_json.pop("id"))
     assert_created(response_json.pop("created_at"))
+
+    # Update first sale date to after apartment completion date, this should have no effect on the calculation
+    sale.purchase_date = datetime.date(2018, 11, 27)  # Later than apartment completion date
+    sale.save()
+    sale.refresh_from_db()
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+    assert response.json()["calculations"] == calculations
 
 
 @pytest.mark.django_db
@@ -1024,6 +1037,85 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
         },
+    }
+
+    # Update first sale date to after apartment completion date, sale date is used instead of apartment completion date
+    sale.purchase_date = datetime.date(2013, 6, 28)  # Later than apartment completion date
+    sale.save()
+    sale.refresh_from_db()
+    ConstructionPriceIndexFactory.create(month=datetime.date(2013, 6, 1), value=1337)
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]),
+        data=data,
+        format="json",
+    )
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    response_json = response.json()
+    construction_price_index_calculation = response_json["calculations"]["construction_price_index"]
+    assert construction_price_index_calculation == {
+        "calculation_variables": {
+            "housing_company_acquisition_price": 4_512_344.21,
+            "housing_company_assets": 4_961_134.2,
+            "apartment_share_of_housing_company_assets": 52178.07,
+            "interest_during_construction": 2703.0,
+            "interest_during_construction_percentage": 6,
+            "additional_work_during_construction": 2500.0,
+            "index_adjusted_additional_work_during_construction": 681.75,
+            "apartment_improvements": {
+                "items": [
+                    {
+                        "name": cpi_improvement.name,
+                        "value": 15_000.0,
+                        "completion_date": "2020-06-01",
+                        "calculation_date_index": 364.6,
+                        "completion_date_index": 316.33,
+                        "index_adjusted": 17_288.91,
+                        "depreciation": {
+                            "amount": 4178.15,
+                            "percentage": 10.0,
+                            "time": {
+                                "years": 2,
+                                "months": 5,
+                            },
+                        },
+                        "value_for_apartment": 13_110.75,
+                    }
+                ],
+                "summary": {
+                    "value": 15_000.0,
+                    "index_adjusted": 17288.91,
+                    "depreciation": 4178.15,
+                    "value_for_apartment": 13110.75,
+                },
+            },
+            "housing_company_improvements": {
+                "items": [
+                    {
+                        "name": cpi_hc_improvement.name,
+                        "value": 1_000_000.00,
+                        "value_for_apartment": 448_790.0,
+                        "completion_date": "2018-02-01",
+                    },
+                ],
+                "summary": {
+                    "value": 1_000_000.00,
+                    "value_for_apartment": 448_790.0,
+                },
+            },
+            "debt_free_price": 68673.58,
+            "debt_free_price_m2": 1509.31,
+            "apartment_share_of_housing_company_loans": 3000,
+            "apartment_share_of_housing_company_loans_date": "2022-11-20",
+            "completion_date": str(a.completion_date),
+            "completion_date_index": 1337.0,
+            "calculation_date": "2022-11-21",
+            "calculation_date_index": 364.6,
+        },
+        "maximum_price": 65673.58,
+        "valid_until": "2023-02-21",
+        "maximum": False,
     }
 
 

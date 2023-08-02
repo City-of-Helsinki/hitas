@@ -58,6 +58,10 @@ class ApartmentFactory(DjangoModelFactory):
 
         if extracted is None:
             kwargs.setdefault("apartment", self)
+            if self.completion_date:
+                # Use completion date as default for purchase date, as this can affect the indices for
+                # old-hitas CPI calculations, when the apartment was sold after the completion date.
+                kwargs.setdefault("purchase_date", self.completion_date)
             extracted = [ApartmentSaleFactory.create(**kwargs)]
 
         for ownership in extracted:
