@@ -87,7 +87,9 @@ const UnconfirmedPricesDownloadModalButton = () => {
                         unconfirmedPrices.market_price_index.value &&
                         unconfirmedPrices.construction_price_index.value &&
                         unconfirmedPrices.surface_area_price_ceiling.value
-                    ) || housingCompany.regulation_status !== "regulated"
+                    ) ||
+                    housingCompany.regulation_status !== "regulated" ||
+                    housingCompany.hitas_type === "half_hitas"
                 }
             />
             <GenericActionModal
@@ -156,9 +158,9 @@ const MaximumPriceDownloadModalButton = () => {
                 onClick={() => setIsModalOpen(true)}
                 size="small"
                 disabled={
-                    !apartment.prices.maximum_prices.confirmed ||
-                    !apartment.prices.maximum_prices.confirmed.id ||
-                    housingCompany.regulation_status !== "regulated"
+                    !apartment.prices.maximum_prices.confirmed?.id ||
+                    housingCompany.regulation_status !== "regulated" ||
+                    housingCompany.hitas_type === "half_hitas"
                 }
             />
             <GenericActionModal
