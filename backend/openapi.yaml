@@ -7554,6 +7554,7 @@ components:
         - half_hitas
         - rental_hitas_1
         - rental_hitas_2
+        - rr_new_hitas
       type: string
       example: hitas_1
       x-extensible-enum:
@@ -7567,6 +7568,7 @@ components:
         - half_hitas
         - rental_hitas_1
         - rental_hitas_2
+        - rr_new_hitas
 
     ReadOnlyPropertyManager:
       description: Read-only Property manager information

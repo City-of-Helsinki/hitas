@@ -43,6 +43,8 @@ class HitasType(Enum):
     RENTAL_HITAS_I = "rental_hitas_1"
     # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa, Ei sisällytetä tilastoihin
     RENTAL_HITAS_II = "rental_hitas_2"
+    # Uudet säännöt. Ryhmärakentamiskohde, jälleenmyynti sallittu vaikka taloyhtiö ei ole vielä valmis
+    RR_NEW_HITAS = "rr_new_hitas"
 
     class Labels:
         NON_HITAS = _("Ei Hitas")
@@ -55,6 +57,7 @@ class HitasType(Enum):
         HALF_HITAS = _("Puolihitas")
         RENTAL_HITAS_I = _("Vuokratalo Hitas I")
         RENTAL_HITAS_II = _("Vuokratalo Hitas II")
+        RR_NEW_HITAS = _("RR Uusi Hitas")
 
     @DynamicClassAttribute
     def new_hitas_ruleset(self) -> bool:
@@ -81,6 +84,7 @@ class HitasType(Enum):
         return [  # type: ignore
             cls.NEW_HITAS_I,
             cls.NEW_HITAS_II,
+            cls.RR_NEW_HITAS,
         ]
 
     @classmethod
