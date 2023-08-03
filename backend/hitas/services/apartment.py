@@ -17,6 +17,7 @@ from hitas.models import (
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import Apartment
 from hitas.models.apartment_sale import ApartmentSale
+from hitas.models.housing_company import HitasType
 from hitas.utils import SQSum, monthify, subquery_first_id
 
 
@@ -227,6 +228,8 @@ def annotate_apartment_unconfirmed_prices(
     """
     Annotate apartments with their unconfirmed maximum prices.
     Intended only for a single apartment at a time.
+
+    Requires `_last_apartment_completion_date` to be annotated to the housing company
     """
 
     from hitas.services.indices import (
@@ -237,21 +240,27 @@ def annotate_apartment_unconfirmed_prices(
     null_decimal_field = Cast(None, output_field=HitasModelDecimalField())
 
     if housing_company.hitas_type.new_hitas_ruleset:
+        # For RR new hitas, we use the completion date of the last apartment completed, no matter if company is complete
+        if housing_company.hitas_type == HitasType.RR_NEW_HITAS:
+            completion_date = housing_company._last_apartment_completion_date
+        else:
+            completion_date = housing_company.completion_date
+
         queryset = queryset.annotate(
             completion_month=Value(
-                housing_company.completion_date and monthify(housing_company.completion_date or None),
+                completion_date and monthify(completion_date) or None,
                 output_field=models.DateField(),
             ),
             cpi=null_decimal_field,
             mpi=null_decimal_field,
             cpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 ConstructionPriceIndex2005Equal100,
-                completion_date=housing_company.completion_date,
+                completion_date=completion_date,
                 calculation_date=calculation_date,
             ),
             mpi_2005_100=subquery_apartment_first_sale_acquisition_price_index_adjusted(
                 MarketPriceIndex2005Equal100,
-                completion_date=housing_company.completion_date,
+                completion_date=completion_date,
                 calculation_date=calculation_date,
             ),
         )

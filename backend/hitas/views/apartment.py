@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, Optional, Union
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Prefetch, Q, Max
 from django.db.models.expressions import Case, F, Subquery, When
 from django.http import HttpResponse
 from django.urls import reverse
@@ -848,7 +848,10 @@ class ApartmentViewSet(HitasModelViewSet):
     def get_detail_queryset(self):
         housing_company = (
             HousingCompany.objects.filter(uuid=self.kwargs["housing_company_uuid"])
-            .annotate(_completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"))
+            .annotate(
+                _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
+                _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date"),  # For RR
+            )
             .first()
         )
 
