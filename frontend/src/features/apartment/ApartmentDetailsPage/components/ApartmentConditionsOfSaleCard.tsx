@@ -28,9 +28,16 @@ const ApartmentSalesPageLinkButton = ({
 
     if (!apartment.surface_area) {
         apartmentCantBeSoldErrorMessage = "Asunnolta puuttuu pinta-ala";
-    } else if (apartment.prices.first_purchase_date && !housingCompany.completion_date) {
+    } else if (
+        apartment.prices.first_purchase_date &&
+        !housingCompany.completion_date &&
+        housingCompany.hitas_type !== "rr_new_hitas"
+    ) {
         // If apartment has been sold for the first time, and it's company not fully completed, it can not be re-sold
+        // Exception: rr_new_hitas, which allows re-selling before housing company is fully completed
         apartmentCantBeSoldErrorMessage = "Valmistumattoman taloyhtiön asuntoa ei voida jälleenmyydä";
+    } else if (apartment.prices.first_purchase_date && !apartment.completion_date) {
+        apartmentCantBeSoldErrorMessage = "Valmistumatonta asuntoa ei voida jälleenmyydä";
     } else if (apartment.prices.first_purchase_date && housingCompany.hitas_type === "half_hitas") {
         apartmentCantBeSoldErrorMessage = "Puolihitas-taloyhtiön asuntoa ei voida jälleenmyydä";
     } else if (housingCompany.regulation_status !== "regulated") {
