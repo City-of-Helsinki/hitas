@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import Any, Dict, Optional
 
 from django.db import models
-from django.db.models import Case, F, OuterRef, Prefetch, Q, Subquery, Sum, Value, When
+from django.db.models import Case, F, Max, OuterRef, Prefetch, Q, Subquery, Sum, Value, When
 from django.db.models.functions import Coalesce, Greatest, Round, TruncMonth
 from django.utils import timezone
 
@@ -29,6 +29,7 @@ from hitas.models import (
 )
 from hitas.models._base import HitasModelDecimalField
 from hitas.models.apartment import ApartmentWithAnnotationsMaxPrice
+from hitas.models.housing_company import HitasType
 from hitas.services.apartment import (
     get_first_sale_acquisition_price,
     get_first_sale_loan_amount,
@@ -57,13 +58,25 @@ def create_max_price_calculation(
 ) -> Dict[str, Any]:
     housing_company = HousingCompany.objects.annotate(
         _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
+        _last_apartment_completion_date=Max("real_estates__buildings__apartments__completion_date"),
         sum_surface_area=Sum("real_estates__buildings__apartments__surface_area"),
     ).get(uuid=housing_company_uuid)
+
+    # For RR_NEW_HITAS housing companies (Ryhmärakentamiskohde kohde), the completion date is the date of the last
+    # completed apartment to allow for re-sale of completed apartments while some are still under construction
+    if housing_company.hitas_type == HitasType.RR_NEW_HITAS:
+        housing_company._completion_date = housing_company._last_apartment_completion_date
+        validate_rr_housing_company_for_max_price_calculation(housing_company)
 
     if housing_company.completion_date is None:
         raise InvalidCalculationResultException(
             error_code="missing_housing_company_completion_date",
             message="Cannot create max price calculation for a housing company without completion date.",
+        )
+    elif housing_company.completion_date > timezone.now().date():
+        raise InvalidCalculationResultException(
+            error_code="completion_date_in_future",
+            message="Cannot create max price calculation for a housing company with completion date in the future.",
         )
 
     apartment = fetch_apartment(
@@ -105,6 +118,27 @@ def create_max_price_calculation(
     return calculation
 
 
+def validate_rr_housing_company_for_max_price_calculation(housing_company: HousingCompanyWithAnnotationsMaxPrice):
+    # RR_NEW_HITAS housing companies are allowed to have apartments with completion date, but still need to have
+    # surface area and share numbers for all apartments, as they affect the max price calculation
+    apartment_missing_data = (
+        Apartment.objects.filter(building__real_estate__housing_company=housing_company)
+        .filter(Q(surface_area__isnull=True) | Q(share_number_start__isnull=True) | Q(share_number_end__isnull=True))
+        .first()
+    )
+    if apartment_missing_data is not None:
+        if apartment_missing_data.surface_area is None:
+            raise InvalidCalculationResultException(
+                error_code="missing_surface_area_for_apartment",
+                message="Cannot create max price calculation as an apartment is missing surface area.",
+            )
+        elif apartment_missing_data.share_number_start is None or apartment_missing_data.share_number_end is None:
+            raise InvalidCalculationResultException(
+                error_code="missing_share_numbers_for_apartment",
+                message="Cannot create max price calculation for as an apartment is missing share numbers.",
+            )
+
+
 def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotationsMaxPrice):
     if not apartment.surface_area:
         raise InvalidCalculationResultException(
@@ -127,11 +161,6 @@ def validate_apartment_for_max_price_calculation(apartment: ApartmentWithAnnotat
         raise InvalidCalculationResultException(
             error_code="missing_completion_date",
             message="Cannot create max price calculation for an apartment without completion date.",
-        )
-    elif apartment.housing_company.completion_date > timezone.now().date():
-        raise InvalidCalculationResultException(
-            error_code="completion_date_in_future",
-            message="Cannot create max price calculation for a housing company with completion date in the future.",
         )
 
     if apartment.housing_company.release_date:
