@@ -89,7 +89,8 @@ const UnconfirmedPricesDownloadModalButton = () => {
                         unconfirmedPrices.surface_area_price_ceiling.value
                     ) ||
                     housingCompany.regulation_status !== "regulated" ||
-                    housingCompany.hitas_type === "half_hitas"
+                    housingCompany.hitas_type === "half_hitas" ||
+                    !apartment.completion_date
                 }
             />
             <GenericActionModal
@@ -233,9 +234,10 @@ const ApartmentMaximumPricesCard = ({
                         theme="black"
                         size="small"
                         disabled={
-                            !housingCompany.completion_date ||
+                            (housingCompany.hitas_type !== "rr_new_hitas" && !housingCompany.completion_date) ||
                             housingCompany.regulation_status !== "regulated" ||
                             housingCompany.hitas_type === "half_hitas" ||
+                            !apartment.completion_date ||
                             !apartment.prices.first_purchase_date
                         }
                     >
