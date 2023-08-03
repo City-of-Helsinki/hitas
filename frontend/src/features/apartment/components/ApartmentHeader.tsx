@@ -42,8 +42,9 @@ const ApartmentHeaderContent = ({
             {!housingCompany.completed && <StatusLabel>Taloyhtiö ei valmis</StatusLabel>}
 
             {housingCompany.hitas_type === "half_hitas" && <StatusLabel>Puolihitas</StatusLabel>}
+            {housingCompany.hitas_type === "rr_new_hitas" && <StatusLabel>RR</StatusLabel>}
 
-            <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>
+            {!apartment.is_sold && <StatusLabel>{getApartmentSoldStatusLabel(apartment)}</StatusLabel>}
 
             {apartment.sell_by_date && (
                 <StatusLabel

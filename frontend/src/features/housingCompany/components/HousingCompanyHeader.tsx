@@ -44,6 +44,8 @@ const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousing
                     </>
                 ) : null}
 
+                {housingCompany.hitas_type === "rr_new_hitas" && <StatusLabel>Ryhmärakentamiskohde</StatusLabel>}
+
                 {housingCompany.exclude_from_statistics ? <StatusLabel>Ei tilastoihin</StatusLabel> : null}
             </div>
         </>
