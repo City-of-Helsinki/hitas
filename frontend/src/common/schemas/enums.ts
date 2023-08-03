@@ -6,6 +6,7 @@ export const housingCompanyHitasTypes = [
     "hitas_2_no_interest",
     "new_hitas_1",
     "new_hitas_2",
+    "rr_new_hitas",
     "half_hitas",
     "rental_hitas_1",
     "rental_hitas_2",
