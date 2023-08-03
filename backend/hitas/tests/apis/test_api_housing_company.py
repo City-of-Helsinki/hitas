@@ -1465,6 +1465,13 @@ def test__api__hitas_type(api_client: HitasAPIClient):
             "old_ruleset": True,
             "skip_from_statistics": True,
         },
+        {
+            "label": "RR Uusi Hitas",
+            "value": "rr_new_hitas",
+            "no_interest": False,
+            "old_ruleset": False,
+            "skip_from_statistics": False,
+        },
     ]
 
 
