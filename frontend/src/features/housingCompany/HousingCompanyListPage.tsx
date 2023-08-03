@@ -20,7 +20,7 @@ const HousingCompanyListItem = ({housingCompany}: {housingCompany: IHousingCompa
         if (housingCompany.regulation_status.startsWith("released")) {
             return "Vapautunut";
         } else if (!housingCompany.completed) {
-            return "Ei valmis";
+            return `Ei valmis${housingCompany.hitas_type === "rr_new_hitas" ? " (RR)" : ""}`;
         } else {
             return getHousingCompanyHitasTypeName(housingCompany.hitas_type);
         }
