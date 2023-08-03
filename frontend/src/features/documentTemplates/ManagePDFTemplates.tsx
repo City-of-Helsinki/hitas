@@ -7,7 +7,7 @@ const ManagePDFTemplates = () => {
     const {data, error, isLoading} = useGetPDFBodiesQuery({});
     return (
         <div>
-            <Accordion heading="Enimmäishintalaskelma">
+            <Accordion heading="Enimmäishinta-arvio">
                 <QueryStateHandler
                     data={{}} // Always render, regardless of if returned data is empty
                     error={error}
