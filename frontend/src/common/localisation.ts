@@ -22,6 +22,8 @@ export const getHousingCompanyHitasTypeName = (state) => {
             return "Vuokratalo Hitas I";
         case "rental_hitas_2":
             return "Vuokratalo Hitas II";
+        case "rr_new_hitas":
+            return "RR Uusi Hitas";
         default:
             return "VIRHE";
     }
