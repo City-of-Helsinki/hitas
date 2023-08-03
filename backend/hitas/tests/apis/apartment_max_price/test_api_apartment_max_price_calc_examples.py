@@ -1674,3 +1674,167 @@ def test__api__apartment_max_price__missing_property_manager(api_client: HitasAP
     assert response.status_code == status.HTTP_200_OK, response.json()
 
     assert response.json()["housing_company"]["property_manager"] == {"name": ""}
+
+
+## RR Housing Companies
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__rr_housing_company(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.RR_NEW_HITAS,
+        completion_date=datetime.date(2020, 1, 1),
+        surface_area=100,
+    )
+
+    # Create necessary apartment's completion date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 1, 1), value=100)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2020, 1, 1), value=100)
+
+    # Create necessary calculation date indices
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 1, 1), value=200)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2022, 1, 1), value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=datetime.date(2022, 1, 1), value=200)
+
+    data = {
+        "calculation_date": "2022-01-01",
+        "apartment_share_of_housing_company_loans": 2500,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
+    }
+    url = reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex])
+
+    # First calculation we create should use the apartment's completion date, which is the same as housing company's
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    calculations = response.json().pop("calculations")
+    assert calculations["construction_price_index"]["calculation_variables"]["completion_date"] == "2020-01-01"
+    assert calculations["construction_price_index"]["calculation_variables"]["completion_date_index"] == 100
+    assert calculations["market_price_index"]["calculation_variables"]["completion_date"] == "2020-01-01"
+    assert calculations["market_price_index"]["calculation_variables"]["completion_date_index"] == 100
+
+    # Now we create a second apartment which is incomplete, as RR, this should not affect the calculation even though
+    # the housing company is not fully completed
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=None,
+        surface_area=0,
+    )
+
+    # Create a second calculation, which should be unaffected by the new apartment as its incomplete
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json().pop("calculations") == calculations
+
+    # But if the housing company has an apartment with a later completion date, that date is used instead
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=datetime.date(2021, 1, 1),
+    )
+    ConstructionPriceIndex2005Equal100Factory.create(month=datetime.date(2021, 1, 1), value=150)
+    MarketPriceIndex2005Equal100Factory.create(month=datetime.date(2021, 1, 1), value=150)
+
+    # Create a second calculation, which should be unaffected by the new apartment as its incomplete
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    calculations = response.json().pop("calculations")
+    assert calculations["construction_price_index"]["calculation_variables"]["completion_date"] == "2021-01-01"
+    assert calculations["construction_price_index"]["calculation_variables"]["completion_date_index"] == 150
+    assert calculations["market_price_index"]["calculation_variables"]["completion_date"] == "2021-01-01"
+    assert calculations["market_price_index"]["calculation_variables"]["completion_date_index"] == 150
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__rr_housing_company__missing_surface_area(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.RR_NEW_HITAS,
+        completion_date=datetime.date(2020, 1, 1),
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=None,
+        surface_area=None,
+    )
+
+    data = {
+        "calculation_date": "2022-01-01",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    )
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing_surface_area_for_apartment",
+        "message": "Maximum price calculation could not be completed. "
+        "Cannot create max price calculation as an apartment is missing surface area.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__rr_housing_company__missing_share_numbers(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.RR_NEW_HITAS,
+        completion_date=datetime.date(2020, 1, 1),
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=None,
+        share_number_start=None,
+        share_number_end=None,
+    )
+
+    data = {
+        "calculation_date": "2022-01-01",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    )
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing_share_numbers_for_apartment",
+        "message": "Maximum price calculation could not be completed. "
+        "Cannot create max price calculation for as an apartment is missing share numbers.",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
+def test__api__apartment_max_price__rr_housing_company__apartment_not_complete(api_client: HitasAPIClient):
+    a: Apartment = ApartmentFactory.create(
+        building__real_estate__housing_company__hitas_type=HitasType.RR_NEW_HITAS,
+        completion_date=None,
+    )
+    ApartmentFactory.create(
+        building__real_estate__housing_company=a.housing_company,
+        completion_date=datetime.date(2020, 1, 1),
+    )
+
+    data = {
+        "calculation_date": "2022-01-01",
+        "apartment_share_of_housing_company_loans": 0,
+        "apartment_share_of_housing_company_loans_date": "2022-07-28",
+        "additional_info": "Example",
+    }
+
+    response = api_client.post(
+        reverse("hitas:maximum-price-list", args=[a.housing_company.uuid.hex, a.uuid.hex]), data=data, format="json"
+    )
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+    assert response.json() == {
+        "error": "missing_completion_date",
+        "message": "Maximum price calculation could not be completed. Cannot create "
+        "max price calculation for an apartment without completion date.",
+        "reason": "Conflict",
+        "status": 409,
+    }
