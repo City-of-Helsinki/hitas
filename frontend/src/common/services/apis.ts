@@ -32,7 +32,9 @@ const baseQuery = fetchBaseQuery({
     prepareHeaders: (headers, api) => {
         Config.token && headers.set("Authorization", "Bearer " + Config.token);
         if (api.type === "mutation") {
-            headers.set("Content-type", "application/json; charset=UTF-8");
+            if (!headers.has("Content-Type")) {
+                headers.set("Content-type", "application/json; charset=UTF-8");
+            }
             const csrfToken = getCookie("csrftoken");
             csrfToken && headers.set("X-CSRFToken", csrfToken);
         }
@@ -41,6 +43,7 @@ const baseQuery = fetchBaseQuery({
     },
     ...(!Config.token && {credentials: "include"}),
 });
+
 const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
     args,
     api,
