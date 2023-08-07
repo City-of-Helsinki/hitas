@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 from hitas.models import ExternalSalesData
 from hitas.models.external_sales_data import QuarterData
+from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
 
@@ -29,3 +30,11 @@ def get_relevant_dates(freezer):
     regulation_month = this_month - relativedelta(years=30)
 
     return this_month, previous_year_last_month, regulation_month
+
+
+def create_necessary_indices(this_month, regulation_month, skip_surface_area_price_ceiling=False):
+    """Create common necessary indices for the tests"""
+    MarketPriceIndexFactory.create(month=regulation_month, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    if not skip_surface_area_price_ceiling:
+        SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
