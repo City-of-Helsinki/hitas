@@ -778,7 +778,7 @@ def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResul
     )
     worksheet.append(column_headers)
 
-    for row in results.rows.all():
+    for row in results.rows.order_by("completion_date").all():
         data = ReportColumns(
             display_name=row.housing_company.display_name,
             acquisition_price=row.realized_acquisition_price,
