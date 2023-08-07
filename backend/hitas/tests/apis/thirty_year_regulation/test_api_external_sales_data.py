@@ -41,7 +41,7 @@ def test__api__external_sales_data__create(api_client: HitasAPIClient):
     for postal_code in postal_codes:
         HousingCompanyFactory.create(postal_code__value=postal_code)
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -126,7 +126,7 @@ def test__api__external_sales_data__create__missing_postal_codes(api_client: Hit
     url = reverse("hitas:external-sales-data-list") + "?calculation_date=2023-02-01"
     content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -187,7 +187,7 @@ def test__api__external_sales_data__create__postal_codes_not_on_housing_companie
     for postal_code in postal_codes:
         HitasPostalCodeFactory.create(value=postal_code)
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -419,7 +419,7 @@ def test__api__external_sales_data__create__invalid_data(api_client: HitasAPICli
     for postal_code in postal_codes:
         HousingCompanyFactory.create(postal_code__value=postal_code)
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     wb: Workbook = load_workbook(path, data_only=True)
     ws: Worksheet = wb.worksheets[0]
 
@@ -481,7 +481,7 @@ def test__api__external_sales_data__exists(api_client: HitasAPIClient):
     for postal_code in postal_codes:
         HousingCompanyFactory.create(postal_code__value=postal_code)
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
@@ -525,7 +525,7 @@ def test__api__external_sales_data__wrong_calculation_date(api_client: HitasAPIC
     for postal_code in postal_codes:
         HousingCompanyFactory.create(postal_code__value=postal_code)
 
-    path = Path(__file__).parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
+    path = Path(__file__).parent.parent.parent / "static" / "tilastokeskuksen_esimerkki.xlsx"
     data = path.read_bytes()
 
     response = api_client.post(
