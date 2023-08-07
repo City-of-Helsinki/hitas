@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ConditionOfSale
+from hitas.models import ConditionOfSale
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
@@ -13,10 +13,11 @@ from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
+    create_new_apartment,
     create_no_external_sales_data,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
+from hitas.tests.factories import ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
 
 
 @pytest.mark.django_db
@@ -47,13 +48,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
     assert condition_of_sale.fulfilled is None
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month)
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
@@ -135,13 +130,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
     )
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month)
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
@@ -226,13 +215,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     )
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month)
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900

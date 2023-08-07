@@ -5,7 +5,6 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment
 from hitas.models.external_sales_data import SaleData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import (
@@ -19,10 +18,11 @@ from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
+    create_new_apartment,
     create_no_external_sales_data,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.factories import ApartmentSaleFactory
 
 
 @pytest.mark.django_db
@@ -34,13 +34,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(
@@ -98,13 +92,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment_1: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment_1 = create_new_apartment(previous_year_last_month, postal_code="00002")
 
     # Sale in the previous year
     # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
@@ -116,13 +104,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
     )
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment_2: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00003",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment_2 = create_new_apartment(previous_year_last_month, postal_code="00003")
 
     # Sale in the previous year
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
@@ -238,12 +220,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is in a half-hitas housing company
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month, hitas_type=HitasType.HALF_HITAS)
 
     # Sale in the previous year, but it is for half-hitas housing company
     ApartmentSaleFactory.create(
@@ -301,13 +278,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month - relativedelta(years=1),
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month - relativedelta(years=1),  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month - relativedelta(years=1))
 
     # Sale is not in the previous four quarters, so it is not counted
     ApartmentSaleFactory.create(
@@ -368,13 +339,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
     sale_2 = create_apartment_sale_for_date(regulation_month, postal_code="00002")
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(

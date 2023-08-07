@@ -17,6 +17,7 @@ from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
+    create_new_apartment,
     create_no_external_sales_data,
     get_relevant_dates,
 )
@@ -118,13 +119,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
     create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00002",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(

@@ -5,17 +5,17 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment
-from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.housing_company import RegulationStatus
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
+    create_new_apartment,
     create_no_external_sales_data,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.factories import ApartmentSaleFactory
 
 
 @pytest.mark.django_db
@@ -28,13 +28,9 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
 
     # Apartment where sales happened in the previous year, but it is in a housing company that should not be
     # included in statistics, so its sales do not affect postal code average square price calculation
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
+    apartment = create_new_apartment(
+        previous_year_last_month,
         building__real_estate__housing_company__exclude_from_statistics=True,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
     # Sale in the previous year
@@ -93,13 +89,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month)
 
     # Sale in the previous year, but it is excluded from statistics
     ApartmentSaleFactory.create(
@@ -158,13 +148,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
-    )
+    apartment = create_new_apartment(previous_year_last_month)
 
     # Sale in the previous year, which affect the average price per square meter
     # This sale will not affect the average price per square meter since it is excluded from statistics
