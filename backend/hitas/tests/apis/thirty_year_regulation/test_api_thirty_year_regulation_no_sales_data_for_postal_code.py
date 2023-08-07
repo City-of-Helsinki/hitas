@@ -13,13 +13,14 @@ from hitas.models.thirty_year_regulation import (
     ReplacementPostalCodesWithPrice,
     ThirtyYearRegulationResults,
 )
-from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
+from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
 from hitas.tests.factories import ApartmentSaleFactory
@@ -58,25 +59,9 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         obfuscated_owners=[],
@@ -143,25 +128,9 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         skipped=[],
@@ -244,25 +213,9 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         obfuscated_owners=[],
@@ -302,25 +255,9 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         obfuscated_owners=[],
@@ -363,26 +300,10 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale_1.apartment.housing_company.uuid.hex,
-                display_name=sale_1.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale_1.apartment.housing_company.street_address,
-                    postal_code=sale_1.apartment.housing_company.postal_code.value,
-                    city=sale_1.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale_1.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale_1.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale_1.apartment.housing_company.property_manager.name,
-                    email=sale_1.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
-            )
+            get_comparison_data_for_single_housing_company(
+                sale_1.apartment.housing_company,
+                regulation_month,
+            ),
         ],
         obfuscated_owners=[],
     )
