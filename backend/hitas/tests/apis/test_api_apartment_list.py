@@ -297,7 +297,6 @@ def test__api__apartment__filter__regulation_status(api_client: HitasAPIClient):
 
     url = reverse("hitas:apartment-list") + "?is_regulated=false"
     response_json = api_client.get(url).json()["contents"]
-    print(response_json)
     assert len(response_json) == 3, response_json
 
 
