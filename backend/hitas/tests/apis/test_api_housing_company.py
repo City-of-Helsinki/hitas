@@ -1310,7 +1310,6 @@ def test__api__housing_company__filter__new_hitas(api_client: HitasAPIClient):
 
     url = reverse("hitas:housing-company-list") + "?new_hitas=false"
     response_json = api_client.get(url).json()["contents"]
-    print(response_json)
     assert len(response_json) == 3, response_json
 
 
@@ -1327,7 +1326,6 @@ def test__api__housing_company__filter__regulation_status(api_client: HitasAPICl
 
     url = reverse("hitas:housing-company-list") + "?is_regulated=false"
     response_json = api_client.get(url).json()["contents"]
-    print(response_json)
     assert len(response_json) == 3, response_json
 
 
