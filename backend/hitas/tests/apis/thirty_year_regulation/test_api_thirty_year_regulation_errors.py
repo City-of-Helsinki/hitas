@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ApartmentSale
+from hitas.models import Apartment
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import (
     FullSalesData,
@@ -15,6 +15,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_apartment_sale_for_date,
     create_necessary_indices,
     create_no_external_sales_data,
     get_relevant_dates,
@@ -44,16 +45,7 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary sale, apartment, and housing company for regulation
-    ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    create_apartment_sale_for_date(regulation_month)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -79,16 +71,7 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
     create_necessary_indices(this_month, regulation_month)
 
     # Create necessary sale, apartment, and housing company for regulation
-    ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    create_apartment_sale_for_date(regulation_month)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -108,16 +91,7 @@ def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasA
     create_necessary_indices(this_month, regulation_month, skip_surface_area_price_ceiling=True)
 
     # Create necessary sale, apartment, and housing company for regulation
-    ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    create_apartment_sale_for_date(regulation_month)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -141,16 +115,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment: Apartment = ApartmentFactory.create(
@@ -280,7 +245,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company, validation will fail
-    sale: ApartmentSale = ApartmentSaleFactory.create(
+    sale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -321,7 +286,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company,
     # an error will be raised when trying to make index adjustments
-    sale: ApartmentSale = ApartmentSaleFactory.create(
+    sale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -398,16 +363,7 @@ def test__api__regulation__regulation_already_made(api_client: HitasAPIClient, f
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
     # Sale in a housing company that already has regulation data
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     results = ThirtyYearRegulationResults.objects.create(
         calculation_month=this_month,

@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ApartmentSale, ExternalSalesData
+from hitas.models import Apartment, ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
@@ -19,6 +19,7 @@ from hitas.models.thirty_year_regulation import (
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_apartment_sale_for_date,
     create_necessary_indices,
     create_no_external_sales_data,
     get_relevant_dates,
@@ -35,7 +36,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
     # Sale in a housing company that already has regulation data
-    sale: ApartmentSale = ApartmentSaleFactory.create(
+    sale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -130,18 +131,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
     create_necessary_indices(this_month, regulation_month)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
@@ -243,18 +233,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     create_necessary_indices(this_month, regulation_month)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     owner: Owner = sale.ownerships.first().owner
 
@@ -364,18 +343,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
 
     create_necessary_indices(this_month, regulation_month)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     owner: Owner = sale.ownerships.first().owner
 
@@ -454,16 +422,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     # Create necessary sale, apartment, and housing company for regulation
     # This housing company will be automatically released, since it is not using the old hitas ruleset
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month, hitas_type=HitasType.NEW_HITAS_I)
 
     owner: Owner = sale.ownerships.first().owner
 
@@ -545,27 +504,9 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
     # Sales for the apartment in a housing company that will be under regulation checking
     # This housing company will be automatically released, since it is not using the old hitas ruleset
-    sale_1: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale_1 = create_apartment_sale_for_date(regulation_month, hitas_type=HitasType.NEW_HITAS_I)
     # This housing company will be checked, since it is using the old hitas ruleset
-    sale_2: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale_2 = create_apartment_sale_for_date(regulation_month)
 
     owner_1: Owner = sale_1.ownerships.first().owner
     owner_2: Owner = sale_2.ownerships.first().owner
@@ -672,18 +613,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     # Surface area price will be higher than the housing company index adjusted price
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=50_000)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     owner: Owner = sale.ownerships.first().owner
 
@@ -760,18 +690,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
 
     create_necessary_indices(this_month, regulation_month)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     # Create necessary external sales data
     # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
@@ -838,18 +757,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
 
     create_necessary_indices(this_month, regulation_month)
 
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
@@ -1062,7 +970,7 @@ def test__api__regulation__housing_company_regulation_status(
     create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company whose state is under test
-    sale: ApartmentSale = ApartmentSaleFactory.create(
+    sale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
         purchase_price=50_000,
         apartment_share_of_housing_company_loans=10_000,
@@ -1151,16 +1059,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(

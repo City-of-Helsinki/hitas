@@ -13,8 +13,6 @@ from pypdf import PdfReader
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import ApartmentSale
-from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import (
     RegulationResult,
@@ -22,8 +20,8 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import get_relevant_dates
-from hitas.tests.factories import ApartmentSaleFactory, PDFBodyFactory
+from hitas.tests.apis.thirty_year_regulation.utils import create_apartment_sale_for_date, get_relevant_dates
+from hitas.tests.factories import PDFBodyFactory
 from users.models import User
 
 # Regulation letters
@@ -34,16 +32,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
     api_user: User = api_client.handler._force_user
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
@@ -232,16 +221,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
     api_user: User = api_client.handler._force_user
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
@@ -429,16 +409,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
     last_month = this_month - relativedelta(months=1)
     regulation_month = this_month - relativedelta(years=30)
 
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     # Previous thirty-year regulation results
     result_1 = ThirtyYearRegulationResults.objects.create(
@@ -648,16 +619,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
 def test__api__regulation_letter__no_regulation_data(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     url = (
         reverse("hitas:thirty-year-regulation-letter")
@@ -718,16 +680,7 @@ def test__api__regulation_letter__id_missing(api_client: HitasAPIClient, freezer
 def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale: ApartmentSale = ApartmentSaleFactory.create(
-        purchase_date=regulation_month,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=regulation_month,
-        apartment__building__real_estate__housing_company__postal_code__value="00001",
-        apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-    )
+    sale = create_apartment_sale_for_date(regulation_month)
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
