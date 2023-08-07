@@ -63,9 +63,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,
@@ -149,9 +147,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,
@@ -245,9 +241,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the

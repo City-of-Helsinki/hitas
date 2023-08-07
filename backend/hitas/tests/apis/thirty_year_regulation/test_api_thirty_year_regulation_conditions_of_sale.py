@@ -86,9 +86,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -195,9 +193,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -307,9 +303,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
