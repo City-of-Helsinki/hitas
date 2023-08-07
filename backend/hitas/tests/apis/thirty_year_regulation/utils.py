@@ -2,8 +2,10 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 
-from hitas.models import ExternalSalesData
+from hitas.models import ApartmentSale, ExternalSalesData
 from hitas.models.external_sales_data import QuarterData
+from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.tests.factories import ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -38,3 +40,21 @@ def create_necessary_indices(this_month, regulation_month, skip_surface_area_pri
     MarketPriceIndexFactory.create(month=this_month, value=200)
     if not skip_surface_area_price_ceiling:
         SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+
+def create_apartment_sale_for_date(date, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs) -> ApartmentSale:
+    """
+    Sale for the apartment in a housing company that will be under regulation checking
+    Index adjusted price/m² for the apartment will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    """
+    return ApartmentSaleFactory.create(
+        purchase_date=date,
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=10,
+        apartment__completion_date=date,
+        apartment__building__real_estate__housing_company__postal_code__value=postal_code,
+        apartment__building__real_estate__housing_company__hitas_type=hitas_type,
+        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        **kwargs,
+    )
