@@ -1,5 +1,3 @@
-import datetime
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
@@ -9,17 +7,14 @@ from hitas.models import Apartment, ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
+from hitas.tests.apis.thirty_year_regulation.utils import get_relevant_dates
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.utils import to_quarter
 
 
 @pytest.mark.django_db
 def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
+    this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
@@ -80,8 +75,7 @@ def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
 
 @pytest.mark.django_db
 def test__api__regulation_postal_codes__missing_external_sales_data(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
+    get_relevant_dates(freezer)
 
     url = reverse("hitas:thirty-year-regulation-postal-codes-list")
 
@@ -98,11 +92,7 @@ def test__api__regulation_postal_codes__missing_external_sales_data(api_client: 
 
 @pytest.mark.django_db
 def test__api__regulation_postal_codes__wrong_calculation_date(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
+    this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
 
     # Create necessary external sales data
     ExternalSalesData.objects.create(
