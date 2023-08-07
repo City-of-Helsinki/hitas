@@ -1,4 +1,3 @@
-import datetime
 from decimal import Decimal
 
 import pytest
@@ -11,19 +10,14 @@ from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data
+from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
 def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -134,12 +128,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
 @pytest.mark.django_db
 def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
     less_than_two_years_ago = this_month - relativedelta(years=2) + relativedelta(days=1)
 
     # Create necessary indices
@@ -244,12 +233,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
 @pytest.mark.django_db
 def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
     two_years_ago = this_month - relativedelta(years=2)
 
     # Create necessary indices

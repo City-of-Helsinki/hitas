@@ -1,4 +1,3 @@
-import datetime
 from decimal import Decimal
 
 import pytest
@@ -10,19 +9,14 @@ from hitas.models import Apartment, ApartmentSale
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data
+from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
 def test__api__regulation__exclude_from_statistics__housing_company(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -102,12 +96,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
 
 @pytest.mark.django_db
 def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -186,12 +175,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
 
 @pytest.mark.django_db
 def test__api__regulation__exclude_from_statistics__sale__partial(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)

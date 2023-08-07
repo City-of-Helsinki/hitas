@@ -22,6 +22,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.thirty_year_regulation.utils import get_relevant_dates
 from hitas.tests.factories import ApartmentSaleFactory, PDFBodyFactory
 from users.models import User
 
@@ -31,11 +32,7 @@ from users.models import User
 @pytest.mark.django_db
 def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient, freezer):
     api_user: User = api_client.handler._force_user
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, _, regulation_month = get_relevant_dates(freezer)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
@@ -233,11 +230,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
 @pytest.mark.django_db
 def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, freezer):
     api_user: User = api_client.handler._force_user
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, _, regulation_month = get_relevant_dates(freezer)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
@@ -433,7 +426,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
     freezer.move_to(day)
 
     this_month = day.date()
-    last_month = day.date() - relativedelta(months=1)
+    last_month = this_month - relativedelta(months=1)
     regulation_month = this_month - relativedelta(years=30)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
@@ -653,11 +646,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
 
 @pytest.mark.django_db
 def test__api__regulation_letter__no_regulation_data(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, _, regulation_month = get_relevant_dates(freezer)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,
@@ -727,11 +716,7 @@ def test__api__regulation_letter__id_missing(api_client: HitasAPIClient, freezer
 
 @pytest.mark.django_db
 def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, _, regulation_month = get_relevant_dates(freezer)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=regulation_month,

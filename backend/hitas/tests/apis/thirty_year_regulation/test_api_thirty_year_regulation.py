@@ -18,7 +18,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data
+from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
@@ -28,11 +28,7 @@ from hitas.utils import to_quarter
 
 @pytest.mark.django_db
 def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, _, regulation_month = get_relevant_dates(freezer)
 
     # Sale in a housing company that already has regulation data
     sale: ApartmentSale = ApartmentSaleFactory.create(
@@ -110,8 +106,7 @@ def test__api__regulation__fetch_exising(api_client: HitasAPIClient, freezer):
 
 @pytest.mark.django_db
 def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
+    get_relevant_dates(freezer)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -127,12 +122,7 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
 
 @pytest.mark.django_db
 def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -248,12 +238,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
 @pytest.mark.django_db
 def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -377,12 +362,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
 @pytest.mark.django_db
 def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -473,12 +453,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
 
 @pytest.mark.django_db
 def test__api__regulation__automatically_release__all(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -572,12 +547,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
 @pytest.mark.django_db
 def test__api__regulation__automatically_release__partial(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -706,12 +676,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
 @pytest.mark.django_db
 def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -804,12 +769,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
 
 @pytest.mark.django_db
 def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -890,12 +850,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
 
 @pytest.mark.django_db
 def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = day.date() - relativedelta(months=2)
-    regulation_month = day.date() - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -994,12 +949,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
 
 @pytest.mark.django_db
 def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
@@ -1083,11 +1033,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
 
 @pytest.mark.django_db
 def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPIClient, freezer):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=1)
+    this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
 
     # Apartment where sales happened in the previous year
     apartment: Apartment = ApartmentFactory.create(
@@ -1133,12 +1079,7 @@ def test__api__regulation__housing_company_regulation_status(
     is_compared: bool,
     freezer,
 ):
-    day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
-
-    this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
+    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
     # Create necessary indices
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
