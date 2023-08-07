@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from hitas.models import ApartmentSale, ExternalSalesData
 from hitas.models.external_sales_data import QuarterData
 from hitas.models.housing_company import HitasType, RegulationStatus
-from hitas.tests.factories import ApartmentSaleFactory
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -56,5 +56,16 @@ def create_apartment_sale_for_date(date, postal_code="00001", hitas_type=HitasTy
         apartment__building__real_estate__housing_company__postal_code__value=postal_code,
         apartment__building__real_estate__housing_company__hitas_type=hitas_type,
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        **kwargs,
+    )
+
+
+def create_new_apartment(date, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs) -> ApartmentSale:
+    return ApartmentFactory.create(
+        completion_date=date,
+        sales__purchase_date=date,  # First sale for the apartment is not counted
+        building__real_estate__housing_company__postal_code__value=postal_code,
+        building__real_estate__housing_company__hitas_type=hitas_type,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         **kwargs,
     )

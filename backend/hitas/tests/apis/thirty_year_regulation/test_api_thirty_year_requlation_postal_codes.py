@@ -3,12 +3,14 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import Apartment, ExternalSalesData
+from hitas.models import ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData
-from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
-from hitas.tests.apis.thirty_year_regulation.utils import get_relevant_dates
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_new_apartment,
+    get_relevant_dates,
+)
+from hitas.tests.factories import ApartmentSaleFactory
 from hitas.utils import to_quarter
 
 
@@ -17,13 +19,9 @@ def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
 
     # Apartment where sales happened in the previous year
-    apartment: Apartment = ApartmentFactory.create(
-        completion_date=previous_year_last_month,
-        building__real_estate__housing_company__postal_code__value="00001",
+    apartment = create_new_apartment(
+        previous_year_last_month,
         building__real_estate__housing_company__postal_code__cost_area=1,
-        building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
-        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        sales__purchase_date=previous_year_last_month,  # first sale, not counted
     )
 
     # Sale in the previous year, which affect the average price per square meter
