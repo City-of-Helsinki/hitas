@@ -68,9 +68,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,
@@ -311,9 +309,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,
@@ -396,9 +392,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,
@@ -491,9 +485,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since postal code average square price does not exist, the housing company cannot be regulated,

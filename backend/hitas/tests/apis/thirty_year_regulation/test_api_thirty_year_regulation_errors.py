@@ -58,9 +58,7 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
@@ -102,9 +100,7 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
     MarketPriceIndexFactory.create(month=this_month, value=200)
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
     assert response.json() == {
@@ -138,9 +134,7 @@ def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasA
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
     MarketPriceIndexFactory.create(month=this_month, value=200)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND, response.json()
     assert response.json() == {
@@ -248,9 +242,7 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
         sales=[],
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
@@ -297,9 +289,7 @@ def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freeze
         sales=[],
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
@@ -345,9 +335,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
@@ -395,9 +383,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
     assert response.json() == {
@@ -443,9 +429,7 @@ def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client
         sales=[],
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {
@@ -508,9 +492,7 @@ def test__api__regulation__regulation_already_made(api_client: HitasAPIClient, f
         regulation_result=RegulationResult.STAYS_REGULATED,
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_409_CONFLICT, response.json()
     assert response.json() == {

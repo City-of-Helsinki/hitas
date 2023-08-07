@@ -113,9 +113,7 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
     day = datetime.datetime(2023, 2, 1)
     freezer.move_to(day)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -174,9 +172,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -299,9 +295,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -430,9 +424,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -510,9 +502,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -640,9 +630,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -767,9 +755,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is lower than the
@@ -861,9 +847,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
         ),
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -964,9 +948,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
         ),
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -1058,9 +1040,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
@@ -1126,9 +1106,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -1198,9 +1176,7 @@ def test__api__regulation__housing_company_regulation_status(
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     assert response.status_code == status.HTTP_200_OK, response.json()
 
@@ -1293,9 +1269,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
 
     create_no_external_sales_data(this_month, previous_year_last_month)
 
-    url = reverse("hitas:thirty-year-regulation-list")
-
-    response = api_client.post(url, data={}, format="json")
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
     # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
