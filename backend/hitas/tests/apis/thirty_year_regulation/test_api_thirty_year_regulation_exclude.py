@@ -1,18 +1,16 @@
-from decimal import Decimal
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models.housing_company import RegulationStatus
-from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
+from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
 from hitas.tests.factories import ApartmentSaleFactory
@@ -55,25 +53,9 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         obfuscated_owners=[],
@@ -114,25 +96,9 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
         released_from_regulation=[],
         stays_regulated=[],
         skipped=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         obfuscated_owners=[],
@@ -186,25 +152,9 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
         automatically_released=[],
         released_from_regulation=[],
         stays_regulated=[
-            ComparisonData(
-                id=sale.apartment.housing_company.uuid.hex,
-                display_name=sale.apartment.housing_company.display_name,
-                address=AddressInfo(
-                    street_address=sale.apartment.housing_company.street_address,
-                    postal_code=sale.apartment.housing_company.postal_code.value,
-                    city=sale.apartment.housing_company.postal_code.city,
-                ),
-                price=Decimal("12000.0"),
-                old_ruleset=sale.apartment.housing_company.hitas_type.old_hitas_ruleset,
-                completion_date=regulation_month.isoformat(),
-                property_manager=PropertyManagerInfo(
-                    id=sale.apartment.housing_company.property_manager.uuid.hex,
-                    name=sale.apartment.housing_company.property_manager.name,
-                    email=sale.apartment.housing_company.property_manager.email,
-                    last_modified=this_month.isoformat(),
-                ),
-                letter_fetched=False,
-                current_regulation_status=RegulationStatus.REGULATED.value,
+            get_comparison_data_for_single_housing_company(
+                sale.apartment.housing_company,
+                regulation_month,
             )
         ],
         skipped=[],
