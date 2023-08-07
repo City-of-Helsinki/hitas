@@ -10,19 +10,19 @@ from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
+from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_necessary_indices,
+    create_no_external_sales_data,
+    get_relevant_dates,
+)
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
-from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
 def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     owner: Owner = OwnerFactory.create()
 
@@ -131,10 +131,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
     less_than_two_years_ago = this_month - relativedelta(years=2) + relativedelta(days=1)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -236,10 +233,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
     two_years_ago = this_month - relativedelta(years=2)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000

@@ -14,9 +14,12 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
+from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_necessary_indices,
+    create_no_external_sales_data,
+    get_relevant_dates,
+)
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
-from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
@@ -73,6 +76,8 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
 def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
+    create_necessary_indices(this_month, regulation_month)
+
     # Create necessary sale, apartment, and housing company for regulation
     ApartmentSaleFactory.create(
         purchase_date=regulation_month,
@@ -84,11 +89,6 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
-
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -105,6 +105,8 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
 def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
+    create_necessary_indices(this_month, regulation_month, skip_surface_area_price_ceiling=True)
+
     # Create necessary sale, apartment, and housing company for regulation
     ApartmentSaleFactory.create(
         purchase_date=regulation_month,
@@ -116,9 +118,6 @@ def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasA
         apartment__building__real_estate__housing_company__hitas_type=HitasType.HITAS_I,
         apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
     )
-
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -138,10 +137,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
 ):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -201,10 +197,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
 def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, validation will fail
@@ -244,10 +237,7 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
 def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, an error will be raised when trying to make index adjustments
@@ -286,10 +276,7 @@ def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freeze
 def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company, validation will fail
@@ -329,10 +316,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
 def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company,
@@ -372,10 +356,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
 def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, validation will fail

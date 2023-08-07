@@ -16,19 +16,19 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data, get_relevant_dates
+from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_necessary_indices,
+    create_no_external_sales_data,
+    get_relevant_dates,
+)
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
-from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -103,10 +103,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
 def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -257,10 +254,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -334,10 +328,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
@@ -412,10 +403,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
 def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(api_client: HitasAPIClient, freezer):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
 
-    # Create necessary indices
-    MarketPriceIndexFactory.create(month=regulation_month, value=100)
-    MarketPriceIndexFactory.create(month=this_month, value=200)
-    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+    create_necessary_indices(this_month, regulation_month)
 
     # Sale for the apartment in a housing company that has no sales in its postal code
     sale_1: ApartmentSale = ApartmentSaleFactory.create(
