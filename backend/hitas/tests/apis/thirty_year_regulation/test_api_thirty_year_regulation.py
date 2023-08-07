@@ -18,6 +18,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
@@ -171,14 +172,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -303,14 +297,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         apartment_share_of_housing_company_loans=900,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -441,14 +428,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         apartment_share_of_housing_company_loans=2_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -528,14 +508,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     owner: Owner = sale.ownerships.first().owner
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -665,14 +638,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         apartment_share_of_housing_company_loans=900,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -799,14 +765,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -1097,14 +1056,7 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -1244,14 +1196,7 @@ def test__api__regulation__housing_company_regulation_status(
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -1346,14 +1291,7 @@ def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 

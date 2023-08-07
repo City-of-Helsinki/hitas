@@ -6,15 +6,14 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ApartmentSale, ConditionOfSale, ExternalSalesData
-from hitas.models.external_sales_data import QuarterData
+from hitas.models import Apartment, ApartmentSale, ConditionOfSale
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo, RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.thirty_year_regulation.utils import create_no_external_sales_data
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
-from hitas.utils import to_quarter
 
 
 @pytest.mark.django_db
@@ -85,14 +84,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
         apartment_share_of_housing_company_loans=900,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -201,14 +193,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
         apartment_share_of_housing_company_loans=900,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -320,14 +305,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
         apartment_share_of_housing_company_loans=900,
     )
 
-    # Create necessary external sales data (no external sales)
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
+    create_no_external_sales_data(this_month, previous_year_last_month)
 
     url = reverse("hitas:thirty-year-regulation-list")
 
