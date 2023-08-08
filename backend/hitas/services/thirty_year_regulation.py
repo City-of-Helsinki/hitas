@@ -423,14 +423,14 @@ def get_sales_data(
             apartment__building__real_estate__housing_company__postal_code__value__in=postal_codes,
         )
 
+    # Group sales by quarter and postal code
     for sale in sales_in_previous_year:
         quarter = to_quarter(sale.purchase_date)
         postal_code = sale.apartment.postal_code.value
-        if postal_codes is not None and postal_code not in postal_codes:
-            continue
 
         sales_by_quarter.setdefault(postal_code, {})
         sales_by_quarter[postal_code].setdefault(quarter, SaleData(sale_count=0, price=0))
+
         sales_by_quarter[postal_code][quarter]["sale_count"] += 1
         sales_by_quarter[postal_code][quarter]["price"] += sale.total_price
 
