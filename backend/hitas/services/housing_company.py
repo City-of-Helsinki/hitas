@@ -40,9 +40,9 @@ ApartmentAddressT: TypeAlias = str
 
 def get_completed_housing_companies(
     completion_month: datetime.date,
-    include_excluded_from_statistics: bool = False,
-    include_rental_hitas: bool = True,
-    include_half_hitas: bool = False,
+    include_excluded_from_statistics: bool,
+    include_rental_hitas: bool,
+    include_half_hitas: bool,
 ) -> list[HousingCompanyWithAnnotations]:
     """
     Get all housing companies completed before the given month (YYYY-MM-01) which are in the given states.
