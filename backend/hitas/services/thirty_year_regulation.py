@@ -139,7 +139,12 @@ def perform_thirty_year_regulation(
     logger.info(f"Checking regulation need for housing companies completed before {regulation_month.isoformat()!r}...")
 
     logger.info("Fetching housing companies...")
-    housing_companies = get_completed_housing_companies(completion_month=regulation_month)
+    housing_companies = get_completed_housing_companies(
+        completion_month=regulation_month,
+        include_excluded_from_statistics=True,
+        include_rental_hitas=True,
+        include_half_hitas=True,
+    )
     if not housing_companies:
         logger.info("No housing companies to check regulation for.")
         logger.info("Regulation check complete!")  # NOSONAR
