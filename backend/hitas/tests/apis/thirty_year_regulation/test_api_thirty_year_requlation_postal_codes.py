@@ -3,15 +3,13 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status
 
-from hitas.models import ExternalSalesData
-from hitas.models.external_sales_data import CostAreaData, QuarterData
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_external_sales_data_for_postal_code,
     create_new_apartment,
     get_relevant_dates,
 )
 from hitas.tests.factories import ApartmentSaleFactory
-from hitas.utils import to_quarter
 
 
 @pytest.mark.django_db
@@ -34,22 +32,7 @@ def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
     )
 
     # Create necessary external sales data
-    # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(
-            quarter=to_quarter(previous_year_last_month - relativedelta(months=3)),
-            areas=[CostAreaData(postal_code="00002", sale_count=1, price=15_000)],
-        ),
-        quarter_4=QuarterData(
-            quarter=to_quarter(previous_year_last_month),
-            areas=[
-                CostAreaData(postal_code="00002", sale_count=2, price=30_000),
-            ],
-        ),
-    )
+    create_external_sales_data_for_postal_code(previous_year_last_month, previous_year_last_month, postal_code="00002")
 
     url = reverse("hitas:thirty-year-regulation-postal-codes-list")
 
@@ -93,21 +76,7 @@ def test__api__regulation_postal_codes__wrong_calculation_date(api_client: Hitas
     this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
 
     # Create necessary external sales data
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(previous_year_last_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(
-            quarter=to_quarter(previous_year_last_month - relativedelta(months=3)),
-            areas=[CostAreaData(postal_code="00002", sale_count=1, price=15_000)],
-        ),
-        quarter_4=QuarterData(
-            quarter=to_quarter(previous_year_last_month),
-            areas=[
-                CostAreaData(postal_code="00002", sale_count=2, price=30_000),
-            ],
-        ),
-    )
+    create_external_sales_data_for_postal_code(previous_year_last_month, previous_year_last_month, postal_code="00002")
 
     url = reverse("hitas:thirty-year-regulation-postal-codes-list") + "?calculation_date=2022-02-01"
 
