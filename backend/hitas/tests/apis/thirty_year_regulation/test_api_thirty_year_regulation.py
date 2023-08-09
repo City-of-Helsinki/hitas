@@ -6,8 +6,8 @@ from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from hitas.models import Apartment, ExternalSalesData
-from hitas.models.external_sales_data import CostAreaData, QuarterData, SaleData
+from hitas.models import Apartment
+from hitas.models.external_sales_data import SaleData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
 from hitas.models.thirty_year_regulation import (
@@ -20,6 +20,7 @@ from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
+    create_external_sales_data_for_postal_code,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -28,7 +29,6 @@ from hitas.tests.apis.thirty_year_regulation.utils import (
 )
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import SurfaceAreaPriceCeilingFactory
-from hitas.utils import to_quarter
 
 # Read regulation results
 
@@ -549,22 +549,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Create necessary external sales data
-    # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(
-            quarter=to_quarter(previous_year_last_month - relativedelta(months=3)),
-            areas=[CostAreaData(postal_code="00001", sale_count=1, price=15_000)],
-        ),
-        quarter_4=QuarterData(
-            quarter=to_quarter(previous_year_last_month),
-            areas=[
-                CostAreaData(postal_code="00001", sale_count=2, price=30_000),
-            ],
-        ),
-    )
+    create_external_sales_data_for_postal_code(this_month, previous_year_last_month, postal_code="00001")
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -610,21 +595,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
         apartment_share_of_housing_company_loans=9_000,
     )
     # Create necessary external sales data
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(
-            quarter=to_quarter(previous_year_last_month - relativedelta(months=3)),
-            areas=[CostAreaData(postal_code="00001", sale_count=1, price=15_000)],
-        ),
-        quarter_4=QuarterData(
-            quarter=to_quarter(previous_year_last_month),
-            areas=[
-                CostAreaData(postal_code="00001", sale_count=2, price=30_000),
-            ],
-        ),
-    )
+    create_external_sales_data_for_postal_code(this_month, previous_year_last_month, postal_code="00001")
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 

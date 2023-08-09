@@ -5,24 +5,12 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from hitas.models import ApartmentSale, ExternalSalesData
-from hitas.models.external_sales_data import QuarterData
+from hitas.models.external_sales_data import CostAreaData, QuarterData
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo
 from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
-
-
-def create_no_external_sales_data(this_month, previous_year_last_month):
-    """Create necessary external sales data (no external sales)"""
-
-    ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(this_month),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
-    )
 
 
 def get_relevant_dates(freezer):
@@ -103,3 +91,24 @@ def get_comparison_data_for_single_housing_company(
         current_regulation_status=current_regulation_status.value,
         letter_fetched=letter_fetched,
     )
+
+
+def create_no_external_sales_data(calculation_quarter_date, previous_year_last_month):
+    """Create necessary external sales data (no external sales)"""
+
+    return ExternalSalesData.objects.create(
+        calculation_quarter=to_quarter(calculation_quarter_date),
+        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+    )
+
+
+def create_external_sales_data_for_postal_code(calculation_quarter, previous_year_last_month, postal_code):
+    external_sales_data = create_no_external_sales_data(calculation_quarter, previous_year_last_month)
+
+    # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
+    external_sales_data.quarter_3["areas"] = [CostAreaData(postal_code=postal_code, sale_count=1, price=15_000)]
+    external_sales_data.quarter_4["areas"] = [CostAreaData(postal_code=postal_code, sale_count=2, price=30_000)]
+    external_sales_data.save()
