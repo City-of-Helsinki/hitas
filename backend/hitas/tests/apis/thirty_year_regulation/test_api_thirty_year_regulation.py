@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from typing import NamedTuple
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -17,7 +18,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.services.thirty_year_regulation import RegulationResults
-from hitas.tests.apis.helpers import HitasAPIClient
+from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_apartment_sale_for_date,
     create_external_sales_data_for_postal_code,
@@ -114,9 +115,29 @@ def test__api__regulation__empty(api_client: HitasAPIClient, freezer):
     )
 
 
+class RegulationTestArgs(NamedTuple):
+    current_date: datetime.date
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Companies stay regulated with correct conditions": RegulationTestArgs(
+                current_date=datetime.date(2023, 1, 1),
+            ),
+            # Calculation is made on the last day of the hitas calculation period.
+            # It should still work just the same as if it was the first day of the period.
+            "Regulation can be run even on the last date of the period": RegulationTestArgs(
+                current_date=datetime.datetime(2023, 4, 30),
+            ),
+        }
+    )
+)
 @pytest.mark.django_db
-def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer):
+def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, current_date):
     this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+
+    freezer.move_to(current_date)
 
     create_necessary_indices(this_month, regulation_month)
 
@@ -780,60 +801,3 @@ def test__api__regulation__housing_company_regulation_status(
             skipped=[],
             obfuscated_owners=[],
         )
-
-
-@pytest.mark.django_db
-def test__api__regulation__end_of_period(api_client: HitasAPIClient, freezer):
-    first_day = datetime.date(2023, 2, 1)
-    last_day = datetime.datetime(2023, 4, 30)
-    # Calculation is made on the last day of the hitas calculation period.
-    # It should still work just the same as if it was the first day of the period.
-    freezer.move_to(last_day)
-
-    this_month = first_day
-    previous_year_last_month = this_month - relativedelta(months=2)
-    regulation_month = this_month - relativedelta(years=30)
-
-    create_necessary_indices(this_month, regulation_month)
-
-    # Sale for the apartment in a housing company that will be under regulation checking
-    # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
-    sale = create_apartment_sale_for_date(regulation_month)
-
-    # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(previous_year_last_month)
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
-
-    create_no_external_sales_data(this_month, previous_year_last_month)
-
-    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
-
-    #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
-    #
-    # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
-    #
-    assert response.status_code == status.HTTP_200_OK, response.json()
-    assert response.json() == RegulationResults(
-        automatically_released=[],
-        released_from_regulation=[],
-        stays_regulated=[
-            get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
-                regulation_month,
-            ),
-        ],
-        skipped=[],
-        obfuscated_owners=[],
-    )
