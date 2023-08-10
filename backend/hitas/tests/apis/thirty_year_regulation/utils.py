@@ -5,11 +5,11 @@ from typing import Optional
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
-from hitas.models import ApartmentSale, ExternalSalesData
+from hitas.models import Apartment, ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData
-from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.models.housing_company import HitasType, HousingCompany, RegulationStatus
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo
-from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.factories import ApartmentFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -37,31 +37,45 @@ def create_necessary_indices(skip_surface_area_price_ceiling=False):
         SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
 
 
-def create_apartment_sale_for_date(date, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs) -> ApartmentSale:
+def create_thirty_year_old_housing_company(
+    postal_code="00001",
+    hitas_type=HitasType.HITAS_I,
+    **apartment_kwargs,
+) -> HousingCompany:
     """
-    Sale for the apartment in a housing company that will be under regulation checking
-    Index adjusted price/m² for the apartment will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
+    Create an over 30 years old housing company, which is potentially releasable under regulation checking.
+
+    Index adjusted price/m² for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
     """
-    return ApartmentSaleFactory.create(
-        purchase_date=date,
-        purchase_price=50_000,
-        apartment_share_of_housing_company_loans=10_000,
-        apartment__surface_area=10,
-        apartment__completion_date=date,
-        apartment__building__real_estate__housing_company__postal_code__value=postal_code,
-        apartment__building__real_estate__housing_company__hitas_type=hitas_type,
-        apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
-        **kwargs,
+    _, _, regulation_month = get_relevant_dates()
+
+    apartment = ApartmentFactory.create(
+        surface_area=10,
+        completion_date=regulation_month,
+        # First sale for the apartment is not used for regulation, but affects index adjusted price
+        sales__purchase_date=regulation_month,
+        sales__purchase_price=50_000,
+        sales__apartment_share_of_housing_company_loans=10_000,
+        building__real_estate__housing_company__postal_code__value=postal_code,
+        building__real_estate__housing_company__hitas_type=hitas_type,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        **apartment_kwargs,
     )
+    return apartment.housing_company
 
 
 def create_new_apartment(
-    completion_date: Optional[datetime.date] = None, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs
-) -> ApartmentSale:
+    completion_date: Optional[datetime.date] = None,
+    postal_code="00001",
+    hitas_type=HitasType.HITAS_I,
+    **kwargs,
+) -> Apartment:
     """
     Create a new apartment that will be under regulation checking.
     By default, the apartment is completed two months ago and has a first sale on the same date
-    The first sale is not counted in the regulation checking, but is needed to count any later sales for the apartment
+
+    This first sale is not counted in the regulation checking, but is needed to count any later sales for the apartment
+    and any later sales created for this apartment will be counted in the regulation checking.
     """
     if completion_date is None:
         _, two_months_ago, _ = get_relevant_dates()

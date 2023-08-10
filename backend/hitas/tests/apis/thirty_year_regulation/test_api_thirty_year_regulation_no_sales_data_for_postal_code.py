@@ -16,10 +16,10 @@ from hitas.models.thirty_year_regulation import (
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
-    create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    create_thirty_year_old_housing_company,
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
@@ -32,7 +32,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment = create_new_apartment(postal_code="00002")
@@ -60,7 +60,7 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -74,7 +74,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment_1 = create_new_apartment(postal_code="00002")
@@ -129,7 +129,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
         released_from_regulation=[],
         stays_regulated=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -140,8 +140,8 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
     #
     # Check that the housing company stays regulated
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.REGULATED
 
     #
     # Check that the regulation results were saved
@@ -169,7 +169,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].housing_company == old_housing_company
     assert result_rows[0].completion_date == regulation_month
     assert result_rows[0].surface_area == Decimal("10")
     assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
@@ -186,7 +186,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year, but it is in a half-hitas housing company
     apartment = create_new_apartment(hitas_type=HitasType.HALF_HITAS)
@@ -214,7 +214,7 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -228,7 +228,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened
     last_year_previous_quarter = two_months_ago - relativedelta(years=1)
@@ -257,7 +257,7 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -272,9 +272,9 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
     create_necessary_indices()
 
     # Sale for the apartment in a housing company that has no sales in its postal code
-    sale_1 = create_apartment_sale_for_date(regulation_month, postal_code="00001")
+    old_housing_company_1 = create_thirty_year_old_housing_company(postal_code="00001")
     # This housing company would be released, but since the other one is not, the regulation won't finish
-    sale_2 = create_apartment_sale_for_date(regulation_month, postal_code="00002")
+    old_housing_company_2 = create_thirty_year_old_housing_company(postal_code="00002")
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment = create_new_apartment(postal_code="00002")
@@ -302,7 +302,7 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale_1.apartment.housing_company,
+                old_housing_company_1,
                 regulation_month,
             ),
         ],
@@ -312,8 +312,8 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
     #
     # Check that the housing companies have not been regulated
     #
-    sale_1.apartment.housing_company.refresh_from_db()
-    assert sale_1.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+    old_housing_company_1.refresh_from_db()
+    assert old_housing_company_1.regulation_status == RegulationStatus.REGULATED
 
-    sale_2.apartment.housing_company.refresh_from_db()
-    assert sale_2.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+    old_housing_company_2.refresh_from_db()
+    assert old_housing_company_2.regulation_status == RegulationStatus.REGULATED
