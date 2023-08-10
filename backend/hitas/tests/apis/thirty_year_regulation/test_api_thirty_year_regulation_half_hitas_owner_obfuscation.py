@@ -8,10 +8,10 @@ from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
-    create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    create_thirty_year_old_housing_company,
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
@@ -25,9 +25,9 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    owner: Owner = sale.ownerships.first().owner
+    owner: Owner = Owner.objects.first()
 
     # Sale in a half-hitas apartment for the same owner.
     ApartmentSaleFactory.create(
@@ -69,7 +69,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),
@@ -84,8 +84,8 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
     #
     # Check that the housing company was freed from regulation
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
 @pytest.mark.django_db
@@ -95,9 +95,9 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    owner: Owner = sale.ownerships.first().owner
+    owner: Owner = Owner.objects.first()
 
     # Sale in a half-hitas apartment for the same owner.
     ApartmentSaleFactory.create(
@@ -139,7 +139,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),
@@ -158,5 +158,5 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     #
     # Check that the housing company was freed from regulation
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS

@@ -9,10 +9,10 @@ from hitas.models.owner import Owner
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
-    create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    create_thirty_year_old_housing_company,
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
@@ -27,22 +27,21 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
     owner: Owner = OwnerFactory.create()
 
-    sale_old = create_apartment_sale_for_date(
-        regulation_month,
+    # Sale for an old apartment for the owner.
+    old_housing_company = create_thirty_year_old_housing_company(
         postal_code="00001",
-        ownerships__owner=owner,
+        sales__ownerships__owner=owner,
     )
     # Sale for a new apartment for the same owner.
-    sale_new = create_apartment_sale_for_date(
-        this_month,
+    new_apartment = create_new_apartment(
         postal_code="00002",
-        ownerships__owner=owner,
+        sales__ownerships__owner=owner,
     )
 
     # There is a condition of sale between the apartment that will be released from regulation and the new apartment.
     condition_of_sale: ConditionOfSale = ConditionOfSaleFactory.create(
-        new_ownership=sale_new.ownerships.first(),
-        old_ownership=sale_old.ownerships.first(),
+        new_ownership=new_apartment.sales.first().ownerships.first(),
+        old_ownership=owner.ownerships.exclude(sale__apartment=new_apartment).first(),
     )
     assert condition_of_sale.fulfilled is None
 
@@ -75,7 +74,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale_old.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),

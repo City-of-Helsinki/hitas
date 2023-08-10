@@ -19,11 +19,11 @@ from hitas.models.thirty_year_regulation import (
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
 from hitas.tests.apis.thirty_year_regulation.utils import (
-    create_apartment_sale_for_date,
     create_external_sales_data_for_postal_code,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    create_thirty_year_old_housing_company,
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
@@ -68,12 +68,11 @@ class RegulationTestArgs(NamedTuple):
 @pytest.mark.django_db
 def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, current_date):
     this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
-
     freezer.move_to(current_date)
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -105,7 +104,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
         released_from_regulation=[],
         stays_regulated=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -116,8 +115,8 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
     #
     # Check that the housing company stays regulated
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.REGULATED
 
     #
     # Check that the regulation results were saved
@@ -136,7 +135,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].housing_company == old_housing_company
     assert result_rows[0].completion_date == regulation_month
     assert result_rows[0].surface_area == Decimal("10")
     assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
@@ -153,9 +152,10 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    owner: Owner = sale.ownerships.first().owner
+    # Only one owner exists in the database
+    owner: Owner = Owner.objects.first()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -186,7 +186,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),
@@ -205,8 +205,8 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     #
     # Check that the housing company was freed from regulation
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
     # Check that the regulation results were saved
@@ -225,7 +225,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].housing_company == old_housing_company
     assert result_rows[0].completion_date == regulation_month
     assert result_rows[0].surface_area == Decimal("10")
     assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
@@ -242,9 +242,10 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    owner: Owner = sale.ownerships.first().owner
+    # Only one owner exists in the database
+    owner: Owner = Owner.objects.first()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -275,7 +276,7 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),
@@ -300,9 +301,10 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     # Create necessary sale, apartment, and housing company for regulation
     # This housing company will be automatically released, since it is not using the old hitas ruleset
-    sale = create_apartment_sale_for_date(regulation_month, hitas_type=HitasType.NEW_HITAS_I)
+    old_housing_company = create_thirty_year_old_housing_company(hitas_type=HitasType.NEW_HITAS_I)
 
-    owner: Owner = sale.ownerships.first().owner
+    # Only one owner exists in the database
+    owner: Owner = Owner.objects.first()
 
     create_no_external_sales_data()
 
@@ -312,7 +314,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     assert response.json() == RegulationResults(
         automatically_released=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 price="0",
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
@@ -333,8 +335,8 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     #
     # Check that the housing company was freed from regulation
     #
-    sale.apartment.housing_company.refresh_from_db()
-    assert sale.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    old_housing_company.refresh_from_db()
+    assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
     #
     # Check that the regulation results were saved
@@ -349,7 +351,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == sale.apartment.housing_company
+    assert result_rows[0].housing_company == old_housing_company
     assert result_rows[0].completion_date == regulation_month
     assert result_rows[0].surface_area == Decimal("10")
     assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
@@ -367,13 +369,17 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     create_necessary_indices()
 
     # Sales for the apartment in a housing company that will be under regulation checking
-    # This housing company will be automatically released, since it is not using the old hitas ruleset
-    sale_1 = create_apartment_sale_for_date(regulation_month, hitas_type=HitasType.NEW_HITAS_I)
-    # This housing company will be checked, since it is using the old hitas ruleset
-    sale_2 = create_apartment_sale_for_date(regulation_month)
+    # This housing company will be automatically released, since it is using the new hitas ruleset
+    new_hitas_housing_company = create_thirty_year_old_housing_company(hitas_type=HitasType.NEW_HITAS_I)
+    new_hitas_owner = Owner.objects.filter(
+        ownerships__sale__apartment__building__real_estate__housing_company=new_hitas_housing_company
+    ).first()
 
-    owner_1: Owner = sale_1.ownerships.first().owner
-    owner_2: Owner = sale_2.ownerships.first().owner
+    # This housing company will be checked, since it is using the old hitas ruleset
+    old_hitas_housing_company = create_thirty_year_old_housing_company()
+    old_hitas_owner = Owner.objects.filter(
+        ownerships__sale__apartment__building__real_estate__housing_company=old_hitas_housing_company
+    ).first()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -394,7 +400,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     assert response.json() == RegulationResults(
         automatically_released=[
             get_comparison_data_for_single_housing_company(
-                sale_1.apartment.housing_company,
+                new_hitas_housing_company,
                 regulation_month,
                 price="0",
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
@@ -402,7 +408,7 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         ],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale_2.apartment.housing_company,
+                old_hitas_housing_company,
                 regulation_month,
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
             ),
@@ -411,14 +417,14 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
         skipped=[],
         obfuscated_owners=[
             OwnerT(
-                name=owner_1.name,
-                identifier=owner_1.identifier,
-                email=owner_1.email,
+                name=new_hitas_owner.name,
+                identifier=new_hitas_owner.identifier,
+                email=new_hitas_owner.email,
             ),
             OwnerT(
-                name=owner_2.name,
-                identifier=owner_2.identifier,
-                email=owner_2.email,
+                name=old_hitas_owner.name,
+                identifier=old_hitas_owner.identifier,
+                email=old_hitas_owner.email,
             ),
         ],
     )
@@ -426,11 +432,11 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
     #
     # Check that the first housing companies were freed from regulation
     #
-    sale_1.apartment.housing_company.refresh_from_db()
-    assert sale_1.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    new_hitas_housing_company.refresh_from_db()
+    assert new_hitas_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
-    sale_2.apartment.housing_company.refresh_from_db()
-    assert sale_2.apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+    old_hitas_housing_company.refresh_from_db()
+    assert old_hitas_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
 
 
 @pytest.mark.django_db
@@ -442,9 +448,10 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     # Surface area price will be higher than the housing company index adjusted price
     SurfaceAreaPriceCeilingFactory.create(month=this_month, value=50_000)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    owner: Owner = sale.ownerships.first().owner
+    # Only one owner exists in the database
+    owner: Owner = Owner.objects.first()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -475,7 +482,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
         automatically_released=[],
         released_from_regulation=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
                 price="50000.0",
                 current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
@@ -499,7 +506,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Create necessary external sales data
     create_external_sales_data_for_postal_code(postal_code="00001")
@@ -520,7 +527,7 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
         released_from_regulation=[],
         stays_regulated=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -535,7 +542,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -569,7 +576,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
         released_from_regulation=[],
         stays_regulated=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],

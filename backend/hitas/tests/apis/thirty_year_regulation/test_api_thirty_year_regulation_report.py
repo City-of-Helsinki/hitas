@@ -13,6 +13,7 @@ from pypdf import PdfReader
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from hitas.models import Apartment
 from hitas.models.pdf_body import PDFBodyName
 from hitas.models.thirty_year_regulation import (
     RegulationResult,
@@ -20,7 +21,7 @@ from hitas.models.thirty_year_regulation import (
     ThirtyYearRegulationResultsRow,
 )
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.apis.thirty_year_regulation.utils import create_apartment_sale_for_date, get_relevant_dates
+from hitas.tests.apis.thirty_year_regulation.utils import create_thirty_year_old_housing_company, get_relevant_dates
 from hitas.tests.factories import PDFBodyFactory
 from users.models import User
 
@@ -32,7 +33,8 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
     api_user: User = api_client.handler._force_user
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
+    apartment = Apartment.objects.first()
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
@@ -48,7 +50,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
 
     row = ThirtyYearRegulationResultsRow.objects.create(
         parent=result,
-        housing_company=sale.apartment.housing_company,
+        housing_company=old_housing_company,
         completion_date=datetime.date(1993, 2, 1),
         surface_area=Decimal("10.00"),
         postal_code="00001",
@@ -63,10 +65,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
 
     body = PDFBodyFactory.create(name=PDFBodyName.STAYS_REGULATED, texts=["||foo||", "||bar||", "||baz||"])
 
-    url = (
-        reverse("hitas:thirty-year-regulation-letter")
-        + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
-    )
+    url = reverse("hitas:thirty-year-regulation-letter") + f"?housing_company_id={old_housing_company.uuid.hex}"
 
     response: HttpResponse = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -82,8 +81,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
     page_1 = cleandoc("\n".join(item.strip() for item in page_1.split("\n")))
 
     address = (
-        f"{sale.apartment.housing_company.street_address}, "
-        f"{row.postal_code} {sale.apartment.housing_company.postal_code.city.upper()}"
+        f"{old_housing_company.street_address}, " f"{row.postal_code} {old_housing_company.postal_code.city.upper()}"
     )
 
     assert page_1 == cleandoc(
@@ -99,16 +97,16 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS
         Asunto-osakeyhtiö
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite
         {address}
         Osakenumerot
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Kiinteistötunnukset
-        {sale.apartment.building.real_estate.property_identifier}
+        {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
         Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
         Yhtiön keskineliöhinta
@@ -124,7 +122,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         hintatiedoilla) mukaan postinumeroalueen 00001 asuntojen keskimääräinen neliöhinta on
         neljäkymmentäyhdeksäntuhatta (49 000) euroa.
         Neliöhintojen vertailu
-        {sale.apartment.housing_company.display_name} jää enimmäishintojen vertailun perusteella hintasääntelyn
+        {old_housing_company.display_name} jää enimmäishintojen vertailun perusteella hintasääntelyn
         vaikutuksen piiriin, koska yhtiön keskineliöhinta alittaa postinumeroalueen kaikkien asuntojen
         keskineliöhinnan.
         Hintasääntelystä
@@ -164,13 +162,13 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         LASKELMA YHTIÖN KESKINELIÖHINNASTA
         RAKENNUSKUSTANNUS- JA MARKKINAHINTAINDEKSILLÄ
         Asunto-osakeyhtiö:
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite:
         {address}
         Yhtiön osakenumerot:
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Osakkeiden lkm:
-        {sale.apartment.share_number_end - sale.apartment.share_number_start + 1}
+        {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
 
@@ -221,7 +219,8 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
     api_user: User = api_client.handler._force_user
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
+    apartment = Apartment.objects.first()
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
@@ -237,7 +236,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
 
     row = ThirtyYearRegulationResultsRow.objects.create(
         parent=result,
-        housing_company=sale.apartment.housing_company,
+        housing_company=old_housing_company,
         completion_date=datetime.date(1993, 2, 1),
         surface_area=Decimal("10.00"),
         postal_code="00001",
@@ -251,10 +250,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
 
     body = PDFBodyFactory.create(name=PDFBodyName.RELEASED_FROM_REGULATION, texts=["||foo||"])
 
-    url = (
-        reverse("hitas:thirty-year-regulation-letter")
-        + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
-    )
+    url = reverse("hitas:thirty-year-regulation-letter") + f"?housing_company_id={old_housing_company.uuid.hex}"
 
     response: HttpResponse = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -270,8 +266,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
     page_1 = cleandoc("\n".join(item.strip() for item in page_1.split("\n")))
 
     address = (
-        f"{sale.apartment.housing_company.street_address}, "
-        f"{row.postal_code} {sale.apartment.housing_company.postal_code.city.upper()}"
+        f"{old_housing_company.street_address}, " f"{row.postal_code} {old_housing_company.postal_code.city.upper()}"
     )
 
     assert page_1 == cleandoc(
@@ -287,16 +282,16 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYSTÄ VAPAUTUMINEN
         Asunto-osakeyhtiö
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite
         {address}
         Osakenumerot
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Kiinteistötunnukset
-        {sale.apartment.building.real_estate.property_identifier}
+        {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
         Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
         Yhtiön keskineliöhinta
@@ -312,7 +307,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         hintatiedoilla) mukaan postinumeroalueen 00001 asuntojen keskimääräinen neliöhinta on
         neljätuhatta yhdeksänsataa (4 900) euroa.
         Neliöhintojen vertailu
-        {sale.apartment.housing_company.display_name} vapautuu enimmäishintojen vertailun perusteella
+        {old_housing_company.display_name} vapautuu enimmäishintojen vertailun perusteella
         hintasääntelystä, koska yhtiön keskineliöhinta ylittää postinumeroalueen kaikkien asuntojen
         keskineliöhinnan.
         Hintasääntelystä
@@ -347,13 +342,13 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         LASKELMA YHTIÖN KESKINELIÖHINNASTA
         RAKENNUSKUSTANNUS- JA MARKKINAHINTAINDEKSILLÄ
         Asunto-osakeyhtiö:
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite:
         {address}
         Yhtiön osakenumerot:
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Osakkeiden lkm:
-        {sale.apartment.share_number_end - sale.apartment.share_number_start + 1}
+        {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
 
@@ -407,9 +402,9 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
 
     this_month = day.date()
     last_month = this_month - relativedelta(months=1)
-    regulation_month = this_month - relativedelta(years=30)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
+    apartment = Apartment.objects.first()
 
     # Previous thirty-year regulation results
     result_1 = ThirtyYearRegulationResults.objects.create(
@@ -425,7 +420,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
     )
     ThirtyYearRegulationResultsRow.objects.create(
         parent=result_1,
-        housing_company=sale.apartment.housing_company,
+        housing_company=old_housing_company,
         completion_date=datetime.date(1993, 2, 1),
         surface_area=Decimal("10.00"),
         postal_code="00001",
@@ -451,7 +446,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
     )
     row = ThirtyYearRegulationResultsRow.objects.create(
         parent=result,
-        housing_company=sale.apartment.housing_company,
+        housing_company=old_housing_company,
         completion_date=datetime.date(1993, 2, 1),
         surface_area=Decimal("10.00"),
         postal_code="00001",
@@ -467,7 +462,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
 
     url = (
         reverse("hitas:thirty-year-regulation-letter")
-        + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
+        + f"?housing_company_id={old_housing_company.uuid.hex}"
         + f"&calculation_date={last_month.isoformat()}"
     )
 
@@ -481,8 +476,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
     page_1 = cleandoc("\n".join(item.strip() for item in page_1.split("\n")))
 
     address = (
-        f"{sale.apartment.housing_company.street_address}, "
-        f"{row.postal_code} {sale.apartment.housing_company.postal_code.city.upper()}"
+        f"{old_housing_company.street_address}, " f"{row.postal_code} {old_housing_company.postal_code.city.upper()}"
     )
 
     assert page_1 == cleandoc(
@@ -498,16 +492,16 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         00580 Helsinki
         Url http://www.hel.fi/hitas
         00099 HELSINGIN KAUPUNKI
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         HITAS-YHTIÖN HINTOJEN VERTAILU JA HINTASÄÄNTELYN VAIKUTUS
         Asunto-osakeyhtiö
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite
         {address}
         Osakenumerot
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Kiinteistötunnukset
-        {sale.apartment.building.real_estate.property_identifier}
+        {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
         Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
         Yhtiön keskineliöhinta
@@ -523,7 +517,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         hintatiedoilla) mukaan postinumeroalueen 00001 asuntojen keskimääräinen neliöhinta on
         neljäkymmentäyhdeksäntuhatta (49 000) euroa.
         Neliöhintojen vertailu
-        {sale.apartment.housing_company.display_name} jää enimmäishintojen vertailun perusteella hintasääntelyn
+        {old_housing_company.display_name} jää enimmäishintojen vertailun perusteella hintasääntelyn
         vaikutuksen piiriin, koska yhtiön keskineliöhinta alittaa postinumeroalueen kaikkien asuntojen
         keskineliöhinnan.
         Hintasääntelystä
@@ -563,13 +557,13 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         LASKELMA YHTIÖN KESKINELIÖHINNASTA
         RAKENNUSKUSTANNUS- JA MARKKINAHINTAINDEKSILLÄ
         Asunto-osakeyhtiö:
-        {sale.apartment.housing_company.display_name}
+        {old_housing_company.display_name}
         Yhtiön osoite:
         {address}
         Yhtiön osakenumerot:
-        {sale.apartment.share_number_start} - {sale.apartment.share_number_end}
+        {apartment.share_number_start} - {apartment.share_number_end}
         Osakkeiden lkm:
-        {sale.apartment.share_number_end - sale.apartment.share_number_start + 1}
+        {apartment.share_number_end - apartment.share_number_start + 1}
         Asuntojen lkm:
         1
 
@@ -619,12 +613,9 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
 def test__api__regulation_letter__no_regulation_data(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
-    url = (
-        reverse("hitas:thirty-year-regulation-letter")
-        + f"?housing_company_id={sale.apartment.housing_company.uuid.hex}"
-    )
+    url = reverse("hitas:thirty-year-regulation-letter") + f"?housing_company_id={old_housing_company.uuid.hex}"
 
     response = api_client.get(url)
 
@@ -680,7 +671,7 @@ def test__api__regulation_letter__id_missing(api_client: HitasAPIClient, freezer
 def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     result = ThirtyYearRegulationResults.objects.create(
         regulation_month=datetime.datetime(1993, 2, 1),
@@ -696,7 +687,7 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
 
     ThirtyYearRegulationResultsRow.objects.create(
         parent=result,
-        housing_company=sale.apartment.housing_company,
+        housing_company=old_housing_company,
         completion_date=datetime.date(1993, 2, 1),
         surface_area=Decimal("10.00"),
         postal_code="00001",
@@ -732,7 +723,7 @@ def test__api__regulation_results__report(api_client: HitasAPIClient, freezer):
             "Yhtiön ikä",
         ),
         (
-            sale.apartment.housing_company.display_name,
+            old_housing_company.display_name,
             60000,
             1,
             "100.00/200.00",

@@ -6,10 +6,10 @@ from rest_framework.reverse import reverse
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
-    create_apartment_sale_for_date,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
+    create_thirty_year_old_housing_company,
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
@@ -22,7 +22,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year, but it is in a housing company that should not be
     # included in statistics, so its sales do not affect postal code average square price calculation
@@ -51,7 +51,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -65,7 +65,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -94,7 +94,7 @@ def test__api__regulation__exclude_from_statistics__sale__all(api_client: HitasA
         stays_regulated=[],
         skipped=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
@@ -108,7 +108,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
 
     create_necessary_indices()
 
-    sale = create_apartment_sale_for_date(regulation_month)
+    old_housing_company = create_thirty_year_old_housing_company()
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
@@ -150,7 +150,7 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
         released_from_regulation=[],
         stays_regulated=[
             get_comparison_data_for_single_housing_company(
-                sale.apartment.housing_company,
+                old_housing_company,
                 regulation_month,
             )
         ],
