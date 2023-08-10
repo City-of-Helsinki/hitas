@@ -1,15 +1,14 @@
 import pytest
-from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from rest_framework import status
 
 from hitas.tests.apis.helpers import HitasAPIClient, count_queries
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_external_sales_data_for_postal_code,
+    create_high_price_sale_for_apartment,
     create_new_apartment,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentSaleFactory
 
 
 @pytest.mark.django_db
@@ -17,16 +16,13 @@ def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
     this_month, two_months_ago, _ = get_relevant_dates(freezer)
 
     # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(building__real_estate__housing_company__postal_code__cost_area=1)
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
+    apartment = create_new_apartment(
+        postal_code="00001",
+        building__real_estate__housing_company__postal_code__cost_area=1,
     )
+    # Sale in the previous year, which affect the average price per square meter
+
+    create_high_price_sale_for_apartment(apartment)
 
     # Create necessary external sales data
     create_external_sales_data_for_postal_code(postal_code="00002")

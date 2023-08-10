@@ -20,6 +20,8 @@ from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
 from hitas.tests.apis.thirty_year_regulation.utils import (
     create_external_sales_data_for_postal_code,
+    create_high_price_sale_for_apartment,
+    create_low_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -55,7 +57,7 @@ class RegulationTestArgs(NamedTuple):
     **parametrize_helper(
         {
             "Companies stay regulated with correct conditions": RegulationTestArgs(
-                current_date=datetime.date(2023, 1, 1),
+                current_date=datetime.date(2023, 2, 1),
             ),
             # Calculation is made on the last day of the hitas calculation period.
             # It should still work just the same as if it was the first day of the period.
@@ -76,15 +78,7 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -159,15 +153,7 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (4_000 + 900) / 1 = 4_900
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
-    )
+    create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -383,14 +369,8 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
     # Sale in the previous year, which affect the average price per square meter
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
-    )
+    create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -457,13 +437,7 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     apartment = create_new_apartment()
 
     # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -548,12 +522,7 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
     apartment = create_new_apartment()
 
     # Sale in the previous year, which affect the average price per square meter
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
     # Create necessary external sales data
     create_external_sales_data_for_postal_code(postal_code="00001")
 
@@ -607,15 +576,8 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
 
     # Apartment where sales happened in the previous year
     apartment_2 = create_new_apartment()
-
     # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment_2,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment_2)
 
     create_no_external_sales_data()
 
@@ -652,12 +614,7 @@ def test__api__regulation__no_housing_company_over_30_years(api_client: HitasAPI
     apartment = create_new_apartment()
 
     # Sale in the previous year, which would be used in comparison, but there are no housing companies to check
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -706,12 +663,7 @@ def test__api__regulation__housing_company_regulation_status(
     apartment = create_new_apartment()
 
     # Sale in the previous year, which might be used in comparison if there are housing companies to check
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 

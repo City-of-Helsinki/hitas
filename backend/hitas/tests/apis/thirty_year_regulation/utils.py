@@ -9,7 +9,7 @@ from hitas.models import Apartment, ExternalSalesData
 from hitas.models.external_sales_data import CostAreaData, QuarterData
 from hitas.models.housing_company import HitasType, HousingCompany, RegulationStatus
 from hitas.services.thirty_year_regulation import AddressInfo, ComparisonData, PropertyManagerInfo
-from hitas.tests.factories import ApartmentFactory
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
 from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 from hitas.utils import to_quarter
 
@@ -88,6 +88,38 @@ def create_new_apartment(
         building__real_estate__housing_company__hitas_type=hitas_type,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         **kwargs,
+    )
+
+
+def create_high_price_sale_for_apartment(apartment: Apartment):
+    """
+    Create a sale in the quarter, which affect the average price per square meter
+
+    This generally causes the housing company to not be released, as the average price per square meter is too high
+    """
+    _, two_months_ago, _ = get_relevant_dates()
+
+    return ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=two_months_ago + relativedelta(days=1),
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9_000,
+    )
+
+
+def create_low_price_sale_for_apartment(apartment: Apartment):
+    """
+    Create a sale in the quarter, which affect the average price per square meter
+
+    This generally causes the housing company to be released, as the average price per square meter is low enough
+    """
+    _, two_months_ago, _ = get_relevant_dates()
+
+    return ApartmentSaleFactory.create(
+        apartment=apartment,
+        purchase_date=two_months_ago + relativedelta(days=1),
+        purchase_price=4_000,
+        apartment_share_of_housing_company_loans=900,
     )
 
 

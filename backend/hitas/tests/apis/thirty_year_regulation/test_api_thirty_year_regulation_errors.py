@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 import pytest
-from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -15,6 +14,7 @@ from hitas.models.thirty_year_regulation import (
 )
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_high_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -122,12 +122,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
     apartment = create_new_apartment(postal_code="00002")
 
     # Sale in the previous year
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 

@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_high_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -29,12 +30,7 @@ def test__api__regulation__exclude_from_statistics__housing_company(api_client: 
     apartment = create_new_apartment(building__real_estate__housing_company__exclude_from_statistics=True)
 
     # Sale in the previous year
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -113,24 +109,16 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
 
-    # Sale in the previous year, which affect the average price per square meter
     # This sale will not affect the average price per square meter since it is excluded from statistics
     ApartmentSaleFactory.create(
         apartment=apartment,
         purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=100_000,
+        purchase_price=1_000_000,
+        apartment_share_of_housing_company_loans=999_999,
         exclude_from_statistics=True,
-        apartment_share_of_housing_company_loans=99_999,
     )
-    # This sale does affect the average price per square meter, since it is excluded from statistics
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=2),
-        purchase_price=40_000,
-        exclude_from_statistics=False,  # being explicit here
-        apartment_share_of_housing_company_loans=9_000,
-    )
+    # This sale does affect the average price per square meter, since it is not excluded from statistics
+    create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
