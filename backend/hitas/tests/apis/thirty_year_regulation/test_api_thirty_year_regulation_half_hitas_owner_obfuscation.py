@@ -8,6 +8,7 @@ from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_low_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -45,12 +46,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
-    )
+    create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
@@ -115,12 +111,7 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
-    )
+    create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 

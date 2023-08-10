@@ -1,5 +1,4 @@
 import pytest
-from dateutil.relativedelta import relativedelta
 from rest_framework import status
 from rest_framework.reverse import reverse
 
@@ -9,6 +8,7 @@ from hitas.models.owner import Owner
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_low_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
     create_no_external_sales_data,
@@ -16,7 +16,7 @@ from hitas.tests.apis.thirty_year_regulation.utils import (
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentSaleFactory, ConditionOfSaleFactory, OwnerFactory
+from hitas.tests.factories import ConditionOfSaleFactory, OwnerFactory
 
 
 @pytest.mark.django_db
@@ -50,12 +50,7 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
-    ApartmentSaleFactory.create(
-        apartment=apartment,
-        purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
-    )
+    create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
 
