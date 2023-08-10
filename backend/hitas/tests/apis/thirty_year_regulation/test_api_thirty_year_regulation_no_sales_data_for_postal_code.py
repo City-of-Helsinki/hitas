@@ -28,24 +28,24 @@ from hitas.tests.factories import ApartmentSaleFactory
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
+    apartment = create_new_apartment(postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -70,37 +70,37 @@ def test__api__regulation__no_sales_data_for_postal_code(api_client: HitasAPICli
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment_1 = create_new_apartment(previous_year_last_month, postal_code="00002")
+    apartment_1 = create_new_apartment(postal_code="00002")
 
     # Sale in the previous year
     # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
     ApartmentSaleFactory.create(
         apartment=apartment_1,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment_2 = create_new_apartment(previous_year_last_month, postal_code="00003")
+    apartment_2 = create_new_apartment(postal_code="00003")
 
     # Sale in the previous year
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
     ApartmentSaleFactory.create(
         apartment=apartment_2,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=4_000,
         apartment_share_of_housing_company_loans=900,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -182,24 +182,24 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is in a half-hitas housing company
-    apartment = create_new_apartment(previous_year_last_month, hitas_type=HitasType.HALF_HITAS)
+    apartment = create_new_apartment(hitas_type=HitasType.HALF_HITAS)
 
     # Sale in the previous year, but it is for half-hitas housing company
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -224,24 +224,25 @@ def test__api__regulation__no_sales_data_for_postal_code__half_hitas(api_client:
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened
-    apartment = create_new_apartment(previous_year_last_month - relativedelta(years=1))
+    last_year_previous_quarter = two_months_ago - relativedelta(years=1)
+    apartment = create_new_apartment(completion_date=last_year_previous_quarter)
 
     # Sale is not in the previous four quarters, so it is not counted
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month - relativedelta(years=1) + relativedelta(days=1),
+        purchase_date=last_year_previous_quarter + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -266,9 +267,9 @@ def test__api__regulation__no_sales_data_for_postal_code__sale_previous_year(api
 
 @pytest.mark.django_db
 def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Sale for the apartment in a housing company that has no sales in its postal code
     sale_1 = create_apartment_sale_for_date(regulation_month, postal_code="00001")
@@ -276,17 +277,17 @@ def test__api__regulation__no_sales_data_for_postal_code__other_not_regulated(ap
     sale_2 = create_apartment_sale_for_date(regulation_month, postal_code="00002")
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
+    apartment = create_new_apartment(postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
