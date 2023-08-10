@@ -69,7 +69,7 @@ def test__api__regulation__indices_missing(api_client: HitasAPIClient, freezer):
 def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Create necessary sale, apartment, and housing company for regulation
     create_apartment_sale_for_date(regulation_month)
@@ -89,7 +89,7 @@ def test__api__regulation__external_sales_data_missing(api_client: HitasAPIClien
 def test__api__regulation__surface_area_price_ceiling_missing(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month, skip_surface_area_price_ceiling=True)
+    create_necessary_indices(skip_surface_area_price_ceiling=True)
 
     # Create necessary sale, apartment, and housing company for regulation
     create_apartment_sale_for_date(regulation_month)
@@ -110,26 +110,26 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
     api_client: HitasAPIClient,
     freezer,
 ):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Index adjusted price for the housing company will be: (50_000 + 10_000) / 10 * (200 / 100) = 12_000
     create_apartment_sale_for_date(regulation_month)
 
     # Apartment where sales happened in the previous year, but it is on another postal code
-    apartment = create_new_apartment(previous_year_last_month, postal_code="00002")
+    apartment = create_new_apartment(postal_code="00002")
 
     # Sale in the previous year
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     url = reverse("hitas:thirty-year-regulation-list")
 
@@ -157,7 +157,7 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements__one_
 def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, validation will fail
@@ -197,7 +197,7 @@ def test__api__regulation__no_catalog_prices_or_sales(api_client: HitasAPIClient
 def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, an error will be raised when trying to make index adjustments
@@ -236,7 +236,7 @@ def test__api__regulation__catalog_price_zero(api_client: HitasAPIClient, freeze
 def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company, validation will fail
@@ -276,7 +276,7 @@ def test__api__regulation__no_surface_area(api_client: HitasAPIClient, freezer):
 def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Sale for the apartment in a housing company that will be under regulation checking
     # Since there is no total surface area for the housing company,
@@ -316,7 +316,7 @@ def test__api__regulation__surface_area_zero(api_client: HitasAPIClient, freezer
 def test__api__regulation__no_catalog_prices_or_sales_or_surface_area(api_client: HitasAPIClient, freezer):
     this_month, _, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     # Apartment in a housing company that will be under regulation checking
     # Since there are no sales or catalog prices, validation will fail

@@ -21,9 +21,9 @@ from hitas.tests.factories import ApartmentSaleFactory, ConditionOfSaleFactory, 
 
 @pytest.mark.django_db
 def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     owner: Owner = OwnerFactory.create()
 
@@ -47,18 +47,18 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
     assert condition_of_sale.fulfilled is None
 
     # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(previous_year_last_month)
+    apartment = create_new_apartment()
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=4_000,
         apartment_share_of_housing_company_loans=900,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -93,10 +93,10 @@ def test__api__regulation__conditions_of_sale_fulfilled(api_client: HitasAPIClie
 
 @pytest.mark.django_db
 def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
     less_than_two_years_ago = this_month - relativedelta(years=2) + relativedelta(days=1)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
@@ -114,18 +114,18 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
     )
 
     # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(previous_year_last_month)
+    apartment = create_new_apartment()
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=4_000,
         apartment_share_of_housing_company_loans=900,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
@@ -163,10 +163,10 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
 @pytest.mark.django_db
 def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, regulation_month = get_relevant_dates(freezer)
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
     two_years_ago = this_month - relativedelta(years=2)
 
-    create_necessary_indices(this_month, regulation_month)
+    create_necessary_indices()
 
     sale = create_apartment_sale_for_date(regulation_month)
 
@@ -184,18 +184,18 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     )
 
     # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(previous_year_last_month)
+    apartment = create_new_apartment()
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (4_000 + 900) / 1 = 4_900
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=4_000,
         apartment_share_of_housing_company_loans=900,
     )
 
-    create_no_external_sales_data(this_month, previous_year_last_month)
+    create_no_external_sales_data()
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 

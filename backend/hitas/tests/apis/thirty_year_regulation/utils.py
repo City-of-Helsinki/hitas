@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from typing import Optional
 
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -13,20 +14,23 @@ from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPr
 from hitas.utils import to_quarter
 
 
-def get_relevant_dates(freezer):
+def get_relevant_dates(freezer=None):
     """Set date to 2023-02-01 and return relevant dates for the test"""
     day = datetime.datetime(2023, 2, 1)
-    freezer.move_to(day)
+    if freezer is not None:
+        freezer.move_to(day)
 
     this_month = day.date()
-    previous_year_last_month = this_month - relativedelta(months=2)
+    two_months_ago = this_month - relativedelta(months=2)
     regulation_month = this_month - relativedelta(years=30)
 
-    return this_month, previous_year_last_month, regulation_month
+    return this_month, two_months_ago, regulation_month
 
 
-def create_necessary_indices(this_month, regulation_month, skip_surface_area_price_ceiling=False):
+def create_necessary_indices(skip_surface_area_price_ceiling=False):
     """Create common necessary indices for the tests"""
+    this_month, _, regulation_month = get_relevant_dates()
+
     MarketPriceIndexFactory.create(month=regulation_month, value=100)
     MarketPriceIndexFactory.create(month=this_month, value=200)
     if not skip_surface_area_price_ceiling:
@@ -51,10 +55,21 @@ def create_apartment_sale_for_date(date, postal_code="00001", hitas_type=HitasTy
     )
 
 
-def create_new_apartment(date, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs) -> ApartmentSale:
+def create_new_apartment(
+    completion_date: Optional[datetime.date] = None, postal_code="00001", hitas_type=HitasType.HITAS_I, **kwargs
+) -> ApartmentSale:
+    """
+    Create a new apartment that will be under regulation checking.
+    By default, the apartment is completed two months ago and has a first sale on the same date
+    The first sale is not counted in the regulation checking, but is needed to count any later sales for the apartment
+    """
+    if completion_date is None:
+        _, two_months_ago, _ = get_relevant_dates()
+        completion_date = two_months_ago
+
     return ApartmentFactory.create(
-        completion_date=date,
-        sales__purchase_date=date,  # First sale for the apartment is not counted
+        completion_date=completion_date,
+        sales__purchase_date=completion_date,  # First sale for the apartment is not counted
         building__real_estate__housing_company__postal_code__value=postal_code,
         building__real_estate__housing_company__hitas_type=hitas_type,
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
@@ -69,6 +84,7 @@ def get_comparison_data_for_single_housing_company(
     current_regulation_status=RegulationStatus.REGULATED,
     letter_fetched=False,
 ):
+    """Util to remove boilerplate code from the tests"""
     return ComparisonData(
         # Housing Company data
         id=housing_company.uuid.hex,
@@ -93,20 +109,25 @@ def get_comparison_data_for_single_housing_company(
     )
 
 
-def create_no_external_sales_data(calculation_quarter_date, previous_year_last_month):
-    """Create necessary external sales data (no external sales)"""
+def create_no_external_sales_data() -> ExternalSalesData:
+    """
+    Create an empty external sales data object (no external sales)
+    This is needed to run the regulation
+    """
+    this_month, two_months_ago, _ = get_relevant_dates()
 
     return ExternalSalesData.objects.create(
-        calculation_quarter=to_quarter(calculation_quarter_date),
-        quarter_1=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=9)), areas=[]),
-        quarter_2=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=6)), areas=[]),
-        quarter_3=QuarterData(quarter=to_quarter(previous_year_last_month - relativedelta(months=3)), areas=[]),
-        quarter_4=QuarterData(quarter=to_quarter(previous_year_last_month), areas=[]),
+        calculation_quarter=to_quarter(this_month),
+        quarter_1=QuarterData(quarter=to_quarter(two_months_ago - relativedelta(months=9)), areas=[]),
+        quarter_2=QuarterData(quarter=to_quarter(two_months_ago - relativedelta(months=6)), areas=[]),
+        quarter_3=QuarterData(quarter=to_quarter(two_months_ago - relativedelta(months=3)), areas=[]),
+        quarter_4=QuarterData(quarter=to_quarter(two_months_ago), areas=[]),
     )
 
 
-def create_external_sales_data_for_postal_code(calculation_quarter, previous_year_last_month, postal_code):
-    external_sales_data = create_no_external_sales_data(calculation_quarter, previous_year_last_month)
+def create_external_sales_data_for_postal_code(postal_code):
+    """Create some external sales data for a given postal code"""
+    external_sales_data = create_no_external_sales_data()
 
     # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
     external_sales_data.quarter_3["areas"] = [CostAreaData(postal_code=postal_code, sale_count=1, price=15_000)]

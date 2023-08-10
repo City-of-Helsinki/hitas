@@ -14,25 +14,22 @@ from hitas.tests.factories import ApartmentSaleFactory
 
 @pytest.mark.django_db
 def test__api__regulation_postal_codes(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
+    this_month, two_months_ago, _ = get_relevant_dates(freezer)
 
     # Apartment where sales happened in the previous year
-    apartment = create_new_apartment(
-        previous_year_last_month,
-        building__real_estate__housing_company__postal_code__cost_area=1,
-    )
+    apartment = create_new_apartment(building__real_estate__housing_company__postal_code__cost_area=1)
 
     # Sale in the previous year, which affect the average price per square meter
     # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
     ApartmentSaleFactory.create(
         apartment=apartment,
-        purchase_date=previous_year_last_month + relativedelta(days=1),
+        purchase_date=two_months_ago + relativedelta(days=1),
         purchase_price=40_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
     # Create necessary external sales data
-    create_external_sales_data_for_postal_code(previous_year_last_month, previous_year_last_month, postal_code="00002")
+    create_external_sales_data_for_postal_code(postal_code="00002")
 
     url = reverse("hitas:thirty-year-regulation-postal-codes-list")
 
@@ -73,10 +70,10 @@ def test__api__regulation_postal_codes__missing_external_sales_data(api_client: 
 
 @pytest.mark.django_db
 def test__api__regulation_postal_codes__wrong_calculation_date(api_client: HitasAPIClient, freezer):
-    this_month, previous_year_last_month, _ = get_relevant_dates(freezer)
+    this_month, two_months_ago, _ = get_relevant_dates(freezer)
 
     # Create necessary external sales data
-    create_external_sales_data_for_postal_code(previous_year_last_month, previous_year_last_month, postal_code="00002")
+    create_external_sales_data_for_postal_code(postal_code="00002")
 
     url = reverse("hitas:thirty-year-regulation-postal-codes-list") + "?calculation_date=2022-02-01"
 
