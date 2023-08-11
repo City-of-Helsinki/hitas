@@ -82,6 +82,7 @@ def create_new_apartment(
         completion_date = two_months_ago
 
     return ApartmentFactory.create(
+        surface_area=10,
         completion_date=completion_date,
         sales__purchase_date=completion_date,  # First sale for the apartment is not counted
         building__real_estate__housing_company__postal_code__value=postal_code,
@@ -95,6 +96,8 @@ def create_high_price_sale_for_apartment(apartment: Apartment):
     """
     Create a sale in the quarter, which affect the average price per square meter
 
+    Average price per square meter for this sale is: (140_000 + 9_000) / 10 = 14_900
+
     This generally causes the housing company to not be released, as the average price per square meter is too high
     """
     _, two_months_ago, _ = get_relevant_dates()
@@ -102,7 +105,7 @@ def create_high_price_sale_for_apartment(apartment: Apartment):
     return ApartmentSaleFactory.create(
         apartment=apartment,
         purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
+        purchase_price=140_000,
         apartment_share_of_housing_company_loans=9_000,
     )
 
@@ -111,6 +114,8 @@ def create_low_price_sale_for_apartment(apartment: Apartment):
     """
     Create a sale in the quarter, which affect the average price per square meter
 
+    Average price per square meter for this sale is: (40_000 + 9000) / 10 = 4900
+
     This generally causes the housing company to be released, as the average price per square meter is low enough
     """
     _, two_months_ago, _ = get_relevant_dates()
@@ -118,8 +123,8 @@ def create_low_price_sale_for_apartment(apartment: Apartment):
     return ApartmentSaleFactory.create(
         apartment=apartment,
         purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=4_000,
-        apartment_share_of_housing_company_loans=900,
+        purchase_price=40_000,
+        apartment_share_of_housing_company_loans=9000,
     )
 
 
@@ -175,7 +180,7 @@ def create_external_sales_data_for_postal_code(postal_code):
     """Create some external sales data for a given postal code"""
     external_sales_data = create_no_external_sales_data()
 
-    # Average sales price will be: (15_000 + 30_000) / (1 + 2) = 15_000
+    # Average sales price will be: (15_000 * 1 + 30_000 * 2) / (1 + 2) = 25_000
     external_sales_data.quarter_3["areas"] = [CostAreaData(postal_code=postal_code, sale_count=1, price=15_000)]
     external_sales_data.quarter_4["areas"] = [CostAreaData(postal_code=postal_code, sale_count=2, price=30_000)]
     external_sales_data.save()
