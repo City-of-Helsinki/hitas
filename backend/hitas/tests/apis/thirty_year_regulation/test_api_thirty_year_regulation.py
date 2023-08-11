@@ -85,12 +85,12 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # The average sales price/m² for the postal code in the last year is 14_900.
+    # Since it's higher than the housing company's compared value (12_000), the housing company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -121,23 +121,24 @@ def test__api__regulation__stays_regulated(api_client: HitasAPIClient, freezer, 
     assert regulation_results[0].calculation_month == this_month
     assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
     assert regulation_results[0].sales_data == FullSalesData(
-        internal={"00001": {"2022Q4": SaleData(sale_count=1, price=49_000)}},
+        internal={"00001": {"2022Q4": SaleData(sale_count=1, price=14_900)}},
         external={},
-        price_by_area={"00001": 49_000},
+        price_by_area={"00001": 14_900},
     )
     assert regulation_results[0].replacement_postal_codes == []
 
     result_rows = list(regulation_results[0].rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == old_housing_company
-    assert result_rows[0].completion_date == regulation_month
-    assert result_rows[0].surface_area == Decimal("10")
-    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
-    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
-    assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
-    assert result_rows[0].completion_month_index == Decimal("100")
-    assert result_rows[0].calculation_month_index == Decimal("200")
-    assert result_rows[0].regulation_result == RegulationResult.STAYS_REGULATED
+    row = result_rows[0]
+    assert row.housing_company == old_housing_company
+    assert row.completion_date == regulation_month
+    assert row.surface_area == Decimal("10")
+    assert row.realized_acquisition_price == Decimal("60000.0")
+    assert row.unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert row.adjusted_average_price_per_square_meter == Decimal("12000.0")
+    assert row.completion_month_index == Decimal("100")
+    assert row.calculation_month_index == Decimal("200")
+    assert row.regulation_result == RegulationResult.STAYS_REGULATED
 
 
 @pytest.mark.django_db
@@ -160,12 +161,12 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (4_900) is lower than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # The average sales price/m² for the postal code in the last year is 4_900.
+    # Since it's lower than the housing company's compared value (12_000), the company is released form regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -199,27 +200,29 @@ def test__api__regulation__released_from_regulation(api_client: HitasAPIClient, 
     #
     regulation_results = list(ThirtyYearRegulationResults.objects.all())
     assert len(regulation_results) == 1
-    assert regulation_results[0].regulation_month == regulation_month
-    assert regulation_results[0].calculation_month == this_month
-    assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
-    assert regulation_results[0].sales_data == FullSalesData(
+    result = regulation_results[0]
+    assert result.regulation_month == regulation_month
+    assert result.calculation_month == this_month
+    assert result.surface_area_price_ceiling == Decimal("5000.0")
+    assert result.sales_data == FullSalesData(
         internal={"00001": {"2022Q4": SaleData(sale_count=1, price=4_900)}},
         external={},
         price_by_area={"00001": 4_900},
     )
-    assert regulation_results[0].replacement_postal_codes == []
+    assert result.replacement_postal_codes == []
 
-    result_rows = list(regulation_results[0].rows.all())
+    result_rows = list(result.rows.all())
     assert len(result_rows) == 1
-    assert result_rows[0].housing_company == old_housing_company
-    assert result_rows[0].completion_date == regulation_month
-    assert result_rows[0].surface_area == Decimal("10")
-    assert result_rows[0].realized_acquisition_price == Decimal("60000.0")
-    assert result_rows[0].unadjusted_average_price_per_square_meter == Decimal("6000.0")
-    assert result_rows[0].adjusted_average_price_per_square_meter == Decimal("12000.0")
-    assert result_rows[0].completion_month_index == Decimal("100")
-    assert result_rows[0].calculation_month_index == Decimal("200")
-    assert result_rows[0].regulation_result == RegulationResult.RELEASED_FROM_REGULATION
+    row = result_rows[0]
+    assert row.housing_company == old_housing_company
+    assert row.completion_date == regulation_month
+    assert row.surface_area == Decimal("10")
+    assert row.realized_acquisition_price == Decimal("60000.0")
+    assert row.unadjusted_average_price_per_square_meter == Decimal("6000.0")
+    assert row.adjusted_average_price_per_square_meter == Decimal("12000.0")
+    assert row.completion_month_index == Decimal("100")
+    assert row.calculation_month_index == Decimal("200")
+    assert row.regulation_result == RegulationResult.RELEASED_FROM_REGULATION
 
 
 @pytest.mark.django_db
@@ -250,12 +253,12 @@ def test__api__regulation__comparison_is_equal(api_client: HitasAPIClient, freez
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (12_000) is equal to the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # The average sales price/m² for the postal code in the last year is 4_900.
+    # Since it's equal to the housing company's compared value (12_000), the company is released form regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -286,7 +289,7 @@ def test__api__regulation__automatically_release__all(api_client: HitasAPIClient
     create_necessary_indices()
 
     # Create necessary sale, apartment, and housing company for regulation
-    # This housing company will be automatically released, since it is not using the old hitas ruleset
+    # This housing company will be automatically released, since it is using the new hitas ruleset
     old_housing_company = create_thirty_year_old_housing_company(hitas_type=HitasType.NEW_HITAS_I)
 
     # Only one owner exists in the database
@@ -369,7 +372,6 @@ def test__api__regulation__automatically_release__partial(api_client: HitasAPICl
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-    # Sale in the previous year, which affect the average price per square meter
     create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
@@ -435,8 +437,6 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
     create_high_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
@@ -444,12 +444,12 @@ def test__api__regulation__surface_area_price_ceiling_is_used_in_comparison(api_
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is lower than the
-    # surface area price ceiling of 50_000, the surface area price ceiling will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 50_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (49_000) is lower than the
-    # housing company's compared value (in this case the index surface area price ceiling of 50_000),
-    # the company is released from regulation.
+    # The average sales price/m² for the postal code in the last year is 4_900.
+    # Since it's lower than the housing company's compared value (50_000), the company is released form regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -488,12 +488,12 @@ def test__api__regulation__only_external_sales_data(api_client: HitasAPIClient, 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (15_000) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # The average sales price/m² for the postal code in the last year is 25_000.
+    # Since it's higher than the housing company's compared value (12_000), the housing company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -520,24 +520,21 @@ def test__api__regulation__both_hitas_and_external_sales_data(api_client: HitasA
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
     create_high_price_sale_for_apartment(apartment)
+
     # Create necessary external sales data
     create_external_sales_data_for_postal_code(postal_code="00001")
 
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Average sales price will be calculated based on both hitas and external sales:
-    # -> (15_000 + 30_000 + (40_000 + 9_000)) / (1 + 2 + 1) = 23_500
-    #
-    # Since the average sales price per square meter for the area in the last year (23_500) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # The average sales price/m² for the postal code will be calculated based from both hitas and external sales:
+    # -> (25_000 * 3 + 14_900 * 1) / (3 + 1) = 22_475
+    # Since it's higher than the housing company's compared value (12_000), the housing company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -576,7 +573,6 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
 
     # Apartment where sales happened in the previous year
     apartment_2 = create_new_apartment()
-    # Sale in the previous year, which affect the average price per square meter
     create_high_price_sale_for_apartment(apartment_2)
 
     create_no_external_sales_data()
@@ -584,12 +580,12 @@ def test__api__regulation__use_catalog_prices(api_client: HitasAPIClient, freeze
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # The average sales price/m² for the postal code in the last year is 14_900.
+    # Since it's higher than the housing company's compared value (12_000), the housing company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(

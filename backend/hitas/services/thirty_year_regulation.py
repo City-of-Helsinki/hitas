@@ -432,7 +432,14 @@ def get_sales_data(
         sales_by_quarter[postal_code].setdefault(quarter, SaleData(sale_count=0, price=0))
 
         sales_by_quarter[postal_code][quarter]["sale_count"] += 1
-        sales_by_quarter[postal_code][quarter]["price"] += sale.total_price
+        # Price field is used to store the sum of surface area price of the sales, so we can calculate average later
+        sales_by_quarter[postal_code][quarter]["price"] += sale.total_price / sale.apartment.surface_area
+
+    # Convert sum of surface area prices of sales into postal code average price
+    # This is the same type of value as is in external sales data, so they can now be combined in later steps
+    for postal_code in sales_by_quarter:
+        for quarter in sales_by_quarter[postal_code]:
+            sales_by_quarter[postal_code][quarter]["price"] /= sales_by_quarter[postal_code][quarter]["sale_count"]
 
     return sales_by_quarter
 
@@ -471,7 +478,8 @@ def combine_sales_data(*args: dict[PostalCodeT, dict[QuarterT, SaleData]]) -> di
             for sale_data in quarter_data.values():
                 sales_data.setdefault(postal_code, SaleData(sale_count=0, price=0))
                 sales_data[postal_code]["sale_count"] += sale_data["sale_count"]
-                sales_data[postal_code]["price"] += sale_data["price"]
+                # Multiply price by sale count to weight it by the number of sales
+                sales_data[postal_code]["price"] += sale_data["price"] * sale_data["sale_count"]
 
     total_by_postal_code: dict[PostalCodeT, Decimal] = {}
     for postal_code, sale_data in sales_data.items():
@@ -513,6 +521,7 @@ def _determine_regulation_need(  # NOSONAR
     for postal_code, comparison_data_by_housing_company in comparison_values.items():
         postal_code_average_price_per_square_meter = price_by_area.get(postal_code)
 
+        # If no average price/m² is found for the postal code, try to find it from replacement postal codes
         if postal_code_average_price_per_square_meter is None:
             postal_code_average_price_per_square_meter = _find_average_of_nearest(
                 postal_code,
@@ -561,6 +570,8 @@ def _find_average_of_nearest(
 ) -> Optional[Decimal]:
     """
     Find the average of the nearest two postal areas in the given prices by area.
+
+    Note: Replacement postal code average calculation is intentionally not weighted by the number of sales.
     """
     replacements = replacement_postal_codes.get(postal_code)
     if replacements is None:

@@ -75,15 +75,12 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment_1 = create_new_apartment(postal_code="00002")
-
-    # Sale in the previous year
-    # Average sales price will be: (40_000 + 9_000) / 1 = 49_000
     ApartmentSaleFactory.create(
         apartment=apartment_1,
         purchase_date=two_months_ago + relativedelta(days=1),
-        purchase_price=40_000,
-        apartment_share_of_housing_company_loans=9_000,
-    )
+        purchase_price=1_000_000,
+        apartment_share_of_housing_company_loans=99_000,
+    )  # = 109_900
 
     # Apartment where sales happened in the previous year, but it is on another postal code
     apartment_2 = create_new_apartment(postal_code="00003")
@@ -106,11 +103,12 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
 
     #
     # Since there is no sales data for the postal code, we use the replacement postal codes.
-    # The average price per square meter for the replacement postal codes is (49_000 + 4_900) / 2 = 26_950.
+    # The average price per square meter for the replacement postal codes is (109_900 + 4900) / 2 = 57_400.
+    # Note: Replacement postal code average calculation is intentionally not weighted by the number of sales.
     #
-    # Since the average sales price per square meter in the last year (26_950) is higher than the
+    # Since the average sales price per square meter in the last year (57_400) is higher than the
     # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # the company is released from regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -142,17 +140,17 @@ def test__api__regulation__no_sales_data_for_postal_code__use_replacements(api_c
     assert regulation_results[0].surface_area_price_ceiling == Decimal("5000.0")
     assert regulation_results[0].sales_data == FullSalesData(
         internal={
-            "00002": {"2022Q4": SaleData(sale_count=1, price=49_000)},
+            "00002": {"2022Q4": SaleData(sale_count=1, price=109_900)},
             "00003": {"2022Q4": SaleData(sale_count=1, price=4_900)},
         },
         external={},
-        price_by_area={"00002": 49000.0, "00003": 4900.0},
+        price_by_area={"00002": 109_900.0, "00003": 4900.0},
     )
     assert regulation_results[0].replacement_postal_codes == [
         ReplacementPostalCodesWithPrice(
             postal_code="00001",
             replacements=["00002", "00003"],
-            price_by_area=26950.0,
+            price_by_area=57_400.0,
         ),
     ]
 

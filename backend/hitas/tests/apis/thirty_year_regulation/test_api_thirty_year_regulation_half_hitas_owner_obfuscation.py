@@ -43,9 +43,6 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (4_000 + 900) / 1 = 4_900
     create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
@@ -53,12 +50,12 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment(api_client: Hit
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (4_900) is lower than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # The average sales price/m² for the postal code in the last year is 4_900.
+    # Since it's lower than the housing company's compared value (12_000), the company is released form regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(
@@ -108,9 +105,6 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
 
     # Apartment where sales happened in the previous year
     apartment = create_new_apartment()
-
-    # Sale in the previous year, which affect the average price per square meter
-    # Average sales price will be: (4_000 + 900) / 1 = 4_900
     create_low_price_sale_for_apartment(apartment)
 
     create_no_external_sales_data()
@@ -118,12 +112,12 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (4_900) is lower than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company is released from regulation.
+    # The average sales price/m² for the postal code in the last year is 4_900.
+    # Since it's lower than the housing company's compared value (12_000), the company is released form regulation.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(

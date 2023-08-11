@@ -125,12 +125,12 @@ def test__api__regulation__exclude_from_statistics__sale__partial(api_client: Hi
     response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
 
     #
-    # Since the housing company's index adjusted acquisition price is 12_000, which is higher than the
-    # surface area price ceiling of 5_000, the acquisition price will be used in the comparison.
+    # The housing company's index adjusted acquisition price/m² is 12_000.
+    # The housing company's surface area price ceiling is 5_000.
+    # Since the index adjusted acquisition price/m² is higher than the SAPC, it will be used in the comparison
     #
-    # Since the average sales price per square meter for the area in the last year (49_000) is higher than the
-    # housing company's compared value (in this case the index adjusted acquisition price of 12_000),
-    # the company stays regulated.
+    # The average sales price/m² for the postal code in the last year is 14_900.
+    # Since it's higher than the housing company's compared value (12_000), the housing company stays regulated.
     #
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == RegulationResults(

@@ -169,10 +169,9 @@ class ThirtyYearRegulationPostalCodesView(ViewSet):
         calculation_month = hitas_calculation_quarter(calculation_date)
         this_quarter = business_quarter(calculation_month)
         this_quarter_previous_year = this_quarter - relativedelta(years=1)
-        previous_quarter = this_quarter - relativedelta(months=3)
 
         sales_data = get_sales_data(this_quarter_previous_year, this_quarter)
-        external_sales_data = get_external_sales_data(to_quarter(previous_quarter))
+        external_sales_data = get_external_sales_data(to_quarter(this_quarter))
         price_by_area = combine_sales_data(sales_data, external_sales_data)
         results = compile_postal_codes_with_cost_areas(price_by_area)
 
