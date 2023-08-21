@@ -497,8 +497,8 @@ def test__api__apartment_max_price__market_price_index__2011_onwards(api_client:
 @pytest.mark.django_db
 def test__api__apartment_max_price__market_price_index__pre_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        interest_during_construction_6=3455.0,
-        interest_during_construction_14=4000.0,
+        interest_during_construction_mpi=3455.0,
+        interest_during_construction_cpi=4000.0,
         additional_work_during_construction=4307.0,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=54.5,
@@ -785,8 +785,8 @@ def test__api__apartment_max_price__market_price_index__pre_2011(api_client: Hit
 @pytest.mark.django_db
 def test__api__apartment_max_price__construction_price_index__pre_2011(api_client: HitasAPIClient):
     a: Apartment = ApartmentFactory.create(
-        interest_during_construction_6=2703.0,
-        interest_during_construction_14=3233.0,
+        interest_during_construction_mpi=2703.0,
+        interest_during_construction_cpi=3233.0,
         additional_work_during_construction=2500.0,
         completion_date=datetime.date(2012, 6, 28),
         surface_area=45.5,
@@ -915,7 +915,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "housing_company_acquisition_price": 20_374_887.55,
             "housing_company_assets": 20_823_677.55,
             "apartment_share_of_housing_company_assets": 219010.27,
-            "interest_during_construction": 2703.0,
+            "interest_during_construction": 3233.0,
             "interest_during_construction_percentage": 6,
             "additional_work_during_construction": 2500.0,
             "index_adjusted_additional_work_during_construction": 3078.35,
@@ -960,8 +960,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                     "value_for_apartment": 448_790.0,
                 },
             },
-            "debt_free_price": 237902.37,
-            "debt_free_price_m2": 5228.62,
+            "debt_free_price": 238432.37,
+            "debt_free_price_m2": 5240.27,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
             "completion_date": str(a.completion_date),
@@ -969,7 +969,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "calculation_date": "2022-11-21",
             "calculation_date_index": 364.6,
         },
-        "maximum_price": 234902.37,
+        "maximum_price": 235432.37,
         "valid_until": "2023-02-21",
         "maximum": False,
     }
@@ -1059,7 +1059,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "housing_company_acquisition_price": 4_512_344.21,
             "housing_company_assets": 4_961_134.2,
             "apartment_share_of_housing_company_assets": 52178.07,
-            "interest_during_construction": 2703.0,
+            "interest_during_construction": 3233.0,
             "interest_during_construction_percentage": 6,
             "additional_work_during_construction": 2500.0,
             "index_adjusted_additional_work_during_construction": 681.75,
@@ -1104,8 +1104,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
                     "value_for_apartment": 448_790.0,
                 },
             },
-            "debt_free_price": 68673.58,
-            "debt_free_price_m2": 1509.31,
+            "debt_free_price": 69203.58,
+            "debt_free_price_m2": 1520.96,
             "apartment_share_of_housing_company_loans": 3000,
             "apartment_share_of_housing_company_loans_date": "2022-11-20",
             "completion_date": str(a.completion_date),
@@ -1113,7 +1113,7 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
             "calculation_date": "2022-11-21",
             "calculation_date_index": 364.6,
         },
-        "maximum_price": 65673.58,
+        "maximum_price": 66203.58,
         "valid_until": "2023-02-21",
         "maximum": False,
     }
@@ -1123,8 +1123,8 @@ def test__api__apartment_max_price__construction_price_index__pre_2011(api_clien
 @pytest.mark.django_db
 def test__api__apartment_max_price__pre_2011__no_improvements(api_client: HitasAPIClient, during_construction):
     a: Apartment = ApartmentFactory.create(
-        interest_during_construction_6=during_construction,
-        interest_during_construction_14=during_construction,
+        interest_during_construction_mpi=during_construction,
+        interest_during_construction_cpi=during_construction,
         additional_work_during_construction=during_construction,
         completion_date=datetime.date(2003, 5, 9),
         surface_area=10,

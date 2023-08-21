@@ -307,27 +307,27 @@ class SharesSerializer(serializers.Serializer):
 
 
 class ConstructionPricesInterest(serializers.Serializer):
-    rate_6 = HitasDecimalField(
-        source="interest_during_construction_6",
+    rate_mpi = HitasDecimalField(
+        source="interest_during_construction_mpi",
         required=False,
         allow_null=True,
     )
-    rate_14 = HitasDecimalField(
-        source="interest_during_construction_14",
+    rate_cpi = HitasDecimalField(
+        source="interest_during_construction_cpi",
         required=False,
         allow_null=True,
     )
 
     def validate(self, data):
-        rate_6, rate_14 = data["interest_during_construction_6"], data["interest_during_construction_14"]
+        rate_mpi, rate_cpi = data["interest_during_construction_mpi"], data["interest_during_construction_cpi"]
 
-        if rate_6 is None and rate_14 is None:
+        if rate_mpi is None and rate_cpi is None:
             return data
-        if rate_6 is None or rate_14 is None:
-            err_msg = "Both 'rate_6' and 'rate_14' must be given or be 'null'."
-            raise ValidationError({"rate_6": err_msg, "rate_14": err_msg})
-        if rate_6 > rate_14:
-            raise ValidationError({"rate_6": "'rate_6' must not be greater than 'rate_14'."})
+        if rate_mpi is None or rate_cpi is None:
+            err_msg = "Both 'rate_mpi' and 'rate_cpi' must be given or be 'null'."
+            raise ValidationError({"rate_mpi": err_msg, "rate_cpi": err_msg})
+        if rate_mpi > rate_cpi:
+            raise ValidationError({"rate_mpi": "'rate_mpi' must not be greater than 'rate_cpi'."})
 
         return data
 
@@ -336,14 +336,14 @@ class ConstructionPricesInterest(serializers.Serializer):
 
         if value is None:
             value = {
-                "interest_during_construction_6": None,
-                "interest_during_construction_14": None,
+                "interest_during_construction_mpi": None,
+                "interest_during_construction_cpi": None,
             }
 
         return value
 
     def to_representation(self, instance):
-        if instance.interest_during_construction_6 is None:
+        if instance.interest_during_construction_mpi is None:
             return None
 
         return super().to_representation(instance)

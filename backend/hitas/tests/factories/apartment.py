@@ -46,8 +46,8 @@ class ApartmentFactory(DjangoModelFactory):
     catalog_primary_loan_amount = fuzzy.FuzzyDecimal(10000, 20000)
     additional_work_during_construction = fuzzy.FuzzyDecimal(10000, 20000)
     loans_during_construction = fuzzy.FuzzyDecimal(10000, 20000)
-    interest_during_construction_6 = fuzzy.FuzzyDecimal(1000, 2000)
-    interest_during_construction_14 = fuzzy.FuzzyDecimal(2000, 3000)
+    interest_during_construction_mpi = fuzzy.FuzzyDecimal(1000, 2000)
+    interest_during_construction_cpi = fuzzy.FuzzyDecimal(2000, 3000)
     debt_free_purchase_price_during_construction = fuzzy.FuzzyDecimal(100000, 200000)
     notes = factory.Faker("text")
 
