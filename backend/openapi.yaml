@@ -7106,15 +7106,15 @@ components:
               additionalProperties: false
               nullable: true
               required:
-                - rate_6
-                - rate_14
+                - rate_mpi
+                - rate_cpi
               properties:
-                rate_6:
+                rate_mpi:
                   type: number
                   minimum: 0
                   nullable: true
                   example: 3618
-                rate_14:
+                rate_cpi:
                   type: number
                   minimum: 0
                   nullable: true

@@ -339,7 +339,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
 
     # Override values based on table type for Old Hitas ruleset
     if issubclass(table, MarketPriceIndex):
-        interest = Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField())
+        interest = Coalesce(F("interest_during_construction_mpi"), 0, output_field=HitasModelDecimalField())
     elif issubclass(table, ConstructionPriceIndex):
         depreciation = Value(
             depreciation_multiplier(months_between_dates(completion_date, calculation_date)),
@@ -348,9 +348,9 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
         interest = Case(
             When(
                 condition=Q(completion_date__lt=datetime.date(2005, 1, 1)),
-                then=Coalesce(F("interest_during_construction_14"), 0, output_field=HitasModelDecimalField()),
+                then=Coalesce(F("interest_during_construction_cpi"), 0, output_field=HitasModelDecimalField()),
             ),
-            default=Coalesce(F("interest_during_construction_6"), 0, output_field=HitasModelDecimalField()),
+            default=Coalesce(F("interest_during_construction_mpi"), 0, output_field=HitasModelDecimalField()),
             output_field=HitasModelDecimalField(),
         )
 

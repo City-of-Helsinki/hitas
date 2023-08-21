@@ -29,8 +29,8 @@
       "catalog_primary_loan_amount": null,
       "additional_work_during_construction": "33442.00",
       "loans_during_construction": "55000.00",
-      "interest_during_construction_6": "2222.00",
-      "interest_during_construction_14": "3333.00",
+      "interest_during_construction_mpi": "2222.00",
+      "interest_during_construction_cpi": "3333.00",
       "debt_free_purchase_price_during_construction": "22333.00",
       "notes": ""
     }
@@ -57,8 +57,8 @@
       "catalog_primary_loan_amount": null,
       "additional_work_during_construction": "3000.00",
       "loans_during_construction": "167725.00",
-      "interest_during_construction_6": "4444.00",
-      "interest_during_construction_14": "5555.00",
+      "interest_during_construction_mpi": "4444.00",
+      "interest_during_construction_cpi": "5555.00",
       "debt_free_purchase_price_during_construction": "198000.00",
       "notes": "Nulla eos maiores illo reprehenderit. Sunt ducimus laborum nulla eveniet laboriosam.\nIpsa molestias aspernatur non occaecati."
     }
@@ -85,8 +85,8 @@
       "catalog_primary_loan_amount": "18304503.00",
       "additional_work_during_construction": "22.00",
       "loans_during_construction": "12426834.00",
-      "interest_during_construction_6": "12311.00",
-      "interest_during_construction_14": "45411.00",
+      "interest_during_construction_mpi": "12311.00",
+      "interest_during_construction_cpi": "45411.00",
       "debt_free_purchase_price_during_construction": "12333.00",
       "notes": "Voluptatem veritatis sit dolorem. Earum sint quidem quos voluptate cumque numquam. Esse architecto dolorum sit.\nRerum incidunt velit quis quibusdam."
     }
@@ -113,8 +113,8 @@
       "catalog_primary_loan_amount": "16844104.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "1499646.00",
-      "interest_during_construction_6": "0.00",
-      "interest_during_construction_14": "0.00",
+      "interest_during_construction_mpi": "0.00",
+      "interest_during_construction_cpi": "0.00",
       "debt_free_purchase_price_during_construction": "0.00",
       "notes": "Quos magnam quaerat provident asperiores praesentium provident. Illo quasi commodi. Consequatur nobis corporis mollitia."
     }
@@ -141,8 +141,8 @@
       "catalog_primary_loan_amount": "14639110.00",
       "additional_work_during_construction": "22223.00",
       "loans_during_construction": "163860.00",
-      "interest_during_construction_6": "223.00",
-      "interest_during_construction_14": "333.00",
+      "interest_during_construction_mpi": "223.00",
+      "interest_during_construction_cpi": "333.00",
       "debt_free_purchase_price_during_construction": "169999.00",
       "notes": "Fugit omnis modi voluptatibus ut. Sequi quaerat quasi omnis labore expedita repudiandae. Excepturi aperiam voluptatum animi quod quae."
     }
@@ -169,8 +169,8 @@
       "catalog_primary_loan_amount": "120237.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "147004.00",
-      "interest_during_construction_6": null,
-      "interest_during_construction_14": null,
+      "interest_during_construction_mpi": null,
+      "interest_during_construction_cpi": null,
       "debt_free_purchase_price_during_construction": "190000.00",
       "notes": "Necessitatibus quidem quisquam expedita laboriosam. Minus explicabo voluptates exercitationem beatae."
     }
@@ -197,8 +197,8 @@
       "catalog_primary_loan_amount": "150795.00",
       "additional_work_during_construction": "1233.00",
       "loans_during_construction": "110982.00",
-      "interest_during_construction_6": null,
-      "interest_during_construction_14": null,
+      "interest_during_construction_mpi": null,
+      "interest_during_construction_cpi": null,
       "debt_free_purchase_price_during_construction": "166968.00",
       "notes": "Eum quos praesentium cupiditate odio odit quibusdam. Fuga placeat ipsum quasi. Blanditiis praesentium odio sit id adipisci minima pariatur."
     }
@@ -225,8 +225,8 @@
       "catalog_primary_loan_amount": "102128.00",
       "additional_work_during_construction": "0.00",
       "loans_during_construction": "131965.00",
-      "interest_during_construction_6": null,
-      "interest_during_construction_14": null,
+      "interest_during_construction_mpi": null,
+      "interest_during_construction_cpi": null,
       "debt_free_purchase_price_during_construction": "0.00",
       "notes": "At occaecati explicabo iste fuga magni. Occaecati tenetur a itaque animi quo odit totam. Quod maxime magni optio.\nOdio animi consequatur. Eligendi ut maxime laborum quae minus."
     }

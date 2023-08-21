@@ -118,11 +118,10 @@ class RulesPre2011(CalculatorRules):
         )
 
         # Interest during construction
+        interest_during_construction = apartment.interest_during_construction_cpi or 0
         if apartment.completion_date < datetime.date(2005, 1, 1):
-            interest_during_construction = apartment.interest_during_construction_14 or 0
             interest_during_construction_percentage = 14
         else:
-            interest_during_construction = apartment.interest_during_construction_6 or 0
             interest_during_construction_percentage = 6
 
         index_adjusted_additional_work_during_construction = (
@@ -188,7 +187,7 @@ class RulesPre2011(CalculatorRules):
         # Basic price
         basic_price = (
             apartment.first_sale_acquisition_price
-            + (apartment.interest_during_construction_6 or 0)
+            + (apartment.interest_during_construction_mpi or 0)
             + (apartment.additional_work_during_construction or 0)
         )
 
@@ -256,7 +255,7 @@ class RulesPre2011(CalculatorRules):
             valid_until=calculation_date + relativedelta(months=3),
             calculation_variables=IndexCalculation.CalculationVarsMarketPriceIndexBefore2011(
                 first_sale_acquisition_price=apartment.first_sale_acquisition_price,
-                interest_during_construction=apartment.interest_during_construction_6 or 0,
+                interest_during_construction=apartment.interest_during_construction_mpi or 0,
                 interest_during_construction_percentage=6,
                 additional_work_during_construction=apartment.additional_work_during_construction or 0,
                 basic_price=basic_price,

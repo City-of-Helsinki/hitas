@@ -289,8 +289,8 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
         stair="A",
         additional_work_during_construction=None,
         loans_during_construction=None,
-        interest_during_construction_6=None,
-        interest_during_construction_14=None,
+        interest_during_construction_mpi=None,
+        interest_during_construction_cpi=None,
         debt_free_purchase_price_during_construction=None,
         notes=None,
         sales=[],
@@ -603,8 +603,8 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "construction": {
                 "loans": float(ap1.loans_during_construction),
                 "interest": {
-                    "rate_6": float(ap1.interest_during_construction_6),
-                    "rate_14": float(ap1.interest_during_construction_14),
+                    "rate_mpi": float(ap1.interest_during_construction_mpi),
+                    "rate_cpi": float(ap1.interest_during_construction_cpi),
                 },
                 "debt_free_purchase_price": float(ap1.debt_free_purchase_price_during_construction),
                 "additional_work": float(ap1.additional_work_during_construction),
@@ -778,8 +778,8 @@ def _test_unconfirmed_max_prices(
         completion_date=completion_date,
         additional_work_during_construction=5000 if not null_values else None,
         surface_area=50 if not null_values else None,
-        interest_during_construction_6=1000,
-        interest_during_construction_14=2000,
+        interest_during_construction_mpi=1000,
+        interest_during_construction_cpi=2000,
         building__real_estate__housing_company__hitas_type=(
             HitasType.HITAS_I if old_hitas_ruleset else HitasType.NEW_HITAS_I
         ),
@@ -1003,8 +1003,8 @@ def test__api__apartment__retrieve__unconfirmed_prices_use_housing_company_compl
         completion_date=datetime.date(2020, 1, 1),
         additional_work_during_construction=0,
         surface_area=100,
-        interest_during_construction_6=0,
-        interest_during_construction_14=0,
+        interest_during_construction_mpi=0,
+        interest_during_construction_cpi=0,
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
@@ -1012,8 +1012,8 @@ def test__api__apartment__retrieve__unconfirmed_prices_use_housing_company_compl
         completion_date=None,
         additional_work_during_construction=0,
         surface_area=100,
-        interest_during_construction_6=0,
-        interest_during_construction_14=0,
+        interest_during_construction_mpi=0,
+        interest_during_construction_cpi=0,
         sales=[],
         building__real_estate__housing_company=ap.housing_company,
     )
@@ -1204,8 +1204,8 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
             "construction": {
                 "loans": 123.1,
                 "interest": {
-                    "rate_6": 234.2,
-                    "rate_14": 345.3,
+                    "rate_mpi": 234.2,
+                    "rate_cpi": 345.3,
                 },
                 "debt_free_purchase_price": 345.3,
                 "additional_work": 456.4,
@@ -1549,55 +1549,55 @@ def test__api__apartment__create__new_hitas_no_apartment_improvements(api_client
                 ],
             ),
             "construction interest rate 6% less than 0": InvalidInput(
-                invalid_data={"prices": {"construction": {"interest": {"rate_6": -1, "rate_14": 1}}}},
+                invalid_data={"prices": {"construction": {"interest": {"rate_mpi": -1, "rate_cpi": 1}}}},
                 fields=[
                     {
-                        "field": "prices.construction.interest.rate_6",
+                        "field": "prices.construction.interest.rate_mpi",
                         "message": "Ensure this value is greater than or equal to 0.",
                     }
                 ],
             ),
-            "construction interest rate 14% less than 0": InvalidInput(
-                invalid_data={"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": -1}}}},
+            "construction interest rate cpi less than 0": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_mpi": 1, "rate_cpi": -1}}}},
                 fields=[
                     {
-                        "field": "prices.construction.interest.rate_14",
+                        "field": "prices.construction.interest.rate_cpi",
                         "message": "Ensure this value is greater than or equal to 0.",
                     }
                 ],
             ),
-            "construction interest rate 6% null": InvalidInput(
-                invalid_data={"prices": {"construction": {"interest": {"rate_6": None, "rate_14": 1}}}},
+            "construction interest rate mpi null": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_mpi": None, "rate_cpi": 1}}}},
                 fields=[
                     {
-                        "field": "prices.construction.interest.rate_6",
-                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                        "field": "prices.construction.interest.rate_mpi",
+                        "message": "Both 'rate_mpi' and 'rate_cpi' must be given or be 'null'.",
                     },
                     {
-                        "field": "prices.construction.interest.rate_14",
-                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                        "field": "prices.construction.interest.rate_cpi",
+                        "message": "Both 'rate_mpi' and 'rate_cpi' must be given or be 'null'.",
                     },
                 ],
             ),
-            "construction interest rate 14% null": InvalidInput(
-                invalid_data={"prices": {"construction": {"interest": {"rate_6": 1, "rate_14": None}}}},
+            "construction interest rate cpi null": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_mpi": 1, "rate_cpi": None}}}},
                 fields=[
                     {
-                        "field": "prices.construction.interest.rate_6",
-                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                        "field": "prices.construction.interest.rate_mpi",
+                        "message": "Both 'rate_mpi' and 'rate_cpi' must be given or be 'null'.",
                     },
                     {
-                        "field": "prices.construction.interest.rate_14",
-                        "message": "Both 'rate_6' and 'rate_14' must be given or be 'null'.",
+                        "field": "prices.construction.interest.rate_cpi",
+                        "message": "Both 'rate_mpi' and 'rate_cpi' must be given or be 'null'.",
                     },
                 ],
             ),
-            "construction interest rate 6% greater than 14%": InvalidInput(
-                invalid_data={"prices": {"construction": {"interest": {"rate_6": 100, "rate_14": 10}}}},
+            "construction interest rate mpi greater than cpi": InvalidInput(
+                invalid_data={"prices": {"construction": {"interest": {"rate_mpi": 100, "rate_cpi": 10}}}},
                 fields=[
                     {
-                        "field": "prices.construction.interest.rate_6",
-                        "message": "'rate_6' must not be greater than 'rate_14'.",
+                        "field": "prices.construction.interest.rate_mpi",
+                        "message": "'rate_mpi' must not be greater than 'rate_cpi'.",
                     },
                 ],
             ),
@@ -2052,8 +2052,8 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
             "construction": {
                 "loans": 44444,
                 "interest": {
-                    "rate_6": 55555,
-                    "rate_14": 88888,
+                    "rate_mpi": 55555,
+                    "rate_cpi": 88888,
                 },
                 "debt_free_purchase_price": 66666,
                 "additional_work": 77777,
@@ -2088,8 +2088,8 @@ def test__api__apartment__update__clear_improvements(api_client: HitasAPIClient)
     assert ap.floor == data["address"]["floor"]
     assert ap.stair == data["address"]["stair"]
     assert ap.loans_during_construction == data["prices"]["construction"]["loans"]
-    assert ap.interest_during_construction_6 == data["prices"]["construction"]["interest"]["rate_6"]
-    assert ap.interest_during_construction_14 == data["prices"]["construction"]["interest"]["rate_14"]
+    assert ap.interest_during_construction_mpi == data["prices"]["construction"]["interest"]["rate_mpi"]
+    assert ap.interest_during_construction_cpi == data["prices"]["construction"]["interest"]["rate_cpi"]
     assert ap.debt_free_purchase_price_during_construction == data["prices"]["construction"]["debt_free_purchase_price"]
     assert ap.additional_work_during_construction == data["prices"]["construction"]["additional_work"]
     assert ap.notes == data["notes"]

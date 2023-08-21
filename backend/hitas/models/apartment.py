@@ -66,10 +66,10 @@ class Apartment(ExternalSafeDeleteHitasModel):
     additional_work_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Rakennusaikaiset lainat'
     loans_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
-    # 'Rakennusaikaiset korot 6%'
-    interest_during_construction_6: Optional[Decimal] = HitasModelDecimalField(null=True)
-    # 'Rakennusaikaiset korot 14%'
-    interest_during_construction_14: Optional[Decimal] = HitasModelDecimalField(null=True)
+    # 'Rakennusaikaiset korot Markkinahintaindeksi (aina 6%)'
+    interest_during_construction_mpi: Optional[Decimal] = HitasModelDecimalField(null=True)
+    # 'Rakennusaikaiset korot Rakennuskustannusindeksi (6% tai 14%)'
+    interest_during_construction_cpi: Optional[Decimal] = HitasModelDecimalField(null=True)
     # 'Luovutushinta (RA)'
     debt_free_purchase_price_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
 

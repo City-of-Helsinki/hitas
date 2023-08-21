@@ -62,12 +62,12 @@
             <td>Rakennusaikainen korko, euroa</td>
             {% if cpi_bigger %}
                 {% if apartment.completion_date|date_before("2005-01-01") %}
-                <td>{{ apartment.prices.construction.interest.rate_14|intcomma }}</td>
+                <td>{{ apartment.prices.construction.interest.rate_cpi|intcomma }}</td>
                 {% else %}
-                <td>{{ apartment.prices.construction.interest.rate_6|intcomma }}</td>
+                <td>{{ apartment.prices.construction.interest.rate_mpi|intcomma }}</td>
                 {% endif %}
             {% else %}
-                <td>{{ apartment.prices.construction.interest.rate_6|intcomma }}</td>
+                <td>{{ apartment.prices.construction.interest.rate_mpi|intcomma }}</td>
             {% endif %}
         </tr>
         {% endif %}
