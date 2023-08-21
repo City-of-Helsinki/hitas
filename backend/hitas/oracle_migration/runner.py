@@ -294,6 +294,8 @@ def run(
             # Remove apartments owned by housing companies
             remove_apartments_owned_by_housing_companies()
 
+            recalculate_interests(connection, converted_data)
+
     MigrationDone.objects.create()
 
 
@@ -578,7 +580,7 @@ def create_apartments(
         new.loans_during_construction = apartment["loans_during_construction"]
 
         if apartment["completion_date"]:
-            new.interest_during_construction_6 = total_construction_time_interest(
+            new.interest_during_construction_mpi = total_construction_time_interest(
                 loan_rate=Decimal(6.0),
                 apartment_completion_date=apartment["completion_date"],
                 apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
@@ -586,7 +588,7 @@ def create_apartments(
                 payments=fetch_payments(connection, apartment["id"]),
             )
 
-            new.interest_during_construction_14 = total_construction_time_interest(
+            new.interest_during_construction_cpi = total_construction_time_interest(
                 loan_rate=Decimal(14.0),
                 apartment_completion_date=apartment["completion_date"],
                 apartment_transfer_price=Decimal(apartment["debt_free_purchase_price"]),
@@ -1021,6 +1023,41 @@ def create_hitas_types(financing_methods: List[LegacyRow]) -> dict[str, HitasTyp
         hitas_types_by_code_number[financing_method["code_id"]] = hitas_type
 
     return hitas_types_by_code_number
+
+
+def recalculate_interests(connection, converted_data):
+    def fetch_payments(apartment_id: int):
+        retval = []
+        for payment in connection.execute(
+            select(apartment_payments).where(apartment_payments.c.apartment_id == apartment_id)
+        ).fetchall():
+            retval.append(Payment(date=payment.date, percentage=Decimal(payment.percentage)))
+        return retval
+
+    for _apartment_oracle_id, apartment in converted_data.apartments_by_oracle_id.items():
+        first_sale = apartment.first_sale()
+
+        if (
+            apartment.interest_during_construction_mpi
+            and apartment.first_purchase_date is not None
+            and apartment.completion_date is not None
+            and apartment.first_purchase_date > apartment.completion_date
+        ):
+            if apartment.completion_date < date(2005, 1, 1):
+                interestP = 14
+            else:
+                interestP = 6
+
+            interest = total_construction_time_interest(
+                loan_rate=Decimal(interestP),
+                apartment_completion_date=first_sale.purchase_date,
+                apartment_transfer_price=first_sale.purchase_price,
+                apartment_loans_during_construction=apartment.loans_during_construction,
+                payments=fetch_payments(_apartment_oracle_id),
+            )
+
+            apartment.interest_during_construction_cpi = interest
+            apartment.save()
 
 
 # @prints_to_file("log.txt")
