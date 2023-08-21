@@ -289,8 +289,8 @@ export const ApartmentPricesSchema = object({
         loans: nullishDecimal,
         additional_work: nullishDecimal,
         interest: object({
-            rate_6: nullishDecimal,
-            rate_14: nullishDecimal,
+            rate_mpi: nullishDecimal,
+            rate_cpi: nullishDecimal,
         }).optional(),
         debt_free_purchase_price: nullishDecimal,
     }),

@@ -40,7 +40,7 @@ export const errorMessages = {
     sharesEmpty: "Toinen osakekenttä on tyhjä",
     sharesStartGreaterThanEnd: "Osakkeiden lopun on oltava suurempi kuin alun",
     constructionInterestEmpty: "Toinen korkokenttä on tyhjä",
-    constructionInterest6GreaterThan14: "14% koron on oltava suurempi kuin 6% koron",
+    constructionInterest6GreaterThan14: "MHI koron on oltava vähintään yhtä suuri kuin RKI koron",
     maxTwoDecimalPlaces: "Anna arvo enintän kahden desimaalin tarkkuudella",
     noDecimalPlaces: "Anna arvo kokonaislukuna",
     ownerIsRequired: `"Omistaja"-kenttä ei voi olla tyhjä`,

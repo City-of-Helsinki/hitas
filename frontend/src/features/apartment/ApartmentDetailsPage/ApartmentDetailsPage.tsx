@@ -196,18 +196,18 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                             value={formatMoney(apartment.prices.construction.additional_work)}
                                         />
                                         <DetailField
-                                            label="Rakennusaikaiset korot (6 %)"
+                                            label="Rakennusaikaiset korot (MHI)"
                                             value={
                                                 apartment.prices.construction.interest
-                                                    ? formatMoney(apartment.prices.construction.interest.rate_6)
+                                                    ? formatMoney(apartment.prices.construction.interest.rate_mpi)
                                                     : 0
                                             }
                                         />
                                         <DetailField
-                                            label="Rakennusaikaiset korot (14 %)"
+                                            label="Rakennusaikaiset korot (RKI)"
                                             value={
                                                 apartment.prices.construction.interest
-                                                    ? formatMoney(apartment.prices.construction.interest.rate_14)
+                                                    ? formatMoney(apartment.prices.construction.interest.rate_cpi)
                                                     : 0
                                             }
                                         />

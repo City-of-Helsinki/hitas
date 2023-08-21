@@ -100,8 +100,8 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
                 construction: {
                     loans: null,
                     interest: {
-                        rate_6: undefined,
-                        rate_14: undefined,
+                        rate_mpi: undefined,
+                        rate_cpi: undefined,
                     },
                     debt_free_purchase_price: null,
                     additional_work: null,
@@ -224,23 +224,23 @@ const LoadedApartmentCreatePage = () => {
         }
         // If either interest rate is null, we have an error
         else if (!rate6 && rate6 !== 0) {
-            formObject.setError("prices.construction.interest.rate_6", {
+            formObject.setError("prices.construction.interest.rate_mpi", {
                 type: "custom",
                 message: errorMessages.constructionInterestEmpty,
             });
         } else if (!rate14 && rate14 !== 0) {
-            formObject.setError("prices.construction.interest.rate_14", {
+            formObject.setError("prices.construction.interest.rate_cpi", {
                 type: "custom",
                 message: errorMessages.constructionInterestEmpty,
             });
         }
-        // If 6% is greater than 14%, we have an error
-        else if (rate6 && rate14 && rate6 >= rate14) {
-            formObject.setError("prices.construction.interest.rate_6", {
+        // If MPI is greater than CPI, we have an error (CPI interest should always be equal or greater than MPI)
+        else if (rate6 && rate14 && rate6 > rate14) {
+            formObject.setError("prices.construction.interest.rate_mpi", {
                 type: "custom",
                 message: errorMessages.constructionInterest6GreaterThan14,
             });
-            formObject.setError("prices.construction.interest.rate_14", {
+            formObject.setError("prices.construction.interest.rate_cpi", {
                 type: "custom",
                 message: errorMessages.constructionInterest6GreaterThan14,
             });
@@ -265,7 +265,7 @@ const LoadedApartmentCreatePage = () => {
 
         handleValidateShares(...formObject.getValues(["shares.start", "shares.end"]));
         handleValidateInterestDuringConstructionRates(
-            ...formObject.getValues(["prices.construction.interest.rate_6", "prices.construction.interest.rate_14"])
+            ...formObject.getValues(["prices.construction.interest.rate_mpi", "prices.construction.interest.rate_cpi"])
         );
 
         // If there are errors, set focus to the first error field
@@ -285,10 +285,10 @@ const LoadedApartmentCreatePage = () => {
                 handleValidateShares(value?.shares?.start, value.shares?.end);
             }
 
-            if (name === "prices.construction.interest.rate_6" || name === "prices.construction.interest.rate_14") {
+            if (name === "prices.construction.interest.rate_mpi" || name === "prices.construction.interest.rate_cpi") {
                 handleValidateInterestDuringConstructionRates(
-                    value?.prices?.construction?.interest?.rate_6,
-                    value?.prices?.construction?.interest?.rate_14
+                    value?.prices?.construction?.interest?.rate_mpi,
+                    value?.prices?.construction?.interest?.rate_cpi
                 );
             }
         });
@@ -378,14 +378,14 @@ const LoadedApartmentCreatePage = () => {
                                 allowDecimals
                             />
                             <NumberInput
-                                name="prices.construction.interest.rate_6"
-                                label="Rak.aik. korko (6%)"
+                                name="prices.construction.interest.rate_mpi"
+                                label="Rak.aik. korko (MHI)"
                                 unit="€"
                                 allowDecimals
                             />
                             <NumberInput
-                                name="prices.construction.interest.rate_14"
-                                label="Rak.aik. korko (14%)"
+                                name="prices.construction.interest.rate_cpi"
+                                label="Rak.aik. korko (RKI)"
                                 unit="€"
                                 allowDecimals
                             />
