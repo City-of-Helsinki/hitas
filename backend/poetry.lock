@@ -553,20 +553,20 @@ files = [
 
 [[package]]
 name = "django"
-version = "3.2.20"
-description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
+version = "4.2.4"
+description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "Django-3.2.20-py3-none-any.whl", hash = "sha256:a477ab326ae7d8807dc25c186b951ab8c7648a3a23f9497763c37307a2b5ef87"},
-    {file = "Django-3.2.20.tar.gz", hash = "sha256:dec2a116787b8e14962014bf78e120bba454135108e1af9e9b91ade7b2964c40"},
+    {file = "Django-4.2.4-py3-none-any.whl", hash = "sha256:860ae6a138a238fc4f22c99b52f3ead982bb4b1aad8c0122bcd8c8a3a02e409d"},
+    {file = "Django-4.2.4.tar.gz", hash = "sha256:7e4225ec065e0f354ccf7349a22d209de09cc1c074832be9eb84c51c1799c432"},
 ]
 
 [package.dependencies]
-asgiref = ">=3.3.2,<4"
-pytz = "*"
-sqlparse = ">=0.2.2"
+asgiref = ">=3.6.0,<4"
+sqlparse = ">=0.3.1"
+tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
 [package.extras]
 argon2 = ["argon2-cffi (>=19.1.0)"]
@@ -590,14 +590,14 @@ python-dateutil = ">=2.7.0"
 
 [[package]]
 name = "django-cors-headers"
-version = "3.14.0"
+version = "4.2.0"
 description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "django_cors_headers-3.14.0-py3-none-any.whl", hash = "sha256:684180013cc7277bdd8702b80a3c5a4b3fcae4abb2bf134dceb9f5dfe300228e"},
-    {file = "django_cors_headers-3.14.0.tar.gz", hash = "sha256:5fbd58a6fb4119d975754b2bc090f35ec160a8373f276612c675b00e8a138739"},
+    {file = "django_cors_headers-4.2.0-py3-none-any.whl", hash = "sha256:9ada212b0e2efd4a5e339360ffc869cb21ac5605e810afe69f7308e577ea5bde"},
+    {file = "django_cors_headers-4.2.0.tar.gz", hash = "sha256:f9749c6410fe738278bc2b6ef17f05195bc7b251693c035752d8257026af024f"},
 ]
 
 [package.dependencies]
@@ -702,14 +702,14 @@ test = ["celery", "pytest", "pytest-cov", "pytest-django", "redis"]
 
 [[package]]
 name = "django-helusers"
-version = "0.8.1"
+version = "0.9.0"
 description = "Django app for the user infrastructure of the City of Helsinki"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-helusers-0.8.1.tar.gz", hash = "sha256:4b8a4566a1548405c03fc88fce971c04aef7210ac638a038d67c2ee52779e573"},
-    {file = "django_helusers-0.8.1-py3-none-any.whl", hash = "sha256:15f5747ab4dba992ec652f40c4c388fdb3d6c0ebeb3256d0346cd78d446175f2"},
+    {file = "django-helusers-0.9.0.tar.gz", hash = "sha256:640885b8684ae1de131320307a4355c2034bff968655dae602d2d25d07dd9811"},
+    {file = "django_helusers-0.9.0-py3-none-any.whl", hash = "sha256:3754e80e92b49a222e4d3c00baa5cc7c7d9f885f451fc63100daa19cdcf18425"},
 ]
 
 [package.dependencies]
@@ -749,14 +749,14 @@ files = [
 
 [[package]]
 name = "django-post-fetch-hook"
-version = "0.0.1"
+version = "0.0.2"
 description = "Modify data fetched from a database after it has been fetched but before it has been cached in django's result cache."
 category = "main"
 optional = false
 python-versions = ">=3.9,<4"
 files = [
-    {file = "django_post_fetch_hook-0.0.1-py3-none-any.whl", hash = "sha256:7959358cbcf5432f962dcabc5a99d5c8e5234567eaffe5e4e5d7db8f34156e36"},
-    {file = "django_post_fetch_hook-0.0.1.tar.gz", hash = "sha256:73e9db90abeb5211887b910db177ff84b2452d6e1b5f36c94c71d93873fcc43d"},
+    {file = "django_post_fetch_hook-0.0.2-py3-none-any.whl", hash = "sha256:5ad1426e2d5b0f6cd795f44d5632a5d40a1abc1661108cdde731c5e4277a3d63"},
+    {file = "django_post_fetch_hook-0.0.2.tar.gz", hash = "sha256:36b2c84da05b077373415718a1248e88ddffad8dd2a7d6d44076ef04c21c10cf"},
 ]
 
 [package.dependencies]
@@ -943,14 +943,14 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "17.6.0"
+version = "19.3.0"
 description = "Faker is a Python package that generates fake data for you."
 category = "dev"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "Faker-17.6.0-py3-none-any.whl", hash = "sha256:5aaa16fa9cfde7d117eef70b6b293a705021e57158f3fa6b44ed1b70202d2065"},
-    {file = "Faker-17.6.0.tar.gz", hash = "sha256:51f37ff9df710159d6d736d0ba1c75e063430a8c806b91334d7794305b5a6114"},
+    {file = "Faker-19.3.0-py3-none-any.whl", hash = "sha256:bee54278d6e1289573317604ab6f4782acca724396bf261eaf1890de228e553d"},
+    {file = "Faker-19.3.0.tar.gz", hash = "sha256:7d6ed00de3eef9bd57504500c67ee034cab959e4248f9c24aca33e08af82ca93"},
 ]
 
 [package.dependencies]
@@ -3167,4 +3167,4 @@ svglib = ">=1.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d4629f4f7f944cd873ab85968aed87b669e9951c0dfdf6ee4742b28036ce6ac6"
+content-hash = "72293f3d471c701f0a592e825cc2f196c5099343f2cfced3c693d4c33e7011d8"
