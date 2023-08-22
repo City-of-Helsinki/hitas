@@ -5,7 +5,7 @@ from typing import Literal, NamedTuple, Optional, Union
 
 from dateutil.relativedelta import relativedelta
 from django.db.models import Case, F, OuterRef, Q, Subquery, Value, When
-from django.db.models.functions import Coalesce, NullIf
+from django.db.models.functions import Coalesce, NullIf, Round
 from django.utils import timezone
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
@@ -30,7 +30,7 @@ from hitas.models.indices import (
     SurfaceAreaPriceCeilingResult,
 )
 from hitas.services.housing_company import get_completed_housing_companies, make_index_adjustment_for_housing_companies
-from hitas.utils import RoundWithPrecision, format_sheet, hitas_calculation_quarter, monthify, resize_columns, roundup
+from hitas.utils import format_sheet, hitas_calculation_quarter, monthify, resize_columns, roundup
 
 logger = logging.getLogger()
 
@@ -287,7 +287,7 @@ def build_surface_area_price_ceiling_report_excel(results: SurfaceAreaPriceCeili
 
 def subquery_apartment_current_surface_area_price(
     calculation_date: Optional[datetime.date] = None,
-) -> RoundWithPrecision:
+) -> Round:
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
 
@@ -296,7 +296,7 @@ def subquery_apartment_current_surface_area_price(
         output_field=HitasModelDecimalField(),
     )
 
-    return RoundWithPrecision(
+    return Round(
         F("surface_area") * current_value,
         precision=2,
     )
@@ -311,7 +311,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     ],
     completion_date: Optional[datetime.date],
     calculation_date: datetime.date,
-) -> RoundWithPrecision:
+) -> Round:
     """
     If 'completion_date' is missing, calculating index for that month will fail
     and index price will be null, so we can skip this calculation freely
@@ -319,7 +319,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     Requires `completion_month` to be annotated to the queryset
     """
     if completion_date is None:
-        return RoundWithPrecision(None, output_field=HitasModelDecimalField())
+        return Round(None, output_field=HitasModelDecimalField())
 
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
@@ -354,7 +354,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
             output_field=HitasModelDecimalField(),
         )
 
-    return RoundWithPrecision(
+    return Round(
         (
             F("_first_sale_purchase_price")
             + F("_first_sale_share_of_housing_company_loans")
