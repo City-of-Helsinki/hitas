@@ -54,6 +54,7 @@ django-debug-toolbar = "^3.8.1" # Updating to 4 breaks query count tests
 pre-commit = "^3.3.3"
 pypdf = "^3.15.2"
 sqlparse = "^0.4.4"
+pytest-xdist = "^3.3.1"
 
 [tool.poetry.group.migration]
 optional = true
