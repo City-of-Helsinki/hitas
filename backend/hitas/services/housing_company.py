@@ -29,7 +29,7 @@ from hitas.services.apartment import (
     get_first_sale_purchase_date,
 )
 from hitas.services.audit_log import last_modified
-from hitas.utils import RoundWithPrecision, max_date_if_all_not_null, roundup
+from hitas.utils import max_date_if_all_not_null, roundup
 
 logger = logging.getLogger()
 
@@ -313,7 +313,7 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
             _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
             surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
             realized_acquisition_price=Sum("_acquisition_price"),
-            avg_price_per_square_meter=RoundWithPrecision(
+            avg_price_per_square_meter=Round(
                 F("realized_acquisition_price") / F("surface_area"),
                 precision=2,
             ),
