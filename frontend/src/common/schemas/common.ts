@@ -24,7 +24,7 @@ export const errorMessages = {
     ownershipPercent: "Asunnon omistajuusprosentin tulee olla yhteensä 100%",
     ownershipDuplicate: "Samaa henkilöä ei voi valita useaan kertaan",
     priceMin: "Kauppahinta ei saa olla tyhjä",
-    priceMax: "Kauppahinta ei saa ylittää 999 999 €",
+    salePriceOverMillion: "Kauppahinta ei saa ylittää 999 999 €",
     loanShareMin: "Lainaosuus ei voi olla alle 0 €",
     emailInvalid: "Virheellinen sähköpostiosoite",
     urlInvalid: "Virheellinen www-osoite",

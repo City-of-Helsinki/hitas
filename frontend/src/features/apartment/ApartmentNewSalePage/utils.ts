@@ -95,12 +95,14 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
                 code: z.ZodIssueCode.custom,
                 path: ["purchase_price"],
                 message: "Pakollinen jos kauppa tilastoidaan.",
+                fatal: true,
             });
+            return z.NEVER;
         }
 
         if (data.exclude_from_statistics) return; // No need to validate further.
-
         if (maximumPrices.debtFreePurchasePrice === null || maximumPrices.maximumPrice === null) return;
+
         const debtFreePurchasePrice = (data.purchase_price ?? 0) + (data.apartment_share_of_housing_company_loans ?? 0);
 
         const isCalculationValid = isApartmentMaxPriceCalculationValid(apartment, data.purchase_date);
@@ -150,6 +152,17 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
                 path: ["apartment_share_of_housing_company_loans"],
                 message: errorMessages.loanShareChanged,
             });
+        }
+
+        // Warn that the price is over a million, as it is a rare case and might be a mistake.
+        if (!warningsGiven.purchase_price_over_million) {
+            if (data.purchase_price && data.purchase_price > 999999) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["purchase_price"],
+                    message: errorMessages.salePriceOverMillion,
+                });
+            }
         }
     });
 
