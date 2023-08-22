@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import environ
@@ -70,16 +69,17 @@ CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 CORS_ALLOW_CREDENTIALS = True
 
-# In Django 3.2, this should not include schema.
-# This was changed in django 4.0+ so that schema is mandatory,
-# so this should be changed when updating to django 4.0+.
-# https://docs.djangoproject.com/en/dev/releases/4.0/#format-change
-CSRF_TRUSTED_ORIGINS = [re.sub(r"^https?://", "", host) for host in CORS_ALLOWED_ORIGINS]
-if CSRF_TRUSTED_ORIGINS:
-    # Don't set CSRF_COOKIE_DOMAIN if running locally
-    if CSRF_TRUSTED_ORIGINS[0].split(":")[0] not in ["localhost", "127.0.0.1"]:
-        # Allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
-        CSRF_COOKIE_DOMAIN = "." + ".".join(CSRF_TRUSTED_ORIGINS[0].split(".")[1:])
+if CORS_ALLOWED_ORIGINS:
+    # CORS_ALLOWED_ORIGINS items must be in the format e.g. 'http://localhost:3000' or 'https://hitas.dev.hel.ninja'
+    CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+
+    # When not running locally, set the CSRF_COOKIE_DOMAIN variable
+    if CORS_ALLOWED_ORIGINS[0].split("://")[1].split(":")[0] not in ["localhost", "127.0.0.1"]:
+        # Assume that all urls are in the same domain except for the first part, e.g. 'hitas.dev.hel.ninja'
+        # Take the first url and remove the first domain part to e.g. 'dev.hel.ninja'
+        # Lastly add a dot in front of the url to make it a domain, e.g. '.dev.hel.ninja'
+        # This allow 'csrftoken' cookie to be read/used by all subdomains, e.g. the frontend
+        CSRF_COOKIE_DOMAIN = "." + ".".join(CORS_ALLOWED_ORIGINS[0].split(".")[1:])
 
 # ----- Installed apps ---------------------------------------------------------------------------------
 

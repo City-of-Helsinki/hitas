@@ -65,7 +65,7 @@ Git will now automatically look for the file when using `git blame`, no addition
 ### API definitions
 
 * It's possible to take a look into `openapi.yaml`
-* After running `make docker-build` Swagger editor is running in [localhost:8090](localhost:8090)
+* After running `make docker-build` Swagger editor is running in [http://localhost:8090](http://localhost:8090)
 
 
 ### Helpful commands
@@ -139,7 +139,7 @@ GitHub OAuth app to `SOCIAL_AUTH_GITHUB_KEY` and `SOCIAL_AUTH_GITHUB_SECRET` res
 
 You should be set up to re-run docker with `docker-compose --profile tunnistamo up --build --detach`
 on the root level. This will build the Tunnistamo containers using the secrets you provided.
-Tunnistamo admin interface will be running on `localhost:8099/admin`.
+Tunnistamo admin interface will be running on `http://localhost:8099/admin`.
 
 
 #### Configure the OIDC Provider Client in your local Tunnistamo
