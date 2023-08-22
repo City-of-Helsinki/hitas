@@ -1751,6 +1751,61 @@ def test__api__apartment_sale__delete__over_three_months(api_client: HitasAPICli
 
 
 @pytest.mark.django_db
+def test__api__apartment_sale__delete__over_three_months__condition_of_sale__new(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=under_three_months,
+        apartment__completion_date=under_three_months,
+    )
+    ConditionOfSaleFactory.create(new_ownership=sale.ownerships.first())
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": sale.apartment.uuid.hex,
+            "uuid": sale.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+
+@pytest.mark.django_db
+def test__api__apartment_sale__delete__over_three_months__condition_of_sale__old(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2023-01-01")
+
+    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=under_three_months,
+        apartment__completion_date=under_three_months,
+    )
+    ConditionOfSaleFactory.create(old_ownership=sale.ownerships.first())
+
+    url = reverse(
+        "hitas:apartment-sale-detail",
+        kwargs={
+            "housing_company_uuid": sale.apartment.housing_company.uuid.hex,
+            "apartment_uuid": sale.apartment.uuid.hex,
+            "uuid": sale.uuid.hex,
+        },
+    )
+    response = api_client.delete(url)
+    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+    assert response.json() == {
+        "error": "invalid",
+        "message": "This sale can no longer be cancelled",
+        "reason": "Conflict",
+        "status": 409,
+    }
+
+
+@pytest.mark.django_db
 def test__api__apartment_sale__delete__cant_delete_sale_if_not_latest(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 

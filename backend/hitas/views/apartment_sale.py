@@ -201,7 +201,12 @@ class ApartmentSaleViewSet(HitasModelViewSet):
         if instance.apartment.completion_date is not None:
             comparison_date = max(instance.apartment.completion_date, instance.purchase_date)
 
-            if comparison_date < timezone.now().date() - relativedelta(months=3):
+            # The sale can be cancelled:
+            # - Within 3 months of the comparison date
+            # - If the apartment has conditions of sale, where it is considered the new apartment
+            if comparison_date < timezone.now().date() - relativedelta(months=3) and not any(
+                ownership.conditions_of_sale_new.exists() for ownership in instance.ownerships.all()
+            ):
                 raise ModelConflict("This sale can no longer be cancelled", error_code="invalid")
 
         previous_sale: Optional[ApartmentSale] = (
