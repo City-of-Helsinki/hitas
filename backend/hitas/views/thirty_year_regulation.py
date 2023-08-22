@@ -174,5 +174,6 @@ class ThirtyYearRegulationPostalCodesView(ViewSet):
         external_sales_data = get_external_sales_data(to_quarter(this_quarter))
         price_by_area = combine_sales_data(sales_data, external_sales_data)
         results = compile_postal_codes_with_cost_areas(price_by_area)
+        results = sorted(results, key=lambda x: x["postal_code"])
 
         return Response(data=results, status=status.HTTP_200_OK)
