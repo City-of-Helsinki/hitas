@@ -311,7 +311,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     ],
     completion_date: Optional[datetime.date],
     calculation_date: datetime.date,
-) -> Round:
+) -> Union[Round | Value]:
     """
     If 'completion_date' is missing, calculating index for that month will fail
     and index price will be null, so we can skip this calculation freely
@@ -319,7 +319,7 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
     Requires `completion_month` to be annotated to the queryset
     """
     if completion_date is None:
-        return Round(None, output_field=HitasModelDecimalField())
+        return Value(None, output_field=HitasModelDecimalField())
 
     calculation_date = timezone.now().date() if calculation_date is None else calculation_date
     calculation_month = monthify(calculation_date)
