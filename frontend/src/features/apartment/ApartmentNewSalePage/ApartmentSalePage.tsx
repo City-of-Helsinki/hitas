@@ -7,7 +7,7 @@ import {v4 as uuidv4} from "uuid";
 import {z, ZodSchema} from "zod";
 import {ConfirmDialogModal, Heading, NavigateBackButton, OwnershipList, SaveButton} from "../../../common/components";
 import {FormProviderForm} from "../../../common/components/forms";
-import {IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
+import {errorMessages, IApartmentSaleForm, OwnershipsListSchema} from "../../../common/schemas";
 import {useCreateSaleMutation} from "../../../common/services";
 import {hdsToast, setAPIErrorsForFormFields, today} from "../../../common/utils";
 import {ApartmentViewContext, ApartmentViewContextProvider} from "../components/ApartmentViewContextProvider";
@@ -35,7 +35,11 @@ const LoadedApartmentSalePage = () => {
     // ************
 
     // Certain form errors should be able to be ignored.
-    const noWarningsGiven = {maximum_price_calculation: false, catalog_acquisition_price: false};
+    const noWarningsGiven = {
+        maximum_price_calculation: false,
+        catalog_acquisition_price: false,
+        purchase_price_over_million: false,
+    };
     const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
     const [warningMessage, setWarningMessage] = useState("");
     const [warningsGiven, setWarningsGiven] = useState(noWarningsGiven);
@@ -108,7 +112,11 @@ const LoadedApartmentSalePage = () => {
         } else if (errors.purchase_date) {
             hdsToast.error(`Kauppakirjan päivämäärä: ${errors.purchase_date.message}`);
             return;
-        } else if (errors.purchase_price && !errors.maximum_price_calculation) {
+        } else if (
+            errors.purchase_price &&
+            !errors.maximum_price_calculation &&
+            errors.purchase_price.message !== errorMessages.salePriceOverMillion
+        ) {
             hdsToast.error(`Kauppahinta: ${errors.purchase_price.message}`);
             return;
         } else if (errors.apartment_share_of_housing_company_loans) {
@@ -132,6 +140,10 @@ const LoadedApartmentSalePage = () => {
             setIsWarningModalVisible(true);
             setWarningsGiven((prev) => ({...prev, catalog_acquisition_price: true}));
             setWarningMessage(errors.catalog_acquisition_price.message);
+        } else if (errors.purchase_price && errors.purchase_price.type === z.ZodIssueCode.custom) {
+            setIsWarningModalVisible(true);
+            setWarningsGiven((prev) => ({...prev, purchase_price_over_million: true}));
+            setWarningMessage(errors.purchase_price.message);
         } else {
             hdsToast.error(`Virhe luodessa asunnon kauppaa!`);
             setIsWarningModalVisible(false);

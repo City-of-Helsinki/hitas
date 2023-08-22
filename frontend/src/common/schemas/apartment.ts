@@ -443,7 +443,6 @@ export const ApartmentSaleFormSchema = object({
     purchase_price: z
         .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
         .nonnegative(errorMessages.priceMin)
-        .max(999999, errorMessages.priceMax)
         .multipleOf(1, errorMessages.noDecimalPlaces)
         .nullish(),
     apartment_share_of_housing_company_loans: z
@@ -465,8 +464,7 @@ export const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
         id: string().optional(),
         purchase_price: z
             .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
-            .nonnegative(errorMessages.priceMin)
-            .max(999999, errorMessages.priceMax),
+            .nonnegative(errorMessages.priceMin),
         apartment_share_of_housing_company_loans: z
             .number({invalid_type_error: errorMessages.required, required_error: errorMessages.required})
             .nonnegative(errorMessages.priceMin),
