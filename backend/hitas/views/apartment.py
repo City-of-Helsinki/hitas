@@ -697,8 +697,8 @@ class ApartmentDetailSerializer(EnumSupportSerializerMixin, HitasModelSerializer
         return instance
 
     def update(self, instance: ApartmentWithAnnotations, validated_data: dict[str, Any]) -> Apartment:
-        mpi = validated_data.pop("market_price_improvements")
-        cpi = validated_data.pop("construction_price_improvements")
+        mpi = validated_data.pop("market_price_improvements", [])
+        cpi = validated_data.pop("construction_price_improvements", [])
 
         if (mpi or cpi) and not instance.building.real_estate.housing_company.hitas_type.old_hitas_ruleset:
             raise serializers.ValidationError(
