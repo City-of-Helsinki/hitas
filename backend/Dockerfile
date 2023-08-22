@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye AS base
+FROM python:3.11.4-slim-bullseye AS base
 
 # Setup environment variables.
 ENV PYTHONUNBUFFERED=1 \
