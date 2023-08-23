@@ -25,7 +25,6 @@
                 "endOfLine": "auto"
             }
         ],
-        "comma-dangle": 0,
         "require-jsdoc": 0,
         "max-len": [0, 120, 2],
         "object-curly-spacing": 0,

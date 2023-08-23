@@ -6,7 +6,7 @@ import {IMutateFormProps, MutateModal} from "./index";
 interface IResultListProps<
     TFilterQueryParams extends object,
     TListFieldsWithTitles extends object,
-    TFormFieldsWithTitles extends object
+    TFormFieldsWithTitles extends object,
 > {
     listFieldsWithTitles: TListFieldsWithTitles;
     params: TFilterQueryParams;
@@ -23,7 +23,7 @@ function ResultList<
     TFilterQueryParams extends object,
     TDefaultObject extends object,
     TListFieldsWithTitles extends object,
-    TFormFieldsWithTitles extends object
+    TFormFieldsWithTitles extends object,
 >({
     listFieldsWithTitles,
     params,
@@ -119,7 +119,7 @@ function ResultList<
 interface IMutateSearchListProps<
     TListFieldsWithTitles extends object,
     TFilterQueryParams extends object,
-    TFormFieldsWithTitles extends object
+    TFormFieldsWithTitles extends object,
 > {
     listFieldsWithTitles: TListFieldsWithTitles;
     searchStringMinLength?: number;
@@ -137,7 +137,7 @@ interface IMutateSearchListProps<
 export default function MutateSearchList<
     TListFieldsWithTitles extends object,
     TFilterQueryParams extends object,
-    TFormFieldsWithTitles extends object
+    TFormFieldsWithTitles extends object,
 >({
     listFieldsWithTitles,
     searchStringMinLength = 2,
