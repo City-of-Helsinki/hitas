@@ -72,6 +72,7 @@ const DateInput = ({name, label, required, ...rest}: DateInputProps) => {
                 errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={!!fieldError}
                 required={required}
+                crossOrigin={undefined}
                 {...rest}
             />
         </div>

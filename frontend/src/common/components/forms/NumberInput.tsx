@@ -61,6 +61,7 @@ const NumberInput = ({name, label = "", unit, required, invalid, allowDecimals, 
                 errorText={fieldError ? (fieldError as {message: string}).message : ""}
                 invalid={invalid ?? !!fieldError}
                 required={required}
+                crossOrigin={undefined}
                 {...rest}
             />
         </div>
