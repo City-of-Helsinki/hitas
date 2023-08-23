@@ -81,7 +81,7 @@ export const OwnershipsListSchema = object({
         if (percentagesSum !== 0 && percentagesSum !== 100) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: errorMessages.ownershipPercent,
+                message: errorMessages.ownershipPercentSum,
             });
         }
     });
