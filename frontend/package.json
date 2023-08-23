@@ -5,8 +5,8 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@reduxjs/toolkit": "^1.9.3",
-    "@svgr/webpack": "^8.0.1",
-    "@testing-library/jest-dom": "^5.14.1",
+    "@svgr/webpack": "^8.1.0",
+    "@testing-library/jest-dom": "^6.1.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^29.2.6",
@@ -17,7 +17,7 @@
     "hds-react": "^2.15.0",
     "immer": "^10.0.2",
     "loader-utils": "^3.2.1",
-    "minimatch": "^9.0.1",
+    "minimatch": "^9.0.3",
     "path": "^0.12.7",
     "postcss-loader": "^7.0.0",
     "react": "^18.1.0",
@@ -28,7 +28,7 @@
     "react-router": "^6.7.0",
     "react-router-dom": "^6.7.0",
     "sass": "^1.57.1",
-    "typescript": "^4 && <5",
+    "typescript": "^5.1.6",
     "typescript-cookie": "^1.0.6",
     "use-immer": "^0.9.0",
     "uuid": "^9.0.0",
@@ -60,22 +60,16 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.11",
-    "@typescript-eslint/parser": "^5.59.11",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
     "eslint": "^8.42.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.2",
     "prettier-plugin-organize-imports": "^3.2.2",
     "react-scripts": "^5.0.1"
-  },
-  "resolutions": {
-    "@svgr/webpack": "^6.3.1",
-    "**/recursive-readdir/minimatch": "^3.0.5",
-    "react-scripts/@pmmmwh/react-refresh-webpack-plugin/**/loader-utils": "^2.0.4",
-    "react-scripts/react-dev-utils/loader-utils": "^3.2.1"
   }
 }
