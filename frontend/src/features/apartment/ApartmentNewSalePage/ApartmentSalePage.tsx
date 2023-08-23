@@ -89,13 +89,17 @@ const LoadedApartmentSalePage = () => {
     };
 
     useEffect(() => {
-        // Re-validate form due to maximum prices changing to get rid of errors
-        if (maximumPrices.maximumPrice !== null && formObject.getValues("purchase_price")) {
-            formObject.trigger();
-        }
-        // If purchase_price didn't have a value, clear only loan share errors in case there are any
-        else if (formObject.getValues("apartment_share_of_housing_company_loans") !== null) {
-            formObject.trigger("apartment_share_of_housing_company_loans");
+        // No need to trigger a validation when doing an apartments first sale
+        // (Triggering can cause e.g. date fields to show errors prematurely if they are empty)
+        if (!isApartmentFirstSale) {
+            // Re-validate form due to maximum prices changing to get rid of errors
+            if (maximumPrices.maximumPrice !== null && formObject.getValues("purchase_price")) {
+                formObject.trigger();
+            }
+            // If purchase_price didn't have a value, clear only loan share errors in case there are any
+            else if (formObject.getValues("apartment_share_of_housing_company_loans") !== null) {
+                formObject.trigger("apartment_share_of_housing_company_loans");
+            }
         }
     }, [maximumPrices]);
 

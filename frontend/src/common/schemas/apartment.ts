@@ -455,10 +455,9 @@ export const ApartmentSaleFormSchema = object({
 });
 export type IApartmentSaleForm = z.infer<typeof ApartmentSaleFormSchema>;
 
-export const ApartmentSaleSchema = ApartmentSaleFormSchema.omit({
-    purchase_price: true,
-    apartment_share_of_housing_company_loans: true,
-    ownerships: true,
+export const ApartmentSaleSchema = ApartmentSaleFormSchema.pick({
+    notification_date: true,
+    purchase_date: true,
 }).and(
     object({
         id: string().optional(),

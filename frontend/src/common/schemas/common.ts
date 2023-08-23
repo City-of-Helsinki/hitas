@@ -111,10 +111,15 @@ export const writableRequiredNumber = number({
     .nonnegative(errorMessages.numberPositive)
     .optional(); // allow undefined but no null
 
-export const APIDateSchema = string({required_error: errorMessages.required}).regex(
-    /^\d{4}-\d{2}-\d{2}$/,
-    errorMessages.dateFormat
-);
+export const APIDateSchema = string({
+    errorMap: (error, ctx) => {
+        // Instead of showing 'Expected string, received null' show 'Field is required' message
+        if (error.code == z.ZodIssueCode.invalid_type && error.received === "null") {
+            return {message: errorMessages.required};
+        }
+        return {message: ctx.defaultError};
+    },
+}).regex(/^\d{4}-\d{2}-\d{2}$/, errorMessages.dateFormat);
 
 // ********************************
 // * Basic common schemas
