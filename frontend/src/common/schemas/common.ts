@@ -21,7 +21,7 @@ export const errorMessages = {
     dateMin: "Liian aikainen päivämäärä",
     dateMax: "Liian myöhäinen päivämäärä",
     noOwnerships: "Asunnolla täytyy olla omistaja",
-    ownershipPercent: "Asunnon omistajuusprosentin tulee olla yhteensä 100%",
+    ownershipPercentSum: "Asunnon omistajuusprosentin tulee olla yhteensä 100%",
     ownershipDuplicate: "Samaa henkilöä ei voi valita useaan kertaan",
     priceMin: "Kauppahinta ei saa olla tyhjä",
     salePriceOverMillion: "Kauppahinta ei saa ylittää 999 999 €",
