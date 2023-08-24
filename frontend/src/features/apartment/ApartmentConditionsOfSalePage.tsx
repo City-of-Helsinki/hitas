@@ -77,6 +77,32 @@ const HouseholdOwnersList = () => {
     );
 };
 
+const DuplicateConditionsOfSaleHelpText = ({apartment, formObject}) => {
+    // Display a warning message, that if user creates a new condition of sale to an apartment that has at least 2
+    // owners and the household includes at least one owner not in the apartment, the conditions of sale will look
+    // like duplicates.
+    // This is due to the new conditions of sale having the same owner and apartment, but in truth they are
+    // different conditions of sale, because they are linked to different owners in this apartment.
+
+    // No need to show warning when apartment has less than 2 owners
+    if (apartment.ownerships.length < 2) return null;
+
+    const household = formObject.watch("household").filter((o) => o?.owner?.id);
+    const apartmentOwnerIds = apartment.ownerships.map((o) => o.owner.id);
+    const householdOtherOwnersCount = household.filter((o) => !apartmentOwnerIds.includes(o?.owner?.id)).length;
+    // No need to show warning when household includes only owners in this apartment
+    if (householdOtherOwnersCount < 1) return null;
+    // No need to show warning when user selected only one current owner
+    if (household.length - householdOtherOwnersCount < 2) return null;
+
+    return (
+        <p className="help-text">
+            Huom! Taloudelle luotavat myyntiehdot voivat näyttää duplikaateilta, koska niissä on sama toinen omistaja.
+            Myyntiehdot ovat kuitenkin toisistaan erillisiä, sillä ne kohdistuvat tämän asunnon eri omistajiin.
+        </p>
+    );
+};
+
 const CreateConditionOfSaleButton = () => {
     const {apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
@@ -155,6 +181,10 @@ const CreateConditionOfSaleButton = () => {
                 >
                     <HouseholdOwnersList />
                 </FormProviderForm>
+                <DuplicateConditionsOfSaleHelpText
+                    apartment={apartment}
+                    formObject={formObject}
+                />
             </GenericActionModal>
         </>
     );
