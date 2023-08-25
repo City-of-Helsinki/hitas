@@ -4,7 +4,7 @@ import {FormProvider, useForm} from "react-hook-form";
 import {useState} from "react";
 import {Divider, DownloadButton, Heading, QueryStateHandler} from "../../common/components";
 import {SelectInput} from "../../common/components/forms";
-import {hitasQuarters} from "../../common/schemas";
+import {hitasQuarters, IThirtyYearRegulationResponse} from "../../common/schemas";
 import {
     downloadRegulationResults,
     useCreateThirtyYearRegulationMutation,
@@ -142,8 +142,10 @@ const ThirtyYearRegulationContainer = () => {
     // ******************
 
     const hasSkippedCompanies = makeRegulationData?.skipped?.length;
-    const regulationData: object | undefined = hasSkippedCompanies ? makeRegulationData : getRegulationData;
-    const isRegulationLoading = isGetRegulationLoading ?? isMakeRegulationLoading;
+    const regulationData: IThirtyYearRegulationResponse | undefined = hasSkippedCompanies
+        ? makeRegulationData
+        : getRegulationData;
+    const isRegulationLoading = isGetRegulationLoading || isMakeRegulationLoading;
     const regulationError = getRegulationError ?? makeRegulationError;
     const hasRegulationResults = (!getRegulationError && !!getRegulationData) || !!regulationData;
 
@@ -151,7 +153,7 @@ const ThirtyYearRegulationContainer = () => {
     // * Event handlers *
     // ******************
 
-    const onCompareButtonClick = (data) => {
+    const handleCompareButtonClick = (data) => {
         // format eventual skipped data to match the API format
         const skippedArray: {postalCode: string; replacements: string[]}[] = [];
         if (data?.skipped) {
@@ -187,12 +189,14 @@ const ThirtyYearRegulationContainer = () => {
                     formObject={formObject}
                     hasSkippedCompanies={hasSkippedCompanies}
                 />
+
                 <ThirtyYearRegulationSurfaceAreaPriceCeiling
                     priceCeilingData={priceCeilingData}
                     isPriceCeilingLoading={isPriceCeilingLoading}
                     priceCeilingError={priceCeilingError}
                     calculationMonth={calculationMonth}
                 />
+
                 {hasRegulationResults && (
                     <div className="download-button-container">
                         <DownloadButton
@@ -215,12 +219,12 @@ const ThirtyYearRegulationContainer = () => {
             <ThirtyYearResultsSection
                 hasResults={hasRegulationResults}
                 hasExternalSalesData={hasExternalSalesData}
-                data={regulationData}
-                error={regulationError}
-                isLoading={isRegulationLoading}
-                date={calculationMonth}
+                regulationData={regulationData}
+                regulationError={regulationError}
+                isRegulationLoading={isRegulationLoading}
+                calculationMonth={calculationMonth}
                 priceCeilingValue={priceCeilingData?.value}
-                compareFn={onCompareButtonClick}
+                handleCompareButtonClick={handleCompareButtonClick}
             />
 
             <ThirtyYearErrorModal

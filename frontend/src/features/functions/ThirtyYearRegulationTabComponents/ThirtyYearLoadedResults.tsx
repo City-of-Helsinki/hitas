@@ -1,6 +1,6 @@
 import {Button, Dialog} from "hds-react";
 import React, {useState} from "react";
-import {CloseButton, Heading} from "../../../common/components";
+import {CloseButton, Divider, Heading} from "../../../common/components";
 import {ThirtyYearResultListItem, ThirtyYearSkippedList} from "./index";
 
 const ListHeaders = () => (
@@ -88,7 +88,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
         );
     };
 
-    if (skippedCompanies.length > 0)
+    if (skippedCompanies.length > 0) {
         return (
             <ThirtyYearSkippedList
                 companies={skippedCompanies}
@@ -96,7 +96,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                 reCalculateFn={reCalculateFn}
             />
         );
-    else if (releasedCompanies.length === 0 && stayingCompanies.length === 0)
+    } else if (releasedCompanies.length === 0 && stayingCompanies.length === 0) {
         return (
             <Dialog
                 className="error-modal"
@@ -118,11 +118,12 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                 </Dialog.ActionButtons>
             </Dialog>
         );
-    else
+    } else {
         return (
             <>
                 <>
                     <ResultsList category="freed" />
+                    <Divider size="s" />
                     <ResultsList category="remaining" />
                 </>
                 <Dialog
@@ -148,6 +149,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                 </Dialog>
             </>
         );
+    }
 };
 
 export default ThirtyYearLoadedResults;
