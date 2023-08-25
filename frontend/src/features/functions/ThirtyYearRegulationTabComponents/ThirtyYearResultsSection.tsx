@@ -1,64 +1,83 @@
-import {Button} from "hds-react";
-import {useState} from "react";
 import {QueryStateHandler} from "../../../common/components";
-import {hdsToast} from "../../../common/utils";
 import {ThirtyYearLoadedResults} from "./index";
+import {Button} from "hds-react";
+import {IThirtyYearRegulationResponse} from "../../../common/schemas";
+
+const RunThirtyYearRegulationButton = ({
+    hasResults,
+    regulationData,
+    handleCompareButtonClick,
+    priceCeilingValue,
+    hasExternalSalesData,
+    isRegulationLoading,
+}) => {
+    if (hasResults || regulationData?.skipped?.length > 0) {
+        return null;
+    }
+
+    return (
+        <div className="row row--buttons">
+            <div className="column">
+                <Button
+                    theme="black"
+                    onClick={handleCompareButtonClick}
+                    type="submit"
+                    disabled={!priceCeilingValue || !hasExternalSalesData || isRegulationLoading}
+                    isLoading={isRegulationLoading}
+                >
+                    Aloita vertailu
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+interface ThirtyYearResultsSectionProps {
+    hasExternalSalesData: boolean;
+    hasResults: boolean;
+    regulationData?: IThirtyYearRegulationResponse;
+    regulationError;
+    isRegulationLoading: boolean;
+    calculationMonth: string;
+    priceCeilingValue?: number;
+    handleCompareButtonClick;
+}
 
 const ThirtyYearResultsSection = ({
-    hasResults,
     hasExternalSalesData,
-    data,
-    error,
-    isLoading,
-    date,
+    hasResults,
+    regulationData,
+    regulationError,
+    isRegulationLoading,
+    calculationMonth,
     priceCeilingValue,
-    compareFn,
-}) => {
-    // Because the compareFn doesn't play ball with isLoading, we need to keep track of whether the button has been
-    // clicked. Clicking it again while the comparison is running results in errors.
-    const [isButtonClicked, setIsButtonClicked] = useState(false);
-    let req;
-    const handleCompareButton = () => {
-        setIsButtonClicked(true);
-        compareFn()
-            .then(() => setIsButtonClicked(false)) // wait until the comparison is done before re-enabling the button
-            .catch((e) => {
-                // eslint-disable-next-line no-console
-                console.warn(e);
-                setIsButtonClicked(false); // in the event of an error, re-enable the button
-                hdsToast.error("Virhe!");
-            });
-    };
+    handleCompareButtonClick,
+}: ThirtyYearResultsSectionProps) => {
     return (
         <>
-            {req?.status === "pending" ||
-                (hasExternalSalesData && hasResults && (
-                    <QueryStateHandler
-                        data={data}
-                        error={error}
-                        isLoading={isLoading}
-                        attemptedAction="hae suoritetun vertailun tulokset"
-                    >
-                        <ThirtyYearLoadedResults
-                            data={data}
-                            calculationDate={date}
-                            reCalculateFn={compareFn}
-                        />
-                    </QueryStateHandler>
-                ))}
-            {!hasResults && !(data as unknown as {skipped: object[]})?.skipped && (
-                <div className="row row--buttons">
-                    <Button
-                        theme="black"
-                        onClick={handleCompareButton}
-                        type="submit"
-                        disabled={!priceCeilingValue || !hasExternalSalesData || isButtonClicked} // Disable button if no price ceiling or no external sales data, or it has been clicked
-                        isLoading={isButtonClicked} // show loading spinner while the comparison is running
-                    >
-                        Aloita vertailu
-                    </Button>
-                </div>
+            {hasExternalSalesData && hasResults && (
+                <QueryStateHandler
+                    data={regulationData}
+                    error={regulationError}
+                    isLoading={isRegulationLoading}
+                    attemptedAction="hae suoritetun vertailun tulokset"
+                >
+                    <ThirtyYearLoadedResults
+                        data={regulationData}
+                        calculationDate={calculationMonth}
+                        reCalculateFn={handleCompareButtonClick}
+                    />
+                </QueryStateHandler>
             )}
+
+            <RunThirtyYearRegulationButton
+                hasExternalSalesData={hasExternalSalesData}
+                hasResults={hasResults}
+                regulationData={regulationData}
+                isRegulationLoading={isRegulationLoading}
+                priceCeilingValue={priceCeilingValue}
+                handleCompareButtonClick={handleCompareButtonClick}
+            />
         </>
     );
 };
