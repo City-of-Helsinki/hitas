@@ -85,12 +85,15 @@
         @include flexbox()
 
       .download-button-container
+        margin-top: auto
+        margin-bottom: auto
         margin-left: auto
 
-    .external-sales-data-import
-      padding: $spacing-m
-      padding-top: 0
+    .external-sales-data-import-section
       width: 50%
+
+      [class^="TextInput-module_root"]
+        padding: $spacing-m
 
       // Hide the input help texts and file list as we can't manually clear selected files
       [class^="TextInput-module_infoText"],
@@ -100,7 +103,6 @@
 
     .companies
       padding: $spacing-m
-      margin-top: $spacing-m
       background-color: $color-engel-medium-light
       .obfuscated-owners-button
         position: relative

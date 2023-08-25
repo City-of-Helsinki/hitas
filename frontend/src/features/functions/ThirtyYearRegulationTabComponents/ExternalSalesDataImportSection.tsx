@@ -1,15 +1,30 @@
 import {FileInput as HDSFileInput, LoadingSpinner} from "hds-react";
 import {useState} from "react";
-import {SaveDialogModal} from "../../../common/components";
+import {Divider, SaveDialogModal} from "../../../common/components";
 import {useSaveExternalSalesDataMutation} from "../../../common/services";
 import {hdsToast} from "../../../common/utils";
 
-const ExternalSalesDataImport = ({calculationMonth, hasExternalSalesData, isExternalSalesDataLoading}) => {
+const Spinner = () => {
+    return (
+        <div className="spinner-wrap-color">
+            <LoadingSpinner />
+        </div>
+    );
+};
+
+const ExternalSalesDataAlreadySaved = () => {
+    return (
+        <p className="help-text">
+            Tilastokeskuksen postinumeroalueiden keskineliöhinnat on tallennettu valitulle Hitas-vuosineljännekselle.
+        </p>
+    );
+};
+
+const ExternalSalesDataImport = ({calculationMonth}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [saveExternalSalesData, {data, isLoading, error}] = useSaveExternalSalesDataMutation();
 
-    // Upload file to backend
     const handleFileSelected = (externalSalesDataFile) => {
         saveExternalSalesData({
             calculation_date: calculationMonth,
@@ -19,7 +34,7 @@ const ExternalSalesDataImport = ({calculationMonth, hasExternalSalesData, isExte
             .then((data) => {
                 // Successful upload
                 hdsToast.success(
-                    `Postinumeroalueiden keskineliöhinnat ladattu onnistuneesti Hitas-vuosineljännekselle ${data.calculation_quarter}`
+                    `Postinumeroalueiden keskineliöhinnat tallennettu onnistuneesti Hitas-vuosineljännekselle ${data.calculation_quarter}`
                 );
             })
             .catch((error) => {
@@ -29,28 +44,8 @@ const ExternalSalesDataImport = ({calculationMonth, hasExternalSalesData, isExte
             });
     };
 
-    if (isExternalSalesDataLoading) {
-        return (
-            <div className="external-sales-data-import">
-                <div className="spinner-wrap-color">
-                    <LoadingSpinner />
-                </div>
-            </div>
-        );
-    }
-    if (hasExternalSalesData) {
-        return (
-            <div className="external-sales-data-import">
-                <p>
-                    Tilastokeskuksen postinumeroalueiden keskineliöhinnat on jo tallennettu tälle
-                    Hitas-vuosineljännekselle.
-                </p>
-            </div>
-        );
-    }
-
     return (
-        <div className="external-sales-data-import">
+        <>
             <HDSFileInput
                 id="externalSalesDataFile"
                 label="Tilastokeskuksen postinumeroalueiden keskineliöhinnat"
@@ -73,8 +68,42 @@ const ExternalSalesDataImport = ({calculationMonth, hasExternalSalesData, isExte
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
             />
-        </div>
+        </>
     );
 };
 
-export default ExternalSalesDataImport;
+interface ExternalSalesDataImportProps {
+    hasRegulationResults: boolean;
+    isExternalSalesDataLoading: boolean;
+    hasExternalSalesData: boolean;
+    calculationMonth: string;
+}
+
+const ExternalSalesDataImportSection = ({
+    hasRegulationResults,
+    isExternalSalesDataLoading,
+    hasExternalSalesData,
+    calculationMonth,
+}: ExternalSalesDataImportProps) => {
+    if (hasRegulationResults) {
+        return null;
+    }
+
+    let sectionContent;
+    if (isExternalSalesDataLoading) {
+        sectionContent = <Spinner />;
+    } else if (hasExternalSalesData) {
+        sectionContent = <ExternalSalesDataAlreadySaved />;
+    } else {
+        sectionContent = <ExternalSalesDataImport calculationMonth={calculationMonth} />;
+    }
+
+    return (
+        <>
+            <Divider size="l" />
+            <div className="external-sales-data-import-section">{sectionContent}</div>
+        </>
+    );
+};
+
+export default ExternalSalesDataImportSection;
