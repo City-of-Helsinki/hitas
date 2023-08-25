@@ -14,7 +14,7 @@ import {
 } from "../../common/services";
 import {getHitasQuarter, getHitasQuarterFullLabel, hdsToast} from "../../common/utils";
 import {
-    ExternalSalesDataImport,
+    ExternalSalesDataImportSection,
     ThirtyYearErrorModal,
     ThirtyYearErrorTest,
     ThirtyYearResults,
@@ -139,6 +139,8 @@ const ThirtyYearRegulationContainer = () => {
     const [makeRegulation, {data: makeRegulationData, isLoading: isMakeRegulationLoading, error: makeRegulationError}] =
         useCreateThirtyYearRegulationMutation();
 
+    // ******************
+
     const hasSkippedCompanies = makeRegulationData?.skipped?.length;
     const regulationData: object | undefined = hasSkippedCompanies ? makeRegulationData : getRegulationData;
     const isRegulationLoading = isGetRegulationLoading ?? isMakeRegulationLoading;
@@ -201,17 +203,12 @@ const ThirtyYearRegulationContainer = () => {
                 )}
             </div>
 
-            {!hasRegulationResults ? (
-                <>
-                    <Divider size="l" />
-
-                    <ExternalSalesDataImport
-                        calculationMonth={calculationMonth}
-                        hasExternalSalesData={hasExternalSalesData}
-                        isExternalSalesDataLoading={isExternalSalesDataLoading}
-                    />
-                </>
-            ) : null}
+            <ExternalSalesDataImportSection
+                hasRegulationResults={hasRegulationResults}
+                calculationMonth={calculationMonth}
+                hasExternalSalesData={hasExternalSalesData}
+                isExternalSalesDataLoading={isExternalSalesDataLoading}
+            />
 
             <Divider size="l" />
 

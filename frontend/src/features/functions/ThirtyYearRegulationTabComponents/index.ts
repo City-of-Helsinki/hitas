@@ -1,4 +1,4 @@
-export {default as ExternalSalesDataImport} from "./ExternalSalesDataImport";
+export {default as ExternalSalesDataImportSection} from "./ExternalSalesDataImportSection";
 export {default as ThirtyYearErrorModal} from "./ThirtyYearErrorModal";
 export {default as ThirtyYearErrorTest} from "./ThirtyYearErrorTest";
 export {default as ThirtyYearLoadedResults} from "./ThirtyYearLoadedResults";
