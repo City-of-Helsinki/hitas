@@ -4,7 +4,7 @@ import {QueryStateHandler} from "../../../common/components";
 import {hdsToast} from "../../../common/utils";
 import {ThirtyYearLoadedResults} from "./index";
 
-const ThirtyYearResults = ({
+const ThirtyYearResultsSection = ({
     hasResults,
     hasExternalSalesData,
     data,
@@ -63,4 +63,4 @@ const ThirtyYearResults = ({
     );
 };
 
-export default ThirtyYearResults;
+export default ThirtyYearResultsSection;

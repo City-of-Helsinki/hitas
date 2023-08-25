@@ -17,7 +17,7 @@ import {
     ExternalSalesDataImportSection,
     ThirtyYearErrorModal,
     ThirtyYearErrorTest,
-    ThirtyYearResults,
+    ThirtyYearResultsSection,
 } from "./ThirtyYearRegulationTabComponents";
 
 const yearChoices = [
@@ -212,7 +212,7 @@ const ThirtyYearRegulationContainer = () => {
 
             <Divider size="l" />
 
-            <ThirtyYearResults
+            <ThirtyYearResultsSection
                 hasResults={hasRegulationResults}
                 hasExternalSalesData={hasExternalSalesData}
                 data={regulationData}
