@@ -210,7 +210,7 @@ def calculate_max_price(
         calculation_date,
         housing_company.completion_date,
     )
-    surface_area_price_ceiling = max_price_calculator.calculate_surface_area_price_ceiling(
+    surface_area_price_ceiling = max_price_calculator.calculate_surface_area_price_ceiling_max_price(
         apartment,
         apartment_share_of_housing_company_loans,
         apartment_share_of_housing_company_loans_date,
