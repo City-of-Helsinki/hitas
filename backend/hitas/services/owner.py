@@ -74,7 +74,7 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
 
     # 'non_disclosure' needs to be included temporarily so that we can determine
     # if obfuscation is needed in 'hitas.models.owner.Owner.post_fetch_values_hook'
-    obfuscated_owners: list[OwnerT] = list(owners.values("name", "identifier", "email", "non_disclosure"))
+    obfuscated_owners = list(owners.values("name", "identifier", "email", "non_disclosure"))
 
     if obfuscated_owners:
         for owner in obfuscated_owners:
