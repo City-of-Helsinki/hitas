@@ -489,6 +489,33 @@ def test__api__housing_company__retrieve__release_date__regulation__dont_count_i
     assert response.json()["release_date"] is None
 
 
+@pytest.mark.django_db
+def test__api__housing_company__retrieve__release_date__manually_released(api_client: HitasAPIClient, freezer):
+    freezer.move_to("2022-09-08")
+
+    housing_company: HousingCompany = HousingCompanyFactory.create(
+        legacy_release_date=None,
+        regulation_status=RegulationStatus.REGULATED,
+    )
+    assert housing_company.release_date is None
+
+    freezer.move_to("2022-09-09")
+
+    # Manually release the housing company
+    data = {"regulation_status": RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT.value}
+    url = reverse("hitas:housing-company-detail", kwargs={"uuid": housing_company.uuid.hex})
+    response = api_client.patch(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    housing_company.refresh_from_db()
+    assert housing_company.release_date == date(2022, 9, 9)
+
+    # Retrieve the release date, it should be today.
+    response = api_client.get(reverse("hitas:housing-company-detail", args=[housing_company.uuid.hex]))
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json()["release_date"] == date(2022, 9, 9).isoformat()
+
+
 @pytest.mark.parametrize("invalid_id", ["foo", "38432c233a914dfb9c2f54d9f5ad9063"])
 @pytest.mark.django_db
 def test__api__housing_company__read__not_found(api_client: HitasAPIClient, invalid_id):
