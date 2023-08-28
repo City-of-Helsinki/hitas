@@ -577,7 +577,7 @@ def _find_average_of_nearest(
     if replacements is None:
         return None
 
-    return sum(price_by_area[postal_code] for postal_code in replacements) / len(replacements)
+    return Decimal(sum(price_by_area[postal_code] for postal_code in replacements) / len(replacements))
 
 
 def _free_housing_companies_from_regulation(
