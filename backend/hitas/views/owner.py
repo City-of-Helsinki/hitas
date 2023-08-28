@@ -12,6 +12,7 @@ from hitas.models.utils import (
     check_social_security_number,
     deobfuscate,
 )
+from hitas.services.owner import exclude_obfuscated_owners
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelMixin, HitasModelSerializer, HitasModelViewSet
 
 
@@ -76,7 +77,8 @@ class OwnerViewSet(HitasModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
-        return Owner.objects.all().order_by("id")
+        qs = Owner.objects.all().order_by("id")
+        return exclude_obfuscated_owners(qs)
 
     @staticmethod
     def get_filterset_class():
