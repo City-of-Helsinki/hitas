@@ -44,7 +44,7 @@ class CalculatorRules:
         raise NotImplementedError()
 
     @staticmethod
-    def calculate_surface_area_price_ceiling(
+    def calculate_surface_area_price_ceiling_max_price(
         apartment: ApartmentWithAnnotationsMaxPrice,
         apartment_share_of_housing_company_loans: int,
         apartment_share_of_housing_company_loans_date: datetime.date,
