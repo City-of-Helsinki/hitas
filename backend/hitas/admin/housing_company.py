@@ -39,3 +39,11 @@ class HousingCompanyAdmin(AuditLogHistoryAdminMixin, NestedModelAdmin):
         HousingCompanyConstructionPriceImprovementAdmin,
     )
     readonly_fields = ("id", "uuid", "city", "area_display")
+
+    list_display = [
+        "id",
+        "display_name",
+        "postal_code",
+        "street_address",
+        "regulation_status",
+    ]
