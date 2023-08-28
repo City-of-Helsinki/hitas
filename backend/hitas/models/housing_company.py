@@ -3,10 +3,12 @@ from decimal import Decimal
 from types import DynamicClassAttribute
 from typing import Optional
 
+from auditlog.models import LogEntry
 from auditlog.registry import auditlog
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import F, Sum
+from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields import Enum, EnumField
@@ -242,12 +244,40 @@ class HousingCompany(ExternalSafeDeleteHitasModel):
 
         # Allow caches for the instance
         if hasattr(self, "_release_date"):
-            return self._release_date
+            if self._release_date is not None:
+                return self._release_date
 
+        # Try to find the release date from 30 year regulation
         from hitas.services.housing_company import get_regulation_release_date
 
-        self._release_date = get_regulation_release_date(self.id)
-        return self._release_date
+        regulation_release_date = get_regulation_release_date(self.id)
+        if regulation_release_date:
+            self._release_date = regulation_release_date
+            return self._release_date
+
+        # Housing company is released, but not in a regulation, so it was released manually. Get the date from logs.
+        if self.regulation_status == RegulationStatus.RELEASED_BY_PLOT_DEPARTMENT:
+            # Find the latest log entry that contains regulation status changes
+            log_entry = (
+                LogEntry.objects.get_for_object(self)
+                .annotate(changes_as_json=Cast("changes", output_field=models.JSONField()))
+                .filter(changes_as_json__regulation_status__isnull=False)
+                .exclude(  # Ignore cases where regulation status was not actually changed
+                    changes_as_json__regulation_status__0="Released by Plot Department",
+                    changes_as_json__regulation_status__1="Released by Plot Department",
+                )
+                .order_by("-timestamp", "-id")
+                .first()
+            )
+            if (
+                log_entry is not None
+                and log_entry.changes_as_json["regulation_status"][1] == "Released by Plot Department"
+            ):
+                self._release_date = log_entry.timestamp.date()
+                return self._release_date
+
+        # Release date was not found
+        return None
 
     class Meta:
         verbose_name = _("Housing company")

@@ -4972,15 +4972,6 @@ components:
       description: Single housing company's details
       type: object
       additionalProperties: false
-      required:
-        - address
-        - area
-        - completion_date
-        - id
-        - name
-        - hitas_type
-        - real_estates
-        - summary
       properties:
         id:
           description: Housing company ID
