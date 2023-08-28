@@ -138,13 +138,28 @@ def perform_thirty_year_regulation(
 
     logger.info(f"Checking regulation need for housing companies completed before {regulation_month.isoformat()!r}...")
 
+    # Select regular housing companies
     logger.info("Fetching housing companies...")
     housing_companies = get_completed_housing_companies(
         completion_month=regulation_month,
         include_excluded_from_statistics=True,
         include_rental_hitas=True,
-        include_half_hitas=True,
+        select_half_hitas=False,
     )
+
+    # Half-Hitas housing companies require another query as they are not included above query,
+    # since they can be released from regulation after only 2 years instead of 30.
+    logger.info("Fetching half-hitas housing companies...")
+    half_hitas_regulation_month = calculation_month - relativedelta(years=2)
+    half_hitas_housing_companies = get_completed_housing_companies(
+        completion_month=half_hitas_regulation_month,
+        include_excluded_from_statistics=True,
+        include_rental_hitas=True,
+        select_half_hitas=True,
+    )
+
+    housing_companies = housing_companies + half_hitas_housing_companies
+
     if not housing_companies:
         logger.info("No housing companies to check regulation for.")
         logger.info("Regulation check complete!")  # NOSONAR
@@ -297,16 +312,32 @@ def _split_automatically_released(
     housing_companies: list[HousingCompanyWithAnnotations],
 ) -> tuple[list[HousingCompanyWithAnnotations], list[ComparisonData]]:
     """
-    Separate out housing companies that are automatically released from regulation.
+    Separate out housing companies that are automatically released from regulation:
+    - 30 Years old housing companies, which follow the New-Hitas ruleset
+    - 2 Years old Half-Hitas housing companies
+
+    Returns a list of housing companies that are automatically released, and a list containing their comparison data
+    The original list is then modified to remove the automatically released housing companies
     """
     split_housing_companies: list[HousingCompanyWithAnnotations] = []
     automatically_released: list[ComparisonData] = []
+
     for i, housing_company in enumerate(housing_companies):
-        if not housing_company.hitas_type.old_hitas_ruleset:
-            logger.info(
-                f"Housing company {housing_company.display_name!r} uses new hitas ruleset. "
-                f"Automatically qualified for release from regulation."
-            )
+        if (
+            housing_company.hitas_type.value == HitasType.HALF_HITAS.value
+            or housing_company.hitas_type.new_hitas_ruleset
+        ):
+            if housing_company.hitas_type == HitasType.HALF_HITAS.value:
+                logger.info(
+                    f"Housing company {housing_company.display_name!r} is a half-hitas housing company. "
+                    f"Automatically qualified for release from regulation."
+                )
+            else:
+                logger.info(
+                    f"Housing company {housing_company.display_name!r} uses new hitas ruleset. "
+                    f"Automatically qualified for release from regulation."
+                )
+
             split_housing_companies.append(housing_company)
             automatically_released.append(
                 ComparisonData(
@@ -336,7 +367,9 @@ def _split_automatically_released(
             )
             housing_companies[i] = None
 
+    # Remove the automatically released companies from the original list
     housing_companies[:] = [housing_company for housing_company in housing_companies if housing_company is not None]
+
     return split_housing_companies, automatically_released
 
 

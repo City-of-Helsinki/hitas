@@ -20,8 +20,18 @@ QuarterT: TypeAlias = str  # e.g. '2022Q1'
 
 
 class RegulationResult(Enum):
+    # Housing companies that use the New Hitas ruleset.
+    # Companies are automatically released after 30 years from completion
+    # or Half-Hitas housing companies, which are released after 2 years from completion
     AUTOMATICALLY_RELEASED = "automatically_released"
+
+    # Housing companies that use the Old Hitas ruleset
+    # Companies are released after 30 years from completion if their €/m² is above the price for the postal code
     RELEASED_FROM_REGULATION = "released_from_regulation"
+
+    # Housing companies that use the Old Hitas ruleset
+    # Companies are not released after regulation checks, since their €/m² is below the price for the postal code
+    # These may be manually released if
     STAYS_REGULATED = "stays_regulated"
 
 

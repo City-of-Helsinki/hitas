@@ -42,10 +42,15 @@ def get_completed_housing_companies(
     completion_month: datetime.date,
     include_excluded_from_statistics: bool,
     include_rental_hitas: bool,
-    include_half_hitas: bool,
+    select_half_hitas: bool,
 ) -> list[HousingCompanyWithAnnotations]:
     """
     Get all housing companies completed before the given month (YYYY-MM-01) which are in the given states.
+
+    :param completion_month: The month to use as the upper bound for completion dates.
+    :param include_excluded_from_statistics: Whether to include housing companies excluded from statistics.
+    :param include_rental_hitas: Whether to include rental Hitas housing companies.
+    :param select_half_hitas: Whether to include only Half-Hitas companies or completely exclude them
     """
     housing_company_queryset: QuerySet[HousingCompanyWithAnnotations] = (
         HousingCompany.objects.select_related(
@@ -94,8 +99,10 @@ def get_completed_housing_companies(
             ~Q(hitas_type__in=[HitasType.RENTAL_HITAS_I, HitasType.RENTAL_HITAS_II]),
         )
 
-    if not include_half_hitas:
-        housing_company_queryset = housing_company_queryset.filter(~Q(hitas_type__in=[HitasType.HALF_HITAS]))
+    if select_half_hitas:
+        housing_company_queryset = housing_company_queryset.filter(hitas_type=HitasType.HALF_HITAS)
+    else:
+        housing_company_queryset = housing_company_queryset.exclude(hitas_type=HitasType.HALF_HITAS)
 
     housing_companies = list(housing_company_queryset)
     if not housing_companies:

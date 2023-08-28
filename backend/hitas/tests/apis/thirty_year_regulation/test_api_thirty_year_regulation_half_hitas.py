@@ -8,6 +8,7 @@ from hitas.models.owner import Owner, OwnerT
 from hitas.services.thirty_year_regulation import RegulationResults
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.apis.thirty_year_regulation.utils import (
+    create_external_sales_data_for_postal_code,
     create_low_price_sale_for_apartment,
     create_necessary_indices,
     create_new_apartment,
@@ -16,7 +17,8 @@ from hitas.tests.apis.thirty_year_regulation.utils import (
     get_comparison_data_for_single_housing_company,
     get_relevant_dates,
 )
-from hitas.tests.factories import ApartmentSaleFactory
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory
+from hitas.tests.factories.indices import MarketPriceIndexFactory, SurfaceAreaPriceCeilingFactory
 
 
 @pytest.mark.django_db
@@ -145,3 +147,95 @@ def test__api__regulation__owner_still_owns_half_hitas_apartment__over_2_years(a
     #
     old_housing_company.refresh_from_db()
     assert old_housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__stays_regulated(api_client: HitasAPIClient, freezer):
+    this_month, two_months_ago, regulation_month = get_relevant_dates(freezer)
+    less_than_two_years_ago = this_month - relativedelta(years=2) + relativedelta(days=1)
+
+    create_necessary_indices()
+    create_external_sales_data_for_postal_code("00001")
+
+    # Create a Half-Hitas housing company
+    apartment = ApartmentFactory.create(
+        surface_area=10,
+        completion_date=less_than_two_years_ago,
+        sales__purchase_date=less_than_two_years_ago,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json() == RegulationResults(
+        automatically_released=[],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[],
+    )
+
+    #
+    # Check that the housing company stays regulated
+    #
+    apartment.housing_company.refresh_from_db()
+    assert apartment.housing_company.regulation_status == RegulationStatus.REGULATED
+
+
+@pytest.mark.django_db
+def test__api__regulation__half_hitas__released_from_regulation(api_client: HitasAPIClient, freezer):
+    this_month, two_months_ago, _ = get_relevant_dates(freezer)
+    two_years_ago = this_month - relativedelta(years=2)
+
+    MarketPriceIndexFactory.create(month=two_years_ago, value=100)
+    MarketPriceIndexFactory.create(month=this_month, value=200)
+    SurfaceAreaPriceCeilingFactory.create(month=this_month, value=5000)
+
+    create_external_sales_data_for_postal_code("00001")
+
+    owner: Owner = Owner.objects.first()
+
+    # Create a Half-Hitas housing company
+    apartment = ApartmentFactory.create(
+        surface_area=10,
+        completion_date=two_years_ago,
+        sales__purchase_date=two_years_ago,
+        building__real_estate__housing_company__postal_code__value="00001",
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+    )
+    owner = apartment.first_sale().ownerships.first().owner
+
+    response = api_client.post(reverse("hitas:thirty-year-regulation-list"), data={}, format="json")
+
+    assert response.status_code == status.HTTP_200_OK, response.json()
+
+    assert response.json() == RegulationResults(
+        automatically_released=[
+            get_comparison_data_for_single_housing_company(
+                apartment.housing_company,
+                two_years_ago,
+                price=0,
+                current_regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+            ),
+        ],
+        released_from_regulation=[],
+        stays_regulated=[],
+        skipped=[],
+        obfuscated_owners=[
+            OwnerT(
+                name=owner.name,
+                identifier=owner.identifier,
+                email=owner.email,
+            ),
+        ],
+    )
+
+    #
+    # Check that the housing company stays regulated
+    #
+    apartment.housing_company.refresh_from_db()
+    assert apartment.housing_company.regulation_status == RegulationStatus.RELEASED_BY_HITAS
