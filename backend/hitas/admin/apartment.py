@@ -16,12 +16,20 @@ class ApartmentConstructionPriceImprovementAdmin(NestedTabularInline):
 @admin.register(Apartment)
 class ApartmentAdmin(AuditLogHistoryAdminMixin, admin.ModelAdmin):
     list_display = [
+        "housing_company",
         "street_address",
         "apartment_number",
+        "stair",
         "postal_code",
         "surface_area",
-        "housing_company",
+        "completion_date",
     ]
+
+    list_filter = [
+        "completion_date",
+        "building__real_estate__housing_company",
+    ]
+
     readonly_fields = ("uuid",)
 
     inlines = (
