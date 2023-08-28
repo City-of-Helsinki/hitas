@@ -10,6 +10,18 @@ from hitas.models.ownership import Ownership, OwnershipWithApartmentCount
 from hitas.utils import SQSum, subquery_count
 
 
+def exclude_obfuscated_owners(owners: QuerySet[Owner]) -> QuerySet[Owner]:
+    """Exclude owners who have already been obfuscated"""
+    return owners.exclude(
+        name="",
+        identifier=None,
+        valid_identifier=False,
+        email=None,
+        bypass_conditions_of_sale=True,
+        non_disclosure=False,
+    )
+
+
 def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
     """Remove any personal information from owners which do not own any regulated hitas apartments."""
     owners: QuerySet[Owner] = Owner.objects.annotate(
@@ -58,6 +70,7 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
         ),
         _owned_regulated_apartments=0,
     )
+    owners = exclude_obfuscated_owners(owners)
 
     # 'non_disclosure' needs to be included temporarily so that we can determine
     # if obfuscation is needed in 'hitas.models.owner.Owner.post_fetch_values_hook'
@@ -73,6 +86,7 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
             valid_identifier=False,
             email=None,
             bypass_conditions_of_sale=True,
+            non_disclosure=False,
         )
 
     return obfuscated_owners

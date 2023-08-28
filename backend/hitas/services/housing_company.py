@@ -260,6 +260,10 @@ def get_regulation_release_date(apartment_id: int) -> Optional[datetime.date]:
 
 
 def get_regulation_release_date(housing_company_id: str | int):
+    """
+    Get the date the housing company was released from regulation in a 30-year regulation.
+    Does not include release date for legacy or manually released housing companies.
+    """
     subquery = isinstance(housing_company_id, str)
     queryset: QuerySet[Optional[datetime.date]] = (
         ThirtyYearRegulationResultsRow.objects.filter(

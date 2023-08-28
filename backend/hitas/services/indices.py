@@ -88,7 +88,7 @@ def calculate_surface_area_price_ceiling(calculation_date: datetime.date) -> lis
 def _calculate_surface_area_price_ceiling_for_housing_companies(
     housing_companies: list[HousingCompanyWithAnnotations],
 ) -> Decimal:
-    total: Decimal = sum((housing_company.avg_price_per_square_meter for housing_company in housing_companies))
+    total: Decimal = Decimal(sum((housing_company.avg_price_per_square_meter for housing_company in housing_companies)))
     return roundup(total / len(housing_companies), precision=0)
 
 
