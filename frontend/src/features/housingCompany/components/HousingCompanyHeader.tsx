@@ -1,10 +1,89 @@
-import {StatusLabel} from "hds-react";
+import {Button, IconHistory, StatusLabel} from "hds-react";
 import {Link, useLocation, useParams} from "react-router-dom";
 
-import {EditButton, Heading, QueryStateHandler} from "../../../common/components";
+import {EditButton, GenericActionModal, Heading, QueryStateHandler} from "../../../common/components";
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../../common/localisation";
 import {IHousingCompanyDetails} from "../../../common/schemas";
-import {useGetHousingCompanyDetailQuery} from "../../../common/services";
+import {useGetHousingCompanyDetailQuery, usePatchHousingCompanyMutation} from "../../../common/services";
+import React, {useState} from "react";
+import {formatDate, hdsToast} from "../../../common/utils";
+
+const CancelHousingCompanyRegulationReleaseButton = ({
+    housingCompany,
+    isHousingCompanySubPage,
+}: {
+    housingCompany: IHousingCompanyDetails;
+    isHousingCompanySubPage: boolean;
+}) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [patchHousingCompany] = usePatchHousingCompanyMutation();
+
+    // Cancel release button is visible only if the housing company is released by plot department,
+    // and the release date is less than three months ago
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    const isCancelReleaseButtonVisible =
+        housingCompany.regulation_status === "released_by_plot_department" &&
+        !isHousingCompanySubPage &&
+        housingCompany.release_date !== null &&
+        new Date(housingCompany.release_date) > threeMonthsAgo;
+
+    if (!isCancelReleaseButtonVisible) return <></>;
+
+    const handleCancelHousingCompanyRelease = () => {
+        patchHousingCompany({
+            housingCompanyId: housingCompany.id,
+            data: {regulation_status: "regulated"},
+        })
+            .then(() => {
+                hdsToast.success(`${housingCompany.name.display} on nyt asetettu takaisin sääntelyn piiriin.`);
+            })
+            .catch(() => {
+                hdsToast.error(`${housingCompany.name.display} asettaminen takaisin sääntelyn piiriin epäonnistui.`);
+            });
+        setIsModalOpen(false);
+    };
+
+    return (
+        <>
+            <Button
+                theme="black"
+                size="small"
+                iconLeft={<IconHistory />}
+                onClick={() => setIsModalOpen(true)}
+            >
+                Peruuta vapautus
+            </Button>
+
+            <GenericActionModal
+                title="Peruuta yhtiön sääntelystä vapautus"
+                modalIcon={<IconHistory />}
+                isModalOpen={isModalOpen}
+                closeModal={() => setIsModalOpen(false)}
+                confirmButton={
+                    <Button
+                        theme="black"
+                        size="small"
+                        iconLeft={<IconHistory />}
+                        onClick={handleCancelHousingCompanyRelease}
+                    >
+                        Peruuta vapautus
+                    </Button>
+                }
+            >
+                <p>Haluatko peruuttaa yhtiön vapautumisen, ja asettaa sen takaisin sääntelyn piiriin?</p>
+                <p>
+                    Yhtiö: <b>{housingCompany.name.display}</b>
+                </p>
+                <p>
+                    Yhtiön vapautuspäivämäärä: <b>{formatDate(housingCompany.release_date)}</b>
+                </p>
+            </GenericActionModal>
+        </>
+    );
+};
 
 const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousingCompanyDetails}) => {
     const {pathname} = useLocation();
@@ -24,6 +103,10 @@ const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousing
                     <Heading type="main">
                         {housingCompany.name.display}
                         {isEditButtonVisible ? <EditButton /> : null}
+                        <CancelHousingCompanyRegulationReleaseButton
+                            housingCompany={housingCompany}
+                            isHousingCompanySubPage={isHousingCompanySubPage}
+                        />
                     </Heading>
                 )}
             </div>
