@@ -277,7 +277,7 @@ const GenericImprovementsPage = ({housingCompany, apartment}: IGenericImprovemen
         formSchema = HousingCompanyImprovementsFormSchema;
         patchFunctionHook = usePatchHousingCompanyMutation;
         patchFunctionArguments = {
-            id: housingCompany.id,
+            housingCompanyId: housingCompany.id,
         };
         rawImprovements = housingCompany.improvements;
     }
