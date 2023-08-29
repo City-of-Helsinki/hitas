@@ -1,13 +1,13 @@
 import {IconUploadCloud, Table} from "hds-react";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
-import {useParams} from "react-router-dom";
 import {GenericActionModal, QueryStateHandler, SaveButton} from "../../../common/components";
 import {FileInput} from "../../../common/components/forms";
 import {ErrorResponse, ISalesCatalogApartment} from "../../../common/schemas";
 import {useCreateFromSalesCatalogMutation, useValidateSalesCatalogMutation} from "../../../common/services";
 import {tableThemeBlack} from "../../../common/themes";
 import {hdsToast} from "../../../common/utils";
+import {HousingCompanyViewContext} from "./HousingCompanyViewContextProvider";
 
 const salesCatalogTableCols = [
     {key: "stair", headerName: "Porras"},
@@ -42,7 +42,8 @@ const SalesCatalogImport = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileValidationError, setFileValidationError] = useState<ErrorResponse | undefined>();
 
-    const params = useParams() as {readonly housingCompanyId: string};
+    const {housingCompany} = useContext(HousingCompanyViewContext);
+    if (!housingCompany) throw new Error("Housing company not found");
 
     const formObject = useForm({defaultValues: {salesCatalog: null}});
     const [validateSalesCatalog, {data: validateData, isLoading: isValidating, error: validateError}] =
@@ -53,7 +54,7 @@ const SalesCatalogImport = () => {
     const validateFile = (data) => {
         validateSalesCatalog({
             data: data.salesCatalog,
-            housingCompanyId: params.housingCompanyId,
+            housingCompanyId: housingCompany.id,
         })
             .unwrap()
             .then(() => {
@@ -79,7 +80,7 @@ const SalesCatalogImport = () => {
 
         createImportedApartments({
             data: importedApartments,
-            housingCompanyId: params.housingCompanyId,
+            housingCompanyId: housingCompany.id,
         })
             .unwrap()
             .then(() => {
@@ -97,16 +98,17 @@ const SalesCatalogImport = () => {
         <>
             <FormProvider {...formObject}>
                 <FileInput
-                    buttonLabel="Lataa myyntihintaluettelo"
+                    buttonLabel="Tallenna yhtiölle myyntihintaluettelo"
                     name="salesCatalog"
                     accept=".xlsx"
                     onChange={() => validateFile(formObject.getValues())}
+                    disabled={housingCompany.regulation_status !== "regulated"}
                 />
             </FormProvider>
 
             <GenericActionModal
                 id="import-sales-catalog-modal"
-                title="Myyntihintaluettelon lataus"
+                title="Tallenna yhtiölle myyntihintaluettelo"
                 modalIcon={<IconUploadCloud />}
                 isModalOpen={isModalOpen}
                 closeModal={() => setIsModalOpen(false)}
