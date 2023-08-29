@@ -26,7 +26,7 @@ const CreateMaximumPriceCalculationButton = ({
 
     const formObject = useFormContext();
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [
         saveMaximumPriceCalculation,
@@ -52,7 +52,7 @@ const CreateMaximumPriceCalculationButton = ({
                     setAPIErrorsForFormFields(formObject, error);
                 })
                 .finally(() => {
-                    setIsModalVisible(true);
+                    setIsModalOpen(true);
                 });
         } else {
             hdsToast.error(
@@ -79,8 +79,8 @@ const CreateMaximumPriceCalculationButton = ({
             <Dialog
                 id="maximum-price-confirmation-modal"
                 aria-labelledby="maximum-price-confirmation-modal__title"
-                isOpen={isModalVisible}
-                close={() => setIsModalVisible(false)}
+                isOpen={isModalOpen}
+                close={() => setIsModalOpen(false)}
                 closeButtonLabelText="Sulje"
                 variant={maximumPriceCreateError ? "danger" : "primary"}
                 boxShadow
@@ -97,14 +97,14 @@ const CreateMaximumPriceCalculationButton = ({
                     errorComponent={
                         <MaximumPriceModalError
                             error={maximumPriceCreateError}
-                            setIsModalVisible={setIsModalVisible}
+                            closeModal={() => setIsModalOpen(false)}
                         />
                     }
                 >
                     <MaximumPriceModalContent
                         calculation={maximumPriceCreateData as IApartmentMaximumPriceCalculationDetails}
                         apartment={apartment}
-                        setIsModalVisible={setIsModalVisible}
+                        setIsModalVisible={setIsModalOpen}
                     />
                 </QueryStateHandler>
             </Dialog>

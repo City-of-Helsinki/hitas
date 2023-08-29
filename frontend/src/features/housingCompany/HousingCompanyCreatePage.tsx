@@ -83,7 +83,7 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
     const navigate = useNavigate();
     const {housingCompany} = useContext(HousingCompanyViewContext);
 
-    const [isEndModalVisible, setIsEndModalVisible] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const initialFormData: IHousingCompanyWritable = getInitialFormData(housingCompany);
     const formRef = useRef<HTMLFormElement>(null);
@@ -119,7 +119,7 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
             })
             .catch((error) => {
                 hdsToast.error("Virhe tallentaessa taloyhtiötä!");
-                setIsEndModalVisible(true);
+                setIsModalOpen(true);
                 setAPIErrorsForFormFields(formObject, error);
             });
     };
@@ -260,8 +260,8 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
             <SaveDialogModal
                 linkText="Yhtiön sivulle"
                 baseURL="/housing-companies/"
-                isVisible={isEndModalVisible}
-                setIsVisible={setIsEndModalVisible}
+                isVisible={isModalOpen}
+                setIsVisible={setIsModalOpen}
                 data={housingCompanySaveData}
                 error={housingCompanySaveError}
                 isLoading={isHousingCompanySaveLoading}

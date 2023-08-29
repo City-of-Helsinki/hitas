@@ -17,21 +17,21 @@ import {
 } from "./components";
 
 const OwnerEditModalButton = ({owner}: {owner: IOwner}): React.JSX.Element => {
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <>
             <button
                 className="text-button"
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => setIsModalOpen(true)}
             >
                 {formatOwner(owner)}
             </button>
             <MutateModal
                 defaultObject={owner}
                 dialogTitles={{modify: "Muokkaa henkilötietoja"}}
-                isVisible={isModalVisible}
-                closeModalAction={() => setIsModalVisible(false)}
+                isVisible={isModalOpen}
+                closeModalAction={() => setIsModalOpen(false)}
                 MutateFormComponent={OwnerMutateForm}
             />
         </>

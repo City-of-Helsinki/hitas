@@ -93,7 +93,7 @@ const EditIndexModal = ({
 };
 
 const IndexListItem = ({indexType, index}: {indexType: {label: string; value: string}; index: IIndex}) => {
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const closeModal = () => setIsModalOpen(false);
 
     return (
@@ -153,7 +153,7 @@ const IndicesTab = (): React.JSX.Element => {
     const [filterParams, setFilterParams] = useState({year: new Date().getFullYear().toString()});
     const [currentIndexType, setCurrentIndexType] = useState(indexOptions[0]);
 
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const closeModal = () => setIsModalOpen(false);
 
     return (

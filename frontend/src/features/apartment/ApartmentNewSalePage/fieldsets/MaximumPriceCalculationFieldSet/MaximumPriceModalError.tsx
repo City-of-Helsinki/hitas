@@ -1,7 +1,7 @@
 import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
 import {Button, Dialog} from "hds-react";
 
-const MaximumPriceModalError = ({error, setIsModalVisible}) => {
+const MaximumPriceModalError = ({error, closeModal}) => {
     const nonFieldError = error?.data?.message ?? "";
     const errorCode = error?.data?.error ?? "";
     return (
@@ -14,7 +14,7 @@ const MaximumPriceModalError = ({error, setIsModalVisible}) => {
             </Dialog.Content>
             <Dialog.ActionButtons>
                 <Button
-                    onClick={() => setIsModalVisible(false)}
+                    onClick={closeModal}
                     variant="secondary"
                     theme="black"
                 >
