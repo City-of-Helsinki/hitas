@@ -20,7 +20,6 @@ import {
 import {getHousingCompanyHitasTypeName, getHousingCompanyRegulationStatusName} from "../../common/localisation";
 import {
     housingCompanyHitasTypes,
-    housingCompanyRegulationStatus,
     HousingCompanyWritableSchema,
     ICode,
     IHousingCompanyWritable,
@@ -40,9 +39,11 @@ import {
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 
-const regulationStatusOptions = housingCompanyRegulationStatus.map((state) => {
-    return {label: getHousingCompanyRegulationStatusName(state), value: state};
-});
+const regulationStatusOptions = [
+    // Don't allow manually setting the regulation status to "released_by_hitas", as it should be set automatically.
+    {label: getHousingCompanyRegulationStatusName("regulated"), value: "regulated"},
+    {label: getHousingCompanyRegulationStatusName("released_by_plot_department"), value: "released_by_plot_department"},
+];
 
 const hitasTypeOptions = housingCompanyHitasTypes.map((state) => {
     return {label: getHousingCompanyHitasTypeName(state), value: state};
