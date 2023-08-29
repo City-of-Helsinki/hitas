@@ -6,7 +6,7 @@ import {DateInput, FormProviderForm, NumberInput} from "../../../common/componen
 import {useBatchCompleteApartmentsMutation} from "../../../common/services";
 import {hdsToast, today} from "../../../common/utils";
 
-const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
+const BatchCompleteApartmentsModal = ({housingCompany}) => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const [batchComplete, {data, error, isLoading}] = useBatchCompleteApartmentsMutation();
@@ -27,7 +27,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
 
     const onSubmit = (data: {start: number | null; end: number | null; completion_date: string}) => {
         const submitData = {
-            housing_company_id: housingCompanyId,
+            housing_company_id: housingCompany.id,
             data: {
                 apartment_number_start: data.start !== undefined && data.start !== null ? Number(data.start) : null,
                 apartment_number_end: data.end !== undefined && data.end !== null ? Number(data.end) : null,
@@ -59,6 +59,7 @@ const BatchCompleteApartmentsModal = ({housingCompanyId}) => {
                 onClick={() => {
                     setIsFormOpen(true);
                 }}
+                disabled={isLoading || housingCompany.regulation_status !== "regulated"}
             >
                 Merkitse valmiiksi
             </Button>

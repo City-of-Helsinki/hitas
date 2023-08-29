@@ -220,7 +220,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 <Heading type="list">
                     <span>Asunnot</span>
                     <div className="buttons">
-                        <BatchCompleteApartmentsModal housingCompanyId={housingCompany.id} />
+                        <BatchCompleteApartmentsModal housingCompany={housingCompany} />
                         <Link to="apartments/create">
                             <Button
                                 theme="black"
