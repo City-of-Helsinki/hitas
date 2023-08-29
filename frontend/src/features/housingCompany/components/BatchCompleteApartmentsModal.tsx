@@ -1,8 +1,8 @@
 import {Button, Dialog} from "hds-react";
-import {useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {CloseButton, SaveDialogModal} from "../../../common/components";
-import {DateInput, FormProviderForm, NumberInput} from "../../../common/components/forms";
+import {DateInput, FormProviderForm, NumberInput, SaveFormButton} from "../../../common/components/forms";
 import {useBatchCompleteApartmentsMutation} from "../../../common/services";
 import {hdsToast, today} from "../../../common/utils";
 
@@ -20,10 +20,6 @@ const BatchCompleteApartmentsModal = ({housingCompany}) => {
         },
         mode: "all",
     });
-
-    const handleConfirmButtonClick = () => {
-        formRef.current && formRef.current.dispatchEvent(new Event("submit", {cancelable: true, bubbles: true}));
-    };
 
     const onSubmit = (data: {start: number | null; end: number | null; completion_date: string}) => {
         const submitData = {
@@ -113,12 +109,11 @@ const BatchCompleteApartmentsModal = ({housingCompany}) => {
                 </Dialog.Content>
                 <Dialog.ActionButtons>
                     <CloseButton onClick={() => setIsFormOpen(false)} />
-                    <Button
-                        theme="black"
-                        onClick={() => handleConfirmButtonClick()}
-                    >
-                        Merkitse valmiiksi
-                    </Button>
+                    <SaveFormButton
+                        formRef={formRef}
+                        isLoading={isLoading}
+                        buttonText="Merkitse valmiiksi"
+                    />
                 </Dialog.ActionButtons>
             </Dialog>
             <SaveDialogModal
