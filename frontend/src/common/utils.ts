@@ -64,6 +64,7 @@ export function formatMoney(value: number | undefined | null, forceDecimals = fa
 }
 
 export function formatDate(value: string | null): string {
+    // Format date to a pretty user-friendly display format.
     if (value === null) return "-";
 
     return new Date(value).toLocaleDateString("fi-FI");
