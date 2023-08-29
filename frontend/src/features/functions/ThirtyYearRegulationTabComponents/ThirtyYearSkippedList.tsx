@@ -15,7 +15,7 @@ type NewPostalCodes = {
     }[];
 };
 
-const ThirtyYearSkippedListItem = ({postalCode, companies, postalCodeOptionSet, index}): React.JSX.Element => {
+const ThirtyYearSkippedListItem = ({postalCode, housingCompanies, postalCodeOptionSet, index}): React.JSX.Element => {
     const formObject = useFormContext();
 
     const options: {label: string; value: string}[] = [];
@@ -34,15 +34,15 @@ const ThirtyYearSkippedListItem = ({postalCode, companies, postalCodeOptionSet, 
             <div>
                 <h2>{postalCode}</h2>
                 <ul>
-                    <li>{companies.length > 1 ? "Yhtiöt:" : "Yhtiö:"} </li>
-                    {companies.map((company) => (
-                        <li key={company.display_name}>
+                    <li>{housingCompanies.length > 1 ? "Yhtiöt:" : "Yhtiö:"} </li>
+                    {housingCompanies.map((housingCompany) => (
+                        <li key={housingCompany.display_name}>
                             <Link
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                to={`/housing-companies/${company.id}`}
+                                to={`/housing-companies/${housingCompany.id}`}
                             >
-                                {company.display_name}
+                                {housingCompany.display_name}
                             </Link>
                         </li>
                     ))}
@@ -73,12 +73,12 @@ const ThirtyYearSkippedListItem = ({postalCode, companies, postalCodeOptionSet, 
     );
 };
 
-const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
+const ThirtyYearSkippedList = ({skippedHousingCompanies, calculationDate, reCalculateFn}) => {
     // If in Test mode, use today's date as the calculation date
     const validCalculationDate = isNaN(Number(calculationDate.substring(0, 4))) ? today() : calculationDate;
 
     const {
-        data: codes,
+        data: postalCodes,
         error,
         isLoading,
     } = useGetAvailablePostalCodesQuery({
@@ -87,13 +87,13 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
 
     const skippedPostalCodes = {};
     // If there are skipped companies, group them by postal code
-    if (companies && companies.length > 0) {
-        companies.forEach(
-            (company) =>
-                (skippedPostalCodes[company.address.postal_code] =
-                    skippedPostalCodes[company.address.postal_code] !== undefined
-                        ? [...skippedPostalCodes[company.address.postal_code], company]
-                        : [company])
+    if (skippedHousingCompanies && skippedHousingCompanies.length > 0) {
+        skippedHousingCompanies.forEach(
+            (skippedHousingCompany) =>
+                (skippedPostalCodes[skippedHousingCompany.address.postal_code] =
+                    skippedPostalCodes[skippedHousingCompany.address.postal_code] !== undefined
+                        ? [...skippedPostalCodes[skippedHousingCompany.address.postal_code], skippedHousingCompany]
+                        : [skippedHousingCompany])
         );
     }
 
@@ -123,7 +123,7 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                 vertailussa puuttuvan keskineliöhinnan sijaan.
             </p>
             <QueryStateHandler
-                data={codes}
+                data={postalCodes}
                 error={error}
                 isLoading={isLoading}
             >
@@ -134,12 +134,12 @@ const ThirtyYearSkippedList = ({companies, calculationDate, reCalculateFn}) => {
                 >
                     <div className="list">
                         <ul className="results-list">
-                            {Object.entries(skippedPostalCodes).map(([key, value], index) => (
+                            {Object.entries(skippedPostalCodes).map(([postalCode, housingCompanies], index) => (
                                 <ThirtyYearSkippedListItem
-                                    key={key}
-                                    postalCode={key}
-                                    companies={value}
-                                    postalCodeOptionSet={codes}
+                                    key={postalCode}
+                                    postalCode={postalCode}
+                                    housingCompanies={housingCompanies}
+                                    postalCodeOptionSet={postalCodes}
                                     index={index}
                                 />
                             ))}
