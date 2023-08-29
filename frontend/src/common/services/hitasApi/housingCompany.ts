@@ -47,30 +47,19 @@ const housingCompanyApi = hitasApi.injectEndpoints({
         }),
         patchHousingCompany: builder.mutation<
             IHousingCompanyDetails,
-            {id: string; data: Partial<IHousingCompanyWritable>}
+            {housingCompanyId: string; data: Partial<IHousingCompanyWritable>}
         >({
-            query: ({id, data}) => ({
-                url: `housing-companies/${id}`,
+            query: ({housingCompanyId, data}) => ({
+                url: `housing-companies/${housingCompanyId}`,
                 method: "PATCH",
                 body: data,
             }),
             invalidatesTags: (result, error, arg) =>
                 safeInvalidate(error, [
                     {type: "HousingCompany", id: "LIST"},
-                    {type: "HousingCompany", id: arg.id},
+                    {type: "HousingCompany", id: arg.housingCompanyId},
                     {type: "Apartment"},
                 ]),
-        }),
-        releaseHousingCompanyFromRegulation: builder.mutation<
-            IHousingCompanyDetails,
-            {housingCompanyId: string; calculationDate: string}
-        >({
-            query: ({housingCompanyId}) => ({
-                url: `housing-companies/${housingCompanyId}`,
-                method: "PATCH",
-                body: {regulation_status: "released_by_plot_department"},
-            }),
-            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "HousingCompany"}, {type: "Apartment"}]),
         }),
         // Real Estate
         saveRealEstate: builder.mutation<IRealEstate, {data: IRealEstate; housingCompanyId: string}>({
@@ -169,7 +158,6 @@ export const {
     useGetHousingCompanyApartmentsQuery,
     useGetHousingCompanyDetailQuery,
     usePatchHousingCompanyMutation,
-    useReleaseHousingCompanyFromRegulationMutation,
     useSaveBuildingMutation,
     useSaveHousingCompanyMutation,
     useSaveRealEstateMutation,

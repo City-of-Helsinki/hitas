@@ -2,16 +2,13 @@ import {Button, IconLockOpen} from "hds-react";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {ConfirmDialogModal, DownloadButton} from "../../../common/components";
-import {
-    useDownloadThirtyYearRegulationLetterMutation,
-    useReleaseHousingCompanyFromRegulationMutation,
-} from "../../../common/services";
+import {useDownloadThirtyYearRegulationLetterMutation, usePatchHousingCompanyMutation} from "../../../common/services";
 
 import {formatDate, hdsToast} from "../../../common/utils";
 
 const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [releaseHousingCompany] = useReleaseHousingCompanyFromRegulationMutation();
+    const [patchHousingCompany] = usePatchHousingCompanyMutation();
     const [downloadPDFFile] = useDownloadThirtyYearRegulationLetterMutation();
     const isHousingCompanyReleased = company.current_regulation_status !== "regulated";
 
@@ -20,9 +17,9 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
     };
 
     const handleFreeHousingCompanyFromRegulation = () => {
-        releaseHousingCompany({
+        patchHousingCompany({
             housingCompanyId: company.id,
-            calculationDate: calculationDate,
+            data: {regulation_status: "released_by_plot_department"},
         })
             .then(() => {
                 hdsToast.success(`${company.display_name} vapautettu onnistuneesti.`);
