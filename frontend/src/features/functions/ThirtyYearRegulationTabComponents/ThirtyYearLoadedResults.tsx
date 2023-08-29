@@ -21,10 +21,10 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
     const releasedCompanies = [...automaticallyReleased, ...releasedFromRegulation];
     const stayingCompanies = data?.stays_regulated ?? [];
     const manuallyReleasedCompanies = stayingCompanies.filter(
-        (company) => company.current_regulation_status !== "regulated"
+        (housingCompany) => housingCompany.current_regulation_status !== "regulated"
     );
     const displayedStayingCompanies = stayingCompanies.filter(
-        (company) => company.current_regulation_status === "regulated"
+        (housingCompany) => housingCompany.current_regulation_status === "regulated"
     );
     const skippedCompanies = data?.skipped ?? [];
     const obfuscatedOwners = data?.obfuscated_owners ?? [];
@@ -57,7 +57,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                             <ul className="results-list">
                                 {companies.map((item) => (
                                     <ThirtyYearResultListItem
-                                        company={item}
+                                        housingCompany={item}
                                         calculationDate={calculationDate}
                                         category={category}
                                         key={item.id}
@@ -74,7 +74,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
                             <ul className="results-list">
                                 {manuallyReleasedCompanies.map((item) => (
                                     <ThirtyYearResultListItem
-                                        company={item}
+                                        housingCompany={item}
                                         calculationDate={calculationDate}
                                         category={category}
                                         key={item.id}
@@ -91,7 +91,7 @@ const ThirtyYearLoadedResults = ({data, calculationDate, reCalculateFn}): React.
     if (skippedCompanies.length > 0) {
         return (
             <ThirtyYearSkippedList
-                companies={skippedCompanies}
+                skippedHousingCompanies={skippedCompanies}
                 calculationDate={calculationDate}
                 reCalculateFn={reCalculateFn}
             />

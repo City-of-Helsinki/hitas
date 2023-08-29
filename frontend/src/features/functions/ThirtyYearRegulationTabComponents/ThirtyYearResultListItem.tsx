@@ -6,26 +6,26 @@ import {useDownloadThirtyYearRegulationLetterMutation, usePatchHousingCompanyMut
 
 import {formatDate, hdsToast} from "../../../common/utils";
 
-const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
+const ThirtyYearResultListItem = ({housingCompany, calculationDate, category}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [patchHousingCompany] = usePatchHousingCompanyMutation();
     const [downloadPDFFile] = useDownloadThirtyYearRegulationLetterMutation();
-    const isHousingCompanyReleased = company.current_regulation_status !== "regulated";
+    const isHousingCompanyReleased = housingCompany.current_regulation_status !== "regulated";
 
     const handleClickDownloadPDFButton = () => {
-        downloadPDFFile({id: company.id, calculationDate: calculationDate});
+        downloadPDFFile({id: housingCompany.id, calculationDate: calculationDate});
     };
 
     const handleFreeHousingCompanyFromRegulation = () => {
         patchHousingCompany({
-            housingCompanyId: company.id,
+            housingCompanyId: housingCompany.id,
             data: {regulation_status: "released_by_plot_department"},
         })
             .then(() => {
-                hdsToast.success(`${company.display_name} vapautettu onnistuneesti.`);
+                hdsToast.success(`${housingCompany.display_name} vapautettu onnistuneesti.`);
             })
             .catch((error) => {
-                hdsToast.error(`${company.display_name} vapautus epäonnistui.`);
+                hdsToast.error(`${housingCompany.display_name} vapautus epäonnistui.`);
                 // eslint-disable-next-line no-console
                 console.warn("Caught error:", error);
             });
@@ -36,18 +36,18 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
         <li className="results-list__item">
             <div className="company-info">
                 <Link
-                    to={`/housing-companies/${company.id}`}
+                    to={`/housing-companies/${housingCompany.id}`}
                     target="_blank"
                 >
-                    <div className="name">{company.display_name}</div>
+                    <div className="name">{housingCompany.display_name}</div>
                     <div className="address">
-                        {company.address.street_address}
+                        {housingCompany.address.street_address}
                         <br />
-                        {company.address.postal_code}, {company.address.city}
+                        {housingCompany.address.postal_code}, {housingCompany.address.city}
                     </div>
                 </Link>
-                <div className="date">{formatDate(company.completion_date)}</div>
-                <div className="property-manager">{company.property_manager.email}</div>
+                <div className="date">{formatDate(housingCompany.completion_date)}</div>
+                <div className="property-manager">{housingCompany.property_manager.email}</div>
             </div>
             <div className="buttons">
                 {category !== "freed" && (
@@ -62,18 +62,18 @@ const ThirtyYearResultListItem = ({company, calculationDate, category}) => {
                         {isHousingCompanyReleased ? "Vapautettu" : "Vapauta"}
                     </Button>
                 )}
-                {company.current_regulation_status !== "released_by_plot_department" && (
+                {housingCompany.current_regulation_status !== "released_by_plot_department" && (
                     <DownloadButton
                         buttonText="Lataa tiedote"
                         onClick={handleClickDownloadPDFButton}
-                        variant={company.letter_fetched ? "secondary" : "primary"}
+                        variant={housingCompany.letter_fetched ? "secondary" : "primary"}
                     />
                 )}
             </div>
             <ConfirmDialogModal
-                modalHeader={`Vapauta ${company.display_name}?`}
+                modalHeader={`Vapauta ${housingCompany.display_name}?`}
                 modalText={`Olet manuaalisesti vapauttamassa yhtiötä (esim tontit-yksikön päätöksestä). Haluatko
-                    varmasti, että ${company.display_name} vapautetaan sääntelyn piiristä?`}
+                    varmasti, että ${housingCompany.display_name} vapautetaan sääntelyn piiristä?`}
                 isVisible={isModalOpen}
                 setIsVisible={setIsModalOpen}
                 buttonText="Vapauta"
