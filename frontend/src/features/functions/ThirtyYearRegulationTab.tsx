@@ -20,11 +20,10 @@ import {
     ThirtyYearResultsSection,
 } from "./ThirtyYearRegulationTabComponents";
 
-const yearChoices = [
-    {label: "2023", value: "2023"},
-    {label: "2022", value: "2022"},
-    {label: "2021", value: "2021"},
-];
+const yearChoices: {label: string; value: string}[] = [];
+for (let i = new Date().getFullYear(); i >= 2023; i--) {
+    yearChoices.push({label: i.toString(), value: i.toString()});
+}
 
 const ThirtyYearRegulationSurfaceAreaPriceCeiling = ({
     priceCeilingData,
@@ -50,8 +49,6 @@ const ThirtyYearRegulationSurfaceAreaPriceCeiling = ({
 };
 
 const ThirtyYearRegulationDateSelection = ({formObject, hasSkippedCompanies}) => {
-    // TODO: populate the years options with years starting from 2023, when testing is done
-
     const currentTime = new Date();
 
     // Populate the time quarter select with options, if current year is selected in the year selector
