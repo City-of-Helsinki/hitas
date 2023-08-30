@@ -231,7 +231,9 @@ def test__api__apartment__list__condition_of_sale(api_client: HitasAPIClient):
     ["selected_filter", "number_of_apartments"],
     [
         [{"housing_company_name": "testdisplay"}, 1],
-        [{"street_address": "test-str"}, 1],
+        [{"address": "est-stree"}, 3],
+        [{"address": "test-street A"}, 2],
+        [{"address": "test-street B 1"}, 1],
         [{"postal_code": "99999"}, 1],
         [{"owner_name": "megatr"}, 1],
         [{"owner_name": "etimus pri"}, 1],
@@ -251,7 +253,9 @@ def test__api__apartment__filter(api_client: HitasAPIClient, selected_filter, nu
     ApartmentFactory.create(
         building__real_estate__housing_company__display_name="TestDisplayName",
     )
-    ApartmentFactory.create(street_address="test-street")
+    ApartmentFactory.create(street_address="test-street", stair="A", apartment_number=1)
+    ApartmentFactory.create(street_address="test-street", stair="A", apartment_number=2)
+    ApartmentFactory.create(street_address="test-street", stair="B", apartment_number=1)
     OwnershipFactory.create(owner__name="Megatron Opetimus Prime")
     OwnershipFactory.create(owner__identifier="010199-123A")
     hc = HousingCompanyFactory.create(postal_code__value="99999")
@@ -308,8 +312,8 @@ def test__api__apartment__filter__regulation_status(api_client: HitasAPIClient):
             [{"field": "housing_company_name", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
-            {"street_address": "a"},
-            [{"field": "street_address", "message": "Ensure this value has at least 2 characters (it has 1)."}],
+            {"address": "a"},
+            [{"field": "address", "message": "Ensure this value has at least 2 characters (it has 1)."}],
         ),
         (
             {"postal_code": "abcde"},
