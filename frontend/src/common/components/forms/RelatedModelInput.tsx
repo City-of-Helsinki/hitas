@@ -10,6 +10,7 @@ type IRelatedModelMutateComponent = React.FC<{
     name: string;
     cancelButtonAction: () => void;
     closeModalAction: () => void;
+    saveSuccessCallback?: (unknown) => void;
 }>;
 
 const RelatedModelTextInput = ({label, required, disabled, name, transform, openModal}) => {
@@ -139,6 +140,7 @@ const RelatedModelModal = ({
                             name={name}
                             cancelButtonAction={() => setIsRelatedModelMutateVisible(false)}
                             closeModalAction={() => closeModal()}
+                            saveSuccessCallback={setFieldValue}
                         />
                     ) : (
                         <>
