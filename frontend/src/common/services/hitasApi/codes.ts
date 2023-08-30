@@ -119,7 +119,13 @@ const ownerApi = hitasApi.injectEndpoints({
                 method: data.id === undefined ? "POST" : "PUT",
                 body: data,
             }),
-            invalidatesTags: (result, error) => safeInvalidate(error, [{type: "Owner"}, {type: "Apartment"}]),
+            invalidatesTags: (result, error, arg) => {
+                if (arg.data.id !== undefined) {
+                    return safeInvalidate(error, [{type: "Owner"}, {type: "Apartment"}]);
+                } else {
+                    return safeInvalidate(error, [{type: "Owner"}]);
+                }
+            },
         }),
     }),
 });
