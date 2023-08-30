@@ -81,7 +81,7 @@ export default function OwnerMutateForm({
             })
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
-                setAPIErrorsForFormFields(error, formObject.setError);
+                setAPIErrorsForFormFields(formObject, error);
             });
     };
 
