@@ -27,10 +27,10 @@ def test_activity_log__create():
         "valid_identifier": ["None", str(owner.valid_identifier)],
         "ownerships": ["None", "hitas.Ownership.None"],
         "deleted_by_cascade": ["None", str(owner.deleted_by_cascade)],
-        "email": ["None", owner.email],
-        "name": ["None", owner.name],
+        "email": ["None", "*" * len(owner.email)],
+        "name": ["None", "*" * len(owner.name)],
         "uuid": ["None", str(owner.uuid)],
-        "identifier": ["None", owner.identifier],
+        "identifier": ["None", "*" * len(owner.identifier)],
         "bypass_conditions_of_sale": ["None", str(owner.bypass_conditions_of_sale)],
         "non_disclosure": ["None", str(owner.non_disclosure)],
     }
@@ -51,7 +51,7 @@ def test_activity_log__update():
     assert activity_log[0].object_pk == str(owner.pk)
     assert activity_log[0].action == LogEntry.Action.UPDATE
     assert json.loads(activity_log[0].changes) == {
-        "name": ["Testi Testinen 1", "Testi Testinen 2"],
+        "name": ["*" * len("Testi Testinen 1"), "*" * len("Testi Testinen 2")],
     }
 
 
@@ -78,10 +78,10 @@ def test_activity_log__soft_delete(freezer):
         "deleted": ["2023-01-01 00:00:00", "None"],
         "ownerships": ["hitas.Ownership.None", "None"],
         "deleted_by_cascade": [str(owner.deleted_by_cascade), "None"],
-        "email": [owner.email, "None"],
-        "name": [owner.name, "None"],
+        "email": ["*" * len(owner.email), "None"],
+        "name": ["*" * len(owner.name), "None"],
         "uuid": [str(owner.uuid), "None"],
-        "identifier": [owner.identifier, "None"],
+        "identifier": ["*" * len(owner.identifier), "None"],
         "bypass_conditions_of_sale": [str(owner.bypass_conditions_of_sale), "None"],
         "non_disclosure": [str(owner.non_disclosure), "None"],
     }

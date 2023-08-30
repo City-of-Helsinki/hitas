@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
-from hitas.models._base import ExternalSafeDeleteHitasModel
+from hitas.models._base import AuditableMaskedModelMixin, ExternalSafeDeleteHitasModel
 from hitas.models.utils import check_business_id, check_social_security_number, lift_obfuscation, obfuscate
 from hitas.utils import index_of
 
@@ -16,7 +16,7 @@ class OwnerT(TypedDict):
     email: Optional[str]
 
 
-class Owner(ExternalSafeDeleteHitasModel):
+class Owner(AuditableMaskedModelMixin, ExternalSafeDeleteHitasModel):
     name: str = models.CharField(max_length=256, blank=True)
     identifier: Optional[str] = models.CharField(max_length=11, blank=True, null=True)
     valid_identifier: bool = models.BooleanField(default=False)
@@ -95,4 +95,4 @@ class Owner(ExternalSafeDeleteHitasModel):
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
 
 
-auditlog.register(Owner)
+auditlog.register(Owner, mask_fields=["name", "identifier", "email"])

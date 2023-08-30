@@ -1,4 +1,5 @@
 import datetime
+import json
 from decimal import Decimal
 from typing import Any, Iterable, Optional, TypeAlias, TypedDict, TypeVar
 from uuid import UUID, uuid4
@@ -117,6 +118,41 @@ class AuditableBulkCreateMixin:
             bulk_create_log_entries(new_objs, LogEntry.Action.CREATE, changes)
 
         return objs
+
+
+class AuditableMaskedModelMixin:
+    def fully_mask_object_latest_log(self) -> None:
+        """
+        Vanilla masking only masks the first half of the data.
+        This method overwrites the whole field value in the log entry after the object is saved.
+        """
+        last_log = LogEntry.objects.get_for_object(self).order_by("-timestamp", "-id").first()
+        if last_log is not None:
+            # Get the fields that should be masked, which are defined in `auditlog.register(MODEL, mask_fields=[...])`.
+            mask_fields = auditlog.get_model_fields(self.__class__).get("mask_fields", [])
+            changes = last_log.changes_dict
+            # Changes to a field that should be masked were made
+            if any(x in mask_fields for x in changes):
+                for field in mask_fields:
+                    if field in changes:
+                        # Replace every character in the before and after fields value with *
+                        for i, _ in enumerate(changes[field]):
+                            # Fix auditlog masking 'empty' values
+                            if changes[field][i] == "**ne":
+                                changes[field][i] = "None"
+                            else:
+                                changes[field][i] = "*" * len(changes[field][i])
+                last_log.changes = json.dumps(changes)
+                last_log.save()
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        self.fully_mask_object_latest_log()
+
+    def delete(self, **kwargs):
+        retval = super().delete(**kwargs)
+        self.fully_mask_object_latest_log()
+        return retval
 
 
 class HitasQuerySet(
