@@ -13,11 +13,13 @@ interface IOwnerMutateForm {
     defaultObject?: IOwner;
     closeModalAction: () => void;
     setEmptyFilterParams?: () => void;
+    saveSuccessCallback?: (obj: IOwner) => void;
 }
 export default function OwnerMutateForm({
     defaultObject: owner,
     closeModalAction,
     setEmptyFilterParams,
+    saveSuccessCallback,
 }: IOwnerMutateForm) {
     const isInitialIdentifierValid = owner !== undefined && validateSocialSecurityNumber(owner.identifier);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
@@ -74,10 +76,14 @@ export default function OwnerMutateForm({
 
         saveOwner({data: formObject.getValues()})
             .unwrap()
-            .then(() => {
+            .then((response) => {
+                console.log(response);
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
                 setEmptyFilterParams?.();
+                if (saveSuccessCallback !== undefined) {
+                    saveSuccessCallback(response);
+                }
             })
             .catch((error) => {
                 hdsToast.error("Virhe omistajan tietojen tallentamisessa!");
