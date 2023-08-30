@@ -90,10 +90,7 @@ class ApartmentFilterSet(HitasFilterSet):
     postal_code = HitasPostalCodeFilter(
         field_name="building__real_estate__housing_company__postal_code__value",
     )
-    owner_name = HitasCharFilter(
-        field_name="sales__ownerships__owner__name",
-        lookup_expr="icontains",
-    )
+    owner_name = HitasCharFilter(method="owner_name_filter")
     owner_identifier = HitasCharFilter(
         field_name="sales__ownerships__owner__identifier",
         lookup_expr="icontains",
@@ -126,6 +123,13 @@ class ApartmentFilterSet(HitasFilterSet):
                 output_field=models.CharField(),
             )
         ).filter(_full_address__icontains=value)
+
+    def owner_name_filter(self, queryset, name, value):
+        # Exclude old sales from the results
+        return queryset.filter(
+            sales__ownerships__deleted__isnull=True,
+            sales__ownerships__owner__name__icontains=value,
+        )
 
     class Meta:
         model = Apartment
