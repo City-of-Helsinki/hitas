@@ -147,7 +147,7 @@ const ApartmentFilters = ({filterParams, setFilterParams}): React.JSX.Element =>
         <div className="filters">
             <FilterTextInputField
                 label="Osoite"
-                filterFieldName="street_address"
+                filterFieldName="address"
                 filterParams={filterParams}
                 setFilterParams={setFilterParams}
             />
