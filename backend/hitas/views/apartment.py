@@ -8,7 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Prefetch, Q, Max
-from django.db.models.expressions import Case, F, Subquery, When
+from django.db.models.expressions import Case, F, Subquery, When, Value
+from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -53,8 +54,8 @@ from hitas.services.apartment import (
     prefetch_latest_sale,
     annotate_apartment_unconfirmed_prices,
 )
-
 from hitas.services.condition_of_sale import condition_of_sale_queryset
+from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.utils import (
     check_for_overlap,
     valid_uuid,
@@ -62,7 +63,6 @@ from hitas.utils import (
     from_iso_format_or_today_if_none,
     max_date_if_all_not_null,
 )
-from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer
 from hitas.views.ownership import OwnershipSerializer
@@ -86,9 +86,7 @@ class ApartmentFilterSet(HitasFilterSet):
         field_name="building__real_estate__housing_company__display_name",
         lookup_expr="icontains",
     )
-    street_address = HitasCharFilter(
-        lookup_expr="icontains",
-    )
+    address = HitasCharFilter(method="address_filter")
     postal_code = HitasPostalCodeFilter(
         field_name="building__real_estate__housing_company__postal_code__value",
     )
@@ -117,11 +115,23 @@ class ApartmentFilterSet(HitasFilterSet):
                 building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED.value
             )
 
+    def address_filter(self, queryset, name, value):
+        return queryset.annotate(
+            _full_address=Concat(
+                F("street_address"),
+                Value(" "),
+                F("stair"),
+                Value(" "),
+                F("apartment_number"),
+                output_field=models.CharField(),
+            )
+        ).filter(_full_address__icontains=value)
+
     class Meta:
         model = Apartment
         fields = [
             "housing_company_name",
-            "street_address",
+            "address",
             "postal_code",
             "owner_name",
             "owner_identifier",
