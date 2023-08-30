@@ -32,7 +32,12 @@ const FormProviderForm = ({
             <form
                 ref={formRef}
                 className={className}
-                onSubmit={handleSubmit(onSubmit, onSubmitError)}
+                onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+                    // Don't trigger submit of parent form, when using nested forms
+                    event.stopPropagation();
+
+                    handleSubmit(onSubmit, onSubmitError)(event);
+                }}
             >
                 {children}
             </form>
