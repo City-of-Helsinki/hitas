@@ -1,3 +1,4 @@
+from auditlog.context import disable_auditlog
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import Count, Max, OuterRef, Q, QuerySet, Subquery
@@ -80,14 +81,16 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
         for owner in obfuscated_owners:
             del owner["non_disclosure"]
 
-        owners.update(
-            name="",
-            identifier=None,
-            valid_identifier=False,
-            email=None,
-            bypass_conditions_of_sale=True,
-            non_disclosure=False,
-        )
+        # No need to auditlog obfuscation
+        with disable_auditlog():
+            owners.update(
+                name="",
+                identifier=None,
+                valid_identifier=False,
+                email=None,
+                bypass_conditions_of_sale=True,
+                non_disclosure=False,
+            )
 
     return obfuscated_owners
 
