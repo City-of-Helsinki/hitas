@@ -1,14 +1,13 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
 import {Button, IconArrowLeft} from "hds-react";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {IOwner, OwnerSchema} from "../../schemas";
 import {useSaveOwnerMutation} from "../../services";
 import {hdsToast, setAPIErrorsForFormFields, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
-import {CheckboxInput, TextInput} from "../forms";
+import {CheckboxInput, SaveFormButton, TextInput} from "../forms";
 import FormProviderForm from "../forms/FormProviderForm";
-import SaveButton from "../SaveButton";
 
 interface IOwnerMutateForm {
     defaultObject?: IOwner;
@@ -42,6 +41,7 @@ export default function OwnerMutateForm({
         )(data, context, {...options, mode: "sync"});
     };
 
+    const formRef = useRef<HTMLFormElement>(null);
     const formObject = useForm({
         defaultValues: owner,
         mode: "all",
@@ -104,6 +104,7 @@ export default function OwnerMutateForm({
     return (
         <FormProviderForm
             formObject={formObject}
+            formRef={formRef}
             onSubmit={onFormSubmitValid}
             onSubmitError={onFormSubmitInvalid}
         >
@@ -144,9 +145,9 @@ export default function OwnerMutateForm({
                     Peruuta
                 </Button>
 
-                <SaveButton
+                <SaveFormButton
+                    formRef={formRef}
                     isLoading={isSaveOwnerLoading}
-                    type="submit"
                     buttonText={isInvalidIdentifierSaveWarningShown ? "Tallenna silti" : "Tallenna"}
                     disabled={isSaveDisabled}
                 />
