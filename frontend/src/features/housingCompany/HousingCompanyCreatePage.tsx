@@ -1,18 +1,19 @@
 import React, {useContext, useRef, useState} from "react";
 
-import {Fieldset} from "hds-react";
+import {Fieldset, IconQuestionCircle} from "hds-react";
 import {useNavigate} from "react-router-dom";
 
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
-import {NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
+import {GenericActionModal, NavigateBackButton, SaveButton, SaveDialogModal} from "../../common/components";
 import {
     CheckboxInput,
     DateInput,
     FormProviderForm,
     NumberInput,
     RelatedModelInput,
+    SaveFormButton,
     SelectInput,
     TextAreaInput,
     TextInput,
@@ -22,6 +23,7 @@ import {
     housingCompanyHitasTypes,
     HousingCompanyWritableSchema,
     ICode,
+    IHousingCompanyDetails,
     IHousingCompanyWritable,
     IPostalCode,
     IPropertyManager,
@@ -81,9 +83,10 @@ const getInitialFormData = (housingCompany): IHousingCompanyWritable => {
 
 const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
     const navigate = useNavigate();
-    const {housingCompany} = useContext(HousingCompanyViewContext);
+    const {housingCompany}: {housingCompany?: IHousingCompanyDetails} = useContext(HousingCompanyViewContext);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRegulationStatusModalOpen, setIsRegulationStatusModalOpen] = useState(false);
 
     const initialFormData: IHousingCompanyWritable = getInitialFormData(housingCompany);
     const formRef = useRef<HTMLFormElement>(null);
@@ -111,6 +114,16 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
     ] = useSaveHousingCompanyMutation();
 
     const onSubmit = (data) => {
+        // Show a confirmation message if regulation status is changed before allowing the save
+        if (
+            housingCompany !== undefined &&
+            housingCompany.regulation_status !== data.regulation_status &&
+            !isRegulationStatusModalOpen
+        ) {
+            setIsRegulationStatusModalOpen(true);
+            return;
+        }
+
         saveHousingCompany({id: housingCompany?.id, data: data})
             .unwrap()
             .then((payload) => {
@@ -257,6 +270,28 @@ const LoadedHousingCompanyCreatePage = (): React.JSX.Element => {
                     />
                 </div>
             </FormProviderForm>
+
+            <GenericActionModal
+                title="Yhtiön sääntelyn tilan muutos"
+                modalIcon={<IconQuestionCircle />}
+                isModalOpen={isRegulationStatusModalOpen}
+                closeModal={() => setIsRegulationStatusModalOpen(false)}
+                confirmButton={
+                    <SaveFormButton
+                        formRef={formRef}
+                        isLoading={isHousingCompanySaveLoading}
+                    />
+                }
+            >
+                <p>
+                    Olet muuttamassa yhtiön <b>{housingCompany?.name.display}</b> sääntelyn tilaa.
+                </p>
+                <p>
+                    Vahvista, että yhtiö on tarkoitus asettaa tilaan '
+                    <b>{getHousingCompanyRegulationStatusName(formObject.getValues("regulation_status"))}</b>'.
+                </p>
+            </GenericActionModal>
+
             <SaveDialogModal
                 linkText="Yhtiön sivulle"
                 baseURL="/housing-companies/"
