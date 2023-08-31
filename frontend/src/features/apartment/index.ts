@@ -4,4 +4,4 @@ export {default as ApartmentDetailsPage} from "./ApartmentDetailsPage";
 export {default as ApartmentImprovementsPage} from "./ApartmentImprovementsPage";
 export {default as ApartmentListPage} from "./ApartmentListPage";
 export {default as ApartmentMaxPricePage} from "./ApartmentMaxPricePage";
-export {default as ApartmentNewSalePage} from "./ApartmentNewSalePage";
+export {default as ApartmentSalePage} from "./ApartmentSalePage";

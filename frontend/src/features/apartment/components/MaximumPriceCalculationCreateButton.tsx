@@ -5,9 +5,33 @@ import {QueryStateHandler} from "../../../common/components";
 import {ApartmentSaleFormSchema, IApartmentMaximumPriceCalculationDetails} from "../../../common/schemas";
 import {useSaveApartmentMaximumPriceMutation} from "../../../common/services";
 import {hdsToast, setAPIErrorsForFormFields} from "../../../common/utils";
-import MaximumPriceModalError from "../ApartmentNewSalePage/fieldsets/MaximumPriceCalculationFieldSet/MaximumPriceModalError";
 import MaximumPriceModalContent from "./ApartmentMaximumPriceBreakdownModal";
 import {ApartmentViewContext} from "./ApartmentViewContextProvider";
+import {FetchBaseQueryError} from "@reduxjs/toolkit/query";
+
+const MaximumPriceModalError = ({error, closeModal}) => {
+    const nonFieldError = error?.data?.message ?? "";
+    const errorCode = error?.data?.error ?? "";
+    return (
+        <>
+            <Dialog.Content>
+                <p>Virhe: {(error as FetchBaseQueryError)?.status}</p>
+                <p>
+                    {nonFieldError} {errorCode ? `(${errorCode})` : ""}
+                </p>
+            </Dialog.Content>
+            <Dialog.ActionButtons>
+                <Button
+                    onClick={closeModal}
+                    variant="secondary"
+                    theme="black"
+                >
+                    Sulje
+                </Button>
+            </Dialog.ActionButtons>
+        </>
+    );
+};
 
 const CreateMaximumPriceCalculationButton = ({
     buttonVariant,
