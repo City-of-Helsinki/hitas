@@ -127,16 +127,19 @@ const LoadedApartmentSalePage = () => {
             hdsToast.error(`Osuus yhtiön lainoista: ${errors.apartment_share_of_housing_company_loans.message}`);
             return;
         } else if (errors.ownerships) {
-            if (errors.ownerships.root) {
-                hdsToast.error(`Omistajuudet: ${errors.ownerships.root.message}`);
-                return;
-            }
-
-            // Find errors in some Owner field
-            const ownerErrors = errors.ownerships.filter((e) => !!e); // Filter out nullish values
-            if (ownerErrors.length > 0) {
-                const ownerErrorMessage = ownerErrors[0]?.owner?.message ?? ownerErrors[0]?.percentage?.message;
-                hdsToast.error(`Omistajuudet: ${ownerErrorMessage || "Virhe omistajuus-kentässä"}`);
+            if (Array.isArray(errors.ownerships)) {
+                // Find errors in some specific Owner field
+                const ownerErrors = errors.ownerships.filter((e) => !!e); // Filter out nullish values
+                if (ownerErrors.length > 0) {
+                    const ownerErrorMessage = ownerErrors[0]?.owner?.message ?? ownerErrors[0]?.percentage?.message;
+                    hdsToast.error(`Omistajuudet: ${ownerErrorMessage || "Virhe omistajuus-kentässä"}`);
+                }
+            } else {
+                if (errors.ownerships.root) {
+                    hdsToast.error(`Omistajuudet: ${errors.ownerships.root.message}`);
+                } else {
+                    hdsToast.error(`Omistajuudet: ${errors.ownerships.message}`);
+                }
             }
             return;
         }
