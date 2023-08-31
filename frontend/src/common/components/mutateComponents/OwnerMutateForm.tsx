@@ -77,7 +77,6 @@ export default function OwnerMutateForm({
         saveOwner({data: formObject.getValues()})
             .unwrap()
             .then((response) => {
-                console.log(response);
                 hdsToast.success("Omistajan tiedot tallennettu onnistuneesti!");
                 closeModalAction();
                 setEmptyFilterParams?.();
