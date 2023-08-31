@@ -70,10 +70,10 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
 
         // The apartment share of housing company loans must match the sales catalog price.
         if (
-            apartment.prices.catalog_share_of_housing_company_loans !== null &&
-            !warningsGiven.maximum_price_calculation &&
+            null !== apartment.prices.catalog_share_of_housing_company_loans &&
             data.apartment_share_of_housing_company_loans !== null &&
-            data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans
+            !warningsGiven.apartment_share_of_housing_company_loans &&
+            maximumPrices.apartmentShareOfHousingCompanyLoans !== data.apartment_share_of_housing_company_loans
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,

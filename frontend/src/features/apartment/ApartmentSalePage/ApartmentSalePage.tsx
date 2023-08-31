@@ -38,6 +38,7 @@ const LoadedApartmentSalePage = () => {
     const noWarningsGiven = {
         maximum_price_calculation: false,
         catalog_acquisition_price: false,
+        apartment_share_of_housing_company_loans: false,
         purchase_price_over_million: false,
     };
     const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
@@ -123,7 +124,10 @@ const LoadedApartmentSalePage = () => {
         ) {
             hdsToast.error(`Kauppahinta: ${errors.purchase_price.message}`);
             return;
-        } else if (errors.apartment_share_of_housing_company_loans) {
+        } else if (
+            errors.apartment_share_of_housing_company_loans &&
+            errors.apartment_share_of_housing_company_loans.type !== z.ZodIssueCode.custom
+        ) {
             hdsToast.error(`Osuus yhtiön lainoista: ${errors.apartment_share_of_housing_company_loans.message}`);
             return;
         } else if (errors.ownerships) {
@@ -157,6 +161,13 @@ const LoadedApartmentSalePage = () => {
             setIsWarningModalVisible(true);
             setWarningsGiven((prev) => ({...prev, catalog_acquisition_price: true}));
             setWarningMessage(errors.catalog_acquisition_price.message);
+        } else if (
+            errors.apartment_share_of_housing_company_loans &&
+            errors.apartment_share_of_housing_company_loans.type === z.ZodIssueCode.custom
+        ) {
+            setIsWarningModalVisible(true);
+            setWarningsGiven((prev) => ({...prev, apartment_share_of_housing_company_loans: true}));
+            setWarningMessage(errors.apartment_share_of_housing_company_loans.message);
         } else if (errors.purchase_price && errors.purchase_price.type === z.ZodIssueCode.custom) {
             setIsWarningModalVisible(true);
             setWarningsGiven((prev) => ({...prev, purchase_price_over_million: true}));
