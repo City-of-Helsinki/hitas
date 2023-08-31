@@ -192,7 +192,7 @@ def build_sales_report_excel(sales: list[ApartmentSale]) -> Workbook:
         contain all values as indicated by the mapping.
         """
         comparison_values: list[Any] = list(comparison_ranges_to_values.values())
-        unwrapped_comparison_ranges = zip(*(unwrap_range(rang) for rang in comparison_ranges_to_values))
+        unwrapped_comparison_ranges = zip(*(unwrap_range(rang) for rang in comparison_ranges_to_values), strict=False)
         zipped_ranges = zip(unwrap_range(value_range), unwrapped_comparison_ranges, strict=True)
         return [
             value

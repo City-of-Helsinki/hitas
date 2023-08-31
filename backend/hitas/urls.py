@@ -120,6 +120,13 @@ router.register(
     basename="multiple-ownerships-report",
 )
 
+# /api/v1/job-performance/{source}
+router.register(
+    r"job-performance",
+    views.JobPerformanceView,
+    basename="job-performance",
+)
+
 # Codes
 router.register(r"postal-codes", views.HitasPostalCodeViewSet, basename="postal-code")
 router.register(r"building-types", views.BuildingTypeViewSet, basename="building-type")

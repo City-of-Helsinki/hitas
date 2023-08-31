@@ -4076,6 +4076,67 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/job-performance/confirmed-maximum-price:
+    get:
+      description: Get Job Performance data for the timeframe on Confirmed Maximum Price calculations
+      tags:
+        - JobPerformance
+      parameters:
+        - name: start_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2022-02-01
+        - name: end_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2023-02-01
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                $ref: '#/components/schemas/JobPerformance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/job-performance/unconfirmed-maximum-price:
+    get:
+      description: Get Job Performance data for the timeframe on Unconfirmed Maximum Price calculations
+      tags:
+        - JobPerformance
+      parameters:
+        - name: start_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2022-02-01
+        - name: end_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2023-02-01
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPerformance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # Email templates
 
   /api/v1/email-templates/{type}:
@@ -8767,6 +8828,45 @@ components:
             description: Email recipient.
             type: string
             example: test@email.com
+
+    JobPerformance:
+      description: Job Performance
+      type: object
+      additionalProperties: false
+      required:
+        - totals
+        - per_user
+      properties:
+        totals:
+          type: object
+          description: Summary statistics for performance data
+          properties:
+            count:
+              type: integer
+              description: Total count of job performances
+              example: 3
+            average_days:
+              type: number
+              description: Average number of days between requesting and delivery dates
+              example: 3.4
+            maximum_days:
+              type: integer
+              description: Maximum number of days between requesting and delivery dates
+              example: 4
+        per_user:
+          type: array
+          description: List of individual user performance data
+          items:
+            type: object
+            properties:
+              full_name:
+                type: string
+                description: Full name of the user
+                example: Matti Meikäläinen
+              job_performance_count:
+                type: integer
+                description: Count of job performances for the user
+                example: 2
 
     # Errors
 
