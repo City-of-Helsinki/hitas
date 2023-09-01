@@ -288,3 +288,23 @@ export const setAPIErrorsForFormFields = (formObject, error) => {
         }
     }
 };
+
+// Return the latest full month from current date
+// If today is the last day of the month, return this month
+// else return previous month
+export const getLatestFullMonth = () => {
+    const today = new Date();
+    if (new Date(new Date().setDate(today.getDate() + 1)).getMonth() !== today.getMonth()) {
+        // Today is the last day of the month, use this month
+        return {
+            start: today,
+            end: new Date(new Date(today).setDate(1)),
+        };
+    } else {
+        // Use previous month
+        return {
+            start: new Date(new Date(new Date(today).setMonth(today.getMonth() - 1)).setDate(1)),
+            end: new Date(new Date(today).setDate(0)),
+        };
+    }
+};

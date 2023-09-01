@@ -1,4 +1,4 @@
-import {IApartmentDetails} from "../../schemas";
+import {IApartmentDetails, JobPerformanceResponse} from "../../schemas";
 import {hdsToast} from "../../utils";
 import {fetchAndDownloadPDF, handleDownloadPDF, safeInvalidate} from "../utils";
 
@@ -110,3 +110,30 @@ export const {
     useGetHousingCompanyStatesQuery,
     useGetPDFBodiesQuery,
 } = reportsApi;
+
+// Mutations are used to allow invalidating cache when PDF is downloaded
+export const jobPerformanceApi = hitasApi.injectEndpoints({
+    endpoints: (builder) => ({
+        getConfirmedMaximumPriceJobPerformance: builder.query<
+            JobPerformanceResponse,
+            {params: {start_date: string; end_date: string}}
+        >({
+            query: ({params}) => ({
+                url: "job-performance/confirmed-maximum-price",
+                params: params,
+            }),
+        }),
+        getUnconfirmedMaximumPriceJobPerformance: builder.query<
+            JobPerformanceResponse,
+            {params: {start_date: string; end_date: string}}
+        >({
+            query: ({params}) => ({
+                url: "job-performance/unconfirmed-maximum-price",
+                params: params,
+            }),
+        }),
+    }),
+});
+
+export const {useGetConfirmedMaximumPriceJobPerformanceQuery, useGetUnconfirmedMaximumPriceJobPerformanceQuery} =
+    jobPerformanceApi;
