@@ -3,13 +3,15 @@ import {DownloadButton, Heading} from "../../../common/components";
 import {DateInput, FormProviderForm} from "../../../common/components/forms";
 import {SalesReportFormSchema} from "../../../common/schemas";
 import {downloadSalesByPostalCodeAndAreaReportPDF, downloadSalesReportPDF} from "../../../common/services";
-import {today} from "../../../common/utils";
+import {getLatestFullMonth} from "../../../common/utils";
+import {format} from "date-fns";
 
 const BaseSalesReport = ({header, downloadReportFunction}) => {
+    const defaultDates = getLatestFullMonth();
     const formObject = useForm({
         defaultValues: {
-            startDate: "",
-            endDate: today(),
+            startDate: format(defaultDates.start, "yyyy-MM-dd"),
+            endDate: format(defaultDates.end, "yyyy-MM-dd"),
         },
         mode: "all",
     });
