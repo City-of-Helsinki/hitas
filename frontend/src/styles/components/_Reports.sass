@@ -63,3 +63,12 @@
 
     [class^="Table-module_container"]
       width: 100%
+
+    .job-performance-heading
+      margin-top: $spacing-2-xl
+
+    .job-performance-totals
+      @include flexbox()
+      @include flex-flow(row nowrap)
+      @include justify-content(space-between)
+      gap: $spacing-s

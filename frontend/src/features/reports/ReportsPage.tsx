@@ -8,6 +8,7 @@ import {
 import OwnerReports from "./components/OwnerReports";
 import {SalesReportAll, SalesReportByAreas} from "./components/SalesReports";
 import {SurfaceAreaPriceCeilingCalculationReport} from "./components/SurfaceAreaPriceCalculationReports";
+import {JobPerformanceReport} from "./components/JobPerformanceReport";
 
 const ReportsPage = () => {
     return (
@@ -40,6 +41,7 @@ const ReportsPage = () => {
                     heading="Rajahintalaskelmat"
                     closeButton={false}
                 >
+                    <Divider size="s" />
                     <SurfaceAreaPriceCeilingCalculationReport />
                 </Accordion>
 
@@ -49,6 +51,14 @@ const ReportsPage = () => {
                 >
                     <Divider size="s" />
                     <OwnerReports />
+                </Accordion>
+
+                <Accordion
+                    heading="Suoritteet"
+                    closeButton={false}
+                >
+                    <Divider size="s" />
+                    <JobPerformanceReport />
                 </Accordion>
             </div>
         </div>
