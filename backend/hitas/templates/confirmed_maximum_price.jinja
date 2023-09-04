@@ -129,7 +129,7 @@
     <br>
 
     <p class="plain-text">
-        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma(0) }}) euroa.
+        Huoneiston vahvistettu enimmäismyyntihinta on {{ maximum_price_calculation.maximum_price|round|wordify }} ({{ maximum_price_calculation.maximum_price|intcomma(0) }}) euroa.
         {% if is_surface_area_maximum %}
             Enimmäismyyntihinta on vahvistettu rajahinnan perusteella ja laskelma on voimassa {{ maximum_price_calculation.valid_until|format_date }} asti.
         {% else %}
