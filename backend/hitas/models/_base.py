@@ -107,11 +107,12 @@ class AuditableBulkCreateMixin:
             return super().bulk_create(objs, batch_size, ignore_conflicts)
 
         with transaction.atomic():
-            # Need to fetch the existing IDs before 'bulk_create',
-            # because it does not return the IDs in the created objects
-            existing_ids: list[int] = list(self.values_list("pk", flat=True))
+            # Bulk create does not always return the created object IDs, so we need to fetch them separately.
+            # Previously we fetched the existing IDs before 'bulk_create' but that caused problems with thousands of ids
+            # Instead, get the existing last ID, and assume all the created objects have a greater ID than that.
+            last_id: int = _last_obj.id if (_last_obj := self.order_by("-id").first()) is not None else 0
             objs = super().bulk_create(objs, batch_size, ignore_conflicts)
-            new_objs: list[TModel] = list(self.exclude(id__in=existing_ids))
+            new_objs: list[TModel] = list(self.filter(id__gt=last_id))
 
             changes: dict[PK, dict[FieldName, tuple[OldValue, NewValue]]]
             changes = {obj.pk: model_instance_diff(None, obj) for obj in new_objs}
