@@ -119,7 +119,11 @@
           {% for ownership in latest_sale.ownerships.all() %}
               <tr>
                   <td class="first-column">{% if loop.index == 1 %}<b>Omistaja ja omistusosuus (%)</b>{% endif %}</td>
-                  <td>{{ ownership.owner.name }}</td>
+                  {% if ownership.owner.non_disclosure %}
+                    <td>***</td>
+                  {% else %}
+                    <td>{{ ownership.owner.name }}</td>
+                  {% endif %}
                   <td>{{ ownership.percentage }}</td>
               </tr>
           {% endfor %}

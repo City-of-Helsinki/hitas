@@ -10,11 +10,11 @@ from django.utils import timezone
 from pypdf import PdfReader
 from rest_framework import status
 
-from hitas.models import Apartment, Ownership
+from hitas.models import Apartment, ApartmentSale, Ownership
 from hitas.models.housing_company import HitasType
 from hitas.models.pdf_body import PDFBodyName
 from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
-from hitas.tests.factories import ApartmentFactory, PDFBodyFactory
+from hitas.tests.factories import ApartmentFactory, ApartmentSaleFactory, OwnershipFactory, PDFBodyFactory
 from hitas.tests.factories.indices import (
     ConstructionPriceIndex2005Equal100Factory,
     ConstructionPriceIndexFactory,
@@ -26,9 +26,15 @@ from users.models import User
 
 
 @pytest.mark.django_db
-def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
+@pytest.mark.parametrize("non_disclosure", [False, True])
+def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer, non_disclosure):
     freezer.move_to("2022-01-01")
     api_user: User = api_client.handler._force_user
+
+    ownership: Ownership = OwnershipFactory(owner__non_disclosure=non_disclosure)
+    sale: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_price=80000, apartment_share_of_housing_company_loans=15000, ownerships=[ownership]
+    )
 
     apartment: Apartment = ApartmentFactory.create(
         completion_date=datetime.date(2021, 1, 1),
@@ -37,8 +43,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         interest_during_construction_cpi=2000,
         surface_area=50,
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
-        sales__purchase_price=80000,
-        sales__apartment_share_of_housing_company_loans=15000,
+        sales=[sale],
     )
 
     ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
@@ -80,6 +85,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
     page_1 = letter.pages[0].extract_text()
     page_1 = cleandoc("\n".join(item.strip() for item in page_1.split("\n")))
 
+    expected_name = "***" if non_disclosure else ownership.owner.name
     assert page_1 == cleandoc(
         f"""
         01.01.2022
@@ -98,7 +104,7 @@ def test__api__unconfirmed_max_price_pdf(api_client: HitasAPIClient, freezer):
         HITAS-HUONEISTON ENIMMÄISHINTA
         \x7f ilman yhtiökohtaisia parannuksia ja mahdollista yhtiölainaosuutta
         Omistaja ja omistusosuus (%)
-        {ownership.owner.name}
+        {expected_name}
         {float(ownership.percentage):.2f}
         Asunto-osakeyhtiö
         {apartment.housing_company.display_name}, Helsinki
@@ -151,7 +157,6 @@ def test__api__unconfirmed_max_price_pdf__old_hitas_ruleset(api_client: HitasAPI
     )
 
     ownership: Ownership = apartment.latest_sale(include_first_sale=True).ownerships.first()
-
     body = PDFBodyFactory.create(
         name=PDFBodyName.UNCONFIRMED_MAX_PRICE_CALCULATION,
         texts=["||foo||", "||bar||", "||baz||"],
