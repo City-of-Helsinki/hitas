@@ -1,7 +1,7 @@
-import sys
 import datetime
+import sys
 from functools import wraps
-from typing import Optional, ParamSpec, TypeVar, Callable
+from typing import Callable, Optional, ParamSpec, TypeVar
 
 import pytz
 from django.utils.translation import gettext_lazy as _

@@ -7,8 +7,8 @@ from typing import Any, Dict, Iterable, Optional, Union
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, Prefetch, Q, Max
-from django.db.models.expressions import Case, F, Subquery, When, Value
+from django.db.models import Count, Max, Prefetch, Q
+from django.db.models.expressions import Case, F, Subquery, Value, When
 from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.urls import reverse
@@ -30,38 +30,38 @@ from hitas.models import (
     Building,
     ConditionOfSale,
     HousingCompany,
-    Ownership,
-    SurfaceAreaPriceCeiling,
     JobPerformance,
+    Ownership,
     PDFBody,
+    SurfaceAreaPriceCeiling,
 )
 from hitas.models.apartment import (
     ApartmentMarketPriceImprovement,
     ApartmentWithAnnotations,
-    DepreciationPercentage,
     ApartmentWithListAnnotations,
+    DepreciationPercentage,
 )
 from hitas.models.condition_of_sale import GracePeriod
 from hitas.models.housing_company import RegulationStatus
 from hitas.models.job_performance import JobPerformanceSource
 from hitas.models.pdf_body import PDFBodyName
 from hitas.services.apartment import (
-    get_first_sale_purchase_date,
+    annotate_apartment_unconfirmed_prices,
     get_first_sale_loan_amount,
+    get_first_sale_purchase_date,
     get_first_sale_purchase_price,
     get_latest_sale_purchase_date,
     get_latest_sale_purchase_price,
     prefetch_latest_sale,
-    annotate_apartment_unconfirmed_prices,
 )
 from hitas.services.condition_of_sale import condition_of_sale_queryset
 from hitas.services.validation import lookup_model_id_by_uuid
 from hitas.utils import (
     check_for_overlap,
-    valid_uuid,
-    monthify,
     from_iso_format_or_today_if_none,
     max_date_if_all_not_null,
+    monthify,
+    valid_uuid,
 )
 from hitas.views.codes import ReadOnlyApartmentTypeSerializer
 from hitas.views.condition_of_sale import MinimalApartmentSerializer, MinimalOwnerSerializer

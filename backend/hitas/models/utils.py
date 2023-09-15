@@ -1,7 +1,7 @@
 import datetime
 import re
 from functools import wraps
-from typing import Optional, TypeVar, ParamSpec, Callable, Any, Iterable
+from typing import Any, Callable, Iterable, Optional, ParamSpec, TypeVar
 
 from auditlog.signals import accessed
 from django.core.exceptions import ValidationError
