@@ -10,7 +10,7 @@ from num2words import num2words
 
 @django_jinja.library.filter
 def format_date(value: Union[str, datetime]) -> str:
-    if type(value) == str:
+    if isinstance(value, str):
         value = datetime.strptime(value, "%Y-%m-%d")
 
     if value:

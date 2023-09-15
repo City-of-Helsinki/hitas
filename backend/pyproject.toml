@@ -124,6 +124,7 @@ ignore = [
     "B904",  # Allow raise without from clause
     "B905",  # Allow zip without explicit strict parameter
     "C417",  # map(...) is fine
+    "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 
 [tool.ruff.per-file-ignores]
