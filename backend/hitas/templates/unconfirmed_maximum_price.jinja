@@ -22,7 +22,11 @@
         {% for ownership in apartment.ownerships %}
         <tr>
             <td>{% if loop.index == 1 %}Omistaja ja omistusosuus (%){% endif %}</td>
-            <td>{{ ownership.owner.name}}</td>
+            {% if ownership.owner.non_disclosure %}
+                <td>***</td>
+            {% else %}
+                <td>{{ ownership.owner.name }}</td>
+            {% endif %}
             <td>{{ ownership.percentage }}</td>
         </tr>
         {% endfor %}
