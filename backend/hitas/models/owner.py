@@ -95,4 +95,19 @@ class Owner(AuditableMaskedModelMixin, ExternalSafeDeleteHitasModel):
         return f"<{type(self).__name__}:{self.pk} ({str(self)})>"
 
 
+class NonObfuscatedOwner(Owner):
+    """Should be used only in owners api
+    DO NOT use in apis where any data is linked to the Owner.
+    In those cases use Owner model to get obfuscated data.
+    """
+
+    @classproperty
+    def obfuscation_rules(cls) -> dict[str, Any]:
+        return {}
+
+    class Meta:
+        proxy = True
+
+
 auditlog.register(Owner, mask_fields=["name", "identifier", "email"])
+auditlog.register(NonObfuscatedOwner, mask_fields=["name", "identifier", "email"])

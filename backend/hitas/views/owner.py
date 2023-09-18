@@ -7,12 +7,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from hitas.models import Owner, Ownership
+from hitas.models.owner import NonObfuscatedOwner
 from hitas.models.utils import (
     check_business_id,
     check_social_security_number,
     deobfuscate,
 )
-from hitas.services.owner import exclude_obfuscated_owners
 from hitas.views.utils import HitasCharFilter, HitasFilterSet, HitasModelMixin, HitasModelSerializer, HitasModelViewSet
 
 
@@ -56,7 +56,7 @@ class OwnerFilterSet(HitasFilterSet):
 
 class OwnerViewSet(HitasModelViewSet):
     serializer_class = OwnerSerializer
-    model_class = Owner
+    model_class = NonObfuscatedOwner
 
     def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         instance: Owner = self.get_object()
@@ -75,10 +75,6 @@ class OwnerViewSet(HitasModelViewSet):
 
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def get_queryset(self):
-        qs = Owner.objects.all().order_by("id")
-        return exclude_obfuscated_owners(qs)
 
     @staticmethod
     def get_filterset_class():
