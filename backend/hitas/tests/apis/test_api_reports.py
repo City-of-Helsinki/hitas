@@ -21,6 +21,7 @@ from hitas.models import (
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
+from hitas.services.reports import OBFUSCATED_OWNER_NAME
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -1356,8 +1357,9 @@ def test__api__multiple_ownerships_report__no_owners(api_client: HitasAPIClient)
 
 
 @pytest.mark.django_db
-def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClient):
-    owner: Owner = OwnerFactory.create()
+@pytest.mark.parametrize("non_disclosure", [False, True])
+def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClient, non_disclosure):
+    owner: Owner = OwnerFactory.create(non_disclosure=non_disclosure)
     ownership_1: Ownership = OwnershipFactory.create(
         owner=owner,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
@@ -1375,8 +1377,18 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
 
     assert list(worksheet.values) == [
         ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
-        (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
-        (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
+        (
+            OBFUSCATED_OWNER_NAME if non_disclosure else ownership_1.owner.name,
+            ownership_1.apartment.address,
+            ownership_1.apartment.postal_code.value,
+            2,
+        ),
+        (
+            OBFUSCATED_OWNER_NAME if non_disclosure else ownership_2.owner.name,
+            ownership_2.apartment.address,
+            ownership_2.apartment.postal_code.value,
+            2,
+        ),
     ]
 
 
@@ -1392,7 +1404,7 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
         sale__apartment__building__real_estate__housing_company__postal_code__value="00002",
     )
 
-    owner_2: Owner = OwnerFactory.create(name="Owner 2")
+    owner_2: Owner = OwnerFactory.create(name="Owner 2", non_disclosure=True)
     ownership_3: Ownership = OwnershipFactory.create(
         owner=owner_2,
         sale__apartment__building__real_estate__housing_company__postal_code__value="00001",
@@ -1416,7 +1428,7 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
         ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
         (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
         (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
-        (ownership_3.owner.name, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
-        (ownership_4.owner.name, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
-        (ownership_5.owner.name, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
+        (OBFUSCATED_OWNER_NAME, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
+        (OBFUSCATED_OWNER_NAME, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
+        (OBFUSCATED_OWNER_NAME, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
     ]
