@@ -28,6 +28,8 @@ CostAreaT: TypeAlias = Literal[1, 2, 3, 4]
 PostalCodeT: TypeAlias = str  # e.g. '00100'
 RoomLabelT: TypeAlias = Literal["1h", "2h", "3h+"]
 
+OBFUSCATED_OWNER_NAME = "***"
+
 
 class SalesReportColumns(NamedTuple):
     cost_area: int | str
@@ -719,7 +721,7 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
     for ownership in ownerships:
         worksheet.append(
             MultipleOwnershipReportColumns(
-                owner_name=ownership.owner.name,
+                owner_name=OBFUSCATED_OWNER_NAME if ownership.owner.non_disclosure else ownership.owner.name,
                 apartment_address=ownership.apartment.address,
                 postal_code=ownership.apartment.postal_code.value,
                 apartment_count=ownership.apartment_count,
