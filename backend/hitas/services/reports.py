@@ -81,7 +81,7 @@ class ReportState(str, Enum):
     REGULATED = "Sääntelyn piirissä"
     RELEASED_BY_HITAS = "Sääntelystä vapautuneet"
     RELEASED_BY_PLOT_DEPARTMENT = "Vapautuneet tontit-yksikön päätöksellä"
-    HALF_HITAS = "Puoli-Hitas yhtiöt"
+    HALF_HITAS = "Puolihitas yhtiöt"
 
 
 class SalesInfo(TypedDict):
