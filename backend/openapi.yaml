@@ -8633,7 +8633,7 @@ components:
               - "Sääntelyn piirissä"
               - "Sääntelystä vapautuneet"
               - "Vapautuneet tontit-yksikön päätöksellä"
-              - "Puoli-Hitas yhtiöt"
+              - "Puolihitas yhtiöt"
           type: string
           example: "Ei Valmis"
           x-extensible-enum:
@@ -8641,7 +8641,7 @@ components:
             - "Sääntelyn piirissä"
             - "Sääntelystä vapautuneet"
             - "Vapautuneet tontit-yksikön päätöksellä"
-            - "Puoli-Hitas yhtiöt"
+            - "Puolihitas yhtiöt"
         housing_company_count:
           description: Count of housing companies in this state
           type: integer
