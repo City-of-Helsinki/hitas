@@ -39,7 +39,7 @@ class HitasType(Enum):
     NEW_HITAS_I = "new_hitas_1"
     # Uudet säännöt, (Ei ole rakennusaikaista korkoa)
     NEW_HITAS_II = "new_hitas_2"
-    # Puoli-Hitas, Ei sisällytetä tilastoihin
+    # Puolihitas, Ei sisällytetä tilastoihin
     HALF_HITAS = "half_hitas"
     # Vanhat säännöt, Ei hyväksytä rakennusaikaista korkoa, Ei sisällytetä tilastoihin
     RENTAL_HITAS_I = "rental_hitas_1"
