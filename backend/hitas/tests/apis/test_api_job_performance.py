@@ -44,6 +44,7 @@ def test__api__job_performance__no_entries(api_client: HitasAPIClient, viewname)
 def test__api__job_performance__multiple_users(api_client: HitasAPIClient, viewname, source):
     user1 = UserFactory.create(first_name="John", last_name="Doe")
     # Included in the results, days between request and delivery is 4
+    # but it contains saturday and sunday so the actual value used in calculation is 2
     JobPerformance.objects.create(
         user=user1,
         request_date=datetime.date(2021, 1, 1),
@@ -51,6 +52,7 @@ def test__api__job_performance__multiple_users(api_client: HitasAPIClient, viewn
         source=source,
     )
     # Included in the results, days between request and delivery is 25
+    # but it contains 7 weekend days so the actual value used in calculations is 18
     JobPerformance.objects.create(
         user=user1,
         request_date=datetime.date(2021, 1, 5),
@@ -67,6 +69,7 @@ def test__api__job_performance__multiple_users(api_client: HitasAPIClient, viewn
 
     user2 = UserFactory.create(first_name="Jane", last_name="Doe")
     # Included in the results, days between request and delivery is 1
+    # but 09012021 is a saturday so 0 days which is a special case that is converted to 0.5
     JobPerformance.objects.create(
         user=user2,
         request_date=datetime.date(2021, 1, 8),
@@ -77,12 +80,14 @@ def test__api__job_performance__multiple_users(api_client: HitasAPIClient, viewn
     date_params = {"start_date": "2021-01-01", "end_date": "2021-01-31"}
     response = api_client.get(reverse(viewname) + "?" + urlencode(date_params))
 
+    # 3 cases combined handling times is 2+18+0.5 = 20.5
+
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         "totals": {
             "count": 3,
-            "average_days": 10,
-            "maximum_days": 25,
+            "average_days": 6.83,
+            "maximum_days": 18,
         },
         "per_user": [
             {
