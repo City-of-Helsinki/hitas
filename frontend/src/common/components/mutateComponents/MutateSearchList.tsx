@@ -60,6 +60,11 @@ function ResultList<
     // To decide whether to show the create new -button
     const isNew = !!(dialogTitles && "new" in dialogTitles);
 
+    // Function the check if an object has property "non_disclosure" set to true
+    const isObfuscated = (obj: TDefaultObject) => {
+        return "non_disclosure" in obj && obj["non_disclosure"] === true;
+    };
+
     return (
         <QueryStateHandler
             data={data}
@@ -71,7 +76,7 @@ function ResultList<
                     <div key={field}>{title}</div>
                 ))}
             </div>
-            <ul className="results-list">
+            <div className="results-list">
                 {data?.contents.map((rowObject: TDefaultObject) => (
                     <div
                         key={rowObject["id"]}
@@ -79,11 +84,15 @@ function ResultList<
                         {...(isModify && {onClick: (e) => editFn(e, rowObject)})}
                     >
                         {Object.keys(listFieldsWithTitles).map((field) => (
-                            <span key={field}>{rowObject[field]}</span>
+                            <span key={field}>
+                                {isObfuscated(rowObject) && field === "name"
+                                    ? "*** " + rowObject[field]
+                                    : rowObject[field]}
+                            </span>
                         ))}
                     </div>
                 ))}
-            </ul>
+            </div>
             <div className="list-footer">
                 <div className="list-footer-item">
                     Näytetään {data?.page.size}/{data?.page.total_items} hakutulosta

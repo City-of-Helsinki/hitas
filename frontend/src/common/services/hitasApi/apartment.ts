@@ -11,10 +11,13 @@ import {
     ICodeResponse,
     IConditionOfSale,
     ICreateConditionOfSale,
+    IOwner,
 } from "../../schemas";
 import {idOrBlank, safeInvalidate} from "../utils";
 
 import {hitasApi} from "../apis";
+import {FetchBaseQueryError} from "@reduxjs/toolkit/dist/query/react";
+import {QueryReturnValue} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 
 const apartmentApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -36,6 +39,37 @@ const apartmentApi = hitasApi.injectEndpoints({
                 url: `housing-companies/${params.housingCompanyId}/apartments/${params.apartmentId}`,
             }),
             providesTags: (result, error, arg) => [{type: "Apartment", id: arg.apartmentId}, {type: "Owner"}],
+        }),
+        getObfuscatedOwner: builder.query<IOwner, string>({
+            query: (ownerId) => ({
+                url: `owners/deobfuscated/${ownerId}`,
+            }),
+            providesTags: (result, error, arg) => [
+                {type: "ObfuscatedOwner", id: arg},
+                {type: "Owner", id: arg},
+            ],
+        }),
+        getObfuscatedOwners: builder.query<{data: IOwner[]; error: FetchBaseQueryError[]}, string[]>({
+            queryFn: async (ids, _queryApi, _extraOptions, baseQuery) => {
+                const results: QueryReturnValue<unknown, FetchBaseQueryError>[] = await Promise.all(
+                    ids.map((id) => baseQuery(`owners/deobfuscated/${id}`))
+                );
+                const emptyObfuscatedOwnersData = [] as IOwner[];
+                const obfuscatedOwnersData = results.map((result) => result.data) as IOwner[];
+                const obfuscatedOwners = emptyObfuscatedOwnersData.concat(...obfuscatedOwnersData);
+
+                const emptyErrorsData = [] as FetchBaseQueryError[];
+                const errorsData = results
+                    .filter((result) => result.error !== null)
+                    .map((result) => result.error) as FetchBaseQueryError[];
+                const mergedErrorsData = emptyErrorsData.concat(...errorsData);
+                const errors = mergedErrorsData.length > 0 ? mergedErrorsData : undefined;
+
+                return {data: {data: obfuscatedOwners, error: errors}} as {
+                    data: {error: FetchBaseQueryError[]; data: IOwner[]};
+                };
+            },
+            providesTags: () => [{type: "ObfuscatedOwners", id: "LIST"}],
         }),
         saveApartment: builder.mutation<
             IApartmentDetails,
@@ -121,6 +155,8 @@ export const {
     useGetApartmentDetailQuery,
     useGetApartmentTypesQuery,
     useGetApartmentsQuery,
+    useGetObfuscatedOwnerQuery,
+    useGetObfuscatedOwnersQuery,
     usePatchApartmentMutation,
     useSaveApartmentMutation,
 } = apartmentApi;

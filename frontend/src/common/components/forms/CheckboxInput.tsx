@@ -8,8 +8,11 @@ const CheckboxInput = ({
     label,
     required,
     triggerField, // Used to trigger validation of another field, in case validation is related to this checkbox
+    tooltipText,
     ...rest
-}: FormInputProps & {triggerField?: string}) => {
+}: FormInputProps & {triggerField?: string} & {
+    tooltipText?: string;
+}) => {
     const formObject = useFormContext();
     const {register} = formObject;
     const formCheckbox = register(name);
@@ -33,6 +36,7 @@ const CheckboxInput = ({
             style={{
                 fontWeight: required ? "700" : "500",
             }}
+            tooltipText={tooltipText}
             {...rest}
         />
     );

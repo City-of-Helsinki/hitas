@@ -45,9 +45,9 @@ export function formatApartmentAddressShort(address: IApartmentAddress): string 
 }
 
 export function formatOwner(owner: IOwner): string {
-    if (owner.name === "" && owner.non_disclosure === true) return "TURVAKIELTO";
-
-    return `${owner.name}${owner.identifier ? ` (${owner.identifier})` : ""}`;
+    const prefix = owner.non_disclosure ? "*** " : "";
+    const identifier = owner.identifier ? ` (${owner.identifier})` : "";
+    return `${prefix}${owner.name}${identifier}`;
 }
 
 export function formatMoney(value: number | undefined | null, forceDecimals = false): string {

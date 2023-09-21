@@ -18,10 +18,13 @@ import ConditionsOfSaleStatus from "./components/ConditionsOfSaleStatus";
 const ApartmentListItem = ({apartment}: {apartment: IApartment}): React.JSX.Element => {
     // Combine ownerships into a single formatted string
     const ownershipsString = apartment.ownerships.length
-        ? apartment.ownerships.map((o) => `${o.owner.name} (${o.owner.identifier})`).join(", ")
+        ? apartment.ownerships
+              .map((o) => (o.owner.non_disclosure ? "***" : `${o.owner.name} (${o.owner.identifier})`))
+              .join(", ")
         : "Ei omistajuuksia";
 
     const isHousingCompanyReleased = apartment.links.housing_company.regulation_status.startsWith("released");
+
     return (
         <Link to={`/housing-companies/${apartment.links.housing_company.id}/apartments/${apartment.id}`}>
             <li className="results-list__item results-list__item--apartment">

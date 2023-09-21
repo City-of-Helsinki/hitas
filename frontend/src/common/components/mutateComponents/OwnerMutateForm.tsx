@@ -130,6 +130,7 @@ export default function OwnerMutateForm({
             <CheckboxInput
                 label="Turvakielto"
                 name="non_disclosure"
+                tooltipText="Asuntolistauksessa turvakiellon alaisen omistajan nimen tilalla näytetään ***, muualla käyttöliittymässä nimen alkuun lisätään ***. Raporteissa ja PDFissä nimeä ei näytetä."
             />
             {
                 // show warning when saving malformed identifier is enabled
