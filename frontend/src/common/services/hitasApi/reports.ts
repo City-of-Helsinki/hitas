@@ -1,4 +1,4 @@
-import {IApartmentDetails, JobPerformanceResponse} from "../../schemas";
+import {ApartmentSalesJobPerformanceResponse, IApartmentDetails, JobPerformanceResponse} from "../../schemas";
 import {hdsToast} from "../../utils";
 import {fetchAndDownloadPDF, handleDownloadPDF, safeInvalidate} from "../utils";
 
@@ -132,8 +132,20 @@ export const jobPerformanceApi = hitasApi.injectEndpoints({
                 params: params,
             }),
         }),
+        getApartmentSalesJobPerformance: builder.query<
+            ApartmentSalesJobPerformanceResponse,
+            {params: {start_date: string; end_date: string}}
+        >({
+            query: ({params}) => ({
+                url: "job-performance/apartment-sales",
+                params: params,
+            }),
+        }),
     }),
 });
 
-export const {useGetConfirmedMaximumPriceJobPerformanceQuery, useGetUnconfirmedMaximumPriceJobPerformanceQuery} =
-    jobPerformanceApi;
+export const {
+    useGetConfirmedMaximumPriceJobPerformanceQuery,
+    useGetUnconfirmedMaximumPriceJobPerformanceQuery,
+    useGetApartmentSalesJobPerformanceQuery,
+} = jobPerformanceApi;

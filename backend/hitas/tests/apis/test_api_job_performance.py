@@ -1,13 +1,16 @@
 import datetime
 
 import pytest
+from auditlog.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils.http import urlencode
 from rest_framework import status
 
+from hitas.models import ApartmentSale
 from hitas.models.job_performance import JobPerformance, JobPerformanceSource
 from hitas.tests.apis.helpers import HitasAPIClient
-from hitas.tests.factories import UserFactory
+from hitas.tests.factories import LogEntryFactory, UserFactory
 
 
 @pytest.mark.parametrize(
@@ -103,14 +106,55 @@ def test__api__job_performance__multiple_users(api_client: HitasAPIClient, viewn
 
 
 @pytest.mark.parametrize(
+    "date_params, expected_count",
+    [
+        ({"start_date": "2023-01-01", "end_date": "2023-01-01"}, 1),
+        ({"start_date": "2023-01-01", "end_date": "2023-01-02"}, 2),
+        ({"start_date": "2023-01-01", "end_date": "2023-01-03"}, 3),
+        ({"start_date": "2023-02-01", "end_date": "2023-05-01"}, 0),
+    ],
+)
+@pytest.mark.django_db
+def test__api__job_performance__apartment_sales(api_client: HitasAPIClient, date_params, expected_count):
+    # for some reason LogEntry overrides given timestamp value so it needs to be replace after creation
+    log_entry1 = LogEntryFactory(
+        action=LogEntry.Action.CREATE,
+        content_type=ContentType.objects.get_for_model(ApartmentSale),
+    )
+    log_entry1.timestamp = "2023-01-01"
+    log_entry1.save()
+
+    log_entry2 = LogEntryFactory(
+        action=LogEntry.Action.CREATE,
+        content_type=ContentType.objects.get_for_model(ApartmentSale),
+    )
+    log_entry2.timestamp = "2023-01-02"
+    log_entry2.save()
+
+    log_entry3 = LogEntryFactory(
+        action=LogEntry.Action.CREATE,
+        content_type=ContentType.objects.get_for_model(ApartmentSale),
+    )
+    log_entry3.timestamp = "2023-01-03"
+    log_entry3.save()
+
+    response = api_client.get(reverse("hitas:job-performance-apartment-sales") + "?" + urlencode(date_params))
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {"count": expected_count}
+
+
+@pytest.mark.parametrize(
     "viewname,date_params",
     [
         ("hitas:job-performance-confirmed-maximum-price", {"strt_date": "2021-01-01"}),
         ("hitas:job-performance-confirmed-maximum-price", {"end_date": "2021-01-31"}),
+        ("hitas:job-performance-confirmed-maximum-price", {"start_date": "2021-02-01", "end_date": "2021-01-31"}),
         ("hitas:job-performance-unconfirmed-maximum-price", {"start_date": "2021-01-01"}),
         ("hitas:job-performance-unconfirmed-maximum-price", {"end_date": "2021-01-31"}),
-        ("hitas:job-performance-confirmed-maximum-price", {"start_date": "2021-02-01", "end_date": "2021-01-31"}),
         ("hitas:job-performance-unconfirmed-maximum-price", {"start_date": "2021-02-01", "end_date": "2021-01-31"}),
+        ("hitas:job-performance-apartment-sales", {"strt_date": "2021-01-01"}),
+        ("hitas:job-performance-apartment-sales", {"end_date": "2021-01-31"}),
+        ("hitas:job-performance-apartment-sales", {"start_date": "2021-02-01", "end_date": "2021-01-31"}),
     ],
 )
 @pytest.mark.django_db

@@ -18,4 +18,10 @@ export const JobPerformanceSchema = object({
     }).array(),
 });
 
+const ApartmentSalesJobPerformanceSchema = object({
+    count: number(),
+});
+
+export type ApartmentSalesJobPerformanceResponse = z.infer<typeof ApartmentSalesJobPerformanceSchema>;
+
 export type JobPerformanceResponse = z.infer<typeof JobPerformanceSchema>;
