@@ -121,9 +121,18 @@ const ownerApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error, arg) => {
                 if (arg.data.id !== undefined) {
-                    return safeInvalidate(error, [{type: "Owner"}, {type: "Apartment"}]);
+                    return safeInvalidate(error, [
+                        {type: "Owner"},
+                        {type: "ObfuscatedOwners"},
+                        {type: "ObfuscatedOwner"},
+                        {type: "Apartment"},
+                    ]);
                 } else {
-                    return safeInvalidate(error, [{type: "Owner"}]);
+                    return safeInvalidate(error, [
+                        {type: "Owner"},
+                        {type: "ObfuscatedOwners"},
+                        {type: "ObfuscatedOwner"},
+                    ]);
                 }
             },
         }),

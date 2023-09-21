@@ -131,7 +131,7 @@ const RelatedModelModal = ({
         >
             <Dialog.Header
                 id={`input-modal-${name}__title`}
-                title={isRelatedModelMutateVisible ? `Luo uusi ${label}` : `Valitse ${label}`}
+                title={isRelatedModelMutateVisible ? `Luo uusi ${label}` : `Valitse ${label.toLocaleLowerCase()}`}
             />
             <Dialog.Content>
                 <div className="input-field--related-model--modal--content">

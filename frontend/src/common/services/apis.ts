@@ -71,6 +71,8 @@ export const hitasApi = createApi({
         "Apartment",
         "Index",
         "Owner",
+        "ObfuscatedOwner",
+        "ObfuscatedOwners",
         "PropertyManager",
         "Developer",
         "ExternalSaleData",

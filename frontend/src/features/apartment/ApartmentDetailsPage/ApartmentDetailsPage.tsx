@@ -1,4 +1,4 @@
-import {Tabs} from "hds-react";
+import {IconAlertCircle, Tabs} from "hds-react";
 import React, {useContext, useState} from "react";
 import {DetailField, Divider, ImprovementsTable} from "../../../common/components";
 import {
@@ -18,7 +18,6 @@ import {
 
 const OwnerEditModalButton = ({owner}: {owner: IOwner}): React.JSX.Element => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     return (
         <>
             <button
@@ -65,6 +64,20 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
     const {housingCompany, apartment} = useContext(ApartmentViewContext);
     if (!apartment) throw new Error("Apartment not found");
 
+    // find out if apartment has owners with non-disclosure set to true
+    const hasObfuscatedOwners = apartment.ownerships.some((ownership) => ownership.owner.non_disclosure);
+
+    const alert = () => (
+        <>
+            <div className="alert-icon-background">
+                <IconAlertCircle
+                    className="alert-icon"
+                    size="m"
+                />
+            </div>
+            <span>Asunnossa turvakiellon alaisia omistajia</span>
+        </>
+    );
     return (
         <>
             <h2 className="apartment-stats">
@@ -78,6 +91,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                 </span>
                 <span>{apartment.surface_area ? apartment.surface_area + "m²" : ""}</span>
                 <span>{apartment.address.floor ? apartment.address.floor + ".krs" : ""}</span>
+                {hasObfuscatedOwners && alert()}
             </h2>
             <div className="apartment-action-cards">
                 <ApartmentMaximumPricesCard
@@ -153,6 +167,7 @@ const LoadedApartmentDetails = (): React.JSX.Element => {
                                         <div>
                                             <label className="detail-field-label">Huomioitavaa</label>
                                             <textarea
+                                                placeholder="Ei huomioitavaa"
                                                 value={apartment.notes || ""}
                                                 readOnly
                                             />
