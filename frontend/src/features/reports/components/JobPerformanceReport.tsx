@@ -2,6 +2,7 @@ import {Table} from "hds-react";
 import {Divider, Heading, QueryStateHandler} from "../../../common/components";
 import {JobPerformanceResponse} from "../../../common/schemas";
 import {
+    useGetApartmentSalesJobPerformanceQuery,
     useGetConfirmedMaximumPriceJobPerformanceQuery,
     useGetUnconfirmedMaximumPriceJobPerformanceQuery,
 } from "../../../common/services";
@@ -108,6 +109,38 @@ const JobPerformanceDataContainer = ({header, formObject, queryFunction}) => {
     );
 };
 
+const JobPerformanceSalesDataContainer = ({header, formObject, queryFunction}) => {
+    const watch = formObject.watch();
+
+    const {data, error, isFetching} = queryFunction(
+        {
+            params: {
+                start_date: watch.startDate,
+                end_date: watch.endDate,
+            },
+        },
+        {skip: !watch.startDate || !watch.endDate}
+    );
+
+    return (
+        <>
+            <Heading
+                type="sub"
+                className="job-performance-heading"
+            >
+                {header}
+            </Heading>
+            <QueryStateHandler
+                data={data}
+                error={error}
+                isLoading={isFetching}
+            >
+                <span>Kauppoja valitulla ajalla: {data?.count} kpl</span>
+            </QueryStateHandler>
+        </>
+    );
+};
+
 export const JobPerformanceReport = () => {
     const defaultDates = getLatestFullMonth();
     const formObject = useForm({
@@ -135,6 +168,13 @@ export const JobPerformanceReport = () => {
                     header="Hinta-arviot"
                     formObject={formObject}
                     queryFunction={useGetUnconfirmedMaximumPriceJobPerformanceQuery}
+                />
+                <Divider size="s" />
+
+                <JobPerformanceSalesDataContainer
+                    header="Luodut kaupat"
+                    formObject={formObject}
+                    queryFunction={useGetApartmentSalesJobPerformanceQuery}
                 />
                 <Divider size="s" />
             </div>

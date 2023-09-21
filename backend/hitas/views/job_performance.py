@@ -8,7 +8,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from hitas.models.job_performance import JobPerformanceSource
-from hitas.services.job_performance import find_job_performance, find_job_performance_per_user
+from hitas.services.job_performance import (
+    find_apartment_sale_creations,
+    find_job_performance,
+    find_job_performance_per_user,
+)
 from hitas.types import HitasJSONRenderer
 from hitas.views.reports import SalesReportSerializer
 
@@ -59,3 +63,21 @@ class JobPerformanceView(ViewSet):
     def confirmed_maximum_price(self, request: Request, *args, **kwargs) -> HttpResponse:
         source = JobPerformanceSource.CONFIRMED_MAX_PRICE
         return self.generic_job_performance_view(request, source)
+
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="apartment-sales",
+        url_name="apartment-sales",
+    )
+    def apartment_sales(self, request: Request, *args, **kwargs) -> HttpResponse:
+        serializer = SalesReportSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        start: datetime.date = serializer.validated_data["start_date"]
+        end: datetime.date = serializer.validated_data["end_date"]
+
+        apartment_sales = find_apartment_sale_creations(start, end)
+
+        data = {"count": apartment_sales.count()}
+        return Response(data=data, status=status.HTTP_200_OK)

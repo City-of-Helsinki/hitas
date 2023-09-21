@@ -4137,6 +4137,35 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/job-performance/apartment-sales:
+    get:
+      description: Get Job Performance data for the timeframe on Apartment Sales
+      tags:
+        - JobPerformance
+      parameters:
+        - name: start_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2022-02-01
+        - name: end_date
+          required: true
+          in: query
+          schema:
+            type: string
+            example: 2023-02-01
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobPerformanceApartmentSales'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   # Email templates
 
   /api/v1/email-templates/{type}:
@@ -8828,6 +8857,18 @@ components:
             description: Email recipient.
             type: string
             example: test@email.com
+
+    JobPerformanceApartmentSales:
+      description: Job Performance Apartment Sales
+      type: object
+      additionalProperties: false
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          description: Total count of job performances
+          example: 3
 
     JobPerformance:
       description: Job Performance

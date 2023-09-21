@@ -20,6 +20,7 @@ from hitas.tests.factories.housing_company import (
     HousingCompanyMarketPriceImprovementFactory,
     RealEstateFactory,
 )
+from hitas.tests.factories.log_entry import LogEntryFactory
 from hitas.tests.factories.owner import OwnerFactory, OwnershipFactory
 from hitas.tests.factories.pdf_body import PDFBodyFactory
 from hitas.tests.factories.postal_code import HitasPostalCodeFactory
