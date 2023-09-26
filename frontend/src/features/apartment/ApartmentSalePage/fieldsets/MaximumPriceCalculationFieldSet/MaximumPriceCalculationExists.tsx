@@ -32,7 +32,11 @@ const LoadedMaximumPriceCalculationExists = ({
             <div className="row row--max-prices">
                 <div className="fieldset--max-prices__value">
                     <legend>Enimmäishinta (€)</legend>
-                    <span className={getValues("purchase_price") > maximumPrices.maximumPrice ? "error-text" : ""}>
+                    <span
+                        className={
+                            getValues("purchase_price") > Math.round(maximumPrices.maximumPrice) ? "error-text" : ""
+                        }
+                    >
                         {formatMoney(maximumPrices.maximumPrice)}
                     </span>
                 </div>

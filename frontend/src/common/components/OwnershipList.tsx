@@ -34,40 +34,38 @@ const OwnershipList = () => {
                         </legend>
                     </li>
 
-                    {fields.map((field, index) => {
-                        return (
-                            <li
-                                className="ownership-item"
-                                key={field.id}
-                            >
-                                <div className="owner">
-                                    <RelatedModelInput
-                                        label="Omistaja"
-                                        required
-                                        queryFunction={useGetOwnersQuery}
-                                        relatedModelSearchField="name"
-                                        name={`ownerships.${index}.owner`}
-                                        transform={(obj) => formatOwner(obj)}
-                                        RelatedModelMutateComponent={OwnerMutateForm}
-                                    />
-                                </div>
-                                <div className="percentage">
-                                    <NumberInput
-                                        name={`ownerships.${index}.percentage`}
-                                        allowDecimals
-                                        required
-                                    />
-                                    <span>%</span>
-                                </div>
-                                <div className="icon--remove">
-                                    <IconCrossCircle
-                                        size="m"
-                                        onClick={() => remove(index)}
-                                    />
-                                </div>
-                            </li>
-                        );
-                    })}
+                    {fields.map((field, index) => (
+                        <li
+                            className="ownership-item"
+                            key={field.id}
+                        >
+                            <div className="owner">
+                                <RelatedModelInput
+                                    label="Omistaja"
+                                    required
+                                    queryFunction={useGetOwnersQuery}
+                                    relatedModelSearchField="name"
+                                    name={`ownerships.${index}.owner`}
+                                    transform={(obj) => formatOwner(obj)}
+                                    RelatedModelMutateComponent={OwnerMutateForm}
+                                />
+                            </div>
+                            <div className="percentage">
+                                <NumberInput
+                                    name={`ownerships.${index}.percentage`}
+                                    allowDecimals
+                                    required
+                                />
+                                <span>%</span>
+                            </div>
+                            <div className="icon--remove">
+                                <IconCrossCircle
+                                    size="m"
+                                    onClick={() => remove(index)}
+                                />
+                            </div>
+                        </li>
+                    ))}
                 </>
             </ul>
 
