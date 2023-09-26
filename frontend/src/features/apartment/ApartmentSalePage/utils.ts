@@ -110,7 +110,7 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
         if (!warningsGiven.maximum_price_calculation) {
             // Normal apartment sale without confirmed maximum price calculation
             if (!isCalculationValid) {
-                if (debtFreePurchasePrice > maximumPrices.debtFreePurchasePrice) {
+                if (debtFreePurchasePrice > Math.round(maximumPrices.debtFreePurchasePrice)) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         path: ["maximum_price_calculation"],
@@ -126,7 +126,7 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
             // Normal apartment sale with confirmed maximum price calculation
             else {
                 // Price can not be bigger than the maximum price calculations maximum price.
-                if (data.purchase_price && data.purchase_price > maximumPrices.maximumPrice) {
+                if (data.purchase_price && data.purchase_price > Math.round(maximumPrices.maximumPrice)) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         path: ["maximum_price_calculation"],

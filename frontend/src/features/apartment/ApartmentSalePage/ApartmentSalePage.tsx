@@ -273,7 +273,7 @@ const LoadedApartmentSalePage = () => {
                 isLoading={isCreateSaleLoading}
                 isVisible={isWarningModalVisible}
                 setIsVisible={setIsWarningModalVisible}
-                modalText={`${warningMessage}. Haluatko varmasti tallentaa kaupan?`}
+                modalText={`${warningMessage} Haluatko varmasti tallentaa kaupan?`}
                 modalHeader="Vahvista kaupan tallennus"
                 cancelAction={closeWarningsModal}
                 confirmAction={handleSaveButtonClick}
