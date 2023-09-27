@@ -27,7 +27,7 @@ from hitas.models.indices import (
 )
 from hitas.models.job_performance import JobPerformance
 from hitas.models.migration_done import MigrationDone
-from hitas.models.owner import Owner
+from hitas.models.owner import NonObfuscatedOwner, Owner
 from hitas.models.ownership import Ownership
 from hitas.models.pdf_body import PDFBody
 from hitas.models.postal_code import HitasPostalCode

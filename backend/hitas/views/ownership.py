@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hitas.models import Owner, Ownership
+from hitas.models import NonObfuscatedOwner, Owner, Ownership
 from hitas.views.utils import HitasDecimalField, UUIDRelatedField
 from hitas.views.utils.serializers import ReadOnlySerializer
 
@@ -25,6 +25,11 @@ class OwnerSerializer(ReadOnlySerializer):
         ]
 
 
+class NonObfuscatedOwnerSerializer(OwnerSerializer):
+    def get_model_class(self):
+        return NonObfuscatedOwner
+
+
 class OwnershipSerializer(serializers.ModelSerializer):
     owner = OwnerSerializer()
     percentage = HitasDecimalField(required=True)
@@ -35,3 +40,7 @@ class OwnershipSerializer(serializers.ModelSerializer):
             "owner",
             "percentage",
         ]
+
+
+class NonObfuscatedOwnerShipSerializer(OwnershipSerializer):
+    owner = NonObfuscatedOwnerSerializer()
