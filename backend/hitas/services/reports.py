@@ -4,7 +4,7 @@ from decimal import Decimal
 from enum import Enum
 from functools import cache
 from statistics import mean
-from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar
+from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, Union
 
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
@@ -12,7 +12,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from hitas.models import ApartmentSale
+from hitas.models import ApartmentSale, Owner
 from hitas.models.housing_company import (
     HitasType,
     HousingCompanyWithRegulatedReportAnnotations,
@@ -27,8 +27,6 @@ T = TypeVar("T")
 CostAreaT: TypeAlias = Literal[1, 2, 3, 4]
 PostalCodeT: TypeAlias = str  # e.g. '00100'
 RoomLabelT: TypeAlias = Literal["1h", "2h", "3h+"]
-
-OBFUSCATED_OWNER_NAME = "***"
 
 
 class SalesReportColumns(NamedTuple):
@@ -98,6 +96,15 @@ class MultipleOwnershipReportColumns(NamedTuple):
     apartment_address: str
     postal_code: str
     apartment_count: int | str
+
+
+class OwnersByHousingCompanyReportColumns(NamedTuple):
+    number: str | int
+    surface_area: str | Decimal
+    share_numbers: str
+    purchase_date: str
+    owner_name: str
+    owner_ssn: str
 
 
 SalesInfoByRoomCount = TypedDict(
@@ -721,15 +728,50 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
     for ownership in ownerships:
         worksheet.append(
             MultipleOwnershipReportColumns(
-                owner_name=OBFUSCATED_OWNER_NAME if ownership.owner.non_disclosure else ownership.owner.name,
+                owner_name=Owner.OBFUSCATED_OWNER_NAME if ownership.owner.non_disclosure else ownership.owner.name,
                 apartment_address=ownership.apartment.address,
                 postal_code=ownership.apartment.postal_code.value,
                 apartment_count=ownership.apartment_count,
             )
         )
 
-    column_letters = string.ascii_uppercase[: len(column_headers)]
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
 
+
+def build_owners_by_housing_companies_report_excel(entries) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+    column_headers = OwnersByHousingCompanyReportColumns(
+        number="Asunnon nro",
+        surface_area="Asunnon pinta-ala",
+        share_numbers="Osakenumerot",
+        purchase_date="Kauppakirjapäivä",
+        owner_name="Omistajan nimi",
+        owner_ssn="Henkilötunnus",
+    )
+
+    worksheet.append(column_headers)
+    for entry in entries:
+        worksheet.append(
+            OwnersByHousingCompanyReportColumns(
+                number=entry.sale.apartment.apartment_number,
+                surface_area=entry.sale.apartment.surface_area,
+                share_numbers=f"{entry.sale.apartment.share_number_start}-{entry.sale.apartment.share_number_end}",
+                purchase_date=entry.sale.purchase_date,
+                owner_name=Owner.OBFUSCATED_OWNER_NAME if entry.owner.non_disclosure else entry.owner.name,
+                owner_ssn=" " if entry.owner.non_disclosure else entry.owner.identifier,
+            )
+        )
+
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
+
+
+def _basic_format_sheet(
+    column_headers: Union[OwnersByHousingCompanyReportColumns, MultipleOwnershipReportColumns], worksheet: Worksheet
+) -> None:
+    column_letters = string.ascii_uppercase[: len(column_headers)]
     last_row = worksheet.max_row
     worksheet.auto_filter.ref = worksheet.dimensions
 
@@ -745,4 +787,3 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
 
     resize_columns(worksheet)
     worksheet.protection.sheet = True
-    return workbook
