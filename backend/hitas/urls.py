@@ -120,6 +120,21 @@ router.register(
     basename="multiple-ownerships-report",
 )
 
+# /api/v1/reports/ownership-by-housing-company/<pk>
+router.register(
+    r"reports/ownership-by-housing-company-report",
+    views.OwnershipsByCompanyJSONReportView,
+    basename="ownership-by-housing-company-report",
+)
+
+# /api/v1/reports/download-ownership-by-housing-company/<pk>
+router.register(
+    r"reports/download-ownership-by-housing-company-report",
+    views.OwnershipsByHousingCompanyReport,
+    basename="download-ownership-by-housing-company-report",
+)
+
+
 # /api/v1/job-performance/{source}
 router.register(
     r"job-performance",

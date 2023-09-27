@@ -1,13 +1,13 @@
 from auditlog.context import disable_auditlog
 from dateutil.relativedelta import relativedelta
 from django.db import models
-from django.db.models import Count, Max, OuterRef, Q, QuerySet, Subquery
+from django.db.models import Count, F, Max, OuterRef, Q, QuerySet, Subquery
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.owner import Owner, OwnerT
-from hitas.models.ownership import Ownership, OwnershipWithApartmentCount
+from hitas.models.ownership import Ownership, OwnershipForHousingReport, OwnershipWithApartmentCount
 from hitas.utils import SQSum, subquery_count
 
 
@@ -113,4 +113,25 @@ def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
             "sale__apartment__building__real_estate__housing_company__postal_code__value",
             "sale__apartment__street_address",
         )
+    )
+
+
+def find_apartments_by_housing_company(housing_company_id: int) -> list[OwnershipForHousingReport]:
+    return (
+        Ownership.objects.filter(
+            sale__apartment__building__real_estate__housing_company_id=housing_company_id,
+            sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        )
+        .select_related("sale__apartment")
+        .annotate(
+            apartment_number=F("sale__apartment__apartment_number"),
+            apartment_surface_area=F("sale__apartment__surface_area"),
+            apartment_share_number_start=F("sale__apartment__share_number_start"),
+            apartment_share_number_end=F("sale__apartment__share_number_end"),
+            sale_purchase_date=F("sale__purchase_date"),
+            owner_name=F("owner__name"),
+            owner_identifier=F("owner__identifier"),
+            owner_non_disclosure=F("owner__non_disclosure"),
+        )
+        .order_by("sale__apartment__apartment_number")
     )
