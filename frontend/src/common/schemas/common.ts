@@ -81,6 +81,7 @@ z.setErrorMap(customErrorMap);
 // ********************************
 
 export const APIIdString = string().min(32, errorMessages.APIIdMin).max(32, errorMessages.APIIdMax);
+export type IAPIIdString = z.infer<typeof APIIdString>;
 
 export const nullishNumber = number({
     invalid_type_error: errorMessages.numberType,

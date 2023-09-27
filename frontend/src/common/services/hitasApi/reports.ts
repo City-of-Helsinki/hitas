@@ -1,7 +1,11 @@
-import {ApartmentSalesJobPerformanceResponse, IApartmentDetails, JobPerformanceResponse} from "../../schemas";
+import {
+    ApartmentSalesJobPerformanceResponse,
+    IAPIIdString,
+    IApartmentDetails,
+    JobPerformanceResponse,
+} from "../../schemas";
 import {hdsToast} from "../../utils";
 import {fetchAndDownloadPDF, handleDownloadPDF, safeInvalidate} from "../utils";
-
 import {hitasApi} from "../apis";
 
 export const downloadApartmentUnconfirmedMaximumPricePDF = (
@@ -66,6 +70,9 @@ export const downloadHousingCompanyStatesReportPDF = () =>
 
 export const downloadMultipleOwnershipsReportPDF = () =>
     fetchAndDownloadPDF("/reports/download-multiple-ownerships-report");
+
+export const downloadHousingCompanyWithOwnersExcel = (id: IAPIIdString) =>
+    fetchAndDownloadPDF(`/reports/download-ownership-by-housing-company-report/${id}`);
 
 // Mutations are used to allow invalidating cache when PDF is downloaded
 export const reportsApi = hitasApi.injectEndpoints({
