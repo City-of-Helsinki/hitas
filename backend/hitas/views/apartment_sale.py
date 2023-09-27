@@ -15,7 +15,7 @@ from hitas.services.apartment import get_latest_sale_purchase_date, prefetch_fir
 from hitas.services.condition_of_sale import create_conditions_of_sale
 from hitas.services.housing_company import get_number_of_unsold_apartments
 from hitas.services.validation import lookup_id_to_uuid, lookup_model_id_by_uuid
-from hitas.views.ownership import OwnershipSerializer
+from hitas.views.ownership import NonObfuscatedOwnerShipSerializer, OwnershipSerializer
 from hitas.views.utils import HitasModelSerializer, HitasModelViewSet
 
 
@@ -51,7 +51,7 @@ class ApartmentSaleSerializer(HitasModelSerializer):
 
 
 class ApartmentSaleCreateSerializer(HitasModelSerializer):
-    ownerships = OwnershipSerializer(many=True)
+    ownerships = NonObfuscatedOwnerShipSerializer(many=True)
     conditions_of_sale_created = serializers.ReadOnlyField(default=False)
 
     @staticmethod

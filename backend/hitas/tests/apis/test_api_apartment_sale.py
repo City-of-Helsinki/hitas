@@ -48,9 +48,10 @@ def test__api__apartment_sale__list__empty(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.parametrize("non_disclosure", [False, True])
 @pytest.mark.django_db
-def test__api__apartment_sale__list(api_client: HitasAPIClient):
-    ownership: Ownership = OwnershipFactory.create()
+def test__api__apartment_sale__list(api_client: HitasAPIClient, non_disclosure: bool):
+    ownership: Ownership = OwnershipFactory.create(owner__non_disclosure=non_disclosure)
 
     url = reverse(
         "hitas:apartment-sale-list",
@@ -127,9 +128,10 @@ def test__api__apartment_sale__list__dont_include_sales_for_other_apartments(api
 # Retrieve tests
 
 
+@pytest.mark.parametrize("non_disclosure", [False, True])
 @pytest.mark.django_db
-def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
-    ownership: Ownership = OwnershipFactory.create()
+def test__api__apartment_sale__retrieve(api_client: HitasAPIClient, non_disclosure: bool):
+    ownership: Ownership = OwnershipFactory.create(owner__non_disclosure=non_disclosure, owner__name="Olli Ostaja")
     sale: ApartmentSale = ApartmentSaleFactory.create(ownerships=[ownership])
 
     url = reverse(
@@ -167,14 +169,15 @@ def test__api__apartment_sale__retrieve(api_client: HitasAPIClient):
 # Create tests
 
 
+@pytest.mark.parametrize("non_disclosure", [False, True])
 @pytest.mark.django_db
-def test__api__apartment_sale__create(api_client: HitasAPIClient):
+def test__api__apartment_sale__create(api_client: HitasAPIClient, non_disclosure):
     apartment: Apartment = ApartmentFactory.create(
         building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
         building__real_estate__housing_company__hitas_type=HitasType.NEW_HITAS_I,
         sales=[],
     )
-    owner: Owner = OwnerFactory.create()
+    owner: Owner = OwnerFactory.create(non_disclosure=non_disclosure)
 
     data = {
         "ownerships": [
