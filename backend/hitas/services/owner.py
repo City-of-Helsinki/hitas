@@ -114,3 +114,14 @@ def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
             "sale__apartment__street_address",
         )
     )
+
+
+def find_apartments_by_housing_company(housing_company_id: int) -> list[Ownership]:
+    return (
+        Ownership.objects.filter(
+            sale__apartment__building__real_estate__housing_company_id=housing_company_id,
+            sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
+        )
+        .select_related("sale", "sale__apartment", "owner")
+        .order_by("sale__apartment__apartment_number")
+    )

@@ -17,6 +17,8 @@ class OwnerT(TypedDict):
 
 
 class Owner(AuditableMaskedModelMixin, ExternalSafeDeleteHitasModel):
+    OBFUSCATED_OWNER_NAME = "***"
+
     name: str = models.CharField(max_length=256, blank=True)
     identifier: Optional[str] = models.CharField(max_length=11, blank=True, null=True)
     valid_identifier: bool = models.BooleanField(default=False)

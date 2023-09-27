@@ -21,7 +21,6 @@ from hitas.models import (
 )
 from hitas.models.housing_company import HitasType, RegulationStatus
 from hitas.models.thirty_year_regulation import FullSalesData, RegulationResult
-from hitas.services.reports import OBFUSCATED_OWNER_NAME
 from hitas.tests.apis.helpers import HitasAPIClient
 from hitas.tests.factories import (
     ApartmentFactory,
@@ -1378,13 +1377,13 @@ def test__api__multiple_ownerships_report__single_owner(api_client: HitasAPIClie
     assert list(worksheet.values) == [
         ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
         (
-            OBFUSCATED_OWNER_NAME if non_disclosure else ownership_1.owner.name,
+            Owner.OBFUSCATED_OWNER_NAME if non_disclosure else ownership_1.owner.name,
             ownership_1.apartment.address,
             ownership_1.apartment.postal_code.value,
             2,
         ),
         (
-            OBFUSCATED_OWNER_NAME if non_disclosure else ownership_2.owner.name,
+            Owner.OBFUSCATED_OWNER_NAME if non_disclosure else ownership_2.owner.name,
             ownership_2.apartment.address,
             ownership_2.apartment.postal_code.value,
             2,
@@ -1428,7 +1427,138 @@ def test__api__multiple_ownerships_report__multiple_owners(api_client: HitasAPIC
         ("Omistajan nimi", "Asunnon osoite", "Postinumero", "Omistajan asuntojen lukumäärä"),
         (ownership_1.owner.name, ownership_1.apartment.address, ownership_1.apartment.postal_code.value, 2),
         (ownership_2.owner.name, ownership_2.apartment.address, ownership_2.apartment.postal_code.value, 2),
-        (OBFUSCATED_OWNER_NAME, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
-        (OBFUSCATED_OWNER_NAME, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
-        (OBFUSCATED_OWNER_NAME, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
+        (Owner.OBFUSCATED_OWNER_NAME, ownership_3.apartment.address, ownership_3.apartment.postal_code.value, 3),
+        (Owner.OBFUSCATED_OWNER_NAME, ownership_4.apartment.address, ownership_4.apartment.postal_code.value, 3),
+        (Owner.OBFUSCATED_OWNER_NAME, ownership_5.apartment.address, ownership_5.apartment.postal_code.value, 3),
     ]
+
+
+@pytest.mark.django_db
+def test__api__download_ownerships_by_housing_company(api_client: HitasAPIClient):
+    housing_company = HousingCompanyFactory(
+        display_name="HCompany1",
+    )
+    ownership_1 = OwnershipFactory(
+        sale__apartment__apartment_number=20,
+        sale__apartment__surface_area=50.2,
+        sale__apartment__building__real_estate__housing_company=housing_company,
+    )
+    non_disclosure_owner: Owner = OwnerFactory.create(name="Owner 2 non-disclosure", non_disclosure=True)
+    OwnershipFactory(
+        owner=non_disclosure_owner,
+        sale__apartment=ownership_1.apartment,
+        sale__purchase_date=datetime.date(2023, 10, 10),
+    )
+
+    ownership_2 = OwnershipFactory(
+        sale__apartment__apartment_number=10,
+        sale__apartment__surface_area=150.2,
+        sale__apartment__share_number_start=10,
+        sale__apartment__share_number_end=100,
+        sale__apartment__building__real_estate__housing_company=housing_company,
+        sale__purchase_date=datetime.date(2023, 9, 9),
+    )
+
+    url = reverse("hitas:download-ownership-by-housing-company-report-detail", kwargs={"pk": housing_company.uuid})
+    response: HttpResponse = api_client.get(url)
+    assert f"attachment; filename=Omistajat yhtiölle {housing_company.display_name}.xlsx" == response.headers.get(
+        "Content-Disposition"
+    )
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+    assert list(worksheet.values) == [
+        ("Asunnon nro", "Asunnon pinta-ala", "Osakenumerot", "Kauppakirjapäivä", "Omistajan nimi", "Henkilötunnus"),
+        (
+            10,
+            150.2,
+            "10-100",
+            datetime.datetime.fromisoformat("2023-09-09"),
+            ownership_2.owner.name,
+            ownership_2.owner.identifier,
+        ),
+        (
+            20,
+            50.2,
+            f"{ownership_1.sale.apartment.share_number_start}-{ownership_1.sale.apartment.share_number_end}",
+            datetime.datetime.fromisoformat(ownership_1.sale.purchase_date.isoformat()),
+            ownership_1.owner.name,
+            ownership_1.owner.identifier,
+        ),
+        (
+            20,
+            50.2,
+            f"{ownership_1.sale.apartment.share_number_start}-{ownership_1.sale.apartment.share_number_end}",
+            datetime.datetime.fromisoformat("2023-10-10"),
+            "***",
+            " ",
+        ),
+    ]
+
+
+@pytest.mark.parametrize("regulated", [False, True])
+@pytest.mark.django_db
+def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulated):
+    housing_company = HousingCompanyFactory(
+        display_name="HCompany1",
+        regulation_status=RegulationStatus.REGULATED if regulated else RegulationStatus.RELEASED_BY_HITAS,
+    )
+    ownership_1 = OwnershipFactory(
+        sale__apartment__apartment_number=20,
+        sale__apartment__surface_area=50.2,
+        sale__apartment__building__real_estate__housing_company=housing_company,
+    )
+    non_disclosure_owner: Owner = OwnerFactory.create(name="Owner 2 non-disclosure", non_disclosure=True)
+    ownership_1_2 = OwnershipFactory(
+        owner=non_disclosure_owner,
+        sale__apartment=ownership_1.apartment,
+        sale__purchase_date=datetime.date(2023, 10, 10),
+    )
+
+    ownership_2 = OwnershipFactory(
+        sale__apartment__apartment_number=10,
+        sale__apartment__surface_area=150.2,
+        sale__apartment__share_number_start=10,
+        sale__apartment__share_number_end=100,
+        sale__apartment__building__real_estate__housing_company=housing_company,
+        sale__purchase_date=datetime.date(2023, 9, 9),
+    )
+
+    url = reverse("hitas:ownership-by-housing-company-report-detail", kwargs={"pk": housing_company.uuid})
+    response = api_client.get(url)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    if regulated:
+
+        def get_share_range(apartment: Apartment):
+            return f"{apartment.share_number_start}-{apartment.share_number_end}"
+
+        assert response.json() == [
+            {
+                "number": 10,
+                "owner_name": ownership_2.owner.name,
+                "owner_ssn": ownership_2.owner.identifier,
+                "purchase_date": "2023-09-09",
+                "share_numbers": "10-100",
+                "surface_area": 150.2,
+            },
+            {
+                "number": 20,
+                "owner_name": ownership_1.owner.name,
+                "owner_ssn": ownership_1.owner.identifier,
+                "purchase_date": str(ownership_1.sale.purchase_date),
+                "share_numbers": get_share_range(ownership_1.sale.apartment),
+                "surface_area": 50.2,
+            },
+            {
+                "number": 20,
+                "owner_name": "***",
+                "owner_ssn": "",
+                "purchase_date": "2023-10-10",
+                "share_numbers": get_share_range(ownership_1_2.sale.apartment),
+                "surface_area": 50.2,
+            },
+        ]
+    else:
+        assert response.json() == []
