@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Iterable, Optional, TypedDict, Union
 
@@ -76,6 +77,21 @@ class Ownership(HitasSafeDeleteModel):
 # This is for typing only
 class OwnershipWithApartmentCount(Ownership):
     apartment_count: int
+
+    class Meta:
+        abstract = True
+
+
+# this is for typing only
+class OwnershipForHousingReport(Ownership):
+    apartment_number: int
+    apartment_surface_area: Decimal
+    apartment_share_number_start: int
+    apartment_share_number_end: int
+    sale_purchase_date: datetime.datetime
+    owner_name: str
+    owner_identifier: str
+    owner_non_disclosure: bool
 
     class Meta:
         abstract = True

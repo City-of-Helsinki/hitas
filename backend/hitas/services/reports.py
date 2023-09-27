@@ -4,7 +4,7 @@ from decimal import Decimal
 from enum import Enum
 from functools import cache
 from statistics import mean
-from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar
+from typing import Any, Callable, Iterable, Literal, NamedTuple, TypeAlias, TypedDict, TypeVar, Union
 
 from openpyxl.styles import Alignment, Border, Side
 from openpyxl.workbook import Workbook
@@ -98,6 +98,15 @@ class MultipleOwnershipReportColumns(NamedTuple):
     apartment_address: str
     postal_code: str
     apartment_count: int | str
+
+
+class OwnersByHousingCompanyReportColumns(NamedTuple):
+    number: str | int
+    surface_area: str | Decimal
+    share_numbers: str
+    purchase_date: str
+    owner_name: str
+    owner_ssn: str
 
 
 SalesInfoByRoomCount = TypedDict(
@@ -728,8 +737,43 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
             )
         )
 
-    column_letters = string.ascii_uppercase[: len(column_headers)]
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
 
+
+def build_owners_by_housing_companies_report_excel(entries) -> Workbook:
+    workbook = Workbook()
+    worksheet: Worksheet = workbook.active
+    column_headers = OwnersByHousingCompanyReportColumns(
+        number="Asunnon nro",
+        surface_area="Asunnon pinta-ala",
+        share_numbers="Osakenumerot",
+        purchase_date="Kauppakirjapäivä",
+        owner_name="Omistajan nimi",
+        owner_ssn="Henkilötunnus",
+    )
+
+    worksheet.append(column_headers)
+    for entry in entries:
+        worksheet.append(
+            OwnersByHousingCompanyReportColumns(
+                number=entry.apartment_number,
+                surface_area=entry.apartment_surface_area,
+                share_numbers=f"{entry.apartment_share_number_start}-{entry.apartment_share_number_end}",
+                purchase_date=entry.sale_purchase_date,
+                owner_name=OBFUSCATED_OWNER_NAME if entry.owner_non_disclosure else entry.owner_name,
+                owner_ssn=" " if entry.owner_non_disclosure else entry.owner_identifier,
+            )
+        )
+
+    _basic_format_sheet(column_headers, worksheet)
+    return workbook
+
+
+def _basic_format_sheet(
+    column_headers: Union[OwnersByHousingCompanyReportColumns, MultipleOwnershipReportColumns], worksheet: Worksheet
+) -> None:
+    column_letters = string.ascii_uppercase[: len(column_headers)]
     last_row = worksheet.max_row
     worksheet.auto_filter.ref = worksheet.dimensions
 
@@ -745,4 +789,3 @@ def build_multiple_ownerships_report_excel(ownerships: list[OwnershipWithApartme
 
     resize_columns(worksheet)
     worksheet.protection.sheet = True
-    return workbook

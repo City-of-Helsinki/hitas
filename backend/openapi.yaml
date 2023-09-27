@@ -4076,6 +4076,65 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/reports/ownership-by-housing-company-report/{housing_company_id}:
+    get:
+      description: Get report in JSON format for one regulated housing company
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      tags:
+        - Reports
+      responses:
+        "200":
+          description: Successfully fetched JSON report for housing company owners ordered by apartment number
+          content:
+            application/json:
+              schema:
+                description: List of owners for one housing company
+                type: array
+                items:
+                  $ref: '#/components/schemas/OwnerByHousingCompany'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/reports/download-ownership-by-housing-company-report/{housing_company_id}:
+    get:
+      description: Download excel report for one regulated housing company
+      parameters:
+        - name: housing_company_id
+          required: true
+          in: path
+          description: Housing company ID
+          schema:
+            type: string
+            example: a3181b8fa60b47df8ccba0d554a913bb
+      tags:
+        - Reports
+      responses:
+        '200':
+            description: Successfully downloaded excel report for housing company owners ordered by apartment number
+            content:
+              application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+                schema:
+                  type: string
+                  format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/job-performance/confirmed-maximum-price:
     get:
       description: Get Job Performance data for the timeframe on Confirmed Maximum Price calculations
@@ -4724,6 +4783,49 @@ components:
               type: string
               nullable: true
               example: "https://example.com/api/v1/housing-companies?page=2"
+
+    OwnerByHousingCompany:
+      description: Single Owner information for a Housing company
+      type: object
+      additionalProperties: false
+      required:
+        - number
+        - surface_area
+        - share_numbers
+        - purchase_date
+        - owner_name
+        - owner_ssn
+      properties:
+        number:
+          description: Apartment number
+          type: integer
+          example: 20
+          readOnly: true
+        surface_area:
+          description: Surface area of the apartment
+          type: number
+          example: 50.2
+          readOnly: true
+        share_numbers:
+          description: Share number range
+          type: string
+          example: 1-100
+          readOnly: true
+        purchase_date:
+          description: Date of the purchase
+          type: string
+          example: 2023-09-21
+          readOnly: true
+        owner_name:
+          description: Name of the owner
+          type: string
+          example: Olli Omistaja
+          readOnly: true
+        owner_ssn:
+          description: SSN of the owner
+          type: string
+          example:  010105A957L
+          readOnly: true
 
     HousingCompany:
       description: Single housing company
