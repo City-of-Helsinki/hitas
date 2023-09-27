@@ -67,6 +67,9 @@ export const downloadHousingCompanyStatesReportPDF = () =>
 export const downloadMultipleOwnershipsReportPDF = () =>
     fetchAndDownloadPDF("/reports/download-multiple-ownerships-report");
 
+// TODO täällä nyt hardcoded housingcompany id=1, pitää korvata UIlta haetun companyn id:llä
+export const downloadHousingCompanyWithOwnersExcel = () =>
+    fetchAndDownloadPDF("/reports/download-ownership-by-housing-company-report/1");
 // Mutations are used to allow invalidating cache when PDF is downloaded
 export const reportsApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
