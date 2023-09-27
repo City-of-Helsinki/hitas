@@ -2,7 +2,7 @@ import {Button, IconPlus, Tabs} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
-import {DetailField, EditButton, Heading, ImprovementsTable} from "../../common/components";
+import {DetailField, DownloadButton, EditButton, Heading, ImprovementsTable} from "../../common/components";
 import {MutateForm, MutateModal, propertyManagerMutateFormProps} from "../../common/components/mutateComponents";
 import {IPropertyManager} from "../../common/schemas";
 import {formatAddress, formatDate, formatMoney} from "../../common/utils";
@@ -13,6 +13,7 @@ import {
     HousingCompanyViewContextProvider,
 } from "./components/HousingCompanyViewContextProvider";
 import SalesCatalogImport from "./components/SalesCatalogImport";
+import {downloadHousingCompanyWithOwnersExcel} from "../../common/services";
 
 const LoadedHousingCompanyDetails = (): React.JSX.Element => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
@@ -102,6 +103,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                                 <div>
                                     <label className="detail-field-label">Huomioitavaa</label>
                                     <textarea
+                                        placeholder="Ei huomioitavaa"
                                         readOnly
                                         value={housingCompany.notes || ""}
                                     />
@@ -216,6 +218,20 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                     </ul>
                 </div>
             </div>
+            {housingCompany.regulation_status === "regulated" && (
+                <div className="list-wrapper list-wrapper--owners">
+                    <Heading type="list">
+                        <span>Omistajat</span>
+                        <div className="buttons">
+                            <DownloadButton
+                                buttonText="Lataa raportti"
+                                onClick={() => downloadHousingCompanyWithOwnersExcel(housingCompany.id)}
+                                size="small"
+                            />
+                        </div>
+                    </Heading>
+                </div>
+            )}
             <div className="list-wrapper list-wrapper--apartments">
                 <Heading type="list">
                     <span>Asunnot</span>
