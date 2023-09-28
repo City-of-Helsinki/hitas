@@ -1,4 +1,5 @@
 import {
+    IAPIIdString,
     IApartmentListResponse,
     IBuilding,
     IBuildingWritable,
@@ -6,6 +7,7 @@ import {
     IHousingCompanyApartmentQuery,
     IHousingCompanyDetails,
     IHousingCompanyListResponse,
+    IHousingCompanyOwner,
     IHousingCompanyWritable,
     IRealEstate,
 } from "../../schemas";
@@ -30,6 +32,10 @@ const housingCompanyApi = hitasApi.injectEndpoints({
                 {type: "PropertyManager", id: result?.property_manager?.id},
                 {type: "Developer", id: result?.developer?.id},
             ],
+        }),
+        getHousingCompanyOwners: builder.query<IHousingCompanyOwner[], IAPIIdString>({
+            query: (id) => `reports/ownership-by-housing-company-report/${id}`,
+            providesTags: (result, error, arg) => [{type: "HousingCompany", id: arg}],
         }),
         // MODIFY
         saveHousingCompany: builder.mutation<IHousingCompanyDetails, {data: IHousingCompanyWritable; id?: string}>({
@@ -157,6 +163,7 @@ export const {
     useGetHousingCompaniesQuery,
     useGetHousingCompanyApartmentsQuery,
     useGetHousingCompanyDetailQuery,
+    useGetHousingCompanyOwnersQuery,
     usePatchHousingCompanyMutation,
     useSaveBuildingMutation,
     useSaveHousingCompanyMutation,

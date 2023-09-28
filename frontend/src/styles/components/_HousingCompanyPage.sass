@@ -72,6 +72,26 @@
   .list-wrapper--real-estates, .list-wrapper--buildings
     width: 50%
 
+  .list-wrapper--owners
+    margin: $spacing-layout-m 0
+    .detail-list__list
+      .detail-list__list-headers, .detail-list__list-item
+        > div
+          width: 15%
+          display: flex
+          justify-content: center
+          &:first-child
+            width: 10%
+            justify-content: start
+          &:nth-child(2)
+            width: 10%
+          &:nth-child(5)
+            width: 35%
+            justify-content: start
+            padding-right: $spacing-xs
+          &:last-child
+            justify-content: end
+
   .results
     grid-column-start: 1
     grid-column-end: 3
