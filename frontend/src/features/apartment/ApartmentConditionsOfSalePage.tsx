@@ -217,6 +217,7 @@ const ConditionOfSaleGracePeriodButton = ({conditionOfSale}: {conditionOfSale: I
     return (
         <>
             <button
+                title="Myönnä lisäaikaa"
                 className="text-button"
                 onClick={() => setIsModalOpen(true)}
             >

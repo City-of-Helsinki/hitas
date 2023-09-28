@@ -14,6 +14,7 @@ import {
 } from "./components/HousingCompanyViewContextProvider";
 import SalesCatalogImport from "./components/SalesCatalogImport";
 import {downloadHousingCompanyWithOwnersExcel} from "../../common/services";
+import HousingCompanyOwnersTable from "../../common/components/HousingCompanyOwnersTable";
 
 const LoadedHousingCompanyDetails = (): React.JSX.Element => {
     const {housingCompany} = useContext(HousingCompanyViewContext);
@@ -220,16 +221,19 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
             </div>
             {housingCompany.regulation_status === "regulated" && (
                 <div className="list-wrapper list-wrapper--owners">
-                    <Heading type="list">
-                        <span>Omistajat</span>
-                        <div className="buttons">
-                            <DownloadButton
-                                buttonText="Lataa raportti"
-                                onClick={() => downloadHousingCompanyWithOwnersExcel(housingCompany.id)}
-                                size="small"
-                            />
-                        </div>
-                    </Heading>
+                    <div className="list__wrapper list-wrapper--owners">
+                        <Heading type="list">
+                            <span>Omistajat</span>
+                            <div className="buttons">
+                                <DownloadButton
+                                    buttonText="Lataa raportti"
+                                    onClick={() => downloadHousingCompanyWithOwnersExcel(housingCompany.id)}
+                                    size="small"
+                                />
+                            </div>
+                        </Heading>
+                        <HousingCompanyOwnersTable housingCompanyId={housingCompany.id} />
+                    </div>
                 </div>
             )}
             <div className="list-wrapper list-wrapper--apartments">

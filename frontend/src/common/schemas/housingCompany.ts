@@ -76,6 +76,16 @@ export const HousingCompanySchema = object({
 });
 export type IHousingCompany = z.infer<typeof HousingCompanySchema>;
 
+export const HousingCompanyOwnerSchema = object({
+    number: number(),
+    surface_area: number(),
+    share_numbers: string(),
+    purchase_date: string(),
+    owner_name: string(),
+    owner_ssn: string(),
+});
+export type IHousingCompanyOwner = z.infer<typeof HousingCompanyOwnerSchema>;
+
 export const HousingCompanyDetailsSchema = object({
     id: APIIdString,
     business_id: string().nullable(),
