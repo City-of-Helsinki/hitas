@@ -1536,6 +1536,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
 
         assert response.json() == [
             {
+                "owner_id": ownership_2.owner.uuid.hex,
                 "number": 10,
                 "owner_name": ownership_2.owner.name,
                 "owner_ssn": ownership_2.owner.identifier,
@@ -1544,6 +1545,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
                 "surface_area": 150.2,
             },
             {
+                "owner_id": ownership_1.owner.uuid.hex,
                 "number": 20,
                 "owner_name": ownership_1.owner.name,
                 "owner_ssn": ownership_1.owner.identifier,
@@ -1552,6 +1554,7 @@ def test__api__ownerships_by_housing_company(api_client: HitasAPIClient, regulat
                 "surface_area": 50.2,
             },
             {
+                "owner_id": ownership_1_2.owner.uuid.hex,
                 "number": 20,
                 "owner_name": "***",
                 "owner_ssn": "",

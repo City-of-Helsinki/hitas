@@ -4789,6 +4789,7 @@ components:
       type: object
       additionalProperties: false
       required:
+        - owner_id
         - number
         - surface_area
         - share_numbers
@@ -4796,6 +4797,11 @@ components:
         - owner_name
         - owner_ssn
       properties:
+        owner_id:
+          description: Owner ID
+          type: string
+          example: a3181b8fa60b47df8ccba0d554a913bb
+          readOnly: true
         number:
           description: Apartment number
           type: integer

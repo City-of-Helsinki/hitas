@@ -83,6 +83,7 @@ export const HousingCompanyOwnerSchema = object({
     purchase_date: string(),
     owner_name: string(),
     owner_ssn: string(),
+    owner_id: APIIdString,
 });
 export type IHousingCompanyOwner = z.infer<typeof HousingCompanyOwnerSchema>;
 

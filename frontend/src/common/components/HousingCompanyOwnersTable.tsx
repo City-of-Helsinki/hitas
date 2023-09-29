@@ -28,10 +28,10 @@ export default function HousingCompanyOwnersTable({housingCompanyId}: {housingCo
                         <div>Nimi</div>
                         <div>Henkilötunnus</div>
                     </li>
-                    {housingCompanyOwners.map((item, index) => (
+                    {housingCompanyOwners.map((item) => (
                         <li
                             className="detail-list__list-item"
-                            key={`owner-item-${index}`}
+                            key={`owner-item-${item.owner_id}`}
                         >
                             <div>{item.number}</div>
                             <div>{item.surface_area}</div>
