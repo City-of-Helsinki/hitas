@@ -131,6 +131,7 @@ class MultipleOwnershipsReportView(ViewSet):
 
 
 class OwnershipsByHousingCompanyReportSerializer(serializers.ModelSerializer):
+    owner_id = serializers.SerializerMethodField()
     number = serializers.IntegerField(source="sale.apartment.apartment_number")
     surface_area = HitasDecimalField(source="sale.apartment.surface_area")
     share_numbers = serializers.SerializerMethodField()
@@ -140,7 +141,10 @@ class OwnershipsByHousingCompanyReportSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ownership
-        fields = ("number", "surface_area", "share_numbers", "purchase_date", "owner_name", "owner_ssn")
+        fields = ("owner_id", "number", "surface_area", "share_numbers", "purchase_date", "owner_name", "owner_ssn")
+
+    def get_owner_id(self, obj):
+        return obj.owner.uuid.hex
 
     def get_share_numbers(self, obj):
         return f"{obj.sale.apartment.share_number_start}-{obj.sale.apartment.share_number_end}"
