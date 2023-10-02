@@ -1,4 +1,4 @@
-import {Button, IconPlus, Tabs} from "hds-react";
+import {Button, IconAngleDown, IconAngleUp, IconPlus, Tabs} from "hds-react";
 import {Link} from "react-router-dom";
 
 import React, {useContext, useState} from "react";
@@ -21,6 +21,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
     if (!housingCompany) throw new Error("Housing company not found");
 
     const [isModifyPropertyManagerModalVisible, setIsModifyPropertyManagerModalVisible] = useState(false);
+    const [isHousingCompanyOwnersTableVisible, setIsHousingCompanyOwnersTableVisible] = useState(false);
 
     return (
         <div className="company-details">
@@ -219,23 +220,6 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                     </ul>
                 </div>
             </div>
-            {housingCompany.regulation_status === "regulated" && (
-                <div className="list-wrapper list-wrapper--owners">
-                    <div className="list__wrapper list-wrapper--owners">
-                        <Heading type="list">
-                            <span>Omistajat</span>
-                            <div className="buttons">
-                                <DownloadButton
-                                    buttonText="Lataa raportti"
-                                    onClick={() => downloadHousingCompanyWithOwnersExcel(housingCompany.id)}
-                                    size="small"
-                                />
-                            </div>
-                        </Heading>
-                        <HousingCompanyOwnersTable housingCompanyId={housingCompany.id} />
-                    </div>
-                </div>
-            )}
             <div className="list-wrapper list-wrapper--apartments">
                 <Heading type="list">
                     <span>Asunnot</span>
@@ -257,6 +241,33 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                     <HousingCompanyApartmentResultsList housingCompanyId={housingCompany.id} />
                 </div>
             </div>
+            {housingCompany.regulation_status === "regulated" && (
+                <div className="list-wrapper list-wrapper--owners">
+                    <Heading type="list">
+                        <button
+                            className="text-button"
+                            onClick={() => {
+                                isHousingCompanyOwnersTableVisible
+                                    ? setIsHousingCompanyOwnersTableVisible(false)
+                                    : setIsHousingCompanyOwnersTableVisible(true);
+                            }}
+                        >
+                            Omistajat
+                            {isHousingCompanyOwnersTableVisible ? <IconAngleUp size="m" /> : <IconAngleDown size="m" />}
+                        </button>
+                        <div className="buttons">
+                            <DownloadButton
+                                buttonText="Lataa raportti"
+                                onClick={() => downloadHousingCompanyWithOwnersExcel(housingCompany.id)}
+                                size="small"
+                            />
+                        </div>
+                    </Heading>
+                    {isHousingCompanyOwnersTableVisible && (
+                        <HousingCompanyOwnersTable housingCompanyId={housingCompany.id} />
+                    )}
+                </div>
+            )}
         </div>
     );
 };
