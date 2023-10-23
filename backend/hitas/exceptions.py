@@ -282,6 +282,7 @@ def _convert_field_error(field_name: str, error: dict[str, Any]) -> dict[str, An
         "empty",
         "datetime",
         "missing",
+        "max_digits",
     ]:
         return {"field": field_name, "message": error["message"]}
     else:
