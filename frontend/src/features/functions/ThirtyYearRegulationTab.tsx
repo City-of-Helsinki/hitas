@@ -59,10 +59,10 @@ const ThirtyYearRegulationDateSelection = ({formObject, hasSkippedCompanies}) =>
     } else {
         // ...otherwise add only the quarters that have passed
         const month = currentTime.getMonth();
-        if (month > 1) hitasQuarterOptions.push(hitasQuarters[0]);
-        if (month > 4) hitasQuarterOptions.push(hitasQuarters[1]);
-        if (month > 7) hitasQuarterOptions.push(hitasQuarters[2]);
-        if (month > 10) hitasQuarterOptions.push(hitasQuarters[3]);
+        if (month >= 1) hitasQuarterOptions.push(hitasQuarters[0]);
+        if (month >= 4) hitasQuarterOptions.push(hitasQuarters[1]);
+        if (month >= 7) hitasQuarterOptions.push(hitasQuarters[2]);
+        if (month >= 10) hitasQuarterOptions.push(hitasQuarters[3]);
     }
 
     return (
