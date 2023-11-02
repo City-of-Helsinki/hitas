@@ -58,7 +58,8 @@ def obfuscate_owners_without_regulated_apartments() -> list[OwnerT]:
                     sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
                 )
                 .annotate(_latest_purchase_date=Max("sale__purchase_date"))
-                .values_list("_latest_purchase_date", flat=True)
+                .order_by("-_latest_purchase_date")
+                .values_list("_latest_purchase_date", flat=True)[:1]
             ),
             output_field=models.DateField(null=True),
         ),
