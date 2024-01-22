@@ -62,7 +62,8 @@ const ThirtyYearRegulationDateSelection = ({formObject, hasSkippedCompanies}) =>
         if (month >= 1) hitasQuarterOptions.push(hitasQuarters[0]);
         if (month >= 4) hitasQuarterOptions.push(hitasQuarters[1]);
         if (month >= 7) hitasQuarterOptions.push(hitasQuarters[2]);
-        if (month >= 10) hitasQuarterOptions.push(hitasQuarters[3]);
+        // Last quarter from start of november to the end on january, month == 0 means january
+        if (month >= 10 || month == 0) hitasQuarterOptions.push(hitasQuarters[3]);
     }
 
     return (
