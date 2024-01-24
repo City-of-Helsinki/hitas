@@ -90,7 +90,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
@@ -152,7 +152,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
@@ -272,7 +272,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
@@ -329,7 +329,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
@@ -479,7 +479,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
@@ -541,7 +541,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         Postiosoite
         Käyntiosoite
         Puh. (09) 310 13033
-        Asuntopalvelut
+        Hitas
         Työpajankatu 8
         Email hitas@hel.fi
         PL 58231
