@@ -108,7 +108,7 @@ def test__api__regulation_letter__continuation_letter(api_client: HitasAPIClient
         Kiinteistötunnukset
         {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
-        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
+        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023
         Yhtiön keskineliöhinta
         Yhtiönne laskettu keskimääräinen neliöhinta on kaksitoistatuhatta (12 000) euroa
         markkinahintaindeksillä laskettuna.
@@ -290,7 +290,7 @@ def test__api__regulation_letter__release_letter(api_client: HitasAPIClient, fre
         Kiinteistötunnukset
         {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
-        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
+        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023
         Yhtiön keskineliöhinta
         Yhtiönne laskettu keskimääräinen neliöhinta on kaksitoistatuhatta (12 000) euroa
         markkinahintaindeksillä laskettuna.
@@ -497,7 +497,7 @@ def test__api__regulation_letter__previous_letter(api_client: HitasAPIClient, fr
         Kiinteistötunnukset
         {apartment.building.real_estate.property_identifier}
         Yhtiön ikä
-        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023 / 1. tarkistus.
+        Yhtiönne valmistumisesta on kulunut 30 vuotta 01.02.2023
         Yhtiön keskineliöhinta
         Yhtiönne laskettu keskimääräinen neliöhinta on kaksitoistatuhatta (12 000) euroa
         markkinahintaindeksillä laskettuna.
