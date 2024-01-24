@@ -790,7 +790,10 @@ def get_thirty_year_regulation_results_for_housing_company(
                 housing_company_ref="housing_company",
             ),
             average_price_per_square_meter_cpi=(
-                F("calculation_month_index_cpi") / F("completion_month_index_cpi") * F("realized_acquisition_price")
+                F("calculation_month_index_cpi")
+                / F("completion_month_index_cpi")
+                * F("realized_acquisition_price")
+                / F("surface_area")
             ),
         )
         .order_by("-parent__calculation_month")
