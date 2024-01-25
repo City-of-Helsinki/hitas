@@ -104,6 +104,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "housing_company": {
                     "id": hc1.uuid.hex,
                     "display_name": hc1.display_name,
+                    "official_name": hc1.official_name,
                     "regulation_status": hc1.regulation_status.value,
                     "link": f"/api/v1/housing-companies/{hc1.uuid.hex}",
                 },
@@ -149,6 +150,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                 "housing_company": {
                     "id": hc2.uuid.hex,
                     "display_name": hc2.display_name,
+                    "official_name": hc2.official_name,
                     "regulation_status": hc2.regulation_status.value,
                     "link": f"/api/v1/housing-companies/{hc2.uuid.hex}",
                 },

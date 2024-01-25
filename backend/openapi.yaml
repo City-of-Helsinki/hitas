@@ -7037,6 +7037,7 @@ components:
           required:
             - id
             - display_name
+            - official_name
             - link
           properties:
             id:
@@ -7047,6 +7048,10 @@ components:
               description: Housing company's display name
               type: string
               example: Taloyhtiö Helmi
+            official_name:
+              description: Housing Company's official name
+              type: string
+              example: As Oy Taloyhtiö Helmi
             regulation_status:
               $ref: "#/components/schemas/RegulationStatus"
             link:

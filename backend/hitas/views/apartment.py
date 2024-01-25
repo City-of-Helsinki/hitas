@@ -529,6 +529,7 @@ def create_links(instance: Apartment) -> Dict[str, Any]:
         "housing_company": {
             "id": instance.housing_company.uuid.hex,
             "display_name": instance.housing_company.display_name,
+            "official_name": instance.housing_company.official_name,
             "regulation_status": instance.housing_company.regulation_status.value,
             "link": reverse(
                 "hitas:housing-company-detail",
