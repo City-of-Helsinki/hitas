@@ -150,6 +150,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "housing_company": {
                         "id": hc.uuid.hex,
                         "display_name": hc.display_name,
+                        "official_name": hc.official_name,
                         "regulation_status": hc.regulation_status.value,
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
                     },
@@ -198,6 +199,7 @@ def test__api__apartment__list(api_client: HitasAPIClient):
                     "housing_company": {
                         "id": hc.uuid.hex,
                         "display_name": hc.display_name,
+                        "official_name": hc.official_name,
                         "regulation_status": hc.regulation_status.value,
                         "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
                     },
@@ -320,6 +322,7 @@ def test__api__apartment__list__minimal(api_client: HitasAPIClient):
                 "housing_company": {
                     "id": hc.uuid.hex,
                     "display_name": hc.display_name,
+                    "official_name": hc.official_name,
                     "regulation_status": hc.regulation_status.value,
                     "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
                 },
@@ -644,6 +647,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "housing_company": {
                 "id": hc.uuid.hex,
                 "display_name": hc.display_name,
+                "official_name": hc.official_name,
                 "regulation_status": hc.regulation_status.value,
                 "link": f"/api/v1/housing-companies/{hc.uuid.hex}",
             },
