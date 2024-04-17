@@ -179,10 +179,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 <div className="list-wrapper list-wrapper--real-estates">
                     <Heading type="list">
                         <span>Kiinteistöt</span>
-                        <EditButton
-                            pathname="real-estates"
-                            disabled={housingCompany.regulation_status !== "regulated"}
-                        />
+                        <EditButton pathname="real-estates" />
                     </Heading>
 
                     <ul className="detail-list__list">
@@ -200,10 +197,7 @@ const LoadedHousingCompanyDetails = (): React.JSX.Element => {
                 <div className="list-wrapper list-wrapper--buildings">
                     <Heading type="list">
                         <span>Rakennukset</span>
-                        <EditButton
-                            pathname="buildings"
-                            disabled={housingCompany.regulation_status !== "regulated"}
-                        />
+                        <EditButton pathname="buildings" />
                     </Heading>
                     <ul className="detail-list__list">
                         {housingCompany.real_estates.flatMap((realEstate) => {

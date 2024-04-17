@@ -80,8 +80,8 @@ const ApartmentHeader = () => {
     const {pathname} = useLocation();
     const isApartmentSubPage = pathname.split("/").pop() !== params.apartmentId;
 
-    // Edit button is visible only if the housing company is regulated and user is on the apartment main page
-    const isEditButtonVisible = housingCompanyData?.regulation_status === "regulated" && !isApartmentSubPage;
+    // Edit button is visible only if the user is on the apartment main page
+    const isEditButtonVisible = !isApartmentSubPage;
 
     return (
         <Heading
