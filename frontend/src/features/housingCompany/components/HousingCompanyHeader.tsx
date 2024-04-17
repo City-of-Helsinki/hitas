@@ -89,8 +89,8 @@ const HousingCompanyHeaderContent = ({housingCompany}: {housingCompany: IHousing
     const {pathname} = useLocation();
     const isHousingCompanySubPage = pathname.split("/").pop() !== housingCompany.id;
 
-    // Edit button is visible only if the housing company is regulated and user is on the housing company main page
-    const isEditButtonVisible = housingCompany.regulation_status === "regulated" && !isHousingCompanySubPage;
+    // Edit button is visible only if the user is on the housing company main page
+    const isEditButtonVisible = !isHousingCompanySubPage;
 
     return (
         <>
