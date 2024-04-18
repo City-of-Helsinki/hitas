@@ -801,19 +801,19 @@ def get_thirty_year_regulation_results_for_housing_company(
     )
     if results is None:
         raise HitasModelNotFound(ThirtyYearRegulationResultsRow)
-
     results.turned_30 = results.completion_date + relativedelta(years=30)
-    results.difference = results.adjusted_average_price_per_square_meter - Decimal(
-        results.parent.sales_data["price_by_area"].get(results.postal_code, 0)
+    price_by_area = Decimal(results.parent.sales_data["price_by_area"].get(results.postal_code, 0))
+    difference_from = max(
+        results.parent.surface_area_price_ceiling,
+        results.adjusted_average_price_per_square_meter,
     )
-
+    results.difference = difference_from - price_by_area
     return results
 
 
 def build_thirty_year_regulation_report_excel(results: ThirtyYearRegulationResults) -> Workbook:
     workbook = Workbook()
     worksheet: Worksheet = workbook.active
-
     column_headers = ReportColumns(
         display_name="Yhtiö",
         acquisition_price="Hankinta-arvo",
