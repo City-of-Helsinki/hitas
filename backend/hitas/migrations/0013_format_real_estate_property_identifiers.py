@@ -4,7 +4,7 @@ from django.db import migrations
 def format_real_estate_property_identifiers(apps, schema_editor):
     RealEstate = apps.get_model("hitas", "RealEstate")
     real_estates_missing_dashes = RealEstate.objects.exclude(property_identifier__contains="-")
-    for real_estate in real_estates_missing_dashes:
+    for real_estate in real_estates_missing_dashes.filter(property_identifier__isnull=False):
         # Format `12312312341234` as `123-123-1234-1234`
         real_estate.property_identifier = (
             f"{real_estate.property_identifier[:3]}"
