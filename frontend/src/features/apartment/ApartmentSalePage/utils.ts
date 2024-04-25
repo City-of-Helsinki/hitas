@@ -126,7 +126,7 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
             // Normal apartment sale with confirmed maximum price calculation
             else {
                 // Price can not be bigger than the maximum price calculations maximum price.
-                if (data.purchase_price && data.purchase_price > Math.round(maximumPrices.maximumPrice)) {
+                if (debtFreePurchasePrice > Math.round(maximumPrices.debtFreePurchasePrice)) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         path: ["maximum_price_calculation"],
@@ -139,19 +139,6 @@ export const getRefinedApartmentSaleFormSchema = (apartment, maximumPrices, warn
                     });
                 }
             }
-        }
-
-        // The apartment share of housing company loans must match the maximum price calculations value
-        if (
-            isCalculationValid &&
-            data.apartment_share_of_housing_company_loans !== null &&
-            data.apartment_share_of_housing_company_loans !== maximumPrices.apartmentShareOfHousingCompanyLoans
-        ) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["apartment_share_of_housing_company_loans"],
-                message: errorMessages.loanShareChanged,
-            });
         }
 
         // Warn that the price is over a million, as it is a rare case and might be a mistake.
