@@ -30,7 +30,7 @@ export const errorMessages = {
     urlInvalid: "Virheellinen www-osoite",
     APIIdMin: "Rajapinnan palauttamassa ID-arvossa liian vähän merkkejä",
     APIIdMax: "Rajapinnan palauttamassa ID-arvossa on liian monta merkkiä",
-    overMaxPrice: "Kauppahinta ylittää enimmäishinnan",
+    overMaxPrice: "Velaton kauppahinta ylittää velattoman enimmäishinnan",
     priceHigherThanUnconfirmedMaxPrice: "Velaton kauppahinta ylittää rajaneliöhinnan.",
     loanShareChanged: "Lainaosuus muuttunut laskelmasta",
     loanShareChangedCatalog: "Lainaosuus muuttunut myyntihintaluettelon tiedoista",
