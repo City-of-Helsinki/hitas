@@ -92,8 +92,7 @@ class ApartmentFilterSet(HitasFilterSet):
     )
     owner_name = HitasCharFilter(method="owner_name_filter")
     owner_identifier = HitasCharFilter(
-        field_name="sales__ownerships__owner__identifier",
-        lookup_expr="icontains",
+        method="owner_identifier_filter",
         max_length=11,
     )
     has_conditions_of_sale = BooleanFilter()
@@ -129,6 +128,13 @@ class ApartmentFilterSet(HitasFilterSet):
         return queryset.filter(
             sales__ownerships__deleted__isnull=True,
             sales__ownerships__owner__name__icontains=value,
+        )
+
+    def owner_identifier_filter(self, queryset, name, value):
+        # Exclude old sales from the results
+        return queryset.filter(
+            sales__ownerships__deleted__isnull=True,
+            sales__ownerships__owner__identifier__icontains=value,
         )
 
     class Meta:
