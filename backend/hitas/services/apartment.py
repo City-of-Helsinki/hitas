@@ -64,15 +64,27 @@ def get_first_sale_acquisition_price(apartment_id: int) -> Optional[datetime.dat
 
 def get_first_sale_acquisition_price(apartment_id: str | int):
     subquery = isinstance(apartment_id, str)
-    queryset: QuerySet[ApartmentSale] = (
+    first_sale_queryset: QuerySet[ApartmentSale] = (
         ApartmentSale.objects.filter(apartment_id=OuterRef(apartment_id) if subquery else apartment_id)
         .order_by("purchase_date", "id")
         .annotate(_first_sale_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans")))
         .values_list("_first_sale_price", flat=True)
     )
+    # Prioritize updated_acquisition_price, if None fall back to first sale prices
     if subquery:
-        return Subquery(queryset=queryset[:1], output_field=HitasModelDecimalField(null=True))
-    return queryset.first()
+        updated_acquisition_price_queryset = Apartment.objects.filter(id=OuterRef(apartment_id)).values_list(
+            "updated_acquisition_price", flat=True
+        )
+        return Coalesce(
+            Subquery(queryset=updated_acquisition_price_queryset[:1], output_field=HitasModelDecimalField(null=True)),
+            Subquery(queryset=first_sale_queryset[:1], output_field=HitasModelDecimalField(null=True)),
+            output_field=HitasModelDecimalField(null=True),
+        )
+    else:
+        apartment = Apartment.objects.filter(id=apartment_id, updated_acquisition_price__isnull=False).first()
+        if apartment is not None:
+            return apartment.updated_acquisition_price
+        return first_sale_queryset.first()
 
 
 @overload

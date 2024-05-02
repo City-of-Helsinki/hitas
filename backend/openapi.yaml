@@ -7134,6 +7134,12 @@ components:
           minimum: 0
           nullable: true
           example: 55430
+        updated_acquisition_price:
+          description: A fixed value to override first_sale_acquisition_price.
+          type: number
+          minimum: 0
+          nullable: true
+          example: 55430
         catalog_purchase_price:
           description: Purchase price given in the sales catalog for this apartment
           type: number

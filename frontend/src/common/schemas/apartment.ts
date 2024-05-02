@@ -278,6 +278,7 @@ export const ApartmentPricesSchema = object({
     first_sale_purchase_price: number().nullable(), // Read only
     first_sale_share_of_housing_company_loans: number().nullable(), // Read only
     first_sale_acquisition_price: number().optional(), // Read only (purchase_price + share_of_housing_company_loans)
+    updated_acquisition_price: nullishDecimal,
     first_purchase_date: string().nullable(), // Read only
     current_sale_id: string().nullable(), // Read only
     latest_sale_purchase_price: number().nullable(), // Read only
@@ -304,6 +305,7 @@ export const ApartmentPricesSchema = object({
 });
 const ApartmentWritablePricesSchema = ApartmentPricesSchema.pick({
     construction: true,
+    updated_acquisition_price: true,
 });
 
 export const ApartmentSharesSchema = object({

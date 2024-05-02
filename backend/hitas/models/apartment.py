@@ -73,6 +73,9 @@ class Apartment(ExternalSafeDeleteHitasModel):
     # 'Luovutushinta (RA)'
     debt_free_purchase_price_during_construction: Optional[Decimal] = HitasModelDecimalField(null=True)
 
+    # 'Päivitetty hankinta-arvo' for overriding first_sale_acquisition_price
+    updated_acquisition_price: Optional[Decimal] = HitasModelDecimalField(null=True)
+
     # 'Muistiinpanot'
     notes: Optional[str] = models.TextField(blank=True, null=True)
 
@@ -87,9 +90,10 @@ class Apartment(ExternalSafeDeleteHitasModel):
     # 'Hankinta-arvo' = Ensimmäisen kaupan kauppakirjahinta + yhtiölainaosuus
     @property
     def first_sale_acquisition_price(self) -> Optional[Decimal]:
+        if self.updated_acquisition_price is not None:
+            return self.updated_acquisition_price
         if self.first_sale_purchase_price is not None and self.first_sale_share_of_housing_company_loans is not None:
             return self.first_sale_purchase_price + self.first_sale_share_of_housing_company_loans
-
         return None
 
     # 'Ensimmäinen kauppahinta = 'Luovutushinta' = Ensimmäisen kaupan kauppakirjahinta
