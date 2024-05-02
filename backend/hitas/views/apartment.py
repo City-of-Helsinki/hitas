@@ -394,6 +394,7 @@ class PricesSerializer(serializers.Serializer):
     first_sale_purchase_price = serializers.SerializerMethodField()
     first_sale_share_of_housing_company_loans = serializers.SerializerMethodField()
     first_sale_acquisition_price = serializers.SerializerMethodField()
+    updated_acquisition_price = HitasDecimalField(required=False, allow_null=True)
     catalog_purchase_price = serializers.SerializerMethodField()
     catalog_share_of_housing_company_loans = serializers.SerializerMethodField()
     catalog_acquisition_price = serializers.SerializerMethodField()

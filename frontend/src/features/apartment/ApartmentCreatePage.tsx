@@ -106,6 +106,7 @@ const getInitialFormData = (apartment, buildingOptions): IApartmentWritableForm 
                     debt_free_purchase_price: null,
                     additional_work: null,
                 },
+                updated_acquisition_price: null,
             },
             // The first building in the list is selected by default
             building: buildingOptions.length
@@ -356,7 +357,10 @@ const LoadedApartmentCreatePage = () => {
                                 label="Valmistumispäivä"
                                 name="completion_date"
                             />
-                            <div />
+                            <NumberInput
+                                label="Päivitetty hankinta-arvo"
+                                name="prices.updated_acquisition_price"
+                            />
                         </div>
                     </Fieldset>
                     <Fieldset heading="">

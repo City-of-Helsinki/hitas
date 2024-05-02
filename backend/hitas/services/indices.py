@@ -354,13 +354,16 @@ def subquery_apartment_first_sale_acquisition_price_index_adjusted(
             output_field=HitasModelDecimalField(),
         )
 
+    updated_acquisition_price = F("updated_acquisition_price")
+    first_sale_acquisition_price = F("_first_sale_purchase_price") + F("_first_sale_share_of_housing_company_loans")
+    acquisition_price = Coalesce(
+        updated_acquisition_price,
+        first_sale_acquisition_price,
+        output_field=HitasModelDecimalField(),
+    )
+
     return Round(
-        (
-            F("_first_sale_purchase_price")
-            + F("_first_sale_share_of_housing_company_loans")
-            + F("additional_work_during_construction")
-            + interest
-        )
+        (acquisition_price + F("additional_work_during_construction") + interest)
         * depreciation
         * current_value
         / NullIf(original_value, 0, output_field=HitasModelDecimalField()),  # prevent zero division errors

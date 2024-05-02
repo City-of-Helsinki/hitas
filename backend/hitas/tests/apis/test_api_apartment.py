@@ -596,6 +596,7 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "first_sale_purchase_price": float(ap1.first_sale_purchase_price),
             "first_sale_share_of_housing_company_loans": float(ap1.first_sale_share_of_housing_company_loans),
             "first_sale_acquisition_price": float(ap1.first_sale_acquisition_price),
+            "updated_acquisition_price": None,
             "catalog_purchase_price": float(ap1.catalog_purchase_price),
             "catalog_share_of_housing_company_loans": float(ap1.catalog_primary_loan_amount),
             "catalog_acquisition_price": float(ap1.catalog_acquisition_price),
@@ -1202,6 +1203,7 @@ def get_apartment_create_data(building: Building) -> dict[str, Any]:
         "prices": {
             "first_sale_purchase_price": 12345.1,
             "first_sale_share_of_housing_company_loans": 34567.3,
+            "updated_acquisition_price": None,
             "first_purchase_date": "2000-01-01",
             "latest_sale_purchase_price": 23456.2,
             "latest_purchase_date": "2020-05-05",
@@ -1260,6 +1262,7 @@ def get_minimal_apartment_data(data):
             "first_sale_purchase_price": None,
             "first_sale_share_of_housing_company_loans": None,
             "first_sale_acquisition_price": None,
+            "updated_acquisition_price": None,
             "catalog_purchase_price": None,
             "catalog_share_of_housing_company_loans": None,
             "catalog_acquisition_price": None,
