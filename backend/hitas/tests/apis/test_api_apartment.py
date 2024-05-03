@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from decimal import Decimal
 from typing import Any, NamedTuple
 
 import pytest
@@ -596,7 +597,9 @@ def test__api__apartment__retrieve(api_client: HitasAPIClient):
             "first_sale_purchase_price": float(ap1.first_sale_purchase_price),
             "first_sale_share_of_housing_company_loans": float(ap1.first_sale_share_of_housing_company_loans),
             "first_sale_acquisition_price": float(ap1.first_sale_acquisition_price),
-            "updated_acquisition_price": None,
+            "updated_acquisition_price": (
+                float(ap1.updated_acquisition_price) if ap1.updated_acquisition_price else None
+            ),
             "catalog_purchase_price": float(ap1.catalog_purchase_price),
             "catalog_share_of_housing_company_loans": float(ap1.catalog_primary_loan_amount),
             "catalog_acquisition_price": float(ap1.catalog_acquisition_price),
@@ -2239,6 +2242,25 @@ def test__api__apartment__update__overlapping_shares(
         "reason": "Bad Request",
         "status": 400,
     }
+
+
+@pytest.mark.django_db
+def test__api__apartment__update__updated_acquisition_price(api_client: HitasAPIClient):
+    apartment: Apartment = ApartmentFactory.create(building__real_estate__housing_company__hitas_type=HitasType.HITAS_I)
+    data = get_apartment_create_data(apartment.building)
+    updated_acquisition_price = apartment.first_sale_acquisition_price + Decimal(100_000)
+    data["prices"]["updated_acquisition_price"] = updated_acquisition_price
+    url = reverse(
+        "hitas:apartment-detail",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.put(url, data=data, format="json")
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert Decimal(str(response.json()["prices"]["first_sale_acquisition_price"])) == updated_acquisition_price
+    assert Decimal(str(response.json()["prices"]["updated_acquisition_price"])) == updated_acquisition_price
 
 
 # Delete tests

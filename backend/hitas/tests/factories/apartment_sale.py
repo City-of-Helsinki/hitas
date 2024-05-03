@@ -2,6 +2,7 @@ from datetime import date
 from typing import Any, Iterable, Optional
 
 import factory
+from django.conf import settings
 from factory import fuzzy
 from factory.django import DjangoModelFactory
 
@@ -36,3 +37,9 @@ class ApartmentSaleFactory(DjangoModelFactory):
 
         for ownership in extracted:
             self.ownerships.add(ownership)
+
+    @factory.post_generation
+    def set_updated_acquisition_price(self, create, extracted, **kwargs):
+        if getattr(settings, "TESTS_SHOULD_SET_UPDATED_ACQUISITION_PRICE", False):
+            self.apartment.updated_acquisition_price = self.apartment.first_sale_acquisition_price
+            self.apartment.save()

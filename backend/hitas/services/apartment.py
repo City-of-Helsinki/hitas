@@ -70,7 +70,6 @@ def get_first_sale_acquisition_price(apartment_id: str | int):
         .annotate(_first_sale_price=Sum(F("purchase_price") + F("apartment_share_of_housing_company_loans")))
         .values_list("_first_sale_price", flat=True)
     )
-    # Prioritize updated_acquisition_price, if None fall back to first sale prices
     if subquery:
         updated_acquisition_price_queryset = Apartment.objects.filter(id=OuterRef(apartment_id)).values_list(
             "updated_acquisition_price", flat=True
