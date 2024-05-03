@@ -358,8 +358,9 @@ const LoadedApartmentCreatePage = () => {
                                 name="completion_date"
                             />
                             <NumberInput
-                                label="Päivitetty hankinta-arvo"
+                                label="Päivitetty hankinta-arvo (€)"
                                 name="prices.updated_acquisition_price"
+                                allowDecimals
                             />
                         </div>
                     </Fieldset>
