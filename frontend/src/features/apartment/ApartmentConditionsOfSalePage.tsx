@@ -7,7 +7,7 @@ import {useFieldArray, useForm, useFormContext} from "react-hook-form";
 import {DeleteButton, GenericActionModal, Heading, NavigateBackButton, SaveButton} from "../../common/components";
 import {FormProviderForm, RelatedModelInput, SaveFormButton} from "../../common/components/forms";
 import {getConditionOfSaleGracePeriodLabel} from "../../common/localisation";
-import {IApartmentConditionOfSale, IApartmentDetails, IOwner, IOwnership} from "../../common/schemas";
+import {IApartmentConditionOfSale, IOwner, IOwnership} from "../../common/schemas";
 import {
     useCreateConditionOfSaleMutation,
     useDeleteConditionOfSaleMutation,
@@ -325,7 +325,7 @@ const DeleteConditionOfSaleButton = ({conditionOfSale}: {conditionOfSale: IApart
     );
 };
 
-const getConditionsOfSaleTableColumns = (apartment: IApartmentDetails) => {
+const getConditionsOfSaleTableColumns = () => {
     return [
         {
             key: "stair",
@@ -392,12 +392,7 @@ const getConditionsOfSaleTableColumns = (apartment: IApartmentDetails) => {
         {
             key: "delete",
             headerName: "",
-            transform: (obj) =>
-                !apartment.ownerships.find((ownership) => ownership.owner.id === obj.owner.id) && !obj.fulfilled ? (
-                    <DeleteConditionOfSaleButton conditionOfSale={obj} />
-                ) : (
-                    ""
-                ),
+            transform: (obj) => <DeleteConditionOfSaleButton conditionOfSale={obj} />,
         },
     ];
 };
@@ -413,7 +408,7 @@ const LoadedConditionsOfSalePage = () => {
                 {apartment.conditions_of_sale.length ? (
                     <Table
                         id="conditions-of-sale-table"
-                        cols={getConditionsOfSaleTableColumns(apartment)}
+                        cols={getConditionsOfSaleTableColumns()}
                         rows={apartment.conditions_of_sale}
                         indexKey="id"
                         variant="light"
