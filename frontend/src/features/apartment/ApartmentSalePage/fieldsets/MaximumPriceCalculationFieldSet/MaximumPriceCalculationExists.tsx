@@ -95,7 +95,6 @@ const MaximumPriceCalculationExists = () => {
             index: calculation.index,
         });
 
-        setValue("purchase_date", calculation.calculation_date);
         setValue("apartment_share_of_housing_company_loans", indexVariables.apartment_share_of_housing_company_loans);
     };
 
