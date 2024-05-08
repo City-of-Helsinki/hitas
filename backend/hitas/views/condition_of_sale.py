@@ -9,7 +9,6 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from safedelete import HARD_DELETE
 
-from hitas.exceptions import ModelConflict
 from hitas.models.apartment import Apartment
 from hitas.models.condition_of_sale import ConditionOfSale, GracePeriod
 from hitas.models.housing_company import HitasType
@@ -139,9 +138,6 @@ class ConditionOfSaleViewSet(HitasModelViewSet):
     model_class = ConditionOfSale
 
     def perform_destroy(self, instance: ConditionOfSale) -> None:
-        if instance.new_ownership.owner == instance.old_ownership.owner:
-            raise ModelConflict("Cannot delete condition of sale between the same owner.", error_code="invalid")
-
         instance.delete(force_policy=HARD_DELETE)
 
     def get_queryset(self):
