@@ -54,15 +54,10 @@ def test__api__condition_of_sale__delete__same_owners(api_client: HitasAPIClient
         },
     )
     response = api_client.delete(url)
-    # Deletion is not allowed since the old and new owners are the same (created through a sale)
-    assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
-    assert response.json() == {
-        "error": "invalid",
-        "message": "Cannot delete condition of sale between the same owner.",
-        "reason": "Conflict",
-        "status": 409,
-    }
+    # Deletion when the old and new owners are the same (created through a sale) used to be disallowed.
+    # There are use cases where this must be allowed, so the restriction has been removed (2024-05-08).
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
 
 @pytest.mark.django_db
