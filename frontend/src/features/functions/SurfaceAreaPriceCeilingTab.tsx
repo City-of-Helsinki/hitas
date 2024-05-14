@@ -30,7 +30,11 @@ const DownloadSurfaceAreaPriceCeilingResultsButton = ({extraOnClickAction}: {ext
     );
 };
 
-const CalculateSurfaceAreaPriceCeilingButton = ({handleCalculateButtonOnClick, isLoading}) => {
+const CalculateSurfaceAreaPriceCeilingButton = ({
+    isCurrentQuarterCalculated,
+    handleCalculateButtonOnClick,
+    isLoading,
+}) => {
     return (
         <Button
             theme="black"
@@ -38,12 +42,17 @@ const CalculateSurfaceAreaPriceCeilingButton = ({handleCalculateButtonOnClick, i
             iconLeft={<IconCogwheels />}
             isLoading={isLoading}
         >
-            Laske rajaneliöhinta
+            {isCurrentQuarterCalculated ? "Laske rajaneliöhinta uudelleen" : "Laske rajaneliöhinta"}
         </Button>
     );
 };
 
-const CurrentMonthCalculationExists = ({sapcIndexData}) => {
+const CurrentMonthCalculationExists = ({
+    sapcIndexData,
+    isCurrentQuarterCalculated,
+    handleCalculateButtonOnClick,
+    isLoading,
+}) => {
     const currentMonth = today().slice(0, 7);
 
     return (
@@ -52,12 +61,16 @@ const CurrentMonthCalculationExists = ({sapcIndexData}) => {
                 <label>Rajaneliöhinta {getHitasQuarterFullLabel(currentMonth)}</label>
                 <span>{sapcIndexData.contents[0].value}</span>
             </div>
-            <DownloadSurfaceAreaPriceCeilingResultsButton />
+            <CalculateSurfaceAreaPriceCeilingButton
+                isCurrentQuarterCalculated={isCurrentQuarterCalculated}
+                handleCalculateButtonOnClick={handleCalculateButtonOnClick}
+                isLoading={isLoading}
+            />
         </>
     );
 };
 
-const CurrentMonthCalculationMissing = ({handleCalculateButtonOnClick, isLoading}) => {
+const CurrentMonthCalculationMissing = ({isCurrentQuarterCalculated, handleCalculateButtonOnClick, isLoading}) => {
     const currentMonth = today().slice(0, 7);
 
     return (
@@ -67,6 +80,7 @@ const CurrentMonthCalculationMissing = ({handleCalculateButtonOnClick, isLoading
                 rajaneliöhintaa.
             </p>
             <CalculateSurfaceAreaPriceCeilingButton
+                isCurrentQuarterCalculated={isCurrentQuarterCalculated}
                 handleCalculateButtonOnClick={handleCalculateButtonOnClick}
                 isLoading={isLoading}
             />
@@ -114,9 +128,15 @@ const SurfaceAreaPriceCeilingCalculationSection = ({sapcIndexData}) => {
             )}
             <div className="price-ceiling-calculation">
                 {isCurrentQuarterCalculated ? (
-                    <CurrentMonthCalculationExists sapcIndexData={sapcIndexData} />
+                    <CurrentMonthCalculationExists
+                        sapcIndexData={sapcIndexData}
+                        isCurrentQuarterCalculated={isCurrentQuarterCalculated}
+                        handleCalculateButtonOnClick={handleCalculateButtonOnClick}
+                        isLoading={isLoading}
+                    />
                 ) : (
                     <CurrentMonthCalculationMissing
+                        isCurrentQuarterCalculated={isCurrentQuarterCalculated}
                         handleCalculateButtonOnClick={handleCalculateButtonOnClick}
                         isLoading={isLoading}
                     />
