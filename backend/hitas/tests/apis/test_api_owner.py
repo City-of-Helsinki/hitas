@@ -593,6 +593,43 @@ def test__api__owner__update__remove_non_disclosure(api_client: HitasAPIClient):
     }
 
 
+@pytest.mark.parametrize(
+    ["should_use_second_owner_details", "expected_name", "expected_identifier", "expected_email"],
+    [
+        [False, "Name 1", "123-ID", "name1@mail.test"],
+        [True, "Name 2", "456-ID", "name2@mail.test"],
+    ],
+)
+@pytest.mark.django_db
+def test__api__owner__merge(
+    api_client: HitasAPIClient, should_use_second_owner_details, expected_name, expected_identifier, expected_email
+):
+    owner_1: Owner = OwnerFactory.create(name="Name 1", identifier="123-ID", email="name1@mail.test")
+    owner_2: Owner = OwnerFactory.create(name="Name 2", identifier="456-ID", email="name2@mail.test")
+    OwnershipFactory.create(owner=owner_1)
+    OwnershipFactory.create(owner=owner_2)
+
+    data = {
+        "first_owner_id": owner_1.uuid.hex,
+        "second_owner_id": owner_2.uuid.hex,
+        "should_use_second_owner_name": should_use_second_owner_details,
+        "should_use_second_owner_identifier": should_use_second_owner_details,
+        "should_use_second_owner_email": should_use_second_owner_details,
+    }
+
+    url = reverse("hitas:owner-merge")
+    response = api_client.post(url, data=data, format="json")
+    assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
+
+    assert Owner.objects.count() == 1
+    assert Owner.objects.first().ownerships.count() == 2
+
+    owner_1 = Owner.objects.first()
+    assert owner_1.name == expected_name
+    assert owner_1.identifier == expected_identifier
+    assert owner_1.email == expected_email
+
+
 # Delete tests
 
 

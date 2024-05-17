@@ -2106,6 +2106,14 @@ paths:
             type: string
             minLength: 2
             example: matti.meikalainen@example.com
+        - name: search
+          description: Search owners whose name, identifier or email address match the given search string (case-insensitive)
+          required: false
+          in: query
+          schema:
+            type: string
+            minLength: 2
+            example: Matti
         - $ref: "#/components/parameters/PagingLimitParameter"
         - $ref: "#/components/parameters/PagingPageParameter"
       responses:
@@ -2289,6 +2297,52 @@ paths:
           $ref: "#/components/responses/NotFound"
         "406":
           $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  # Owner merging
+
+  /api/v1/owners/merge:
+    post:
+      description: Merge two owners removing the duplicate one. Ownerships are transferred from the second owner to the first owner and the second owner is removed.
+      operationId: merge-owners
+      tags:
+        - Owners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_owner_id:
+                  type: string
+                  description: The ID of the first owner
+                second_owner_id:
+                  type: string
+                  description: The ID of the second owner
+                should_use_second_owner_name:
+                  type: boolean
+                  description: Flag indicating whether to update the name of the first owner using the name of the second owner
+                should_use_second_owner_identifier:
+                  type: boolean
+                  description: Flag indicating whether to update the identifier of the first owner using the identifier of the second owner
+                should_use_second_owner_email:
+                  type: boolean
+                  description: Flag indicating whether to update the email of the first owner using the email of the second owner
+      responses:
+        "204":
+          description: Successfully merged owner
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "409":
+          $ref: "#/components/responses/Conflict"
         "500":
           $ref: "#/components/responses/InternalServerError"
 

@@ -1,6 +1,6 @@
 import {zodResolver} from "@hookform/resolvers/zod/dist/zod";
-import {Button, IconArrowLeft} from "hds-react";
-import {useEffect, useRef} from "react";
+import {Button, IconArrowLeft, IconUser} from "hds-react";
+import {useEffect, useRef, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {IOwner, OwnerSchema} from "../../schemas";
@@ -8,6 +8,7 @@ import {useSaveOwnerMutation} from "../../services";
 import {hdsToast, setAPIErrorsForFormFields, validateBusinessId, validateSocialSecurityNumber} from "../../utils";
 import {CheckboxInput, SaveFormButton, TextInput} from "../forms";
 import FormProviderForm from "../forms/FormProviderForm";
+import {OwnerMergeModal} from "./OwnerMergeMutateForm";
 
 interface IOwnerMutateForm {
     defaultObject?: IOwner;
@@ -23,6 +24,7 @@ export default function OwnerMutateForm({
 }: IOwnerMutateForm) {
     const isInitialIdentifierValid = owner !== undefined && validateSocialSecurityNumber(owner.identifier);
     const [saveOwner, {isLoading: isSaveOwnerLoading}] = useSaveOwnerMutation();
+    const [isOwnerMergeModalVisible, setIsOwnerMergeModalVisible] = useState(false);
 
     const closeModal = () => {
         closeModalAction();
@@ -107,57 +109,80 @@ export default function OwnerMutateForm({
     }, []);
 
     return (
-        <FormProviderForm
-            formObject={formObject}
-            formRef={formRef}
-            onSubmit={onFormSubmitValid}
-            onSubmitError={onFormSubmitInvalid}
-        >
-            <TextInput
-                name="name"
-                label="Nimi"
-                required
-            />
-            <TextInput
-                name="identifier"
-                label="Henkilö- tai Y-tunnus"
-                required
-            />
-            <TextInput
-                name="email"
-                label="Sähköpostiosoite"
-            />
-            <CheckboxInput
-                label="Turvakielto"
-                name="non_disclosure"
-                tooltipText="Asuntolistauksessa turvakiellon alaisen omistajan nimen tilalla näytetään ***, muualla käyttöliittymässä nimen alkuun lisätään ***. Raporteissa ja PDFissä nimeä ei näytetä."
-            />
-            {
-                // show warning when saving malformed identifier is enabled
-                isInvalidIdentifierSaveWarningShown && !isSaveDisabled && (
-                    <p className="error-message">
-                        '{formObject.watch("identifier")}' on virheellinen henkilö- tai Y-tunnus.
-                        <br />
-                        Tallennetaanko silti?
-                    </p>
-                )
-            }
-            <div className="row row--buttons">
-                <Button
-                    theme="black"
-                    iconLeft={<IconArrowLeft />}
-                    onClick={closeModal}
-                >
-                    Peruuta
-                </Button>
-
-                <SaveFormButton
-                    formRef={formRef}
-                    isLoading={isSaveOwnerLoading}
-                    buttonText={isInvalidIdentifierSaveWarningShown ? "Tallenna silti" : "Tallenna"}
-                    disabled={isSaveDisabled}
+        <>
+            <FormProviderForm
+                formObject={formObject}
+                formRef={formRef}
+                onSubmit={onFormSubmitValid}
+                onSubmitError={onFormSubmitInvalid}
+            >
+                <TextInput
+                    name="name"
+                    label="Nimi"
+                    required
                 />
-            </div>
-        </FormProviderForm>
+                <TextInput
+                    name="identifier"
+                    label="Henkilö- tai Y-tunnus"
+                    required
+                />
+                <TextInput
+                    name="email"
+                    label="Sähköpostiosoite"
+                />
+                <CheckboxInput
+                    label="Turvakielto"
+                    name="non_disclosure"
+                    tooltipText="Asuntolistauksessa turvakiellon alaisen omistajan nimen tilalla näytetään ***, muualla käyttöliittymässä nimen alkuun lisätään ***. Raporteissa ja PDFissä nimeä ei näytetä."
+                />
+                {
+                    // show warning when saving malformed identifier is enabled
+                    isInvalidIdentifierSaveWarningShown && !isSaveDisabled && (
+                        <p className="error-message">
+                            '{formObject.watch("identifier")}' on virheellinen henkilö- tai Y-tunnus.
+                            <br />
+                            Tallennetaanko silti?
+                        </p>
+                    )
+                }
+                <div className="row row--buttons">
+                    <Button
+                        theme="black"
+                        iconLeft={<IconArrowLeft />}
+                        onClick={closeModal}
+                    >
+                        Peruuta
+                    </Button>
+
+                    {owner !== undefined && (
+                        <Button
+                            theme="black"
+                            iconLeft={<IconUser />}
+                            onClick={() => {
+                                setIsOwnerMergeModalVisible(true);
+                            }}
+                        >
+                            Yhdistä
+                        </Button>
+                    )}
+
+                    <SaveFormButton
+                        formRef={formRef}
+                        isLoading={isSaveOwnerLoading}
+                        buttonText={isInvalidIdentifierSaveWarningShown ? "Tallenna silti" : "Tallenna"}
+                        disabled={isSaveDisabled}
+                    />
+                </div>
+            </FormProviderForm>
+            <OwnerMergeModal
+                firstOwner={owner}
+                closeModal={() => {
+                    closeModal();
+                    setIsOwnerMergeModalVisible(false);
+                }}
+                isVisible={isOwnerMergeModalVisible}
+                setIsVisible={setIsOwnerMergeModalVisible}
+            />
+        </>
     );
 }

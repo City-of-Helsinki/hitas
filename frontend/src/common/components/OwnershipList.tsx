@@ -44,7 +44,7 @@ const OwnershipList = () => {
                                     label="Omistaja"
                                     required
                                     queryFunction={useGetOwnersQuery}
-                                    relatedModelSearchField="name"
+                                    relatedModelSearchField="search"
                                     name={`ownerships.${index}.owner`}
                                     transform={(obj) => formatOwner(obj)}
                                     RelatedModelMutateComponent={OwnerMutateForm}
