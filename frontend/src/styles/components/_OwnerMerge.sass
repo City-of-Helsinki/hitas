@@ -1,0 +1,58 @@
+@use '../imports' as *
+
+.owner-merge-modal
+  &.owner-merge-modal
+    width: 1000px
+
+  .owner-merge-details-heading
+    margin-top: 0
+    font-size: var(--fontsize-heading-xs)
+
+  .owners-container-row
+    gap: $spacing-m
+
+  .owners-column
+    gap: $spacing-m
+    flex-grow: 1
+    width: 100%
+
+  .owner-row
+    position: relative
+    align-items: center
+    gap: $spacing-xs
+
+    input[disabled]
+      color: inherit
+
+    .owner-row-overlay-label
+      position: absolute
+      top: 0
+      left: 0
+      right: 0
+      bottom: 0
+      width: auto
+      height: auto
+      cursor: pointer
+      z-index: 1
+
+    [class*="TextInput-module_root"]
+      flex-grow: 1
+
+    [class*="RadioButton-module_radioButton"]
+      margin-top: 18px
+
+    // Ref HDS-2142
+    label[class*="RadioButton-module_label"]
+      padding-left: var(--size)
+
+  .first-owner-heading-label
+    margin-bottom: 4px
+    font-weight: 700
+    padding: 0 calc(var(--spacing-xs) + 24px)
+
+  .first-owner-heading
+    display: flex
+    align-items: center
+    height: 58px
+    padding: 0 calc(var(--spacing-xs) + 24px)
+    font-size: 18px

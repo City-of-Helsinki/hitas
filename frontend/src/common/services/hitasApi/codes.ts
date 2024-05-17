@@ -10,6 +10,7 @@ import {
     IIndexQuery,
     IIndexResponse,
     IOwner,
+    IOwnerMergeData,
     IOwnersResponse,
     IPostalCodeResponse,
     IPropertyManager,
@@ -136,7 +137,22 @@ const ownerApi = hitasApi.injectEndpoints({
                 }
             },
         }),
+        mergeOwners: builder.mutation<IOwner, {data: IOwnerMergeData}>({
+            query: ({data}) => ({
+                url: `owners/merge`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: (result, error) => {
+                return safeInvalidate(error, [
+                    {type: "Owner"},
+                    {type: "ObfuscatedOwners"},
+                    {type: "ObfuscatedOwner"},
+                    {type: "Apartment"},
+                ]);
+            },
+        }),
     }),
 });
 
-export const {useGetOwnersQuery, useSaveOwnerMutation} = ownerApi;
+export const {useGetOwnersQuery, useSaveOwnerMutation, useMergeOwnersMutation} = ownerApi;
