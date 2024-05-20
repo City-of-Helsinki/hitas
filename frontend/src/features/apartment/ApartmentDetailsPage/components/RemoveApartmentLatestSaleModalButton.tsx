@@ -18,9 +18,6 @@ const canApartmentSaleBeDeleted = (apartment) => {
     // First sale can be removed before apartment is completed (Completion date is in the future)
     if (today < completionDate) return true;
 
-    const threeMonthsAgo = new Date(today);
-    threeMonthsAgo.setMonth(today.getMonth() - 3);
-
     const comparisonDate = [
         completionDate,
         new Date(apartment.prices.first_purchase_date),
@@ -28,9 +25,6 @@ const canApartmentSaleBeDeleted = (apartment) => {
     ]
         .sort((a, b) => a.getTime() - b.getTime())
         .reverse()[0];
-
-    // Apartment sale can be removed within 3 months of the sale or completion date
-    if (comparisonDate > threeMonthsAgo) return true;
 
     // Apartment sale can be removed if there are conditions of sale, and this is the new apartment
     if (apartment.conditions_of_sale?.length > 0) {
@@ -40,7 +34,7 @@ const canApartmentSaleBeDeleted = (apartment) => {
 
         // If the comparison date is within a year of today, it's most likely the new apartment
         const oneYearAgo = new Date(today);
-        threeMonthsAgo.setFullYear(today.getFullYear() - 1);
+        oneYearAgo.setFullYear(today.getFullYear() - 1);
         if (comparisonDate > oneYearAgo) return true;
     }
 
