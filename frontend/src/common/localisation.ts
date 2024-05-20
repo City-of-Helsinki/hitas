@@ -34,7 +34,7 @@ export const getHousingCompanyRegulationStatusName = (state) => {
         case "regulated":
             return "Ei vapautunut";
         case "released_by_hitas":
-            return "Vapautunut 30v vertailussa";
+            return "Vapautunut vertailussa";
         case "released_by_plot_department":
             return "Vapautunut tontit-yksikön päätöksellä";
         default:
