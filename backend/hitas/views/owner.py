@@ -103,8 +103,8 @@ class OwnerViewSet(HitasModelViewSet):
         first_owner_uuid = lookup_id_to_uuid(data["first_owner_id"], Owner)
         second_owner_uuid = lookup_id_to_uuid(data["second_owner_id"], Owner)
         try:
-            first_owner = Owner.objects.get(uuid=first_owner_uuid)
-            second_owner = Owner.objects.get(uuid=second_owner_uuid)
+            first_owner = NonObfuscatedOwner.objects.get(uuid=first_owner_uuid)
+            second_owner = NonObfuscatedOwner.objects.get(uuid=second_owner_uuid)
         except Owner.DoesNotExist as error:
             raise HitasModelNotFound(Owner) from error
         # Transfer ownerships from second owner to first owner
