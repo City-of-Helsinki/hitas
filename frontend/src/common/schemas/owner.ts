@@ -104,3 +104,12 @@ export const FilterOwnersQuerySchema = object({
     page: number().int().optional(),
 });
 export type IFilterOwnersQuery = z.infer<typeof FilterOwnersQuerySchema>;
+
+export const OwnerMergeDataSchema = object({
+    first_owner_id: APIIdString,
+    second_owner_id: APIIdString,
+    should_use_second_owner_name: boolean(),
+    should_use_second_owner_identifier: boolean(),
+    should_use_second_owner_email: boolean(),
+});
+export type IOwnerMergeData = z.infer<typeof OwnerMergeDataSchema>;
