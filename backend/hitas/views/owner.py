@@ -134,8 +134,14 @@ class OwnerViewSet(HitasModelViewSet):
             first_owner.name = second_owner.name
         if data["should_use_second_owner_identifier"]:
             first_owner.identifier = second_owner.identifier
+            first_owner.valid_identifier = check_social_security_number(first_owner.identifier) or check_business_id(
+                first_owner.identifier
+            )
         if data["should_use_second_owner_email"]:
             first_owner.email = second_owner.email
+        # If either owner has non-disclosure, set it to True for the merged owner
+        if second_owner.non_disclosure:
+            first_owner.non_disclosure = True
         first_owner.save()
         second_owner.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
