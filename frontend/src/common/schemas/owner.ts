@@ -27,7 +27,7 @@ export const OwnershipSchema = object({
     owner: OwnerSchema,
     percentage: z
         .number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
-        .positive(errorMessages.numberPositive)
+        .min(0, errorMessages.numberMin)
         .max(100, errorMessages.numberMax),
 });
 export type IOwnership = z.infer<typeof OwnershipSchema>;
@@ -37,7 +37,7 @@ export const OwnershipsListSchema = object({
     owner: object({id: APIIdString.optional().or(z.literal(""))}, {required_error: errorMessages.ownerIsRequired}),
     percentage: number({invalid_type_error: errorMessages.numberType, required_error: errorMessages.required})
         .multipleOf(0.01, errorMessages.maxTwoDecimalPlaces)
-        .positive(errorMessages.numberPositive),
+        .min(0, errorMessages.numberMin),
 })
     .array()
     .superRefine((elements, ctx) => {
@@ -64,13 +64,6 @@ export const OwnershipsListSchema = object({
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: errorMessages.ownerIsRequired,
-            });
-            return;
-        }
-        if (elements.filter((e) => !e.percentage).length) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: "Prosenttikentän arvo on 0",
             });
             return;
         }
