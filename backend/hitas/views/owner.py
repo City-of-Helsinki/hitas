@@ -9,6 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from hitas.exceptions import HitasModelNotFound
 from hitas.models import Owner, Ownership
+from hitas.models.apartment import Apartment
 from hitas.models.owner import NonObfuscatedOwner
 from hitas.models.utils import (
     check_business_id,
@@ -107,6 +108,25 @@ class OwnerViewSet(HitasModelViewSet):
             second_owner = NonObfuscatedOwner.objects.get(uuid=second_owner_uuid)
         except Owner.DoesNotExist as error:
             raise HitasModelNotFound(Owner) from error
+        # Merge of two owners of the same apartment not allowed,
+        # because there is no use case for it and the transfer is non-trivial
+        first_owner_apartment_ids = Apartment.objects.filter(sales__ownerships__owner_id=first_owner.pk).values_list(
+            "pk", flat=True
+        )
+        second_owner_apartment_ids = Apartment.objects.filter(sales__ownerships__owner_id=second_owner.pk).values_list(
+            "pk", flat=True
+        )
+        overlapping_apartment_ids = set(first_owner_apartment_ids).intersection(set(second_owner_apartment_ids))
+        if len(overlapping_apartment_ids) > 0:
+            return Response(
+                {
+                    "error": "overlapping_ownerships",
+                    "message": "Kahden saman asunnon omistajan yhdistäminen ei ole sallittua.",
+                    "reason": "Conflict",
+                    "status": 409,
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
         # Transfer ownerships from second owner to first owner
         Ownership.objects.filter(owner=second_owner).update(owner=first_owner)
         # Update first owner with data from second owner if requested
