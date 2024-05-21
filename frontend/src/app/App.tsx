@@ -77,7 +77,7 @@ const App = (): React.JSX.Element => {
             {environment.hasDevelopmentBanner && <div className="development-banner">{environment.name}</div>}
             <div className="App">
                 <Navigation
-                    title="Asuntopalvelut"
+                    title="Asumisen palvelut"
                     menuToggleAriaLabel=""
                     skipTo=""
                     skipToContentLabel=""
