@@ -133,7 +133,7 @@ class AuditableMaskedModelMixin:
             mask_fields = auditlog.get_model_fields(self.__class__).get("mask_fields", [])
             changes = last_log.changes_dict
             # Changes to a field that should be masked were made
-            if any(x in mask_fields for x in changes):
+            if changes is not None and any(x in mask_fields for x in changes):
                 for field in mask_fields:
                     if field in changes:
                         # Replace every character in the before and after fields value with *
