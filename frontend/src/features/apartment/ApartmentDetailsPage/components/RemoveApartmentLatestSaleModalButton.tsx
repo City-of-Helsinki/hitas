@@ -18,6 +18,9 @@ const canApartmentSaleBeDeleted = (apartment) => {
     // First sale can be removed before apartment is completed (Completion date is in the future)
     if (today < completionDate) return true;
 
+    const oneYearAgo = new Date(today);
+    oneYearAgo.setFullYear(today.getFullYear() - 1);
+
     const comparisonDate = [
         completionDate,
         new Date(apartment.prices.first_purchase_date),
@@ -26,6 +29,8 @@ const canApartmentSaleBeDeleted = (apartment) => {
         .sort((a, b) => a.getTime() - b.getTime())
         .reverse()[0];
 
+    if (comparisonDate > oneYearAgo) return true;
+
     // Apartment sale can be removed if there are conditions of sale, and this is the new apartment
     if (apartment.conditions_of_sale?.length > 0) {
         // Frontend doesn't know which apartment is the new one, so we do some guesswork
@@ -33,8 +38,6 @@ const canApartmentSaleBeDeleted = (apartment) => {
         if (apartment.prices.latest_purchase_date) return false;
 
         // If the comparison date is within a year of today, it's most likely the new apartment
-        const oneYearAgo = new Date(today);
-        oneYearAgo.setFullYear(today.getFullYear() - 1);
         if (comparisonDate > oneYearAgo) return true;
     }
 
