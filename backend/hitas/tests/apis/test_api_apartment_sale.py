@@ -1724,10 +1724,10 @@ def test__api__apartment_sale__delete__under_three_months(api_client: HitasAPICl
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_three_months(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__over_threshold(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=under_three_months,
@@ -1754,10 +1754,10 @@ def test__api__apartment_sale__delete__over_three_months(api_client: HitasAPICli
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_three_months__condition_of_sale__new(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__over_threshold__condition_of_sale__new(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=under_three_months,
@@ -1778,10 +1778,10 @@ def test__api__apartment_sale__delete__over_three_months__condition_of_sale__new
 
 
 @pytest.mark.django_db
-def test__api__apartment_sale__delete__over_three_months__condition_of_sale__old(api_client: HitasAPIClient, freezer):
+def test__api__apartment_sale__delete__over_threshold__condition_of_sale__old(api_client: HitasAPIClient, freezer):
     freezer.move_to("2023-01-01")
 
-    under_three_months = timezone.now().date() - relativedelta(months=3) - relativedelta(days=1)
+    under_three_months = timezone.now().date() - relativedelta(months=12) - relativedelta(days=1)
 
     sale: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=under_three_months,
