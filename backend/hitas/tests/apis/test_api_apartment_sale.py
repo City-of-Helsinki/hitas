@@ -342,7 +342,7 @@ def test__api__apartment_sale__create__multiple_owners(api_client: HitasAPIClien
                     {
                         "field": "ownerships.percentage",
                         "message": (
-                            "Ownership percentage must be greater than 0 and less than or equal to 100. "
+                            "Ownership percentage must be greater than or equal to 0 and less than or equal to 100. "
                             "Given value was 150.00."
                         ),
                     },
