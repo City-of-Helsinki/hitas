@@ -91,11 +91,11 @@ def check_ownership_percentages(ownerships: Iterable[Union[Ownership, OwnershipL
     for ownership in ownerships:
         percentage = ownership.percentage if isinstance(ownership, Ownership) else ownership["percentage"]
         percentage_sum += percentage
-        if not 0 < percentage <= 100:
+        if not 0 <= percentage <= 100:
             raise ValidationError(
                 {
                     "percentage": (
-                        f"Ownership percentage must be greater than 0 and less than or equal to 100. "
+                        f"Ownership percentage must be greater than or equal to 0 and less than or equal to 100. "
                         f"Given value was {percentage}."
                     )
                 },
