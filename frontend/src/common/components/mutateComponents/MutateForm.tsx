@@ -1,14 +1,23 @@
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Button, IconArrowLeft} from "hds-react";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {hdsToast} from "../../utils";
 import {FormProviderForm, TextInput} from "../forms";
 import SaveButton from "../SaveButton";
+import DeleteButton from "../DeleteButton";
+import ConfirmDialogModal from "../ConfirmDialogModal";
 
 export interface IMutateFormProps<TFormFieldsWithTitles extends object> {
     formObjectSchema;
     useSaveMutation;
+    deleteProps?: {
+        useDeleteMutation;
+        modalText: string | ((object) => string);
+        successText: string;
+        successToastText: string;
+        errorToastText: string;
+    };
     successMessage: string;
     errorMessage: string;
     notModifiedMessage: string;
@@ -29,6 +38,7 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
     setEmptyFilterParams,
     formObjectSchema,
     useSaveMutation,
+    deleteProps,
     successMessage,
     errorMessage,
     notModifiedMessage,
@@ -36,6 +46,17 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
     requiredFields,
 }: IMutateForm<TDefaultObject, TFormFieldsWithTitles>) {
     const [saveData, {isLoading}] = useSaveMutation();
+    const {
+        useDeleteMutation,
+        modalText: deleteModalText,
+        successText: deleteSuccessText,
+        successToastText: deleteSuccessToastText,
+        errorToastText: deleteErrorToastTest,
+    } = deleteProps ?? {};
+    const [deleteObject, {data: deleteData, error: deleteError, isLoading: isDeleteLoading}] =
+        useDeleteMutation?.() ?? [null, {}];
+    const canDelete = !!(deleteProps && defaultObject);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const runSaveData = (data) => {
         // submit the form values
         saveData(data)
@@ -52,6 +73,19 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
                         formObject.setError(field.field, {type: "backend", message: field.message})
                     );
                 }
+            });
+    };
+    const handleConfirmedDeleteAction = () => {
+        deleteObject(defaultObject)
+            .unwrap()
+            .then(() => {
+                hdsToast.info(deleteSuccessToastText ?? "Tiedot poistettu onnistuneesti.");
+                closeModalAction?.();
+                setEmptyFilterParams?.();
+            })
+            .catch(() => {
+                hdsToast.error(deleteErrorToastTest ?? "Virhe tietojen poistamisessa.");
+                setIsDeleteModalVisible(true);
             });
     };
 
@@ -86,34 +120,56 @@ export default function MutateForm<TDefaultObject extends object, TFormFieldsWit
     };
 
     return (
-        <FormProviderForm
-            formObject={formObject}
-            onSubmit={formObject.formState.isDirty ? onFormSubmitValid : onFormSubmitUnchanged}
-        >
-            {formFieldsWithTitles &&
-                Object.entries(formFieldsWithTitles).map(([field, title]) => (
-                    <TextInput
-                        key={field}
-                        name={field}
-                        label={title}
-                        required={requiredFields?.includes(field)}
+        <>
+            <FormProviderForm
+                formObject={formObject}
+                onSubmit={formObject.formState.isDirty ? onFormSubmitValid : onFormSubmitUnchanged}
+            >
+                {formFieldsWithTitles &&
+                    Object.entries(formFieldsWithTitles).map(([field, title]) => (
+                        <TextInput
+                            key={field}
+                            name={field}
+                            label={title}
+                            required={requiredFields?.includes(field)}
+                        />
+                    ))}
+                <div className="row row--buttons">
+                    <Button
+                        theme="black"
+                        iconLeft={<IconArrowLeft />}
+                        onClick={close}
+                    >
+                        Peruuta
+                    </Button>
+                    {canDelete && (
+                        <DeleteButton
+                            isLoading={false}
+                            onClick={() => setIsDeleteModalVisible(true)}
+                        />
+                    )}
+                    <SaveButton
+                        isLoading={isLoading}
+                        type="submit"
+                        buttonText="Tallenna"
+                        disabled={!formObject.formState.isValid}
                     />
-                ))}
-            <div className="row row--buttons">
-                <Button
-                    theme="black"
-                    iconLeft={<IconArrowLeft />}
-                    onClick={close}
-                >
-                    Peruuta
-                </Button>
-                <SaveButton
-                    isLoading={isLoading}
-                    type="submit"
-                    buttonText="Tallenna"
-                    disabled={!formObject.formState.isValid}
+                </div>
+            </FormProviderForm>
+            {canDelete && (
+                <ConfirmDialogModal
+                    modalText={typeof deleteModalText === "function" ? deleteModalText(defaultObject) : deleteModalText}
+                    successText={deleteSuccessText}
+                    buttonText="Poista"
+                    isVisible={isDeleteModalVisible}
+                    setIsVisible={setIsDeleteModalVisible}
+                    data={deleteData}
+                    error={deleteError}
+                    isLoading={isDeleteLoading}
+                    confirmAction={handleConfirmedDeleteAction}
+                    cancelAction={() => setIsDeleteModalVisible(false)}
                 />
-            </div>
-        </FormProviderForm>
+            )}
+        </>
     );
 }

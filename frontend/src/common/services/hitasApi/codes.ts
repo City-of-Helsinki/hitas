@@ -100,10 +100,28 @@ const propertyManagerApi = hitasApi.injectEndpoints({
             }),
             invalidatesTags: (result, error) => safeInvalidate(error, [{type: "PropertyManager"}]),
         }),
+        deletePropertyManager: builder.mutation<
+            IPropertyManager,
+            {
+                id: string;
+            }
+        >({
+            query: ({id}) => ({
+                url: `property-managers/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (result, error, arg) =>
+                safeInvalidate(error, [
+                    {type: "PropertyManager", id: "LIST"},
+                    {type: "PropertyManager", id: arg.id},
+                    {type: "HousingCompany"},
+                ]),
+        }),
     }),
 });
 
-export const {useGetPropertyManagersQuery, useSavePropertyManagerMutation} = propertyManagerApi;
+export const {useGetPropertyManagersQuery, useSavePropertyManagerMutation, useDeletePropertyManagerMutation} =
+    propertyManagerApi;
 
 const ownerApi = hitasApi.injectEndpoints({
     endpoints: (builder) => ({
