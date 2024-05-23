@@ -1,12 +1,17 @@
 from typing import NamedTuple
 
 import pytest
+from django.urls import reverse
+from rest_framework import status
 
 from hitas.models import Owner, Ownership
+from hitas.models.apartment import Apartment
 from hitas.models.housing_company import HitasType, RegulationStatus
+from hitas.services.housing_company import get_number_of_unsold_apartments
 from hitas.services.owner import obfuscate_owners_without_regulated_apartments
-from hitas.tests.apis.helpers import parametrize_helper
+from hitas.tests.apis.helpers import HitasAPIClient, parametrize_helper
 from hitas.tests.factories import OwnerFactory, OwnershipFactory
+from hitas.tests.factories.apartment import ApartmentFactory
 
 
 @pytest.mark.django_db
@@ -151,3 +156,54 @@ def test_obfuscate_owners_without_regulated_apartments__one_owns_one_regulated_a
     owners = obfuscate_owners_without_regulated_apartments()
 
     assert len(owners) == 0
+
+
+@pytest.mark.django_db
+def test_obfuscate_owners_without_regulated_apartments__half_hitas_sales_after_regulation_released(
+    api_client: HitasAPIClient,
+):
+    # Unsold apartment in a released half hitas housing company
+    apartment: Apartment = ApartmentFactory.create(
+        sales=[],
+        building__real_estate__housing_company__regulation_status=RegulationStatus.RELEASED_BY_HITAS,
+        building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+    )
+
+    unsold_apartments_count = get_number_of_unsold_apartments(apartment.housing_company)
+    assert unsold_apartments_count == 1
+
+    # Create a sale for the apartment through the API so that it passes through validation
+    owner: Owner = OwnerFactory.create()
+    data = {
+        "ownerships": [
+            {
+                "owner": {
+                    "id": owner.uuid.hex,
+                },
+                "percentage": 100.0,
+            },
+        ],
+        "notification_date": "2022-01-01",
+        "purchase_date": "2022-01-01",
+        "purchase_price": 100_000,
+        "apartment_share_of_housing_company_loans": 50_000,
+        "exclude_from_statistics": True,
+    }
+    url = reverse(
+        "hitas:apartment-sale-list",
+        kwargs={
+            "housing_company_uuid": apartment.housing_company.uuid.hex,
+            "apartment_uuid": apartment.uuid.hex,
+        },
+    )
+    response = api_client.post(url, data=data, format="json")
+    response_data = response.json()
+
+    assert response.status_code == status.HTTP_201_CREATED, response_data
+
+    unsold_apartments_count = get_number_of_unsold_apartments(apartment.housing_company)
+    assert unsold_apartments_count == 0
+
+    # See that owner is obfuscated in the next regulation round
+    owners = obfuscate_owners_without_regulated_apartments()
+    assert len(owners) == 1

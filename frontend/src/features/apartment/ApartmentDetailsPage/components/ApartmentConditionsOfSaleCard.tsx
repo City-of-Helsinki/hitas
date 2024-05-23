@@ -25,6 +25,9 @@ const ApartmentSalesPageLinkButton = ({
     apartment: IApartmentDetails;
 }) => {
     let apartmentCantBeSoldErrorMessage;
+    const isCreateButtonEnabled =
+        housingCompany.regulation_status === "regulated" ||
+        (housingCompany.hitas_type === "half_hitas" && apartment.prices.first_purchase_date === null);
 
     if (!apartment.surface_area) {
         apartmentCantBeSoldErrorMessage = "Asunnolta puuttuu pinta-ala";
@@ -41,14 +44,18 @@ const ApartmentSalesPageLinkButton = ({
     } else if (apartment.prices.first_purchase_date && housingCompany.hitas_type === "half_hitas") {
         apartmentCantBeSoldErrorMessage = "Puolihitas-taloyhtiön asuntoa ei voida jälleenmyydä";
     } else if (housingCompany.regulation_status !== "regulated") {
-        apartmentCantBeSoldErrorMessage = "Vapautetun taloyhtiön asuntoa ei voida jälleenmyydä";
+        if (housingCompany.hitas_type === "half_hitas" && apartment.prices.first_purchase_date === null) {
+            // Allow half hitas sales after release from regulation if the sale is a first sale.
+        } else {
+            apartmentCantBeSoldErrorMessage = "Vapautetun taloyhtiön asuntoa ei voida jälleenmyydä";
+        }
     }
 
     if (apartmentCantBeSoldErrorMessage) {
         return (
             <ApartmentSaleButton
                 onClick={() => hdsToast.error(apartmentCantBeSoldErrorMessage)}
-                disabled={housingCompany.regulation_status !== "regulated"}
+                disabled={!isCreateButtonEnabled}
             />
         );
     } else {
@@ -56,7 +63,7 @@ const ApartmentSalesPageLinkButton = ({
             <Link to="sales">
                 <ApartmentSaleButton
                     onClick={undefined}
-                    disabled={housingCompany.regulation_status !== "regulated"}
+                    disabled={!isCreateButtonEnabled}
                 />
             </Link>
         );

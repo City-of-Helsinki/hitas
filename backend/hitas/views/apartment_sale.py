@@ -88,7 +88,12 @@ class ApartmentSaleCreateSerializer(HitasModelSerializer):
             raise HitasModelNotFound(model=Apartment) from error
 
         if apartment.housing_company.regulation_status != RegulationStatus.REGULATED:
-            raise ModelConflict("Cannot sell an unregulated apartment.", error_code="invalid")
+            hitas_type = apartment.housing_company.hitas_type
+            if hitas_type == HitasType.HALF_HITAS and apartment.latest_purchase_date is None:
+                # Allow half hitas sales after release from regulation if the sale is a first sale.
+                pass
+            else:
+                raise ModelConflict("Cannot sell an unregulated apartment.", error_code="invalid")
 
         if apartment.housing_company.hitas_type == HitasType.HALF_HITAS and apartment.latest_purchase_date is not None:
             raise ModelConflict("Cannot re-sell a half-hitas housing company apartment.", error_code="invalid")
