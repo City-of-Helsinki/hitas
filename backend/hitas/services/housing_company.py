@@ -317,6 +317,9 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
         .filter(
             regulation_status=RegulationStatus.REGULATED,
         )
+        .exclude(
+            hitas_type=HitasType.HALF_HITAS,
+        )
         .alias(
             _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
         )
