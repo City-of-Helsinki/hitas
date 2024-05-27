@@ -457,7 +457,6 @@ def test__api__regulated_housing_companies_report__single_housing_company(api_cl
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
-            "Puolihitas",
         ),
         (
             housing_company.postal_code.cost_area,
@@ -467,9 +466,8 @@ def test__api__regulated_housing_companies_report__single_housing_company(api_cl
             datetime.datetime.fromisoformat(sale.apartment.completion_date.isoformat()),
             1,
             int(sale.total_price / sale.apartment.surface_area),
-            None,
         ),
-        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 
@@ -492,7 +490,7 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
     housing_company_2: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00002",
         postal_code__cost_area=1,
-        hitas_type=HitasType.HALF_HITAS,
+        hitas_type=HitasType.HITAS_II,
     )
     sale_2: ApartmentSale = ApartmentSaleFactory.create(
         purchase_date=datetime.date(2021, 1, 1),
@@ -518,7 +516,6 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
-            "Puolihitas",
         ),
         (
             housing_company_1.postal_code.cost_area,
@@ -528,7 +525,6 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat()),
             1,
             int(sale_1.total_price / sale_1.apartment.surface_area),
-            None,
         ),
         (
             housing_company_2.postal_code.cost_area,
@@ -538,9 +534,8 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
             datetime.datetime.fromisoformat(sale_2.apartment.completion_date.isoformat()),
             1,
             int(sale_2.total_price / sale_2.apartment.surface_area),
-            "X",
         ),
-        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 
@@ -576,6 +571,21 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
         apartment__building__real_estate__housing_company=housing_company_2,
     )
 
+    # Housing company not included in the report since HALF_HITAS have a separate report
+    housing_company_3: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        postal_code__cost_area=1,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__completion_date=datetime.date(2020, 1, 1),
+        apartment__building__real_estate__housing_company=housing_company_3,
+    )
+
     url = reverse("hitas:regulated-housing-companies-report-list")
     response: HttpResponse = api_client.get(url)
 
@@ -591,7 +601,6 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
             "Valmistumispäivä",
             "Asuntojen lukumäärä",
             "Keskineliöhinta",
-            "Puolihitas",
         ),
         (
             housing_company_1.postal_code.cost_area,
@@ -601,9 +610,8 @@ def test__api__regulated_housing_companies_report__unregulated_not_included(api_
             datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat()),
             1,
             int(sale_1.total_price / sale_1.apartment.surface_area),
-            None,
         ),
-        (None, None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
     ]
 
 
