@@ -109,6 +109,9 @@ def find_owners_with_multiple_ownerships() -> list[OwnershipWithApartmentCount]:
             sale__apartment__building__real_estate__housing_company__regulation_status=RegulationStatus.REGULATED,
             apartment_count__gt=1,
         )
+        .exclude(
+            sale__apartment__building__real_estate__housing_company__hitas_type=HitasType.HALF_HITAS,
+        )
         .order_by(
             "owner__name",
             "sale__apartment__building__real_estate__housing_company__postal_code__value",
