@@ -540,6 +540,74 @@ def test__api__regulated_housing_companies_report__multiple_housing_companies(ap
 
 
 @pytest.mark.django_db
+def test__api__regulated_half_hitas_housing_companies_report__multiple_housing_companies(api_client: HitasAPIClient):
+    housing_company_1: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00001",
+        postal_code__cost_area=1,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    sale_1: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2020, 1, 1),
+        purchase_price=50_000,
+        apartment_share_of_housing_company_loans=10_000,
+        apartment__surface_area=100,
+        apartment__completion_date=datetime.date(2020, 1, 1),
+        apartment__building__real_estate__housing_company=housing_company_1,
+    )
+
+    housing_company_2: HousingCompany = HousingCompanyFactory.create(
+        postal_code__value="00002",
+        postal_code__cost_area=1,
+        hitas_type=HitasType.HALF_HITAS,
+    )
+    sale_2: ApartmentSale = ApartmentSaleFactory.create(
+        purchase_date=datetime.date(2021, 1, 1),
+        purchase_price=100_000,
+        apartment_share_of_housing_company_loans=44_000,
+        apartment__surface_area=50,
+        apartment__completion_date=datetime.date(2021, 1, 1),
+        apartment__building__real_estate__housing_company=housing_company_2,
+    )
+
+    url = reverse("hitas:regulated-half-hitas-housing-companies-report-list")
+    response: HttpResponse = api_client.get(url)
+
+    workbook: Workbook = load_workbook(BytesIO(response.content), data_only=False)
+    worksheet: Worksheet = workbook.worksheets[0]
+
+    assert list(worksheet.values) == [
+        (
+            "Kalleusalue",
+            "Postinumero",
+            "Yhtiö",
+            "Osoite",
+            "Valmistumispäivä",
+            "Asuntojen lukumäärä",
+            "Keskineliöhinta",
+        ),
+        (
+            housing_company_1.postal_code.cost_area,
+            housing_company_1.postal_code.value,
+            housing_company_1.display_name,
+            housing_company_1.street_address,
+            datetime.datetime.fromisoformat(sale_1.apartment.completion_date.isoformat()),
+            1,
+            int(sale_1.total_price / sale_1.apartment.surface_area),
+        ),
+        (
+            housing_company_2.postal_code.cost_area,
+            housing_company_2.postal_code.value,
+            housing_company_2.display_name,
+            housing_company_2.street_address,
+            datetime.datetime.fromisoformat(sale_2.apartment.completion_date.isoformat()),
+            1,
+            int(sale_2.total_price / sale_2.apartment.surface_area),
+        ),
+        (None, None, None, None, None, None, None),  # Empty row at the bottom for filtering and sorting
+    ]
+
+
+@pytest.mark.django_db
 def test__api__regulated_housing_companies_report__unregulated_not_included(api_client: HitasAPIClient):
     housing_company_1: HousingCompany = HousingCompanyFactory.create(
         postal_code__value="00001",

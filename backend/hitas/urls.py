@@ -81,8 +81,15 @@ router.register(r"reports/download-sales-report", views.SalesReportView, basenam
 # /api/v1/reports/download-regulated-housing-companies-report
 router.register(
     r"reports/download-regulated-housing-companies-report",
-    views.RegulateHousingCompaniesReportView,
+    views.RegulatedHousingCompaniesReportView,
     basename="regulated-housing-companies-report",
+)
+
+# /api/v1/reports/download-regulated-half-hitas-housing-companies-report
+router.register(
+    r"reports/download-regulated-half-hitas-housing-companies-report",
+    views.RegulatedHalfHitasHousingCompaniesReportView,
+    basename="regulated-half-hitas-housing-companies-report",
 )
 
 # /api/v1/reports/download-unregulated-housing-companies-report

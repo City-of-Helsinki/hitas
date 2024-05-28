@@ -4008,6 +4008,27 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /api/v1/reports/download-regulated-half-hitas-housing-companies-report:
+    get:
+      description: Download an Excel report of half hitas regulated housing companies
+      operationId: fetch-regulated-half-hitas-housing-companies-report-excel
+      tags:
+        - Reports
+      responses:
+        "200":
+          description: Successfully downloaded a regulated half hitas housing company report
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /api/v1/reports/download-unregulated-housing-companies-report:
     get:
       description: Download an Excel report of housing companies released from regulation

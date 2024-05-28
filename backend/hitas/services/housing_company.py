@@ -340,6 +340,36 @@ def find_regulated_housing_companies_for_reporting() -> list[HousingCompanyWithR
     )
 
 
+def find_regulated_half_hitas_housing_companies_for_reporting() -> list[HousingCompanyWithRegulatedReportAnnotations]:
+    return list(
+        HousingCompany.objects.select_related("postal_code")
+        .prefetch_related(
+            "real_estates__buildings__apartments",
+        )
+        .filter(
+            regulation_status=RegulationStatus.REGULATED,
+            hitas_type=HitasType.HALF_HITAS,
+        )
+        .alias(
+            _acquisition_price=get_first_sale_acquisition_price("real_estates__buildings__apartments__id"),
+        )
+        .annotate(
+            _completion_date=max_date_if_all_not_null("real_estates__buildings__apartments__completion_date"),
+            surface_area=Round(Sum("real_estates__buildings__apartments__surface_area")),
+            realized_acquisition_price=Sum("_acquisition_price"),
+            avg_price_per_square_meter=Round(
+                F("realized_acquisition_price") / F("surface_area"),
+                precision=2,
+            ),
+            apartment_count=Count("real_estates__buildings__apartments"),
+        )
+        .order_by(
+            "postal_code__value",
+            "_completion_date",
+        )
+    )
+
+
 def find_unregulated_housing_companies_for_reporting() -> list[HousingCompanyWithUnregulatedReportAnnotations]:
     return list(
         HousingCompany.objects.select_related("postal_code")
